@@ -2,8 +2,14 @@
  * Copyright 2016 Mälardalskartan
  * Licensed under BSD 2-Clause (https://github.com/malardalskartan/mdk/blob/master/LICENSE.txt)
  * ======================================================================== */
+ "use strict";
 
-var TransactionHandler = (function($){
+var ol = require('openlayers');
+var $ = require('jquery');
+var viewer = require('./viewer');
+var modal = require('./modal');
+
+module.exports = function(){
 
   var settings = {
   		srsName: undefined,
@@ -26,7 +32,7 @@ var TransactionHandler = (function($){
 
 
   return {
-    init: function(options){
+    onSetEditLayer: function(options){
       settings.srsName = options.srsName;
       settings.source = options.source;
       settings.geometryType = options.geometryType;
@@ -42,18 +48,18 @@ var TransactionHandler = (function($){
         geometryName: settings.geometryName
       });
       settings.hasDraw = false;
-      settings.select = new ol.interaction.Select({layers: [Viewer.getLayer(Viewer.getEditLayer().name)]});
+      settings.select = new ol.interaction.Select({layers: [options.editableLayer]});
       settings.modify = new ol.interaction.Modify({
         features: settings.select.getFeatures()
       });
-      settings.select.getFeatures().on('add', TransactionHandler.onSelectAdd, this);
-      settings.select.getFeatures().on('remove', TransactionHandler.onSelectRemove, this);
+      settings.select.getFeatures().on('add', this.onSelectAdd, this);
+      settings.select.getFeatures().on('remove', this.onSelectRemove, this);
       settings.dirty = {};
       settings.map.addInteraction(settings.select);
       settings.map.addInteraction(settings.modify);
       settings.format = new ol.format.WFS();
       settings.serializer = new XMLSerializer();
-      settings.draw.on('drawend', TransactionHandler.onDrawEnd, this);
+      settings.draw.on('drawend', this.onDrawEnd, this);
     },
     readResponse: function(data) {
       var result;
@@ -98,7 +104,7 @@ var TransactionHandler = (function($){
           data: settings.serializer.serializeToString(node),
           contentType: 'text/xml',
           success: function(data) {
-            var result = TransactionHandler.readResponse(data);
+            var result = this.readResponse(data);
             if (result && result.transactionSummary.totalUpdated === 1) {
               delete settings.dirty[fid];
             }
@@ -120,7 +126,7 @@ var TransactionHandler = (function($){
         data: settings.serializer.serializeToString(node),
         contentType: 'text/xml',
         success: function(data) {
-          var result = TransactionHandler.readResponse(data);
+          var result = this.readResponse(data);
           if (result) {
             var insertId = result.insertIds[0];
             if (insertId == 'new0') {
@@ -169,6 +175,11 @@ var TransactionHandler = (function($){
           success: function(data) {
             //alert('success');
           },
+          error: function(e) {
+            var errorMsg = e? (e.status + ' ' + e.statusText) : "";
+            alert('Error saving this feature to GeoServer.<br><br>'
+              + errorMsg);
+          },
           context: this
         });
     },
@@ -179,7 +190,9 @@ var TransactionHandler = (function($){
       }
     },
     attributeSelected: function() {
-      var field = '', formElement= '', val = '', type = '';
+      var self = this;
+
+      var field = '', formElement= '', val = '', type = '', label = '', dropdownOptions;
 
       var features = settings.select.getFeatures();
       if (features.getLength() === 1) {
@@ -190,12 +203,12 @@ var TransactionHandler = (function($){
             field = settings.attributes[i].name;
             val = feature.get(settings.attributes[i].name) || '';
             type = settings.attributes[i].type;
-            options = settings.attributes[i].options || [];
-            formElement += TransactionHandler.createFormElement(label, field, val, type, options);
+            dropdownOptions = settings.attributes[i].options || [];
+            formElement += this.createFormElement(label, field, val, type, dropdownOptions);
           }
         }
         var form = '<form>' + formElement +'<br><div class="mdk-form-save"><input id="mdk-save-button" type="button" value="Spara"></input></div></form>';
-        var modal = Modal('#map', {title: 'Information', content: form});
+        modal.createModal('#map', {title: 'Information', content: form});
         modal.showModal();
 
         $('#mdk-save-button').on('touchend click', function(e) {
@@ -212,7 +225,7 @@ var TransactionHandler = (function($){
             }
           }
           modal.closeModal();
-          TransactionHandler.onAttributeSave(feature, editEl);
+          self.onAttributeSave(feature, editEl);
           $('#mdk-save-button').blur();
           e.preventDefault();
         });
@@ -236,7 +249,7 @@ var TransactionHandler = (function($){
               data: settings.serializer.serializeToString(node),
               contentType: 'text/xml',
               success: function(data) {
-                var result = TransactionHandler.readResponse(data);
+                var result = this.readResponse(data);
                 if (result) {
                   if (result.transactionSummary.totalDeleted === 1) {
                     settings.select.getFeatures().clear();
@@ -283,4 +296,4 @@ var TransactionHandler = (function($){
       return el;
     }
   };
-})(jQuery);
+}()

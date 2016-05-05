@@ -6,6 +6,9 @@ body, html {
   -ms-touch-action: manipulation;
   touch-action: manipulation;
 }
+*:focus {
+    outline: none;
+}
 svg,
 object{
   width: 100%;
@@ -23,11 +26,35 @@ i {
 b, strong{
   font-weight: bold;
 }
-button {
+.o-map button {
+	background-color: #fff;
   border: none;
+	color: #000;
+	cursor: pointer;
 }
-button:focus {
+.o-map button:focus {
 	outline: none;
+}
+.o-control {
+		background-color: #fff;
+		color: #000;
+		position: fixed;
+		z-index: 10;
+}
+.o-btn-2 {
+		height: 2rem;
+		width: 2rem;
+}
+.o-btn-3 {
+		height: 3rem;
+		width: 3rem;
+}
+.o-rounded-top {
+	border-top-left-radius: 3px;
+	border-top-right-radius: 3px;
+}
+.o-padding-horizontal-8 {
+	padding: 0 .5rem;
 }
 #no-map {
   display: none;
@@ -590,6 +617,7 @@ button.ol-zoom-out {
 	overflow: hidden;
 	position: relative;
 }
+.o-map-container,
 #wrapper {
 	height: 100%;
 	position: relative;
@@ -822,6 +850,18 @@ button.mdk-button:focus {
   left: .5em;
   top: 7.5em;
   z-index: 1;
+}
+#o-editor-control {
+		bottom: 0;
+		left: 50%;
+		-webkit-box-shadow: 0 2px 8px 1px rgba(0,0,0,0.45);
+	  box-shadow: 0 2px 8px 1px rgba(0,0,0,0.45);
+		/*-webkit-transform-style: preserve-3d;
+	  -moz-transform-style: preserve-3d;
+	  transform-style: preserve-3d;		*/
+		-ms-transform: translate(-50%, 0);
+	  -webkit-transform: translate(-50%, 0);
+	  transform: translate(-50%, 0);
 }
 #edit-draw-button {
   left: .5em;
@@ -1493,11 +1533,35 @@ input.search-field::-ms-clear {
   float: right;
   fill: #424242;
 }
+[class^="o-icon-"],
+[class*=" o-icon-"] {
+  padding: .375rem;
+  height: 1.25rem;
+  width: 1.25rem;
+}
 .ol-control>button:hover [class^="mdk-icon-"],
 .ol-control>button:hover [class*=" mdk-icon-"],
 .mdk-button:hover [class^="mdk-icon-"],
 .mdk-button:hover [class*="mdk-icon-"] {
 	fill: #fff;
+}
+.o-map button:hover [class^="o-icon-"],
+.o-map button:hover [class*="o-icon-"] {
+	fill: #007AFF;
+}
+#o-editor-control button {
+	float: left;
+	position: relative;
+}
+#o-editor-control select {
+	border: 1px solid rgba(0, 0, 0, 0.4);
+	float: left;
+	height: 2rem;
+	line-height: 2rem;
+	margin-top: .5rem;
+	margin-right: .5rem;
+	vertical-align: middle;
+	width: 150px;
 }
 .mdk-icon-fa-location-arrow {
 	padding: 0.45em;

@@ -21,6 +21,7 @@ controls.print = require('./print');
 controls.sharemap = require('./sharemap');
 controls.legend = require('./legend');
 controls.search = require('./search');
+controls.editortoolbar = require('./editortoolbar');
 
 
 var map, mapControls, attribution;
@@ -137,7 +138,7 @@ function init (mapOptions){
           controlOptions ? controls[controlName].init(controlOptions) : controls[controlName].init();
       }
 
-      featureinfo(settings.featureinfoOptions);
+      // featureinfo(settings.featureinfoOptions);
 
     }
     function createLayers(layerlist, layers) {
