@@ -18,7 +18,7 @@ module.exports = function(){
   var defaultLayer;
   var editableLayers = {};
   var editableLayer = undefined;
-
+  var editAttributes = {};
 
   function render(selectOptions) {
       $("#map").append(editortemplate(selectOptions));
@@ -41,7 +41,7 @@ module.exports = function(){
           $('#o-editor-toolbar').addClass('hidden');
       }
   }
-  function dispatchEnableInteraction() {
+  function emitEnableInteraction() {
       $('.o-map').trigger({
           type: 'enableInteraction',
           interaction: 'editor'
@@ -55,6 +55,27 @@ module.exports = function(){
           return obj;
       });
       return selectOptions;
+  }
+  function setEditProps(layerNames, map, srsName) {
+      var initialValue = {};
+      var result = layerNames.reduce(function(layerProps, layerName) {
+          var layer = viewer.getLayer(layerName);
+
+          layerProps[layerName] = {
+              editableLayer: layer,
+              source: layer.getSource(),
+              geometryType: layer.get('geometryType') || undefined,
+              geometryName: layer.get('geometryName') || undefined,
+              srsName: srsName,
+              featureNS: viewer.getMapSource()['local'].workspace,
+              featureType: layer.get('featureType'),
+              attributes: layer.get('attributes'),
+              url: viewer.getMapSource()['local'].url,
+              map: map
+          };
+          return layerProps;
+      }, initialValue);
+      return result;
   }
 
   return {
@@ -70,27 +91,16 @@ module.exports = function(){
 
         $('.o-map').on('enableInteraction', onEnableInteraction);
 
-        options.editableLayers.forEach(function(layerName, index) {
+        //set edit properties for editable layers
+        editableLayers = setEditProps(options.editableLayers, map, srsName);
+        //
+        options.editableLayers.forEach(function(layerName) {
             var layer = viewer.getLayer(layerName);
-
-            editableLayers[layerName] = {
-                editableLayer: layer,
-                source: layer.getSource(),
-                geometryType: layer.get('geometryType') || undefined,
-                geometryName: layer.get('geometryName') || undefined,
-                srsName: srsName,
-                featureNS: viewer.getMapSource()['local'].workspace,
-                featureType: layer.get('featureType'),
-                attributes: layer.get('attributes'),
-                url: viewer.getMapSource()['local'].url,
-                map: map
-            };
-
             layer.getSource().once('addfeature', function(e) {
                 editableLayers[layerName].geometryType = layer.getSource().getFeatures()[0].getGeometry().getType();
                 editableLayers[layerName].geometryName = layer.getSource().getFeatures()[0].getGeometryName();
                 if(layerName === defaultLayer && options.isActive) {
-                    dispatchEnableInteraction();
+                    emitEnableInteraction();
                 }
             });
         });
