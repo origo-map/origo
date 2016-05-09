@@ -851,7 +851,7 @@ button.mdk-button:focus {
   top: 7.5em;
   z-index: 1;
 }
-#o-editor-control {
+#o-editor-toolbar {
 		bottom: 0;
 		left: 50%;
 		-webkit-box-shadow: 0 2px 8px 1px rgba(0,0,0,0.45);
@@ -862,30 +862,6 @@ button.mdk-button:focus {
 		-ms-transform: translate(-50%, 0);
 	  -webkit-transform: translate(-50%, 0);
 	  transform: translate(-50%, 0);
-}
-#edit-draw-button {
-  left: .5em;
-  top: 12em;
-  z-index: 1;
-}
-#edit-attribute-button {
-  left: .5em;
-  top: 14.5em;
-  z-index: 1;
-}
-#edit-delete-button {
-  left: .5em;
-  top: 17em;
-  z-index: 1;
-}
-button.edit-draw-button:after {
-  content: "\f040";
-}
-button.edit-attribute-button:after {
-  content: "\f031";
-}
-button.edit-delete-button:after {
-  content: "\f014";
 }
 /*remove the boxshadow when selected*/
 .mdk-button.mapmenu-button-true {
@@ -1535,6 +1511,7 @@ input.search-field::-ms-clear {
 }
 [class^="o-icon-"],
 [class*=" o-icon-"] {
+  fill: #424242;
   padding: .375rem;
   height: 1.25rem;
   width: 1.25rem;
@@ -1549,11 +1526,11 @@ input.search-field::-ms-clear {
 .o-map button:hover [class*="o-icon-"] {
 	fill: #007AFF;
 }
-#o-editor-control button {
+#o-editor-toolbar button {
 	float: left;
 	position: relative;
 }
-#o-editor-control select {
+#o-editor-toolbar select {
 	border: 1px solid rgba(0, 0, 0, 0.4);
 	float: left;
 	height: 2rem;
@@ -1599,6 +1576,7 @@ input.search-field::-ms-clear {
 	height: .7em;
 	width: .7em;
 }
+#o-editor-button .o-icon-fa-pencil,
 .mdk-icon-fa-print,
 .mdk-icon-fa-share-square-o {
 	padding: 0.25em;
@@ -1614,6 +1592,11 @@ input.search-field::-ms-clear {
 	padding: .5em;
 	height: 1em;
 	width: 1em;
+}
+#o-editor-toolbar .o-icon-fa-times {
+	height: 1rem;
+	padding: 0;
+	width: 1rem;
 }
 .mdk-icon-fa-angle-double-down,
 .mdk-icon-fa-angle-double-up {

@@ -21,7 +21,7 @@ controls.print = require('./print');
 controls.sharemap = require('./sharemap');
 controls.legend = require('./legend');
 controls.search = require('./search');
-controls.editortoolbar = require('./editortoolbar');
+controls.editor = require('./editor');
 
 
 var map, mapControls, attribution;
@@ -130,6 +130,8 @@ function init (mapOptions){
       $(window).on('resize', checkSize);
       checkSize();
 
+      featureinfo(settings.featureinfoOptions);
+
       //Init controls
       var controlName, controlOptions;
       for (var i=0; i<settings.controls.length; i++) {
@@ -137,8 +139,6 @@ function init (mapOptions){
           controlOptions = settings.controls[i].options || undefined;
           controlOptions ? controls[controlName].init(controlOptions) : controls[controlName].init();
       }
-
-      // featureinfo(settings.featureinfoOptions);
 
     }
     function createLayers(layerlist, layers) {

@@ -183,6 +183,11 @@ module.exports = function(){
           context: this
         });
     },
+    removeInteractions: function() {
+        // console.log(settings.select);
+        settings.map.removeInteraction(settings.modify);
+        settings.map.removeInteraction(settings.select);
+    },
     activateInsert: function() {
       if (settings.hasDraw !== true) {
         settings.map.addInteraction(settings.draw);
@@ -192,7 +197,7 @@ module.exports = function(){
     attributeSelected: function() {
       var self = this;
 
-      var field = '', formElement= '', val = '', type = '', label = '', dropdownOptions;
+      var field = '', formElement= '', val = '', type = '', label = '', dropdownOptions, maxLength;
 
       var features = settings.select.getFeatures();
       if (features.getLength() === 1) {
@@ -203,8 +208,9 @@ module.exports = function(){
             field = settings.attributes[i].name;
             val = feature.get(settings.attributes[i].name) || '';
             type = settings.attributes[i].type;
+            maxLength = settings.attributes[i].maxLength ? ' maxlength="' + settings.attributes[i].maxLength + '" ' : '';
             dropdownOptions = settings.attributes[i].options || [];
-            formElement += this.createFormElement(label, field, val, type, dropdownOptions);
+            formElement += this.createFormElement(label, field, val, type, dropdownOptions, maxLength);
           }
         }
         var form = '<form>' + formElement +'<br><div class="mdk-form-save"><input id="mdk-save-button" type="button" value="Spara"></input></div></form>';
@@ -265,14 +271,14 @@ module.exports = function(){
 
       }
     },
-    createFormElement: function(label, field, val, type, options) {
+    createFormElement: function(label, field, val, type, options, maxLength) {
       var el;
       switch(type) {
         case 'text':
-          el = '<div><label>' + label +'</label><br><input type="text" id="input-' + field + '" value="' + val +'"></div>';
+          el = '<div><label>' + label +'</label><br><input type="text" id="input-' + field + '" value="' + val +'"' + maxLength + '></div>';
           break;
         case 'textarea':
-          el = '<div><label>' + label +'</label><br><textarea id="input-' + field + '" rows="3">' + val + '</textarea></div>';
+          el = '<div><label>' + label +'</label><br><textarea id="input-' + field + '"' + maxLength + 'rows="3">' + val + '</textarea></div>';
           break;
         case 'checkbox':
           var checked = val == true ? ' checked' : '';

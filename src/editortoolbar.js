@@ -15,12 +15,37 @@ module.exports = function(){
 
   var options = {};
 
+  var defaultLayer;
   var editableLayers = {};
   var editableLayer = undefined;
 
 
   function render(selectOptions) {
       $("#map").append(editortemplate(selectOptions));
+  }
+  function onEnableInteraction(e) {
+      if(e.interaction === 'editor') {
+          setActive(true);
+          transactionhandler.onSetEditLayer(editableLayers[defaultLayer]);
+      }
+      else {
+          setActive(false);
+          transactionhandler.removeInteractions();
+      }
+  }
+  function setActive(state) {
+      if(state === true) {
+          $('#o-editor-toolbar').removeClass('hidden');
+      }
+      else {
+          $('#o-editor-toolbar').addClass('hidden');
+      }
+  }
+  function dispatchEnableInteraction() {
+      $('.o-map').trigger({
+          type: 'enableInteraction',
+          interaction: 'editor'
+      });
   }
   function selectionModel(layerNames) {
       var selectOptions = layerNames.map(function(layerName) {
@@ -36,12 +61,14 @@ module.exports = function(){
     init: function(opt_options){
 
         $.extend(options, opt_options)
-        var defaultLayer = options.defaultLayer || options.editableLayers[0];
+        defaultLayer = options.defaultLayer || options.editableLayers[0];
 
         var map = viewer.getMap();
         var srsName = viewer.getProjectionCode();
 
         render(selectionModel(options.editableLayers));
+
+        $('.o-map').on('enableInteraction', onEnableInteraction);
 
         options.editableLayers.forEach(function(layerName, index) {
             var layer = viewer.getLayer(layerName);
@@ -58,17 +85,21 @@ module.exports = function(){
                 url: viewer.getMapSource()['local'].url,
                 map: map
             };
+
             layer.getSource().once('addfeature', function(e) {
                 editableLayers[layerName].geometryType = layer.getSource().getFeatures()[0].getGeometry().getType();
                 editableLayers[layerName].geometryName = layer.getSource().getFeatures()[0].getGeometryName();
-                if(layerName === defaultLayer) {
-                    transactionhandler.onSetEditLayer(editableLayers[layerName]);
+                if(layerName === defaultLayer && options.isActive) {
+                    dispatchEnableInteraction();
                 }
             });
         });
 
         this.bindUIActions();
 
+        if(options.isActive) {
+            setActive(true);
+        }
     },
     deleteFeature: function() {
       transactionhandler.deleteSelected();
@@ -99,7 +130,16 @@ module.exports = function(){
         $('#o-editor-delete').blur();
         e.preventDefault();
       });
+      $('#o-editor-close').on('click', function(e) {
+          $('.o-map').trigger({
+              type: 'enableInteraction',
+              interaction: 'featureInfo'
+          });
+          $('#o-editor-close').blur();
+          e.preventDefault();
+      });
       $('select[name="layer-dropdown"]').change(function() {
+          transactionhandler.removeInteractions();
           transactionhandler.onSetEditLayer(editableLayers[$(this).val()]);
       });
     }

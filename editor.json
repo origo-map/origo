@@ -13,9 +13,10 @@
       "name": "print"
     },
     {
-      "name": "editortoolbar",
+      "name": "editor",
       "options": {
-        "editableLayers": ["test_byggnadsytor", "test_punkt"]
+        "editableLayers": ["test_byggnadsytor", "test_punkt"],
+        "isActive": true
       }
     },
     {
@@ -107,8 +108,9 @@
       "attributes": [
           {
             "name": "typ",
-            "title": "Typ",
-            "type": "dropdown",
+            "title": "Typ:",
+            "type": "textarea",
+            "maxLength": 5,
             "options": [
                 "Villa",
                 "Radhus",

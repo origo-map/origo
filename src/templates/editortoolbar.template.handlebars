@@ -1,4 +1,4 @@
-<div id="o-editor-control" class="o-control o-padding-horizontal-8 o-rounded-top">
+<div id="o-editor-toolbar" class="o-control o-padding-horizontal-8 o-rounded-top hidden">
     <select name="layer-dropdown">
       {{#each this}}
         <option value="{{this.value}}">{{this.name}}</option>
@@ -18,5 +18,10 @@
       <svg class="o-icon-fa-trash">
           <use xlink:href="css/svg/fa-icons.svg#fa-trash"></use>
       </svg>
+    </button>
+    <button id="o-editor-close" class="o-btn-3" type="button" name="button">
+        <svg class="o-icon-fa-times">
+            <use xlink:href="css/svg/fa-icons.svg#fa-times"></use>
+        </svg>
     </button>
 </div>
