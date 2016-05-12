@@ -109,8 +109,8 @@
           {
             "name": "typ",
             "title": "Typ:",
-            "type": "textarea",
-            "maxLength": 5,
+            "type": "dropdown",
+            "maxLength": 20,
             "options": [
                 "Villa",
                 "Radhus",

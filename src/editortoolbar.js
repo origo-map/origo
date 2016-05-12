@@ -60,6 +60,8 @@ module.exports = function(){
       var initialValue = {};
       var result = layerNames.reduce(function(layerProps, layerName) {
           var layer = viewer.getLayer(layerName);
+          //get the layers source options
+          var source = viewer.getMapSource()[layer.get('sourceName')];
 
           layerProps[layerName] = {
               editableLayer: layer,
@@ -67,10 +69,10 @@ module.exports = function(){
               geometryType: layer.get('geometryType') || undefined,
               geometryName: layer.get('geometryName') || undefined,
               srsName: srsName,
-              featureNS: viewer.getMapSource()['local'].workspace,
+              featureNS: source.workspace,
               featureType: layer.get('featureType'),
               attributes: layer.get('attributes'),
-              url: viewer.getMapSource()['local'].url,
+              url: source.url,
               map: map
           };
           return layerProps;
