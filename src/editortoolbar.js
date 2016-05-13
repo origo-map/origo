@@ -117,7 +117,7 @@ module.exports = function(){
       transactionhandler.deleteSelected();
     },
     attributeFeature: function() {
-      transactionhandler.attributeSelected();
+      transactionhandler.onAttributes();
     },
     drawFeature: function() {
       transactionhandler.activateInsert();

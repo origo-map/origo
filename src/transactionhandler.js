@@ -149,39 +149,60 @@ module.exports = function(){
         context: this
       });
     },
-    onAttributeSave: function(f, el) {
-        var formEl = el;
-        var feature = f;
-        var fid = feature.getId();
-        var clone = new ol.Feature();
-        clone.setId(fid);
-        for (var i=0; i<settings.attributes.length; i++) {
-          if (formEl.hasOwnProperty(settings.attributes[i].name)) {
-            feature.set(settings.attributes[i].name, formEl[settings.attributes[i].name]);
-            clone.set(settings.attributes[i].name, formEl[settings.attributes[i].name]);
+    onAttributesSave: function(feature) {
+        var self = this;
+        $('#mdk-save-button').on('touchend click', function(e) {
+          var editEl = {};
+          //Read values from form
+          for (var i=0; i<settings.attributes.length; i++) {
+            //Check if checkbox. If checkbox read state.
+            if ($('#input-' + settings.attributes[i].name).attr('type') == 'checkbox') {
+              editEl[settings.attributes[i].name] = $('#input-' + settings.attributes[i].name).is(':checked') ? 1 : 0;
+            }
+            //Read value from input text, textarea or select
+            else {
+              editEl[settings.attributes[i].name] = $('#input-' + settings.attributes[i].name).val();
+            }
           }
+          modal.closeModal();
+          self.attributesSaveHandler(feature, editEl);
+          $('#mdk-save-button').blur();
+          e.preventDefault();
+        });
+    },
+    attributesSaveHandler: function(f, el) {
+      var formEl = el;
+      var feature = f;
+      var fid = feature.getId();
+      var clone = new ol.Feature();
+      clone.setId(fid);
+      for (var i=0; i<settings.attributes.length; i++) {
+        if (formEl.hasOwnProperty(settings.attributes[i].name)) {
+          feature.set(settings.attributes[i].name, formEl[settings.attributes[i].name]);
+          clone.set(settings.attributes[i].name, formEl[settings.attributes[i].name]);
         }
+      }
 
-        var node = settings.format.writeTransaction(null, [clone], null, {
-          gmlOptions: {srsName: settings.srsName},
-          featureNS: settings.featureNS,
-          featureType: settings.featureType
-        });
-        $.ajax({
-          type: "POST",
-          url: settings.url,
-          data: settings.serializer.serializeToString(node),
-          contentType: 'text/xml',
-          success: function(data) {
-            //alert('success');
-          },
-          error: function(e) {
-            var errorMsg = e? (e.status + ' ' + e.statusText) : "";
-            alert('Error saving this feature to GeoServer.<br><br>'
-              + errorMsg);
-          },
-          context: this
-        });
+      var node = settings.format.writeTransaction(null, [clone], null, {
+        gmlOptions: {srsName: settings.srsName},
+        featureNS: settings.featureNS,
+        featureType: settings.featureType
+      });
+      $.ajax({
+        type: "POST",
+        url: settings.url,
+        data: settings.serializer.serializeToString(node),
+        contentType: 'text/xml',
+        success: function(data) {
+          //alert('success');
+        },
+        error: function(e) {
+          var errorMsg = e? (e.status + ' ' + e.statusText) : "";
+          alert('Error saving this feature to GeoServer.<br><br>'
+            + errorMsg);
+        },
+        context: this
+      });
     },
     removeInteractions: function() {
         // console.log(settings.select);
@@ -194,7 +215,7 @@ module.exports = function(){
         settings.hasDraw = true;
       }
     },
-    attributeSelected: function() {
+    onAttributes: function() {
       var self = this;
 
       var field = '', formElement= '', val = '', type = '', label = '', dropdownOptions, maxLength;
@@ -217,24 +238,7 @@ module.exports = function(){
         modal.createModal('#map', {title: 'Information', content: form});
         modal.showModal();
 
-        $('#mdk-save-button').on('touchend click', function(e) {
-          var editEl = {};
-          //Read values from form
-          for (var i=0; i<settings.attributes.length; i++) {
-            //Check if checkbox. If checkbox read state.
-            if ($('#input-' + settings.attributes[i].name).attr('type') == 'checkbox') {
-              editEl[settings.attributes[i].name] = $('#input-' + settings.attributes[i].name).is(':checked') ? 1 : 0;
-            }
-            //Read value from input text, textarea or select
-            else {
-              editEl[settings.attributes[i].name] = $('#input-' + settings.attributes[i].name).val();
-            }
-          }
-          modal.closeModal();
-          self.onAttributeSave(feature, editEl);
-          $('#mdk-save-button').blur();
-          e.preventDefault();
-        });
+        this.onAttributesSave(feature);
       }
 
 
