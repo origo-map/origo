@@ -176,6 +176,7 @@ module.exports = function(){
       var fid = feature.getId();
       var clone = new ol.Feature();
       clone.setId(fid);
+      //get DOM values and set attribute values to cloned feature
       for (var i=0; i<settings.attributes.length; i++) {
         if (formEl.hasOwnProperty(settings.attributes[i].name)) {
           feature.set(settings.attributes[i].name, formEl[settings.attributes[i].name]);
@@ -220,6 +221,7 @@ module.exports = function(){
 
       var field = '', formElement= '', val = '', type = '', label = '', dropdownOptions, maxLength;
 
+      //Get attributes from selected feature and fill DOM elements with the values
       var features = settings.select.getFeatures();
       if (features.getLength() === 1) {
         var feature = features.item(0);
