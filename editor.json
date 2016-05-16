@@ -75,7 +75,7 @@
   ],
   "source": {
     "local": {
-      "url": "http://localhost:9090/geoserver/wfs",
+      "url": "http://localhost:9090/geoserver/sqlserver/wfs",
       "workspace": "sqlserver"
     },
     "basemap": {
@@ -99,6 +99,7 @@
       "name": "test_byggnadsytor",
       "title": "Byggnadsytor",
       "group": "test",
+      "extent": [105085,6571627,219773,6628182],      
       "geometryName": "ogr_geometry",
       "queryable": true,
       "source": "local",
@@ -116,6 +117,30 @@
                 "Radhus",
                 "Lägenhet"
             ]
+          },
+          {
+            "name": "stomme1",
+            "title": "Stomme:",
+            "type": "dropdown",
+            "maxLength": 20,
+            "constraint": "change:typ:Villa",
+            "options": [
+                "mexitegel",
+                "träpanel",
+                "eternit"
+            ]
+          },
+          {
+            "name": "stomme1",
+            "title": "Stomme:",
+            "type": "dropdown",
+            "maxLength": 20,
+            "constraint": "change:typ:Lägenhet",
+            "options": [
+                "betong",
+                "cement",
+                "puts"
+            ]
           }
       ]
     },
@@ -128,6 +153,12 @@
       "source": "local",
       "style": "cirkel",
       "type": "WFS",
+      "extent": [
+          105085,
+          6571627,
+          219773,
+          6628182
+        ],
       "visible": true,
       "attributes": [
           {

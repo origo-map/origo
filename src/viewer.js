@@ -476,13 +476,20 @@ function init (mapOptions){
         var bboxProjectionCode = options.filter ? "'" + settings.projectionCode + "')" : settings.projectionCode;
         vectorSource = new ol.source.Vector({
           format: new ol.format.GeoJSON({geometryName: options.geometryName}),
-          url: function(extent, resolution, projection) {
-              return serverUrl +
+          loader: function(extent, resolution, projection) {
+              var url = serverUrl +
                   '?service=WFS&' +
                   'version=1.1.0&request=GetFeature&typeName=' + options.featureType +
                   '&outputFormat=application/json' +
                   '&srsname=' + settings.projectionCode +
                   queryFilter + extent.join(',') + ',' + bboxProjectionCode;
+              $.ajax({
+                url: url,
+                cache: false
+              })
+              .done(function(response) {
+                  vectorSource.addFeatures(vectorSource.getFormat().readFeatures(response));
+              });
           },
           strategy: ol.loadingstrategy.tile(ol.tilegrid.createXYZ({
               maxZoom: settings.resolutions.length
