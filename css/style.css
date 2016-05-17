@@ -1748,6 +1748,10 @@ input.search-field::-ms-clear {
 	bottom: .5em;
 	top: auto;
 }
+#window-button {
+	bottom: 10em;
+	top: auto;
+}
 }
 @media screen and (max-width: 320px) {
 #sidebar,
