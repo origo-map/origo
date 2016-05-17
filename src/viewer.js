@@ -500,7 +500,7 @@ function init (mapOptions){
     function agsFeature(options) {
         var vectorSource = null;
         var esriSrs = settings.projectionCode.split(':').pop();
-        var serverUrl = settings.source[options.source].url;
+        var serverUrl = settings.source[options.sourceName].url;
         var queryFilter = options.filter ? '&where=' + options.filter : '';
         var esrijsonFormat = new ol.format.EsriJSON();
         vectorSource = new ol.source.Vector({
