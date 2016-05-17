@@ -99,7 +99,7 @@
       "name": "test_byggnadsytor",
       "title": "Byggnadsytor",
       "group": "test",
-      "extent": [105085,6571627,219773,6628182],      
+      "extent": [105085,6571627,219773,6628182],
       "geometryName": "ogr_geometry",
       "queryable": true,
       "source": "local",
