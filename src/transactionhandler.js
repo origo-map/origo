@@ -2,8 +2,14 @@
  * Copyright 2016 Mälardalskartan
  * Licensed under BSD 2-Clause (https://github.com/malardalskartan/mdk/blob/master/LICENSE.txt)
  * ======================================================================== */
+ "use strict";
 
-var TransactionHandler = (function($){
+var ol = require('openlayers');
+var $ = require('jquery');
+var viewer = require('./viewer');
+var modal = require('./modal');
+
+module.exports = function(){
 
   var settings = {
   		srsName: undefined,
@@ -26,7 +32,7 @@ var TransactionHandler = (function($){
 
 
   return {
-    init: function(options){
+    onSetEditLayer: function(options){
       settings.srsName = options.srsName;
       settings.source = options.source;
       settings.geometryType = options.geometryType;
@@ -42,18 +48,18 @@ var TransactionHandler = (function($){
         geometryName: settings.geometryName
       });
       settings.hasDraw = false;
-      settings.select = new ol.interaction.Select({layers: [Viewer.getLayer(Viewer.getEditLayer().name)]});
+      settings.select = new ol.interaction.Select({layers: [options.editableLayer]});
       settings.modify = new ol.interaction.Modify({
         features: settings.select.getFeatures()
       });
-      settings.select.getFeatures().on('add', TransactionHandler.onSelectAdd, this);
-      settings.select.getFeatures().on('remove', TransactionHandler.onSelectRemove, this);
+      settings.select.getFeatures().on('add', this.onSelectAdd, this);
+      settings.select.getFeatures().on('remove', this.onSelectRemove, this);
       settings.dirty = {};
       settings.map.addInteraction(settings.select);
       settings.map.addInteraction(settings.modify);
       settings.format = new ol.format.WFS();
       settings.serializer = new XMLSerializer();
-      settings.draw.on('drawend', TransactionHandler.onDrawEnd, this);
+      settings.draw.on('drawend', this.onDrawEnd, this);
     },
     readResponse: function(data) {
       var result;
@@ -98,7 +104,7 @@ var TransactionHandler = (function($){
           data: settings.serializer.serializeToString(node),
           contentType: 'text/xml',
           success: function(data) {
-            var result = TransactionHandler.readResponse(data);
+            var result = this.readResponse(data);
             if (result && result.transactionSummary.totalUpdated === 1) {
               delete settings.dirty[fid];
             }
@@ -120,7 +126,7 @@ var TransactionHandler = (function($){
         data: settings.serializer.serializeToString(node),
         contentType: 'text/xml',
         success: function(data) {
-          var result = TransactionHandler.readResponse(data);
+          var result = this.readResponse(data);
           if (result) {
             var insertId = result.insertIds[0];
             if (insertId == 'new0') {
@@ -143,34 +149,71 @@ var TransactionHandler = (function($){
         context: this
       });
     },
-    onAttributeSave: function(f, el) {
-        var formEl = el;
-        var feature = f;
-        var fid = feature.getId();
-        var clone = new ol.Feature();
-        clone.setId(fid);
-        for (var i=0; i<settings.attributes.length; i++) {
-          if (formEl.hasOwnProperty(settings.attributes[i].name)) {
-            feature.set(settings.attributes[i].name, formEl[settings.attributes[i].name]);
-            clone.set(settings.attributes[i].name, formEl[settings.attributes[i].name]);
+    onAttributesSave: function(feature, attributes) {
+        var self = this;
+        $('#mdk-save-button').on('touchend click', function(e) {
+          var editEl = {};
+          //Read values from form
+          for (var i=0; i<attributes.length; i++) {
+            //Get the input container class
+            var containerClass = '.' + attributes[i].elId.slice(1);
+            // If hidden element it should be excluded
+            if($(containerClass).hasClass('hidden') === false) {
+                //Check if checkbox. If checkbox read state.
+                if ($(attributes[i].elId).attr('type') == 'checkbox') {
+                  editEl[attributes[i].name] = $(attributes[i].elId).is(':checked') ? 1 : 0;
+                }
+                //Read value from input text, textarea or select
+                else {
+                  editEl[attributes[i].name] = $(attributes[i].elId).val();
+                }
+            }
           }
+          modal.closeModal();
+          self.attributesSaveHandler(feature, editEl);
+          $('#mdk-save-button').blur();
+          e.preventDefault();
+        });
+    },
+    attributesSaveHandler: function(f, el) {
+      var formEl = el;
+      var feature = f;
+      var fid = feature.getId();
+      var clone = new ol.Feature();
+      clone.setId(fid);
+      //get DOM values and set attribute values to cloned feature
+      for (var i=0; i<settings.attributes.length; i++) {
+        if (formEl.hasOwnProperty(settings.attributes[i].name)) {
+          feature.set(settings.attributes[i].name, formEl[settings.attributes[i].name]);
+          clone.set(settings.attributes[i].name, formEl[settings.attributes[i].name]);
         }
+      }
 
-        var node = settings.format.writeTransaction(null, [clone], null, {
-          gmlOptions: {srsName: settings.srsName},
-          featureNS: settings.featureNS,
-          featureType: settings.featureType
-        });
-        $.ajax({
-          type: "POST",
-          url: settings.url,
-          data: settings.serializer.serializeToString(node),
-          contentType: 'text/xml',
-          success: function(data) {
-            //alert('success');
-          },
-          context: this
-        });
+      var node = settings.format.writeTransaction(null, [clone], null, {
+        gmlOptions: {srsName: settings.srsName},
+        featureNS: settings.featureNS,
+        featureType: settings.featureType
+      });
+      $.ajax({
+        type: "POST",
+        url: settings.url,
+        data: settings.serializer.serializeToString(node),
+        contentType: 'text/xml',
+        success: function(data) {
+          //alert('success');
+        },
+        error: function(e) {
+          var errorMsg = e? (e.status + ' ' + e.statusText) : "";
+          alert('Error saving this feature to GeoServer.<br><br>'
+            + errorMsg);
+        },
+        context: this
+      });
+    },
+    removeInteractions: function() {
+        // console.log(settings.select);
+        settings.map.removeInteraction(settings.modify);
+        settings.map.removeInteraction(settings.select);
     },
     activateInsert: function() {
       if (settings.hasDraw !== true) {
@@ -178,44 +221,71 @@ var TransactionHandler = (function($){
         settings.hasDraw = true;
       }
     },
-    attributeSelected: function() {
-      var field = '', formElement= '', val = '', type = '';
+    addListener: function() {
+        var fn = function(obj) {
+            $(obj.elDependencyId).on(obj.eventType, function(e) {
+                var containerClass = '.' + obj.elId.slice(1);
+                if($(obj.elDependencyId + (' option:selected')).text() === obj.requiredVal) {
+                    $(containerClass).removeClass('hidden');
+                }
+                else {
+                    $(containerClass).addClass('hidden');
+                }
+            });
+        }
+        return fn;
+    },
+    onAttributes: function() {
+      var self = this;
 
+      //Get attributes from selected feature and fill DOM elements with the values
       var features = settings.select.getFeatures();
       if (features.getLength() === 1) {
         var feature = features.item(0);
         if (settings.attributes.length > 0) {
-          for(var i=0; i<settings.attributes.length; i++) {
-            label = settings.attributes[i].title;
-            field = settings.attributes[i].name;
-            val = feature.get(settings.attributes[i].name) || '';
-            type = settings.attributes[i].type;
-            options = settings.attributes[i].options || [];
-            formElement += TransactionHandler.createFormElement(label, field, val, type, options);
-          }
+          //Create an array of defined attributes and corresponding values from selected feature
+          var attributeObjects = settings.attributes.map(function(attributeObject) {
+              var obj = {};
+              $.extend(obj, attributeObject);
+              obj.val = feature.get(obj.name) || '';
+              if(obj.hasOwnProperty('constraint')) {
+                  var constraintProps = obj.constraint.split(':');
+                  if (constraintProps.length === 3) {
+                      obj.eventType = constraintProps[0];
+                      obj.dependencyVal = feature.get(constraintProps[1]);
+                      obj.requiredVal = constraintProps[2];
+                      obj.dependencyVal === obj.requiredVal ? obj.isVisible = true : obj.isVisible = false;
+                      obj.addListener = self.addListener();
+                      obj.elId = '#input-' + obj.name + '-' + obj.requiredVal;
+                      obj.elDependencyId = '#input-' + constraintProps[1];
+                  }
+                  else {
+                      alert('Constraint properties are not written correct, it should written as for example change:attribute:value');
+                  }
+              }
+              else {
+                  obj.isVisible = true;
+                  obj.elId = '#input-' + obj.name;
+              }
+              obj.formElement = self.createFormElement(obj);
+              return obj;
+          });
+
         }
+        var formElement = attributeObjects.reduce(function(prev, next) {
+              return prev + next.formElement;
+        }, '');
         var form = '<form>' + formElement +'<br><div class="mdk-form-save"><input id="mdk-save-button" type="button" value="Spara"></input></div></form>';
-        var modal = Modal('#map', {title: 'Information', content: form});
+        modal.createModal('#map', {title: 'Information', content: form});
         modal.showModal();
 
-        $('#mdk-save-button').on('touchend click', function(e) {
-          var editEl = {};
-          //Read values from form
-          for (var i=0; i<settings.attributes.length; i++) {
-            //Check if checkbox. If checkbox read state.
-            if ($('#input-' + settings.attributes[i].name).attr('type') == 'checkbox') {
-              editEl[settings.attributes[i].name] = $('#input-' + settings.attributes[i].name).is(':checked') ? 1 : 0;
+        attributeObjects.forEach(function(obj) {
+            if(obj.hasOwnProperty('addListener')) {
+                obj.addListener(obj);
             }
-            //Read value from input text, textarea or select
-            else {
-              editEl[settings.attributes[i].name] = $('#input-' + settings.attributes[i].name).val();
-            }
-          }
-          modal.closeModal();
-          TransactionHandler.onAttributeSave(feature, editEl);
-          $('#mdk-save-button').blur();
-          e.preventDefault();
         });
+
+        this.onAttributesSave(feature, attributeObjects);
       }
 
 
@@ -236,7 +306,7 @@ var TransactionHandler = (function($){
               data: settings.serializer.serializeToString(node),
               contentType: 'text/xml',
               success: function(data) {
-                var result = TransactionHandler.readResponse(data);
+                var result = this.readResponse(data);
                 if (result) {
                   if (result.transactionSummary.totalDeleted === 1) {
                     settings.select.getFeatures().clear();
@@ -252,14 +322,23 @@ var TransactionHandler = (function($){
 
       }
     },
-    createFormElement: function(label, field, val, type, options) {
+    createFormElement: function(obj) {
+      var id = obj.elId.slice(1);
+      var cls = obj.cls || '';
+      cls += id;
+      cls += obj.isVisible ? "" : " hidden";
+      var label = obj.title;
+      var val = obj.isVisible ? obj.val : '';
+      var type = obj.type;
+      var maxLength = obj.maxLength ? ' maxlength="' + obj.maxLength + '" ' : '';
+      var dropdownOptions = obj.options || [];
       var el;
       switch(type) {
         case 'text':
-          el = '<div><label>' + label +'</label><br><input type="text" id="input-' + field + '" value="' + val +'"></div>';
+          el = '<div><label>' + label +'</label><br><input type="text" id="input-' + id + '" value="' + val +'"' + maxLength + '></div>';
           break;
         case 'textarea':
-          el = '<div><label>' + label +'</label><br><textarea id="input-' + field + '" rows="3">' + val + '</textarea></div>';
+          el = '<div><label>' + label +'</label><br><textarea id="input-' + id + '"' + maxLength + 'rows="3">' + val + '</textarea></div>';
           break;
         case 'checkbox':
           var checked = val == true ? ' checked' : '';
@@ -268,14 +347,14 @@ var TransactionHandler = (function($){
         case 'dropdown':
           var firstOption;
           if (val) {
-            firstOption = '<option value="' + val + ' " selected>' + val + '</option>';
+            firstOption = '<option value="' + val + '" selected>' + val + '</option>';
           }
           else {
             firstOption = '<option value="" selected>Välj</option>';
           }
-          el ='<div><label>' + label +'</label><br><select id="input-' + field + '">' + firstOption;
-          for (var i=0; i<options.length; i++) {
-            el += '<option value="' + options[i] + ' ">' + options[i] + '</option>';
+          el ='<div class="' + cls + '"><label>' + label +'</label><br><select id=' + id + '>' + firstOption;
+          for (var i=0; i<dropdownOptions.length; i++) {
+            el += '<option value="' + dropdownOptions[i] + '">' + dropdownOptions[i] + '</option>';
           }
           el += '</select></div>';
           break;
@@ -283,4 +362,4 @@ var TransactionHandler = (function($){
       return el;
     }
   };
-})(jQuery);
+}()

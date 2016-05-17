@@ -6,6 +6,9 @@ body, html {
   -ms-touch-action: manipulation;
   touch-action: manipulation;
 }
+*:focus {
+    outline: none;
+}
 svg,
 object{
   width: 100%;
@@ -23,11 +26,35 @@ i {
 b, strong{
   font-weight: bold;
 }
-button {
+.o-map button {
+	background-color: #fff;
   border: none;
+	color: #000;
+	cursor: pointer;
 }
-button:focus {
+.o-map button:focus {
 	outline: none;
+}
+.o-control {
+		background-color: #fff;
+		color: #000;
+		position: fixed;
+		z-index: 10;
+}
+.o-btn-2 {
+		height: 2rem;
+		width: 2rem;
+}
+.o-btn-3 {
+		height: 3rem;
+		width: 3rem;
+}
+.o-rounded-top {
+	border-top-left-radius: 3px;
+	border-top-right-radius: 3px;
+}
+.o-padding-horizontal-8 {
+	padding: 0 .5rem;
 }
 #no-map {
   display: none;
@@ -590,6 +617,7 @@ button.ol-zoom-out {
 	overflow: hidden;
 	position: relative;
 }
+.o-map-container,
 #wrapper {
 	height: 100%;
 	position: relative;
@@ -823,29 +851,17 @@ button.mdk-button:focus {
   top: 7.5em;
   z-index: 1;
 }
-#edit-draw-button {
-  left: .5em;
-  top: 12em;
-  z-index: 1;
-}
-#edit-attribute-button {
-  left: .5em;
-  top: 14.5em;
-  z-index: 1;
-}
-#edit-delete-button {
-  left: .5em;
-  top: 17em;
-  z-index: 1;
-}
-button.edit-draw-button:after {
-  content: "\f040";
-}
-button.edit-attribute-button:after {
-  content: "\f031";
-}
-button.edit-delete-button:after {
-  content: "\f014";
+#o-editor-toolbar {
+		bottom: 0;
+		left: 50%;
+		-webkit-box-shadow: 0 2px 8px 1px rgba(0,0,0,0.45);
+	  box-shadow: 0 2px 8px 1px rgba(0,0,0,0.45);
+		/*-webkit-transform-style: preserve-3d;
+	  -moz-transform-style: preserve-3d;
+	  transform-style: preserve-3d;		*/
+		-ms-transform: translate(-50%, 0);
+	  -webkit-transform: translate(-50%, 0);
+	  transform: translate(-50%, 0);
 }
 /*remove the boxshadow when selected*/
 .mdk-button.mapmenu-button-true {
@@ -1493,11 +1509,36 @@ input.search-field::-ms-clear {
   float: right;
   fill: #424242;
 }
+[class^="o-icon-"],
+[class*=" o-icon-"] {
+  fill: #424242;
+  padding: .375rem;
+  height: 1.25rem;
+  width: 1.25rem;
+}
 .ol-control>button:hover [class^="mdk-icon-"],
 .ol-control>button:hover [class*=" mdk-icon-"],
 .mdk-button:hover [class^="mdk-icon-"],
 .mdk-button:hover [class*="mdk-icon-"] {
 	fill: #fff;
+}
+.o-map button:hover [class^="o-icon-"],
+.o-map button:hover [class*="o-icon-"] {
+	fill: #007AFF;
+}
+#o-editor-toolbar button {
+	float: left;
+	position: relative;
+}
+#o-editor-toolbar select {
+	border: 1px solid rgba(0, 0, 0, 0.4);
+	float: left;
+	height: 2rem;
+	line-height: 2rem;
+	margin-top: .5rem;
+	margin-right: .5rem;
+	vertical-align: middle;
+	width: 150px;
 }
 .mdk-icon-fa-location-arrow {
 	padding: 0.45em;
@@ -1535,6 +1576,7 @@ input.search-field::-ms-clear {
 	height: .7em;
 	width: .7em;
 }
+#o-editor-button .o-icon-fa-pencil,
 .mdk-icon-fa-print,
 .mdk-icon-fa-share-square-o {
 	padding: 0.25em;
@@ -1550,6 +1592,11 @@ input.search-field::-ms-clear {
 	padding: .5em;
 	height: 1em;
 	width: 1em;
+}
+#o-editor-toolbar .o-icon-fa-times {
+	height: 1rem;
+	padding: 0;
+	width: 1rem;
 }
 .mdk-icon-fa-angle-double-down,
 .mdk-icon-fa-angle-double-up {

@@ -21,6 +21,7 @@ controls.print = require('./print');
 controls.sharemap = require('./sharemap');
 controls.legend = require('./legend');
 controls.search = require('./search');
+controls.editor = require('./editor');
 
 
 var map, mapControls, attribution;
@@ -129,6 +130,8 @@ function init (mapOptions){
       $(window).on('resize', checkSize);
       checkSize();
 
+      featureinfo(settings.featureinfoOptions);
+
       //Init controls
       var controlName, controlOptions;
       for (var i=0; i<settings.controls.length; i++) {
@@ -136,8 +139,6 @@ function init (mapOptions){
           controlOptions = settings.controls[i].options || undefined;
           controlOptions ? controls[controlName].init(controlOptions) : controls[controlName].init();
       }
-
-      featureinfo(settings.featureinfoOptions);
 
     }
     function createLayers(layerlist, layers) {
@@ -163,7 +164,7 @@ function init (mapOptions){
                 layers.push(createTileLayer(layerOptions, agsTileSource));
             }
             else if(layer.type == 'GEOJSON') {
-                layers.push(createVectorLayer(layerOptions, geojson(layerOptions.source)));
+                layers.push(createVectorLayer(layerOptions, geojson(layerOptions.sourceName)));
             }
             else if(layer.type == 'XYZ') {
                 var xyzSource = xyz(layerOptions);
@@ -193,7 +194,7 @@ function init (mapOptions){
             relations: options.relations || undefined,
             layerType: options.layerType || 'vector',
             legend: false,
-            source: options.source,
+            sourceName: options.source,
             style: options.style || 'default',
             styleName: options.style,
             tileGrid: options.tileGrid || undefined,
@@ -219,7 +220,7 @@ function init (mapOptions){
           title: layersConfig.title,
           styleName: layersConfig.style || 'default',
           layers: group,
-          mapSource: layersConfig.source,
+          sourceName: layersConfig.source,
           visible: layersConfig.visible
       });
     }
@@ -410,6 +411,7 @@ function init (mapOptions){
           attributes: layersConfig.attributes,
           queryable: true || layersConfig.queryable,
           legend: false,
+          sourceName: layersConfig.source,
           source: new ol.source.TileWMS(({
             url: settings.source[layersConfig.source].url,
             gutter: layersConfig.gutter || 0,
@@ -440,6 +442,7 @@ function init (mapOptions){
            queryable: layersConfig.queryable || false,
            featureinfoLayer: layersConfig.featureinfoLayer || undefined,
            extent: layersConfig.extent || settings.extent, //layer extent to avoid bad requests out of range
+           sourceName: layersConfig.name,
            source: new ol.source.WMTS({
              crossOrigin: 'anonymous',
              attributions: attr,
@@ -465,7 +468,7 @@ function init (mapOptions){
     }
     function wfs(options) {
         var vectorSource = null;
-        var serverUrl = settings.source[options.source].url;
+        var serverUrl = settings.source[options.sourceName].url;
 
         //If cql filter then bbox must be used in the filter.
         var geometryName = options.geometryName;
@@ -473,13 +476,20 @@ function init (mapOptions){
         var bboxProjectionCode = options.filter ? "'" + settings.projectionCode + "')" : settings.projectionCode;
         vectorSource = new ol.source.Vector({
           format: new ol.format.GeoJSON({geometryName: options.geometryName}),
-          url: function(extent, resolution, projection) {
-              return serverUrl +
+          loader: function(extent, resolution, projection) {
+              var url = serverUrl +
                   '?service=WFS&' +
                   'version=1.1.0&request=GetFeature&typeName=' + options.featureType +
                   '&outputFormat=application/json' +
                   '&srsname=' + settings.projectionCode +
                   queryFilter + extent.join(',') + ',' + bboxProjectionCode;
+              $.ajax({
+                url: url,
+                cache: false
+              })
+              .done(function(response) {
+                  vectorSource.addFeatures(vectorSource.getFormat().readFeatures(response));
+              });
           },
           strategy: ol.loadingstrategy.tile(ol.tilegrid.createXYZ({
               maxZoom: settings.resolutions.length
@@ -581,7 +591,7 @@ function init (mapOptions){
             for(var i=0; i < relations.length; i++) {
               (function(index) {
                 var layer = relations[index].layer;
-                var mapServer = settings.source[getLayer(layer).get('mapSource')].url;
+                var mapServer = settings.source[getLayer(layer).get('sourceName')].url;
                 url = mapServer + '?';
                 data = 'service=WFS&' +
                     'version=1.0.0&request=GetFeature&typeName=' + layer +
