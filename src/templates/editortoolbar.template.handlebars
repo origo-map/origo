@@ -1,0 +1,27 @@
+<div id="o-editor-toolbar" class="o-control o-padding-horizontal-8 o-rounded-top hidden">
+    <select name="layer-dropdown">
+      {{#each this}}
+        <option value="{{this.value}}">{{this.name}}</option>
+      {{/each}}
+    </select>
+    <button id="o-editor-draw" class="o-btn-3" type="button" name="button">
+        <svg class="o-icon-fa-pencil">
+            <use xlink:href="css/svg/fa-icons.svg#fa-pencil"></use>
+        </svg>
+    </button>
+    <button id="o-editor-attribute" class="o-btn-3" type="button" name="button">
+      <svg class="o-icon-fa-font">
+          <use xlink:href="css/svg/fa-icons.svg#fa-font"></use>
+      </svg>
+    </button>
+    <button id="o-editor-delete" class="o-btn-3" type="button" name="button">
+      <svg class="o-icon-fa-trash">
+          <use xlink:href="css/svg/fa-icons.svg#fa-trash"></use>
+      </svg>
+    </button>
+    <button id="o-editor-close" class="o-btn-3" type="button" name="button">
+        <svg class="o-icon-fa-times">
+            <use xlink:href="css/svg/fa-icons.svg#fa-times"></use>
+        </svg>
+    </button>
+</div>

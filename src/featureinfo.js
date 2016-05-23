@@ -57,7 +57,12 @@ module.exports = function(opt_options) {
       identifyTarget = 'sidebar';
   }
 
-    map.on('click', function(evt) {
+    map.on('click', onClick);
+
+    $('.o-map').on('enableInteraction', onEnableInteraction);
+
+    function onClick(evt) {
+
         Viewer.removeOverlays();
         //Featurinfo in two steps. First serverside and client side when finished
         var clientResult = forEachFeatureAtPixel(evt);
@@ -107,7 +112,25 @@ module.exports = function(opt_options) {
             });
         }
         evt.preventDefault();
-    });
+    }
+    function setActive(state) {
+        if(state === true) {
+            map.on('click', onClick);
+        }
+        else {
+            selectionLayer.clear();
+            Popup.setVisibility(false);
+            map.un('click', onClick);
+        }
+    }
+    function onEnableInteraction(e) {
+        if(e.interaction === 'featureInfo') {
+            setActive(true);
+        }
+        else {
+            setActive(false);
+        }
+    }
     function forEachLayerAtPixel(evt) {
         var requests = [];
         //Check for support of crossOrigin in image, absent in IE 8 and 9
