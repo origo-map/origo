@@ -16,20 +16,14 @@ Origo is a web mapping framework. It is based on the [OpenLayers 3 library](http
 
 ## How to get started:
 
-Download [the latest release](https://github.com/origo-map/origo/releases).
-
-### Requirements
- * [Node.js](https://nodejs.org/)
- * A webserver to host your application
-
-Take a look at the documentation for more detailed instructions.
+We will be using releases that you can download to get started. The project is still in its early stages. We are working hard to get a first version published, although there is currently no timeline for when this will happen.
 
 ## Documentation
 
-In the [documentation](http://origo-map.github.io/) you will find detailed how-to instructions as well as the API-documentation.
+In the documentation you will find detailed how-to instructions as well as the API-documentation. It is currently being worked on and it will be linked here as soon as it is done.
 
 ## Want to contribute?
-We happily accept contributions of any kind, just be sure to follow the guidelines.
+We happily accept contributions of any kind. Guidelines will be available at a later date.
 
 Thank you for considering contributing to Origo.
 
