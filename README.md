@@ -39,4 +39,4 @@ Not convinced? Or maybe you need some inspiration? Check out these examples of w
 * [Västerås Stads samlingskarta](http://karta.vasteras.se/sam)
 
 ## Copyright
-The license is specified in the license file.
+The project is licensed under the BSD 2-clause license. It is specified in the [license file](LICENSE.txt).
