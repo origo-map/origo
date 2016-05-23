@@ -14,7 +14,7 @@ Origo is a web mapping framework. It is based on the [OpenLayers 3 library](http
 * Ability to read data from multiple different types of sources
 * Very light footprint
 
-## How to get started:
+## How to get started
 
 We will be using releases that you can download to get started. The project is still in its early stages. We are working hard to get a first version published, although there is currently no timeline for when this will happen.
 
