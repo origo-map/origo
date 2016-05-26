@@ -315,10 +315,12 @@ module.exports = function(opt_options) {
                           title = '<b>' + attribute['title'] + '</b>';
                         }
                         if (attribute['url']) {
+                          if(feature.get(attribute['url'])) {
                           var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['url']));
                           val = '<a href="' + url + '" target="_blank">' +
                                 feature.get(attribute['name']) +
                                 '</a>';
+                          }
                         }
                     }
                   }
