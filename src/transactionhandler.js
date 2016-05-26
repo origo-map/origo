@@ -335,14 +335,14 @@ module.exports = function(){
       var el;
       switch(type) {
         case 'text':
-          el = '<div><label>' + label +'</label><br><input type="text" id="input-' + id + '" value="' + val +'"' + maxLength + '></div>';
+          el = '<div><label>' + label +'</label><br><input type="text" id="' + id + '" value="' + val +'"' + maxLength + '></div>';
           break;
         case 'textarea':
-          el = '<div><label>' + label +'</label><br><textarea id="input-' + id + '"' + maxLength + 'rows="3">' + val + '</textarea></div>';
+          el = '<div><label>' + label +'</label><br><textarea id="' + id + '"' + maxLength + 'rows="3">' + val + '</textarea></div>';
           break;
         case 'checkbox':
           var checked = val == true ? ' checked' : '';
-          el = '<div class="mdk-form-checkbox"><label>' + label + '</label><input type="checkbox" id="input-' + field + '" value="' + val +'"' + checked + '></div>';
+          el = '<div class="mdk-form-checkbox"><label>' + label + '</label><input type="checkbox" id="' + id + '" value="' + val +'"' + checked + '></div>';
           break;
         case 'dropdown':
           var firstOption;

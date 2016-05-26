@@ -141,6 +141,17 @@
                 "cement",
                 "puts"
             ]
+          },
+          {
+            "name": "fastighet",
+            "title": "Fastighet: ",
+            "type": "text",
+            "maxLength": 15
+          },
+          {
+            "name": "byggtyp",
+            "title": "Typ:",
+            "type": "checkbox"
           }
       ]
     },
