@@ -815,8 +815,14 @@ function init (mapOptions){
             switch (styleParams.geometry) {
                 case 'centerPoint':
                     styleOptions.geometry = function(feature) {
-                        var coordinates = feature.getGeometry().getInteriorPoints().getFirstCoordinate();
-                        return new ol.geom.Point(coordinates);
+                        if (feature.getGeometry().getType() === 'Polygon') {
+                            var coordinates = feature.getGeometry().getInteriorPoint().getFirstCoordinate();
+                            return new ol.geom.Point(coordinates);
+                        }
+                        if (feature.getGeometry().getType() === 'MultiPolygon') {
+                            var coordinates = feature.getGeometry().getInteriorPoints().getFirstCoordinate();
+                            return new ol.geom.Point(coordinates);
+                        }
                     }
                 break;
             }
