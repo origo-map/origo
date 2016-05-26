@@ -42,6 +42,7 @@ module.exports = function(){
       settings.featureNS = options.featureNS;
       settings.featureType = options.featureType;
       settings.attributes = options.attributes;
+      settings.title = options.title;
       settings.draw = new ol.interaction.Draw({
         source: settings.source,
         'type': settings.geometryType,
@@ -275,8 +276,9 @@ module.exports = function(){
         var formElement = attributeObjects.reduce(function(prev, next) {
               return prev + next.formElement;
         }, '');
+        var title = settings.title;
         var form = '<form>' + formElement +'<br><div class="mdk-form-save"><input id="mdk-save-button" type="button" value="Spara"></input></div></form>';
-        modal.createModal('#map', {title: 'Information', content: form});
+        modal.createModal('#map', {title: title, content: form});
         modal.showModal();
 
         attributeObjects.forEach(function(obj) {

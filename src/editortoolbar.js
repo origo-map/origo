@@ -72,6 +72,7 @@ module.exports = function(){
               featureNS: source.workspace,
               featureType: layer.get('featureType'),
               attributes: layer.get('attributes'),
+              title: layer.get('title') || 'Information',
               url: source.url,
               map: map
           };
