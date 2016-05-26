@@ -832,7 +832,7 @@ button.mdk-button:focus {
 #mapmenu-button {
   right: .5em;
   top: .5em;
-  z-index: 5;
+  z-index: 25;
 }
 #mapmenu-button button.mdk-button:hover .mdk-icon-fa-bars{
 	fill: #fff;
@@ -908,7 +908,7 @@ button.home-button:after {
 	right: -230px;
 	top: 0px;
 	width: 230px;
-	z-index: 4;
+	z-index: 20;
 	-ms-transform: translateX(0);
 	-webkit-transform: translateX(0);
 	transform: translateX(0);
@@ -991,7 +991,7 @@ li .menu-button:hover {
   right: -270px;
   top: 0px;
   width: 270px;
-  z-index: 10;
+  z-index: 30;
   -ms-transform: translateX(0);
   -webkit-transform: translateX(0);
   transform: translateX(0);
@@ -1012,7 +1012,7 @@ li .menu-button:hover {
   position: fixed;
   top: 0;
   width: 100%;
-  z-index: 10;
+  z-index: 90;
 }
 .mdk-modal {
   background-color: white;
@@ -1027,7 +1027,7 @@ li .menu-button:hover {
   position: fixed;
   top: 50%;
   width: 300px;
-  z-index: 11;
+  z-index: 100;
 }
 .no-csstransforms .mdk-modal {
   margin-left: -150px;
