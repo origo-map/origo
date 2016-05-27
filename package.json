@@ -1,14 +1,19 @@
 {
-  "name": "mdk",
-  "version": "1.0.0",
-  "description": "",
+  "name": "origo",
+  "version": "1.0.0 beta",
+  "description": "Framework to build web map apps",
+  "keywords": [
+    "map",
+    "mapping",
+    "ol3",
+    "origo"
+  ],
+  "license": "BSD-2-Clause",
   "main": "mdk.js",
   "scripts": {
     "start": "watchify mdk.js --s mdk --d --outfile dist/mdk.js",
     "build": "browserify mdk.js --s mdk | uglifyjs --compress --output dist/mdk.min.js"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "browserify": "^11.0.1",
     "jquery": "^1.11.3",
