@@ -13,7 +13,7 @@ typeahead.loadjQueryPlugin();
 var Bloodhound = require("typeahead.js-browserify").Bloodhound;
 
 var adress;
-var name, northing, easting, url, title;
+var name, northing, easting, url, title, hint;
 
 function init(options){
 
@@ -22,10 +22,11 @@ function init(options){
     easting = options.easting;
     url = options.url;
     title = options.title || '';
+    hint = options.hint || "Sök...";
 
     var el = '<div id="search-wrapper">' +
                 '<div id="search" class="search search-false">' +
-                    '<input class="search-field typeahead form-control" type="text" placeholder="Sök adress...">' +
+                    '<input class="search-field typeahead form-control" type="text" placeholder="' + hint + '">' +
                     '<button id="search-button">' +
                         '<svg class="mdk-icon-fa-search">' +
                             '<use xlink:href="css/svg/fa-icons.svg#fa-search"></use>' +
