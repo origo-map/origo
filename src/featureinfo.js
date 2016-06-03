@@ -38,18 +38,15 @@ module.exports = function(opt_options) {
   var savedSelection = options.savedSelection || undefined,
   selectionLayer = featurelayer(savedSelection, map);
 
-  var overlay = new ol.Overlay({
-    element: $('#popup').get(0)
-  });
   var showOverlay = options.hasOwnProperty('overlay') ? options.overlay : true;
 
   var identifyTarget;
   if(showOverlay) {
       Popup.init('#map');
-      var overlay = new ol.Overlay({
-        element: $('#popup').get(0)
-      });
-      map.addOverlay(overlay);
+      // var overlay = new ol.Overlay({
+      //   element: $('#popup').get(0)
+      // });
+      // map.addOverlay(overlay);
       identifyTarget = 'overlay';
   }
   else {
@@ -62,7 +59,7 @@ module.exports = function(opt_options) {
     $('.o-map').on('enableInteraction', onEnableInteraction);
 
     function onClick(evt) {
-
+        Popup.setVisibility(false);
         Viewer.removeOverlays();
         //Featurinfo in two steps. First serverside and client side when finished
         var clientResult = forEachFeatureAtPixel(evt);
@@ -93,11 +90,11 @@ module.exports = function(opt_options) {
               }
               else if(selectionLayer.getFeatures().length > 0) {
                   selectionLayer.clear();
-                  Popup.setVisibility(false);
                   sidebar.setVisibility(false);
                   console.log("Clearing selection");
               }
               else if(pinning){
+                  sidebar.setVisibility(false);
                   var resolution = map.getView().getResolution();
                   setTimeout(function() {
                       if(!maputils.checkZoomChange(resolution, map.getView().getResolution())) {
@@ -257,6 +254,10 @@ module.exports = function(opt_options) {
         content = '<div id="identify"><div id="mdk-identify-carousel" class="owl-carousel owl-theme">' + content + '</div></div>';
         switch (target) {
             case 'overlay':
+                var overlay = new ol.Overlay({
+                  element: $('#popup').get(0)
+                });
+                map.addOverlay(overlay);
                 var geometry = items[0].feature.getGeometry();
                 var coord;
                 geometry.getType() == 'Point' ? coord = geometry.getCoordinates() : coord = coordinate;
