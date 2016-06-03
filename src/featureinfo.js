@@ -43,10 +43,6 @@ module.exports = function(opt_options) {
   var identifyTarget;
   if(showOverlay) {
       Popup.init('#map');
-      // var overlay = new ol.Overlay({
-      //   element: $('#popup').get(0)
-      // });
-      // map.addOverlay(overlay);
       identifyTarget = 'overlay';
   }
   else {
