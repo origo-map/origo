@@ -7,22 +7,25 @@
 var ol = require('openlayers');
 var $ = require('jquery');
 var Viewer = require('./viewer');
+var wktToFeature = require('./maputils')['wktToFeature'];
 var Popup = require('./popup');
 var typeahead = require("typeahead.js-browserify");
 typeahead.loadjQueryPlugin();
 var Bloodhound = require("typeahead.js-browserify").Bloodhound;
 
 var adress;
-var name, northing, easting, url, title, hint;
+var name, northing, easting, geometryAttribute, url, title, hint, projectionCode;
 
 function init(options){
 
     name = options.searchAttribute;
-    northing = options.northing;
-    easting = options.easting;
+    northing = options.northing || undefined;
+    easting = options.easting || undefined;
+    geometryAttribute = options.geometryAttribute;
     url = options.url;
     title = options.title || '';
     hint = options.hint || "Sök...";
+    projectionCode = Viewer.getProjectionCode();
 
     var el = '<div id="search-wrapper">' +
                 '<div id="search" class="search search-false">' +
@@ -102,14 +105,21 @@ function bindUIActions() {
 
           map.addOverlay(overlay);
 
-          var coord = [data[easting], data[northing]];
+          if(geometryAttribute) {
+              var feature = wktToFeature(data[geometryAttribute], projectionCode);
+              var coord = feature.getGeometry().getCoordinates();
+          }
+          else {
+              var coord = [data[easting], data[northing]];
+          }
+
           overlay.setPosition(coord);
           var content = data[name];
           // content += '<br>' + data.postnr + '&nbsp;' + data.postort;
           Popup.setContent({content: content, title: title});
           Popup.setVisibility(true);
 
-          map.getView().setCenter([data[easting], data[northing]]);
+          map.getView().setCenter([coord[0], coord[1]]);
           map.getView().setZoom(11);
         });
 

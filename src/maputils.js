@@ -42,5 +42,13 @@ module.exports = {
         features: (new ol.format.GeoJSON()).readFeatures(obj)
       });
       return vectorSource.getFeatures()[0];
+  },
+  wktToFeature: function wktToFeature(wkt, srsName) {
+      var format = new ol.format.WKT();
+      var feature = format.readFeature(wkt, {
+        dataProjection: srsName,
+        featureProjection: srsName
+      });
+      return feature;
   }
 }
