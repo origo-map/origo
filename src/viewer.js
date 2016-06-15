@@ -20,7 +20,7 @@ controls.mapmenu = require('./mapmenu');
 controls.print = require('./print');
 controls.sharemap = require('./sharemap');
 controls.legend = require('./legend');
-controls.search = require('./search');
+controls.search = require('./search_mdk');
 controls.editor = require('./editor');
 
 

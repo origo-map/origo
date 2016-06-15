@@ -163,7 +163,6 @@ module.exports = function(opt_options) {
         cluster = false;
         map.forEachFeatureAtPixel(evt.pixel,
             function(feature, layer) {
-              var item = {};
               var l = layer;
               var queryable = false;
               if(layer) {
@@ -171,23 +170,35 @@ module.exports = function(opt_options) {
               }
               if(feature.get('features')) {
                   //If cluster
-                  if (feature.get('features').length > 1) {
-                    map.getView().setCenter(evt.coordinate);
+                  var collection = feature.get('features');
+                  if (collection.length > 1) {
                     var zoom = map.getView().getZoom();
                     if(zoom + 1 < Viewer.getResolutions().length) {
-                      map.getView().setZoom(zoom + 1);
+                        map.getView().setCenter(evt.coordinate);
+                        map.getView().setZoom(zoom + 1);
+                        cluster = true;
+                        return true;
                     }
-                    cluster = true;
-                    return true;
+                    else {
+                        collection.forEach(function(f) {
+                              var item = {};
+                              item.layer = l;
+                              item.feature = f;
+                              item.content =  getAttributes(f,l);
+                              result.push(item);
+                        });
+                    }
                   }
-                  else if(feature.get('features').length == 1 && queryable) {
+                  else if(collection.length == 1 && queryable) {
+                      var item = {};
                       item.layer = l;
-                      item.feature = feature.get('features')[0];
-                      item.content = getAttributes(feature.get('features')[0],l);
+                      item.feature = collection[0];
+                      item.content = getAttributes(collection[0],l);
                       result.push(item);
                   }
               }
               else if(queryable) {
+                  var item = {};
                   item.layer = l;
                   item.feature = feature;
                   item.content = getAttributes(feature,l)
