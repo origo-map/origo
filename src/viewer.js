@@ -12,6 +12,7 @@ var Popup = require('./popup');
 var Modal = require('./modal');
 var utils = require('./utils');
 var featureinfo = require('./featureinfo');
+var mapwindow = require('./mapwindow');
 var maputils = require('./maputils');
 
 var controls = {};
@@ -120,7 +121,7 @@ function init (mapOptions){
                 new ol.control.ScaleLine({target: 'bottom-tools'})
         ]
         if(window.top!=window.self) {
-            MapWindow.init();
+            mapwindow.init();
         }
 
       createHome(settings.home);
