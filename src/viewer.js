@@ -423,8 +423,11 @@ function init (mapOptions){
     }
     function addWMTS(layersConfig) {
         var matrixIds = [], attr = null;
+        var layerSource = settings.source[layersConfig.source];
+        var matrixSet = layerSource.hasOwnProperty('matrixSetName') ? layerSource.matrixSetName : settings.projectionCode;
+        var matrixIdsPrefix = layerSource.hasOwnProperty('matrixIdsPrefix') ? layerSource.matrixIdsPrefix : settings.projectionCode + ':';
         for (var z = 0; z < settings.resolutions.length; ++z) {
-          matrixIds[z] = settings.projectionCode + ':' + z;
+          matrixIds[z] = matrixIdsPrefix + z;
         }
 
         layersConfig.hasOwnProperty('attribution') ? attr=[new ol.Attribution({html: layersConfig.attribution})] : [attr = null];
@@ -446,10 +449,10 @@ function init (mapOptions){
            source: new ol.source.WMTS({
              crossOrigin: 'anonymous',
              attributions: attr,
-             url: settings.source[layersConfig.source].url,
+             url: layerSource.url,
              projection: settings.projection,
              layer: layersConfig.name,
-             matrixSet: settings.projectionCode,
+             matrixSet: matrixSet,
              format: layersConfig.format,
              tileGrid: new ol.tilegrid.WMTS({
                origin: ol.extent.getTopLeft(settings.projectionExtent),
