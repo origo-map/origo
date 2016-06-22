@@ -50,6 +50,8 @@ module.exports = function(opt_options) {
       identifyTarget = 'sidebar';
   }
 
+    var clusterZoomLevel = options.hasOwnProperty('clusterZoomLevel') ? options.clusterZoomLevel : 1;
+
     map.on('click', onClick);
 
     $('.o-map').on('enableInteraction', onEnableInteraction);
@@ -173,7 +175,8 @@ module.exports = function(opt_options) {
                   var collection = feature.get('features');
                   if (collection.length > 1) {
                     var zoom = map.getView().getZoom();
-                    if(zoom + 1 < Viewer.getResolutions().length) {
+                    var zoomLimit = clusterZoomLevel === -1 ? Viewer.getResolutions().length : zoom + clusterZoomLevel;
+                    if(zoomLimit < Viewer.getResolutions().length) {
                         map.getView().setCenter(evt.coordinate);
                         map.getView().setZoom(zoom + 1);
                         cluster = true;
