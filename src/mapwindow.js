@@ -5,6 +5,7 @@
 "use strict";
 
 var $ = require('jquery');
+var utils = require('./utils');
 var viewer = require('./viewer');
 
 var settings = {
@@ -22,8 +23,17 @@ function bindUIActions() {
     })
 }
 function createButton() {
-    var button = '<div id="window-button" class="mdk-button"><button class="window-button"></button></div>';
-    $('#map').append(button);
+	var tooltipText = "Visa kartan i nytt fönster";
+	//Element for control
+	var el = utils.createButton({
+			id: 'window-button',
+			cls: 'mapwindow-button',
+			iconCls: 'mdk-icon-fa-expand',
+			src: 'css/svg/fa-icons.svg#fa-expand',
+			tooltipText: tooltipText,
+			tooltipPlacement: 'east'
+	});
+	$('#map').append(el);
 }
 function openMapWindow() {
     var url = viewer.getMapUrl();
