@@ -744,7 +744,7 @@ function init (mapOptions){
         var styleL;
         //If size is larger than, it is a cluster
         var size = clusterStyleList ? feature.get('features').length : 1;
-        if(size > 1 && map.getView().getResolution() != settings.resolutions[settings.resolutions.length-1]) {
+        if(size > 1 && map.getView().getResolution() != settings.resolutions[settings.resolutions.length+1]) {
             styleL = checkOptions(feature, scale, clusterStyleSettings, clusterStyleList, size.toString());
             // clusterStyleList[0].setText(size);
         }
