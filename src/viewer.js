@@ -874,55 +874,6 @@ function init (mapOptions){
       var resolution = scale / (mpu * 39.37 * dpi);
       return resolution;
     }
-    function addGetFeatureInfo() {
-        Popup.init('#map');
-
-        var overlay = new ol.Overlay({
-          element: $('#popup').get(0)
-        });
-
-        map.on('singleclick', function(evt) {
-          var element = overlay.getElement();
-          var coordinate = evt.coordinate;
-          var layer, queryLayers=[];
-          for(var i=0; i<settings.layers.length; i++) {
-            layer = settings.layers[i];
-            if(layer.get('type')=='WMS' && layer.getVisible()==true) {
-              (function(l) {
-              var url = layer.getSource().getGetFeatureInfoUrl(
-              evt.coordinate, map.getView().getResolution(), settings.projection,
-              {'INFO_FORMAT': 'text/html'});
-                $.post(url, function(data) {
-                  var match = data.match(/<body[^>]*>([\s\S]*)<\/body>/);
-                    if (match && !match[1].match(/^\s*$/)) {
-                      if(queryLayers.length==0) {
-                      queryLayers.push(data);
-
-                      overlay.setPosition(coordinate);
-
-                      Popup.setContent({content: data, title: l.get('title')});
-                      Popup.setVisibility(true);
-                      autoPan();
-
-                      }/*End if empty*/
-                      else {
-                        queryLayers.push(data);;
-                      }
-                    }
-                    else {
-                      // $(element).popover('hide');
-                      Popup.setVisibility(false);
-                    }
-                });//end post
-              })(layer) //end post function
-              } //end if
-              } //end for
-
-          map.addOverlay(overlay);
-          evt.preventDefault();
-        });
-
-    }
     function autoPan() {
     /*Workaround to remove when autopan implemented for overlays */
       var el=$('.popup');
@@ -1018,7 +969,6 @@ module.exports.styleFunction = styleFunction;
 module.exports.createStyleOptions = createStyleOptions;
 module.exports.getScale = getScale;
 module.exports.scaleToResolution = scaleToResolution;
-module.exports.addGetFeatureInfo = addGetFeatureInfo;
 module.exports.autoPan = autoPan;
 module.exports.removeOverlays = removeOverlays;
 module.exports.checkSize = checkSize;
