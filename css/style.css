@@ -718,8 +718,8 @@ button.ol-zoom-out {
   -webkit-box-shadow: 0 2px 5px rgba(0,0,0,0.45);
   box-shadow: 0 2px 5px rgba(0,0,0,0.45);
 }
-.no-boxshadow .mdk-button {
-  border: 1px solid #A6A6A6;
+.no-boxshadow {
+  box-shadow: none;
 }
 .mdk-button:hover {
   background-color: rgba(255,255,255,0.6);
@@ -832,7 +832,7 @@ button.mdk-button:focus {
 #mapmenu-button {
   right: .5em;
   top: .5em;
-  z-index: 25;
+  z-index: 5;
 }
 #mapmenu-button button.mdk-button:hover .mdk-icon-fa-bars{
 	fill: #fff;
@@ -840,6 +840,11 @@ button.mdk-button:focus {
 #mapmenu-button button.mdk-button {
 	padding-right: 0;
 	width: 5.3125em;
+}
+#mapmenu-button-close {
+		position: absolute;
+		right: .5em;
+		top: .5rem;
 }
 #home-button {
   left: .5em;
@@ -904,6 +909,8 @@ button.home-button:after {
   -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.45);
 	box-shadow: 0 0 5px rgba(0,0,0,0.45);
 	height: 100%;
+	overflow: hidden;
+	overflow-y: auto;
 	position: absolute;
 	right: -230px;
 	top: 0px;
@@ -1594,6 +1601,11 @@ input.search-field::-ms-clear {
 	padding: .65em;
 	height: 1.129em;
 	width: 1.129em;
+}
+.mdk-icon-menu-fa-times {
+	padding: .5rem;
+	height: 1rem;
+	width: 1rem;
 }
 .mdk-icon-search-fa-times {
 	padding: .5em;

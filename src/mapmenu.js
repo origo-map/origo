@@ -8,7 +8,7 @@ var $ = require('jquery');
 var viewer = require('./viewer');
 var utils = require('./utils');
 
-var menuButton, mapMenu;
+var $menuButton, $closeButton, $mapMenu;
 
 var symbolSize = 20;
 var styleSettings;
@@ -25,7 +25,7 @@ function init() {
         tooltipPlacement: 'west'
     });
     $('#map').append(el);
-    menuButton = $('#mapmenu-button button');
+    $menuButton = $('#mapmenu-button button');
 
     var menuEl = '<div id="mapmenu">' +
                     '<div class="block">' +
@@ -35,32 +35,48 @@ function init() {
                     '</div>' +
                   '</div>';
     $('#map').append(menuEl);
-    mapMenu = $('#mapmenu');
+    $mapMenu = $('#mapmenu');
+
+    var closeButton = utils.createButton({
+        id: 'mapmenu-button-close',
+        cls: 'no-boxshadow',
+        iconCls: 'mdk-icon-menu-fa-times',
+        src: 'css/svg/fa-icons.svg#fa-times',
+        tooltipText: 'Stäng meny',
+        tooltipPlacement: 'west'
+    });
+    $('#menutools').append(closeButton);
+    $closeButton = $('#mapmenu-button-close');
 
     bindUIActions();
     // addLegend(viewer.getGroups());
 }
 function bindUIActions() {
-    menuButton.on('touchend click', function(e) {
+    $menuButton.on('touchend click', function(e) {
       	toggleMenu();
-        menuButton.blur();
+        $menuButton.blur();
+        e.preventDefault();
+    });
+    $closeButton.on('click', function(e) {
+      	toggleMenu();
+        $closeButton.blur();
         e.preventDefault();
     });
 }
 function toggleMenu() {
-    if(mapMenu.hasClass('mapmenu-show')){
-      mapMenu.removeClass('mapmenu-show');
-      menuButton.removeClass('mapmenu-button-false');
-      menuButton.addClass('mapmenu-button-true');
+    if($mapMenu.hasClass('mapmenu-show')){
+      $mapMenu.removeClass('mapmenu-show');
+      $menuButton.removeClass('mapmenu-button-false');
+      $menuButton.addClass('mapmenu-button-true');
     }
     else {
-      mapMenu.addClass('mapmenu-show');
-      menuButton.removeClass('mapmenu-button-true');
-      menuButton.addClass('mapmenu-button-false');
+      $mapMenu.addClass('mapmenu-show');
+      $menuButton.removeClass('mapmenu-button-true');
+      $menuButton.addClass('mapmenu-button-false');
     }
 }
 function getTarget() {
-    return mapMenu;
+    return $mapMenu;
 }
 
 module.exports.init = init;
