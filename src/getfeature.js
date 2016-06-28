@@ -7,19 +7,16 @@ var $ = require('jquery');
 var viewer = require('./viewer');
 
 var sourceType = {};
+var projectionCode = viewer.getProjectionCode();
+var source = viewer.getMapSource();
 
 module.exports = function(id, layer) {
-    var projectionCode = viewer.getProjectionCode();
-    var source = viewer.getMapSource();
     var serverUrl = source[layer.get('sourceName')].url;
     var type = layer.get('type');
-    sourceType[type](id, layer, serverUrl, projectionCode)
-      .done(function(data) {
-          console.log(data);
-      });
+    return sourceType[type](id, layer, serverUrl);
 }
 
-sourceType.AGS_FEATURE = function agsFeature(id, layer, serverUrl, projectionCode) {
+sourceType.AGS_FEATURE = function agsFeature(id, layer, serverUrl) {
   var esriSrs = projectionCode.split(':').pop();
   var layerId = layer.get('id');
   var esrijsonFormat = new ol.format.EsriJSON();
