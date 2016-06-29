@@ -15,10 +15,8 @@ module.exports = function(id, layer) {
     source = viewer.getMapSource();
     var serverUrl = source[layer.get('sourceName')].url;
     var type = layer.get('type');
-    sourceType[type](id, layer, serverUrl)
-        .done(function(response) {
-            console.log(response);
-        });
+    //returns a promise with features as result
+    return sourceType[type](id, layer, serverUrl);
 }
 
 sourceType.AGS_FEATURE = function agsFeature(id, layer, serverUrl) {
@@ -64,7 +62,7 @@ sourceType.WFS = function(id, layer, serverUrl) {
       '&version=1.0.0' +
       '&request=GetFeature&typeName=' + layer.get('name') +
       '&outputFormat=json' +
-      '&CQL_FILTER=fid=' + id;
+      '&featureId=' + id;
   return $.ajax({
     url: url,
     type: 'POST',
