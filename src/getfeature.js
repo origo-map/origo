@@ -7,13 +7,18 @@ var $ = require('jquery');
 var viewer = require('./viewer');
 
 var sourceType = {};
-var projectionCode = viewer.getProjectionCode();
-var source = viewer.getMapSource();
+var projectionCode;
+var source;
 
 module.exports = function(id, layer) {
+    projectionCode = viewer.getProjectionCode();
+    source = viewer.getMapSource();
     var serverUrl = source[layer.get('sourceName')].url;
     var type = layer.get('type');
-    return sourceType[type](id, layer, serverUrl);
+    sourceType[type](id, layer, serverUrl)
+        .done(function(response) {
+            console.log(response);
+        });
 }
 
 sourceType.AGS_FEATURE = function agsFeature(id, layer, serverUrl) {
@@ -49,6 +54,25 @@ sourceType.AGS_FEATURE = function agsFeature(id, layer, serverUrl) {
         }
     }, fail
     );
+}
+
+sourceType.WFS = function(id, layer, serverUrl) {
+  var geometryName = layer.get('geometryName');
+  var format = new ol.format.GeoJSON({geometryName: geometryName});
+  var url = serverUrl +
+      '?service=WFS' +
+      '&version=1.0.0' +
+      '&request=GetFeature&typeName=' + layer.get('name') +
+      '&outputFormat=json' +
+      '&CQL_FILTER=fid=' + id;
+  return $.ajax({
+    url: url,
+    type: 'POST',
+    dataType: 'json'
+  })
+    .then(function(response) {
+        return format.readFeatures(response);
+    });
 }
 
 function fail(response) {
