@@ -549,7 +549,7 @@ function init (mapOptions){
         return vectorSource;
     }
     function agsTile(options) {
-        var url = settings.source[options.source].url;
+        var url = settings.source[options.sourceName].url;
         var params = options.params || {};
         params.layers = "show:" + options.id;
         var tileSource = new ol.source.TileArcGISRest({
@@ -560,8 +560,8 @@ function init (mapOptions){
         return tileSource;
     }
     function xyz(options) {
-        var format = options.source.split('.')[1],
-        url = options.source.split('.')[0] + '/{z}/{x}/{y}.';
+        var format = options.sourceName.split('.')[1],
+        url = options.sourceName.split('.')[0] + '/{z}/{x}/{y}.';
         url += format;
         var tileSource = new ol.source.XYZ({
             projection: settings.projection || 'EPSG:3857',
