@@ -8,8 +8,9 @@ var ol = require('openlayers');
 
 //create unmanaged layer
 module.exports = function(features, map) {
+  var collection = features ? [features] : [];
   var featureLayerStore = new ol.source.Vector({
-      features: features || []
+      features: collection
   }),
   featureLayer = new ol.layer.Vector({
     source: featureLayerStore,

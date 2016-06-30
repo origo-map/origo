@@ -11,6 +11,7 @@ var viewer = require('./viewer');
 var modal = require('./modal');
 var mapmenu = require('./mapmenu');
 var utils = require('./utils');
+var permalink = require('./permalink/permalink');
 
 var shareButton;
 
@@ -39,7 +40,8 @@ function createContent() {
            '<i>Kopiera och klistra in länken för att dela kartan.</i>';
 }
 function createLink() {
-    $('.share-link input').val(viewer.getMapUrl());
+    var url = permalink.getPermalink();
+    $('.share-link input').val(url).select();
 }
 
 module.exports.init = init;
