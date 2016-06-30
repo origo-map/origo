@@ -12,9 +12,20 @@ var Popup = require('./popup');
 var typeahead = require("typeahead.js-browserify");
 typeahead.loadjQueryPlugin();
 var Bloodhound = require("typeahead.js-browserify").Bloodhound;
+var getFeature = require('./getfeature');
 
 var adress;
-var name, northing, easting, geometryAttribute, url, title, hint, projectionCode;
+var name,
+    northing,
+    easting,
+    geometryAttribute,
+    idAttribute,
+    layerNameAttribute,
+    layerName,
+    url,
+    title,
+    hint,
+    projectionCode;
 
 function init(options){
 
@@ -22,6 +33,9 @@ function init(options){
     northing = options.northing || undefined;
     easting = options.easting || undefined;
     geometryAttribute = options.geometryAttribute;
+    idAttribute = options.idAttribute;
+    layerNameAttribute = options.layerNameAttribute || undefined;
+    layerName = options.layerName || undefined;
     url = options.url;
     title = options.title || '';
     hint = options.hint || "Sök...";
@@ -111,6 +125,13 @@ function bindUIActions() {
           }
           else {
               var coord = [data[easting], data[northing]];
+          }
+
+          //Select geometry if configured with layerName or layerNameAttribute
+          if(layerNameAttribute) {
+              var layer = Viewer.getLayer(data[layerNameAttribute]);
+              var id = data[idAttribute];
+              var promise = getFeature(id, layer);
           }
 
           overlay.setPosition(coord);
