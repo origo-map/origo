@@ -14,6 +14,9 @@ var utils = require('./utils');
 var featureinfo = require('./featureinfo');
 var mapwindow = require('./mapwindow');
 var maputils = require('./maputils');
+var permalink = require('./permalink/permalink');
+var getUrl = require('./utils/geturl');
+var isUrl = require('./utils/isurl');
 
 var controls = {};
 controls.geoposition = require('./geoposition');
@@ -43,26 +46,55 @@ var settings = {
   featureInfoOverlay: undefined,
   editLayer: null
 };
-var cqlQuery, queryFinished = false;
+var cqlQuery, queryFinished = false, urlParams = {};
 
-function init (mapOptions){
-        $("#app-wrapper").html(template);
-        // if(!(Modernizr.canvas)) {
-        //   $('#wrapper').remove();
-        //   return;
-        // }
-        //Map settings to use for this module
-        if (typeof(mapOptions) === 'object') {
-            setMapOptions(mapOptions);
-        }
-        else if (typeof(mapOptions) === 'string') {
-            $.getJSON(mapOptions)
-                .done(function(data) {
-                    setMapOptions(data);
-                });
-        }
+function init (el, mapOptions){
+      var mapEl = "#app-wrapper";
+      if(arguments.length === 1) {
+          mapOptions = el;
+      }
+      else if(mapEl.substring(0,0) !== '#') {
+          mapEl = '#' + el;
+      }
+      else if(mapEl.substring(0,0) === '#') {
+          mapEl = el;
+      }
+      $(mapEl).html(template);
 
-
+      if (typeof(mapOptions) === 'object') {
+          if(window.location.hash) {
+              urlParams = permalink.parsePermalink(window.location.href);
+          }
+          settings.url = getUrl();
+          setMapOptions(mapOptions);
+      }
+      else if (typeof(mapOptions) === 'string') {
+          if(isUrl(mapOptions)) {
+              urlParams = permalink.parsePermalink(mapOptions);
+              var url = mapOptions.split('#')[0];
+              settings.url = url;
+              if (url.substring(url.lastIndexOf('/')).indexOf('.') !== -1) {
+                  url = url.substring(0, url.lastIndexOf('/')+1);
+              }
+              settings.map = urlParams.map + '.json';
+              url += settings.map;
+              $.getJSON(url)
+                  .done(function(data) {
+                      setMapOptions(data);
+                  });
+          }
+          else {
+              if(window.location.hash) {
+                  urlParams = permalink.parsePermalink(window.location.href);
+              }
+              settings.url = getUrl();
+              settings.map = mapOptions;
+              $.getJSON(mapOptions)
+                  .done(function(data) {
+                      setMapOptions(data);
+                  });
+          }
+      }
     }
     function setMapOptions(mapOptions) {
         // Read and set projection
@@ -87,14 +119,14 @@ function init (mapOptions){
         }
 
         settings.extent = mapOptions.extent || undefined;
-        settings.center = mapOptions.center;
-        settings.zoom = mapOptions.zoom;
+        settings.center = urlParams.center || mapOptions.center;
+        settings.zoom = urlParams.zoom || mapOptions.zoom;
         settings.source = mapOptions.source;
         settings.home = mapOptions.home;
         settings.groups = mapOptions.groups;
         settings.editLayer = mapOptions.editLayer;
         settings.styles = mapOptions.styles;
-        createLayers(mapOptions.layers, settings.layers); //read layers from mapOptions
+        createLayers(mapOptions.layers, settings.layers, urlParams.layers);
         settings.controls = mapOptions.controls;
         settings.featureinfoOptions = mapOptions.featureinfoOptions || undefined;
         //If url arguments, parse this settings
@@ -131,6 +163,15 @@ function init (mapOptions){
       $(window).on('resize', checkSize);
       checkSize();
 
+      if(urlParams.pin) {
+          settings.featureinfoOptions.savedPin = urlParams.pin;
+      }
+      //This is needs further development for proper handling in permalink
+      else if(urlParams.selection) {
+          settings.featureinfoOptions.savedSelection = new ol.Feature({
+              geometry: new ol.geom[urlParams.selection.geometryType](urlParams.selection.coordinates)
+          });
+      }
       featureinfo(settings.featureinfoOptions);
 
       //Init controls
@@ -142,10 +183,14 @@ function init (mapOptions){
       }
 
     }
-    function createLayers(layerlist, layers) {
+    function createLayers(layerlist, layers, savedLayers) {
         for(var i=layerlist.length-1; i>=0; i--) {
-            var layer = layerlist[i];
-            var layerOptions = setLayerOptions(layer);
+          var savedLayer = {};
+          if(savedLayers) {
+              savedLayer = savedLayers[layerlist[i].name] || {visible: false, legend: false};
+          }
+          var layer = $.extend(layerlist[i],savedLayer);
+          var layerOptions = setLayerOptions(layer);
             if(layer.type == 'WMTS') {
                 layers.push(addWMTS(layer));
             }
@@ -194,7 +239,7 @@ function init (mapOptions){
             filter: options.filter || undefined,
             relations: options.relations || undefined,
             layerType: options.layerType || 'vector',
-            legend: false,
+            legend: options.legend || false,
             sourceName: options.source,
             style: options.style || 'default',
             styleName: options.style,
@@ -290,6 +335,12 @@ function init (mapOptions){
     function getSettings() {
         return settings;
     }
+    function getMapName() {
+        return settings.map;
+    }
+    function getUrl() {
+        return settings.url;
+    }
     function getStyleSettings() {
         return settings.styles;
     }
@@ -363,6 +414,12 @@ function init (mapOptions){
     }
     function getMapSource() {
       return settings.source;
+    }
+    function getControlNames() {
+        var controlNames = settings.controls.map(function(obj) {
+            return obj.name;
+        });
+        return controlNames;
     }
     function createTileLayer(options, source) {
         var tileLayer;
@@ -948,6 +1005,7 @@ module.exports.getMapUrl = getMapUrl;
 module.exports.getMap = getMap;
 module.exports.getLayers = getLayers;
 module.exports.getLayer = getLayer;
+module.exports.getControlNames = getControlNames;
 module.exports.getQueryableLayers = getQueryableLayers;
 module.exports.getEditLayer = getEditLayer;
 module.exports.getGroup = getGroup;
@@ -973,3 +1031,5 @@ module.exports.autoPan = autoPan;
 module.exports.removeOverlays = removeOverlays;
 module.exports.checkSize = checkSize;
 module.exports.setMapOptions = setMapOptions;
+module.exports.getMapName = getMapName;
+module.exports.getUrl = getUrl;
