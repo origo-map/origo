@@ -25,7 +25,7 @@ module.exports = function(opt_options) {
   var options = opt_options || {};
 
   var pinning = options.hasOwnProperty('pinning') ? options.pinning : true;
-  var pinStyleOptions = opt_options.pinStyle || styleTypes.getStyle('pin');
+  var pinStyleOptions = options.hasOwnProperty('pinStyle') ? options.pinStyle : styleTypes.getStyle('pin');
   var pinStyle = style.createStyleRule(pinStyleOptions)[0];
   savedPin = options.savedPin ? maputils.createPointFeature(opt_options.savedPin, pinStyle) : undefined;
 
