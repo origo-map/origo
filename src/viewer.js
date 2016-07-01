@@ -73,8 +73,11 @@ function init (el, mapOptions){
               urlParams = permalink.parsePermalink(mapOptions);
               var url = mapOptions.split('#')[0];
               settings.url = url;
-              if (url.substring(url.lastIndexOf('/')).indexOf('.') !== -1) {
+              if (url.substring(url.lastIndexOf('/')).indexOf('.htm') !== -1) {
                   url = url.substring(0, url.lastIndexOf('/')+1);
+              }
+              else if (url.substr(url.length - 1) !== '/') {
+                  url += '/';
               }
               settings.map = urlParams.map + '.json';
               url += settings.map;
