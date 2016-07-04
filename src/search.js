@@ -13,6 +13,7 @@ var typeahead = require("typeahead.js-browserify");
 typeahead.loadjQueryPlugin();
 var Bloodhound = require("typeahead.js-browserify").Bloodhound;
 var getFeature = require('./getfeature');
+var featureInfo = require('./featureinfo');
 
 var adress;
 var name,
@@ -128,10 +129,17 @@ function bindUIActions() {
           }
 
           //Select geometry if configured with layerName or layerNameAttribute
-          if(layerNameAttribute) {
+          if(layerNameAttribute && idAttribute) {
               var layer = Viewer.getLayer(data[layerNameAttribute]);
               var id = data[idAttribute];
-              var promise = getFeature(id, layer);
+              var promise = getFeature(id, layer)
+                .done(function(res) {
+                    var obj = {};
+                    obj.layer = layer;
+                    obj.feature = res;
+                    obj.content = featureInfo.getAttributes(res, layer);
+                    featureInfo(obj, 'overlay', coord);
+                });
           }
 
           overlay.setPosition(coord);
