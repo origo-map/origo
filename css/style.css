@@ -38,7 +38,7 @@ b, strong{
 .o-control {
 		background-color: #fff;
 		color: #000;
-		position: fixed;
+		position: absolute;
 		z-index: 10;
 }
 .o-btn-2 {
@@ -207,7 +207,7 @@ button.ol-zoom-out {
   text-align: right;
   bottom: .5em;
   padding: .35em 0;
-  position: fixed;
+  position: absolute;
   right: .5em;
   max-width: calc(100% - 3.5em);
   z-index: 2;
@@ -620,6 +620,7 @@ button.ol-zoom-out {
 .o-map-container,
 #wrapper {
 	height: 100%;
+	overflow: hidden;
 	position: relative;
 }
 #map {
@@ -629,7 +630,7 @@ button.ol-zoom-out {
   bottom: 1.7em;
   height: auto;
   left: 0;
-  position: fixed;
+  position: absolute;
   width: 100%;
   z-index: 1;
 }
@@ -640,7 +641,7 @@ button.ol-zoom-out {
   font-size: 0.7em;
   height: 2.5em;
   line-height: 2em;
-  position: fixed;
+  position: absolute;
   bottom: 0;
   left: 0;
   z-index: 1;
@@ -1016,7 +1017,7 @@ li .menu-button:hover {
   background-color: rgba(0,0,0,0.5);
   height: 100%;
   left: 0;
-  position: fixed;
+  position: absolute;
   top: 0;
   width: 100%;
   z-index: 90;
@@ -1032,7 +1033,7 @@ li .menu-button:hover {
   -ms-transform: translate(-50%, -50%);
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
-  position: fixed;
+  position: absolute;
 	right: auto;
 	top: 50%;
 	-webkit-transform-style: preserve-3d;
@@ -1262,7 +1263,7 @@ li .menu-button:hover {
   left: .5em;
   bottom: 2.2em;
   padding: 0 5px 5px 5px;
-  position: fixed;
+  position: absolute;
   z-index: 1;
 }
 li .legend-header {
@@ -1378,7 +1379,7 @@ li .legend-item-img {
   box-shadow: 0 2px 5px rgba(0,0,0,0.45);
 	height: 2.5em;
   margin: 0 0 0 -155px;
-  position: fixed;
+  position: absolute;
   top: .5em;
   left: 50%;
   width: 310px;

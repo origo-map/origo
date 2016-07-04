@@ -13,30 +13,27 @@ var maputils = require('./maputils');
 var featureinfotemplates = require('./featureinfotemplates');
 var featurelayer = require('./featurelayer');
 var style = require('./style');
+var styleTypes = require('./style/styletypes');
 var owlCarousel = require('../externs/owlcarousel-browserify');
 owlCarousel.loadjQueryPlugin();
+
+var selectionLayer = undefined, savedPin = undefined;
 
 module.exports = function(opt_options) {
   var map = Viewer.getMap();
 
   var options = opt_options || {};
 
-  var pinStyleOptions = options.pinStyle || [
-    {
-      'icon': {
-          anchor: [0.5, 32],
-          anchorXUnits: 'fraction',
-          anchorYUnits: 'pixels',
-          src: 'img/png/drop_blue.png'
-      }
-    }
-  ];
   var pinning = options.hasOwnProperty('pinning') ? options.pinning : true;
-  var pinStyle = style.createStyleRule(pinStyleOptions);
+  var pinStyleOptions = options.hasOwnProperty('pinStyle') ? options.pinStyle : styleTypes.getStyle('pin');
+  var pinStyle = style.createStyleRule(pinStyleOptions)[0];
+  savedPin = options.savedPin ? maputils.createPointFeature(opt_options.savedPin, pinStyle) : undefined;
+
   var selectionStyles = style.createEditStyle();
 
-  var savedSelection = options.savedSelection || undefined,
-  selectionLayer = featurelayer(savedSelection, map);
+  var savedSelection = options.savedSelection || undefined;
+  var savedFeature = savedPin || savedSelection || undefined;
+  selectionLayer = featurelayer(savedFeature, map);
 
   var showOverlay = options.hasOwnProperty('overlay') ? options.overlay : true;
 
@@ -59,6 +56,7 @@ module.exports = function(opt_options) {
     function onClick(evt) {
         Popup.setVisibility(false);
         Viewer.removeOverlays();
+        savedPin = undefined;
         //Featurinfo in two steps. First serverside and client side when finished
         var clientResult = forEachFeatureAtPixel(evt);
         if(clientResult !== false) {
@@ -96,8 +94,8 @@ module.exports = function(opt_options) {
                   var resolution = map.getView().getResolution();
                   setTimeout(function() {
                       if(!maputils.checkZoomChange(resolution, map.getView().getResolution())) {
-                           var feature = maputils.createPointFeature(evt.coordinate, [pinStyle[0], selectionStyles['Point'][0]]);
-                           selectionLayer.addFeature(feature);
+                          savedPin = maputils.createPointFeature(evt.coordinate, pinStyle);
+                          selectionLayer.addFeature(savedPin);
                       }
                   }, 250);
               }
@@ -408,4 +406,14 @@ module.exports = function(opt_options) {
             return matchLayer === layer;
         })
     }
+}
+
+module.exports.getSelection = function getSelection() {
+    var selection = {};
+    selection.geometryType = selectionLayer.getFeatures()[0].getGeometry().getType();
+    selection.coordinates = selectionLayer.getFeatures()[0].getGeometry().getCoordinates();
+    return selection;
+}
+module.exports.getPin = function getPin() {
+    return savedPin;
 }
