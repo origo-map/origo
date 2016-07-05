@@ -12,7 +12,7 @@ var map;
 
 module.exports.getFeaturesFromRemote = function getFeaturesFromRemote(evt) {
         map = Viewer.getMap();
-        return forEachLayerAtPixel(evt).map(function(request) {
+        return getFeatureInfoRequests(evt).map(function(request) {
             request.fn.then(function(data) {
                 var feature = maputils.geojsonToFeature(data),
                 layer = Viewer.getLayer(request.layer);
@@ -26,7 +26,7 @@ module.exports.getFeaturesFromRemote = function getFeaturesFromRemote(evt) {
             });
         });
 }
-function forEachLayerAtPixel(evt) {
+function getFeatureInfoRequests(evt) {
     var requests = [];
     //Check for support of crossOrigin in image, absent in IE 8 and 9
     if('crossOrigin' in new(Image)) {
