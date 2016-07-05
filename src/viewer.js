@@ -130,7 +130,7 @@ function init (el, mapOptions){
         settings.styles = mapOptions.styles;
         createLayers(mapOptions.layers, settings.layers, urlParams.layers);
         settings.controls = mapOptions.controls;
-        settings.featureinfoOptions = mapOptions.featureinfoOptions || undefined;
+        settings.featureinfoOptions = mapOptions.featureinfoOptions || {};
         //If url arguments, parse this settings
         if (window.location.search) {
             parseArg();
