@@ -191,6 +191,7 @@ function init (el, mapOptions){
           var savedLayer = {};
           if(savedLayers) {
               savedLayer = savedLayers[layerlist[i].name.split(':').pop()] || {visible: false, legend: false};
+              savedLayer.name = layerlist[i].name;
           }
           var layer = $.extend(layerlist[i],savedLayer);
           var layerOptions = setLayerOptions(layer);
