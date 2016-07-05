@@ -11,8 +11,8 @@
   "license": "BSD-2-Clause",
   "main": "mdk.js",
   "scripts": {
-    "start": "watchify mdk.js --s origo --d --outfile dist/origo.js",
-    "build": "browserify mdk.js --s origo | uglifyjs --compress --output dist/origo.min.js"
+    "start": "watchify origo.js --s origo --d --outfile dist/origo.js",
+    "build": "browserify origo.js --s origo | uglifyjs --compress --output dist/origo.min.js"
   },
   "dependencies": {
     "browserify": "^11.0.1",
@@ -41,6 +41,6 @@
     ]
   },
   "browserify-shim": {
-    "./externs/modernizr.js": "modernizr"
+    
   }
 }

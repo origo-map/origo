@@ -6,7 +6,6 @@
 
 var ol = require('openlayers');
 var $ = require('jquery');
-var Modernizr = require('../externs/modernizr');
 var template = require("./templates/viewer.handlebars");
 var Popup = require('./popup');
 var Modal = require('./modal');
@@ -190,7 +189,8 @@ function init (el, mapOptions){
         for(var i=layerlist.length-1; i>=0; i--) {
           var savedLayer = {};
           if(savedLayers) {
-              savedLayer = savedLayers[layerlist[i].name] || {visible: false, legend: false};
+              savedLayer = savedLayers[layerlist[i].name.split(':').pop()] || {visible: false, legend: false};
+              savedLayer.name = layerlist[i].name;
           }
           var layer = $.extend(layerlist[i],savedLayer);
           var layerOptions = setLayerOptions(layer);
