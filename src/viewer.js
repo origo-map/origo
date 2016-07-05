@@ -6,7 +6,6 @@
 
 var ol = require('openlayers');
 var $ = require('jquery');
-var Modernizr = require('../externs/modernizr');
 var template = require("./templates/viewer.handlebars");
 var Popup = require('./popup');
 var Modal = require('./modal');

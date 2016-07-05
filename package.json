@@ -41,6 +41,6 @@
     ]
   },
   "browserify-shim": {
-    "./externs/modernizr.js": "modernizr"
+    
   }
 }
