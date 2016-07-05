@@ -10,402 +10,58 @@ var Viewer = require('./viewer');
 var Popup = require('./popup');
 var sidebar = require('./sidebar');
 var maputils = require('./maputils');
-var featureinfotemplates = require('./featureinfotemplates');
 var featurelayer = require('./featurelayer');
 var style = require('./style');
 var styleTypes = require('./style/styletypes');
+var getFeatureInfo = require('./getfeatureinfo');
+var getAttributes = require('./getattributes');
 var owlCarousel = require('../externs/owlcarousel-browserify');
 owlCarousel.loadjQueryPlugin();
 
-var selectionLayer = undefined, savedPin = undefined;
+var selectionLayer = undefined,
+    savedPin = undefined,
+    options,
+    map,
+    pinning,
+    pinStyle,
+    selectionStyles,
+    showOverlay,
+    identifyTarget,
+    clusterFeatureinfoLevel;
 
-module.exports = function(opt_options) {
-  var map = Viewer.getMap();
 
-  var options = opt_options || {};
+module.exports.init = function init(opt_options) {
+    map = Viewer.getMap();
 
-  var pinning = options.hasOwnProperty('pinning') ? options.pinning : true;
-  var pinStyleOptions = options.hasOwnProperty('pinStyle') ? options.pinStyle : styleTypes.getStyle('pin');
-  var pinStyle = style.createStyleRule(pinStyleOptions)[0];
-  savedPin = options.savedPin ? maputils.createPointFeature(opt_options.savedPin, pinStyle) : undefined;
+    options = opt_options || {};
 
-  var selectionStyles = style.createEditStyle();
+    pinning = options.hasOwnProperty('pinning') ? options.pinning : true;
+    var pinStyleOptions = options.hasOwnProperty('pinStyle') ? options.pinStyle : styleTypes.getStyle('pin');
+    pinStyle = style.createStyleRule(pinStyleOptions)[0];
+    savedPin = options.savedPin ? maputils.createPointFeature(opt_options.savedPin, pinStyle) : undefined;
 
-  var savedSelection = options.savedSelection || undefined;
-  var savedFeature = savedPin || savedSelection || undefined;
-  selectionLayer = featurelayer(savedFeature, map);
+    selectionStyles = style.createEditStyle();
 
-  var showOverlay = options.hasOwnProperty('overlay') ? options.overlay : true;
+    var savedSelection = options.savedSelection || undefined;
+    var savedFeature = savedPin || savedSelection || undefined;
+    selectionLayer = featurelayer(savedFeature, map);
 
-  var identifyTarget;
-  if(showOverlay) {
-      Popup.init('#map');
-      identifyTarget = 'overlay';
-  }
-  else {
-      sidebar.init();
-      identifyTarget = 'sidebar';
-  }
+    showOverlay = options.hasOwnProperty('overlay') ? options.overlay : true;
 
-    var clusterFeatureinfoLevel = options.hasOwnProperty('clusterFeatureinfoLevel') ? options.clusterFeatureinfoLevel : 1;
+    if(showOverlay) {
+        Popup.init('#map');
+        identifyTarget = 'overlay';
+    }
+    else {
+        sidebar.init();
+        identifyTarget = 'sidebar';
+    }
+
+    clusterFeatureinfoLevel = options.hasOwnProperty('clusterFeatureinfoLevel') ? options.clusterFeatureinfoLevel : 1;
 
     map.on('click', onClick);
-
     $('.o-map').on('enableInteraction', onEnableInteraction);
 
-    function onClick(evt) {
-        Popup.setVisibility(false);
-        Viewer.removeOverlays();
-        savedPin = undefined;
-        //Featurinfo in two steps. First serverside and client side when finished
-        var clientResult = forEachFeatureAtPixel(evt);
-        if(clientResult !== false) {
-            var result = [],
-            serverResult = [],
-            promiseFn = [];
-            forEachLayerAtPixel(evt).map(function(request) {
-                request.fn.done(function(data) {
-                    var feature = maputils.geojsonToFeature(data),
-                    layer = Viewer.getLayer(request.layer);
-                    if(feature) {
-                        serverResult.push({
-                            layer: layer,
-                            feature: feature,
-                            content: getAttributes(feature, layer)
-                        });
-                    }
-                });
-                promiseFn.push(request.fn);
-            });
-            //When server side finished do client side
-            $.when.apply($, promiseFn).done(function() {
-              result = serverResult.concat(clientResult);
-              if (result.length > 0) {
-                  selectionLayer.clear();
-                  identify(result, identifyTarget, evt.coordinate)
-              }
-              else if(selectionLayer.getFeatures().length > 0) {
-                  selectionLayer.clear();
-                  sidebar.setVisibility(false);
-                  console.log("Clearing selection");
-              }
-              else if(pinning){
-                  sidebar.setVisibility(false);
-                  var resolution = map.getView().getResolution();
-                  setTimeout(function() {
-                      if(!maputils.checkZoomChange(resolution, map.getView().getResolution())) {
-                          savedPin = maputils.createPointFeature(evt.coordinate, pinStyle);
-                          selectionLayer.addFeature(savedPin);
-                      }
-                  }, 250);
-              }
-              else {
-                  console.log('No features identified');
-              }
-            });
-        }
-        evt.preventDefault();
-    }
-    function setActive(state) {
-        if(state === true) {
-            map.on('click', onClick);
-        }
-        else {
-            selectionLayer.clear();
-            Popup.setVisibility(false);
-            map.un('click', onClick);
-        }
-    }
-    function onEnableInteraction(e) {
-        if(e.interaction === 'featureInfo') {
-            setActive(true);
-        }
-        else {
-            setActive(false);
-        }
-    }
-    function forEachLayerAtPixel(evt) {
-        var requests = [];
-        //Check for support of crossOrigin in image, absent in IE 8 and 9
-        if('crossOrigin' in new(Image)) {
-            map.forEachLayerAtPixel(evt.pixel, function(layer) {
-                var item = getGetFeatureInfoRequest(layer, evt.coordinate);
-                if(item) {requests.push(item)};
-            });
-        }
-        //If canvas is tainted
-        else if(isTainted(evt.pixel)) {
-            var layers = Viewer.getQueryableLayers();
-            layers.forEach(function(layer) {
-                //If layer is tainted, then create request for layer
-                if(isTainted(evt.pixel, layer)) {
-                    var item = getGetFeatureInfoRequest(layer, evt.coordinate);
-                    if(item) {requests.push(item)};
-                }
-                //If layer is not tainted, test if layer hit at pixel
-                else if(layerAtPixel(evt.pixel, layer)){
-                    var item = getGetFeatureInfoRequest(layer, evt.coordinate);
-                    if(item) {requests.push(item)};
-                }
-            });
-        }
-        //If crossOrigin is not supported and canvas not tainted
-        else {
-            map.forEachLayerAtPixel(evt.pixel, function(layer) {
-                var item = getGetFeatureInfoRequest(layer, evt.coordinate);
-                if(item) {requests.push(item)};
-            });
-        }
-        return requests;
-    }
-    function forEachFeatureAtPixel(evt) {
-        var result = [],
-        cluster = false;
-        map.forEachFeatureAtPixel(evt.pixel,
-            function(feature, layer) {
-              var l = layer;
-              var queryable = false;
-              if(layer) {
-                  queryable = layer.get('queryable');
-              }
-              if(feature.get('features')) {
-                  //If cluster
-                  var collection = feature.get('features');
-                  if (collection.length > 1) {
-                    var zoom = map.getView().getZoom();
-                    var zoomLimit = clusterFeatureinfoLevel === -1 ? Viewer.getResolutions().length : zoom + clusterFeatureinfoLevel;
-                    if(zoomLimit < Viewer.getResolutions().length) {
-                        map.getView().setCenter(evt.coordinate);
-                        map.getView().setZoom(zoom + 1);
-                        cluster = true;
-                        return true;
-                    }
-                    else {
-                        collection.forEach(function(f) {
-                              var item = {};
-                              item.layer = l;
-                              item.feature = f;
-                              item.content =  getAttributes(f,l);
-                              result.push(item);
-                        });
-                    }
-                  }
-                  else if(collection.length == 1 && queryable) {
-                      var item = {};
-                      item.layer = l;
-                      item.feature = collection[0];
-                      item.content = getAttributes(collection[0],l);
-                      result.push(item);
-                  }
-              }
-              else if(queryable) {
-                  var item = {};
-                  item.layer = l;
-                  item.feature = feature;
-                  item.content = getAttributes(feature,l)
-                  result.push(item);
-              }
-
-            });
-        if(cluster) {
-            return false;
-        }
-        else {
-            return result;
-        }
-    }
-    function getGetFeatureInfoRequest(layer, coordinate) {
-        var layerType = layer.get('type'),
-        obj = {};
-        switch (layerType) {
-          case 'WMTS':
-            if(layer.get('featureinfoLayer')) {
-                var featureinfoLayerName = layer.get('featureinfoLayer'),
-                featureinfoLayer = Viewer.getLayer(featureinfoLayerName),
-                url = featureinfoLayer.getSource().getGetFeatureInfoUrl(
-                coordinate, map.getView().getResolution(), Viewer.getProjection(),
-                {'INFO_FORMAT': 'application/json'});
-                obj.layer = featureinfoLayerName;
-                obj.cb = "GEOJSON";
-                obj.fn = getFeatureInfo(url);
-                return obj;
-            }
-            else {
-                return undefined;
-            }
-            break;
-          case 'WMS':
-            var url = layer.getSource().getGetFeatureInfoUrl(
-            coordinate, map.getView().getResolution(), Viewer.getProjection(),
-            {'INFO_FORMAT': 'application/json'});
-            obj.layer = layer.get('name');
-            obj.cb = "GEOJSON";
-            obj.fn = getFeatureInfo(url);
-            return obj;
-            break;
-          default:
-            return undefined;
-        }
-    }
-    function getFeatureInfo(url) {
-        return $.ajax(url, {
-          type: 'post'
-        });
-    }
-    function identify(items, target, coordinate) {
-        var layers = items.map(function(i){
-            return i.layer;
-        });
-        var content = items.map(function(i){
-            return i.content;
-        }).join('');
-        content = '<div id="identify"><div id="mdk-identify-carousel" class="owl-carousel owl-theme">' + content + '</div></div>';
-        switch (target) {
-            case 'overlay':
-                var overlay = new ol.Overlay({
-                  element: $('#popup').get(0)
-                });
-                map.addOverlay(overlay);
-                var geometry = items[0].feature.getGeometry();
-                var coord;
-                geometry.getType() == 'Point' ? coord = geometry.getCoordinates() : coord = coordinate;
-                overlay.setPosition(coord);
-                Popup.setContent({content: content, title: items[0].layer.get('title')});
-                Popup.setVisibility(true);
-                var owl = initCarousel('#mdk-identify-carousel', undefined, function(){
-                    var currentItem = this.owl.currentItem;
-                    selectionLayer.clearAndAdd(items[currentItem].feature.clone(), selectionStyles[items[currentItem].feature.getGeometry().getType()]);
-                    Popup.setTitle(items[currentItem].layer.get('title'));
-                });
-                Viewer.autoPan();
-                break;
-            case 'sidebar':
-                sidebar.setContent({content: content, title: items[0].layer.get('title')});
-                sidebar.setVisibility(true);
-                var owl = initCarousel('#mdk-identify-carousel', undefined, function(){
-                    var currentItem = this.owl.currentItem;
-                    selectionLayer.clearAndAdd(items[currentItem].feature.clone(), selectionStyles[items[currentItem].feature.getGeometry().getType()]);
-                    sidebar.setTitle(items[currentItem].layer.get('title'));
-                });
-                break;
-        }
-    }
-    function initCarousel(id, options, cb) {
-        var carouselOptions = options || {
-          navigation : true, // Show next and prev buttons
-          slideSpeed : 300,
-          paginationSpeed : 400,
-          singleItem:true,
-          rewindSpeed:200,
-          navigationText: ['<svg class="mdk-icon-fa-chevron-left"><use xlink:href="css/svg/fa-icons.svg#fa-chevron-left"></use></svg>', '<svg class="mdk-icon-fa-chevron-right"><use xlink:href="css/svg/fa-icons.svg#fa-chevron-right"></use></svg>'],
-          afterAction: cb
-        };
-        return $(id).owlCarousel(carouselOptions);
-    }
-    function getAttributes(feature, layer) {
-      var content = '<div><ul>';
-      var attribute, li = '', title, val;
-      //If layer is configured with attributes
-      if(layer.get('attributes')) {
-            //If attributes is string then use template named with the string
-            if(typeof layer.get('attributes') === 'string') {
-                //Use attributes with the template
-                li = featureinfotemplates(layer.get('attributes'),feature.getProperties());
-            }
-            else {
-                for(var i=0; i<layer.get('attributes').length; i++) {
-                  attribute = layer.get('attributes')[i];
-                  title = '';
-                  val = '';
-                  if (attribute['name']) {
-                    if(feature.get(attribute['name'])) {
-                        val = feature.get(attribute['name']);
-                        if (attribute['title']) {
-                          title = '<b>' + attribute['title'] + '</b>';
-                        }
-                        if (attribute['url']) {
-                          if(feature.get(attribute['url'])) {
-                          var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['url']));
-                          val = '<a href="' + url + '" target="_blank">' +
-                                feature.get(attribute['name']) +
-                                '</a>';
-                          }
-                        }
-                    }
-                  }
-                  else if (attribute['url']) {
-                      if(feature.get(attribute['url'])) {
-                          var text = attribute['html'] || attribute['url'];
-                          var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['url']));
-                          val = '<a href="' + url + '" target="_blank">' +
-                                text +
-                                '</a>';
-                      }
-                  }
-                  else if (attribute['img']) {
-                      if(feature.get(attribute['img'])) {
-                          var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['img']));
-                          var attribution = attribute['attribution'] ? '<div class="image-attribution">' + attribute['attribution'] + '</div>' : '';
-                          val = '<div class="image-container">' +
-                                    '<img src="' + url + '">' + attribution +
-                                '</div>';
-                      }
-                  }
-                  else if (attribute['html']) {
-                    val = attribute['html'];
-                  }
-
-                  var cls = ' class="' + attribute['cls'] + '" ' || '';
-
-                  li += '<li' + cls +'>' + title + val + '</li>';
-                }
-          }
-      }
-      else {
-        //Clean feature attributes from non-wanted properties
-        var attributes = filterObject(feature.getProperties(), ['FID_', 'geometry']);
-        //Use attributes with the template
-        li = featureinfotemplates('default',attributes);
-      }
-      content += li + '</ul></div>';
-      return content;
-    }
-    function filterObject(obj, excludedKeys) {
-        var result = {}, key;
-        for (key in obj) {
-            if(excludedKeys.indexOf(key) === -1) {
-                result[key] = obj[key];
-            }
-        }
-        return result;
-    }
-    function createUrl(prefix, suffix, url) {
-        var p = prefix || '';
-        var s = suffix || '';
-        return p + url + s;
-    }
-    function isTainted(pixel, layerFilter) {
-        try {
-            if(layerFilter) {
-                map.forEachLayerAtPixel(pixel, function(layer) {
-                    return layerFilter === layer;
-                });
-            }
-            else {
-                map.forEachLayerAtPixel(pixel, function(layer) {});
-            }
-            return false;
-        }
-        catch(e) {
-            console.log(e);
-            return true;
-        }
-    }
-    function layerAtPixel(pixel, matchLayer) {
-        map.forEachLayerAtPixel(pixel, function(layer) {
-            return matchLayer === layer;
-        })
-    }
 }
 
 module.exports.getSelection = function getSelection() {
@@ -416,4 +72,109 @@ module.exports.getSelection = function getSelection() {
 }
 module.exports.getPin = function getPin() {
     return savedPin;
+}
+module.exports.identify = function identify(items, target, coordinate) {
+    var layers = items.map(function(i){
+        return i.layer;
+    });
+    var content = items.map(function(i){
+        return i.content;
+    }).join('');
+    content = '<div id="identify"><div id="mdk-identify-carousel" class="owl-carousel owl-theme">' + content + '</div></div>';
+    switch (target) {
+        case 'overlay':
+            var overlay = new ol.Overlay({
+              element: $('#popup').get(0)
+            });
+            map.addOverlay(overlay);
+            var geometry = items[0].feature.getGeometry();
+            var coord;
+            geometry.getType() == 'Point' ? coord = geometry.getCoordinates() : coord = coordinate;
+            overlay.setPosition(coord);
+            Popup.setContent({content: content, title: items[0].layer.get('title')});
+            Popup.setVisibility(true);
+            var owl = initCarousel('#mdk-identify-carousel', undefined, function(){
+                var currentItem = this.owl.currentItem;
+                selectionLayer.clearAndAdd(items[currentItem].feature.clone(), selectionStyles[items[currentItem].feature.getGeometry().getType()]);
+                Popup.setTitle(items[currentItem].layer.get('title'));
+            });
+            Viewer.autoPan();
+            break;
+        case 'sidebar':
+            sidebar.setContent({content: content, title: items[0].layer.get('title')});
+            sidebar.setVisibility(true);
+            var owl = initCarousel('#mdk-identify-carousel', undefined, function(){
+                var currentItem = this.owl.currentItem;
+                selectionLayer.clearAndAdd(items[currentItem].feature.clone(), selectionStyles[items[currentItem].feature.getGeometry().getType()]);
+                sidebar.setTitle(items[currentItem].layer.get('title'));
+            });
+            break;
+    }
+}
+function onClick(evt) {
+    Popup.setVisibility(false);
+    Viewer.removeOverlays();
+    savedPin = undefined;
+    //Featurinfo in two steps. First serverside and client side when finished
+    var clientResult = getFeatureInfo.getFeaturesAtPixel(evt);
+    //Returns false if abort
+    if(clientResult !== false) {
+        var serverPromises = getFeatureInfo.getFeaturesFromRemote(evt);
+            //When server side finished do client side
+            $.when.apply($, serverPromises).done(function(serverResult) {
+                var result = serverResult.concat(clientResult);
+                if (result.length > 0) {
+                    selectionLayer.clear();
+                    identify(result, identifyTarget, evt.coordinate)
+                }
+                else if(selectionLayer.getFeatures().length > 0) {
+                    selectionLayer.clear();
+                    sidebar.setVisibility(false);
+                    console.log("Clearing selection");
+                }
+                else if(pinning){
+                    sidebar.setVisibility(false);
+                    var resolution = map.getView().getResolution();
+                    setTimeout(function() {
+                        if(!maputils.checkZoomChange(resolution, map.getView().getResolution())) {
+                            savedPin = maputils.createPointFeature(evt.coordinate, pinStyle);
+                            selectionLayer.addFeature(savedPin);
+                        }
+                    }, 250);
+                }
+                else {
+                    console.log('No features identified');
+                }
+            });
+    }
+}
+function setActive(state) {
+    if(state === true) {
+        map.on('click', onClick);
+    }
+    else {
+        selectionLayer.clear();
+        Popup.setVisibility(false);
+        map.un('click', onClick);
+    }
+}
+function onEnableInteraction(e) {
+    if(e.interaction === 'featureInfo') {
+        setActive(true);
+    }
+    else {
+        setActive(false);
+    }
+}
+function initCarousel(id, options, cb) {
+    var carouselOptions = options || {
+      navigation : true, // Show next and prev buttons
+      slideSpeed : 300,
+      paginationSpeed : 400,
+      singleItem:true,
+      rewindSpeed:200,
+      navigationText: ['<svg class="mdk-icon-fa-chevron-left"><use xlink:href="css/svg/fa-icons.svg#fa-chevron-left"></use></svg>', '<svg class="mdk-icon-fa-chevron-right"><use xlink:href="css/svg/fa-icons.svg#fa-chevron-right"></use></svg>'],
+      afterAction: cb
+    };
+    return $(id).owlCarousel(carouselOptions);
 }
