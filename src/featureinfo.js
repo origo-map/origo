@@ -14,7 +14,6 @@ var featurelayer = require('./featurelayer');
 var style = require('./style');
 var styleTypes = require('./style/styletypes');
 var getFeatureInfo = require('./getfeatureinfo');
-var getAttributes = require('./getattributes');
 var owlCarousel = require('../externs/owlcarousel-browserify');
 owlCarousel.loadjQueryPlugin();
 
@@ -30,7 +29,7 @@ var selectionLayer = undefined,
     clusterFeatureinfoLevel;
 
 
-module.exports.init = function init(opt_options) {
+function init(opt_options) {
     map = Viewer.getMap();
 
     options = opt_options || {};
@@ -64,16 +63,16 @@ module.exports.init = function init(opt_options) {
 
 }
 
-module.exports.getSelection = function getSelection() {
+function getSelection() {
     var selection = {};
     selection.geometryType = selectionLayer.getFeatures()[0].getGeometry().getType();
     selection.coordinates = selectionLayer.getFeatures()[0].getGeometry().getCoordinates();
     return selection;
 }
-module.exports.getPin = function getPin() {
+function getPin() {
     return savedPin;
 }
-module.exports.identify = function identify(items, target, coordinate) {
+function identify(items, target, coordinate) {
     var layers = items.map(function(i){
         return i.layer;
     });
@@ -115,13 +114,13 @@ function onClick(evt) {
     Popup.setVisibility(false);
     Viewer.removeOverlays();
     savedPin = undefined;
-    //Featurinfo in two steps. First serverside and client side when finished
+    //Featurinfo in two steps. Concat serverside and clientside when serverside is finished
     var clientResult = getFeatureInfo.getFeaturesAtPixel(evt);
-    //Returns false if abort
+    //Abort if clientResult is false
     if(clientResult !== false) {
-        var serverPromises = getFeatureInfo.getFeaturesFromRemote(evt);
-            //When server side finished do client side
-            $.when.apply($, serverPromises).done(function(serverResult) {
+        getFeatureInfo.getFeaturesFromRemote(evt)
+            .done(function(data) {
+                var serverResult = data || [];
                 var result = serverResult.concat(clientResult);
                 if (result.length > 0) {
                     selectionLayer.clear();
@@ -178,3 +177,8 @@ function initCarousel(id, options, cb) {
     };
     return $(id).owlCarousel(carouselOptions);
 }
+
+module.exports.init = init;
+module.exports.getSelection = getSelection;
+module.exports.getPin = getPin;
+module.exports.identify = identify;

@@ -10,20 +10,25 @@ var getAttributes = require('./getattributes');
 
 var map;
 
-module.exports.getFeaturesFromRemote = function getFeaturesFromRemote(evt) {
+function getFeaturesFromRemote(evt) {
         map = Viewer.getMap();
-        return getFeatureInfoRequests(evt).map(function(request) {
-            request.fn.then(function(data) {
+        var requestResult = [];
+        var requestPromises = getFeatureInfoRequests(evt).map(function(request) {
+            return request.fn.then(function(data) {
                 var feature = maputils.geojsonToFeature(data),
                 layer = Viewer.getLayer(request.layer);
                 if(feature) {
-                    return {
+                    requestResult.push({
                         layer: layer,
                         feature: feature,
                         content: getAttributes(feature, layer)
-                    };
+                    });
+                    return requestResult;
                 }
             });
+        });
+        return $.when.apply($, requestPromises).then(function(data) {
+            return requestResult;
         });
 }
 function getFeatureInfoRequests(evt) {
@@ -73,7 +78,7 @@ function getGetFeatureInfoRequest(layer, coordinate) {
             {'INFO_FORMAT': 'application/json'});
             obj.layer = featureinfoLayerName;
             obj.cb = "GEOJSON";
-            obj.fn = getFeatureInfo(url);
+            obj.fn = getRequest(url);
             return obj;
         }
         else {
@@ -86,14 +91,14 @@ function getGetFeatureInfoRequest(layer, coordinate) {
         {'INFO_FORMAT': 'application/json'});
         obj.layer = layer.get('name');
         obj.cb = "GEOJSON";
-        obj.fn = getFeatureInfo(url);
+        obj.fn = getRequest(url);
         return obj;
         break;
       default:
         return undefined;
     }
 }
-function getFeatureInfo(url) {
+function getRequest(url) {
     return $.ajax(url, {
       type: 'post'
     });
@@ -120,7 +125,7 @@ function layerAtPixel(pixel, matchLayer) {
         return matchLayer === layer;
     })
 }
-module.exports.getFeaturesAtPixel = function getFeaturesAtPixel(evt) {
+function getFeaturesAtPixel(evt) {
     map = Viewer.getMap();
     var result = [],
     cluster = false;
@@ -177,3 +182,6 @@ module.exports.getFeaturesAtPixel = function getFeaturesAtPixel(evt) {
         return result;
     }
 }
+
+module.exports.getFeaturesFromRemote = getFeaturesFromRemote;
+module.exports.getFeaturesAtPixel = getFeaturesAtPixel;
