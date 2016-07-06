@@ -6,7 +6,6 @@
 
 var ol = require('openlayers');
 var $ = require('jquery');
-var Modernizr = require('../externs/modernizr');
 var template = require("./templates/viewer.handlebars");
 var Popup = require('./popup');
 var Modal = require('./modal');
@@ -131,7 +130,7 @@ function init (el, mapOptions){
         settings.styles = mapOptions.styles;
         createLayers(mapOptions.layers, settings.layers, urlParams.layers);
         settings.controls = mapOptions.controls;
-        settings.featureinfoOptions = mapOptions.featureinfoOptions || undefined;
+        settings.featureinfoOptions = mapOptions.featureinfoOptions || {};
         //If url arguments, parse this settings
         if (window.location.search) {
             parseArg();
@@ -175,7 +174,7 @@ function init (el, mapOptions){
               geometry: new ol.geom[urlParams.selection.geometryType](urlParams.selection.coordinates)
           });
       }
-      featureinfo(settings.featureinfoOptions);
+      featureinfo.init(settings.featureinfoOptions);
 
       //Init controls
       var controlName, controlOptions;
@@ -190,7 +189,8 @@ function init (el, mapOptions){
         for(var i=layerlist.length-1; i>=0; i--) {
           var savedLayer = {};
           if(savedLayers) {
-              savedLayer = savedLayers[layerlist[i].name] || {visible: false, legend: false};
+              savedLayer = savedLayers[layerlist[i].name.split(':').pop()] || {visible: false, legend: false};
+              savedLayer.name = layerlist[i].name;
           }
           var layer = $.extend(layerlist[i],savedLayer);
           var layerOptions = setLayerOptions(layer);

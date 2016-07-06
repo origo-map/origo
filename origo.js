@@ -7,7 +7,7 @@ global.jQuery = require("jquery");
 //Adds support for linking till external svg sprites
 svg4everybody();
 
-var mdk = {};
-mdk.map = require('./src/viewer');
+var origo = {};
+origo.map = require('./src/viewer');
 
-module.exports = mdk;
+module.exports = origo;
