@@ -174,7 +174,7 @@ function init (el, mapOptions){
               geometry: new ol.geom[urlParams.selection.geometryType](urlParams.selection.coordinates)
           });
       }
-      featureinfo(settings.featureinfoOptions);
+      featureinfo.init(settings.featureinfoOptions);
 
       //Init controls
       var controlName, controlOptions;
