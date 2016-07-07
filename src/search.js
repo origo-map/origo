@@ -12,9 +12,23 @@ var Popup = require('./popup');
 var typeahead = require("typeahead.js-browserify");
 typeahead.loadjQueryPlugin();
 var Bloodhound = require("typeahead.js-browserify").Bloodhound;
+var getFeature = require('./getfeature');
+var getAttributes = require('./getattributes');
+var featureInfo = require('./featureinfo');
 
 var adress;
-var name, northing, easting, geometryAttribute, url, title, hint, projectionCode;
+var map,
+    name,
+    northing,
+    easting,
+    geometryAttribute,
+    idAttribute,
+    layerNameAttribute,
+    layerName,
+    url,
+    title,
+    hint,
+    projectionCode;
 
 function init(options){
 
@@ -22,10 +36,15 @@ function init(options){
     northing = options.northing || undefined;
     easting = options.easting || undefined;
     geometryAttribute = options.geometryAttribute;
+    idAttribute = options.idAttribute; //idAttribute in combination with layerNameAttribute must be defined if search result should be selected
+    layerNameAttribute = options.layerNameAttribute || undefined;
+    layerName = options.layerName || undefined;
     url = options.url;
     title = options.title || '';
     hint = options.hint || "Sök...";
     projectionCode = Viewer.getProjectionCode();
+
+    map = Viewer.getMap();
 
     var el = '<div id="search-wrapper">' +
                 '<div id="search" class="search search-false">' +
@@ -95,15 +114,6 @@ function init(options){
 }
 function bindUIActions() {
         $('.typeahead').on('typeahead:selected', function(evt, data){
-            // alert(data.x);
-          // Popup.init('#map');
-          Viewer.removeOverlays();
-          var map = Viewer.getMap();
-          var overlay = new ol.Overlay({
-            element: $('#popup').get(0)
-          });
-
-          map.addOverlay(overlay);
 
           if(geometryAttribute) {
               var feature = wktToFeature(data[geometryAttribute], projectionCode);
@@ -113,11 +123,27 @@ function bindUIActions() {
               var coord = [data[easting], data[northing]];
           }
 
-          overlay.setPosition(coord);
-          var content = data[name];
-          // content += '<br>' + data.postnr + '&nbsp;' + data.postort;
-          Popup.setContent({content: content, title: title});
-          Popup.setVisibility(true);
+          //Select geometry if configured with layerName or layerNameAttribute
+          if(layerNameAttribute && idAttribute) {
+              var layer = Viewer.getLayer(data[layerNameAttribute]);
+              var id = data[idAttribute];
+              var promise = getFeature(id, layer)
+                .done(function(res) {
+                    if(res.length > 0) {
+                        var obj = {};
+                        obj.layer = layer;
+                        obj.feature = res[0];
+                        obj.content = getAttributes(res[0], layer);
+                        featureInfo.identify([obj], 'overlay', coord);
+                    }
+                    else {
+                        showOverlay(data, coord);
+                    }
+                });
+          }
+          else {
+              showOverlay(data, coord);
+          }
 
           map.getView().setCenter([coord[0], coord[1]]);
           map.getView().setZoom(11);
@@ -139,7 +165,7 @@ function bindUIActions() {
 function onClearSearch() {
     $('#search-button-close').on('touchend click', function(e) {
       $('.typeahead').typeahead('val', '');
-      Popup.setVisibility(false);
+      featureInfo.clear();
       Viewer.removeOverlays();
       $('#search').removeClass('search-true');
       $('#search').addClass('search-false');
@@ -153,6 +179,20 @@ function offClearSearch() {
     // $('#search-button').off('touchend click', function(e) {
     //   e.preventDefault();
     // });
+}
+function showOverlay(data, coord) {
+    Viewer.removeOverlays();
+    var overlay = new ol.Overlay({
+      element: $('#popup').get(0)
+    });
+
+    map.addOverlay(overlay);
+
+    overlay.setPosition(coord);
+    var content = data[name];
+    // content += '<br>' + data.postnr + '&nbsp;' + data.postort;
+    Popup.setContent({content: content, title: title});
+    Popup.setVisibility(true);
 }
 
 module.exports.init = init;
