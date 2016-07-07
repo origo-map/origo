@@ -17,7 +17,7 @@
   "dependencies": {
     "browserify": "^11.0.1",
     "jquery": "^1.11.3",
-    "openlayers": "^3.16.0",
+    "openlayers": "^3.17.1",
     "proj4": "^2.3.10",
     "svg4everybody": "^2.0.3",
     "typeahead.js-browserify": "^1.0.7"
@@ -40,7 +40,5 @@
       ]
     ]
   },
-  "browserify-shim": {
-    
-  }
+  "browserify-shim": {}
 }
