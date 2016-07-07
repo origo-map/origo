@@ -125,7 +125,7 @@ function layerAtPixel(pixel, matchLayer) {
         return matchLayer === layer;
     })
 }
-function getFeaturesAtPixel(evt) {
+function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
     map = Viewer.getMap();
     var result = [],
     cluster = false;

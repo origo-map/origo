@@ -115,7 +115,7 @@ function onClick(evt) {
     Viewer.removeOverlays();
     savedPin = undefined;
     //Featurinfo in two steps. Concat serverside and clientside when serverside is finished
-    var clientResult = getFeatureInfo.getFeaturesAtPixel(evt);
+    var clientResult = getFeatureInfo.getFeaturesAtPixel(evt, clusterFeatureinfoLevel);
     //Abort if clientResult is false
     if(clientResult !== false) {
         getFeatureInfo.getFeaturesFromRemote(evt)
