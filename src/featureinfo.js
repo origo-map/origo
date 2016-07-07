@@ -127,9 +127,7 @@ function onClick(evt) {
                     identify(result, identifyTarget, evt.coordinate)
                 }
                 else if(selectionLayer.getFeatures().length > 0) {
-                    selectionLayer.clear();
-                    sidebar.setVisibility(false);
-                    console.log("Clearing selection");
+                    clear();
                 }
                 else if(pinning){
                     sidebar.setVisibility(false);
@@ -157,6 +155,12 @@ function setActive(state) {
         map.un('click', onClick);
     }
 }
+function clear() {
+    selectionLayer.clear();
+    sidebar.setVisibility(false);
+    Popup.setVisibility(false);
+    console.log("Clearing selection");
+}
 function onEnableInteraction(e) {
     if(e.interaction === 'featureInfo') {
         setActive(true);
@@ -179,6 +183,7 @@ function initCarousel(id, options, cb) {
 }
 
 module.exports.init = init;
+module.exports.clear = clear;
 module.exports.getSelection = getSelection;
 module.exports.getPin = getPin;
 module.exports.identify = identify;

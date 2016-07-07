@@ -24,7 +24,7 @@ sourceType.AGS_FEATURE = function agsFeature(id, layer, serverUrl) {
   var layerId = layer.get('id');
   var esrijsonFormat = new ol.format.EsriJSON();
 
-  var url = serverUrl + layerId +
+  var url = serverUrl + '/' + layerId +
       '/query?f=json&' +
       'returnGeometry=true' +
       '&objectIds=' + id +
@@ -41,14 +41,15 @@ sourceType.AGS_FEATURE = function agsFeature(id, layer, serverUrl) {
         dataType: 'jsonp'
   })
     .then(function(response) {
-        var features = esrijsonFormat.readFeatures(response, {
-                featureProjection: viewer.getProjection()
-        });
-        if(features.length > 0) {
-            return features;
+        if(response.error) {
+            fail(response);
+            return [];
         }
         else {
-            console.log('No features returned');
+            var features = esrijsonFormat.readFeatures(response, {
+                    featureProjection: viewer.getProjection()
+            });
+            return features;
         }
     }, fail
     );
@@ -57,14 +58,15 @@ sourceType.AGS_FEATURE = function agsFeature(id, layer, serverUrl) {
 sourceType.WFS = function(id, layer, serverUrl) {
   var geometryName = layer.get('geometryName');
   var format = new ol.format.GeoJSON({geometryName: geometryName});
-  var url = serverUrl +
-      '?service=WFS' +
+  var url = serverUrl +'?';
+  var data = 'service=WFS' +
       '&version=1.0.0' +
       '&request=GetFeature&typeName=' + layer.get('name') +
       '&outputFormat=json' +
       '&featureId=' + id;
   return $.ajax({
     url: url,
+    data: data,
     type: 'POST',
     dataType: 'json'
   })
@@ -75,7 +77,7 @@ sourceType.WFS = function(id, layer, serverUrl) {
 
 function fail(response) {
     if(response.error) {
-        alert(response.error.message + '\n' +
+        console.log(response.error.message + '\n' +
             response.error.details.join('\n'));
     }
 }
