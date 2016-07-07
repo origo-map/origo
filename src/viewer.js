@@ -219,9 +219,6 @@ function init (el, mapOptions){
                 var xyzSource = xyz(layerOptions);
                 layers.push(createTileLayer(layerOptions, xyzSource));
             }
-            else if(layer.type == 'MAPQUEST') {
-                layers.push(addMapQuest(layer));
-            }
             else if(layer.type == 'GROUP') {
                 layers.push(createLayerGroup(layer.layers, layer));
             }
@@ -630,23 +627,6 @@ function init (el, mapOptions){
         });
         return tileSource;
     }
-    function addMapQuest(layersConfig) {
-        // layersConfig.hasOwnProperty('attribution') ? attr=[new ol.Attribution({html: layersConfig.attribution})] : [attr = null];
-
-        return new ol.layer.Tile({
-           group: layersConfig.group || 'background',
-           name: layersConfig.name.split(':').pop(), //remove workspace part of name
-           opacity: layersConfig.opacity || 1,
-           title: layersConfig.title,
-           styleName: layersConfig.style || 'default',
-           minResolution: layersConfig.hasOwnProperty('minScale') ? scaleToResolution(layersConfig.minScale): undefined,
-           maxResolution: layersConfig.hasOwnProperty('maxScale') ? scaleToResolution(layersConfig.maxScale): undefined,
-           visible: layersConfig.visible,
-           source: new ol.source.MapQuest({
-             layer: layersConfig.name
-           })
-        })
-    }
     function wfsCql(relations, coordinates) {
             var url, finishedQueries = 0;
             cqlQuery = [];
@@ -1021,7 +1001,6 @@ module.exports.addWMS = addWMS;
 module.exports.addWMTS = addWMTS;
 module.exports.geojson = geojson;
 module.exports.wfs = wfs;
-module.exports.addMapQuest = addMapQuest;
 module.exports.wfsCql = wfsCql;
 module.exports.getCqlQuery = getCqlQuery;
 module.exports.modalMoreInfo = modalMoreInfo;
