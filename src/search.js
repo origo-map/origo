@@ -27,7 +27,9 @@ var map,
     layerName,
     url,
     title,
+    hintText,
     hint,
+    highlight,
     projectionCode;
 
 function init(options){
@@ -41,14 +43,16 @@ function init(options){
     layerName = options.layerName || undefined;
     url = options.url;
     title = options.title || '';
-    hint = options.hint || "Sök...";
+    hintText = options.hintText || "Sök...";
+    hint = options.hasOwnProperty('hint') ? options.hint : true;
+    highlight = options.hasOwnProperty('highlight') ? options.highlight : true;
     projectionCode = Viewer.getProjectionCode();
 
     map = Viewer.getMap();
 
     var el = '<div id="search-wrapper">' +
                 '<div id="search" class="search search-false">' +
-                    '<input class="search-field typeahead form-control" type="text" placeholder="' + hint + '">' +
+                    '<input class="search-field typeahead form-control" type="text" placeholder="' + hintText + '">' +
                     '<button id="search-button">' +
                         '<svg class="mdk-icon-fa-search">' +
                             '<use xlink:href="css/svg/fa-icons.svg#fa-search"></use>' +
@@ -94,8 +98,8 @@ function init(options){
 
     $('.typeahead').typeahead({
       autoSelect: true,
-      hint: true,
-      highlight: true,
+      hint: hint,
+      highlight: highlight,
       minLength: 4
     },
     {

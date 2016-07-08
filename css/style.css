@@ -1387,6 +1387,7 @@ li .legend-item-img {
 }
 .search-field {
   border: none;
+  border-radius: 4px;
   font-size: 1.25em;
 	height: 1em;
   overflow: hidden;
@@ -1394,7 +1395,7 @@ li .legend-item-img {
   padding-right: 0;
 /*  position: relative;
   float: left;*/
-  width: 250px;
+  width: 260px;
 }
 input.search-field:focus {
   outline: none;
