@@ -9,7 +9,7 @@
     "origo"
   ],
   "license": "BSD-2-Clause",
-  "main": "mdk.js",
+  "main": "origo.js",
   "scripts": {
     "start": "watchify origo.js --s origo --d --outfile dist/origo.js",
     "build": "browserify origo.js --s origo | uglifyjs --compress --output dist/origo.min.js"
