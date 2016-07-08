@@ -213,7 +213,8 @@ function init (el, mapOptions){
                 layers.push(createTileLayer(layerOptions, agsTileSource));
             }
             else if(layer.type == 'GEOJSON') {
-                layers.push(createVectorLayer(layerOptions, geojson(layerOptions.sourceName)));
+                var geojsonSource = geojson(layerOptions);
+                layers.push(createVectorLayer(layerOptions, geojsonSource));
             }
             else if(layer.type == 'XYZ') {
                 var xyzSource = xyz(layerOptions);
@@ -228,6 +229,8 @@ function init (el, mapOptions){
     function setLayerOptions(options) {
         var geometryName = options.hasOwnProperty('geometryName') ? options.geometryName : 'geom';
         var featureType = options.name.split('__').shift();
+        var attr;
+        options.hasOwnProperty('attribution') ? attr=[new ol.Attribution({html: options.attribution})] : [attr = null];
         var layerOptions = {
             featureType: featureType.split('__').shift(),
             name: options.name.split(':').pop(),
@@ -241,6 +244,7 @@ function init (el, mapOptions){
             layerType: options.layerType || 'vector',
             legend: options.legend || false,
             sourceName: options.source,
+            attribution: attr,
             style: options.style || 'default',
             styleName: options.style,
             tileGrid: options.tileGrid || undefined,
@@ -437,6 +441,7 @@ function init (el, mapOptions){
                 break;
             case 'cluster':
                 options.source = new ol.source.Cluster({
+                  attributions: options.attribution,
                   source: source,
                   distance: 60
                 });
@@ -454,6 +459,8 @@ function init (el, mapOptions){
         return vectorLayer;
     }
     function addWMS(layersConfig) {
+        var attr;
+        layersConfig.hasOwnProperty('attribution') ? attr=[new ol.Attribution({html: layersConfig.attribution})] : [attr = null];
 
         return new ol.layer.Tile({
           name: layersConfig.name.split(':').pop(), //remove workspace part of name
@@ -468,10 +475,11 @@ function init (el, mapOptions){
           visible: layersConfig.visible,
           attributes: layersConfig.attributes,
           queryable: true || layersConfig.queryable,
-          featureinfoLayer: layersConfig.featureinfoLayer || undefined,          
+          featureinfoLayer: layersConfig.featureinfoLayer || undefined,
           legend: false,
           sourceName: layersConfig.source,
           source: new ol.source.TileWMS(({
+            attributions: attr,
             url: settings.source[layersConfig.source].url,
             gutter: layersConfig.gutter || 0,
             crossOrigin: 'anonymous',
@@ -522,9 +530,10 @@ function init (el, mapOptions){
            })
         })
     }
-    function geojson(source) {
+    function geojson(options) {
         return new ol.source.Vector({
-            url: source,
+            attributions: options.attribution,
+            url: options.sourceName,
             format: new ol.format.GeoJSON()
         })
     }
@@ -537,6 +546,7 @@ function init (el, mapOptions){
         var queryFilter = options.filter ? '&CQL_FILTER=' + options.filter + ' AND BBOX(' + geometryName + ',' : '&BBOX=';
         var bboxProjectionCode = options.filter ? "'" + settings.projectionCode + "')" : settings.projectionCode;
         vectorSource = new ol.source.Vector({
+          attributions: options.attribution,
           format: new ol.format.GeoJSON({geometryName: options.geometryName}),
           loader: function(extent, resolution, projection) {
               var url = serverUrl +
@@ -566,6 +576,7 @@ function init (el, mapOptions){
         var queryFilter = options.filter ? '&where=' + options.filter : '';
         var esrijsonFormat = new ol.format.EsriJSON();
         vectorSource = new ol.source.Vector({
+            attributions: options.attribution,
             loader: function(extent, resolution, projection) {
               var that = this;
               // var serverUrl = settings.source[options.source].url;
@@ -611,6 +622,7 @@ function init (el, mapOptions){
         var params = options.params || {};
         params.layers = "show:" + options.id;
         var tileSource = new ol.source.TileArcGISRest({
+            attributions: options.attribution,
             projection: settings.projection,
             params: params,
             url: url
@@ -622,6 +634,7 @@ function init (el, mapOptions){
         url = options.sourceName.split('.')[0] + '/{z}/{x}/{y}.';
         url += format;
         var tileSource = new ol.source.XYZ({
+            attributions: options.attribution,
             projection: settings.projection || 'EPSG:3857',
             tileGrid: settings.tileGrid || undefined,
             url: url
