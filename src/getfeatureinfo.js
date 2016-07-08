@@ -72,28 +72,22 @@ function getGetFeatureInfoRequest(layer, coordinate) {
       case 'WMTS':
         if(layer.get('featureinfoLayer')) {
             var featureinfoLayerName = layer.get('featureinfoLayer'),
-            featureinfoLayer = Viewer.getLayer(featureinfoLayerName),
-            url = featureinfoLayer.getSource().getGetFeatureInfoUrl(
-            coordinate, map.getView().getResolution(), Viewer.getProjection(),
-            {'INFO_FORMAT': 'application/json'});
-            obj.layer = featureinfoLayerName;
-            obj.cb = "GEOJSON";
-            obj.fn = getRequest(url);
-            return obj;
+            featureinfoLayer = Viewer.getLayer(featureinfoLayerName);
+            return createRequestObj(featureinfoLayer, coordinate);
         }
         else {
             return undefined;
         }
         break;
       case 'WMS':
-        var url = layer.getSource().getGetFeatureInfoUrl(
-        coordinate, map.getView().getResolution(), Viewer.getProjection(),
-        {'INFO_FORMAT': 'application/json'});
-        obj.layer = layer.get('name');
-        obj.cb = "GEOJSON";
-        obj.fn = getRequest(url);
-        return obj;
-        break;
+        if(layer.get('featureinfoLayer')) {
+            var featureinfoLayerName = layer.get('featureinfoLayer'),
+            featureinfoLayer = Viewer.getLayer(featureinfoLayerName);
+            return createRequestObj(featureinfoLayer, coordinate);
+        }
+        else {
+            return createRequestObj(layer, coordinate);
+        }
       default:
         return undefined;
     }
@@ -181,6 +175,16 @@ function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
     else {
         return result;
     }
+}
+function createRequestObj(layer, coordinate) {
+    var url = layer.getSource().getGetFeatureInfoUrl(
+    coordinate, map.getView().getResolution(), Viewer.getProjection(),
+    {'INFO_FORMAT': 'application/json'});
+    var obj = {};
+    obj.layer = layer.get('name');
+    obj.cb = "GEOJSON";
+    obj.fn = getRequest(url);
+    return obj;
 }
 
 module.exports.getFeaturesFromRemote = getFeaturesFromRemote;

@@ -468,6 +468,7 @@ function init (el, mapOptions){
           visible: layersConfig.visible,
           attributes: layersConfig.attributes,
           queryable: true || layersConfig.queryable,
+          featureinfoLayer: layersConfig.featureinfoLayer || undefined,          
           legend: false,
           sourceName: layersConfig.source,
           source: new ol.source.TileWMS(({
