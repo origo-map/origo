@@ -4,6 +4,7 @@
  * ======================================================================== */
 "use strict";
 var featureinfotemplates = require('./featureinfotemplates');
+var replacer = require('../src/utils/replacer');
 
 module.exports = function(feature, layer) {
     var content = '<div><ul>';
@@ -28,7 +29,7 @@ module.exports = function(feature, layer) {
                       }
                       if (attribute['url']) {
                         if(feature.get(attribute['url'])) {
-                        var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['url']));
+                        var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], replacer.replace(feature.get(attribute['url']), feature.getProperties()));
                         val = '<a href="' + url + '" target="_blank">' +
                               feature.get(attribute['name']) +
                               '</a>';
@@ -39,7 +40,7 @@ module.exports = function(feature, layer) {
                 else if (attribute['url']) {
                     if(feature.get(attribute['url'])) {
                         var text = attribute['html'] || attribute['url'];
-                        var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['url']));
+                        var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], replacer.replace(feature.get(attribute['url']), feature.getProperties()));
                         val = '<a href="' + url + '" target="_blank">' +
                               text +
                               '</a>';
@@ -47,7 +48,7 @@ module.exports = function(feature, layer) {
                 }
                 else if (attribute['img']) {
                     if(feature.get(attribute['img'])) {
-                        var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['img']));
+                        var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], replacer.replace(feature.get(attribute['img']), feature.getProperties()));
                         var attribution = attribute['attribution'] ? '<div class="image-attribution">' + attribute['attribution'] + '</div>' : '';
                         val = '<div class="image-container">' +
                                   '<img src="' + url + '">' + attribution +
@@ -55,7 +56,7 @@ module.exports = function(feature, layer) {
                     }
                 }
                 else if (attribute['html']) {
-                  val = attribute['html'];
+                  val = replacer.replace(attribute['html'], feature.getProperties());
                 }
 
                 var cls = ' class="' + attribute['cls'] + '" ' || '';
