@@ -526,7 +526,7 @@ function init (el, mapOptions){
                resolutions: settings.resolutions,
                matrixIds: matrixIds
              }),
-             style: 'default'
+             style: 'raster'
            })
         })
     }
