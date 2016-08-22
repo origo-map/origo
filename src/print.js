@@ -45,12 +45,13 @@ function imageToPrint(printCanvas) {
         console.log(e);
     }
     finally {
-        var pw = '<html><head><link href="img/print.css" rel="stylesheet"></head><body>';
-        pw += '<div class="print-logo"><img src="print/logo_print.png"></div>';
+        var pw = '<html><head><link href="css/style.css" rel="stylesheet"></head><body>';
+        pw += '<div class="print-logo"><img src="img/logo_print.png" alt="Hallstahammars kommun"></div>';
         pw += '<div class="map-canvas"><img src="' + imageCrop.src + '"/></div>';
-        pw += '<div class="print-attribution">&copy&nbsp;Lantmäteriet&nbsp;Geodatasamverkan</div>'
+        pw += '<div class="print-attribution">Kartan&nbsp;saknar&nbsp;rättsverkan.&nbsp;&copy&nbsp;Lantmäteriet&nbsp;Geodatasamverkan,&nbsp;Hallstahammars&nbsp;kommun.</div>'
+        pw += '<div class="grafiskt_element"><img src="img/grafiskt_element.png" alt="Grafiskt element"></div>';
         pw += '</body></html>';
-        var logoUrl = '&quot;css/logo_print.png&quot;';
+        var logoUrl = '&quot;img/logo_print.png&quot;';
         var printWindow = window.open('','','width=800,height=820');
         printWindow.document.write(pw);
         printWindow.document.close();
