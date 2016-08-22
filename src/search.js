@@ -16,16 +16,18 @@ var getFeature = require('./getfeature');
 var getAttributes = require('./getattributes');
 var featureInfo = require('./featureinfo');
 
-var adress;
+var adress, fastighet;
 var map,
-    name,
+    nameAds,
+    nameFat,
     northing,
     easting,
     geometryAttribute,
     idAttribute,
     layerNameAttribute,
     layerName,
-    url,
+    urlAds,
+    urlFat,
     title,
     hintText,
     hint,
@@ -34,14 +36,16 @@ var map,
 
 function init(options){
 
-    name = options.searchAttribute;
+    nameAds = options.searchAttributeAds;
+    nameFat = options.searchAttributeFat;
     northing = options.northing || undefined;
     easting = options.easting || undefined;
     geometryAttribute = options.geometryAttribute;
     idAttribute = options.idAttribute; //idAttribute in combination with layerNameAttribute must be defined if search result should be selected
     layerNameAttribute = options.layerNameAttribute || undefined;
     layerName = options.layerName || undefined;
-    url = options.url;
+    urlAds = options.urlAds;
+    urlFat = options.urlFat;
     title = options.title || '';
     hintText = options.hintText || "Sök...";
     hint = options.hasOwnProperty('hint') ? options.hint : true;
@@ -71,7 +75,26 @@ function init(options){
         // constructs the suggestion engine
         // fix for internet explorer
     $.support.cors = true;
+
+
+    fastighet = new Bloodhound({
+      datumTokenizer: Bloodhound.tokenizers.obj.whitespace(nameFat),
+      queryTokenizer: Bloodhound.tokenizers.whitespace,
+      remote: {
+        url: urlFat + '?q=&QUERY',
+        wildcard: '&QUERY',
+    }
+    });
     adress = new Bloodhound({
+      datumTokenizer: Bloodhound.tokenizers.obj.whitespace(nameAds),
+      queryTokenizer: Bloodhound.tokenizers.whitespace,
+      remote: {
+        url: urlAds + '?q=%QUERY',
+        wildcard: '%QUERY'
+      }
+    });
+
+    /*adress = new Bloodhound({
       datumTokenizer: Bloodhound.tokenizers.obj.whitespace(name),
       queryTokenizer: Bloodhound.tokenizers.whitespace,
       limit: 10,
@@ -92,16 +115,25 @@ function init(options){
           }
         }
       }
-    });
+    });*/
 
     adress.initialize();
+    fastighet.initialize();
 
     $('.typeahead').typeahead({
       autoSelect: true,
       hint: hint,
       highlight: highlight,
       minLength: 4
-    },
+    },  {
+        name: 'fastighet',
+        display: 'fastighet',
+        limit: 4,
+        source: fastighet,
+        templates: {
+            footer: '<h3 class="multiple-datasets"></h3>'
+        }
+    }, 
     {
       name: 'adress',
       limit: 9,
