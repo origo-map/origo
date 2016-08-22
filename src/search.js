@@ -75,8 +75,6 @@ function init(options){
         // constructs the suggestion engine
         // fix for internet explorer
     $.support.cors = true;
-
-
     fastighet = new Bloodhound({
       datumTokenizer: Bloodhound.tokenizers.obj.whitespace(nameFat),
       queryTokenizer: Bloodhound.tokenizers.whitespace,
@@ -94,29 +92,6 @@ function init(options){
       }
     });
 
-    /*adress = new Bloodhound({
-      datumTokenizer: Bloodhound.tokenizers.obj.whitespace(name),
-      queryTokenizer: Bloodhound.tokenizers.whitespace,
-      limit: 10,
-      remote: {
-        url: url + '?q=&QUERY',
-        wildcard: '&QUERY',
-        ajax: {
-          contentType:'application/json',
-          type: 'POST',
-          crossDomain: true,
-          success: function(data) {
-            data.sort(function(a, b) {
-              return a[name].localeCompare(b[name]);
-            });
-          },
-          error: function(jqXHR, textStatus, errorThrown) {
-            console.log(errorThrown);
-          }
-        }
-      }
-    });*/
-
     adress.initialize();
     fastighet.initialize();
 
@@ -124,26 +99,28 @@ function init(options){
       autoSelect: true,
       hint: hint,
       highlight: highlight,
-      minLength: 4
-    },  {
+      minLength: 2
+    }, {
         name: 'fastighet',
+        limit: 5,
         display: 'fastighet',
-        limit: 4,
         source: fastighet,
         templates: {
             footer: '<h3 class="multiple-datasets"></h3>'
         }
-    }, 
-    {
+    }, {
       name: 'adress',
-      limit: 9,
-      displayKey: name,
-      source: adress.ttAdapter()
-      // templates: {
-      //   suggestion: function(data) {
-      //     return data.NAMN;
-      //   }
-      // }
+      limit: 5,
+      display: function(item) {
+            if (item.buildingname !== "" && item.beladress !== "") {
+                return item.buildingname + ', ' + item.beladress;
+            } else if (item.buildingname !== "" && item.beladress === "") {
+                return item.buildingname;
+            } else {
+                return item.beladress + ', ' + item.postort;
+            }
+        },
+      source: adress
     });
 
     bindUIActions();
