@@ -1382,6 +1382,28 @@ li .legend-item-img {
 .menu-item-empty {
   margin: 0.8em 0;
 }
+/*print module*/
+.print-logo img {
+  height: 1.52cm;
+  margin-top: 1.25cm;
+  padding-bottom: 2cm;
+}
+.print-attribution {
+  padding-left: 2cm;
+  padding-top: 0.2cm;
+}
+.grafiskt_element img {
+  position: absolute;
+  bottom: 1.25cm;
+  right: 0;
+  width: 20.98cm
+}
+@media print {
+  @page {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
 #search-wrapper {
   /*background-color: transparent;*/
   background-color: #fff;
