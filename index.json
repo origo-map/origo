@@ -7,8 +7,10 @@
         "name": "search",
         "options": {
             "geometryAttribute": "st_astext",
-            "urlAds": "http://localhost:3000/sok",
-            "urlFat": "http://localhost:3000/sokIntern"
+            "urlAds": "http://localhost:3000/sAds",
+            "urlFat": "http://localhost:3000/sFat",
+            "searchAttributeAds": "beladress",
+            "searchAttributeFat": "fastighet"
         }
     }, {
         "name": "sharemap"
