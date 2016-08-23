@@ -757,7 +757,7 @@ button.mdk-button:hover,
 button.mdk-button:focus {
   color: #EEEEEE;
   text-decoration: none;
-  background-color: #424242;
+  background-color: #0097cf;
 }
 .mdk-button span.mdk-button-text {
 	height: 2em;
@@ -1259,6 +1259,9 @@ li .menu-button:hover {
 .mdk-close-button:hover {
   cursor: pointer;
 }
+.mdk-close-button:hover .mdk-icon-fa-times{
+	fill:#0097cf;
+}
 /*share map module*/
 .share-link input[type=text] {
   border: 1px solid #B3B3B3;
@@ -1311,7 +1314,8 @@ li .legend-item {
   padding: 5px;
 }
 li .legend-item:hover {
-  background-color: #EEEEEE;
+  background-color: #0097cf;
+	color: #fff;
 }
 li .legend-item-title {
   cursor: pointer;
@@ -1348,7 +1352,7 @@ li .legend-item-img {
   padding: 3px;
 }
 #map-legend-background .check-true-img .legend-item-img{
-  border: 1px solid #424242;
+  border: 1px solid #0097cf;
 }
 #map-legend-background li .legend-item.check-true-img {
   background-color: #C5C5C5;
