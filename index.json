@@ -47,6 +47,10 @@
       0.14
     ],
     "source": {
+        "wms": {
+            "url": "http://karta.hallstahammar.se/geoserver/wms",
+            "version": "1.1.1"
+        },
         "local": {
             "url": "http://karta.hallstahammar.se/geoserver/ows"
         },
@@ -81,7 +85,7 @@
     }],
     "layers": [{
         "name": "granser",
-        "source": "local",
+        "source": "wms",
         "style": "granser",
         "title": "Fastighetsgränser",
         "format": "image/png",
