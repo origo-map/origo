@@ -866,7 +866,7 @@ button.mdk-button:focus {
 }
 #geolocation-button {
   left: .5em;
-  top: 7.5em;
+  top: .5em;
   z-index: 1;
 }
 #o-editor-toolbar {
@@ -1623,12 +1623,6 @@ input.search-field::-ms-clear {
 	padding: .4em;
   height: 1.2em;
   width: 1.2em;
-}
-.mdk-icon-fa-plus,
-.mdk-icon-fa-minus {
-	padding: .65em;
-	height: .7em;
-	width: .7em;
 }
 #o-editor-button .o-icon-fa-pencil,
 .mdk-icon-fa-print,
