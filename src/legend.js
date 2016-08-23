@@ -133,16 +133,12 @@ function createLegendItem(layerid) {
 function addLegend(groups) {
       var layers = viewer.getLayers();
       var legendGroup;
-      var overlayGroup;
       var item = '';
 
       //Add legend groups
       var legend = '<div id="legendlist"><ul class="legendlist"></ul></div>';
       $('#mapmenu').append(legend);
       for (var i=0; i < groups.length; i++) {
-          if (groups[i].hasOwnProperty('overlayGroup')) {
-              overlayGroup = groups[i].name;
-          }
           legendGroup ='<li>' +
                          '<ul id="group-' + groups[i].name + '" class="legend-group">' +
                             '<li class="legend-header"><div class="legend-item">' + groups[i].title +
@@ -179,10 +175,6 @@ function addLegend(groups) {
                               '<svg class="mdk-icon-fa-angle-double-up"><use xlink:href="css/svg/fa-icons.svg#fa-angle-double-up"></use></svg>' +
                           '</div></li><li><ul id="overlay-list"></li></ul></ul><ul id="map-legend-background"></ul></div>';
           $('#map').append(mapLegend);
-          //Add divider to map legend if not only background
-          if(overlayGroup) {
-            $('#map-legend-background').prepend('<div class="legend-item-divider"></div>');
-          };
       }
 
 
@@ -213,20 +205,7 @@ function addLegend(groups) {
           item +=  layers[i].get('styleName') ? getSymbol(styleSettings[layers[i].get('styleName')]) : '';
           item += title;
           $('#group-' + layers[i].get('group')).append(item);
-          if(layers[i].get('legend') == true || layers[i].getVisible(true)) {
-            //Append to map legend
-            item = '<li class="legend ' + name + '" id="legend-' + name + '"><div class ="legend-item"><div class="checkbox">' +
-                    '<svg class="mdk-icon-fa-square-o"><use xlink:href="css/svg/fa-icons.svg#fa-square-o"></use></svg>' +
-                    '<svg class="mdk-icon-fa-check-square-o"><use xlink:href="css/svg/fa-icons.svg#fa-check-square-o"></use></svg>' +
-                  '</div>';
-            item += layers[i].get('styleName') ? getSymbol(styleSettings[layers[i].get('styleName')]) : '';
-            item += title;
-            $('#overlay-list').append(item);
-          }
         }
-
-        //Check map legend to make sure minimize button appears
-        checkToggleOverlay();
 
         //Append class according to visiblity and if group is background
         if(layers[i].get('group') == 'background') {
@@ -308,7 +287,6 @@ function toggleGroup(groupheader) {
 //Toggle layers
 function toggleCheck(layerid) {
     var layername = layerid.split('legend-').pop();
-    var inMapLegend = layerid.split('legend-').length > 1 ? true : false;
     var layer = viewer.getLayer(layername);
     //Radio toggle for background
     if(layer.get('group') == 'background') {
@@ -328,25 +306,14 @@ function toggleCheck(layerid) {
         $('#legend-' + layername).removeClass('check-false-img');
         $('#legend-' + layername).addClass('check-true-img');
     }
-    //Toggle check for alla groups except background
+    //Toggle check for all groups except background
     else {
         if($('.' + layername + ' .checkbox').hasClass('checkbox-true')) {
             $('.' + layername + ' .checkbox').removeClass('checkbox-true');
             $('.' + layername + ' .checkbox').addClass('checkbox-false');
-            if (inMapLegend == false) {
-                offToggleCheck('legend-' + layername);
-                $('#legend-' + layername).remove();
-                layer.set('legend', false);
-                checkToggleOverlay();
-            }
           layer.setVisible(false);
         }
         else {
-            if (inMapLegend == false && $('#legend-' + layername).length == 0) {
-                $('#overlay-list').append(createLegendItem('legend-' + layername));
-                onToggleCheck('legend-' + layername);
-                checkToggleOverlay();
-            }
             $('.' + layername + ' .checkbox').removeClass('checkbox-false');
             $('.' + layername + ' .checkbox').addClass('checkbox-true');
             layer.setVisible(true);
@@ -354,29 +321,4 @@ function toggleCheck(layerid) {
         }
     }
 }
-function checkToggleOverlay() {
-    if($('#overlay-list li').length > 1 && $('#legend-overlay >li:first-child').hasClass('hidden')) {
-        $('#legend-overlay > li:first-child').removeClass('hidden');
-    }
-    else if($('#overlay-list li').length < 2) {
-        $('#legend-overlay > li:first-child').addClass('hidden');
-        if($('#overlay-list').length == 1 && $('#overlay-list').hasClass('hidden')) {
-            $('#overlay-list').removeClass('hidden');
-            toggleOverlay();
-        }
-    }
-}
-function toggleOverlay() {
-    if($('#legend-overlay .toggle-button').hasClass('toggle-button-max')) {
-        $('#legend-overlay .toggle-button').removeClass('toggle-button-max');
-        $('#legend-overlay .toggle-button').addClass('toggle-button-min');
-        $('#overlay-list').addClass('hidden');
-    }
-    else {
-        $('#legend-overlay .toggle-button').removeClass('toggle-button-min');
-        $('#legend-overlay .toggle-button').addClass('toggle-button-max');
-        $('#overlay-list').removeClass('hidden');
-    }
-}
-
 module.exports.init = init;
