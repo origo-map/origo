@@ -9,8 +9,7 @@
             "geometryAttribute": "st_astext",
             "urlAds": "http://localhost:3000/sAds",
             "urlFat": "http://localhost:3000/sFat",
-            "searchAttributeAds": "beladress",
-            "searchAttributeFat": "fastighet"
+            "searchAttribute": "title"
         }
     }, {
         "name": "sharemap"

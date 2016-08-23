@@ -18,8 +18,7 @@ var featureInfo = require('./featureinfo');
 
 var adress, fastighet;
 var map,
-    nameAds,
-    nameFat,
+    name,
     northing,
     easting,
     geometryAttribute,
@@ -28,6 +27,7 @@ var map,
     layerName,
     urlAds,
     urlFat,
+    content,
     title,
     hintText,
     hint,
@@ -36,8 +36,7 @@ var map,
 
 function init(options){
 
-    nameAds = options.searchAttributeAds;
-    nameFat = options.searchAttributeFat;
+    name = options.searchAttribute;
     northing = options.northing || undefined;
     easting = options.easting || undefined;
     geometryAttribute = options.geometryAttribute;
@@ -47,7 +46,7 @@ function init(options){
     urlAds = options.urlAds;
     urlFat = options.urlFat;
     title = options.title || '';
-    hintText = options.hintText || "Sök...";
+    hintText = options.hintText || "Sök i Hallstakartan";
     hint = options.hasOwnProperty('hint') ? options.hint : true;
     highlight = options.hasOwnProperty('highlight') ? options.highlight : true;
     projectionCode = Viewer.getProjectionCode();
@@ -76,7 +75,7 @@ function init(options){
         // fix for internet explorer
     $.support.cors = true;
     fastighet = new Bloodhound({
-      datumTokenizer: Bloodhound.tokenizers.obj.whitespace(nameFat),
+      datumTokenizer: Bloodhound.tokenizers.obj.whitespace(),
       queryTokenizer: Bloodhound.tokenizers.whitespace,
       remote: {
         url: urlFat + '?q=&QUERY',
@@ -84,7 +83,7 @@ function init(options){
     }
     });
     adress = new Bloodhound({
-      datumTokenizer: Bloodhound.tokenizers.obj.whitespace(nameAds),
+      datumTokenizer: Bloodhound.tokenizers.obj.whitespace(),
       queryTokenizer: Bloodhound.tokenizers.whitespace,
       remote: {
         url: urlAds + '?q=%QUERY',
@@ -101,65 +100,32 @@ function init(options){
       highlight: highlight,
       minLength: 2
     }, {
-        name: 'fastighet',
-        limit: 5,
-        display: 'fastighet',
-        source: fastighet,
-        templates: {
-            footer: '<h3 class="multiple-datasets"></h3>'
-        }
-    }, {
-      name: 'adress',
+      name: 'fastighet',
       limit: 5,
-      display: function(item) {
-            if (item.buildingname !== "" && item.beladress !== "") {
-                return item.buildingname + ', ' + item.beladress;
-            } else if (item.buildingname !== "" && item.beladress === "") {
-                return item.buildingname;
-            } else {
-                return item.beladress + ', ' + item.postort;
-            }
-        },
-      source: adress
-    });
+      displayKey: name,
+      source: fastighet,
+      templates: {
+          footer: '<h3 class="multiple-datasets"></h3>'
+      }
+      }, {
+        name: 'adress',
+        limit: 5,
+        displayKey: name,
+        source: adress
+      });
 
     bindUIActions();
 }
 function bindUIActions() {
         $('.typeahead').on('typeahead:selected', function(evt, data){
 
-          if(geometryAttribute) {
-              var feature = wktToFeature(data[geometryAttribute], projectionCode);
-              var coord = feature.getGeometry().getCoordinates();
-          }
-          else {
-              var coord = [data[easting], data[northing]];
-          }
+          var feature = wktToFeature(data[geometryAttribute], projectionCode);
+          var featureExtent = feature.getGeometry().getExtent();
+          var coord = ol.extent.getCenter(featureExtent);
 
-          //Select geometry if configured with layerName or layerNameAttribute
-          if(layerNameAttribute && idAttribute) {
-              var layer = Viewer.getLayer(data[layerNameAttribute]);
-              var id = data[idAttribute];
-              var promise = getFeature(id, layer)
-                .done(function(res) {
-                    if(res.length > 0) {
-                        var obj = {};
-                        obj.layer = layer;
-                        obj.feature = res[0];
-                        obj.content = getAttributes(res[0], layer);
-                        featureInfo.identify([obj], 'overlay', coord);
-                    }
-                    else {
-                        showOverlay(data, coord);
-                    }
-                });
-          }
-          else {
-              showOverlay(data, coord);
-          }
+          showOverlay(data, coord);
 
-          map.getView().setCenter([coord[0], coord[1]]);
-          map.getView().setZoom(11);
+          map.getView().fit(feature.getGeometry(), map.getSize());
         });
 
         $('#search .search-field').on('input', function() {
@@ -171,7 +137,6 @@ function bindUIActions() {
           else if(!($('#search .search-field.tt-input').val()) &&  $('#search').hasClass('search-true')) {
             $('#search').removeClass('search-true');
             $('#search').addClass('search-false');
-            offClearSearch();
           }
         });
 }
@@ -187,12 +152,7 @@ function onClearSearch() {
       e.preventDefault();
     });
 }
-function offClearSearch() {
-    console.log('offClearSearch');
-    // $('#search-button').off('touchend click', function(e) {
-    //   e.preventDefault();
-    // });
-}
+
 function showOverlay(data, coord) {
     Viewer.removeOverlays();
     var overlay = new ol.Overlay({
@@ -202,8 +162,8 @@ function showOverlay(data, coord) {
     map.addOverlay(overlay);
 
     overlay.setPosition(coord);
-    var content = data[name];
-    // content += '<br>' + data.postnr + '&nbsp;' + data.postort;
+    title = data.title;
+    var content = data.content;
     Popup.setContent({content: content, title: title});
     Popup.setVisibility(true);
 }
