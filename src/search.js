@@ -121,8 +121,11 @@ function bindUIActions() {
 
           var feature = wktToFeature(data[geometryAttribute], projectionCode);
           var featureExtent = feature.getGeometry().getExtent();
+          var selectInteraction = Viewer.getSelectInteraction();
           var coord = ol.extent.getCenter(featureExtent);
 
+          selectInteraction.getFeatures().clear();
+          selectInteraction.getFeatures().push(feature);
           showOverlay(data, coord);
 
           map.getView().fit(feature.getGeometry(), map.getSize());

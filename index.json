@@ -7,8 +7,8 @@
         "name": "search",
         "options": {
             "geometryAttribute": "st_astext",
-            "urlAds": "http://localhost:3000/sAds",
-            "urlFat": "http://localhost:3000/sFat",
+            "urlAds": "http://karta.hallstahammar.se/sAds",
+            "urlFat": "http://karta.hallstahammar.se/sFat",
             "searchAttribute": "title"
         }
     }, {
