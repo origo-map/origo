@@ -1406,8 +1406,7 @@ li .legend-item-img {
   margin: 0 20px 5px 20px;
   padding: 3px 0
 }
-#search-button-close,
-#search-button {
+#search-button-close {
   background-color: transparent;
   color: #424242;
 	font-size: 1em;
@@ -1419,9 +1418,6 @@ li .legend-item-img {
   width: 2.5em;
   padding: .25em;
 	top: 3px
-}
-#search-button.search-true:hover {
-  color: black;
 }
 .tt-hint {
   color: #e6e6e6
@@ -1637,7 +1633,6 @@ li .legend-item-img {
 .check-false .mdk-icon-fa-check,
 .icon-expand-false .mdk-icon-fa-chevron-down,
 .icon-expand-true .mdk-icon-fa-chevron-right,
-.search-true #search-button,
 .search-false #search-button-close {
 	display: none
 }
@@ -1705,16 +1700,10 @@ li .legend-item-img {
 .tt-menu {
 	max-width: calc(258px + 2em);
 }
-#search-button-close,
-#search-button {
+#search-button-close {
 	height: 2em;
 	padding: 0;
 	width: 2em;
-}
-.mdk-icon-fa-search {
-	padding: .5em;
-	height: 1em;
-	width: 1em;
 }
 .mdk-icon-search-fa-times {
 	padding: .6em;

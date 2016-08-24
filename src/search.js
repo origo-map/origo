@@ -59,11 +59,6 @@ function init(options){
     var el = '<div id="search-wrapper">' +
                 '<div id="search" class="search search-false">' +
                     '<input class="search-field typeahead form-control" type="text" placeholder="' + hintText + '">' +
-                    '<button id="search-button">' +
-                        '<svg class="mdk-icon-fa-search">' +
-                            '<use xlink:href="css/svg/fa-icons.svg#fa-search"></use>' +
-                        '</svg>' +
-                    '</button>' +
                     '<button id="search-button-close">' +
                         '<svg class="mdk-icon-search-fa-times">' +
                             '<use xlink:href="css/svg/fa-icons.svg#fa-times"></use>' +
