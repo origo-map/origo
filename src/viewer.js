@@ -26,7 +26,7 @@ controls.legend = require('./legend');
 controls.search = require('./search');
 controls.editor = require('./editor');
 
-var map, mapInteractions, mapControls, attribution;
+var map, mapControls, attribution;
 
 var settings = {
   projection: '',
@@ -157,48 +157,6 @@ function init (el, mapOptions){
             mapwindow.init();
         }
 
-        var selectInteraction = new ol.interaction.Select({
-          layers: function(layer) {
-            if (!layer.get('queryable')) {
-                return false;
-            } else {
-              return true
-            }
-          },
-          style: [
-              new ol.style.Style({
-                  image: new ol.style.Circle({
-                      fill: new ol.style.Fill({
-                          color: 'rgba(255, 255, 255, 0.4)'
-                      }),
-                      stroke: new ol.style.Stroke({
-                          color: '#3399CC',
-                          width: 2
-                      }),
-                      radius: 7
-                  })
-              }),
-              new ol.style.Style({
-                  fill: new ol.style.Fill({
-                      color: 'rgba(255, 255, 255, 0.4)'
-                  }),
-                  stroke: new ol.style.Stroke({
-                      color: '#3399CC',
-                      width: 2
-                  })
-              }),
-              new ol.style.Style({
-                  stroke: new ol.style.Stroke({
-                      color: '#3399CC',
-                      width: 2
-                  })
-              })
-          ]
-      });
-      //Set map interactions
-      mapInteractions = [
-        selectInteraction
-      ]
       createHome(settings.home);
       loadMap();
 
@@ -320,7 +278,6 @@ function init (el, mapOptions){
 	    map = new ol.Map({
 	      target: 'map',
 	      controls: mapControls,
-        interactions: ol.interaction.defaults().extend(mapInteractions),
 	      layers: settings.layers,
 	      view: new ol.View({
           extent: settings.extent || undefined,
@@ -460,18 +417,6 @@ function init (el, mapOptions){
     }
     function getMapSource() {
       return settings.source;
-    }
-    function getSelectInteraction() {
-      var select;
-      map.getInteractions().forEach(function(interaction) {
-        if (interaction instanceof ol.interaction.Select) {
-          select = interaction;
-        }
-      });
-      return select;
-    }
-    function removeSelections() {
-      getSelectInteraction().getFeatures().clear();
     }
     function getControlNames() {
         var controlNames = settings.controls.map(function(obj) {
@@ -1064,9 +1009,7 @@ module.exports.getGroups = getGroups;
 module.exports.getProjectionCode = getProjectionCode;
 module.exports.getProjection = getProjection;
 module.exports.getMapSource = getMapSource;
-module.exports.getSelectInteraction = getSelectInteraction;
 module.exports.getResolutions = getResolutions;
-module.exports.removeSelections = removeSelections;
 module.exports.addWMS = addWMS;
 module.exports.addWMTS = addWMTS;
 module.exports.geojson = geojson;

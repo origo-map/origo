@@ -156,11 +156,9 @@ function setActive(state) {
     }
 }
 function clear() {
-    var selectInteraction = Viewer.getSelectInteraction();
     selectionLayer.clear();
     sidebar.setVisibility(false);
     Popup.setVisibility(false);
-    selectInteraction.getFeatures().clear();
     //console.log("Clearing selection");
 }
 function onEnableInteraction(e) {

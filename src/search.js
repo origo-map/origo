@@ -9,6 +9,7 @@ var $ = require('jquery');
 var Viewer = require('./viewer');
 var wktToFeature = require('./maputils')['wktToFeature'];
 var Popup = require('./popup');
+var featurelayer = require('./featurelayer');
 var typeahead = require('../externs/typeahead.bloodhound.browserify.js');
 typeahead.loadjQueryPlugin();
 var Bloodhound = require('../externs/typeahead.bloodhound.browserify.js').Bloodhound;
@@ -32,7 +33,8 @@ var map,
     hintText,
     hint,
     highlight,
-    projectionCode;
+    projectionCode,
+    selectionLayer;
 
 function init(options){
 
@@ -52,6 +54,7 @@ function init(options){
     projectionCode = Viewer.getProjectionCode();
 
     map = Viewer.getMap();
+    selectionLayer = featurelayer(null, map);
 
     var el = '<div id="search-wrapper">' +
                 '<div id="search" class="search search-false">' +
@@ -118,14 +121,13 @@ function init(options){
 }
 function bindUIActions() {
         $('.typeahead').on('typeahead:selected', function(evt, data){
-
           var feature = wktToFeature(data[geometryAttribute], projectionCode);
           var featureExtent = feature.getGeometry().getExtent();
-          var selectInteraction = Viewer.getSelectInteraction();
           var coord = ol.extent.getCenter(featureExtent);
 
-          selectInteraction.getFeatures().clear();
-          selectInteraction.getFeatures().push(feature);
+          selectionLayer.clear();
+          selectionLayer.addFeature(feature);
+
           showOverlay(data, coord);
 
           map.getView().fit(feature.getGeometry(), map.getSize());
@@ -138,14 +140,19 @@ function bindUIActions() {
             onClearSearch();
           }
           else if(!($('#search .search-field.tt-input').val()) &&  $('#search').hasClass('search-true')) {
+            selectionLayer.clear();
+            featureInfo.clear();
+            Viewer.removeOverlays();
             $('#search').removeClass('search-true');
             $('#search').addClass('search-false');
           }
+
         });
 }
 function onClearSearch() {
     $('#search-button-close').on('touchend click', function(e) {
       $('.typeahead').typeahead('val', '');
+      selectionLayer.clear();
       featureInfo.clear();
       Viewer.removeOverlays();
       $('#search').removeClass('search-true');
