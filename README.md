@@ -36,7 +36,8 @@ Not convinced? Or maybe you need some inspiration? Check out these examples of w
 * [Hallstakartan](http://karta.hallstahammar.se)
 * [Karlstadskartan](http://gi.karlstad.se)
 * [Mälardalskartan](http://www.malardalskartan.se)
-* [Västerås Stads samlingskarta](http://karta.vasteras.se/sam)
+* [Sigtunakartan](https://karta.sigtuna.se/)
+* [Västerås Stads samlingskarta](http://kartor.vasteras.se/sam)
 
 ## Copyright
 The project is licensed under the BSD 2-clause license. It is specified in the [license file](LICENSE.txt).
