@@ -1,0 +1,14 @@
+{
+"type": "FeatureCollection",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::3010" } },
+                                                                                
+"features": [
+{ "type": "Feature", "properties": { "id": 1, "name": "Karlstad" }, "geometry": { "type": "Point", "coordinates": [ -20337.688115186233, 6588442.7001647623 ] } },
+{ "type": "Feature", "properties": { "id": 2, "name": "Hallstahammar" }, "geometry": { "type": "Point", "coordinates": [ 134969.60027742674, 6610823.1944371816 ] } },
+{ "type": "Feature", "properties": { "id": 3, "name": "Västerås" }, "geometry": { "type": "Point", "coordinates": [ 152378.81566404965, 6611118.2658844125 ] } },
+{ "type": "Feature", "properties": { "id": 4, "name": "Eskilstuna" }, "geometry": { "type": "Point", "coordinates": [ 150018.24408620247, 6583774.9784410167 ] } },
+{ "type": "Feature", "properties": { "id": 5, "name": "Strängnäs" }, "geometry": { "type": "Point", "coordinates": [ 179525.38880929211, 6584168.4070373243 ] } },
+{ "type": "Feature", "properties": { "id": 6, "name": "Enköping" }, "geometry": { "type": "Point", "coordinates": [ 182869.53187790897, 6614167.3375057988 ] } },
+{ "type": "Feature", "properties": { "id": 7, "name": "Sigtuna" }, "geometry": { "type": "Point", "coordinates": [ 225900.78459908141, 6612224.7838115292 ] } }
+]
+}

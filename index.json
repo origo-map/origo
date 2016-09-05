@@ -8,13 +8,13 @@
     },
     {
       "name": "sharemap"
-    },    
+    },
     {
       "name": "print"
     },
     {
       "name": "legend"
-    }         
+    }
   ],
   "projectionCode": "EPSG:3010",
   "projectionExtent": [
@@ -85,6 +85,20 @@
   ],
   "layers": [
     {
+      "name": "origo-cities",
+      "title": "Origokommuner",
+      "group": "test",
+      "source": "data/origo-cities-3010.geojson",
+      "style": "origo-logo",
+      "type": "GEOJSON",
+      "attributes": [
+          {
+            "name": "name"
+          }
+      ],
+      "visible": true
+    },
+    {
       "name": "mdk",
       "opacity": 0.15,
       "title": "4k",
@@ -131,6 +145,34 @@
           }
         ]
       ],
+      "origo-logo": [
+        [
+          {
+            "circle": {
+              "radius": 16,
+              "stroke": {
+                "color": "rgba(0,0,0,1)",
+                "width": 5
+              },
+              "fill": {
+                "color": "rgba(255,255,255,0.9)"
+              }
+            }
+          },
+          {
+            "circle": {
+              "radius": 4,
+              "stroke": {
+                "color": "rgba(0,0,0,0)",
+                "width": 1
+              },
+              "fill": {
+                "color": "rgba(37,129,196,1)"
+              }
+            }
+          }
+        ]
+      ],
       "cirkel": [
         [
           {
@@ -142,11 +184,11 @@
               },
               "fill": {
                 "color": "rgba(0,0,0,0.5)"
-              }       
+              }
             }
           }
         ]
-      ],           
+      ],
       "karta_gra": [
         [
           {
@@ -173,6 +215,6 @@
             }
           }
         ]
-      ]  
+      ]
   }
 }
