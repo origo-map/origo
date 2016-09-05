@@ -11,7 +11,8 @@
   "license": "BSD-2-Clause",
   "main": "origo.js",
   "scripts": {
-    "start": "watchify origo.js --s origo --d --outfile dist/origo.js",
+    "start": "budo origo.js:dist/origo.js --live -- --s origo --d",
+    "watch": "watchify origo.js --s origo --d --outfile dist/origo.js",
     "build": "browserify origo.js --s origo | uglifyjs --compress --output dist/origo.min.js"
   },
   "dependencies": {
@@ -26,6 +27,7 @@
     "browser-sync": "2.9.5",
     "browserify": "11.0.1",
     "browserify-shim": "3.8.10",
+    "budo": "^9.0.0",
     "handlebars": "4.0.5",
     "hbsfy": "2.5.1",
     "uglify-js": "2.4.24",
