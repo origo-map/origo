@@ -15,6 +15,7 @@ var style = require('./style');
 var styleTypes = require('./style/styletypes');
 var getFeatureInfo = require('./getfeatureinfo');
 var owlCarousel = require('../externs/owlcarousel-browserify');
+require('jquery-mousewheel')($);
 owlCarousel.loadjQueryPlugin();
 
 var selectionLayer = undefined,
@@ -96,6 +97,14 @@ function identify(items, target, coordinate) {
                 var currentItem = this.owl.currentItem;
                 selectionLayer.clearAndAdd(items[currentItem].feature.clone(), selectionStyles[items[currentItem].feature.getGeometry().getType()]);
                 Popup.setTitle(items[currentItem].layer.get('title'));
+            });
+            owl.on("mousewheel", function(e) {
+            if(e.deltaY>0) {
+              owl.trigger('owl.next');
+            } else {
+              owl.trigger('owl.prev');
+            }
+            e.preventDefault();
             });
             Viewer.autoPan();
             break;
