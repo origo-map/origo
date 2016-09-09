@@ -151,7 +151,9 @@ function init (el, mapOptions){
             mapwindow.init();
         }
 
-      createHome(settings.home);
+      if(settings.home) {
+        createHome(settings.home);
+      }
       loadMap();
 
       //Check size for attribution mode
