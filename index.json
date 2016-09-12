@@ -1,178 +1,599 @@
 {
-  "controls": [
-    {
-      "name": "geoposition"
+    "controls": [{
+        "name": "geoposition"
+    }, {
+        "name": "mapmenu"
+    }, {
+        "name": "search",
+        "options": {
+            "geometryAttribute": "st_astext",
+            "urlAds": "http://localhost:3000/sok",
+            "urlFat": "http://localhost:3000/sokIntern"
+        }
+    }, {
+        "name": "sharemap"
+    }, {
+        "name": "print"
+    }, {
+        "name": "legend"
+    }],
+    "projectionCode": "EPSG:3010",
+    "projectionExtent": [-166640, 6305699, 433362, 6905701],
+    "proj4Defs": [{
+        "code": "EPSG:3010",
+        "alias": "urn:ogc:def:crs:EPSG::3010",
+        "projection": "+proj=tmerc +lat_0=0 +lon_0=16.5 +k=1 +x_0=150000 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
+    }],
+    "extent": [-16640, 6455699, 283362, 6755701],
+    "center": [133361, 6605700],
+    "zoom": 2,
+    "resolutions": [
+      91.9577,
+      61.3051,
+      40.8701,
+      27.2467,
+      18.1645,
+      12.1097,
+      8.0731,
+      5.382,
+      3.588,
+      2.392,
+      1.5947,
+      1.0631,
+      0.7088,
+      0.4725,
+      0.315,
+      0.21,
+      0.14
+    ],
+    "source": {
+        "wms": {
+            "url": "http://karta.hallstahammar.se/geoserver/wms",
+            "version": "1.1.1"
+        },
+        "local": {
+            "url": "http://karta.hallstahammar.se/geoserver/ows"
+        },
+        "basemap": {
+            "url": "http://karta.hallstahammar.se/geoserver/gwc/service/wmts"
+        }
     },
-    {
-      "name": "mapmenu"
-    },
-    {
-      "name": "sharemap"
-    },    
-    {
-      "name": "print"
-    },
-    {
-      "name": "legend"
-    }         
-  ],
-  "projectionCode": "EPSG:3010",
-  "projectionExtent": [
-    -1678505.1838360203,
-    4665380,
-    2431912.7361639794,
-    8775797.92
-  ],
-  "proj4Defs": [
-      {
-          "code": "EPSG:3010",
-          "alias": "urn:ogc:def:crs:EPSG::3010",
-          "projection": "+proj=tmerc +lat_0=0 +lon_0=16.5 +k=1 +x_0=150000 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
-      }
-  ],
-  "extent": [
-    -1678505.1838360203,
-    4665380,
-    2431912.7361639794,
-    8775797.92
-  ],
-  "center": [
-    162429,
-    6599905
-  ],
-  "home": [
-    105085,
-    6571627,
-    219773,
-    6628182
-  ],
-  "zoom": 3,
-  "resolutions": [
-    1146.8799999999999,
-    573.4399999999999,
-    286.71999999999997,
-    143.35999999999999,
-    71.67999999999999,
-    35.839999999999996,
-    17.919999999999998,
-    8.959999999999999,
-    4.4799999999999995,
-    2.2399999999999998,
-    1.1199999999999999,
-    0.5599999999999999,
-    0.27999999999999997,
-    0.13999999999999999
-  ],
-  "source": {
-    "local": {
-      "url": "http://localhost/geoserver/wms"
-    },
-    "basemap": {
-      "url": "http://www.malardalskartan.se/geowebcache/service/wmts"
-    }
-  },
-  "groups": [
-    {
-      "name": "test",
-      "title": "Test",
-      "expanded": true
-    },
-    {
-      "name": "background",
-      "title": "Bakgrundskartor",
-      "expanded": true
-    }
-  ],
-  "layers": [
-    {
-      "name": "mdk",
-      "opacity": 0.15,
-      "title": "4k",
-      "group": "none",
-      "queryable": false,
-      "source": "data/mdk.geojson",
-      "style": "mask",
-      "type": "GEOJSON",
-      "visible": true
-    },
-    {
-      "attribution": "&copy Lantmäteriet Geodatasamverkan",
-      "format": "image/png",
-      "group": "background",
-      "name": "topowebbkartan_nedtonad",
-      "source": "basemap",
-      "title": "Karta, grå",
-      "type": "WMTS",
-      "style": "karta_gra",
-      "visible": true
-    },
-    {
-      "attribution": "&copy Lantmäteriet Geodatasamverkan",
-      "format": "image/png",
-      "group": "background",
-      "name": "topowebbkartan",
-      "source": "basemap",
-      "title": "Karta, färg",
-      "type": "WMTS",
-      "style": "karta_farg",
-      "visible": false
-    }
-  ],
-  "styles": {
-      "mask": [
-        [
-          {
-            "stroke": {
-              "color": "rgba(0,0,0,1.0)"
-            },
-            "fill": {
-              "color": "rgba(0,0,0,1.0)"
-            }
-          }
-        ]
-      ],
-      "cirkel": [
+    "groups": [{
+        "name": "bygga",
+        "title": "Bygga & bo",
+        "expanded": true
+    }, {
+        "name": "energi",
+        "title": "Energi & miljö",
+        "expanded": true
+    }, {
+        "name": "trafik",
+        "title": "Trafik & resor",
+        "expanded": true
+    }, {
+        "name": "uppleva",
+        "title": "Uppleva & göra",
+        "expanded": true
+    }, {
+        "name": "utbildning",
+        "title": "Utbildning & barnomsorg",
+        "expanded": true
+    }, {
+        "name": "background",
+        "title": "Bakgrundskartor",
+        "expanded": true
+    }],
+    "layers": [{
+        "name": "granser",
+        "source": "wms",
+        "style": "granser",
+        "title": "Fastighetsgränser",
+        "format": "image/png",
+        "group": "bygga",
+        "type": "WMS",
+        "visible": false
+    }, {
+        "name": "PL_POLYGON",
+        "source": "local",
+        "style": "PL_POLYGON",
+        "title": "Gällande detaljplan",
+        "group": "bygga",
+        "type": "WFS",
+        "visible": false,
+        "attributes": [{
+            "name": "TEXT",
+            "url": "PLAN_ID",
+            "urlPrefix": "http://hallstahammar.se/globalassets/4-bo-och-bygga/detaljplaner/arken/",
+            "urlSuffix": ".pdf"
+        }]
+    }, {
+        "name": "TK_w_lim_y",
+        "source": "local",
+        "style": "TK_w_lim_y",
+        "title": "Ledig industrimark",
+        "group": "bygga",
+        "type": "WFS",
+        "visible": false,
+        "attributes": [{
+            "name": "obj",
+            "title": "Storlek: "
+        }, {
+            "name": "typ",
+            "title": "Pris: "
+        }]
+    }, {
+        "name": "TK_w_let_y",
+        "source": "local",
+        "style": "TK_w_let_y",
+        "title": "Lediga tomter",
+        "group": "bygga",
+        "type": "WFS",
+        "visible": false,
+        "attributes": [{
+            "name": "obj",
+            "title": "Fastighet: "
+        }, {
+            "name": "typ",
+            "title": "Pris: "
+        }, {
+            "name": "egn",
+            "title": "Area: "
+        }, {
+            "name": "status",
+            "title": "Status: "
+        }, {
+            "name": "datum",
+            "title": "Bokad till: ",
+            "cls": "hidden"
+        }]
+    }, {
+        "name": "TK_w_pap_y",
+        "source": "local",
+        "style": "TK_w_pap_y",
+        "title": "Pågående detaljplan",
+        "group": "bygga",
+        "type": "WFS",
+        "visible": false,
+        "attributes": [{
+            "name": "obj",
+            "url": "url"
+        }]
+    }, {
+        "name": "BM_elf_y",
+        "source": "local",
+        "style": "BM_elf_y",
+        "title": "Eldningsförbud",
+        "group": "energi",
+        "type": "WFS",
+        "visible": false,
+        "attributes": [{
+            "fixedUrl": "http://www.hallstahammar.se/Bo-bygga/Miljo-halsa--hallbar-utveckling/eldningsforbud/",
+            "fixedUrlName": "Mer information"
+        }]
+    }, {
+        "name": "BM_lim_p",
+        "source": "local",
+        "style": "point",
+        "clusterStyle": "BM_lim_p_cluster",
+        "title": "Livsmedelsinspektion",
+        "group": "energi",
+        "type": "WFS",
+        "layerType": "cluster",
+        "visible": false,
+        "attributes": [{
+            "name": "obj",
+            "title": ""
+        }, {
+            "name": "typ",
+            "title": ""
+        }, {
+            "name": "egn",
+            "title": ""
+        }, {
+            "name": "status",
+            "title": ""
+        }, {
+            "fixedUrl": "https://eservice.hallstahammar.se/EServiceStart.aspx?id=de4a51a8-d2e5-4768-b2f8-0676099648e1",
+            "fixedUrlName": "Lämna felanmälan"
+        }]
+    }, {
+        "name": "BM_nar_y",
+        "source": "local",
+        "style": "BM_nar_y",
+        "title": "Naturreservat",
+        "group": "uppleva",
+        "type": "WFS",
+        "visible": false,
+        "attributes": [{
+            "name": "obj",
+            "url": "typ"
+        }]
+    }, {
+        "name": "BU_w_fos_p",
+        "source": "local",
+        "style": "BU_w_fos_p",
+        "title": "Förskola",
+        "group": "utbildning",
+        "type": "WFS",
+        "visible": false,
+        "attributes": [{
+            "name": "obj",
+            "url": "url"
+        }, {
+            "name": "egn",
+            "title": "Telefon: "
+        }]
+    }, {
+        "name": "BU_w_grs_p",
+        "source": "local",
+        "style": "BU_w_grs_p",
+        "title": "Grundskola",
+        "group": "utbildning",
+        "type": "WFS",
+        "visible": false,
+        "attributes": [{
+            "name": "obj",
+            "url": "url"
+        }, {
+            "name": "typ",
+            "title": "Årskurs: "
+        }, {
+            "name": "egn",
+            "title": "Telefon: "
+        }]
+    }, {
+        "name": "BU_w_gss_p",
+        "source": "local",
+        "style": "BU_w_gss_p",
+        "title": "Grundsärskola",
+        "group": "utbildning",
+        "type": "WFS",
+        "visible": false,
+        "attributes": [{
+            "name": "obj",
+            "url": "url"
+        }, {
+            "name": "typ",
+            "title": "Årskurs: "
+        }, {
+            "name": "egn",
+            "title": "Telefon: "
+        }]
+    }, {
+        "name": "BU_upo_y",
+        "source": "local",
+        "style": "BU_upo_y",
+        "title": "Upptagningsområden",
+        "group": "utbildning",
+        "type": "WFS",
+        "visible": false,
+        "attributes": [{
+            "name": "omrade",
+            "title": ""
+        }]
+    }, {
+        "name": "TK_mak_y",
+        "source": "local",
+        "style": "TK_mak_y",
+        "title": "Mask",
+        "queryable": false,
+        "type": "WFS",
+        "visible": true
+    }, {
+        "attribution": "&copy Lantmäteriet Geodatasamverkan",
+        "format": "image/jpeg",
+        "group": "background",
+        "name": "Hallstahammar:topowebbkartan_nedtonad",
+        "source": "basemap",
+        "title": "Karta, grå",
+        "type": "WMTS",
+        "style": "karta_gra",
+        "visible": true
+    }, {
+        "attribution": "&copy Lantmäteriet Geodatasamverkan",
+        "format": "image/jpeg",
+        "group": "background",
+        "name": "Hallstahammar:topowebbkartan",
+        "source": "basemap",
+        "title": "Karta, färg",
+        "type": "WMTS",
+        "style": "karta_farg",
+        "visible": false
+    }, {
+        "attribution": "&copy Lantmäteriet Geodatasamverkan",
+        "format": "image/jpeg",
+        "group": "background",
+        "name": "Hallstahammar:orto025",
+        "source": "basemap",
+        "title": "Flygfoto",
+        "type": "WMTS",
+        "style": "orto",
+        "visible": false
+    }],
+    "styles": {
+        "point": [
+            [{
+                "icon": {
+                    "size": [24, 36],
+                    "src": "img/png/drop_blue.png"
+                }
+            }]
+        ],
+        "line": [
+            [{
+                "stroke": {
+                    "color": "rgb(0,0,255)",
+                    "width": 1
+                }
+            }]
+        ],
+        "cirkel": [
+            [{
+                "circle": {
+                    "radius": 6,
+                    "stroke": {
+                        "color": "rgba(0,0,0,1)",
+                        "width": 2
+                    },
+                    "fill": {
+                        "color": "rgba(0,0,0,0.5)"
+                    }
+                }
+            }]
+        ],
+        "cluster": [
         [
           {
             "circle": {
-              "radius": 6,
-              "stroke": {
-                "color": "rgba(0,0,0,1)",
-                "width": 2
-              },
+              "radius": 16,
               "fill": {
-                "color": "rgba(0,0,0,0.5)"
-              }       
+                "color": "rgba(255,153,51,0.5)"
+              },
+              "stroke": {
+                "color": "rgba(255,153,51,0.9)",
+                "width": 4
+              }
             }
-          }
-        ]
-      ],           
-      "karta_gra": [
-        [
+          },
           {
-            "image": {
-              "src": "img/png/gra.png"
+            "text": {
+              "font": "Bold 12px Arial",
+              "textAlign": "center",
+              "text": "size",
+              "fill": {
+                "color": "rgba(0,0,0,1.0)"
+              },
+              "stroke": {
+                "color": "rgba(255,153,51,0.5)",
+                "width": 2
+              }
             }
           }
         ]
       ],
-      "karta_farg": [
+        "granser": [
+            [{
+                "stroke": {
+                    "color": "rgb(150,61,20)",
+                    "width": 1
+                }
+            }]
+        ],
+        "PL_POLYGON": [
+            [{
+                "stroke": {
+                    "color": "rgba(229,109,30,0.6)",
+                    "width": 1
+                },
+                "fill": {
+                    "color": "rgba(66,89,179,0.3)"
+                },
+                "filter": "[PLAN_TYP] != '4041'"
+            }]
+        ],
+        "TK_w_lim_y": [
+            [{
+                "stroke": {
+                    "color": "rgba(103, 60, 31, 0.6)",
+                    "width": 2
+                },
+                "fill": {
+                    "color": "rgba(103, 60, 31,0.3)"
+                }
+            }]
+        ],
+        "TK_w_let_y": [
+            [{  "filter": "[status] == 'Ledig'",
+                "stroke": {
+                    "color": "rgba(0,0,0,0.6)",
+                    "width": 1
+                },
+                "fill": {
+                    "color": "rgba(0,225,0,0.3)"
+                }
+            }],
+            [{  "filter": "[status] == 'Bokad'",
+                "stroke": {
+                    "color": "rgba(0,0,0,0.6)",
+                    "width": 1
+                },
+                "fill": {
+                    "color": "rgba(255,255,0,0.3)"
+                }
+            }],
+            [{  "filter": "[status] == 'Såld'",
+                "stroke": {
+                    "color": "rgba(0,0,0,0.6)",
+                    "width": 1
+                },
+                "fill": {
+                    "color": "rgba(255,0,0,0.3)"
+                }
+            }]
+        ],
+        "TK_w_pap_y": [
+            [{
+                "stroke": {
+                    "color": "rgba(229,109,30,0.6)",
+                    "width": 2
+                },
+                "fill": {
+                    "color": "rgba(255,198,105,0.3)"
+                }
+            }]
+        ],
+        "BM_elf_y": [
+            [{
+                "stroke": {
+                    "color": "rgb(200,0,0)",
+                    "width": 2
+                },
+                "fill": {
+                    "color": "rgba(200,0,0,0.3)"
+                }
+            }]
+        ],
+        "BM_lim_p_cluster": [
         [
           {
-            "image": {
-              "src": "img/png/farg.png"
+            "circle": {
+              "radius": 16,
+              "fill": {
+                "color": "rgba(255,153,51,0.5)"
+              },
+              "stroke": {
+                "color": "rgba(255,153,51,0.9)",
+                "width": 4
+              }
+            }
+          },
+          {
+            "text": {
+              "font": "Bold 12px Arial",
+              "textAlign": "center",
+              "text": "size",
+              "fill": {
+                "color": "rgba(0,0,0,1.0)"
+              },
+              "stroke": {
+                "color": "rgba(255,153,51,0.5)",
+                "width": 2
+              }
             }
           }
         ]
       ],
-      "orto": [
-        [
-          {
-            "image": {
-              "src": "img/png/orto.png"
-            }
-          }
+        "BM_lim_p": [
+            [{  "filter": "[egn] == 'Utan avvikelse'",
+                "icon": {
+                    "src": "img/png/BM_lim_p0.png"
+                }
+            }],
+            [{  "filter": "[egn] == 'Med avvikelse'",
+                "icon": {
+                    "src": "img/png/BM_lim_p1.png"
+                }
+            }],
+            [{  "filter": "[egn] == 'null'",
+                "icon": {
+                    "src": "img/png/BM_lim_p2.png"
+                }
+            }]
+        ],
+        "BM_nar_y": [
+            [{
+                "stroke": {
+                    "color": "rgb(137,210,103)",
+                    "width": 2
+                },
+                "fill": {
+                    "color": "rgba(137,210,103,0.3)"
+                }
+            }]
+        ],
+        "BU_w_fos_p": [
+            [{
+                "icon": {
+                    "size": [24, 24],
+                    "src": "img/png/BU_w_fos_p.png"
+                }
+            }]
+        ],
+        "BU_w_grs_p": [
+            [{
+                "icon": {
+                    "size": [24, 24],
+                    "src": "img/png/BU_w_grs_p.png"
+                }
+            }]
+        ],
+        "BU_w_gss_p": [
+            [{
+                "icon": {
+                    "size": [24, 24],
+                    "src": "img/png/BU_w_gss_p.png"
+                }
+            }]
+        ],
+        "BU_upo_y": [
+            [{
+                "fill": {
+                    "color": "rgba(178, 223, 138,0.3)"
+                },
+                "filter": "[omrade] == 'Fredhem'"
+            }],
+            [{
+                "fill": {
+                    "color": "rgba(31, 120, 180,0.3)"
+                },
+                "filter": "[omrade] == 'Näs'"
+            }],
+            [{
+                "fill": {
+                    "color": "rgba(255, 127, 0,0.3)"
+                },
+                "filter": "[omrade] == 'Nibble'"
+            }],
+            [{
+                "fill": {
+                    "color": "rgba(202, 178, 214,0.3)"
+                },
+                "filter": "[omrade] == 'Strömsholm'"
+            }],
+            [{
+                "fill": {
+                    "color": "rgba(255, 255, 153,0.3)"
+                },
+                "filter": "[omrade] == 'Kolbäck'"
+            }]
+        ],
+        "TK_mak_y": [
+            [{
+                "fill": {
+                    "color": "rgba(0,0,0,0.15)"
+                }
+            }]
+        ],
+        "karta_gra": [
+            [{
+                "image": {
+                    "src": "img/png/gra.png"
+                }
+            }]
+        ],
+        "karta_farg": [
+            [{
+                "image": {
+                    "src": "img/png/farg.png"
+                }
+            }]
+        ],
+        "orto": [
+            [{
+                "image": {
+                    "src": "img/png/orto.png"
+                }
+            }]
         ]
-      ]  
-  }
+    }
 }

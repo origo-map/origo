@@ -141,15 +141,8 @@ function init (el, mapOptions){
           collapsible: false
         });
 
-        var zoomControl = new ol.control.Zoom({
-            zoomInTipLabel: ' ',
-            zoomOutTipLabel:' ',
-            zoomInLabel: $.parseHTML('<svg class="mdk-icon-fa-plus"><use xlink:href="css/svg/fa-icons.svg#fa-plus"></use></svg>')[0],
-            zoomOutLabel: $.parseHTML('<svg class="mdk-icon-fa-minus"><use xlink:href="css/svg/fa-icons.svg#fa-minus"></use></svg>')[0]
-        });
         //Set map controls
         mapControls = [
-                zoomControl,
                 attribution,
                 new ol.control.Rotate({label: ''}), /*Override default label for compass*/
                 new ol.control.ScaleLine({target: 'bottom-tools'})
@@ -158,7 +151,9 @@ function init (el, mapOptions){
             mapwindow.init();
         }
 
-      createHome(settings.home);
+      if(settings.home) {
+        createHome(settings.home);
+      }
       loadMap();
 
       //Check size for attribution mode
@@ -526,7 +521,7 @@ function init (el, mapOptions){
                resolutions: settings.resolutions,
                matrixIds: matrixIds
              }),
-             style: 'default'
+             style: 'raster'
            })
         })
     }
