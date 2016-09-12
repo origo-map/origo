@@ -757,7 +757,7 @@ button.mdk-button:hover,
 button.mdk-button:focus {
   color: #EEEEEE;
   text-decoration: none;
-  background-color: #424242;
+  background-color: #0097cf;
 }
 .mdk-button span.mdk-button-text {
 	height: 2em;
@@ -866,7 +866,7 @@ button.mdk-button:focus {
 }
 #geolocation-button {
   left: .5em;
-  top: 7.5em;
+  top: .5em;
   z-index: 1;
 }
 #o-editor-toolbar {
@@ -1259,6 +1259,9 @@ li .menu-button:hover {
 .mdk-close-button:hover {
   cursor: pointer;
 }
+.mdk-close-button:hover .mdk-icon-fa-times{
+	fill:#0097cf;
+}
 /*share map module*/
 .share-link input[type=text] {
   border: 1px solid #B3B3B3;
@@ -1311,7 +1314,8 @@ li .legend-item {
   padding: 5px;
 }
 li .legend-item:hover {
-  background-color: #EEEEEE;
+  background-color: #0097cf;
+	color: #fff;
 }
 li .legend-item-title {
   cursor: pointer;
@@ -1348,7 +1352,7 @@ li .legend-item-img {
   padding: 3px;
 }
 #map-legend-background .check-true-img .legend-item-img{
-  border: 1px solid #424242;
+  border: 1px solid #0097cf;
 }
 #map-legend-background li .legend-item.check-true-img {
   background-color: #C5C5C5;
@@ -1381,6 +1385,28 @@ li .legend-item-img {
 }
 .menu-item-empty {
   margin: 0.8em 0;
+}
+/*print module*/
+.print-logo img {
+  height: 1.52cm;
+  margin-top: 1.25cm;
+  padding-bottom: 2cm;
+}
+.print-attribution {
+  padding-left: 2cm;
+  padding-top: 0.2cm;
+}
+.grafiskt_element img {
+  position: absolute;
+  bottom: 1.25cm;
+  right: 0;
+  width: 20.98cm
+}
+@media print {
+  @page {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
 }
 #search-wrapper {
   left: calc(50% - 175px);
@@ -1570,12 +1596,6 @@ li .legend-item-img {
 	padding: .4em;
   height: 1.2em;
   width: 1.2em;
-}
-.mdk-icon-fa-plus,
-.mdk-icon-fa-minus {
-	padding: .65em;
-	height: .7em;
-	width: .7em;
 }
 #o-editor-button .o-icon-fa-pencil,
 .mdk-icon-fa-print,
