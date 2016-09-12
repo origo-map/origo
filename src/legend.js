@@ -10,6 +10,7 @@ var utils = require('./utils');
 
 var symbolSize = 20;
 var styleSettings;
+var dragging = false;
 
 var mapMenu;
 var hasMapLegend;
@@ -24,6 +25,13 @@ function init(opt_options) {
     mapMenu = $('#mapmenu');
     $('#menutools').append('<li class="menu-item"><div class="menu-item-divider"></div><li>');
     addLegend(viewer.getGroups());
+
+    mapMenu.on("touchmove", function() {
+       dragging = true;
+     });
+     mapMenu.on("touchstart", function() {
+       dragging = false;
+     });
 }
 function getSymbol(style) {
     var symbol='';
@@ -163,6 +171,7 @@ function addLegend(groups) {
           }
           //Event listener for tick layer
           $('#group-' + groups[i].name + ' .legend-header').on('touchend click', function(evt) {
+              if (dragging){return;}
               toggleGroup($(this));
               evt.preventDefault();
           });
@@ -229,6 +238,7 @@ function addLegend(groups) {
 
         //Event listener for tick layer
         $('#' + name).on('touchend click', function(evt) {
+          if (dragging){return;}
           $(this).each(function() {
             var that = this;
             toggleCheck($(that).attr("id"));
