@@ -7,8 +7,9 @@
         "name": "search",
         "options": {
             "geometryAttribute": "st_astext",
-            "urlAds": "http://localhost:3000/sok",
-            "urlFat": "http://localhost:3000/sokIntern"
+            "urlAds": "http://karta.hallstahammar.se/sAds",
+            "urlFat": "http://karta.hallstahammar.se/sFat",
+            "searchAttribute": "title"
         }
     }, {
         "name": "sharemap"

@@ -168,7 +168,7 @@ function clear() {
     selectionLayer.clear();
     sidebar.setVisibility(false);
     Popup.setVisibility(false);
-    console.log("Clearing selection");
+    //console.log("Clearing selection");
 }
 function onEnableInteraction(e) {
     if(e.interaction === 'featureInfo') {

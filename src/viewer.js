@@ -26,7 +26,6 @@ controls.legend = require('./legend');
 controls.search = require('./search');
 controls.editor = require('./editor');
 
-
 var map, mapControls, attribution;
 
 var settings = {
