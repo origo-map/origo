@@ -15,6 +15,7 @@ var Bloodhound = require("typeahead.js-browserify").Bloodhound;
 var getFeature = require('./getfeature');
 var getAttributes = require('./getattributes');
 var featureInfo = require('./featureinfo');
+var mapUtils = require('./maputils');
 
 var adress;
 var map,
@@ -25,6 +26,7 @@ var map,
     idAttribute,
     layerNameAttribute,
     layerName,
+    maxZoom,
     url,
     title,
     hintText,
@@ -43,6 +45,7 @@ function init(options){
     layerName = options.layerName || undefined;
     url = options.url;
     title = options.title || '';
+    maxZoomLevel: options.maxZoomLevel || 2;
     hintText = options.hintText || "Sök...";
     hint = options.hasOwnProperty('hint') ? options.hint : true;
     highlight = options.hasOwnProperty('highlight') ? options.highlight : true;
@@ -139,18 +142,18 @@ function bindUIActions() {
                         obj.feature = res[0];
                         obj.content = getAttributes(res[0], layer);
                         featureInfo.identify([obj], 'overlay', coord);
+                        mapUtils.zoomToExent(res[0].getGeometry(), 2);
                     }
                     else {
                         showOverlay(data, coord);
+                        mapUtils.zoomToExent(coord, 3);
                     }
                 });
           }
           else {
               showOverlay(data, coord);
+              mapUtils.zoomToExent(coord, 3);
           }
-
-          map.getView().setCenter([coord[0], coord[1]]);
-          map.getView().setZoom(11);
         });
 
         $('#search .search-field').on('input', function() {

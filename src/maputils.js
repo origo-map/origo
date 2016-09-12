@@ -6,6 +6,7 @@
 
 var ol = require('openlayers');
 var $ = require('jquery');
+var viewer = require('./viewer');
 
 module.exports = {
   customProjection: function(projectionCode, extent) {
@@ -50,5 +51,14 @@ module.exports = {
         featureProjection: srsName
       });
       return feature;
+  },
+  zoomToExent: function zoomToExent(geometry, level) {
+      var map = viewer.getMap();
+      var view = map.getView();
+      var maxZoom = view.getResolutions().length - level;
+      var extent = geometry.getExtent();
+      if(extent) {
+          view.fit(extent, map.getSize(), {maxZoom: maxZoom});
+      }
   }
 }
