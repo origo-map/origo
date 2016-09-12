@@ -142,17 +142,17 @@ function bindUIActions() {
                         obj.feature = res[0];
                         obj.content = getAttributes(res[0], layer);
                         featureInfo.identify([obj], 'overlay', coord);
-                        mapUtils.zoomToExent(res[0].getGeometry(), 2);
+                        mapUtils.zoomToExent(res[0].getGeometry(), maxZoomLevel);
                     }
                     else {
                         showOverlay(data, coord);
-                        mapUtils.zoomToExent(coord, 3);
+                        mapUtils.zoomToExent(coord, maxZoomLevel);
                     }
                 });
           }
           else {
               showOverlay(data, coord);
-              mapUtils.zoomToExent(coord, 3);
+              mapUtils.zoomToExent(coord, maxZoomLevel);
           }
         });
 
