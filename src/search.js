@@ -158,14 +158,14 @@ function bindUIActions() {
                     //Fallback if no geometry in response
                     else {
                         showOverlay(data, coord);
-                        mapUtils.zoomToExent(coord, maxZoomLevel);
+                        mapUtils.zoomToExent(new ol.geom.Point(coord), maxZoomLevel);
                     }
                 });
           }
           //Show overlay with no selection
           else {
               showOverlay(data, coord);
-              mapUtils.zoomToExent(coord, maxZoomLevel);
+              mapUtils.zoomToExent(new ol.geom.Point(coord), maxZoomLevel);
           }
         });
 
