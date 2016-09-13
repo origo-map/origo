@@ -122,6 +122,9 @@ function init(options){
 function bindUIActions() {
         $('.typeahead').on('typeahead:selected', function(evt, data){
 
+          /**Get coordinate for placement of overlay
+           * Only used if there is no selection.
+          */
           if(geometryAttribute) {
               var feature = wktToFeature(data[geometryAttribute], projectionCode);
               var coord = feature.getGeometry().getCoordinates();
@@ -130,7 +133,15 @@ function bindUIActions() {
               var coord = [data[easting], data[northing]];
           }
 
-          //Select geometry if configured with layerName or layerNameAttribute
+          /**To select geometry layerName or layerNameAttribute must be provided.
+           * A map service is used to get the geometry. The layer is defined
+           * as an ordinary layer in the layer config section.
+           * Use layerName if only searching one layer. Use layerNameAttribute to
+           * search multiple layers. The layerName must then be available in the
+           * map service response.
+           * If no geometry in response then it will fall back on point geometry
+           * from the autocomplete result.
+          */
           if(layerNameAttribute && idAttribute) {
               var layer = Viewer.getLayer(data[layerNameAttribute]);
               var id = data[idAttribute];
@@ -141,15 +152,17 @@ function bindUIActions() {
                         obj.layer = layer;
                         obj.feature = res[0];
                         obj.content = getAttributes(res[0], layer);
-                        featureInfo.identify([obj], 'overlay', coord);
+                        featureInfo.identify([obj], 'overlay', mapUtils.getCenter(res[0].getGeometry()));
                         mapUtils.zoomToExent(res[0].getGeometry(), maxZoomLevel);
                     }
+                    //Fallback if no geometry in response
                     else {
                         showOverlay(data, coord);
                         mapUtils.zoomToExent(coord, maxZoomLevel);
                     }
                 });
           }
+          //Show overlay with no selection
           else {
               showOverlay(data, coord);
               mapUtils.zoomToExent(coord, maxZoomLevel);
