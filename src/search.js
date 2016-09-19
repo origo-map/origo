@@ -26,6 +26,8 @@ var map,
     idAttribute,
     layerNameAttribute,
     layerName,
+    titleAttribute,
+    contentAttribute,
     maxZoomLevel,
     url,
     title,
@@ -45,6 +47,8 @@ function init(options){
     layerName = options.layerName || undefined;
     url = options.url;
     title = options.title || '';
+    titleAttribute = options.titleAttribute || undefined;
+    contentAttribute = options.contentAttribute || undefined;
     maxZoomLevel: options.maxZoomLevel || 2;
     hintText = options.hintText || "Sök...";
     hint = options.hasOwnProperty('hint') ? options.hint : true;
@@ -120,54 +124,7 @@ function init(options){
     bindUIActions();
 }
 function bindUIActions() {
-        $('.typeahead').on('typeahead:selected', function(evt, data){
-
-          /**Get coordinate for placement of overlay
-           * Only used if there is no selection.
-          */
-          if(geometryAttribute) {
-              var feature = wktToFeature(data[geometryAttribute], projectionCode);
-              var coord = feature.getGeometry().getCoordinates();
-          }
-          else {
-              var coord = [data[easting], data[northing]];
-          }
-
-          /**To select geometry layerName or layerNameAttribute must be provided.
-           * A map service is used to get the geometry. The layer is defined
-           * as an ordinary layer in the layer config section.
-           * Use layerName if only searching one layer. Use layerNameAttribute to
-           * search multiple layers. The layerName must then be available in the
-           * map service response.
-           * If no geometry in response then it will fall back on point geometry
-           * from the autocomplete result.
-          */
-          if(layerNameAttribute && idAttribute) {
-              var layer = Viewer.getLayer(data[layerNameAttribute]);
-              var id = data[idAttribute];
-              var promise = getFeature(id, layer)
-                .done(function(res) {
-                    if(res.length > 0) {
-                        var obj = {};
-                        obj.layer = layer;
-                        obj.feature = res[0];
-                        obj.content = getAttributes(res[0], layer);
-                        featureInfo.identify([obj], 'overlay', mapUtils.getCenter(res[0].getGeometry()));
-                        mapUtils.zoomToExent(res[0].getGeometry(), maxZoomLevel);
-                    }
-                    //Fallback if no geometry in response
-                    else {
-                        showOverlay(data, coord);
-                        mapUtils.zoomToExent(new ol.geom.Point(coord), maxZoomLevel);
-                    }
-                });
-          }
-          //Show overlay with no selection
-          else {
-              showOverlay(data, coord);
-              mapUtils.zoomToExent(new ol.geom.Point(coord), maxZoomLevel);
-          }
-        });
+        $('.typeahead').on('typeahead:selected', selectHandler);
 
         $('#search .search-field').on('input', function() {
           if($('#search .search-field.tt-input').val() &&  $('#search').hasClass('search-false')) {
@@ -203,7 +160,7 @@ function offClearSearch() {
 function showOverlay(data, coord) {
     Viewer.removeOverlays();
     var overlay = new ol.Overlay({
-      element: $('#popup').get(0)
+        element: $('#popup').get(0)
     });
 
     map.addOverlay(overlay);
@@ -211,8 +168,70 @@ function showOverlay(data, coord) {
     overlay.setPosition(coord);
     var content = data[name];
     // content += '<br>' + data.postnr + '&nbsp;' + data.postort;
-    Popup.setContent({content: content, title: title});
+    Popup.setContent({
+        content: content,
+        title: title
+    });
     Popup.setVisibility(true);
+
+    mapUtils.zoomToExent(new ol.geom.Point(coord), maxZoomLevel);
+}
+function showFeatureInfo(features, title, content) {
+    var obj = {};
+    obj.feature = features[0];
+    obj.title = title;
+    obj.content = content;
+    featureInfo.identify([obj], 'overlay', mapUtils.getCenter(features[0].getGeometry()));
+    mapUtils.zoomToExent(features[0].getGeometry(), maxZoomLevel);
+}
+
+/**There are several different ways to handle selected search result.
+ * Option 1. Feature info is requested from a map service.
+ * In this case idAttribute and layerNameAttribute must be provided.
+ * A map service is used to get the geometry and attributes. The layer is defined
+ * as an ordinary layer in the layer config section.
+ * Option 2. Same as option 1 but for single layer search. layerName is defined
+ * as an option and is not included in the search response.
+ * In this case geometryAttribute and layerName must be provided.
+ * Option 3. Complete feature info is included in the search result.
+ * In this case titleAttribute, contentAttribute and geometryAttribute must be provided.
+ * Options 4 and 5. Feature info is shown without selection in the map.
+ * This is a simple single table search. Title is defined as an option and geometry
+ * can be read from an attribute or coordinates from northing and easting attributes.
+ */
+function selectHandler(evt, data) {
+
+    if (layerNameAttribute && idAttribute) {
+        var layer = Viewer.getLayer(data[layerNameAttribute]);
+        var id = data[idAttribute];
+        var promise = getFeature(id, layer)
+            .done(function(res) {
+                if (res.length > 0) {
+                    showFeatureInfo(res, layer.get('title'), getAttributes(res[0], layer));
+                }
+                //Fallback if no geometry in response
+                else if (geometryAttribute) {
+                    var feature = wktToFeature(data[geometryAttribute], projectionCode);
+                    var coord = feature.getGeometry().getCoordinates();
+                    showOverlay(data, coord);
+                }
+            });
+    } else if (geometryAttribute && layerName) {
+        var feature = wktToFeature(data[geometryAttribute], projectionCode);
+        var layer = Viewer.getLayer(data[layerName]);
+        showFeatureInfo([feature], layer.get('title'), getAttributes(feature, layer));
+    } else if (titleAttribute && contentAttribute && geometryAttribute) {
+        var feature = wktToFeature(data[geometryAttribute], projectionCode);
+        showFeatureInfo([feature], data[titleAttribute], data[contentAttribute]);
+    } else if (geometryAttribute && title) {
+        var feature = wktToFeature(data[geometryAttribute], projectionCode);
+        showFeatureInfo([feature], title, data);
+    } else if (easting && northing && title) {
+        var coord = [data[easting], data[northing]];
+        showOverlay(data, coord);
+    } else {
+        console.log('Search options are missing');
+    }
 }
 
 module.exports.init = init;
