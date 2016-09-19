@@ -195,9 +195,11 @@ function showFeatureInfo(features, title, content) {
  * In this case geometryAttribute and layerName must be provided.
  * Option 3. Complete feature info is included in the search result.
  * In this case titleAttribute, contentAttribute and geometryAttribute must be provided.
- * Options 4 and 5. Feature info is shown without selection in the map.
- * This is a simple single table search. Title is defined as an option and geometry
- * can be read from an attribute or coordinates from northing and easting attributes.
+ * Option 4. This is a single table search. No layer is defined.
+ * In this case geometryAttribute and title must be defined.
+ * Option 5. Feature info is shown without selection in the map.
+ * This is a simple single table search. In this case title, northing and easting
+ * must be defined.
  */
 function selectHandler(evt, data) {
 
