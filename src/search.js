@@ -16,6 +16,7 @@ var getFeature = require('./getfeature');
 var getAttributes = require('./getattributes');
 var featureInfo = require('./featureinfo');
 var mapUtils = require('./maputils');
+var utils = require('./utils');
 
 var adress;
 var map,
@@ -224,7 +225,9 @@ function selectHandler(evt, data) {
         showFeatureInfo([feature], layer.get('title'), getAttributes(feature, layer));
     } else if (titleAttribute && contentAttribute && geometryAttribute) {
         var feature = wktToFeature(data[geometryAttribute], projectionCode);
-        showFeatureInfo([feature], data[titleAttribute], data[contentAttribute]);
+        //Make sure the response is wrapped in a html element
+        var content = utils.createElement('div', data[contentAttribute])
+        showFeatureInfo([feature], data[titleAttribute], content);
     } else if (geometryAttribute && title) {
         var feature = wktToFeature(data[geometryAttribute], projectionCode);
         showFeatureInfo([feature], title, data);
