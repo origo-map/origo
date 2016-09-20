@@ -6,6 +6,7 @@
 
 var ol = require('openlayers');
 var $ = require('jquery');
+var viewer = require('./viewer');
 
 module.exports = {
   customProjection: function(projectionCode, extent) {
@@ -50,5 +51,47 @@ module.exports = {
         featureProjection: srsName
       });
       return feature;
+  },
+  zoomToExent: function zoomToExent(geometry, level) {
+      var map = viewer.getMap();
+      var view = map.getView();
+      var maxZoom = level;
+      var extent = geometry.getExtent();
+      if(extent) {
+          view.fit(extent, map.getSize(), {maxZoom: maxZoom});
+          return extent;
+      }
+      else {
+        return undefined;
+      }
+  },
+  getCenter: function getCenter(geometry) {
+      var type = geometry.getType();
+      var center;
+      switch (type) {
+          case "Polygon":
+              center = geometry.getInteriorPoint().getCoordinates();
+              console.log(center);
+              break;
+          case "MultiPolygon":
+              center = geometry.getInteriorPoints()[0].getCoordinates();
+              break;
+          case "Point":
+              center = geometry.getCoordinates();
+              break;
+          case "MultiPoint":
+              center = geometry[0].getCoordinates();
+              break;
+          case "LineString":
+              center = geometry.getCoordinateAt(0.5);
+              break;
+          case "MultiLineString":
+              center = geometry.getLineStrings()[0].getCoordinateAt(0.5);
+              break;
+          case "Circle":
+              center = geometry.getCenter();
+              break;
+      }
+      return center;
   }
 }

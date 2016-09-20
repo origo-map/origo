@@ -19,7 +19,7 @@ function getFeaturesFromRemote(evt) {
                 var layer = Viewer.getLayer(request.layer);
                 if(feature) {
                     requestResult.push({
-                        layer: layer,
+                        title: layer.get('title'),
                         feature: feature,
                         content: getAttributes(feature, layer)
                     });
@@ -154,7 +154,7 @@ function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
                 else {
                     collection.forEach(function(f) {
                           var item = {};
-                          item.layer = l;
+                          item.title = l.get('title');
                           item.feature = f;
                           item.content =  getAttributes(f,l);
                           result.push(item);
@@ -163,7 +163,7 @@ function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
               }
               else if(collection.length == 1 && queryable) {
                   var item = {};
-                  item.layer = l;
+                  item.title = l.get('title');
                   item.feature = collection[0];
                   item.content = getAttributes(collection[0],l);
                   result.push(item);
@@ -171,7 +171,7 @@ function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
           }
           else if(queryable) {
               var item = {};
-              item.layer = l;
+              item.title = l.get('title');
               item.feature = feature;
               item.content = getAttributes(feature,l)
               result.push(item);
