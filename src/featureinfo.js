@@ -184,3 +184,4 @@ module.exports.clear = clear;
 module.exports.getSelection = getSelection;
 module.exports.getPin = getPin;
 module.exports.identify = identify;
+module.exports.setActive = setActive;

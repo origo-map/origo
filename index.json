@@ -14,6 +14,9 @@
     },
     {
       "name": "legend"
+    },
+    {
+      "name": "measure"
     }
   ],
   "projectionCode": "EPSG:3010",
