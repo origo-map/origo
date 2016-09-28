@@ -13,21 +13,8 @@ var utils = require('./utils');
 var featureinfo = require('./featureinfo');
 var mapwindow = require('./mapwindow');
 var maputils = require('./maputils');
-var permalink = require('./permalink/permalink');
-var getUrl = require('./utils/geturl');
-var isUrl = require('./utils/isurl');
 
-var controls = {};
-controls.geoposition = require('./geoposition');
-controls.mapmenu = require('./mapmenu');
-controls.print = require('./print');
-controls.sharemap = require('./sharemap');
-controls.legend = require('./legend');
-controls.search = require('./search');
-controls.editor = require('./editor');
-
-
-var map, mapControls, attribution;
+var map, mapControls, attribution, template;
 
 var settings = {
   projection: '',
@@ -45,146 +32,97 @@ var settings = {
   featureInfoOverlay: undefined,
   editLayer: null
 };
-var cqlQuery, queryFinished = false, urlParams = {};
+var cqlQuery, queryFinished = false, urlParams;
 
-function init (el, mapOptions){
-      var mapEl = "#app-wrapper";
-      if(arguments.length === 1) {
-          mapOptions = el;
-      }
-      else if(mapEl.substring(0,0) !== '#') {
-          mapEl = '#' + el;
-      }
-      else if(mapEl.substring(0,0) === '#') {
-          mapEl = el;
-      }
-      $(mapEl).html(template);
-
-      if (typeof(mapOptions) === 'object') {
-          if(window.location.hash) {
-              urlParams = permalink.parsePermalink(window.location.href);
-          }
-          settings.url = getUrl();
-          setMapOptions(mapOptions);
-      }
-      else if (typeof(mapOptions) === 'string') {
-          if(isUrl(mapOptions)) {
-              urlParams = permalink.parsePermalink(mapOptions);
-              var url = mapOptions.split('#')[0];
-              settings.url = url;
-              if (url.substring(url.lastIndexOf('/')).indexOf('.htm') !== -1) {
-                  url = url.substring(0, url.lastIndexOf('/')+1);
-              }
-              else if (url.substr(url.length - 1) !== '/') {
-                  url += '/';
-              }
-              settings.map = urlParams.map + '.json';
-              url += settings.map;
-              $.getJSON(url)
-                  .done(function(data) {
-                      setMapOptions(data);
-                  });
-          }
-          else {
-              if(window.location.hash) {
-                  urlParams = permalink.parsePermalink(window.location.href);
-              }
-              settings.url = getUrl();
-              settings.map = mapOptions;
-              $.getJSON(mapOptions)
-                  .done(function(data) {
-                      setMapOptions(data);
-                  });
-          }
-      }
-    }
-    function setMapOptions(mapOptions) {
-        // Read and set projection
-        if(mapOptions.hasOwnProperty('proj4Defs')) {
-            var proj = mapOptions['proj4Defs'];
-            //Register proj4 projection definitions
-            for (var i=0; i<proj.length; i++) {
-                proj4.defs(proj[i].code, proj[i].projection);
-                if(proj[i].hasOwnProperty('alias')) {
-                    proj4.defs(proj[i].alias, proj4.defs(proj[i].code));
-                }
+function init(el, mapOptions) {
+    $(el).html(template);
+    // Read and set projection
+    if (mapOptions.hasOwnProperty('proj4Defs') && proj4) {
+        var proj = mapOptions['proj4Defs'];
+        //Register proj4 projection definitions
+        for (var i = 0; i < proj.length; i++) {
+            proj4.defs(proj[i].code, proj[i].projection);
+            if (proj[i].hasOwnProperty('alias')) {
+                proj4.defs(proj[i].alias, proj4.defs(proj[i].code));
             }
-            // Projection to be used in map
-            settings.projectionCode = mapOptions.projectionCode || undefined;
-            settings.projectionExtent =  mapOptions.projectionExtent;
-            settings.projection = new ol.proj.Projection({
-                code: settings.projectionCode,
-                extent: settings.projectionExtent
-            });
-            settings.resolutions = mapOptions.resolutions || undefined;
-            settings.tileGrid = maputils.tileGrid(settings.projectionExtent,settings.resolutions);
         }
-
-        settings.extent = mapOptions.extent || undefined;
-        settings.center = urlParams.center || mapOptions.center;
-        settings.zoom = urlParams.zoom || mapOptions.zoom;
-        settings.source = mapOptions.source;
-        settings.home = mapOptions.home;
-        settings.groups = mapOptions.groups;
-        settings.editLayer = mapOptions.editLayer;
-        settings.styles = mapOptions.styles;
-        createLayers(mapOptions.layers, settings.layers, urlParams.layers);
-        settings.controls = mapOptions.controls;
-        settings.featureinfoOptions = mapOptions.featureinfoOptions || {};
-        //If url arguments, parse this settings
-        if (window.location.search) {
-            parseArg();
-        }
-
-        //Create attribution
-        attribution = new ol.control.Attribution({
-          collapsible: false
-        });
-
-        var zoomControl = new ol.control.Zoom({
-            zoomInTipLabel: ' ',
-            zoomOutTipLabel:' ',
-            zoomInLabel: $.parseHTML('<svg class="mdk-icon-fa-plus"><use xlink:href="css/svg/fa-icons.svg#fa-plus"></use></svg>')[0],
-            zoomOutLabel: $.parseHTML('<svg class="mdk-icon-fa-minus"><use xlink:href="css/svg/fa-icons.svg#fa-minus"></use></svg>')[0]
-        });
-        //Set map controls
-        mapControls = [
-                zoomControl,
-                attribution,
-                new ol.control.Rotate({label: ''}), /*Override default label for compass*/
-                new ol.control.ScaleLine({target: 'bottom-tools'})
-        ]
-        if(window.top!=window.self) {
-            mapwindow.init();
-        }
-
-      createHome(settings.home);
-      loadMap();
-
-      //Check size for attribution mode
-      $(window).on('resize', checkSize);
-      checkSize();
-
-      if(urlParams.pin) {
-          settings.featureinfoOptions.savedPin = urlParams.pin;
-      }
-      //This is needs further development for proper handling in permalink
-      else if(urlParams.selection) {
-          settings.featureinfoOptions.savedSelection = new ol.Feature({
-              geometry: new ol.geom[urlParams.selection.geometryType](urlParams.selection.coordinates)
-          });
-      }
-      featureinfo.init(settings.featureinfoOptions);
-
-      //Init controls
-      var controlName, controlOptions;
-      for (var i=0; i<settings.controls.length; i++) {
-          controlName = settings.controls[i].name;
-          controlOptions = settings.controls[i].options || undefined;
-          controlOptions ? controls[controlName].init(controlOptions) : controls[controlName].init();
-      }
-
     }
+    settings.params = urlParams = mapOptions.params || {};
+    settings.map = mapOptions.map;
+    settings.url = mapOptions.url;
+    if (mapOptions.hasOwnProperty('proj4Defs')) {
+        // Projection to be used in map
+        settings.projectionCode = mapOptions.projectionCode || undefined;
+        settings.projectionExtent = mapOptions.projectionExtent;
+        settings.projection = new ol.proj.Projection({
+            code: settings.projectionCode,
+            extent: settings.projectionExtent
+        });
+        settings.resolutions = mapOptions.resolutions || undefined;
+        settings.tileGrid = maputils.tileGrid(settings.projectionExtent, settings.resolutions);
+    }
+
+    settings.extent = mapOptions.extent || undefined;
+    settings.center = urlParams.center || mapOptions.center;
+    settings.zoom = urlParams.zoom || mapOptions.zoom;
+    settings.source = mapOptions.source;
+    settings.home = mapOptions.home;
+    settings.groups = mapOptions.groups;
+    settings.editLayer = mapOptions.editLayer;
+    settings.styles = mapOptions.styles;
+    createLayers(mapOptions.layers, settings.layers, urlParams.layers);
+    settings.controls = mapOptions.controls;
+    settings.featureinfoOptions = mapOptions.featureinfoOptions || {};
+    //If url arguments, parse this settings
+    if (window.location.search) {
+        parseArg();
+    }
+
+    //Create attribution
+    attribution = new ol.control.Attribution({
+        collapsible: false
+    });
+
+    var zoomControl = new ol.control.Zoom({
+        zoomInTipLabel: ' ',
+        zoomOutTipLabel: ' ',
+        zoomInLabel: $.parseHTML('<svg class="mdk-icon-fa-plus"><use xlink:href="css/svg/fa-icons.svg#fa-plus"></use></svg>')[0],
+        zoomOutLabel: $.parseHTML('<svg class="mdk-icon-fa-minus"><use xlink:href="css/svg/fa-icons.svg#fa-minus"></use></svg>')[0]
+    });
+    //Set map controls
+    mapControls = [
+        zoomControl,
+        attribution,
+        new ol.control.Rotate({
+            label: ''
+        }), /*Override default label for compass*/
+        new ol.control.ScaleLine({
+            target: 'bottom-tools'
+        })
+    ]
+    if (window.top != window.self) {
+        mapwindow.init();
+    }
+
+    createHome(settings.home);
+    loadMap();
+
+    //Check size for attribution mode
+    $(window).on('resize', checkSize);
+    checkSize();
+
+    if (urlParams.pin) {
+        settings.featureinfoOptions.savedPin = urlParams.pin;
+    }
+    //This is needs further development for proper handling in permalink
+    else if (urlParams.selection) {
+        settings.featureinfoOptions.savedSelection = new ol.Feature({
+            geometry: new ol.geom[urlParams.selection.geometryType](urlParams.selection.coordinates)
+        });
+    }
+    featureinfo.init(settings.featureinfoOptions);
+
+}
     function createLayers(layerlist, layers, savedLayers) {
         for(var i=layerlist.length-1; i>=0; i--) {
           var savedLayer = {};
@@ -939,8 +877,8 @@ function init (el, mapOptions){
       var offsetX = (mapOffset.left + mapSize[0])-(popupOffset.left+$(el).outerWidth(true));
       // Check if mapmenu widget is used and opened
       var menuSize = 0;
-      if(controls.hasOwnProperty('mapmenu')) {
-        menuSize = controls.mapmenu.getTarget().offset().left > 0 ? mapSize[0]- controls.mapmenu.getTarget().offset().left : menuSize = 0;
+      if(settings.controls.hasOwnProperty('mapmenu')) {
+        menuSize = settings.controls.mapmenu.getTarget().offset().left > 0 ? mapSize[0]- settings.controls.mapmenu.getTarget().offset().left : menuSize = 0;
       }
       if (offsetY < 0 || offsetX < 0 + menuSize || offsetX > (mapSize[0]-$(el).outerWidth(true))) {
         var dx = 0, dy = 0;
@@ -1026,6 +964,5 @@ module.exports.scaleToResolution = scaleToResolution;
 module.exports.autoPan = autoPan;
 module.exports.removeOverlays = removeOverlays;
 module.exports.checkSize = checkSize;
-module.exports.setMapOptions = setMapOptions;
 module.exports.getMapName = getMapName;
 module.exports.getUrl = getUrl;
