@@ -160,8 +160,9 @@ function offClearSearch() {
 }
 function showOverlay(data, coord) {
     Viewer.removeOverlays();
+    var popup = Popup('#map');
     var overlay = new ol.Overlay({
-        element: $('#popup').get(0)
+        element: popup.getEl()
     });
 
     map.addOverlay(overlay);
@@ -169,11 +170,11 @@ function showOverlay(data, coord) {
     overlay.setPosition(coord);
     var content = data[name];
     // content += '<br>' + data.postnr + '&nbsp;' + data.postort;
-    Popup.setContent({
+    popup.setContent({
         content: content,
         title: title
     });
-    Popup.setVisibility(true);
+    popup.setVisibility(true);
 
     mapUtils.zoomToExent(new ol.geom.Point(coord), maxZoomLevel);
 }

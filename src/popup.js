@@ -5,7 +5,18 @@
 
 var $ = require('jquery');
 
-function init(target){
+module.exports = function(target) {
+    render(target);
+    bindUIActions();
+    return {
+        getEl: getEl,
+        setVisibility: setVisibility,
+        setTitle: setTitle,
+        setContent: setContent,
+        closePopup: closePopup
+    }
+}
+function render(target) {
     var pop = '<div id="popup">' +
                 '<div class="popup">' +
                 '<div class="mdk-close-button"><svg class="mdk-icon-fa-times"><use xlink:href="css/svg/fa-icons.svg#fa-times"></use></svg></div>' +
@@ -14,13 +25,15 @@ function init(target){
                 '</div>' +
               '</div>';
     $(target).append(pop);
-    bindUIActions();
 }
 function bindUIActions() {
     $('#popup .popup .mdk-close-button').on('touchend click', function(evt) {
         closePopup();
         evt.preventDefault();
     });
+}
+function getEl() {
+    return $("#popup").get(0);
 }
 function setVisibility(visible) {
     visible == true ? $('#popup .popup').css('display', 'block') : $('#popup .popup').css('display', 'none');
@@ -35,9 +48,3 @@ function setContent(config) {
 function closePopup() {
     setVisibility(false);
 }
-
-module.exports.init = init;
-module.exports.setVisibility = setVisibility;
-module.exports.setTitle = setTitle;
-module.exports.setContent = setContent;
-module.exports.closePopup = closePopup;
