@@ -134,7 +134,8 @@
     "ol.geom.Polygon#getInteriorPoint",
     "ol.geom.Polygon#getType",
     "ol.geom.Polygon#setCoordinates",
-    "ol.loadingstrategy.*"
+    "ol.loadingstrategy.*",
+    "ol.animation.pan"
   ],
   "umd": true,
   "compile": {
