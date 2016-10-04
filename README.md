@@ -23,12 +23,12 @@ The project is still in its early stages. We will be using releases that you can
 Documentation is currently being written. Once we have it published, it will be linked from this page.
 
 ## Want to contribute?
-We happily accept contributions of any kind. Guidelines are available in the [`CONTRIBUTING.md`](https://github.com/origo-map/origo/CONTRIBUTING.md) file.
+We happily accept contributions of any kind. Guidelines are available in the [`CONTRIBUTING.md`](https://github.com/origo-map/origo/blob/master/CONTRIBUTING.md) file.
 
 Thank you for considering contributing to Origo.
 
 ## Found an issue?
-For all bugs and feature requests please use ["Issues"](https://github.com/origo-map/origo/issues). Have a look at [`CONTRIBUTING.md`](https://github.com/origo-map/origo/CONTRIBUTING.md) for some tips on how to write issues.
+For all bugs and feature requests please use ["Issues"](https://github.com/origo-map/origo/issues). Have a look at [`CONTRIBUTING.md`](https://github.com/origo-map/origo/blob/master/CONTRIBUTING.md) for some tips on how to write issues.
 
 ## Live examples
 Not convinced? Or maybe you need some inspiration? Check out these examples of web maps that have been developed using the Origo framework:
