@@ -212,9 +212,10 @@ module.exports = function(){
       });
     },
     removeInteractions: function() {
-        // console.log(settings.select);
-        settings.map.removeInteraction(settings.modify);
-        settings.map.removeInteraction(settings.select);
+        if (isActive()) {
+            settings.map.removeInteraction(settings.modify);
+            settings.map.removeInteraction(settings.select);
+        }
     },
     activateInsert: function() {
       if (settings.hasDraw !== true) {
@@ -364,4 +365,13 @@ module.exports = function(){
       return el;
     }
   };
+
+  function isActive() {
+      if (settings.modify === undefined || settings.select === undefined) {
+          return false;
+      } else {
+          return true;
+      }
+  }
+
 }()
