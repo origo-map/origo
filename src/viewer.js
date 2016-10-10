@@ -85,8 +85,8 @@ function init(el, mapOptions) {
     var zoomControl = new ol.control.Zoom({
         zoomInTipLabel: ' ',
         zoomOutTipLabel: ' ',
-        zoomInLabel: $.parseHTML('<svg class="mdk-icon-fa-plus"><use xlink:href="css/svg/fa-icons.svg#fa-plus"></use></svg>')[0],
-        zoomOutLabel: $.parseHTML('<svg class="mdk-icon-fa-minus"><use xlink:href="css/svg/fa-icons.svg#fa-minus"></use></svg>')[0]
+        zoomInLabel: $.parseHTML('<svg class="o-icon-fa-plus"><use xlink:href="css/svg/fa-icons.svg#fa-plus"></use></svg>')[0],
+        zoomOutLabel: $.parseHTML('<svg class="o-icon-fa-minus"><use xlink:href="css/svg/fa-icons.svg#fa-minus"></use></svg>')[0]
     });
     //Set map controls
     mapControls = [
@@ -213,7 +213,7 @@ function init(el, mapOptions) {
     function loadMap(){
 
 	    map = new ol.Map({
-	      target: 'map',
+	      target: 'o-map',
 	      controls: mapControls,
 	      layers: settings.layers,
 	      view: new ol.View({
@@ -632,7 +632,7 @@ function init(el, mapOptions) {
       var queryList = '<ul id="querylist">';
       queryList += '</ul>';
 
-      var modal = Modal('#map', {title: title, content: content + queryList});
+      var modal = Modal('#o-map', {title: title, content: content + queryList});
       modal.showModal();
       $('.modal li').removeClass('hidden');
 
@@ -866,7 +866,7 @@ function init(el, mapOptions) {
     }
     function autoPan() {
     /*Workaround to remove when autopan implemented for overlays */
-      var el=$('.popup');
+      var el=$('.o-popup');
       var center = map.getView().getCenter();
       var popupOffset = $(el).offset();
       var mapOffset = $('#' + map.getTarget()).offset();
