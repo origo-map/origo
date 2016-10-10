@@ -9,7 +9,7 @@ var utils = require('./utils');
 var viewer = require('./viewer');
 
 var settings = {
-		windowButton: $('#window-button button')
+		windowButton: $('#o-window-button button')
 };
 
 function init(){
@@ -17,8 +17,8 @@ function init(){
     bindUIActions();
 }
 function bindUIActions() {
-    $('#window-button button').click(function() {
-        $('#window-button button').blur();
+    $('#o-window-button button').click(function() {
+        $('#o-window-button button').blur();
       	openMapWindow();
     })
 }
@@ -26,14 +26,14 @@ function createButton() {
 	var tooltipText = "Visa kartan i nytt fönster";
 	//Element for control
 	var el = utils.createButton({
-			id: 'window-button',
-			cls: 'mapwindow-button',
-			iconCls: 'mdk-icon-fa-expand',
+			id: 'o-window-button',
+			cls: 'o-mapwindow-button',
+			iconCls: 'o-icon-fa-expand',
 			src: 'css/svg/fa-icons.svg#fa-expand',
 			tooltipText: tooltipText,
 			tooltipPlacement: 'east'
 	});
-	$('#map').append(el);
+	$('#o-map').append(el);
 }
 function openMapWindow() {
     var url = viewer.getMapUrl();

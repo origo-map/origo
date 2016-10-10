@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "browserify": "11.0.1",
-    "jquery": "1.11.3",
+    "jquery": "2.1.4",
     "openlayers": "3.17.1",
     "proj4": "2.3.10",
     "svg4everybody": "2.0.3",

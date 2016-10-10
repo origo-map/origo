@@ -11,34 +11,34 @@ var utils = require('./utils');
 var sidebar;
 
 function init() {
-    var el = '<div id="sidebar">' +
-                '<div class="sidebar">' +
-                  '<div class="mdk-close-button"><svg class="mdk-icon-fa-times"><use xlink:href="css/svg/fa-icons.svg#fa-times"></use></svg></div>' +
-                  '<div class="sidebar-title"></div>' +
-                  '<div class="sidebar-content"></div>' +
+    var el = '<div id="o-sidebar">' +
+                '<div class="o-sidebar">' +
+                  '<div class="o-close-button"><svg class="o-icon-fa-times"><use xlink:href="css/svg/fa-icons.svg#fa-times"></use></svg></div>' +
+                  '<div class="o-sidebar-title"></div>' +
+                  '<div class="o-sidebar-content"></div>' +
                 '</div>' +
               '</div>';
-    $('#map').append(el);
-    sidebar = $('#sidebar');
+    $('#o-map').append(el);
+    sidebar = $('#o-sidebar');
 
     bindUIActions();
     // addLegend(viewer.getGroups());
 }
 function bindUIActions() {
-    $('#sidebar .sidebar .mdk-close-button').on('touchend click', function(evt) {
+    $('#o-sidebar .o-sidebar .o-close-button').on('touchend click', function(evt) {
         closeSidebar();
         evt.preventDefault();
     });
 }
 function setVisibility(visible) {
-    visible == true ? $('#sidebar').addClass('sidebar-show') : $('#sidebar').removeClass('sidebar-show');
+    visible == true ? $('#o-sidebar').addClass('o-sidebar-show') : $('#o-sidebar').removeClass('o-sidebar-show');
 }
 function setTitle(title) {
-    $('#sidebar .sidebar-title').html(title);
+    $('#o-sidebar .o-sidebar-title').html(title);
 }
 function setContent(config) {
-    config.title ? $('#sidebar .sidebar .sidebar-title').html(config.title): $('#sidebar .sidebar .sidebar-title').html('');
-    config.content ? $('#sidebar .sidebar .sidebar-content').html(config.content): $('#sidebar .sidebar .sidebar-content').html('');
+    config.title ? $('#o-sidebar .o-sidebar .o-sidebar-title').html(config.title): $('#o-sidebar .o-sidebar .o-sidebar-title').html('');
+    config.content ? $('#o-sidebar .o-sidebar .o-sidebar-content').html(config.content): $('#o-sidebar .o-sidebar .o-sidebar-content').html('');
 }
 function closeSidebar() {
     setVisibility(false);
