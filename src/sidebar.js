@@ -25,7 +25,7 @@ function init() {
     // addLegend(viewer.getGroups());
 }
 function bindUIActions() {
-    $('#sidebar .sidebar .mdk-close-button').on('touchend click', function(evt) {
+    $('#sidebar .sidebar .mdk-close-button').on('click', function(evt) {
         closeSidebar();
         evt.preventDefault();
     });

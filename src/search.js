@@ -141,7 +141,7 @@ function bindUIActions() {
         });
 }
 function onClearSearch() {
-    $('#search-button-close').on('touchend click', function(e) {
+    $('#search-button-close').on('click', function(e) {
       $('.typeahead').typeahead('val', '');
       featureInfo.clear();
       Viewer.removeOverlays();
@@ -154,7 +154,7 @@ function onClearSearch() {
 }
 function offClearSearch() {
     console.log('offClearSearch');
-    // $('#search-button').off('touchend click', function(e) {
+    // $('#search-button').off('click', function(e) {
     //   e.preventDefault();
     // });
 }

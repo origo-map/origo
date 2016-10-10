@@ -59,7 +59,7 @@ function init() {
     bindUIActions();
 }
 function bindUIActions() {
-  settings.geolocateButtonId.on('touchend click', function(e) {
+  settings.geolocateButtonId.on('click', function(e) {
     enabled = false;
     toggle();
     settings.geolocateButton.blur();

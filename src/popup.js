@@ -17,7 +17,7 @@ function init(target){
     bindUIActions();
 }
 function bindUIActions() {
-    $('#popup .popup .mdk-close-button').on('touchend click', function(evt) {
+    $('#popup .popup .mdk-close-button').on('click', function(evt) {
         closePopup();
         evt.preventDefault();
     });

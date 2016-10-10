@@ -128,17 +128,17 @@ module.exports = function(){
     },
     bindUIActions: function() {
       var self = this;
-      $('#o-editor-draw').on('touchend click', function(e) {
+      $('#o-editor-draw').on('click', function(e) {
         self.drawFeature();
         $('#o-editor-draw').blur();
         e.preventDefault();
       });
-      $('#o-editor-attribute').on('touchend click', function(e) {
+      $('#o-editor-attribute').on('click', function(e) {
         self.attributeFeature();
         $('#o-editor-attribute').blur();
         e.preventDefault();
       });
-      $('#o-editor-delete').on('touchend click', function(e) {
+      $('#o-editor-delete').on('click', function(e) {
         self.deleteFeature();
         $('#o-editor-delete').blur();
         e.preventDefault();
