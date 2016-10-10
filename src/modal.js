@@ -15,7 +15,7 @@ function init() {
 
 }
 function bindUIActions() {
-    $('.mdk-modal-screen, .mdk-close-button').click(function() {
+    $('.o-modal-screen, .o-close-button').click(function() {
         closeModal();
     });
 }
@@ -25,12 +25,12 @@ function createModal(modalTarget, options) {
     var footer = options.footer || undefined;
     settings.target = $(modalTarget);
 
-    settings.modal = '<div id="mdk-modal">' +
-              '<div class="mdk-modal-screen"></div>' +
-              '<div class="mdk-modal">' +
-              '<div class="mdk-close-button"><svg class="mdk-icon-fa-times"><use xlink:href="css/svg/fa-icons.svg#fa-times"></use></svg></div>' +
-              '<div class="mdk-modal-title">' + title + '</div>' +
-              '<div class="mdk-modal-content">' + content +'</div>' +
+    settings.modal = '<div id="o-modal">' +
+              '<div class="o-modal-screen"></div>' +
+              '<div class="o-modal">' +
+              '<div class="o-close-button"><svg class="o-icon-fa-times"><use xlink:href="css/svg/fa-icons.svg#fa-times"></use></svg></div>' +
+              '<div class="o-modal-title">' + title + '</div>' +
+              '<div class="o-modal-content">' + content +'</div>' +
               '</div>' +
             '</div>';
 }
@@ -39,7 +39,7 @@ function showModal() {
     bindUIActions();
 }
 function closeModal() {
-    $('#mdk-modal').remove();
+    $('#o-modal').remove();
 }
 
 module.exports.init = init;
