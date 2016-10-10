@@ -345,7 +345,7 @@ module.exports = function(){
           break;
         case 'checkbox':
           var checked = val == true ? ' checked' : '';
-          el = '<div class="mdk-form-checkbox"><label>' + label + '</label><input type="checkbox" id="' + id + '" value="' + val +'"' + checked + '></div>';
+          el = '<div class="o-form-checkbox"><label>' + label + '</label><input type="checkbox" id="' + id + '" value="' + val +'"' + checked + '></div>';
           break;
         case 'dropdown':
           var firstOption;
