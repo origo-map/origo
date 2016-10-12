@@ -230,7 +230,8 @@ function selectHandler(evt, data) {
         showFeatureInfo([feature], data[titleAttribute], content);
     } else if (geometryAttribute && title) {
         var feature = wktToFeature(data[geometryAttribute], projectionCode);
-        showFeatureInfo([feature], title, data);
+        var content = utils.createElement('div', data[name]);
+        showFeatureInfo([feature], title, content);
     } else if (easting && northing && title) {
         var coord = [data[easting], data[northing]];
         showOverlay(data, coord);
