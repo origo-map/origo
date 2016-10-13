@@ -17,6 +17,9 @@
     },
     {
       "name": "measure"
+    },
+    {
+      "name": "home"
     }
   ],
   "projectionCode": "EPSG:3010",

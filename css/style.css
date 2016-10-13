@@ -1665,84 +1665,66 @@ input.o-search-field::-ms-clear {
 	display: none
 }
 /* measure module */
-#measure-button {
-	left: .5em;
-	top: 10em;
+#o-measure-button {
+    left: .5em;
+    top: 10em;
 }
-#measure-line-button {
-	left: 3em;
-	top: 10em;
+#o-measure-line-button {
+    left: 3em;
+    top: 10em;
 }
-#measure-polygon-button {
-	left: 5.5em;
-	top: 10em;
+#o-measure-polygon-button {
+    left: 5.5em;
+    top: 10em;
 }
-.mdk-icon-minicons-square-vector {
-	padding: .3em;
-	height: 1.4em;
-	width: 1.4em;
+.o-icon-minicons-square-vector {
+    padding: .3em;
+    height: 1.4em;
+    width: 1.4em;
 }
-.mdk-icon-minicons-line-vector {
-	padding: .3em;
-	height: 1.4em;
-	width: 1.4em;
+.o-icon-minicons-line-vector {
+    padding: .3em;
+    height: 1.4em;
+    width: 1.4em;
 }
-.measure-button-true .mdk-icon-fa-pencil,
-.measure-button-true .mdk-icon-fa-chevron-down,
-.measure-button-true .mdk-icon-fa-bookmark-o,
-.measure-button-true .mdk-icon-fa-arrows-h,
-.measure-button-true .mdk-icon-steady-measure,
-.measure-button-true .mdk-icon-minicons-square-vector,
-.measure-button-true .mdk-icon-minicons-line-vector,
-.measure-button-true .mdk-icon-fa-minus {
-	fill: #007AFF;
-}
-.measure-show-true {
-	display: inline-block;
-}
-.measure-show-false {
-	display: none;
+.o-measure-button-true .o-icon-fa-pencil,
+.o-measure-button-true .o-icon-steady-measure,
+.o-measure-button-true .o-icon-minicons-square-vector,
+.o-measure-button-true .o-icon-minicons-line-vector {
+    fill: #007AFF;
 }
 .tooltip {
-	position: relative;
-	background: rgba(0, 0, 0, 0.5);
-	border-radius: 4px;
-	color: white;
-	padding: 4px 8px;
-	opacity: 0.8;
-	white-space: nowrap;
+    position: relative;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+    color: white;
+    padding: 4px 8px;
+    opacity: 0.8;
+    white-space: nowrap;
 }
-.tooltip-measure {
-  opacity: 1;
-  font-weight: bold;
-  pointer-events: none;
+.o-tooltip-measure {
+    opacity: 1;
+    font-weight: bold;
+    pointer-events: none;
 }
 .tooltip-static {
-  background-color: #ffffff;
-  color: black;
-  border: 1px solid #c5c5c5;
+    background-color: #ffffff;
+    color: black;
+    border: 1px solid #c5c5c5;
 }
 .tooltip-measure:before,
 .tooltip-static:before {
-  border-top: 6px solid rgba(0, 0, 0, 0.5);
-  border-right: 6px solid transparent;
-  border-left: 6px solid transparent;
-  content: "";
-  position: absolute;
-  bottom: -6px;
-  margin-left: -7px;
-  left: 50%;
+    border-top: 6px solid rgba(0, 0, 0, 0.5);
+    border-right: 6px solid transparent;
+    border-left: 6px solid transparent;
+    content: "";
+    position: absolute;
+    bottom: -6px;
+    margin-left: -7px;
+    left: 50%;
 }
 .tooltip-static:before {
-  border-top-color: #ffffff;
-}
-.util-menu-measure {
-	pointer-events: all;
-	display: none;
-	position: relative;
-	float: left;
-	height: 2em;
-	z-index: 2;
+    border-top-color: #ffffff;
 }
 @media screen and (max-width: 768px) {
 .ol-scale-line, .ol-scale-line-inner {
@@ -1847,29 +1829,29 @@ input.o-search-field::-ms-clear {
 }
 .ol-zoom {
   top: auto;
-	bottom: 5.5em;
+	bottom: 8em;
 }
 #o-home-button {
-	bottom: 3em;
+	bottom: 5.5em;
 	top: auto;
 }
 .ol-rotate {
-  bottom: 10em;
+  bottom: 12.5em;
 	top: auto;
 }
 #o-geolocation-button {
-	bottom: .5em;
+	bottom: 3em;
 	top: auto;
 }
 #o-window-button {
-	bottom: 10em;
+	bottom: 12.5em;
 	top: auto;
 }
-#measure-button, #measure-line-button,
-	#measure-polygon-button  {
-		bottom: 12.5em;
-		top: auto;
-	}
+#o-measure-button, #o-measure-line-button,
+    #o-measure-polygon-button  {
+        bottom: .5em;
+        top: auto;
+    }
 }
 @media screen and (max-width: 320px) {
 #o-sidebar,

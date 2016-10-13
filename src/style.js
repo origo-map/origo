@@ -69,6 +69,11 @@ module.exports = (function() {
                             var coordinates = feature.getGeometry().getInteriorPoints().getFirstCoordinate();
                             return new ol.geom.Point(coordinates);
                         }
+					case 'endPoint':
+                        styleOptions.geometry = function(feature) {
+                            var coordinates = feature.getGeometry().getLastCoordinate();
+                            return new ol.geom.Point(coordinates);
+                        }
                     break;
                 }
             }
