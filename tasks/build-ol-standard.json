@@ -17,6 +17,7 @@
     "ol.proj.Projection",
     "ol.proj.Projection#getMetersPerUnit",
     "ol.View",
+    "ol.View#calculateExtent",    
     "ol.View#getCenter",
     "ol.View#getProjection",
     "ol.View#getResolution",
@@ -159,7 +160,7 @@
     "ol.geom.Polygon#getType",
     "ol.geom.Polygon#setCoordinates",
     "ol.loadingstrategy.*",
-    "ol.animation.pan"    
+    "ol.animation.pan"
   ],
   "umd": true,
   "compile": {
