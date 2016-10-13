@@ -160,7 +160,7 @@ function offClearSearch() {
 }
 function showOverlay(data, coord) {
     Viewer.removeOverlays();
-    var popup = Popup('#map');
+    var popup = Popup('#o-map');
     var overlay = new ol.Overlay({
         element: popup.getEl()
     });

@@ -78,7 +78,7 @@ function identify(items, target, coordinate) {
     content = '<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme">' + content + '</div></div>';
     switch (target) {
         case 'overlay':
-            var popup = Popup('#map');
+            var popup = Popup('#o-map');
             var overlay = new ol.Overlay({
               element: popup.getEl()
             });
