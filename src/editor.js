@@ -30,7 +30,7 @@ function render() {
         src: 'css/svg/fa-icons.svg#fa-pencil',
         text: 'Redigera'
     });
-    $('#menutools').append(el);
+    $('#o-menutools').append(el);
 }
 
 return {

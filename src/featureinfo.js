@@ -75,7 +75,7 @@ function identify(items, target, coordinate) {
     var content = items.map(function(i){
         return i.content;
     }).join('');
-    content = '<div id="identify"><div id="mdk-identify-carousel" class="owl-carousel owl-theme">' + content + '</div></div>';
+    content = '<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme">' + content + '</div></div>';
     switch (target) {
         case 'overlay':
             var popup = Popup('#map');
@@ -89,7 +89,7 @@ function identify(items, target, coordinate) {
             overlay.setPosition(coord);
             popup.setContent({content: content, title: items[0].title});
             popup.setVisibility(true);
-            var owl = initCarousel('#mdk-identify-carousel', undefined, function(){
+            var owl = initCarousel('#o-identify-carousel', undefined, function(){
                 var currentItem = this.owl.currentItem;
                 selectionLayer.clearAndAdd(items[currentItem].feature.clone(), selectionStyles[items[currentItem].feature.getGeometry().getType()]);
                 popup.setTitle(items[currentItem].title);
@@ -99,7 +99,7 @@ function identify(items, target, coordinate) {
         case 'sidebar':
             sidebar.setContent({content: content, title: items[0].title});
             sidebar.setVisibility(true);
-            var owl = initCarousel('#mdk-identify-carousel', undefined, function(){
+            var owl = initCarousel('#o-identify-carousel', undefined, function(){
                 var currentItem = this.owl.currentItem;
                 selectionLayer.clearAndAdd(items[currentItem].feature.clone(), selectionStyles[items[currentItem].feature.getGeometry().getType()]);
                 sidebar.setTitle(items[currentItem].title);
@@ -172,7 +172,7 @@ function initCarousel(id, options, cb) {
       paginationSpeed : 400,
       singleItem:true,
       rewindSpeed:200,
-      navigationText: ['<svg class="mdk-icon-fa-chevron-left"><use xlink:href="css/svg/fa-icons.svg#fa-chevron-left"></use></svg>', '<svg class="mdk-icon-fa-chevron-right"><use xlink:href="css/svg/fa-icons.svg#fa-chevron-right"></use></svg>'],
+      navigationText: ['<svg class="o-icon-fa-chevron-left"><use xlink:href="css/svg/fa-icons.svg#fa-chevron-left"></use></svg>', '<svg class="o-icon-fa-chevron-right"><use xlink:href="css/svg/fa-icons.svg#fa-chevron-right"></use></svg>'],
       afterAction: cb
     };
     return $(id).owlCarousel(carouselOptions);
