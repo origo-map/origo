@@ -17,7 +17,8 @@
     "build-ol": "node node_modules/openlayers/tasks/build.js tasks/build-ol-standard.json node_modules/openlayers/dist/ol.js"
   },
   "dependencies": {
-    "jquery": "1.11.3",
+    "browserify": "11.0.1",
+    "jquery": "2.1.4",
     "openlayers": "3.17.1",
     "proj4": "2.3.10",
     "svg4everybody": "2.0.3",
