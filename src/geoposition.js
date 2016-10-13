@@ -24,21 +24,21 @@ function init() {
     var tooltipText = "Visa nuvarande position i kartan";
     //Element for control
     var el = utils.createButton({
-        id: 'geolocation-button',
-        cls: 'geolocation-button',
-        iconCls: 'mdk-icon-fa-location-arrow',
+        id: 'o-geolocation-button',
+        cls: 'o-geolocation-button',
+        iconCls: 'o-icon-fa-location-arrow',
         src: 'css/svg/fa-icons.svg#fa-location-arrow',
         tooltipText: tooltipText,
         tooltipPlacement: 'east'
     });
-    $('#map').append(el);
+    $('#o-map').append(el);
 
-    settings.geolocateButtonId = $('#geolocation-button');
-    settings.geolocateButton = $('#geolocation-button button');
+    settings.geolocateButtonId = $('#o-geolocation-button');
+    settings.geolocateButton = $('#o-geolocation-button button');
 
-    var markerImg = '<img id="geolocation_marker" src="img/geolocation_marker.png" />';
-    $('#map').prepend(markerImg);
-    markerEl = $('#geolocation_marker').get(0);
+    var markerImg = '<img id="o-geolocation_marker" src="img/geolocation_marker.png" />';
+    $('#o-map').prepend(markerImg);
+    markerEl = $('#o-geolocation_marker').get(0);
     marker = new ol.Overlay({
       positioning: 'center-center',
       element: markerEl,
@@ -67,8 +67,8 @@ function bindUIActions() {
   });
 }
 function toggle() {
-  if(settings.geolocateButton.hasClass('geolocation-button-true')){
-    settings.geolocateButton.removeClass('geolocation-button-true');
+  if(settings.geolocateButton.hasClass('o-geolocation-button-true')){
+    settings.geolocateButton.removeClass('o-geolocation-button-true');
     geolocation.setTracking(false);
 
     geolocation.un('change', getPositionVal);
@@ -76,7 +76,7 @@ function toggle() {
     map.removeOverlay(marker);
   }
   else {
-    settings.geolocateButton.addClass('geolocation-button-true');
+    settings.geolocateButton.addClass('o-geolocation-button-true');
     map.addOverlay(marker);
 
     // Listen to position changes

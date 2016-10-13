@@ -21,7 +21,7 @@ module.exports = function(){
   var editAttributes = {};
 
   function render(selectOptions) {
-      $("#map").append(editortemplate(selectOptions));
+      $("#o-map").append(editortemplate(selectOptions));
   }
   function onEnableInteraction(e) {
       if(e.interaction === 'editor') {
@@ -35,10 +35,10 @@ module.exports = function(){
   }
   function setActive(state) {
       if(state === true) {
-          $('#o-editor-toolbar').removeClass('hidden');
+          $('#o-editor-toolbar').removeClass('o-hidden');
       }
       else {
-          $('#o-editor-toolbar').addClass('hidden');
+          $('#o-editor-toolbar').addClass('o-hidden');
       }
   }
   function emitEnableInteraction() {

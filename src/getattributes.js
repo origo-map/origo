@@ -49,8 +49,8 @@ module.exports = function(feature, layer) {
                 else if (attribute['img']) {
                     if(feature.get(attribute['img'])) {
                         var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], replacer.replace(feature.get(attribute['img']), feature.getProperties()));
-                        var attribution = attribute['attribution'] ? '<div class="image-attribution">' + attribute['attribution'] + '</div>' : '';
-                        val = '<div class="image-container">' +
+                        var attribution = attribute['attribution'] ? '<div class="o-image-attribution">' + attribute['attribution'] + '</div>' : '';
+                        val = '<div class="o-image-container">' +
                                   '<img src="' + url + '">' + attribution +
                               '</div>';
                     }

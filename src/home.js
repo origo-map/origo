@@ -24,18 +24,18 @@ function Init(opt_options) {
 
 function render() {
   var el = utils.createButton({
-    id: 'home-button',
-    iconCls: 'mdk-icon-fa-home',
+    id: 'o-home-button',
+    iconCls: 'o-icon-fa-home',
     src: 'css/svg/fa-icons.svg#fa-home',
     tooltipText: tooltip
   });
-  $('#map').append(el);
+  $('#o-map').append(el);
 }
 
 function bindUIActions() {
-  $('#home-button').on('click', function(e) {
+  $('#o-home-button').on('click', function(e) {
     map.getView().fit(extent, map.getSize());
-    $('#home-button button').blur();
+    $('#o-home-button button').blur();
     e.preventDefault();
   });
 }

@@ -6,31 +6,31 @@
 var $ = require('jquery');
 
 function init(target){
-    var pop = '<div id="popup">' +
-                '<div class="popup">' +
-                '<div class="mdk-close-button"><svg class="mdk-icon-fa-times"><use xlink:href="css/svg/fa-icons.svg#fa-times"></use></svg></div>' +
-                '<div class="popup-title"></div>' +
-                '<div class="popup-content"></div>' +
+    var pop = '<div id="o-popup">' +
+                '<div class="o-popup">' +
+                '<div class="o-close-button"><svg class="o-icon-fa-times"><use xlink:href="css/svg/fa-icons.svg#fa-times"></use></svg></div>' +
+                '<div class="o-popup-title"></div>' +
+                '<div class="o-popup-content"></div>' +
                 '</div>' +
               '</div>';
     $(target).append(pop);
     bindUIActions();
 }
 function bindUIActions() {
-    $('#popup .popup .mdk-close-button').on('click', function(evt) {
+    $('#o-popup .o-popup .o-close-button').on('click', function(evt) {
         closePopup();
         evt.preventDefault();
     });
 }
 function setVisibility(visible) {
-    visible == true ? $('#popup .popup').css('display', 'block') : $('#popup .popup').css('display', 'none');
+    visible == true ? $('#o-popup .o-popup').css('display', 'block') : $('#o-popup .o-popup').css('display', 'none');
 }
 function setTitle(title) {
-    $('#popup .popup-title').html(title);
+    $('#o-popup .o-popup-title').html(title);
 }
 function setContent(config) {
-    config.title ? $('#popup .popup .popup-title').html(config.title): $('#popup .popup .popup-title').html('');
-    config.content ? $('#popup .popup .popup-content').html(config.content): $('#popup .popup .popup-content').html('');
+    config.title ? $('#o-popup .o-popup .o-popup-title').html(config.title): $('#o-popup .o-popup .o-popup-title').html('');
+    config.content ? $('#o-popup .o-popup .o-popup-content').html(config.content): $('#o-popup .o-popup .o-popup-content').html('');
 }
 function closePopup() {
     setVisibility(false);

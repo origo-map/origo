@@ -152,7 +152,7 @@ module.exports = function(){
     },
     onAttributesSave: function(feature, attributes) {
         var self = this;
-        $('#mdk-save-button').on('touchend click', function(e) {
+        $('#o-save-button').on('touchend click', function(e) {
           var editEl = {};
           //Read values from form
           for (var i=0; i<attributes.length; i++) {
@@ -172,7 +172,7 @@ module.exports = function(){
           }
           modal.closeModal();
           self.attributesSaveHandler(feature, editEl);
-          $('#mdk-save-button').blur();
+          $('#o-save-button').blur();
           e.preventDefault();
         });
     },
@@ -228,10 +228,10 @@ module.exports = function(){
             $(obj.elDependencyId).on(obj.eventType, function(e) {
                 var containerClass = '.' + obj.elId.slice(1);
                 if($(obj.elDependencyId + (' option:selected')).text() === obj.requiredVal) {
-                    $(containerClass).removeClass('hidden');
+                    $(containerClass).removeClass('o-hidden');
                 }
                 else {
-                    $(containerClass).addClass('hidden');
+                    $(containerClass).addClass('o-hidden');
                 }
             });
         }
@@ -278,8 +278,8 @@ module.exports = function(){
               return prev + next.formElement;
         }, '');
         var title = settings.title;
-        var form = '<form>' + formElement +'<br><div class="mdk-form-save"><input id="mdk-save-button" type="button" value="Spara"></input></div></form>';
-        modal.createModal('#map', {title: title, content: form});
+        var form = '<form>' + formElement +'<br><div class="o-form-save"><input id="o-save-button" type="button" value="Spara"></input></div></form>';
+        modal.createModal('#o-map', {title: title, content: form});
         modal.showModal();
 
         attributeObjects.forEach(function(obj) {
@@ -345,7 +345,7 @@ module.exports = function(){
           break;
         case 'checkbox':
           var checked = val == true ? ' checked' : '';
-          el = '<div class="mdk-form-checkbox"><label>' + label + '</label><input type="checkbox" id="' + id + '" value="' + val +'"' + checked + '></div>';
+          el = '<div class="o-form-checkbox"><label>' + label + '</label><input type="checkbox" id="' + id + '" value="' + val +'"' + checked + '></div>';
           break;
         case 'dropdown':
           var firstOption;
