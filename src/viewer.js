@@ -898,8 +898,18 @@ function init(el, mapOptions) {
       }
     /*End workaround*/
     }
-    function removeOverlays() {
+    function removeOverlays(overlays) {
+      if (overlays) {
+        if (overlays.constructor === Array || overlays instanceof ol.Collection) {
+          overlays.forEach(function(overlay) {
+            map.removeOverlay(overlay);
+          })
+        } else {
+            map.removeOverlay(overlays);
+        }
+      } else {
         map.getOverlays().clear();
+      }
     }
     function checkSize() {
         var small = map.getSize()[0] < 768;
