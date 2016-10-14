@@ -7,28 +7,27 @@ var utils = require('./utils');
 var style = require('./style');
 var styleTypes = require('./style/styletypes');
 
-var map,
-    activeButton,
-    measure,
-    type,
-    sketch,
-    measureTooltip,
-    measureTooltipElement,
-    helpTooltip,
-    helpTooltipElement,
-    vector,
-    source,
-    label,
-    overlayArray = [],
-    continuePolygonMsg = 'Klicka för att fortsätta rita ytan',
-    continueLineMsg = 'Klicka för att fortsätta rita linjen',
-    drawStart = false,
-    isActive = false;
-        
-function init(){
-    
+var map;
+var activeButton;
+var measure;
+var type;
+var sketch;
+var measureTooltip;
+var measureTooltipElement;
+var measureStyleOptions;
+var helpTooltip;
+var helpTooltipElement;
+var vector;
+var source;
+var label;
+var overlayArray = [];
+var drawStart = false;
+var isActive = false;
+
+function init() {
     map = Viewer.getMap();
     source = new ol.source.Vector();
+    measureStyleOptions = styleTypes.getStyle('measure');
 
     //Drawn features
     vector = new ol.layer.Vector({
@@ -37,10 +36,11 @@ function init(){
         visible: false,
         zIndex: 6
     });
+
     map.addLayer(vector);
-    
+
     $('.o-map').on('enableInteraction', onEnableInteraction);
-    
+
     render();
     bindUIActions();
 }
@@ -51,8 +51,7 @@ function onEnableInteraction(e) {
         $('#o-measure-polygon-button').removeClass('o-hidden');
         $('#o-measure-button').removeClass('tooltip');
         setActive(true);
-    }
-    else {
+    } else {
         if (activeButton) { activeButton.removeClass('o-measure-button-true'); };
         $('#o-measure-button button').removeClass('o-measure-button-true');
         $('#o-measure-line-button').addClass('o-hidden');
@@ -63,7 +62,7 @@ function onEnableInteraction(e) {
         map.un('click', pointerMoveHandler);
         map.removeInteraction(measure);
         vector.setVisible(false);
-        removeOverlays();
+        Viewer.removeOverlays(overlayArray);
         vector.getSource().clear();
         setActive(false);
     }
@@ -71,8 +70,7 @@ function onEnableInteraction(e) {
 function setActive(state) {
     if(state === true) {
         isActive = true;
-    }
-    else {
+    } else {
         isActive = false;
     }
 }
@@ -84,6 +82,7 @@ function render() {
         src: 'css/svg/steady-icons.svg#steady-measure',
         tooltipText: 'Mät i kartan'
     });
+    
     $('#o-map').append(mb);
 
     var lb = utils.createButton({
@@ -94,6 +93,7 @@ function render() {
         tooltipText: 'Linje',
         tooltipPlacement: 'north'
     });
+
     $('#o-map').append(lb);
     $('#o-measure-line-button').addClass('o-hidden');
 
@@ -105,6 +105,7 @@ function render() {
         tooltipText: 'Yta',
         tooltipPlacement: 'north'
     });
+
     $('#o-map').append(pb);
     $('#o-measure-polygon-button').addClass('o-hidden');
 }
@@ -131,8 +132,8 @@ function bindUIActions() {
 } 
 function createStyle(feature, labelText) {
     var featureType = feature.getGeometry().getType();
-    var measureStyleOptions = styleTypes.getStyle('measure');
     var measureStyle = featureType == 'LineString' ? style.createStyleRule(measureStyleOptions.linestring) : style.createStyleRule(measureStyleOptions.polygon);
+    
     return measureStyle;
 }
 //Display and move tooltips with pointer
@@ -140,21 +141,22 @@ function pointerMoveHandler(evt) {
     if (evt.dragging) {
         return;
     }
+    
     var helpMsg = 'Klicka för att börja mäta';
     var tooltipCoord = evt.coordinate;
 
     if (sketch) {
         var output;
         var geom = (sketch.getGeometry());
+        
         if (geom instanceof ol.geom.Polygon) {
             output = formatArea(/** @type {ol.geom.Polygon} */ (geom));
-            helpMsg = continuePolygonMsg;
             tooltipCoord = geom.getInteriorPoint().getCoordinates();
         } else if (geom instanceof ol.geom.LineString) {
             output = formatLength( /** @type {ol.geom.LineString} */ (geom));
-            helpMsg = continueLineMsg;
             tooltipCoord = geom.getLastCoordinate();
         }
+        
         measureTooltipElement.innerHTML = output;
         label = output;
         measureTooltip.setPosition(tooltipCoord);
@@ -166,29 +168,13 @@ function pointerMoveHandler(evt) {
 };
 function addInteraction() {
     vector.setVisible(true);
+    
     measure = new ol.interaction.Draw({
         source: source,
         type: type,
-        style: new ol.style.Style({
-            fill: new ol.style.Fill({
-                color: 'rgba(255, 255, 255, 0.2)'
-            }),
-            stroke: new ol.style.Stroke({
-                color: 'rgba(0, 0, 0, 0.5)',
-                lineDash: [10, 10],
-                width: 2
-            }),
-            image: new ol.style.Circle({
-                radius: 5,
-                stroke: new ol.style.Stroke({
-                    color: 'rgba(0, 0, 0, 0.7)'
-                }),
-                fill: new ol.style.Fill({
-                    color: 'rgba(255, 255, 255, 0.2)'
-                })
-            })
-        })
+        style: style.createStyleRule(measureStyleOptions.interaction)
     });
+    
     map.addInteraction(measure);
 
     createMeasureTooltip();
@@ -201,6 +187,7 @@ function addInteraction() {
         // set sketch
         drawStart = true;
         sketch = evt.feature;
+        $(helpTooltipElement).addClass('o-hidden');
     }, this);
 
     measure.on('drawend', function(evt) {
@@ -213,19 +200,23 @@ function addInteraction() {
         // unset tooltip so that a new one can be created
         measureTooltipElement = null;
         createMeasureTooltip();
+        $(helpTooltipElement).removeClass('o-hidden');
     }, this);
 };
 function createHelpTooltip() {
     if (helpTooltipElement) {
         helpTooltipElement.parentNode.removeChild(helpTooltipElement);
     }
+    
     helpTooltipElement = document.createElement('div');
-    helpTooltipElement.className = 'tooltip';
-    helpTooltip = new ol.Overlay({
+    helpTooltipElement.className = 'o-tooltip o-tooltip-measure';
+   
+   helpTooltip = new ol.Overlay({
         element: helpTooltipElement,
         offset: [15, 0],
         positioning: 'center-left',
     });
+    
     overlayArray.push(helpTooltip);
     map.addOverlay(helpTooltip);
 };
@@ -233,14 +224,17 @@ function createMeasureTooltip() {
     if (measureTooltipElement) {
         measureTooltipElement.parentNode.removeChild(measureTooltipElement);
     }
+    
     measureTooltipElement = document.createElement('div');
-    measureTooltipElement.className = 'tooltip o-tooltip-measure';
+    measureTooltipElement.className = 'o-tooltip o-tooltip-measure';
+    
     measureTooltip = new ol.Overlay({
         element: measureTooltipElement,
         offset: [0, -15],
         positioning: 'bottom-center',
         stopEvent: false
     });
+    
     overlayArray.push(measureTooltip);
     map.addOverlay(measureTooltip);
 };
@@ -248,6 +242,7 @@ function formatLength(line) {
     var length;
     length = Math.round(line.getLength() * 100) / 100;
     var output;
+    
     if (length > 100) {
         output = (Math.round(length / 1000 * 100) / 100) +
             ' ' + 'km';
@@ -255,12 +250,14 @@ function formatLength(line) {
         output = (Math.round(length * 100) / 100) +
             ' ' + 'm';
     }
+    
     return output;
 };
 function formatArea(polygon) {
     var area;
     area = polygon.getArea();
     var output;
+    
     if (area > 10000000) {
         output = (Math.round(area / 1000000 * 100) / 100) +
             ' ' + 'km<sup>2</sup>';
@@ -271,6 +268,7 @@ function formatArea(polygon) {
         output = (Math.round(area * 100) / 100) +
             ' ' + 'm<sup>2</sup>';
     }
+    
     var htmlElem = document.createElement('span');
     htmlElem.innerHTML = output;
 
@@ -279,6 +277,7 @@ function formatArea(polygon) {
             element.textContent = String.fromCharCode(element.textContent.charCodeAt(0) + 128);
         }
     })
+    
     return htmlElem.textContent;
 };
 function toggleMeasure () {
@@ -287,8 +286,7 @@ function toggleMeasure () {
             type: 'enableInteraction',
             interaction: 'featureInfo'
         });
-    }
-    else {
+    } else {
         $('.o-map').trigger({
             type: 'enableInteraction',
             interaction: 'measure'
@@ -296,16 +294,14 @@ function toggleMeasure () {
     }
 };
 function toggleType(button) {
-    if (activeButton) { activeButton.removeClass('o-measure-button-true'); }
+    if (activeButton) {
+        activeButton.removeClass('o-measure-button-true');
+    }
+    
     button.addClass('o-measure-button-true');
     activeButton = button;
     map.removeInteraction(measure);
     addInteraction();
-};
-function removeOverlays() {
-    overlayArray.forEach(function(element) {
-        map.removeOverlay(element);
-    })
 };
 
 module.exports.init = init;

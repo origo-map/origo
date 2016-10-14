@@ -51,6 +51,27 @@ var measure = {
                 stroke: {color: [255, 255, 255, 0.8], width: 4}
             }
         }
+    ],
+    interaction: [
+        {
+            'fill': {
+                color: [255, 255, 255, 0.2]
+            },
+            'stroke': {
+                'color': [0, 0, 0, 0.5],
+                'lineDash': [10, 10],
+                'width': 2
+            },
+            'circle': {
+                'radius': 5,
+                'stroke': {
+                    'color': [0, 0, 0, 0.7]
+                },
+                'fill': {
+                    color: [255, 255, 255, 0.2]
+                }
+            }
+        }
     ]
 };
 

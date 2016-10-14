@@ -120,7 +120,7 @@ b, strong{
   top: 7.5em;
 }*/
 .ol-rotate {
-  top: 10em;
+  top: 12.5em;
   left: .5em;
   transition: opacity .25s;
 }
@@ -1693,38 +1693,16 @@ input.o-search-field::-ms-clear {
 .o-measure-button-true .o-icon-minicons-line-vector {
     fill: #007AFF;
 }
-.tooltip {
+.o-tooltip-measure {
     position: relative;
     background: rgba(0, 0, 0, 0.5);
     border-radius: 4px;
     color: white;
     padding: 4px 8px;
-    opacity: 0.8;
     white-space: nowrap;
-}
-.o-tooltip-measure {
-    opacity: 1;
-    font-weight: bold;
+    opacity: 0.8;
+    font: 80% normal, sans-serif;
     pointer-events: none;
-}
-.tooltip-static {
-    background-color: #ffffff;
-    color: black;
-    border: 1px solid #c5c5c5;
-}
-.tooltip-measure:before,
-.tooltip-static:before {
-    border-top: 6px solid rgba(0, 0, 0, 0.5);
-    border-right: 6px solid transparent;
-    border-left: 6px solid transparent;
-    content: "";
-    position: absolute;
-    bottom: -6px;
-    margin-left: -7px;
-    left: 50%;
-}
-.tooltip-static:before {
-    border-top-color: #ffffff;
 }
 @media screen and (max-width: 768px) {
 .ol-scale-line, .ol-scale-line-inner {

@@ -18,8 +18,7 @@ module.exports = function() {
         getStyle: function getStyle(type) {
             if(type) {
                 return styleTypes[type];
-            }
-            else {
+            } else {
                 console.log(type + ' is not a default style');
             }
         }
