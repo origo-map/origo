@@ -7,7 +7,6 @@
 var ol = require('openlayers');
 var $ = require('jquery');
 var template = require("./templates/viewer.handlebars");
-var Popup = require('./popup');
 var Modal = require('./modal');
 var utils = require('./utils');
 var featureinfo = require('./featureinfo');
@@ -627,7 +626,7 @@ function init(el, mapOptions) {
     function modalMoreInfo() {
       var content = $('#identify').html();
       var title = $('.popup-title').html();
-      Popup.setVisibility(false);
+      removeOverlays();
 
       var queryList = '<ul id="querylist">';
       queryList += '</ul>';
@@ -899,13 +898,18 @@ function init(el, mapOptions) {
       }
     /*End workaround*/
     }
-    function removeOverlays() {
-        var overlays = map.getOverlays();
-        if (overlays.length > 0) {
-            for (var i=0; i < overlays.length; i++) {
-              map.removeOverlay(overlays[i]);
-            }
+    function removeOverlays(overlays) {
+      if (overlays) {
+        if (overlays.constructor === Array || overlays instanceof ol.Collection) {
+          overlays.forEach(function(overlay) {
+            map.removeOverlay(overlay);
+          })
+        } else {
+            map.removeOverlay(overlays);
         }
+      } else {
+        map.getOverlays().clear();
+      }
     }
     function checkSize() {
         var small = map.getSize()[0] < 768;
