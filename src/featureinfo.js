@@ -147,7 +147,7 @@ function setActive(state) {
     }
     else {
         selectionLayer.clear();
-        Viewer.setVisibility(false);
+        Viewer.removeOverlays();
         map.un('click', onClick);
     }
 }
