@@ -152,7 +152,7 @@ module.exports = function(){
     },
     onAttributesSave: function(feature, attributes) {
         var self = this;
-        $('#o-save-button').on('touchend click', function(e) {
+        $('#o-save-button').on('click', function(e) {
           var editEl = {};
           //Read values from form
           for (var i=0; i<attributes.length; i++) {

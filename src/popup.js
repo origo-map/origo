@@ -27,7 +27,7 @@ function render(target) {
   $(target).append(pop);
 }
 function bindUIActions() {
-    $('#o-popup .o-popup .o-close-button').on('touchend click', function(evt) {
+    $('#o-popup .o-popup .o-close-button').on('click', function(evt) {
         closePopup();
         evt.preventDefault();
     });

@@ -166,7 +166,7 @@ function addLegend(groups) {
               $('#o-group-' + groups[i].name).addClass('o-ul-expand-false');
           }
           //Event listener for tick layer
-          $('#o-group-' + groups[i].name + ' .o-legend-header').on('touchend click', function(evt) {
+          $('#o-group-' + groups[i].name + ' .o-legend-header').on('click', function(evt) {
               toggleGroup($(this));
               evt.preventDefault();
           });
@@ -249,14 +249,14 @@ function addLegend(groups) {
         }
 
         //Event listener for tick layer
-        $('#' + name).on('touchend click', function(evt) {
+        $('#' + name).on('click', function(evt) {
           $(this).each(function() {
             var that = this;
             toggleCheck($(that).attr("id"));
           });
           evt.preventDefault();
         });
-        $('#o-legend-' + name).on('touchend click', function(evt) {
+        $('#o-legend-' + name).on('click', function(evt) {
           $(this).each(function() {
             var that = this;
             toggleCheck($(that).attr("id"));
@@ -265,14 +265,14 @@ function addLegend(groups) {
         });
       }
       //Toggle map legend
-      $('#o-legend-overlay .o-toggle-button').on('touchend click', function(evt) {
+      $('#o-legend-overlay .o-toggle-button').on('click', function(evt) {
         toggleOverlay();
         evt.preventDefault();
       });
 }
 function onToggleCheck(layername) {
     //Event listener for tick layer
-    $('#' + layername).on('touchend click', function(evt) {
+    $('#' + layername).on('click', function(evt) {
       $(this).each(function() {
         var that = this;
         toggleCheck($(that).attr("id"));
@@ -282,7 +282,7 @@ function onToggleCheck(layername) {
 }
 function offToggleCheck(layername) {
     //Event listener for tick layer
-    $('#' + layername).off('touchend click', function(evt) {
+    $('#' + layername).off('click', function(evt) {
       $(this).each(function() {
         var that = this;
         toggleCheck($(that).attr("id"));
