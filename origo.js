@@ -1,6 +1,6 @@
 "use strict";
 
-window.proj4 = require('proj4');;
+window.proj4 = require('proj4');
 
 //Adds support for linking till external svg sprites
 var svg4everybody = require('svg4everybody');
