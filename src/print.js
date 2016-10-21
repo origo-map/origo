@@ -30,7 +30,7 @@ function init() {
     bindUIActions();
 }
 function bindUIActions() {
-    printButton.on('touchend click', function(e) {
+    printButton.on('click', function(e) {
         $('#app-wrapper').append('<canvas id="o-print" style="display: none"></canvas>');
         createImage();
         e.preventDefault();

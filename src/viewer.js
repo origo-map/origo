@@ -333,9 +333,6 @@ function init(el, mapOptions) {
         });
         return queryableLayers;
     }
-    function getEditLayer() {
-      return settings.editLayer;
-    }
     function getGroup(group) {
         var group = $.grep(settings.layers, function(obj) {
             return (obj.get('group') == group);
@@ -930,7 +927,6 @@ module.exports.getLayers = getLayers;
 module.exports.getLayer = getLayer;
 module.exports.getControlNames = getControlNames;
 module.exports.getQueryableLayers = getQueryableLayers;
-module.exports.getEditLayer = getEditLayer;
 module.exports.getGroup = getGroup;
 module.exports.getGroups = getGroups;
 module.exports.getProjectionCode = getProjectionCode;

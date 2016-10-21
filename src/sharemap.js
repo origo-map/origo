@@ -27,7 +27,7 @@ function init(){
     bindUIActions();
 }
 function bindUIActions() {
-    shareButton.on('touchend click', function(e) {
+    shareButton.on('click', function(e) {
         modal.createModal('#o-map', {title: 'Länk till karta', content: createContent()});
         modal.showModal();
         createLink(); //Add link to input

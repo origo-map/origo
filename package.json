@@ -13,7 +13,8 @@
   "scripts": {
     "start": "budo origo.js:dist/origo.js --live -- --s origo --d",
     "watch": "watchify origo.js --s origo --d --outfile dist/origo.js",
-    "build": "browserify origo.js --s origo | uglifyjs --compress --output dist/origo.min.js"
+    "build": "browserify origo.js --s origo | uglifyjs --compress --mangle --output dist/origo.min.js",
+    "build-ol": "node node_modules/openlayers/tasks/build.js tasks/build-ol-standard.json node_modules/openlayers/dist/ol.js"
   },
   "dependencies": {
     "browserify": "11.0.1",

@@ -52,7 +52,7 @@ function init() {
     // addLegend(viewer.getGroups());
 }
 function bindUIActions() {
-    $menuButton.on('touchend click', function(e) {
+    $menuButton.on('click', function(e) {
       	toggleMenu();
         $menuButton.blur();
         e.preventDefault();
