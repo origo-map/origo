@@ -9,18 +9,18 @@ var measure = require('./measure');
 
 module.exports = function() {
 
-    var styleTypes = {};
+  var styleTypes = {};
 
-    styleTypes.pin = pin;
-    styleTypes.measure = measure;
+  styleTypes.pin = pin;
+  styleTypes.measure = measure;
 
-    return {
-        getStyle: function getStyle(type) {
-            if(type) {
-                return styleTypes[type];
-            } else {
-                console.log(type + ' is not a default style');
-            }
-        }
+  return {
+    getStyle: function getStyle(type) {
+      if(type) {
+        return styleTypes[type];
+      } else {
+        console.log(type + ' is not a default style');
+      }
     }
+  }
 }();
