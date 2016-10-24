@@ -315,8 +315,8 @@ function toggleCheck(layerid) {
         var group = viewer.getGroup('background');
         for(var i=0; i<group.length; i++) {
             group[i].setVisible(false);
-            $('#o-' + group[i].get('name') + ' .o-checkbox').removeClass('o-check-true');
-            $('#o-' + group[i].get('name') + ' .o-checkbox').addClass('o-check-false');
+            $('#' + group[i].get('name') + ' .o-checkbox').removeClass('o-check-true');
+            $('#' + group[i].get('name') + ' .o-checkbox').addClass('o-check-false');
             //map legend
             $('#o-legend-' + group[i].get('name')).removeClass('o-check-true-img');
             $('#o-legend-' + group[i].get('name')).addClass('o-check-false-img');
