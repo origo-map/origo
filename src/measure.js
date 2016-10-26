@@ -9,6 +9,7 @@ var styleTypes = require('./style/styletypes');
 
 var map;
 var activeButton;
+var defaultButton;
 var measure;
 var type;
 var sketch;
@@ -43,6 +44,8 @@ function init() {
 
   render();
   bindUIActions();
+
+  defaultButton = $('#o-measure-line-button button');
 }
 
 function onEnableInteraction(e) {
@@ -52,6 +55,7 @@ function onEnableInteraction(e) {
     $('#o-measure-polygon-button').removeClass('o-hidden');
     $('#o-measure-button').removeClass('tooltip');
     setActive(true);
+    defaultButton.trigger('click');
   } else {
     if (activeButton) {
       activeButton.removeClass('o-measure-button-true');
