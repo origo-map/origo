@@ -197,12 +197,12 @@ function addLegend(groups) {
           //Append background layers to menu
           item = '<li class="o-legend ' + name + '" id="' + name + '"><div class ="o-legend-item"><div class="o-checkbox"><svg class="o-icon-fa-check"><use xlink:href="css/svg/fa-icons.svg#fa-check"></use></svg></div>';
           item += title;
-          $('#o-group-' + layer.get('group')).append(item);
+          $('#o-group-background .o-legend-header').after(item);
           //Append background layers to map legend
           item = '<li class="o-legend ' + name + '" id="o-legend-' + name + '"><div class ="o-legend-item">'
           item += layer.get('styleName') ? getSymbol(styleSettings[layer.get('styleName')]) : '';
           item += '</div>';
-          $('#o-map-legend-background').append(item);
+          $('#o-map-legend-background').prepend(item);
 
         }
         else if(layer.get('group') && ((layer.get('group') != 'none'))) {
@@ -212,7 +212,7 @@ function addLegend(groups) {
                 '</div>';
           item +=  layer.get('styleName') ? getSymbol(styleSettings[layer.get('styleName')]) : '';
           item += title;
-          $('#o-group-' + layer.get('group')).append(item);
+          $('#o-group-' + layer.get('group') + ' .o-legend-header').after(item);
           if(layer.get('legend') == true || layer.getVisible(true)) {
             //Append to map legend
             item = '<li class="o-legend ' + name + '" id="o-legend-' + name + '"><div class ="o-legend-item"><div class="o-checkbox">' +
