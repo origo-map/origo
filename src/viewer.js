@@ -1,6 +1,6 @@
 /* ========================================================================
- * Copyright 2016 Origo
- * Licensed under BSD 2-Clause (https://github.com/origo-map/origo/blob/master/LICENSE.txt)
+ * Copyright 2016 Mälardalskartan
+ * Licensed under BSD 2-Clause (https://github.com/malardalskartan/mdk/blob/master/LICENSE.txt)
  * ======================================================================== */
 "use strict";
 
@@ -172,6 +172,8 @@ function init(el, mapOptions) {
             id: options.id || undefined,
             title: options.title,
             group: options.group || 'none',
+            subgroup: options.subgroup || undefined,
+            infotext: options.infotext || undefined,
             opacity: options.opacity || 1,
             geometryName: geometryName,
             filter: options.filter || undefined,
@@ -342,6 +344,28 @@ function init(el, mapOptions) {
     function getGroups() {
         return settings.groups;
     }
+    function getSubgroups() {
+      var subgroups = [];
+
+      function findSubgroups(groups, n) {
+        if (n >= groups.length) {
+          return;
+        }
+
+        if (groups[n].subgroups) {
+          groups[n].subgroups.forEach(function(subgroup) {
+            subgroups.push(subgroup);
+          });
+
+          findSubgroups(groups[n].subgroups, 0);
+        }
+
+        findSubgroups(groups, n+1);
+      }
+
+      findSubgroups(settings.groups, 0);
+      return subgroups;
+    }
     function getProjectionCode() {
       return settings.projectionCode;
     }
@@ -397,6 +421,8 @@ function init(el, mapOptions) {
         return new ol.layer.Tile({
           name: layersConfig.name.split(':').pop(), //remove workspace part of name
           group: layersConfig.group || 'default',
+          subgroup: layersConfig.subgroup || undefined,
+          infotext: layersConfig.infotext || undefined,
           opacity: layersConfig.opacity || 1,
           title: layersConfig.title,
           styleName: layersConfig.style || 'default',
@@ -432,34 +458,36 @@ function init(el, mapOptions) {
         layersConfig.hasOwnProperty('attribution') ? attr=[new ol.Attribution({html: layersConfig.attribution})] : [attr = null];
 
         return new ol.layer.Tile({
-           group: layersConfig.group || 'background',
-           name: layersConfig.name.split(':').pop(), //remove workspace part of name
-           opacity: layersConfig.opacity || 1,
-           title: layersConfig.title,
-           styleName: layersConfig.style || 'default',
-           minResolution: layersConfig.hasOwnProperty('minScale') ? scaleToResolution(layersConfig.minScale): undefined,
-           maxResolution: layersConfig.hasOwnProperty('maxScale') ? scaleToResolution(layersConfig.maxScale): undefined,
-           visible: layersConfig.visible,
-           type: layersConfig.type,
-           queryable: layersConfig.queryable || false,
-           featureinfoLayer: layersConfig.featureinfoLayer || undefined,
-           extent: layersConfig.extent || settings.extent, //layer extent to avoid bad requests out of range
-           sourceName: layersConfig.name,
-           source: new ol.source.WMTS({
-             crossOrigin: 'anonymous',
-             attributions: attr,
-             url: layerSource.url,
-             projection: settings.projection,
-             layer: layersConfig.name,
-             matrixSet: matrixSet,
-             format: layersConfig.format,
-             tileGrid: new ol.tilegrid.WMTS({
-               origin: ol.extent.getTopLeft(settings.projectionExtent),
-               resolutions: settings.resolutions,
-               matrixIds: matrixIds
-             }),
-             style: 'default'
-           })
+          group: layersConfig.group || 'background',
+          subgroup: layersConfig.subgroup || undefined,
+          infotext: layersConfig.infotext || undefined,
+          name: layersConfig.name.split(':').pop(), //remove workspace part of name
+          opacity: layersConfig.opacity || 1,
+          title: layersConfig.title,
+          styleName: layersConfig.style || 'default',
+          minResolution: layersConfig.hasOwnProperty('minScale') ? scaleToResolution(layersConfig.minScale): undefined,
+          maxResolution: layersConfig.hasOwnProperty('maxScale') ? scaleToResolution(layersConfig.maxScale): undefined,
+          visible: layersConfig.visible,
+          type: layersConfig.type,
+          queryable: layersConfig.queryable || false,
+          featureinfoLayer: layersConfig.featureinfoLayer || undefined,
+          extent: layersConfig.extent || settings.extent, //layer extent to avoid bad requests out of range
+          sourceName: layersConfig.name,
+          source: new ol.source.WMTS({
+            crossOrigin: 'anonymous',
+            attributions: attr,
+            url: layerSource.url,
+            projection: settings.projection,
+            layer: layersConfig.name,
+            matrixSet: matrixSet,
+            format: layersConfig.format,
+            tileGrid: new ol.tilegrid.WMTS({
+              origin: ol.extent.getTopLeft(settings.projectionExtent),
+              resolutions: settings.resolutions,
+              matrixIds: matrixIds
+            }),
+            style: 'default'
+          })
         })
     }
     function geojson(options) {
@@ -929,6 +957,7 @@ module.exports.getControlNames = getControlNames;
 module.exports.getQueryableLayers = getQueryableLayers;
 module.exports.getGroup = getGroup;
 module.exports.getGroups = getGroups;
+module.exports.getSubgroups = getSubgroups;
 module.exports.getProjectionCode = getProjectionCode;
 module.exports.getProjection = getProjection;
 module.exports.getMapSource = getMapSource;
