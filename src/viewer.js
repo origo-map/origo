@@ -70,6 +70,7 @@ function init(el, mapOptions) {
     settings.styles = mapOptions.styles;
     createLayers(mapOptions.layers, settings.layers, urlParams.layers);
     settings.controls = mapOptions.controls;
+    settings.consoleId = mapOptions.consoleId || 'o-console';
     settings.featureinfoOptions = mapOptions.featureinfoOptions || {};
     //If url arguments, parse this settings
     if (window.location.search) {
@@ -847,6 +848,9 @@ function init(el, mapOptions) {
         }
         return styleOptions;
     }
+    function getConsoleId() {
+      return settings.consoleId;
+    }
     function getScale(resolution) {
       var dpi = 25.4 / 0.28;
       var mpu = settings.projection.getMetersPerUnit();
@@ -949,4 +953,5 @@ module.exports.autoPan = autoPan;
 module.exports.removeOverlays = removeOverlays;
 module.exports.checkSize = checkSize;
 module.exports.getMapName = getMapName;
+module.exports.getConsoleId = getConsoleId;
 module.exports.getUrl = getUrl;
