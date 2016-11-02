@@ -21,6 +21,10 @@ function Init(opt_options) {
   var initialState = options.hasOwnProperty('isActive') ? options.isActive : true;
 
   setActive(initialState);
+
+  return {
+    setActive: setActive
+  }
 }
 
 function setActive(state) {
