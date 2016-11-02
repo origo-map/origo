@@ -13,6 +13,7 @@ var mapLoader = function(mapOptions, config) {
   var map = {};
   var mapEl = config.target;
   var format = 'json';
+  var cors = config.crossOrigin;
 
   var urlParams = undefined;
 
