@@ -8,38 +8,40 @@ var $ = require('jquery');
 var utils = require('./utils');
 var editortoolbar = require('./editortoolbar');
 
+var $editorButton;
 
 module.exports = function() {
 
-var $editorButton;
+  return {
+    init: Init
+  };
+}();
+
+function Init(options) {
+  render();
+  $editorButton = $('#o-editor-button');
+  bindUIActions();
+  editortoolbar.init(options);
+}
 
 function bindUIActions() {
-    $editorButton.on('click', function(e) {
-        $('.o-map').trigger({
-            type: 'enableInteraction',
-            interaction: 'editor'
-        });
-        this.blur();
-        e.preventDefault();
+  $editorButton.on('click', function(e) {
+    $('.o-map').first().trigger({
+      type: 'enableInteraction',
+      interaction: 'editor'
     });
+    this.blur();
+    e.stopPropagation();
+    e.preventDefault();
+  });
 }
+
 function render() {
-    var el = utils.createListButton({
-        id: 'o-editor',
-        iconCls: 'o-icon-fa-pencil',
-        src: 'css/svg/fa-icons.svg#fa-pencil',
-        text: 'Redigera'
-    });
-    $('#o-menutools').append(el);
+  var el = utils.createListButton({
+    id: 'o-editor',
+    iconCls: 'o-icon-fa-pencil',
+    src: 'css/svg/fa-icons.svg#fa-pencil',
+    text: 'Redigera'
+  });
+  $('#o-menutools').append(el);
 }
-
-return {
-    init: function init(options) {
-        render();
-        $editorButton = $('#o-editor-button');
-        bindUIActions();
-        editortoolbar.init(options);
-    }
-}
-
-}();
