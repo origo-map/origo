@@ -10,7 +10,7 @@ var viewer = require('./viewer');
 var modal = require('./modal');
 
 var srsName = undefined;
-var source = undefined;
+var editSource = undefined;
 var geometryType = undefined;
 var geometryName = undefined;
 var url = undefined;
@@ -22,8 +22,10 @@ var title = undefined;
 var draw = undefined;
 var hasDraw = undefined;
 var hasAttribute = undefined;
+var hasSnap = undefined;
 var select = undefined;
 var modify = undefined;
+var snap = undefined;
 var dirty = undefined;
 var format = undefined;
 var serializer = undefined;
@@ -35,7 +37,7 @@ module.exports = function() {
 function setEditLayer(options) {
   removeInteractions();
   srsName = options.srsName;
-  source = options.source;
+  editSource = options.source;
   geometryType = options.geometryType;
   geometryName = options.geometryName;
   url = options.url;
@@ -45,7 +47,7 @@ function setEditLayer(options) {
   attributes = options.attributes;
   title = options.title;
   draw = new ol.interaction.Draw({
-    source: source,
+    source: editSource,
     'type': geometryType,
     geometryName: geometryName
   });
@@ -62,9 +64,18 @@ function setEditLayer(options) {
   dirty = {};
   map.addInteraction(select);
   map.addInteraction(modify);
+  map.addInteraction(draw);
   format = new ol.format.WFS();
   serializer = new XMLSerializer();
   draw.on('drawend', onDrawEnd, this);
+  setActive();
+
+  //If snap should be active then add snap internactions for all snap layers
+  hasSnap = options.hasOwnProperty('snap') ? options.snap : true;
+  if (hasSnap) {
+    var snapSources = getSnapSources(options.snapLayers) || [editSource];
+    snap = addSnapInteraction(snapSources);
+  }
 }
 
 function isActive() {
@@ -142,7 +153,7 @@ function deleteSelected() {
           if (result) {
             if (result.transactionSummary.totalDeleted === 1) {
               select.getFeatures().clear();
-              source.removeFeature(feature);
+              editSource.removeFeature(feature);
             } else {
               alert("There was an issue deleting the feature.");
             }
@@ -276,16 +287,16 @@ function onDrawEnd(evt) {
         var insertId = result.insertIds[0];
         if (insertId == 'new0') {
           // reload data if we're dealing with a shapefile store
-          source.clear();
+          editSource.clear();
         } else {
           feature.setId(insertId);
         }
       }
-      map.removeInteraction(draw);
+      setActive();
       hasDraw = false;
     },
     error: function(e) {
-      map.removeInteraction(draw);
+      setActive();
       hasDraw = false;
       var errorMsg = e ? (e.status + ' ' + e.statusText) : "";
       alert('Error saving this feature to the server...<br><br>' +
@@ -297,7 +308,7 @@ function onDrawEnd(evt) {
 }
 
 function cancelDraw() {
-  map.removeInteraction(draw);
+  setActive();
   hasDraw = false;
   emitChangeEdit('draw', false);
 }
@@ -375,12 +386,20 @@ function removeInteractions() {
   if (isActive()) {
     map.removeInteraction(modify);
     map.removeInteraction(select);
+    map.removeInteraction(draw);
+    snap.forEach(function(snapInteraction) {
+      map.removeInteraction(snapInteraction);
+    });
+    modify = undefined;
+    select = undefined;
+    draw = undefined;
+    snap = undefined;
   }
 }
 
 function startDraw() {
   if (hasDraw !== true && isActive()) {
-    map.addInteraction(draw);
+    setActive('draw');
     hasDraw = true;
     emitChangeEdit('draw', true);
   }
@@ -432,5 +451,44 @@ function toggleEdit(e) {
       setEditLayer(e.options);
   } else if (e.tool === 'cancel') {
       removeInteractions();
+  }
+}
+
+function getSnapSources(layers) {
+  var sources = layers.map(function(layer) {
+    return viewer.getLayer(layer).getSource();
+  });
+  return sources;
+}
+
+function addSnapInteraction(sources) {
+  var snapInteractions = [];
+  sources.forEach(function(source) {
+    var interaction = new ol.interaction.Snap({
+      source: source
+    });
+    snapInteractions.push(interaction);
+    map.addInteraction(interaction);
+  });
+  return snapInteractions;
+}
+
+function setActive(editType) {
+  switch (editType) {
+    case 'modify':
+      draw.setActive(false);
+      modify.setActive(true);
+      select.setActive(true);
+      break;
+    case 'draw':
+      draw.setActive(true);
+      modify.setActive(true);
+      select.setActive(false);
+      break;
+    default:
+      draw.setActive(false);
+      modify.setActive(true);
+      select.setActive(true);
+      break;
   }
 }

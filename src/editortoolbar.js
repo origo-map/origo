@@ -44,7 +44,7 @@ function Init(opt_options) {
   $(document).on('changeEdit', toggleState);
 
   //set edit properties for editable console
-  editableLayers = setEditProps(options.editableLayers, map, srsName);
+  editableLayers = setEditProps(options, map, srsName);
   //
   options.editableLayers.forEach(function(layerName) {
     var layer = viewer.getLayer(layerName);
@@ -155,7 +155,8 @@ function selectionModel(layerNames) {
   return selectOptions;
 }
 
-function setEditProps(layerNames, map, srsName) {
+function setEditProps(options, map, srsName) {
+  var layerNames = options.editableLayers;
   var initialValue = {};
   var result = layerNames.reduce(function(layerProps, layerName) {
     var layer = viewer.getLayer(layerName);
@@ -175,6 +176,8 @@ function setEditProps(layerNames, map, srsName) {
       url: source.url,
       map: map
     };
+    layerProps[layerName].snap = options.hasOwnProperty('snap') ? options.snap : true;
+    layerProps[layerName].snapLayers = options.snapLayers || undefined;
     return layerProps;
   }, initialValue);
   return result;
