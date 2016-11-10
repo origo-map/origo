@@ -115,6 +115,8 @@
     "ol.format.EsriJSON#readFeatures",
     "ol.format.GeoJSON",
     "ol.format.GeoJSON#readFeatures",
+    "ol.format.TopoJSON",
+    "ol.format.TopoJSON#readFeatures",    
     "ol.format.WKT",
     "ol.format.WKT#readFeature",
     "ol.format.WKT#readFeatures",

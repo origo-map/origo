@@ -151,6 +151,10 @@ function init(el, mapOptions) {
                 var geojsonSource = geojson(layerOptions);
                 layers.push(createVectorLayer(layerOptions, geojsonSource));
             }
+            else if(layer.type == 'TOPOJSON') {
+                var topojsonSource = topojson(layerOptions);
+                layers.push(createVectorLayer(layerOptions, topojsonSource));
+            }
             else if(layer.type == 'XYZ') {
                 var xyzSource = xyz(layerOptions);
                 layers.push(createTileLayer(layerOptions, xyzSource));
@@ -467,6 +471,13 @@ function init(el, mapOptions) {
             attributions: options.attribution,
             url: options.sourceName,
             format: new ol.format.GeoJSON()
+        })
+    }
+    function topojson(options) {
+        return new ol.source.Vector({
+            attributions: options.attribution,
+            url: options.sourceName,
+            format: new ol.format.TopoJSON({defaultDataProjection: settings.projection})
         })
     }
     function wfs(options) {
@@ -936,6 +947,7 @@ module.exports.getResolutions = getResolutions;
 module.exports.addWMS = addWMS;
 module.exports.addWMTS = addWMTS;
 module.exports.geojson = geojson;
+module.exports.topojson = topojson;
 module.exports.wfs = wfs;
 module.exports.wfsCql = wfsCql;
 module.exports.getCqlQuery = getCqlQuery;
