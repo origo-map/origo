@@ -42,10 +42,10 @@ function bindUIActions() {
   });
 }
 
-function imageToPrint(printCanvas) {
+function imageToPrint($printCanvas) {
   var imageCrop = new Image();
   try {
-    imageCrop.src = printCanvas.get(0).toDataURL("image/png");
+    imageCrop.src = $printCanvas.get(0).toDataURL("image/png");
   } catch (e) {
     console.log(e);
   } finally {
@@ -76,10 +76,10 @@ function createImage() {
     console.log(e);
   } finally {
 
-    // printCanvas = copy of original map canvas
-    var printCanvas = $('#o-print');
+    // $printCanvas = copy of original map canvas
+    var $printCanvas = $('#o-print');
     image.onload = function() {
-      var ctxCanvas = printCanvas[0].getContext('2d');
+      var ctxCanvas = $printCanvas[0].getContext('2d');
 
        //width of map canvas
       var sourceWidth = $canvas[0].width;
@@ -89,20 +89,20 @@ function createImage() {
 
       //set the width of print canvas
       if (sourceWidth < printWith) {
-        printCanvas[0].width = sourceWidth;
+        $printCanvas[0].width = sourceWidth;
       } else if (sourceWidth >= printWith) {
-        printCanvas[0].width = printWith;
+        $printCanvas[0].width = printWith;
       }
 
       //set the height of print canvas
       if (sourceHeight < printWith) {
-        printCanvas[0].height = sourceHeight;
+        $printCanvas[0].height = sourceHeight;
       } else if (sourceWidth >= printWith) {
-        printCanvas[0].height = printWith;
+        $printCanvas[0].height = printWith;
       }
 
-      ctxCanvas.drawImage(image, (sourceWidth / 2 - printCanvas[0].width / 2), 0, printCanvas[0].width, printCanvas[0].height, 0, 0, printCanvas[0].width, printCanvas[0].height);
-      imageToPrint(printCanvas);
+      ctxCanvas.drawImage(image, (sourceWidth / 2 - $printCanvas[0].width / 2), 0, $printCanvas[0].width, $printCanvas[0].height, 0, 0, $printCanvas[0].width, $printCanvas[0].height);
+      imageToPrint($printCanvas);
     };
     image.src = imageUrl;
   }
