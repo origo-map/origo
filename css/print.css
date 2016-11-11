@@ -11,9 +11,6 @@ body {
 	height: 50px;
 	width: auto;
 }
-.o-map-canvas {
-	/*border: 1px solid #333333;*/
-}
 .o-print-attribution {
 	padding: 5px 0;
 }
