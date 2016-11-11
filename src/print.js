@@ -67,26 +67,33 @@ function imageToPrint(printCanvas) {
 }
 
 function createImage() {
-  var canvas = $('canvas');
+  var $canvas = $('canvas');
   var image = new Image();
 
   try {
-    var imageUrl = canvas.get(0).toDataURL("image/png");
+    var imageUrl = $canvas.get(0).toDataURL("image/png");
   } catch (e) {
     console.log(e);
   } finally {
+
     // printCanvas = copy of original map canvas
     var printCanvas = $('#o-print');
     image.onload = function() {
       var ctxCanvas = printCanvas[0].getContext('2d');
-      var sourceWidth = canvas[0].width; //width of map canvas
-      var sourceHeight = canvas[0].height; //height of map canvas
+
+       //width of map canvas
+      var sourceWidth = $canvas[0].width;
+
+      //height of map canvas
+      var sourceHeight = $canvas[0].height;
+
       //set the width of print canvas
       if (sourceWidth < printWith) {
         printCanvas[0].width = sourceWidth;
       } else if (sourceWidth >= printWith) {
         printCanvas[0].width = printWith;
       }
+
       //set the height of print canvas
       if (sourceHeight < printWith) {
         printCanvas[0].height = sourceHeight;
