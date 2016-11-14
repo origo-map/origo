@@ -8,6 +8,7 @@ var ol = require('openlayers');
 var $ = require('jquery');
 var viewer = require('./viewer');
 var modal = require('./modal');
+var featureInfo = require('./featureinfo');
 
 var srsName = undefined;
 var editSource = undefined;
@@ -73,7 +74,10 @@ function setEditLayer(options) {
   //If snap should be active then add snap internactions for all snap layers
   hasSnap = options.hasOwnProperty('snap') ? options.snap : true;
   if (hasSnap) {
+    console.log(featureInfo.getSelectionLayer().getSource());
+    var selectionSource = featureInfo.getSelectionLayer().getSource();
     var snapSources = getSnapSources(options.snapLayers) || [editSource];
+    snapSources.push(selectionSource);
     snap = addSnapInteraction(snapSources);
   }
 }

@@ -19,9 +19,7 @@
       "name": "editor",
       "options": {
         "editableLayers": ["test_byggnadsytor", "test_punkt"],
-        "isActive": true,
-        "snap": true,
-        "snapLayers": ["test_byggnadsytor", "test_punkt"]
+        "isActive": true
       }
     },
     {
