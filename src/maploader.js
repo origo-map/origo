@@ -22,56 +22,68 @@ var mapLoader = function(mapOptions, config) {
   }
   map.el = mapEl;
 
-  if (typeof(mapOptions) === 'object') {
-    if (window.location.hash) {
-      urlParams = permalink.parsePermalink(window.location.href);
-    }
-    map.options = mapOptions;
-    map.options.url = getUrl();
-    map.options.map = undefined;
-    map.options.params = urlParams;
-    return map;
-  } else if (typeof(mapOptions) === 'string') {
-    if (isUrl(mapOptions)) {
-      urlParams = permalink.parsePermalink(mapOptions);
-      var url = mapOptions.split('#')[0];
-      if (url.substring(url.lastIndexOf('/')).indexOf('.htm') !== -1) {
-        url = url.substring(0, url.lastIndexOf('/') + 1);
-      } else if (url.substr(url.length - 1) !== '/') {
-        url += '/';
-      }
-      var json = urlParams.map + '.json';
-      url += json;
-      return $.ajax({
-          url: url,
-          dataType: format
-        })
-        .then(function(data) {
-          map.options = data;
-          map.options.url = url;
-          map.options.map = json;
-          map.options.params = urlParams;
-          return map;
-        });
-    } else {
+  if (config.authorizationUrl) {
+    return $.ajax({
+        url: config.authorizationUrl
+      })
+      .then(function(data) {
+        return loadMapOptions();
+      });
+  } else {
+    return loadMapOptions();
+  }
+
+  function loadMapOptions() {
+    if (typeof(mapOptions) === 'object') {
       if (window.location.hash) {
         urlParams = permalink.parsePermalink(window.location.href);
       }
-      var url = mapOptions;
-      return $.ajax({
-          url: url,
-          dataType: format
-        })
-        .then(function(data) {
-          map.options = data;
-          map.options.url = getUrl();
-          map.options.map = mapOptions;
-          map.options.params = urlParams;
-          return map;
-        });
+      map.options = mapOptions;
+      map.options.url = getUrl();
+      map.options.map = undefined;
+      map.options.params = urlParams;
+      return map;
+    } else if (typeof(mapOptions) === 'string') {
+      if (isUrl(mapOptions)) {
+        urlParams = permalink.parsePermalink(mapOptions);
+        var url = mapOptions.split('#')[0];
+        if (url.substring(url.lastIndexOf('/')).indexOf('.htm') !== -1) {
+          url = url.substring(0, url.lastIndexOf('/') + 1);
+        } else if (url.substr(url.length - 1) !== '/') {
+          url += '/';
+        }
+        var json = urlParams.map + '.json';
+        url += json;
+        return $.ajax({
+            url: url,
+            dataType: format
+          })
+          .then(function(data) {
+            map.options = data;
+            map.options.url = url;
+            map.options.map = json;
+            map.options.params = urlParams;
+            return map;
+          });
+      } else {
+        if (window.location.hash) {
+          urlParams = permalink.parsePermalink(window.location.href);
+        }
+        var url = mapOptions;
+        return $.ajax({
+            url: url,
+            dataType: format
+          })
+          .then(function(data) {
+            map.options = data;
+            map.options.url = getUrl();
+            map.options.map = mapOptions;
+            map.options.params = urlParams;
+            return map;
+          });
+      }
     }
   }
-
 }
 
 module.exports = mapLoader;
