@@ -7,5 +7,6 @@ controls.legend = require('../src/legend');
 controls.search = require('../src/search');
 controls.editor = require('../src/editor');
 controls.home = require('../src/home');
+controls.measure = require('../src/measure');
 
 module.exports = controls;

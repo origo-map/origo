@@ -1,6 +1,6 @@
- /* ========================================================================
- * Copyright 2016 Mälardalskartan
- * Licensed under BSD 2-Clause (https://github.com/malardalskartan/mdk/blob/master/LICENSE.txt)
+/* ========================================================================
+ * Copyright 2016 Origo
+ * Licensed under BSD 2-Clause (https://github.com/origo-map/origo/blob/master/LICENSE.txt)
  * ======================================================================== */
 "use strict";
 
@@ -46,11 +46,25 @@ module.exports = {
     createElement: function(el, val, attributes) {
         var prefix = '<' + el;
         var suffix = '</' + el  + '>';
-        var attributeNames = attributes ? attributes.getOwnProperties() : [];
+        var attributeNames = attributes ? Object.getOwnPropertyNames(attributes) : [];
         var attributeList = attributeNames.map(function(name) {
-            return name + '=' + attributes[name];
+            var res = '';
+            if (name === "cls") {
+                res = ' ' + 'class'.concat('=', '"', attributes[name], '"');
+            } else {
+                res = ' ' + name.concat('=', '"', attributes[name],'"');
+            }
+            return res;
         });
         var element = prefix.concat(attributeList.join(' '), '>', val, suffix);
         return element;
+    },
+    createSvg: function(props) {
+        var use = this.createElement('use', '', {
+            'xlink:href': props.href
+        });
+        return this.createElement('svg', use, {
+            cls: props.cls
+        });
     }
 }
