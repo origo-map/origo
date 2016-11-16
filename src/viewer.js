@@ -9,6 +9,7 @@ var $ = require('jquery');
 var template = require("./templates/viewer.handlebars");
 var Modal = require('./modal');
 var utils = require('./utils');
+var isUrl = require('./utils/isurl');
 var featureinfo = require('./featureinfo');
 var mapwindow = require('./mapwindow');
 var maputils = require('./maputils');
@@ -49,6 +50,7 @@ function init(el, mapOptions) {
     settings.params = urlParams = mapOptions.params || {};
     settings.map = mapOptions.map;
     settings.url = mapOptions.url;
+    settings.baseUrl = mapOptions.baseUrl;
     if (mapOptions.hasOwnProperty('proj4Defs')) {
         // Projection to be used in map
         settings.projectionCode = mapOptions.projectionCode || undefined;
@@ -274,6 +276,9 @@ function init(el, mapOptions) {
     function getSettings() {
         return settings;
     }
+    function getBaseUrl() {
+        return settings.baseUrl;
+    }
     function getMapName() {
         return settings.map;
     }
@@ -463,9 +468,15 @@ function init(el, mapOptions) {
         })
     }
     function geojson(options) {
+        var url;
+        if (isUrl(options.sourceName)) {
+          url = options.sourceName;
+        } else {
+          url = settings.baseUrl + options.sourceName;
+        }
         return new ol.source.Vector({
             attributions: options.attribution,
-            url: options.sourceName,
+            url: url,
             format: new ol.format.GeoJSON()
         })
     }
@@ -919,6 +930,7 @@ module.exports.createLayers = createLayers;
 module.exports.createLayerGroup = createLayerGroup;
 module.exports.loadMap = loadMap;
 module.exports.parseArg = parseArg;
+module.exports.getBaseUrl = getBaseUrl;
 module.exports.getSettings = getSettings;
 module.exports.getStyleSettings = getStyleSettings;
 module.exports.getMapUrl = getMapUrl;
