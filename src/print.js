@@ -27,7 +27,7 @@ function render() {
   var el = utils.createListButton({
     id: 'o-print',
     iconCls: 'o-icon-fa-print',
-    src: 'css/svg/fa-icons.svg#fa-print',
+    src: '#fa-print',
     text: 'Skriv ut'
   });
   $('#o-menutools').append(el);

@@ -60,17 +60,21 @@ var mapLoader = function(mapOptions, config) {
         var baseUrl = config.baseUrl || url;
         var json = urlParams.map + '.json';
         url += json;
-        return $.ajax({
-            url: url,
-            dataType: format
-          })
-          .then(function(data) {
-            map.options = data;
-            map.options.url = url;
-            map.options.map = json;
-            map.options.params = urlParams;
-            map.options.baseUrl = baseUrl;
-            return map;
+
+        return $.when.apply($, loadSvgSprites(baseUrl, config))
+          .then(function(sprites) {
+            return $.ajax({
+                url: url,
+                dataType: format
+              })
+              .then(function(data) {
+                map.options = data;
+                map.options.url = url;
+                map.options.map = json;
+                map.options.params = urlParams;
+                map.options.baseUrl = baseUrl;
+                return map;
+              });
           });
       } else {
         if (window.location.hash) {
@@ -94,6 +98,21 @@ var mapLoader = function(mapOptions, config) {
       }
     }
   }
+}
+
+function loadSvgSprites(baseUrl, config) {
+  var svgSprites = config.svgSprites;
+  var svgPath = config.svgSpritePath;
+  var svgPromises = [];
+  svgSprites.forEach(function(sprite) {
+    var promise = $.get(baseUrl + svgPath + sprite, function(data) {
+        var div = document.createElement("div");
+        div.innerHTML = new XMLSerializer().serializeToString(data.documentElement);
+        document.body.insertBefore(div, document.body.childNodes[0]);
+      });
+    svgPromises.push(promise);
+    return svgPromises;
+  });
 }
 
 module.exports = mapLoader;

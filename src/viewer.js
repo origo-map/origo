@@ -13,6 +13,7 @@ var isUrl = require('./utils/isurl');
 var featureinfo = require('./featureinfo');
 var mapwindow = require('./mapwindow');
 var maputils = require('./maputils');
+var style = require('./style')();
 
 var map, mapControls, attribution, template;
 
@@ -70,6 +71,7 @@ function init(el, mapOptions) {
     settings.groups = mapOptions.groups;
     settings.editLayer = mapOptions.editLayer;
     settings.styles = mapOptions.styles;
+    style.init();
     createLayers(mapOptions.layers, settings.layers, urlParams.layers);
     settings.controls = mapOptions.controls;
     settings.featureinfoOptions = mapOptions.featureinfoOptions || {};
@@ -86,8 +88,8 @@ function init(el, mapOptions) {
     var zoomControl = new ol.control.Zoom({
         zoomInTipLabel: ' ',
         zoomOutTipLabel: ' ',
-        zoomInLabel: $.parseHTML('<svg class="o-icon-fa-plus"><use xlink:href="css/svg/fa-icons.svg#fa-plus"></use></svg>')[0],
-        zoomOutLabel: $.parseHTML('<svg class="o-icon-fa-minus"><use xlink:href="css/svg/fa-icons.svg#fa-minus"></use></svg>')[0]
+        zoomInLabel: $.parseHTML('<svg class="o-icon-fa-plus"><use xlink:href="#fa-plus"></use></svg>')[0],
+        zoomOutLabel: $.parseHTML('<svg class="o-icon-fa-minus"><use xlink:href="#fa-minus"></use></svg>')[0]
     });
     //Set map controls
     mapControls = [
@@ -373,7 +375,7 @@ function init(el, mapOptions) {
         switch(options.layerType) {
             case 'vector':
                 options.source = source;
-                options.style = createStyle(options.style);
+                options.style = style.createStyle(options.style);
                 vectorLayer = new ol.layer.Vector(options);
                 break;
             case 'cluster':
@@ -382,13 +384,13 @@ function init(el, mapOptions) {
                   source: source,
                   distance: 60
                 });
-                options.style = createStyle(options.style, options.clusterStyle);
+                options.style = style.createStyle(options.style, options.clusterStyle);
                 vectorLayer = new ol.layer.Vector(options);
                 break;
             case 'image':
                 options.source = new ol.source.ImageVector({
                   source: source,
-                  style: createStyle(options.style)
+                  style: style.createStyle(options.style)
                 });
                 vectorLayer = new ol.layer.Image(options);
                 break;
@@ -584,174 +586,7 @@ function init(el, mapOptions) {
         });
         return tileSource;
     }
-    function wfsCql(relations, coordinates) {
-            var url, finishedQueries = 0;
-            cqlQuery = [];
-            // alert(coordinates);
-            // var matches = coordinates.filter.match(/\[(.*?)\]/);
-            for(var i=0; i < relations.length; i++) {
-              (function(index) {
-                var layer = relations[index].layer;
-                var mapServer = settings.source[getLayer(layer).get('sourceName')].url;
-                url = mapServer + '?';
-                data = 'service=WFS&' +
-                    'version=1.0.0&request=GetFeature&typeName=' + layer +
-                    '&outputFormat=json' +
-                    '&CQL_FILTER=INTERSECTS(geom,' + coordinates + ')' +
-                    '&outputFormat=json';
-                $.ajax({
-                  url: url,
-                  type: 'POST',
-                  data: data,
-                  dataType: 'json',
-                  success: function(response) {
-                    var result = {};
-                    result.layer = relations[index].layer;
-                    result.url = relations[index].url || undefined;
-                    result.features = [];
-                    for(var j=0; j<response.features.length; j++) {
-                      var f = {};
-                      f.attribute = response.features[j]['properties'][relations[index].attribute];
-                      f.url = response.features[j]['properties'][relations[index].url] || undefined;
-                      result.features.push(f);
-                    }
-                    cqlQuery.push(result);
-                    finishedQueries++;
-                    if (finishedQueries >= relations.length) {
-                      queryFinished = true;
-                    }
-                  },
-                  error: function(jqXHR, textStatus, errorThrown) {
-                    console.log(errorThrown);
-                  }
-                });
-            })(i);
-          }
-    }
-    function getCqlQuery() {
-      return cqlQuery;
-    }
-    function modalMoreInfo() {
-      var content = $('#identify').html();
-      var title = $('.popup-title').html();
-      removeOverlays();
 
-      var queryList = '<ul id="querylist">';
-      queryList += '</ul>';
-
-      var modal = Modal('#o-map', {title: title, content: content + queryList});
-      modal.showModal();
-      $('.modal li').removeClass('hidden');
-
-      var queryListItems = '';
-      var tries = 10, nrTries = 0;
-      checkQuery();
-
-      //check if query is finished
-      function checkQuery() {
-        if (queryFinished) {
-          appendQuery();
-          queryFinished = false;
-          return;
-        }
-        else {
-          setTimeout(function() {
-            if(nrTries <= tries) {
-              nrTries ++;
-              checkQuery();
-            }
-          }, 100);
-        }
-      }
-
-      //append query results to modal
-      function appendQuery() {
-        cqlQuery.sort(function(a, b) {
-          return a.layer.localeCompare(b.layer);
-        });
-        for (var i=0; i < cqlQuery.length; i++) {
-          if(cqlQuery[i].features.length) {
-            var l = getLayer(cqlQuery[i].layer);
-            queryListItems += '<ul><li>' + l.get('title') + '</li>';
-            for (var j=0; j < cqlQuery[i].features.length; j++) {
-                  var attr = cqlQuery[i].features[j].attribute;
-                  if (cqlQuery[i].features[j].url) {
-                    queryListItems += '<li><div class="query-item"><a href="' + cqlQuery[i].features[j].url + '" target="_blank">' +
-                          attr +
-                          '</a></div></li>';
-                  }
-                  else {
-                    queryListItems += '<li><div class="query-item">' + attr + '</div></li>';//<div class="icon-expand icon-expand-false"></div></li>';
-                  }
-            }
-            queryListItems += '</ul>';
-          }
-        }
-        $('#querylist').append(queryListItems);
-      }
-    }
-    function createStyle(styleName, clusterStyleName) {
-          var styleSettings = settings.styles[styleName];
-          if($.isEmptyObject(styleSettings)) {
-              alert('Style ' + styleName + ' is not defined');
-          }
-          var clusterStyleSettings = settings.styles[clusterStyleName];
-          var style = (function() {
-            //Create style for each rule
-            var styleList = createStyleList(styleSettings);
-            if(clusterStyleSettings) {
-                var clusterStyleList = createStyleList(clusterStyleSettings);
-                return styleFunction(styleSettings, styleList, clusterStyleSettings, clusterStyleList);
-            }
-            else {
-                return styleFunction(styleSettings,styleList);
-            }
-
-          })()
-          return style;
-    }
-    //Create list of ol styles based on style settings
-    function createStyleList(styleSettings) {
-        var styleList=[];
-        //Create style for each rule
-        for (var i = 0; i < styleSettings.length; i++) {
-          var styleRule = [];
-          var styleOptions;
-          //Check if rule is array, ie multiple styles for the rule
-          if(styleSettings[i].constructor === Array) {
-            for(var j=0; j<styleSettings[i].length; j++) {
-              styleOptions = createStyleOptions(styleSettings[i][j]);
-              styleRule.push(new ol.style.Style(styleOptions));
-            }
-          }
-          //If single style for rule
-          else {
-            styleOptions = createStyleOptions(styleSettings[i]);
-            styleRule = [new ol.style.Style(styleOptions)];
-          }
-
-          styleList.push(styleRule);
-        }
-        return styleList;
-    }
-    function styleFunction(styleSettings, styleList, clusterStyleSettings, clusterStyleList) {
-      var s = styleSettings;
-      var fn = function(feature,resolution) {
-        var scale = getScale(resolution);
-        var styleL;
-        //If size is larger than, it is a cluster
-        var size = clusterStyleList ? feature.get('features').length : 1;
-        if(size > 1 && map.getView().getResolution() != settings.resolutions[settings.resolutions.length+1]) {
-            styleL = checkOptions(feature, scale, clusterStyleSettings, clusterStyleList, size.toString());
-            // clusterStyleList[0].setText(size);
-        }
-        else {
-            styleL = checkOptions(feature, scale, styleSettings, styleList);
-        }
-        return styleL;
-      }
-      return fn;
-    }
     function checkScale(scale, maxScale, minScale) {
         if (maxScale || minScale) {
           // Alter 1: maxscale and minscale
@@ -777,86 +612,6 @@ function init(el, mapOptions) {
         else {
             return true;
         }
-    }
-    function checkOptions(feature, scale, styleSettings, styleList, size) {
-        var s = styleSettings;
-        for (var j=0; j<s.length; j++) {
-          var styleL;
-          if(checkScale(scale, s[j][0].maxScale, s[j][0].minScale)) {
-            s[j].some(function(element, index, array) {
-                if (element.hasOwnProperty('text') && size) {
-                    styleList[j][index].getText().setText(size);
-                }
-            });
-            if (s[j][0].hasOwnProperty('filter')) {
-              //find attribute vale between [] defined in styles
-              var featAttr, expr, featMatch;
-              var matches = s[j][0].filter.match(/\[(.*?)\]/);
-              if (matches) {
-                  featAttr = matches[1];
-                  expr = s[j][0].filter.split(']')[1];
-                  featMatch = feature.get(featAttr);
-                  expr = typeof featMatch == 'number' ? featMatch + expr : '"' + featMatch + '"' + expr ;
-              }
-              if(eval(expr)) {
-                styleL = styleList[j];
-                return styleL;
-              }
-            }
-            else {
-              styleL = styleList[j];
-              return styleL;
-            }
-          }
-        }
-    }
-    function createStyleOptions(styleParams) {
-        var styleOptions = {};
-        if(styleParams.hasOwnProperty('geometry')) {
-            switch (styleParams.geometry) {
-                case 'centerPoint':
-                    styleOptions.geometry = function(feature) {
-                        if (feature.getGeometry().getType() === 'Polygon') {
-                            var coordinates = feature.getGeometry().getInteriorPoint().getFirstCoordinate();
-                            return new ol.geom.Point(coordinates);
-                        }
-                        if (feature.getGeometry().getType() === 'MultiPolygon') {
-                            var coordinates = feature.getGeometry().getInteriorPoints().getFirstCoordinate();
-                            return new ol.geom.Point(coordinates);
-                        }
-                    }
-                break;
-            }
-        }
-        if(styleParams.hasOwnProperty('zIndex')) {
-            styleOptions.zIndex = styleParams.zIndex;
-        }
-        if(styleParams.hasOwnProperty('fill')) {
-            styleOptions.fill = new ol.style.Fill(styleParams.fill);
-        }
-        if(styleParams.hasOwnProperty('stroke')) {
-            styleOptions.stroke = new ol.style.Stroke(styleParams.stroke);
-        }
-        if(styleParams.hasOwnProperty('text')) {
-            styleOptions.text = new ol.style.Text(styleParams.text);
-            if(styleParams.text.hasOwnProperty('fill')) {
-                styleOptions.text.setFill(new ol.style.Fill(styleParams.text.fill));
-            }
-            if(styleParams.text.hasOwnProperty('stroke')) {
-                styleOptions.text.setStroke(new ol.style.Stroke(styleParams.text.stroke));
-            }
-        }
-        if(styleParams.hasOwnProperty('icon')) {
-            styleOptions.image = new ol.style.Icon(styleParams.icon);
-        }
-        if(styleParams.hasOwnProperty('circle')) {
-            styleOptions.image = new ol.style.Circle({
-                radius: styleParams.circle.radius,
-                fill: new ol.style.Fill(styleParams.circle.fill) || undefined,
-                stroke: new ol.style.Stroke(styleParams.circle.stroke) || undefined
-            });
-        }
-        return styleOptions;
     }
     function getScale(resolution) {
       var dpi = 25.4 / 0.28;
@@ -949,16 +704,11 @@ module.exports.addWMS = addWMS;
 module.exports.addWMTS = addWMTS;
 module.exports.geojson = geojson;
 module.exports.wfs = wfs;
-module.exports.wfsCql = wfsCql;
-module.exports.getCqlQuery = getCqlQuery;
-module.exports.modalMoreInfo = modalMoreInfo;
-module.exports.createStyle = createStyle;
-module.exports.styleFunction = styleFunction;
-module.exports.createStyleOptions = createStyleOptions;
 module.exports.getScale = getScale;
 module.exports.scaleToResolution = scaleToResolution;
 module.exports.autoPan = autoPan;
 module.exports.removeOverlays = removeOverlays;
+module.exports.checkScale= checkScale;
 module.exports.checkSize = checkSize;
 module.exports.getMapName = getMapName;
 module.exports.getUrl = getUrl;

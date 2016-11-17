@@ -4,7 +4,7 @@ var ol = require('openlayers');
 var $ = require('jquery');
 var Viewer = require('./viewer');
 var utils = require('./utils');
-var style = require('./style');
+var style = require('./style')();
 var styleTypes = require('./style/styletypes');
 
 var map;
@@ -60,7 +60,7 @@ function onEnableInteraction(e) {
     if (activeButton) {
       activeButton.removeClass('o-measure-button-true');
     };
-    
+
     $('#o-measure-button button').removeClass('o-measure-button-true');
     $('#o-measure-line-button').addClass('o-hidden');
     $('#o-measure-polygon-button').addClass('o-hidden');
@@ -91,7 +91,7 @@ function render() {
     id: 'o-measure-button',
     cls: 'o-measure-button',
     iconCls: 'o-icon-steady-measure',
-    src: 'css/svg/steady-icons.svg#steady-measure',
+    src: '#steady-measure',
     tooltipText: 'Mät i kartan'
   });
 
@@ -101,7 +101,7 @@ function render() {
     id: 'o-measure-line-button',
     cls: 'o-measure-type-button',
     iconCls: 'o-icon-minicons-line-vector',
-    src: 'css/svg/minicons-icons.svg#minicons-line-vector',
+    src: '#minicons-line-vector',
     tooltipText: 'Linje',
     tooltipPlacement: 'north'
   });
@@ -113,7 +113,7 @@ function render() {
     id: 'o-measure-polygon-button',
     cls: 'o-measure-type-button',
     iconCls: 'o-icon-minicons-square-vector',
-    src: 'css/svg/minicons-icons.svg#minicons-square-vector',
+    src: '#minicons-square-vector',
     tooltipText: 'Yta',
     tooltipPlacement: 'north'
   });
@@ -143,7 +143,7 @@ function bindUIActions() {
     e.preventDefault();
   });
 
-} 
+}
 
 function createStyle(feature, labelText) {
   var featureType = feature.getGeometry().getType();

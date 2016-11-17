@@ -13,7 +13,7 @@ var sidebar;
 function init() {
     var el = '<div id="o-sidebar">' +
                 '<div class="o-sidebar">' +
-                  '<div class="o-close-button"><svg class="o-icon-fa-times"><use xlink:href="css/svg/fa-icons.svg#fa-times"></use></svg></div>' +
+                  '<div class="o-close-button"><svg class="o-icon-fa-times"><use xlink:href="#fa-times"></use></svg></div>' +
                   '<div class="o-sidebar-title"></div>' +
                   '<div class="o-sidebar-content"></div>' +
                 '</div>' +

@@ -27,7 +27,7 @@ function init() {
         id: 'o-geolocation-button',
         cls: 'o-geolocation-button',
         iconCls: 'o-icon-fa-location-arrow',
-        src: 'css/svg/fa-icons.svg#fa-location-arrow',
+        src: '#fa-location-arrow',
         tooltipText: tooltipText,
         tooltipPlacement: 'east'
     });
