@@ -7,6 +7,7 @@ var $ = require('jquery');
 var permalink = require('./permalink/permalink');
 var getUrl = require('./utils/geturl');
 var isUrl = require('./utils/isurl');
+var trimUrl = require('./utils/trimurl');
 
 var mapLoader = function(mapOptions, config) {
 
@@ -44,58 +45,49 @@ var mapLoader = function(mapOptions, config) {
       map.options.map = undefined;
       map.options.params = urlParams;
       map.options.baseUrl = baseUrl;
-      return map;
+
+      return $.when.apply($, loadSvgSprites(baseUrl, config))
+        .then(function(sprites) {
+          return map;
+        });
+
     } else if (typeof(mapOptions) === 'string') {
       if (isUrl(mapOptions)) {
         urlParams = permalink.parsePermalink(mapOptions);
         var url = mapOptions.split('#')[0];
 
-        //Check if file name in path
-        if (url.substring(url.lastIndexOf('/')).indexOf('.htm') !== -1) {
-          url = url.substring(0, url.lastIndexOf('/') + 1);
-        } else if (url.substr(url.length - 1) !== '/') {
-          url += '/';
-        }
+        //remov file name if included in 
+        url = trimUrl(url);
 
         var baseUrl = config.baseUrl || url;
         var json = urlParams.map + '.json';
+        var mapUrl = url;
         url += json;
-
-        return $.when.apply($, loadSvgSprites(baseUrl, config))
-          .then(function(sprites) {
-            return $.ajax({
-                url: url,
-                dataType: format
-              })
-              .then(function(data) {
-                map.options = data;
-                map.options.url = url;
-                map.options.map = json;
-                map.options.params = urlParams;
-                map.options.baseUrl = baseUrl;
-                return map;
-              });
-          });
       } else {
         if (window.location.hash) {
           urlParams = permalink.parsePermalink(window.location.href);
         }
-
         var baseUrl = config.baseUrl || '';
-        var url = mapOptions;
-        return $.ajax({
-            url: url,
-            dataType: format
-          })
-          .then(function(data) {
-            map.options = data;
-            map.options.url = getUrl();
-            map.options.map = mapOptions;
-            map.options.params = urlParams;
-            map.options.baseUrl = baseUrl;
-            return map;
-          });
+        var json = mapOptions;
+        var url = baseUrl + json;
+        var mapUrl = getUrl();
       }
+
+      return $.when.apply($, loadSvgSprites(baseUrl, config))
+        .then(function(sprites) {
+          return $.ajax({
+              url: url,
+              dataType: format
+            })
+            .then(function(data) {
+              map.options = data;
+              map.options.url = mapUrl;
+              map.options.map = json;
+              map.options.params = urlParams;
+              map.options.baseUrl = baseUrl;
+              return map;
+            });
+        });
     }
   }
 }

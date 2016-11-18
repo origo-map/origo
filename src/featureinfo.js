@@ -172,7 +172,7 @@ function initCarousel(id, options, cb) {
       paginationSpeed : 400,
       singleItem:true,
       rewindSpeed:200,
-      navigationText: ['<svg class="o-icon-fa-chevron-left"><use xlink:href="css/svg/fa-icons.svg#fa-chevron-left"></use></svg>', '<svg class="o-icon-fa-chevron-right"><use xlink:href="css/svg/fa-icons.svg#fa-chevron-right"></use></svg>'],
+      navigationText: ['<svg class="o-icon-fa-chevron-left"><use xlink:href="#fa-chevron-left"></use></svg>', '<svg class="o-icon-fa-chevron-right"><use xlink:href="#fa-chevron-right"></use></svg>'],
       afterAction: cb
     };
     return $(id).owlCarousel(carouselOptions);

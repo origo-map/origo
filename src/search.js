@@ -68,7 +68,7 @@ function init(options){
                     '</button>' +
                     '<button id="o-search-button-close">' +
                         '<svg class="o-icon-search-fa-times">' +
-                            '<use xlink:href="css/svg/fa-icons.svg#fa-times"></use>' +
+                            '<use xlink:href="#fa-times"></use>' +
                         '</svg>' +
                     '</button>' +
                 '</div>' +

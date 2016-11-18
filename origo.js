@@ -22,13 +22,9 @@ origo.map.init = function(options, opt_config) {
   var config = opt_config ? $.extend(origo.config, opt_config) : origo.config;
 
   var map = mapLoader(options, config);
-  if (typeof map.then === 'function') {
-    map.then(function(config) {
-      init(config);
-    })
-  } else {
-    init(map);
-  }
+  map.then(function(config) {
+    init(config);
+  })
   return Viewer;
 }
 
