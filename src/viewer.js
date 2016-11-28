@@ -95,7 +95,7 @@ function init(el, mapOptions) {
             label: ''
         }), /*Override default label for compass*/
         new ol.control.ScaleLine({
-            target: 'bottom-tools'
+            target: 'o-bottom-tools'
         })
     ]
     if (window.top != window.self) {
