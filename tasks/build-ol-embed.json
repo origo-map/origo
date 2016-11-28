@@ -119,7 +119,7 @@
     "ol.geom.LineString#getCoordinateAtM",
     "ol.geom.MultiLineString#getCoordinates",
     "ol.geom.MultiLineString#getType",
-    "ol.geom.MultiLineString#etFirstCoordinate",
+    "ol.geom.MultiLineString#getFirstCoordinate",
     "ol.geom.MultiLineString#setCoordinates",
     "ol.geom.MultiPoint",
     "ol.geom.MultiPoint#clone",
