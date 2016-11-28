@@ -391,6 +391,7 @@ function init(el, mapOptions) {
         return vectorLayer;
     }
     function addWMS(layersConfig) {
+        var version = settings.source[layersConfig.source].version || '1.1.1';
         var attr;
         layersConfig.hasOwnProperty('attribution') ? attr=[new ol.Attribution({html: layersConfig.attribution})] : [attr = null];
 
@@ -416,7 +417,7 @@ function init(el, mapOptions) {
             gutter: layersConfig.gutter || 0,
             crossOrigin: 'anonymous',
             projection: settings.projection,
-            params: {'LAYERS': layersConfig.name, 'TILED': true, VERSION: settings.source[layersConfig.source].version}
+            params: {'LAYERS': layersConfig.name, 'TILED': true, VERSION: version}
           }))
         })
     }
