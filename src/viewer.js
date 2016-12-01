@@ -74,6 +74,7 @@ function init(el, mapOptions) {
     style.init();
     createLayers(mapOptions.layers, settings.layers, urlParams.layers);
     settings.controls = mapOptions.controls;
+    settings.consoleId = mapOptions.consoleId || 'o-console';
     settings.featureinfoOptions = mapOptions.featureinfoOptions || {};
     //If url arguments, parse this settings
     if (window.location.search) {
@@ -99,7 +100,7 @@ function init(el, mapOptions) {
             label: ''
         }), /*Override default label for compass*/
         new ol.control.ScaleLine({
-            target: 'bottom-tools'
+            target: 'o-bottom-tools'
         })
     ]
     if (window.top != window.self) {
@@ -398,6 +399,7 @@ function init(el, mapOptions) {
         return vectorLayer;
     }
     function addWMS(layersConfig) {
+        var version = settings.source[layersConfig.source].version || '1.1.1';
         var attr;
         layersConfig.hasOwnProperty('attribution') ? attr=[new ol.Attribution({html: layersConfig.attribution})] : [attr = null];
 
@@ -423,7 +425,7 @@ function init(el, mapOptions) {
             gutter: layersConfig.gutter || 0,
             crossOrigin: 'anonymous',
             projection: settings.projection,
-            params: {'LAYERS': layersConfig.name, 'TILED': true, VERSION: settings.source[layersConfig.source].version}
+            params: {'LAYERS': layersConfig.name, 'TILED': true, VERSION: version}
           }))
         })
     }
@@ -613,6 +615,9 @@ function init(el, mapOptions) {
             return true;
         }
     }
+    function getConsoleId() {
+      return settings.consoleId;
+    }
     function getScale(resolution) {
       var dpi = 25.4 / 0.28;
       var mpu = settings.projection.getMetersPerUnit();
@@ -711,4 +716,5 @@ module.exports.removeOverlays = removeOverlays;
 module.exports.checkScale= checkScale;
 module.exports.checkSize = checkSize;
 module.exports.getMapName = getMapName;
+module.exports.getConsoleId = getConsoleId;
 module.exports.getUrl = getUrl;
