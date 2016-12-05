@@ -1,0 +1,14 @@
+#o-geolocation-button {
+  left: .5em;
+  top: 7.5em;
+  z-index: 1;
+}
+.o-geolocation-button-true .o-icon-fa-location-arrow {
+	fill: $o-btn-active-color;
+}
+@media screen and (max-width: 500px) {
+#o-geolocation-button {
+	bottom: 3em;
+	top: auto;
+}
+}

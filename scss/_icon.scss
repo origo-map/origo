@@ -1,0 +1,116 @@
+[class^="o-icon-"],
+[class*=" o-icon-"] {
+  padding: .35em;
+  height: 1.3em;
+  width: 1.3em;
+  float: right;
+  fill: $o-btn-color;
+}
+.ol-control>button:hover [class^="o-icon-"],
+.ol-control>button:hover [class*=" o-icon-"],
+.o-button:hover [class^="o-icon-"],
+.o-button:hover [class*="o-icon-"] {
+	fill: $o-btn-bg;
+}
+.o-toolbar button:hover [class^="o-icon-"],
+.o-toolbar button:hover [class*="o-icon-"] {
+	fill: $o-btn-active-color;
+}
+
+.o-icon-fa-location-arrow {
+	padding: 0.45em;
+	height: 1.1em;
+	width: 1.1em;
+}
+.o-icon-fa-chevron-down,
+.o-icon-fa-chevron-right {
+	height: .9em;
+	padding: .1em;
+	width: .9em;
+}
+.o-icon-fa-check {
+	height: 1em;
+	padding: 0.05em;
+	width: 1em;
+}
+.o-icon-fa-square-o,
+.o-icon-fa-check-square-o {
+	height: 1em;
+	padding: 0.1em;
+	width: 1em;
+}
+.o-icon-fa-bars {
+	padding: .4em;
+  height: 1.2em;
+  width: 1.2em;
+}
+.o-icon-fa-plus,
+.o-icon-fa-minus {
+	padding: .65em;
+	height: .7em;
+	width: .7em;
+}
+.o-icon-fa-print,
+.o-icon-fa-share-square-o {
+	padding: 0.25em;
+	height: 1em;
+	width: 1em;
+}
+.o-icon-fa-times {
+	padding: .65em;
+	height: 1.129em;
+	width: 1.129em;
+}
+.o-icon-menu-fa-times {
+	padding: .5rem;
+	height: 1rem;
+	width: 1rem;
+}
+.o-icon-search-fa-times {
+	padding: .5em;
+	height: 1em;
+	width: 1em;
+}
+.o-icon-fa-angle-double-down,
+.o-icon-fa-angle-double-up {
+	padding: .05em;
+	height: 1em;
+	width: 1em;
+}
+.o-icon-fa-angle-double-right,
+.ol-collapsed .o-icon-fa-info {
+	fill: #fff;
+	height: .9em;
+	padding: .3em;
+	width: .9em;
+}
+.o-icon-minicons-square-vector {
+  padding: .3em;
+  height: 1.4em;
+  width: 1.4em;
+}
+.o-icon-minicons-line-vector {
+  padding: .3em;
+  height: 1.4em;
+  width: 1.4em;
+}
+.owl-prev .o-icon-fa-chevron-left,
+.owl-next .o-icon-fa-chevron-right {
+	fill: #424242;
+	height: 1em;
+	padding: .3em;
+	width: 1em;
+}
+.ol-collapsed .o-icon-fa-angle-double-right,
+.ol-attribution:not(.ol-collapsed) .o-icon-fa-info,
+.o-toggle-button-max .o-icon-fa-angle-double-up,
+.o-toggle-button-min .o-icon-fa-angle-double-down,
+.o-checkbox-true .o-icon-fa-square-o,
+.o-checkbox-false .o-icon-fa-check-square-o,
+.o-check-false .o-icon-fa-check,
+.o-icon-expand-false .o-icon-fa-chevron-down,
+.o-icon-expand-true .o-icon-fa-chevron-right,
+.o-search-true #o-search-button,
+.o-search-false #o-search-button-close {
+	display: none
+}

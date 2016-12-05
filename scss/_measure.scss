@@ -1,0 +1,36 @@
+#o-measure-button {
+  left: .5em;
+  top: 10em;
+}
+#o-measure-line-button {
+  left: 3em;
+  top: 10em;
+}
+#o-measure-polygon-button {
+  left: 5.5em;
+  top: 10em;
+}
+.o-tooltip-measure {
+  position: relative;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+  color: white;
+  padding: 4px 8px;
+  white-space: nowrap;
+  opacity: 0.8;
+  font: 80% normal, sans-serif;
+  pointer-events: none;
+}
+.o-measure-button-true .o-icon-fa-pencil,
+.o-measure-button-true .o-icon-steady-measure,
+.o-measure-button-true .o-icon-minicons-square-vector,
+.o-measure-button-true .o-icon-minicons-line-vector {
+  fill: $o-btn-active-color;
+}
+@media screen and (max-width: 500px) {
+#o-measure-button, #o-measure-line-button,
+  #o-measure-polygon-button  {
+    bottom: .5em;
+    top: auto;
+  }
+}

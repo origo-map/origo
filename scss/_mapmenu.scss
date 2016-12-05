@@ -1,0 +1,128 @@
+#o-mapmenu-button {
+  right: .5em;
+  top: .5em;
+  z-index: 5;
+}
+#o-mapmenu-button button.o-button:hover .o-icon-fa-bars{
+	fill: #fff;
+}
+#o-mapmenu-button button.o-button {
+	padding-right: 0;
+	width: 5.3125em;
+}
+#o-mapmenu-button-close {
+		position: absolute;
+		right: .5em;
+		top: .5rem;
+}
+/*remove the boxshadow when selected*/
+.o-button.o-mapmenu-button-true {
+  -webkit-box-shadow: 0 2px 5px rgba(0,0,0,0.45);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.45);
+}
+.o-button.o-mapmenu-button-false {
+  background-color: rgba(255,255,255,0.5);
+  box-shadow: none;
+}
+#o-mapmenu-button .o-button.o-mapmenu-button-false {
+	width: 2em;
+}
+.o-no-boxshadow #o-mapmenu-button .o-button {
+  border: none;
+}
+.o-no-boxshadow .o-button.o-mapmenu-button-true {
+  border: 1px solid #C5C5C5;
+}
+#o-mapmenu {
+  background-color: #fff;
+  border-radius: 1px; /*workaround for box-shadow bug in ios*/
+  -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.45);
+	box-shadow: 0 0 5px rgba(0,0,0,0.45);
+	height: 100%;
+	overflow: hidden;
+	overflow-y: auto;
+	position: absolute;
+	right: -230px;
+	top: 0px;
+	width: 230px;
+	z-index: 20;
+	-ms-transform: translateX(0);
+	-webkit-transform: translateX(0);
+	transform: translateX(0);
+	-ms-transition: .3s ease all;
+	-webkit-transition: .3s ease all;
+	transition: .3s ease all;
+}
+.o-touch #o-mapmenu{
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.o-no-boxshadow #o-mapmenu {
+  border-left: 1px solid #C5C5C5;
+}
+#o-mapmenu.o-mapmenu-show {
+	-ms-transform: translateX(-230px);
+	-webkit-transform: translateX(-230px);
+	transform: translateX(-230px);
+}
+.o-no-csstransforms #o-mapmenu.o-mapmenu-show {
+  right: 0;
+}
+#o-menutools li:first-child {
+	height: 2.8em;
+}
+.o-mapmenu-open {
+	display: inline-block;
+}
+.o-mapmenu-false {
+	display: none;
+}
+li .o-menu-button {
+  cursor: pointer;
+  display: inline-block;
+  font-family: Arial,sans-serif;
+  font-size: 0.9em;
+  line-height: 1.5em;
+  padding: 0 5px;
+  text-decoration: none;
+  text-align: left;
+  width: 100%;
+  height: 1.5em;
+  border: none;
+  vertical-align: middle;
+}
+li .o-menu-button:hover {
+  background-color: #EEEEEE;
+}
+.o-menu-button .o-button-icon {
+  display: inline;
+  float: left;
+	height: 1.5em;
+  padding: 0 4px;
+	vertical-align: middle;
+	width: 1.5em;
+}
+.o-button.o-mapmenu-button-false span.o-button-text {
+	display: none;
+}
+@media screen and (max-width: 768px) {
+#o-mapmenu-button button.o-button {
+	width: 2em;
+}
+#o-mapmenu-button .o-button-text {
+	display: none;
+}
+}
+@media screen and (max-width: 320px) {
+#o-sidebar,
+#o-mapmenu {
+  width: 100%;
+  right: -320px;
+}
+#o-sidebar.o-sidebar-show,
+#o-mapmenu.o-mapmenu-show {
+  -ms-transform: translateX(-320px);
+  -webkit-transform: translateX(-320px);
+  transform: translateX(-320px);
+}
+}
