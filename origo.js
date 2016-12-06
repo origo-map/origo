@@ -25,6 +25,7 @@ origo.controls.search = require('./src/search');
 origo.controls.editor = require('./src/editor');
 origo.controls.measure = require('./src/measure');
 origo.controls.home = require('./src/home');
+origo.controls.scale = require('./src/scale');
 
 origo.map.init = function(el, options) {
     var map = mapLoader(el, options);
