@@ -1300,8 +1300,7 @@ ul.o-legendlist > li:last-child .o-legend-group li:last-child,
 ul.o-legendlist > li:last-child .o-legend-subgroup li:last-child {
   border-bottom: none;
 }
-li .o-legend-header:hover,
-li .o-legend-subheader:hover {
+li .o-legend-header:hover {
   background-color: #EEEEEE;
 }
 li .o-icon-expand {
@@ -1322,11 +1321,8 @@ li .o-subicon-expand {
 .o-ul-expand-false .o-legend {
   display: none;
 }
-.o-ul-expand-false .o-legend-subgroup{
-  display: none;
-}
-ul .o-sub-indent {
-	padding-left: 1.4em;
+ul .o-legend-indent {
+	padding-left: 1.2em;
 }
 li .o-legend-item {
   cursor: pointer;
@@ -1355,10 +1351,9 @@ li .o-legend-item-img {
 li .o-legend-subitem {
   cursor: pointer;
   font-family: Arial,sans-serif;
-  font-size: 14px;	
+  font-size: 14px;
   line-height: 14px;
-  padding: 5px;
-  padding-left: 27px;
+  padding: 5px 5px 5px 24px;
 }
 li .o-legend-subitem-title {
   cursor: pointer;
@@ -1366,12 +1361,6 @@ li .o-legend-subitem-title {
   padding-top: 3px;
   padding-left: 1px;
   vertical-align: top;
-}
-li .o-legend-subitem-img {
-  cursor: pointer;
-  display: inline-block;
-  float: left;
-  height: 20px;
 }
 .o-legendlist li .o-legend-item-info {
   cursor: pointer;
@@ -1388,6 +1377,9 @@ li .o-legend-subitem-img {
   padding-top: 3px;
   width: 1.1em;
 /*  width: 1.375em; */
+}
+.o-checkbox-semi {
+	opacity: .4;
 }
 .o-legend-subheader .o-checkbox {
 	padding-top: 0;

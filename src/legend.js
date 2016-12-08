@@ -16,15 +16,15 @@ var mapMenu;
 var hasMapLegend;
 
 function init(opt_options) {
-    var options = opt_options || {};
+  var options = opt_options || {};
 
-    hasMapLegend = options.hasOwnProperty('hasMapLegend') ? options.hasMapLegend : true;
+  hasMapLegend = options.hasOwnProperty('hasMapLegend') ? options.hasMapLegend : true;
 
-    styleSettings = viewer.getStyleSettings();
+  styleSettings = viewer.getStyleSettings();
 
-    mapMenu = $('#o-mapmenu');
-    $('#o-menutools').append('<li class="o-menu-item"><div class="o-menu-item-divider"></div><li>');
-    addLegend(viewer.getGroups());
+  mapMenu = $('#o-mapmenu');
+  $('#o-menutools').append('<li class="o-menu-item"><div class="o-menu-item-divider"></div><li>');
+  addLegend(viewer.getGroups());    
 }
 
 function getSymbol(style) {
@@ -148,9 +148,14 @@ function createLegendItem(layerid, layerStyle, inSubgroup) {
   var legendItem = '';
 
   if (layerStyle && layerStyle[0][0].hasOwnProperty('filter')) {
-    legendItem += '<li class="o-legend ' + layername + '">' +
-                    '<ul id="o-subgroup-' + layername + '" class="o-legend-subgroup o-ul-expand-false">' +
-                      '<li class="' + layername + '" id="' + layerid + '">';
+
+    if (layerStyle[0][0].hasOwnProperty('legend')) {
+      legendItem += '<li class="o-legend ' + layername + '">';
+      legendItem += '<ul id="o-group-' + layername + '" class="o-legend-group o-ul-expand-false"><li class="' + layername + '" id="' + layerid + '">';
+    } else {
+      legendItem += '<li class="o-legend ' + layername + '" id="' + layerid + '">';
+    }
+
     legendItem += '<div class ="o-legend-item' + subClass + '"><div class="o-checkbox">' +
                     '<svg class="o-icon-fa-square-o"><use xlink:href="css/svg/fa-icons.svg#fa-square-o"></use></svg>' +
                     '<svg class="o-icon-fa-check-square-o"><use xlink:href="css/svg/fa-icons.svg#fa-check-square-o"></use></svg>' +
@@ -162,7 +167,7 @@ function createLegendItem(layerid, layerStyle, inSubgroup) {
     }
 
     if (layerStyle[0][0].hasOwnProperty('legend')) {
-      legendItem += '<div class="o-subicon-expand o-subicon-expand-false">' +
+      legendItem += '<div class="o-icon-expand o-icon-expand-false">' +
                       '<svg class="o-icon-fa-chevron-right">' +
                         '<use xlink:href="css/svg/fa-icons.svg#fa-angle-double-right"></use>' +
                       '</svg>' +
@@ -173,14 +178,14 @@ function createLegendItem(layerid, layerStyle, inSubgroup) {
       legendItem += '</div></li>';
 
       layerStyle.forEach(function (styleArray) {
-        legendItem += '<li class="o-legend ' + layername + '" id="o-subgroup-' + layername + '"><div class ="o-legend-subitem">';
+        legendItem += '<li class="o-legend ' + layername + '" id="' + layername + '"><div class ="o-legend-subitem">';
         legendItem += '<div class="o-checkbox o-checkbox-false"></div>';
         legendItem += layer.get('styleName') ? getSymbol([styleArray]) : '';
         legendItem += '<div class="o-legend-subitem-title">' + styleArray[0].legend + '</div></div></li>';
       });
-    }
 
-    legendItem += '</ul></li>'
+      legendItem += '</ul></li>'
+    }
   } else {
     legendItem += '<li class="o-legend ' + layername + '" id="' + layerid + '"><div class ="o-legend-item' + subClass + '"><div class="o-checkbox">' +
                     '<svg class="o-icon-fa-square-o"><use xlink:href="css/svg/fa-icons.svg#fa-square-o"></use></svg>' +
@@ -199,71 +204,86 @@ function createLegendItem(layerid, layerStyle, inSubgroup) {
   return legendItem;
 }
 
-function createSubGroup(subgroups, parentGroup, subIndent, n) {
-  if (n >= subgroups.length) {
-    return;
-  } else {
-    var infotext = '';
-    var subGroupName=subgroups[n].name;
+function createGroup(group, parentGroup) {
+  var legendGroup;
+  var overlayGroup;
 
-    if (subgroups[n].infotext) {
+  if (group.hasOwnProperty('overlayGroup')) {
+    overlayGroup = group.name;
+  }
+  if (parentGroup) {
+    var infotext = '';
+    var indent = $(parentGroup).parent().closest('ul').hasClass('o-legend-group') ? 'o-legend-indent' : '';
+
+    if (group.infotext) {
       infotext += addInfoTextButton(name);
     }
 
-    var legendSubGroup = '<li class="o-legend ' + subGroupName + ' o-top-item" id="' + subGroupName + '">' +
-                          '<ul id="o-subgroup-' + subGroupName + '" class="o-legend-subgroup '+ subIndent + '">' +
-                            '<li class="o-legend-subheader ' + subGroupName + '" id="' + subGroupName + '"><div class="o-legend-item">' +
-                              '<div class="o-checkbox">' +
-                                '<svg class="o-icon-fa-square-o"><use xlink:href="css/svg/fa-icons.svg#fa-square-o"></use></svg>' +
-                                '<svg class="o-icon-fa-check-square-o"><use xlink:href="css/svg/fa-icons.svg#fa-check-square-o"></use></svg>' +
-                              '</div>' + subgroups[n].title +
-                              '<div class="o-subicon-expand">' +
-                                '<svg class="o-icon-fa-chevron-right"><use xlink:href="css/svg/fa-icons.svg#fa-angle-double-right"></use></svg>' +
-                                '<svg class="o-icon-fa-chevron-down"><use xlink:href="css/svg/fa-icons.svg#fa-angle-double-down"></use></svg>' +
-                              '</div>' +  infotext +
-                            '</div></li>' +
-                          '</ul>' +
-                        '</li>';
-    parentGroup.append(legendSubGroup);
+    legendGroup = '<li class="o-legend ' + group.name + ' o-top-item" id="' + group.name + '">' +
+                    '<ul id="o-group-' + group.name + '" class="o-legend-group o-legend-subgroup ' + indent +'">' +
+                      '<li class="o-legend-header o-legend-subheader ' + group.name + '" id="' + group.name + '"><div class="o-legend-item">' +
+                        '<div class="o-checkbox">' +
+                          '<svg class="o-icon-fa-square-o"><use xlink:href="css/svg/fa-icons.svg#fa-square-o"></use></svg>' +
+                          '<svg class="o-icon-fa-check-square-o"><use xlink:href="css/svg/fa-icons.svg#fa-check-square-o"></use></svg>' +
+                        '</div>' + group.title +
+                        '<div class="o-icon-expand">' +
+                          '<svg class="o-icon-fa-chevron-right"><use xlink:href="css/svg/fa-icons.svg#fa-angle-double-right"></use></svg>' +
+                          '<svg class="o-icon-fa-chevron-down"><use xlink:href="css/svg/fa-icons.svg#fa-angle-double-down"></use></svg>' +
+                        '</div>' + infotext +
+                      '</div></li>' +
+                    '</ul>' +
+                  '</li>';
+    parentGroup.append(legendGroup);
+  } else {
+    legendGroup = '<li>' +
+                    '<ul id="o-group-' + group.name + '" class="o-legend-group">' +
+                      '<li class="o-legend-header"><div class="o-legend-item">' + group.title +
+                        '<div class="o-icon-expand">' +
+                          '<svg class="o-icon-fa-chevron-right"><use xlink:href="css/svg/fa-icons.svg#fa-chevron-right"></use></svg>' +
+                          '<svg class="o-icon-fa-chevron-down"><use xlink:href="css/svg/fa-icons.svg#fa-chevron-down"></use></svg>' +
+                        '</div>' +
+                      '</div></li>' +
+                    '</ul>' +
+                  '</li>';
+    $('#o-legendlist .o-legendlist').append(legendGroup);
+  }
 
-    if (subgroups[n].expanded == true) {
-      $('#o-subgroup-' + subGroupName +' .o-subicon-expand').addClass('o-subicon-expand-true');
-      $('#o-subgroup-' + subGroupName +' .o-checkbox').addClass('o-checkbox-false');
+  if (group.expanded == true) {
+    $('#o-group-' + group.name +' .o-icon-expand').addClass('o-icon-expand-true');
+    $('#o-group-' + group.name +' .o-checkbox').addClass('o-checkbox-false');
+  } else {
+    $('#o-group-' + group.name +' .o-icon-expand').addClass('o-icon-expand-false');
+    $('#o-group-' + group.name +' .o-checkbox').addClass('o-checkbox-false');
+    $('#o-group-' + group.name).addClass('o-ul-expand-false');
+  }
+
+  $('#o-group-' + group.name + ' .o-legend-header').on('click', function(evt) {
+
+    if ($(evt.target).closest('div').hasClass('o-checkbox')) {
+      toggleSubGroupCheck($(this).parent(), true);
+    } else if ($(evt.target).closest('div').hasClass('o-infotext')) {
+
+      $(this).each(function() {
+        var that = this;
+        showInfoText($(that).attr("id"));
+      });
+
     } else {
-      $('#o-subgroup-' + subGroupName +' .o-subicon-expand').addClass('o-subicon-expand-false');
-      $('#o-subgroup-' + subGroupName +' .o-checkbox').addClass('o-checkbox-false');
-      $('#o-subgroup-' + subGroupName).addClass('o-ul-expand-false');
+      toggleGroup($(this));
     }
 
-    $('#o-subgroup-' + subGroupName + ' .o-legend-subheader').on('click', function(evt) {
+    evt.preventDefault();
+  });
 
-      if ($(evt.target).closest('div').hasClass('o-checkbox')) {
-        toggleSubGroupCheck($(this).parent(), true);
-      } else if ($(evt.target).closest('div').hasClass('o-infotext')) {
-
-        $(this).each(function() {
-          var that = this;
-          showInfoText($(that).attr("id"));
-        });
-
-      } else {
-        toggleSubGroup($(this));
-      }
-
-      evt.preventDefault();
+  if (group.hasOwnProperty('groups')) {
+    group.groups.forEach(function(subgroup) {
+      createGroup(subgroup, $('#o-group-' + group.name));
     });
-
-    if (subgroups[n].hasOwnProperty('subgroups')) {
-      createSubGroup(subgroups[n].subgroups, $('#o-subgroup-' + subgroups[n].name), 'o-sub-indent', 0);
-    }
-
-    createSubGroup(subgroups, parentGroup, subIndent, n+1);
   }
 }
 
 function addLegend(groups) {
   var layers = viewer.getMap().getLayers().getArray();
-  var legendGroup;
   var overlayGroup;
   var item = '';
 
@@ -272,43 +292,7 @@ function addLegend(groups) {
   $('#o-mapmenu').append(legend);
 
   groups.forEach(function(group) {
-
-    if (group.hasOwnProperty('overlayGroup')) {
-      overlayGroup = group.name;
-    }
-
-    legendGroup = '<li>' +
-                    '<ul id="o-group-' + group.name + '" class="o-legend-group">' +
-                      '<li class="o-legend-header"><div class="o-legend-item">' + group.title +
-                        '<div class="o-icon-expand">' +
-                          '<svg class="o-icon-fa-chevron-right">' +
-                            '<use xlink:href="css/svg/fa-icons.svg#fa-chevron-right"></use>' +
-                          '</svg>' +
-                          '<svg class="o-icon-fa-chevron-down">' +
-                            '<use xlink:href="css/svg/fa-icons.svg#fa-chevron-down"></use>' +
-                          '</svg>' +
-                        '</div>' +
-                      '</div></li>' +
-                    '</ul>' +
-                  '</li>';
-    $('#o-legendlist .o-legendlist').append(legendGroup);
-
-    if(group.expanded == true) {
-      $('#o-group-' + group.name +' .o-icon-expand').addClass('o-icon-expand-true');
-    } else {
-      $('#o-group-' + group.name +' .o-icon-expand').addClass('o-icon-expand-false');
-      $('#o-group-' + group.name).addClass('o-ul-expand-false');
-    }
-
-    //Event listener for tick layer
-    $('#o-group-' + group.name + ' .o-legend-header').on('click', function(evt) {
-      toggleGroup($(this));
-      evt.preventDefault();
-    });
-
-    if (group.hasOwnProperty('subgroups')) {
-      createSubGroup(group.subgroups, $('#o-group-' + group.name), '', 0);
-    }
+    createGroup(group);
   });
 
   //Add map legend unless set to false
@@ -330,6 +314,8 @@ function addLegend(groups) {
 
     var name = (layer.get('name'));
     var layerStyle = styleSettings[layer.get('styleName')];
+    //Check if layer belongs to subgroup
+    var inSubgroup = $('#o-group-' + layer.get('group')).closest('ul').parent().closest('ul').hasClass('o-legend-group');
     var title = '<div class="o-legend-item-title">' + layer.get('title') + '</div>';
 
     //Add infotext button
@@ -354,29 +340,20 @@ function addLegend(groups) {
 
     } else if(layer.get('group') && ((layer.get('group') != 'none'))) {
 
-      //Append layer to subgroup
-      if (layer.get('subgroup')) {
-        item = createLegendItem(name, layerStyle, true);
-        if ($('#o-subgroup-' + layer.get('subgroup')).find('li.o-top-item:last').length) {
-          $('#o-subgroup-' + layer.get('subgroup')).find('li.o-top-item:last').after(item);
-        } else {
-          $('#o-subgroup-' + layer.get('subgroup') + ' .o-legend-subheader').after(item);
-        }
-      } else { //Append layer to group
-        item = createLegendItem(name, layerStyle, false);
-        if ($('#o-group-' + layer.get('group')).find('li.o-top-item:last').length) {
-          $('#o-group-' + layer.get('group')).find('li.o-top-item:last').after(item);
-        } else {
-          $('#o-group-' + layer.get('group') + ' .o-legend-header').after(item);
-        }
+      //Append layer to group    
+      item = createLegendItem(name, layerStyle, inSubgroup);
+      if ($('#o-group-' + layer.get('group')).find('li.o-top-item:last').length) { 
+        $('#o-group-' + layer.get('group')).find('li.o-top-item:last').after(item);
+      } else {
+        $('#o-group-' + layer.get('group') + ' .o-legend-header').after(item);
       }
 
       if(layer.get('legend') == true || layer.getVisible(true)) {
         //Append to map legend
         item = '<li class="o-legend ' + name + '" id="o-legend-' + name + '"><div class ="o-legend-item"><div class="o-checkbox">' +
-                '<svg class="o-icon-fa-square-o"><use xlink:href="css/svg/fa-icons.svg#fa-square-o"></use></svg>' +
-                '<svg class="o-icon-fa-check-square-o"><use xlink:href="css/svg/fa-icons.svg#fa-check-square-o"></use></svg>' +
-              '</div>';
+                  '<svg class="o-icon-fa-square-o"><use xlink:href="css/svg/fa-icons.svg#fa-square-o"></use></svg>' +
+                  '<svg class="o-icon-fa-check-square-o"><use xlink:href="css/svg/fa-icons.svg#fa-check-square-o"></use></svg>' +
+                '</div>';
         item += layer.get('styleName') ? getSymbol(styleSettings[layer.get('styleName')]) : '';
         item += title;
         $('#o-overlay-list').append(item);
@@ -399,21 +376,17 @@ function addLegend(groups) {
       if (layer.getVisible()==true) {
         $('.' + name + ' .o-checkbox').addClass('o-checkbox-true');
 
-        $('#o-group-' + layer.get('group') +' .o-icon-expand').removeClass('o-icon-expand-false');
-        $('#o-group-' + layer.get('group') +' .o-icon-expand').addClass('o-icon-expand-true');
-        $('#o-group-' + layer.get('group')).removeClass('o-ul-expand-false');
+        if (inSubgroup) {
+          var parentGroups = $('#' + name).parents('ul [id^=o-group-]');
+          [].forEach.call(parentGroups, function(el) {
+            toggleGroup($(el).find('li:first'));
+          });
 
-        if (layer.get('subgroup')) {
-          var subGroupName = layer.get('subgroup');
-          $('#o-subgroup-' + subGroupName +' li#' + subGroupName).find('.o-subicon-expand').removeClass('o-subicon-expand-false');
-          $('#o-subgroup-' + subGroupName +' li#' + subGroupName).find('.o-subicon-expand').addClass('o-subicon-expand-true');
-          $('#o-subgroup-' + subGroupName).removeClass('o-ul-expand-false');
-
-          $('#o-subgroup-' + subGroupName).parents('ul .o-legend-subgroup li:first').find('.o-subicon-expand').removeClass('o-subicon-expand-false');
-          $('#o-subgroup-' + subGroupName).parents('ul .o-legend-subgroup li:first').find('.o-subicon-expand').addClass('o-subicon-expand-true');
-          $('#o-subgroup-' + subGroupName).parents('ul .o-legend-subgroup').removeClass('o-ul-expand-false');
-
-          toggleSubGroupCheck($('#' + name).parents('ul').has('.o-legend-subheader').first(), false);
+          toggleSubGroupCheck($('#' + name).parents('ul').has('.o-legend-header').first(), false);
+        } else {
+          $('#o-group-' + layer.get('group') +' .o-icon-expand').removeClass('o-icon-expand-false');
+          $('#o-group-' + layer.get('group') +' .o-icon-expand').addClass('o-icon-expand-true');
+          $('#o-group-' + layer.get('group')).removeClass('o-ul-expand-false');
         }
 
       } else {
@@ -423,8 +396,8 @@ function addLegend(groups) {
 
     //Event listener for tick layer
     $('#' + name).on('click', function(evt) {
-      if ($(evt.target).closest('div').hasClass('o-subicon-expand')) {
-        toggleSubGroup($(this));
+      if ($(evt.target).closest('div').hasClass('o-icon-expand')) {
+        toggleGroup($(this));
       } else {
         $(this).each(function() {
           var that = this;
@@ -490,7 +463,7 @@ function offToggleCheck(layername) {
 //Expand and minimize group
 function toggleGroup(groupheader) {
   var group = groupheader.parent('.o-legend-group');
-  var groupicon = $('#' + group.attr('id') + ' .o-icon-expand');
+  var groupicon = $('#' + group.attr('id') + ' .o-icon-expand:first');
 
   if (groupicon.hasClass('o-icon-expand-false')) {
     groupicon.removeClass('o-icon-expand-false');
@@ -503,27 +476,11 @@ function toggleGroup(groupheader) {
   }
 }
 
-//Expand and minimize subgroup
-function toggleSubGroup(subgroupheader) {
-  var subgroup = subgroupheader.parent('.o-legend-subgroup');
-  var subgroupicon = $('#' + subgroup.attr('id') + ' .o-subicon-expand:first');
-
-  if (subgroup.hasClass('o-ul-expand-false')) {
-    subgroupicon.removeClass('o-subicon-expand-false');
-    subgroupicon.addClass('o-subicon-expand-true');
-    subgroup.removeClass('o-ul-expand-false');
-  } else {
-    subgroupicon.removeClass('o-subicon-expand-true');
-    subgroupicon.addClass('o-subicon-expand-false');
-    subgroup.addClass('o-ul-expand-false');
-  }
-}
-
 //Toggle subgroups
 function toggleSubGroupCheck(subgroup, toggleAll) {
   var subGroup = $(subgroup);
   var subLayers = subGroup.find('.o-legend-item.o-legend-subitem');
-  var groupList = $('.o-legend-subgroup');
+  var groupList = $('.o-legend-group');
 
   if (toggleAll) {
 
@@ -637,7 +594,7 @@ function toggleCheck(layerid) {
     }
 
     if ($('#' + layername).find('.o-legend-subitem').length > 0) {
-      toggleSubGroupCheck($('#' + layername).parents('ul').has('.o-legend-subheader').first(), false);
+      toggleSubGroupCheck($('#' + layername).parents('ul').has('.o-legend-header').first(), false);
     }
   }
 }

@@ -173,7 +173,6 @@ function init(el, mapOptions) {
             id: options.id || undefined,
             title: options.title,
             group: options.group || 'none',
-            subgroup: options.subgroup || undefined,
             infotext: options.infotext || undefined,
             opacity: options.opacity || 1,
             geometryName: geometryName,
@@ -353,12 +352,12 @@ function init(el, mapOptions) {
           return;
         }
 
-        if (groups[n].subgroups) {
-          groups[n].subgroups.forEach(function(subgroup) {
+        if (groups[n].groups) {
+          groups[n].groups.forEach(function(subgroup) {
             subgroups.push(subgroup);
           });
 
-          findSubgroups(groups[n].subgroups, 0);
+          findSubgroups(groups[n].groups, 0);
         }
 
         findSubgroups(groups, n+1);
@@ -423,7 +422,6 @@ function init(el, mapOptions) {
         return new ol.layer.Tile({
           name: layersConfig.name.split(':').pop(), //remove workspace part of name
           group: layersConfig.group || 'default',
-          subgroup: layersConfig.subgroup || undefined,
           infotext: layersConfig.infotext || undefined,
           opacity: layersConfig.opacity || 1,
           title: layersConfig.title,
@@ -461,7 +459,6 @@ function init(el, mapOptions) {
 
         return new ol.layer.Tile({
           group: layersConfig.group || 'background',
-          subgroup: layersConfig.subgroup || undefined,
           infotext: layersConfig.infotext || undefined,
           name: layersConfig.name.split(':').pop(), //remove workspace part of name
           opacity: layersConfig.opacity || 1,
@@ -586,7 +583,6 @@ function init(el, mapOptions) {
         var tileSource = new ol.source.TileArcGISRest({
             attributions: options.attribution,
             projection: settings.projection,
-            crossOrigin: 'anonymous',
             params: params,
             url: url
         });
