@@ -16,6 +16,14 @@
       "name": "print"
     },
     {
+      "name": "about",
+      "options": {
+        "buttontext": "About",
+        "title": "About this map",
+        "content": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed et scelerisque lectus. Phasellus ultricies diam in sem aliquam tincidunt. Email: <a href='mailto:lorem@ipsum.com?Subject=About map' target='_top'>lorem@ipsum.com</a></p>"
+      }
+    },
+    {
       "name": "legend"
     },
     {
