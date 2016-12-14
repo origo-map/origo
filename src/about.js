@@ -8,15 +8,15 @@ var $ = require('jquery');
 var Utils = require('./utils');
 var Modal = require('./modal');
 
-var aboutButton;
+var $aboutButton;
 var buttonText;
 var title;
 var content;
 
 function init(options) {
-	buttonText = options.buttontext;
-  title = options.title;
-  content = options.content;
+  buttonText = options && options.buttontext ? options.buttontext : 'Om kartan';
+  title = options && options.title ? options.title : 'Om kartan';
+  content = options && options.content ? options.content : '<p></p>';
 
   var el = Utils.createListButton({
     id: 'o-about',
@@ -25,21 +25,21 @@ function init(options) {
     text: buttonText
   });
   $('#o-menutools').append(el);
-  aboutButton = $('#o-about-button');
+  $aboutButton = $('#o-about-button');
 
   bindUIActions();
 }
 
 function bindUIActions() {
-	aboutButton.on('click', function(e) {
-		Modal.createModal('#o-map', {
+  $aboutButton.on('click', function(e) {
+    Modal.createModal('#o-map', {
       title: title,
       content: content
     });
 
-		Modal.showModal();
-		e.preventDefault();
-	});
+    Modal.showModal();
+    e.preventDefault();
+  });
 }
 
 module.exports.init = init;
