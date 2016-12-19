@@ -13,11 +13,17 @@ var buttonText;
 var title;
 var content;
 
-function init(options) {
-  buttonText = options && options.buttontext ? options.buttontext : 'Om kartan';
-  title = options && options.title ? options.title : 'Om kartan';
-  content = options && options.content ? options.content : '<p></p>';
+function init(opt_options) {
+  var options = opt_options || {};
+  buttonText = options.buttontext || 'Om kartan';
+  title = options.title || 'Om kartan';
+  content = options.content || '<p></p>';
 
+  render();
+  bindUIActions();
+}
+
+function render() {
   var el = Utils.createListButton({
     id: 'o-about',
     iconCls: 'o-icon-fa-info-circle',
@@ -26,8 +32,6 @@ function init(options) {
   });
   $('#o-menutools').append(el);
   $aboutButton = $('#o-about-button');
-
-  bindUIActions();
 }
 
 function bindUIActions() {
