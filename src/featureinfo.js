@@ -72,6 +72,7 @@ function getPin() {
     return savedPin;
 }
 function identify(items, target, coordinate) {
+    Viewer.removeOverlays();
     var content = items.map(function(i){
         return i.content;
     }).join('');
@@ -108,7 +109,6 @@ function identify(items, target, coordinate) {
     }
 }
 function onClick(evt) {
-    Viewer.removeOverlays();
     savedPin = undefined;
     //Featurinfo in two steps. Concat serverside and clientside when serverside is finished
     var clientResult = getFeatureInfo.getFeaturesAtPixel(evt, clusterFeatureinfoLevel);

@@ -515,7 +515,7 @@ function init(el, mapOptions) {
               var that = this;
               // var serverUrl = settings.source[options.source].url;
               var url = serverUrl + options.id +
-                  '/query?f=json&' +
+                  encodeURI('/query?f=json&' +
                   'returnGeometry=true' +
                   '&spatialRel=esriSpatialRelIntersects' +
                   '&geometry=' + encodeURIComponent('{"xmin":' + extent[0] + ',"ymin":' +
@@ -524,7 +524,7 @@ function init(el, mapOptions) {
                   '&geometryType=esriGeometryEnvelope'+
                   '&inSR=' + esriSrs + '&outFields=*' + '' + '&returnIdsOnly=false&returnCountOnly=false' +
                   '&geometryPrecision=2' +
-                  '&outSR=' + esriSrs + queryFilter;
+                  '&outSR=' + esriSrs + queryFilter);
               // use jsonp: false to prevent jQuery from adding the "callback"
               // parameter to the URL
               $.ajax({
