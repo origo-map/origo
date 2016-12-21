@@ -19,6 +19,7 @@ origo.controls = {};
 origo.controls.geoposition = require('./src/geoposition');
 origo.controls.mapmenu = require('./src/mapmenu');
 origo.controls.print = require('./src/print');
+origo.controls.about = require('./src/about');
 origo.controls.sharemap = require('./src/sharemap');
 origo.controls.legend = require('./src/legend');
 origo.controls.search = require('./src/search');
