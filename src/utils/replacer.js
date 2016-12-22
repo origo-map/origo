@@ -49,7 +49,7 @@ var Replacer = function() {
     if (args) {
       return [args[1].split(','), str.substring(0, args.index)];
     } else {
-      return undefined;
+      return ['',str];
     }
   }
 
