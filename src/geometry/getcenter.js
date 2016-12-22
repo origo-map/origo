@@ -5,8 +5,15 @@
 "use strict";
 
 var ol = require('openlayers');
+var Viewer = require('../viewer');
 
-var getCenter = function getCenter(geometry) {
+var getCenter = function getCenter(geometry_in, destination, axisOrientation) {
+    var geometry = geometry_in.clone();
+
+    if (destination) {
+      geometry.transform(Viewer.getMap().getView().getProjection(), destination);
+    }
+
     var type = geometry.getType();
     var center;
     switch (type) {
@@ -14,7 +21,7 @@ var getCenter = function getCenter(geometry) {
             center = geometry.getInteriorPoint().getCoordinates();
             break;
         case "MultiPolygon":
-            center = geometry.getInteriorPoints()[0].getCoordinates();
+            center = geometry.getInteriorPoints().getCoordinates()[0];
             break;
         case "Point":
             center = geometry.getCoordinates();
@@ -32,6 +39,13 @@ var getCenter = function getCenter(geometry) {
             center = geometry.getCenter();
             break;
     }
+
+    if (axisOrientation) {
+      if (axisOrientation === 'reverse') {
+        center.reverse();
+      }
+    }
+
     return center;
 }
 

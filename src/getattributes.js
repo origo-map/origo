@@ -57,11 +57,10 @@ module.exports = function(feature, layer) {
                     }
                 }
                 else if (attribute['html']) {
-                  var test = replacer.replace(attribute['html'], geom, {
-                    start: '{{@'
+                  val = replacer.replace(attribute['html'], feature.getProperties(), {
+                    helper: geom,
+                    helperArg: feature.getGeometry()
                   });
-                  console.log(geom);
-                  val = replacer.replace(attribute['html'], feature.getProperties());
                 }
 
                 var cls = ' class="' + attribute['cls'] + '" ' || '';
