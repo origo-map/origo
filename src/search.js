@@ -63,12 +63,12 @@ function init(options){
                     '<input class="o-search-field typeahead form-control" type="text" placeholder="' + hintText + '">' +
                     '<button id="o-search-button">' +
                         '<svg class="o-icon-fa-search">' +
-                            '<use xlink:href="css/svg/fa-icons.svg#fa-search"></use>' +
+                            '<use xlink:href="#fa-search"></use>' +
                         '</svg>' +
                     '</button>' +
                     '<button id="o-search-button-close">' +
                         '<svg class="o-icon-search-fa-times">' +
-                            '<use xlink:href="css/svg/fa-icons.svg#fa-times"></use>' +
+                            '<use xlink:href="#fa-times"></use>' +
                         '</svg>' +
                     '</button>' +
                 '</div>' +

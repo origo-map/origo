@@ -9,40 +9,31 @@ svg4everybody();
 global.jQuery = require("jquery");
 
 var $ = require('jquery');
-var viewer = require('./src/viewer');
+var Viewer = require('./src/viewer');
 var mapLoader = require('./src/maploader');
 var controlInitialiser = require('./src/controlinitialiser');
 
 var origo = {};
 origo.map = {};
-origo.controls = {};
-origo.controls.geoposition = require('./src/geoposition');
-origo.controls.mapmenu = require('./src/mapmenu');
-origo.controls.print = require('./src/print');
-origo.controls.sharemap = require('./src/sharemap');
-origo.controls.legend = require('./src/legend');
-origo.controls.search = require('./src/search');
-origo.controls.editor = require('./src/editor');
-origo.controls.measure = require('./src/measure');
-origo.controls.home = require('./src/home');
+origo.config = require('./conf/origoConfig');
+origo.controls = require('./conf/origoControls');
 
-origo.map.init = function(el, options) {
-    var map = mapLoader(el, options);
-    if (typeof map.then === 'function') {
-        map.then(function(config) {
-            init(config);
-        })
-    }
-    else {
-        init(map);
-    }
-    return viewer;
+origo.map.init = function(options, opt_config) {
+  var config = opt_config ? $.extend(origo.config, opt_config) : origo.config;
+
+  var map = mapLoader(options, config);
+  map.then(function(config) {
+    init(config);
+  })
+  return Viewer;
 }
+
 function init(config) {
-    viewer.init(config.el, config.options);
-    //Init controls
-    var controls = config.options.controls || [];
-    controlInitialiser(controls);
+  Viewer.init(config.el, config.options);
+
+  //Init controls
+  var controls = config.options.controls || [];
+  controlInitialiser(controls);
 }
 
 module.exports = origo;

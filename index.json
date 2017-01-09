@@ -16,6 +16,14 @@
       "name": "print"
     },
     {
+      "name": "about",
+      "options": {
+        "buttontext": "Om Origo",
+        "title": "Om Origo",
+        "content": "<p>Origo är ett ramverk för webbkartor. Ramverket bygger på JavaScript-biblioteket OpenLayers 3. Du kan använda Origo för att skapa egna webbaserade kartapplikationer.</p><br><p>Projektet drivs och underhålls av ett antal svenska kommuner. Besök gärna <a href='https://github.com/origo-map/origo' target='_blank'>Origo på GitHub</a> för mer information.</p>"
+      }
+    },
+    {
       "name": "legend"
     },
     {
@@ -45,12 +53,6 @@
   "center": [
     162429,
     6599905
-  ],
-  "home": [
-    105085,
-    6571627,
-    219773,
-    6628182
   ],
   "zoom": 3,
   "resolutions": [

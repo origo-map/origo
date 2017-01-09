@@ -29,7 +29,7 @@ function createButton() {
 			id: 'o-window-button',
 			cls: 'o-mapwindow-button',
 			iconCls: 'o-icon-fa-expand',
-			src: 'css/svg/fa-icons.svg#fa-expand',
+			src: '#fa-expand',
 			tooltipText: tooltipText,
 			tooltipPlacement: 'east'
 	});

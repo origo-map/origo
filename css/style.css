@@ -1632,6 +1632,11 @@ input.o-search-field::-ms-clear {
 	height: 1em;
 	width: 1em;
 }
+.o-icon-fa-info-circle {
+	padding: .25em;
+	height: 1em;
+	width: 1em;
+}
 #o-editor-toolbar .o-icon-fa-times {
 	height: 1rem;
 	padding: 0;
