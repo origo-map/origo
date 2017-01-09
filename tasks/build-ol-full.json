@@ -5,7 +5,7 @@
     "externs": [
       "externs/bingmaps.js",
       "externs/geojson.js",
-      "externs/esrijson.js",      
+      "externs/esrijson.js",
       "externs/oli.js",
       "externs/olx.js",
       "externs/proj4js.js",
