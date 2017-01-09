@@ -16,10 +16,12 @@ var settings = {
 };
 var map, geolocation, marker, markerEl, positions;
 var enabled = false;
+var baseUrl;
 
 
 function init() {
     map = viewer.getMap();
+    baseUrl = viewer.getBaseUrl();
 
     var tooltipText = "Visa nuvarande position i kartan";
     //Element for control
@@ -27,7 +29,7 @@ function init() {
         id: 'o-geolocation-button',
         cls: 'o-geolocation-button',
         iconCls: 'o-icon-fa-location-arrow',
-        src: 'css/svg/fa-icons.svg#fa-location-arrow',
+        src: '#fa-location-arrow',
         tooltipText: tooltipText,
         tooltipPlacement: 'east'
     });
@@ -36,7 +38,8 @@ function init() {
     settings.geolocateButtonId = $('#o-geolocation-button');
     settings.geolocateButton = $('#o-geolocation-button button');
 
-    var markerImg = '<img id="o-geolocation_marker" src="img/geolocation_marker.png" />';
+    var src = baseUrl + 'img/geolocation_marker.png';
+    var markerImg = '<img id="o-geolocation_marker" src="' + src + '"/>';
     $('#o-map').prepend(markerImg);
     markerEl = $('#o-geolocation_marker').get(0);
     marker = new ol.Overlay({
@@ -118,9 +121,9 @@ function addPosition(position, heading, m, speed) {
 
   // FIXME use speed instead
   if (heading && speed) {
-    markerEl.src = 'img/geolocation_marker_heading.png';
+    markerEl.src = baseUrl + 'img/geolocation_marker_heading.png';
   } else {
-    markerEl.src = 'img/geolocation_marker.png';
+    markerEl.src = baseUrl + 'img/geolocation_marker.png';
   }
 
   var previousM = 0;
