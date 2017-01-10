@@ -177,7 +177,7 @@ function setEditProps(options, map, srsName) {
       map: map
     };
     layerProps[layerName].snap = options.hasOwnProperty('snap') ? options.snap : true;
-    layerProps[layerName].snapLayers = options.snapLayers || undefined;
+    layerProps[layerName].snapLayers = options.snapLayers || options.editableLayers;
     return layerProps;
   }, initialValue);
   return result;
