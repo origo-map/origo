@@ -1637,6 +1637,15 @@ input.o-search-field::-ms-clear {
 	height: 1em;
 	width: 1em;
 }
+.o-icon-fa-external-link {
+	padding: .25em;
+	height: 1em;
+	width: 1em;
+}
+a {
+  text-decoration: none;
+  color: inherit;
+}
 #o-editor-toolbar .o-icon-fa-times {
 	height: 1rem;
 	padding: 0;
