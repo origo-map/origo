@@ -1642,7 +1642,7 @@ input.o-search-field::-ms-clear {
 	height: 1em;
 	width: 1em;
 }
-a {
+.o-externallink {
   text-decoration: none;
   color: inherit;
 }
