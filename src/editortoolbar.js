@@ -160,6 +160,7 @@ function setEditProps(options, map, srsName) {
   var initialValue = {};
   var result = layerNames.reduce(function(layerProps, layerName) {
     var layer = viewer.getLayer(layerName);
+    
     //get the layers source options
     var source = viewer.getMapSource()[layer.get('sourceName')];
 

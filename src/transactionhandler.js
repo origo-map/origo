@@ -2,7 +2,7 @@
  * Copyright 2016 Origo
  * Licensed under BSD 2-Clause (https://github.com/origo-map/origo/blob/master/LICENSE.txt)
  * ======================================================================== */
- "use strict";
+"use strict";
 
 var ol = require('openlayers');
 var $ = require('jquery');
@@ -116,7 +116,7 @@ function createForm(obj) {
       el = '<div><label>' + label + '</label><br><textarea id="' + id + '"' + maxLength + 'rows="3">' + val + '</textarea></div>';
       break;
     case 'checkbox':
-      var checked = val == true ? ' checked' : '';
+      var checked = val === true ? ' checked' : '';
       el = '<div class="o-form-checkbox"><label>' + label + '</label><input type="checkbox" id="' + id + '" value="' + val + '"' + checked + '></div>';
       break;
     case 'dropdown':
@@ -288,7 +288,7 @@ function onDrawEnd(evt) {
       var result = readResponse(data);
       if (result) {
         var insertId = result.insertIds[0];
-        if (insertId == 'new0') {
+        if (insertId === 'new0') {
           // reload data if we're dealing with a shapefile store
           editSource.clear();
         } else {
@@ -331,7 +331,7 @@ function onAttributesSave(feature, attributes) {
       // If hidden element it should be excluded
       if ($(containerClass).hasClass('hidden') === false) {
         //Check if checkbox. If checkbox read state.
-        if ($(attributes[i].elId).attr('type') == 'checkbox') {
+        if ($(attributes[i].elId).attr('type') === 'checkbox') {
           editEl[attributes[i].name] = $(attributes[i].elId).is(':checked') ? 1 : 0;
         }
         //Read value from input text, textarea or select
@@ -425,7 +425,7 @@ function addListener() {
 function readResponse(data) {
   var result;
   if (window.Document && data instanceof Document && data.documentElement &&
-    data.documentElement.localName == 'ExceptionReport') {
+    data.documentElement.localName === 'ExceptionReport') {
     alert(data.getElementsByTagNameNS(
       'http://www.opengis.net/ows', 'ExceptionText').item(0).textContent);
   } else {
