@@ -176,6 +176,7 @@ function editAttributes() {
     emitChangeEdit('attribute', true);
     var feature = features.item(0);
     if (attributes.length > 0) {
+
       //Create an array of defined attributes and corresponding values from selected feature
       var attributeObjects = attributes.map(function(attributeObject) {
         var obj = {};
@@ -289,6 +290,7 @@ function onDrawEnd(evt) {
       if (result) {
         var insertId = result.insertIds[0];
         if (insertId === 'new0') {
+
           // reload data if we're dealing with a shapefile store
           editSource.clear();
         } else {
@@ -324,16 +326,21 @@ function cancelAttribute() {
 function onAttributesSave(feature, attributes) {
   $('#o-save-button').on('click', function(e) {
     var editEl = {};
+
     //Read values from form
     for (var i = 0; i < attributes.length; i++) {
+
       //Get the input container class
       var containerClass = '.' + attributes[i].elId.slice(1);
+
       // If hidden element it should be excluded
       if ($(containerClass).hasClass('hidden') === false) {
+
         //Check if checkbox. If checkbox read state.
         if ($(attributes[i].elId).attr('type') === 'checkbox') {
           editEl[attributes[i].name] = $(attributes[i].elId).is(':checked') ? 1 : 0;
         }
+
         //Read value from input text, textarea or select
         else {
           editEl[attributes[i].name] = $(attributes[i].elId).val();
@@ -353,6 +360,7 @@ function attributesSaveHandler(f, el) {
   var fid = feature.getId();
   var clone = new ol.Feature();
   clone.setId(fid);
+
   //get DOM values and set attribute values to cloned feature
   for (var i = 0; i < attributes.length; i++) {
     if (formEl.hasOwnProperty(attributes[i].name)) {
@@ -374,7 +382,6 @@ function attributesSaveHandler(f, el) {
     data: serializer.serializeToString(node),
     contentType: 'text/xml',
     success: function(data) {
-      //alert('success');
     },
     error: function(e) {
       var errorMsg = e ? (e.status + ' ' + e.statusText) : "";
