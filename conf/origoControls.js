@@ -8,5 +8,6 @@ controls.search = require('../src/search');
 controls.editor = require('../src/editor');
 controls.home = require('../src/home');
 controls.measure = require('../src/measure');
+controls.about = require('../src/about');
 
 module.exports = controls;
