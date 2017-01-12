@@ -8,18 +8,23 @@ var $ = require('jquery');
 var viewer = require('./viewer');
 var utils = require('./utils');
 
+var url;
+var title;
+
 function init(opt_options) {
   var options = opt_options || {};
-  var url = options.url;
-  var title = options.title;
+  url = options.url;
+  title = options.title;
+  render();
+}
 
+function render() {
   var el = utils.createListButton({
-    id: 'o-externallink',
+    id: 'o-link',
     iconCls: 'o-icon-fa-external-link',
     src: 'css/svg/fa-icons.svg#fa-external-link',
-    text: '<a href="' + url + '"class="o-externallink" target="_blank">' + title + '</a>'
+    text: '<a href="' + url + '"class="o-link" target="_blank">' + title + '</a>'
   });
-  
   $('#o-menutools').append(el);
 }
 
