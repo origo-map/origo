@@ -29,10 +29,6 @@ function init() {
   $geolocateButtonId = $('#o-geolocation-button');
   $geolocateButton = $('#o-geolocation-button button');
 
-
-  var src = baseUrl + 'img/geolocation_marker.png';
-  var markerImg = '<img id="o-geolocation_marker" src="' + src + '"/>';
-  $('#o-map').prepend(markerImg);
   markerEl = $('#o-geolocation_marker').get(0);
   marker = new ol.Overlay({
     positioning: 'center-center',
@@ -55,7 +51,10 @@ function init() {
 }
 
 function render() {
-  var tooltipText = "Visa nuvarande position i kartan";
+  var tooltipText = 'Visa nuvarande position i kartan';
+  var src = baseUrl + 'img/geolocation_marker.png';
+  var markerImg = '<img id="o-geolocation_marker" src="' + src + '"/>';
+
   //Element for control
   var el = utils.createButton({
     id: 'o-geolocation-button',
@@ -66,6 +65,7 @@ function render() {
     tooltipPlacement: 'east'
   });
   $('#o-map').append(el);
+  $('#o-map').prepend(markerImg);
 }
 
 function bindUIActions() {
@@ -117,6 +117,7 @@ function addPosition(current) {
   var fCoords = positions.getCoordinates();
   var previous = fCoords[fCoords.length - 1];
   var prevHeading = previous && previous[2];
+  var previousM;
   if (prevHeading) {
     var headingDiff = current.heading - mod(prevHeading);
 
@@ -125,7 +126,7 @@ function addPosition(current) {
       var sign = (headingDiff >= 0) ? 1 : -1;
       headingDiff = -sign * (2 * Math.PI - Math.abs(headingDiff));
     }
-    heading = prevHeading + headingDiff;
+    var heading = prevHeading + headingDiff;
   }
   positions.appendCoordinate([x, y, current.heading, current.m]);
 
@@ -139,7 +140,7 @@ function addPosition(current) {
     markerEl.src = baseUrl + 'img/geolocation_marker.png';
   }
 
-  var previousM = 0;
+  previousM = 0;
 
   // change center and rotation before render
   map.beforeRender(function(map, frameState) {
@@ -152,8 +153,7 @@ function addPosition(current) {
 
       // interpolate position along positions LineString
       var c = positions.getCoordinateAtM(m, true);
-      var view = frameState.viewState;
-      if (c && enabled == false && geolocation.getTracking()) {
+      if (c && enabled === false && geolocation.getTracking()) {
         marker.setPosition(c);
         map.getView().setCenter(c);
         map.getView().setZoom(10);
@@ -169,16 +169,6 @@ function addPosition(current) {
 
 function mod(n) {
   return ((n % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
-}
-
-function getCenterWithHeading(position, rotation, resolution) {
-  var size = map.getSize();
-  var height = size[1];
-
-  return [
-    position[0] - Math.sin(rotation) * height * resolution * 1 / 4,
-    position[1] + Math.cos(rotation) * height * resolution * 1 / 4
-  ];
 }
 
 function renderMap() {
