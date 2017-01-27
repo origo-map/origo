@@ -9,7 +9,10 @@ var $ = require('jquery');
 var viewer = require('./viewer');
 var modal = require('./modal');
 var featureInfo = require('./featureinfo');
+var editsStore = require('./editor/editsstore')();
+var generateUUID = require('./utils/generateuuid');
 
+var tempId = '_tempId';
 var srsName = undefined;
 var editSource = undefined;
 var geometryType = undefined;
@@ -273,6 +276,15 @@ function onSelectRemove(evt) {
 
 function onDrawEnd(evt) {
   var feature = evt.feature;
+  var uuid = generateUUID();
+  feature.set(tempId, uuid);
+  editsStore.addFeature(uuid, featureType);
+  setActive();
+  hasDraw = false;  
+  emitChangeEdit('draw', false);
+}
+
+function insertRemote(feature) {
   var node = format.writeTransaction([feature], null, null, {
     gmlOptions: {
       srsName: srsName
@@ -297,8 +309,6 @@ function onDrawEnd(evt) {
           feature.setId(insertId);
         }
       }
-      setActive();
-      hasDraw = false;
     },
     error: function(e) {
       setActive();
@@ -309,7 +319,6 @@ function onDrawEnd(evt) {
     },
     context: this
   });
-  emitChangeEdit('draw', false);
 }
 
 function cancelDraw() {
