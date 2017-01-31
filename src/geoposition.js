@@ -9,141 +9,156 @@ var $ = require('jquery');
 var viewer = require('./viewer');
 var utils = require('./utils');
 
-var settings = {
-    geolocateButtonId: undefined,
-    geolocateButton: undefined,
-    deltaMean: 500
-};
-var map, geolocation, marker, markerEl, positions;
+var $geolocateButtonId = undefined;
+var $geolocateButton = undefined;
+var deltaMean = 500;
 var enabled = false;
-var baseUrl;
-
+var map = undefined;
+var geolocation = undefined;
+var marker = undefined;
+var markerEl = undefined;
+var positions = undefined;
+var baseUrl = undefined;
 
 function init() {
-    map = viewer.getMap();
-    baseUrl = viewer.getBaseUrl();
+  map = viewer.getMap();
+  baseUrl = viewer.getBaseUrl();
 
-    var tooltipText = "Visa nuvarande position i kartan";
-    //Element for control
-    var el = utils.createButton({
-        id: 'o-geolocation-button',
-        cls: 'o-geolocation-button',
-        iconCls: 'o-icon-fa-location-arrow',
-        src: '#fa-location-arrow',
-        tooltipText: tooltipText,
-        tooltipPlacement: 'east'
-    });
-    $('#o-map').append(el);
+  render();
 
-    settings.geolocateButtonId = $('#o-geolocation-button');
-    settings.geolocateButton = $('#o-geolocation-button button');
+  $geolocateButtonId = $('#o-geolocation-button');
+  $geolocateButton = $('#o-geolocation-button button');
 
-    var src = baseUrl + 'img/geolocation_marker.png';
-    var markerImg = '<img id="o-geolocation_marker" src="' + src + '"/>';
-    $('#o-map').prepend(markerImg);
-    markerEl = $('#o-geolocation_marker').get(0);
-    marker = new ol.Overlay({
-      positioning: 'center-center',
-      element: markerEl,
-      stopEvent: false
-    });
+  markerEl = $('#o-geolocation_marker').get(0);
+  marker = new ol.Overlay({
+    positioning: 'center-center',
+    element: markerEl,
+    stopEvent: false
+  });
 
-    positions = new ol.geom.LineString([], ('XYZM'));
+  positions = new ol.geom.LineString([], ('XYZM'));
 
-    geolocation = new ol.Geolocation(({
-      projection: map.getView().getProjection(),
-      trackingOptions: {
-        maximumAge: 10000,
-        enableHighAccuracy: true,
-        timeout: 600000
-      }
-    }));
+  geolocation = new ol.Geolocation(({
+    projection: map.getView().getProjection(),
+    trackingOptions: {
+      maximumAge: 10000,
+      enableHighAccuracy: true,
+      timeout: 600000
+    }
+  }));
 
-    bindUIActions();
+  bindUIActions();
 }
+
+function render() {
+  var tooltipText = 'Visa nuvarande position i kartan';
+  var src = baseUrl + 'img/geolocation_marker.png';
+  var markerImg = '<img id="o-geolocation_marker" src="' + src + '"/>';
+
+  //Element for control
+  var el = utils.createButton({
+    id: 'o-geolocation-button',
+    cls: 'o-geolocation-button',
+    iconCls: 'o-icon-fa-location-arrow',
+    src: '#fa-location-arrow',
+    tooltipText: tooltipText,
+    tooltipPlacement: 'east'
+  });
+  $('#o-map').append(el);
+  $('#o-map').prepend(markerImg);
+}
+
 function bindUIActions() {
-  settings.geolocateButtonId.on('click', function(e) {
+  $geolocateButtonId.on('click', function(e) {
     enabled = false;
     toggle();
-    settings.geolocateButton.blur();
+    $geolocateButton.blur();
     e.preventDefault();
   });
 }
+
 function toggle() {
-  if(settings.geolocateButton.hasClass('o-geolocation-button-true')){
-    settings.geolocateButton.removeClass('o-geolocation-button-true');
+  if ($geolocateButton.hasClass('o-geolocation-button-true')) {
+    $geolocateButton.removeClass('o-geolocation-button-true');
     geolocation.setTracking(false);
 
-    geolocation.un('change', getPositionVal);
-    map.un('postcompose',render);
+    geolocation.un('change', updatePosition);
+    map.un('postcompose', renderMap);
     map.removeOverlay(marker);
-  }
-  else {
-    settings.geolocateButton.addClass('o-geolocation-button-true');
+  } else {
+    $geolocateButton.addClass('o-geolocation-button-true');
     map.addOverlay(marker);
 
     // Listen to position changes
-    geolocation.on('change', getPositionVal);
+    geolocation.on('change', updatePosition);
     geolocation.setTracking(true); // Start position tracking
-    map.on('postcompose', render);
+    map.on('postcompose', renderMap);
     map.render();
   }
 }
-function getPositionVal() {
-      var position = geolocation.getPosition();
-      var accuracy = geolocation.getAccuracy();
-      var heading = geolocation.getHeading() || 0;
-      var speed = geolocation.getSpeed() || 0;
-      var m = Date.now();
 
-      addPosition(position, heading, m, speed);
+function updatePosition() {
+  addPosition(getPositionVal());
 }
-function addPosition(position, heading, m, speed) {
-  var x = position[0];
-  var y = position[1];
+
+function getPositionVal() {
+  var current = {};
+  current.position = geolocation.getPosition();
+  current.accuracy = geolocation.getAccuracy();
+  current.heading = geolocation.getHeading() || 0;
+  current.speed = geolocation.getSpeed() || 0;
+  current.m = Date.now();
+  return current;
+}
+
+function addPosition(current) {
+  var x = current.position[0];
+  var y = current.position[1];
   var fCoords = positions.getCoordinates();
   var previous = fCoords[fCoords.length - 1];
   var prevHeading = previous && previous[2];
+  var previousM;
   if (prevHeading) {
-    var headingDiff = heading - this.mod(prevHeading);
+    var headingDiff = current.heading - mod(prevHeading);
 
     // force the rotation change to be less than 180°
     if (Math.abs(headingDiff) > Math.PI) {
       var sign = (headingDiff >= 0) ? 1 : -1;
-      headingDiff = - sign * (2 * Math.PI - Math.abs(headingDiff));
+      headingDiff = -sign * (2 * Math.PI - Math.abs(headingDiff));
     }
-    heading = prevHeading + headingDiff;
+    var heading = prevHeading + headingDiff;
   }
-  positions.appendCoordinate([x, y, heading, m]);
+  positions.appendCoordinate([x, y, current.heading, current.m]);
 
   // only keep the 20 last coordinates
   positions.setCoordinates(positions.getCoordinates().slice(-20));
 
   // FIXME use speed instead
-  if (heading && speed) {
+  if (current.heading && current.speed) {
     markerEl.src = baseUrl + 'img/geolocation_marker_heading.png';
   } else {
     markerEl.src = baseUrl + 'img/geolocation_marker.png';
   }
 
-  var previousM = 0;
+  previousM = 0;
+
   // change center and rotation before render
   map.beforeRender(function(map, frameState) {
     if (frameState !== null) {
+
       // use sampling period to get a smooth transition
-      var m = frameState.time - settings.deltaMean * 1.5;
+      var m = frameState.time - deltaMean * 1.5;
       m = Math.max(m, previousM);
       previousM = m;
+
       // interpolate position along positions LineString
       var c = positions.getCoordinateAtM(m, true);
-      var view = frameState.viewState;
-      if (c && enabled == false && geolocation.getTracking()) {
+      if (c && enabled === false && geolocation.getTracking()) {
         marker.setPosition(c);
         map.getView().setCenter(c);
         map.getView().setZoom(10);
         enabled = true;
-      }
-      else if (c && geolocation.getTracking()) {
+      } else if (c && geolocation.getTracking()) {
         marker.setPosition(c);
       }
     }
@@ -151,27 +166,13 @@ function addPosition(position, heading, m, speed) {
   });
 
 }
+
 function mod(n) {
   return ((n % (2 * Math.PI)) + (2 * Math.PI)) % (2 * Math.PI);
 }
-function getCenterWithHeading(position, rotation, resolution) {
-  var size = map.getSize();
-  var height = size[1];
 
-  return [
-    position[0] - Math.sin(rotation) * height * resolution * 1 / 4,
-    position[1] + Math.cos(rotation) * height * resolution * 1 / 4
-  ];
-}
-function render() {
+function renderMap() {
   map.render;
 }
 
 module.exports.init = init;
-module.exports.bindUIActions = bindUIActions;
-module.exports.toggle = toggle;
-module.exports.getPositionVal = getPositionVal;
-module.exports.addPosition = addPosition;
-module.exports.mod = mod;
-module.exports.getCenterWithHeading = getCenterWithHeading;
-module.exports.render = render;

@@ -16,6 +16,7 @@ var getFeature = require('./getfeature');
 var getAttributes = require('./getattributes');
 var featureInfo = require('./featureinfo');
 var mapUtils = require('./maputils');
+var getCenter = require('./geometry/getcenter');
 var utils = require('./utils');
 
 var adress;
@@ -183,7 +184,7 @@ function showFeatureInfo(features, title, content) {
     obj.feature = features[0];
     obj.title = title;
     obj.content = content;
-    featureInfo.identify([obj], 'overlay', mapUtils.getCenter(features[0].getGeometry()));
+    featureInfo.identify([obj], 'overlay', getCenter(features[0].getGeometry()));
     mapUtils.zoomToExent(features[0].getGeometry(), maxZoomLevel);
 }
 

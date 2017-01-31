@@ -5,6 +5,7 @@
 "use strict";
 var featureinfotemplates = require('./featureinfotemplates');
 var replacer = require('../src/utils/replacer');
+var geom = require('./geom');
 
 module.exports = function(feature, layer) {
     var content = '<div><ul>';
@@ -56,7 +57,10 @@ module.exports = function(feature, layer) {
                     }
                 }
                 else if (attribute['html']) {
-                  val = replacer.replace(attribute['html'], feature.getProperties());
+                  val = replacer.replace(attribute['html'], feature.getProperties(), {
+                    helper: geom,
+                    helperArg: feature.getGeometry()
+                  });
                 }
 
                 var cls = ' class="' + attribute['cls'] + '" ' || '';
