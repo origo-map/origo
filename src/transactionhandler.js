@@ -13,6 +13,7 @@ var editsStore = require('./editor/editsstore')();
 var generateUUID = require('./utils/generateuuid');
 
 var tempId = '_tempId';
+var autoSave = undefined;
 var srsName = undefined;
 var editSource = undefined;
 var geometryType = undefined;
@@ -34,8 +35,14 @@ var dirty = undefined;
 var format = undefined;
 var serializer = undefined;
 
-module.exports = function() {
+module.exports = function(options) {
+  autoSave = options.autoSave;
   $(document).on('toggleEdit', toggleEdit);
+  $(document).on('featureChange', autoSaveChanges);
+}
+
+function autoSaveChanges(e) {
+  console.log(e);
 }
 
 function setEditLayer(options) {
@@ -280,7 +287,7 @@ function onDrawEnd(evt) {
   feature.set(tempId, uuid);
   editsStore.addFeature(uuid, featureType);
   setActive();
-  hasDraw = false;  
+  hasDraw = false;
   emitChangeEdit('draw', false);
 }
 

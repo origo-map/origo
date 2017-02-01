@@ -6,6 +6,7 @@
 
 var $ = require('jquery');
 var utils = require('./utils');
+var transactionhandler = require('./transactionhandler');
 var editortoolbar = require('./editortoolbar');
 
 var $editorButton;
@@ -18,6 +19,9 @@ module.exports = function() {
 }();
 
 function Init(options) {
+  var transOptions = {};
+  transOptions.autoSave = options.hasOwnProperty('autoSave') ? options.autoSave : true;
+  transactionhandler(transOptions);
   render();
   $editorButton = $('#o-editor-button');
   bindUIActions();

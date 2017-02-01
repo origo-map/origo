@@ -50,6 +50,11 @@ var editsStore = function featureStore() {
       edits.inserted[layerName] = [];
     }
     edits.inserted[layerName].push(uuid);
+    emitFeatureChange({
+      id: uuid,
+      action: 'insert',
+      layerName: layerName
+    });
   }
 
   function saveFeatures() {
@@ -62,6 +67,17 @@ var editsStore = function featureStore() {
 
   function syncFeatures() {
 
+  }
+
+  function emitFeatureChange(change) {
+    var e = {
+      type: 'featureChange',
+      action: undefined,
+      id: undefined,
+      layerName: undefined
+    };
+    $.extend(e, change);
+    $.event.trigger(e);
   }
 }
 

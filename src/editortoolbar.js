@@ -7,7 +7,6 @@
 var ol = require('openlayers');
 var $ = require('jquery');
 var viewer = require('./viewer');
-var transactionhandler = require('./transactionhandler');
 var editortemplate = require("./templates/editortoolbar.template.handlebars");
 
 var activeClass = 'o-control-active';
@@ -20,17 +19,18 @@ var $editAttribute = undefined;
 var $editDraw = undefined;
 var $editDelete = undefined;
 var $editClose = undefined;
-var options = {};
+var options = {
+  autoSave: true
+};
 
 module.exports = function() {
-  transactionhandler();
+
   return {
     init: Init
   };
 }()
 
 function Init(opt_options) {
-
   $.extend(options, opt_options)
   currentLayer = options.defaultLayer || options.editableLayers[0];
 
@@ -160,7 +160,7 @@ function setEditProps(options, map, srsName) {
   var initialValue = {};
   var result = layerNames.reduce(function(layerProps, layerName) {
     var layer = viewer.getLayer(layerName);
-    
+
     //get the layers source options
     var source = viewer.getMapSource()[layer.get('sourceName')];
 
