@@ -21,7 +21,6 @@
     "jquery": "2.1.4",
     "openlayers": "3.17.1",
     "proj4": "2.3.10",
-    "svg4everybody": "^2.1.2",
     "typeahead.js-browserify": "1.0.7"
   },
   "devDependencies": {
