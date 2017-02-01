@@ -58,6 +58,7 @@ function init(el, mapOptions) {
   settings.map = mapOptions.map;
   settings.url = mapOptions.url;
   settings.baseUrl = mapOptions.baseUrl;
+  settings.tileSize = mapOptions.tileSize ? [mapOptions.tileSize,mapOptions.tileSize] : [256,256];
   if (mapOptions.hasOwnProperty('proj4Defs')) {
     // Projection to be used in map
     settings.projectionCode = mapOptions.projectionCode || undefined;
@@ -66,8 +67,9 @@ function init(el, mapOptions) {
       code: settings.projectionCode,
       extent: settings.projectionExtent
     });
+	settings.extent = mapOptions.extent;
     settings.resolutions = mapOptions.resolutions || undefined;
-    settings.tileGrid = maputils.tileGrid(settings.projectionExtent, settings.resolutions);
+    settings.tileGrid = maputils.tileGrid(settings.extent, settings.resolutions, settings.tileSize);
   }
 
   settings.extent = mapOptions.extent || undefined;
@@ -157,6 +159,7 @@ function loadMap() {
     target: 'o-map',
     controls: mapControls,
     layers: settings.layers,
+	renderer: 'canvas',
     view: new ol.View({
       extent: settings.extent || undefined,
       projection: settings.projection || undefined,

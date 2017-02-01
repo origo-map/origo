@@ -6,6 +6,7 @@
 
 var ol = require('openlayers');
 var style = require('../style')();
+var stylefunctions = require('../style/stylefunctions');
 
 module.exports = function vector(options, source) {
   var vectorLayer;
@@ -31,6 +32,12 @@ module.exports = function vector(options, source) {
       });
       vectorLayer = new ol.layer.Image(options);
       break;
+	case 'vectortile':
+		options.source = source;
+		options.renderMode= 'image';
+		options.style = options.styleFunction ? stylefunctions(options.styleFunction) : style.createStyle(options.style);
+		vectorLayer = new ol.layer.VectorTile(options);
+	break;
   }
   return vectorLayer;
 }

@@ -30,52 +30,37 @@
       "name": "measure"
     }
   ],
-  "projectionCode": "EPSG:3010",
-  "projectionExtent": [
-    -1678505.1838360203,
-    4665380,
-    2431912.7361639794,
-    8775797.92
-  ],
+  "projectionCode": "EPSG:3008",
+  "projectionExtent": [120000, 6556000, 191000, 6635000],
   "proj4Defs": [
       {
+          "code": "EPSG:3008",
+          "alias": "urn:ogc:def:crs:EPSG::3008",
+          "projection": "+proj=tmerc +lat_0=0 +lon_0=13.5 +k=1 +x_0=150000 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
+      },{
           "code": "EPSG:3010",
           "alias": "urn:ogc:def:crs:EPSG::3010",
           "projection": "+proj=tmerc +lat_0=0 +lon_0=16.5 +k=1 +x_0=150000 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
       }
   ],
-  "extent": [
-    -1678505.1838360203,
-    4665380,
-    2431912.7361639794,
-    8775797.92
-  ],
-  "center": [
-    162429,
-    6599905
-  ],
-  "zoom": 3,
-  "resolutions": [
-    1146.8799999999999,
-    573.4399999999999,
-    286.71999999999997,
-    143.35999999999999,
-    71.67999999999999,
-    35.839999999999996,
-    17.919999999999998,
-    8.959999999999999,
-    4.4799999999999995,
-    2.2399999999999998,
-    1.1199999999999999,
-    0.5599999999999999,
-    0.27999999999999997,
-    0.13999999999999999
-  ],
+  "extent": [110000,6540000,200000,6650000],
+  "center": [144000,6584200],
+  "home": [120000, 6556000, 191000, 6635000],
+  "zoom": 2,
+  "resolutions": [128,64,32,16,8,4,2,1,0.5,0.25,0.125],
+  "tileSize":512,
   "source": {
     "local": {
       "url": "http://localhost/geoserver/wms"
     },
-    "basemap": {
+    "geoserver_gi": {
+			"url": "http://gi.karlstad.se/geoserver/ows",
+			"version": "1.1.0"
+	},
+    "geoserver_tms": {
+      "url": "http://gi.karlstad.se/geoserver/gwc/service/tms/1.0.0/"
+    },
+	"basemap": {
       "url": "http://www.malardalskartan.se/geowebcache/service/wmts"
     }
   },
@@ -93,51 +78,48 @@
   ],
   "layers": [
     {
-      "name": "origo-cities",
-      "title": "Origokommuner",
-      "group": "test",
-      "source": "data/origo-cities-3010.geojson",
-      "style": "origo-logo",
-      "type": "GEOJSON",
-      "attributes": [
-          {
-            "name": "name"
-          }
-      ],
-      "visible": true
+		"name": "ByggnadsarVT",
+		"layerName": "Kulprog%3Abyggnadsar",
+		"gridset": "basemap",
+		"format":"topojson",
+		"title": "Byggnadsår",
+		"group": "test",
+		"source": "geoserver_tms",
+		"style": "red",
+		"styleFunction": "byggnadsar",
+		"type": "VECTORTILE",
+		"tileSize": [512, 512],
+		"visible": true,
+		"queryable": true
     },
     {
-      "name": "mdk",
-      "opacity": 0.15,
-      "title": "4k",
-      "group": "none",
-      "queryable": false,
-      "source": "data/mdk.geojson",
-      "style": "mask",
-      "type": "GEOJSON",
-      "visible": true
-    },
-    {
-      "attribution": "&copy Lantmäteriet Geodatasamverkan",
-      "format": "image/png",
-      "group": "background",
-      "name": "topowebbkartan_nedtonad",
-      "source": "basemap",
-      "title": "Karta, grå",
-      "type": "WMTS",
-      "style": "karta_gra",
-      "visible": true
-    },
-    {
-      "attribution": "&copy Lantmäteriet Geodatasamverkan",
-      "format": "image/png",
-      "group": "background",
-      "name": "topowebbkartan",
-      "source": "basemap",
-      "title": "Karta, färg",
-      "type": "WMTS",
-      "style": "karta_farg",
-      "visible": false
+		"name": "GL_BASEMAP2",
+		"layerName": "GL_BASEMAP2",
+		"gridset": "basemap",
+		"format":"pbf",
+		"title": "VectorTileBasemap",
+		"group": "test",
+		"source": "geoserver_tms",
+		"style": "mask",
+		"styleFunction": "basemap",
+		"type": "VECTORTILE",
+		"tileSize": [512, 512],
+		"visible": true,
+		"queryable": false
+    },{
+    "attribution": "&copy Lantmäteriet Geodatasamverkan",
+	"name": "terrangskuggning",
+	"layerName": "EXTERN%3Aterrangskuggning",
+	"gridset": "basemap",
+	"format":"jpeg",
+    "group": "background",
+    "source": "geoserver_tms",
+    "title": "Terrain",
+    "type": "TMS",
+    "style": "karta_gra",
+	"opacity":0.25,
+    "visible": true,
+    "queryable": false
     }
   ],
   "styles": {
@@ -153,7 +135,19 @@
           }
         ]
       ],
-      "origo-logo": [
+      "red": [
+        [
+          {
+            "stroke": {
+              "color": "rgba(255,0,0,1.0)"
+            },
+            "fill": {
+              "color": "rgba(255,0,0,1.0)"
+            }
+          }
+        ]
+      ],
+	  "origo-logo": [
         [
           {
             "circle": {
