@@ -18,8 +18,8 @@ var xyz = function xyz(layerOptions) {
   var xyzOptions = $.extend(xyzDefault, layerOptions);
   xyzOptions.sourceName = xyzOptions.name;
   var sourceOptions = $.extend(sourceDefault, viewer.getMapSource()[layerOptions.source]);
-  sourceOptions.attribution = xyzOptions.attribution;
-  sourceOptions.projectionCode = viewer.getProjectionCode() || 'EPSG:3857';
+  sourceOptions.attributions = xyzOptions.attribution;
+  sourceOptions.projection = viewer.getProjectionCode() || 'EPSG:3857';
   sourceOptions.tileGrid = viewer.getTileGrid();
 
   var xyzSource = createSource(sourceOptions);
