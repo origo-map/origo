@@ -12,7 +12,6 @@ var featureInfo = require('./featureinfo');
 var editsStore = require('./editor/editsstore')();
 var generateUUID = require('./utils/generateuuid');
 
-var tempId = '_tempId';
 var autoSave = undefined;
 var srsName = undefined;
 var editSource = undefined;
@@ -38,11 +37,6 @@ var serializer = undefined;
 module.exports = function(options) {
   autoSave = options.autoSave;
   $(document).on('toggleEdit', toggleEdit);
-  $(document).on('featureChange', autoSaveChanges);
-}
-
-function autoSaveChanges(e) {
-  console.log(e);
 }
 
 function setEditLayer(options) {
@@ -71,7 +65,7 @@ function setEditLayer(options) {
     features: select.getFeatures()
   });
   select.getFeatures().on('add', onSelectAdd, this);
-  select.getFeatures().on('remove', onSelectRemove, this);
+  select.getFeatures().on('remove', onUnSelect, this);
   dirty = {};
   map.addInteraction(select);
   map.addInteraction(modify);
@@ -99,139 +93,79 @@ function isActive() {
   }
 }
 
-function emitChangeEdit(tool, state) {
-  $.event.trigger({
-    type: 'changeEdit',
-    tool: tool,
-    active: state
-  });
-}
-
-function createForm(obj) {
-  var id = obj.elId.slice(1);
-  var cls = obj.cls || '';
-  cls += id;
-  cls += obj.isVisible ? "" : " hidden";
-  var label = obj.title;
-  var val = obj.isVisible ? obj.val : '';
-  var type = obj.type;
-  var maxLength = obj.maxLength ? ' maxlength="' + obj.maxLength + '" ' : '';
-  var dropdownOptions = obj.options || [];
-  var el;
-  switch (type) {
-    case 'text':
-      el = '<div><label>' + label + '</label><br><input type="text" id="' + id + '" value="' + val + '"' + maxLength + '></div>';
-      break;
-    case 'textarea':
-      el = '<div><label>' + label + '</label><br><textarea id="' + id + '"' + maxLength + 'rows="3">' + val + '</textarea></div>';
-      break;
-    case 'checkbox':
-      var checked = val === true ? ' checked' : '';
-      el = '<div class="o-form-checkbox"><label>' + label + '</label><input type="checkbox" id="' + id + '" value="' + val + '"' + checked + '></div>';
-      break;
-    case 'dropdown':
-      var firstOption;
-      if (val) {
-        firstOption = '<option value="' + val + '" selected>' + val + '</option>';
-      } else {
-        firstOption = '<option value="" selected>Välj</option>';
-      }
-      el = '<div class="' + cls + '"><label>' + label + '</label><br><select id=' + id + '>' + firstOption;
-      for (var i = 0; i < dropdownOptions.length; i++) {
-        el += '<option value="' + dropdownOptions[i] + '">' + dropdownOptions[i] + '</option>';
-      }
-      el += '</select></div>';
-      break;
+function saveFeature(change) {
+  emitChangeFeature(change);
+  if (autoSave) {
+    saveToRemote(change);
   }
-  return el;
 }
 
-function deleteSelected() {
+function saveToRemote(change) {
+  switch (change.action) {
+    case 'insert':
+      insertRemote(change);
+      break;
+    case 'update':
+      //updateRemote(change);
+      break;
+    case 'delete':
+      deleteRemote(change);
+  }
+}
+
+function onDeleteSelected() {
   var features = select.getFeatures();
   if (features.getLength() === 1) {
     var feature = features.item(0);
     var r = confirm("Är du säker på att du vill ta bort det här objektet?");
     if (r === true) {
-      var node = format.writeTransaction(null, null, [feature], {
-        featureNS: featureNS,
-        featureType: featureType
+      saveFeature({
+        feature: feature,
+        layerName: featureType,
+        action: 'delete'
       });
-      $.ajax({
-        type: "POST",
-        url: url,
-        data: serializer.serializeToString(node),
-        contentType: 'text/xml',
-        success: function(data) {
-          var result = readResponse(data);
-          if (result) {
-            if (result.transactionSummary.totalDeleted === 1) {
-              select.getFeatures().clear();
-              editSource.removeFeature(feature);
-            } else {
-              alert("There was an issue deleting the feature.");
-            }
-          }
-        },
-        context: this
-      });
+      select.getFeatures().clear();
+      editSource.removeFeature(feature);
     }
   }
 }
 
-function editAttributes() {
+function deleteRemote(change) {
+  var feature = change.feature;
+  var node = writeTransaction('delete', [feature]);
+  doRequest(node, successDelete, errorDelete);
 
-  //Get attributes from selected feature and fill DOM elements with the values
-  var features = select.getFeatures();
-  if (features.getLength() === 1) {
-    emitChangeEdit('attribute', true);
-    var feature = features.item(0);
-    if (attributes.length > 0) {
-
-      //Create an array of defined attributes and corresponding values from selected feature
-      var attributeObjects = attributes.map(function(attributeObject) {
-        var obj = {};
-        $.extend(obj, attributeObject);
-        obj.val = feature.get(obj.name) || '';
-        if (obj.hasOwnProperty('constraint')) {
-          var constraintProps = obj.constraint.split(':');
-          if (constraintProps.length === 3) {
-            obj.eventType = constraintProps[0];
-            obj.dependencyVal = feature.get(constraintProps[1]);
-            obj.requiredVal = constraintProps[2];
-            obj.dependencyVal === obj.requiredVal ? obj.isVisible = true : obj.isVisible = false;
-            obj.addListener = addListener();
-            obj.elId = '#input-' + obj.name + '-' + obj.requiredVal;
-            obj.elDependencyId = '#input-' + constraintProps[1];
-          } else {
-            alert('Constraint properties are not written correct, it should written as for example change:attribute:value');
-          }
-        } else {
-          obj.isVisible = true;
-          obj.elId = '#input-' + obj.name;
-        }
-        obj.formElement = createForm(obj);
-        return obj;
-      });
-
-    }
-    var formElement = attributeObjects.reduce(function(prev, next) {
-      return prev + next.formElement;
-    }, '');
-    var form = '<form>' + formElement + '<br><div class="o-form-save"><input id="o-save-button" type="button" value="Spara"></input></div></form>';
-    modal.createModal('#o-map', {
-      title: title,
-      content: form
-    });
-    modal.showModal();
-
-    attributeObjects.forEach(function(obj) {
-      if (obj.hasOwnProperty('addListener')) {
-        obj.addListener(obj);
+  function successDelete(data) {
+    var result = readResponse(data);
+    if (result) {
+      if (result.transactionSummary.totalDeleted === 1) {
+        //deleted
+      } else {
+        alert("There was an issue deleting the feature.");
       }
-    });
-
-    onAttributesSave(feature, attributeObjects);
+    }
   }
+
+  function errorDelete(e) {
+
+  }
+}
+
+function writeTransaction(type, features) {
+  var t = {
+    insert: null,
+    delete: null,
+    update: null
+  };
+  t[type] = features;
+  var node = format.writeTransaction(t.insert, t.update, t.delete, {
+    gmlOptions: {
+      srsName: srsName
+    },
+    featureNS: featureNS,
+    featureType: featureType
+  });
+  return node;
 }
 
 function getSelect() {
@@ -246,7 +180,7 @@ function onSelectAdd(evt) {
   }, this);
 }
 
-function onSelectRemove(evt) {
+function onUnSelect(evt) {
   var feature = evt.element;
   var fid = feature.getId();
   if (dirty[fid]) {
@@ -258,72 +192,74 @@ function onSelectRemove(evt) {
     delete properties.bbox;
     var clone = new ol.Feature(properties);
     clone.setId(fid);
-    var node = format.writeTransaction(null, [clone], null, {
-      gmlOptions: {
-        srsName: srsName
-      },
-      featureNS: featureNS,
-      featureType: featureType
-    });
-    $.ajax({
-      type: "POST",
-      url: url,
-      data: serializer.serializeToString(node),
-      contentType: 'text/xml',
-      success: function(data) {
-        var result = readResponse(data);
-        if (result && result.transactionSummary.totalUpdated === 1) {
-          delete dirty[fid];
-        }
-      },
-      context: this
-    });
+    var node = writeTransaction('update', [clone]);
+    doRequest(node, updateSucces, updateError);
+  }
+
+  function updateSucces(data) {
+    var result = readResponse(data);
+    if (result && result.transactionSummary.totalUpdated === 1) {
+      delete dirty[fid];
+    }
+  }
+
+  function updateError(data) {
+    alert('Det inträffade ett fel när förändringarna skulle sparas');
   }
 }
 
 function onDrawEnd(evt) {
   var feature = evt.feature;
-  var uuid = generateUUID();
-  feature.set(tempId, uuid);
-  editsStore.addFeature(uuid, featureType);
+  feature.setId(generateUUID());
+  editSource.addFeature(feature);
   setActive();
   hasDraw = false;
+  saveFeature({
+    feature: feature,
+    layerName: featureType,
+    action: 'insert'
+  });
   emitChangeEdit('draw', false);
 }
 
-function insertRemote(feature) {
-  var node = format.writeTransaction([feature], null, null, {
-    gmlOptions: {
-      srsName: srsName
-    },
-    featureNS: featureNS,
-    featureType: featureType
-  });
+function insertRemote(change) {
+  var feature = change.feature;
+  var node = writeTransaction('insert', [feature]);
+  doRequest(node, insertSuccess, insertError);
+
+  function insertSuccess(data) {
+    var result = readResponse(data);
+    if (result) {
+      var insertId = result.insertIds[0];
+      if (insertId === 'new0') {
+
+        // reload data if we're dealing with a shapefile store
+        editSource.clear();
+      } else {
+        feature.setId(insertId);
+      }
+      change.status = 'finished';
+      emitChangeFeature(change);
+    }
+  }
+
+  function insertError(e) {
+    setActive();
+    hasDraw = false;
+    var errorMsg = e ? (e.status + ' ' + e.statusText) : "";
+    alert('Error saving this feature to the server...<br><br>' +
+      errorMsg);
+  }
+}
+
+function doRequest(node, success, error) {
   $.ajax({
     type: "POST",
     url: url,
     data: serializer.serializeToString(node),
     contentType: 'text/xml',
-    success: function(data) {
-      var result = readResponse(data);
-      if (result) {
-        var insertId = result.insertIds[0];
-        if (insertId === 'new0') {
-
-          // reload data if we're dealing with a shapefile store
-          editSource.clear();
-        } else {
-          feature.setId(insertId);
-        }
-      }
-    },
-    error: function(e) {
-      setActive();
-      hasDraw = false;
-      var errorMsg = e ? (e.status + ' ' + e.statusText) : "";
-      alert('Error saving this feature to the server...<br><br>' +
-        errorMsg);
-    },
+    success: success,
+    error: error,
     context: this
   });
 }
@@ -385,27 +321,18 @@ function attributesSaveHandler(f, el) {
     }
   }
 
-  var node = format.writeTransaction(null, [clone], null, {
-    gmlOptions: {
-      srsName: srsName
-    },
-    featureNS: featureNS,
-    featureType: featureType
-  });
-  $.ajax({
-    type: "POST",
-    url: url,
-    data: serializer.serializeToString(node),
-    contentType: 'text/xml',
-    success: function(data) {
-    },
-    error: function(e) {
-      var errorMsg = e ? (e.status + ' ' + e.statusText) : "";
-      alert('Error saving this feature to the server...<br><br>' +
-        errorMsg);
-    },
-    context: this
-  });
+  var node = writeTransaction('update', [clone]);
+  doRequest(node, successAttributes, errorAttributes);
+
+  function successAttributes(data) {
+    console.log('Attribut uppdaterades');
+  }
+
+  function errorAttributes(e) {
+    var errorMsg = e ? (e.status + ' ' + e.statusText) : "";
+    alert('Error saving this feature to the server...<br><br>' +
+      errorMsg);
+  }
 }
 
 function removeInteractions() {
@@ -472,7 +399,7 @@ function toggleEdit(e) {
       cancelAttribute();
     }
   } else if (e.tool === 'delete') {
-      deleteSelected();
+      onDeleteSelected();
   } else if (e.tool === 'edit') {
       setEditLayer(e.options);
   } else if (e.tool === 'cancel') {
@@ -517,4 +444,117 @@ function setActive(editType) {
       select.setActive(true);
       break;
   }
+}
+
+function editAttributes() {
+
+  //Get attributes from selected feature and fill DOM elements with the values
+  var features = select.getFeatures();
+  if (features.getLength() === 1) {
+    emitChangeEdit('attribute', true);
+    var feature = features.item(0);
+    if (attributes.length > 0) {
+
+      //Create an array of defined attributes and corresponding values from selected feature
+      var attributeObjects = attributes.map(function(attributeObject) {
+        var obj = {};
+        $.extend(obj, attributeObject);
+        obj.val = feature.get(obj.name) || '';
+        if (obj.hasOwnProperty('constraint')) {
+          var constraintProps = obj.constraint.split(':');
+          if (constraintProps.length === 3) {
+            obj.eventType = constraintProps[0];
+            obj.dependencyVal = feature.get(constraintProps[1]);
+            obj.requiredVal = constraintProps[2];
+            obj.dependencyVal === obj.requiredVal ? obj.isVisible = true : obj.isVisible = false;
+            obj.addListener = addListener();
+            obj.elId = '#input-' + obj.name + '-' + obj.requiredVal;
+            obj.elDependencyId = '#input-' + constraintProps[1];
+          } else {
+            alert('Constraint properties are not written correct, it should written as for example change:attribute:value');
+          }
+        } else {
+          obj.isVisible = true;
+          obj.elId = '#input-' + obj.name;
+        }
+        obj.formElement = createForm(obj);
+        return obj;
+      });
+
+    }
+    var formElement = attributeObjects.reduce(function(prev, next) {
+      return prev + next.formElement;
+    }, '');
+    var form = '<form>' + formElement + '<br><div class="o-form-save"><input id="o-save-button" type="button" value="Spara"></input></div></form>';
+    modal.createModal('#o-map', {
+      title: title,
+      content: form
+    });
+    modal.showModal();
+
+    attributeObjects.forEach(function(obj) {
+      if (obj.hasOwnProperty('addListener')) {
+        obj.addListener(obj);
+      }
+    });
+
+    onAttributesSave(feature, attributeObjects);
+  }
+}
+
+function createForm(obj) {
+  var id = obj.elId.slice(1);
+  var cls = obj.cls || '';
+  cls += id;
+  cls += obj.isVisible ? "" : " hidden";
+  var label = obj.title;
+  var val = obj.isVisible ? obj.val : '';
+  var type = obj.type;
+  var maxLength = obj.maxLength ? ' maxlength="' + obj.maxLength + '" ' : '';
+  var dropdownOptions = obj.options || [];
+  var el;
+  switch (type) {
+    case 'text':
+      el = '<div><label>' + label + '</label><br><input type="text" id="' + id + '" value="' + val + '"' + maxLength + '></div>';
+      break;
+    case 'textarea':
+      el = '<div><label>' + label + '</label><br><textarea id="' + id + '"' + maxLength + 'rows="3">' + val + '</textarea></div>';
+      break;
+    case 'checkbox':
+      var checked = val === true ? ' checked' : '';
+      el = '<div class="o-form-checkbox"><label>' + label + '</label><input type="checkbox" id="' + id + '" value="' + val + '"' + checked + '></div>';
+      break;
+    case 'dropdown':
+      var firstOption;
+      if (val) {
+        firstOption = '<option value="' + val + '" selected>' + val + '</option>';
+      } else {
+        firstOption = '<option value="" selected>Välj</option>';
+      }
+      el = '<div class="' + cls + '"><label>' + label + '</label><br><select id=' + id + '>' + firstOption;
+      for (var i = 0; i < dropdownOptions.length; i++) {
+        el += '<option value="' + dropdownOptions[i] + '">' + dropdownOptions[i] + '</option>';
+      }
+      el += '</select></div>';
+      break;
+  }
+  return el;
+}
+
+function emitChangeEdit(tool, state) {
+  $.event.trigger({
+    type: 'changeEdit',
+    tool: tool,
+    active: state
+  });
+}
+
+function emitChangeFeature(change) {
+  $.event.trigger({
+    type: 'changeFeature',
+    feature: change.feature,
+    layerName: change.layerName,
+    action: change.action,
+    status: change.status || 'pending'
+  });
 }
