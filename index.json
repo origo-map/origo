@@ -76,7 +76,7 @@
       "url": "http://localhost/geoserver/wms"
     },
     "basemap": {
-      "url": "http://www.malardalskartan.se/geowebcache/service/wmts"
+      "url": "https://www.malardalskartan.se/geowebcache/service/wmts"
     }
   },
   "groups": [
