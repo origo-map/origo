@@ -100,6 +100,46 @@ function saveFeature(change) {
   }
 }
 
+function saveFeatures() {
+  var edits = editsStore.getEdits();
+  var editTypes = Object.getOwnPropertyNames(edits);
+  editTypes.forEach(function(editType) {
+    var layerNames = Object.getOwnPropertyNames(edits[editType]);
+    layerNames.forEach(function(layerName) {
+      var layer = viewer.getLayer(layerName);
+      var ids = edits[editType][layerName];
+      var features;
+      features = getFeaturesByIds(editType,layer, ids);
+      if (features.length) {
+        saveToRemote({
+          feature: features[0],
+          layerName: layerName,
+          action: editType
+        });
+      }
+    });
+  });
+}
+
+function getFeaturesByIds(type, layer, ids) {
+  var source = layer.getSource();
+  var features = [];
+  if (type === 'delete') {
+    ids.forEach(function(id) {
+      var dummy = new ol.Feature();
+      dummy.setId(id);
+      features.push(dummy);
+    });
+  } else {
+    ids.forEach(function(id) {
+      if (source.getFeatureById(id)) {
+        features.push(source.getFeatureById(id));
+      }
+    });
+  }
+  return features;
+}
+
 function saveToRemote(change) {
   switch (change.action) {
     case 'insert':
@@ -139,7 +179,8 @@ function deleteRemote(change) {
     var result = readResponse(data);
     if (result) {
       if (result.transactionSummary.totalDeleted === 1) {
-        //deleted
+        change.status = 'finished';
+        emitChangeFeature(change);
       } else {
         alert("There was an issue deleting the feature.");
       }
@@ -230,6 +271,8 @@ function insertRemote(change) {
   function insertSuccess(data) {
     var result = readResponse(data);
     if (result) {
+      change.status = 'finished';
+      emitChangeFeature(change);
       var insertId = result.insertIds[0];
       if (insertId === 'new0') {
 
@@ -238,8 +281,6 @@ function insertRemote(change) {
       } else {
         feature.setId(insertId);
       }
-      change.status = 'finished';
-      emitChangeFeature(change);
     }
   }
 
@@ -404,6 +445,8 @@ function toggleEdit(e) {
       setEditLayer(e.options);
   } else if (e.tool === 'cancel') {
       removeInteractions();
+  } else if (e.tool === 'save') {
+      saveFeatures();
   }
 }
 

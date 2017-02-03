@@ -18,6 +18,7 @@ var editableLayer = undefined;
 var $editAttribute = undefined;
 var $editDraw = undefined;
 var $editDelete = undefined;
+var $editSave = undefined;
 var $editClose = undefined;
 var options = {
   autoSave: true
@@ -69,6 +70,7 @@ function render(selectOptions) {
   $editAttribute = $('#o-editor-attribute');
   $editDraw = $('#o-editor-draw');
   $editDelete = $('#o-editor-delete');
+  $editSave = $('#o-editor-save');
   $editClose = $('#o-editor-close');
 }
 
@@ -88,6 +90,11 @@ function bindUIActions() {
   $editDelete.on('click', function(e) {
     emitToggleEdit('delete');
     $editDelete.blur();
+    e.preventDefault();
+  });
+  $editSave.on('click', function(e) {
+    emitToggleEdit('save');
+    $editSave.blur();
     e.preventDefault();
   });
   $editClose.on('click', function(e) {

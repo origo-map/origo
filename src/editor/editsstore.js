@@ -35,7 +35,7 @@ var editsStore = function featureStore() {
   var geojson =  new ol.format.GeoJSON();
 
   return {
-    getFeatures: getFeatures,
+    getEdits: getEdits,
     saveFeatures: saveFeatures,
     syncFeatures: syncFeatures
   };
@@ -47,24 +47,39 @@ var editsStore = function featureStore() {
     // store.setItem('feature', layer).then(function() {
     //   return store.getItem('feature');
     // });
-    var uuid = e.feature.getId();
-    if (edits.insert.hasOwnProperty(e.layerName) === false) {
-      edits.insert[e.layerName] = [];
+    if (e.action === 'insert') {
+      var uuid = e.feature.getId();
+      if (edits.insert.hasOwnProperty(e.layerName) === false) {
+        edits.insert[e.layerName] = [];
+      }
+      edits.insert[e.layerName].push(uuid);
+    } else if (e.action === 'modify') {
+        console.log('modify');
+    } else if (e.action === 'delete') {
+      if (edits.delete.hasOwnProperty(e.layerName) === false) {
+        edits.delete[e.layerName] = [];
+      }
+      edits.delete[e.layerName].push(e.feature.getId());
     }
-    edits.insert[e.layerName].push(uuid);
+    console.log(edits);
   }
 
   function removeFeature(e) {
     var index;
+    console.log(edits);
     if (e.action === 'insert') {
       index = edits.insert[e.layerName].indexOf(e.feature.getId());
-      if (index) {
+      if (index > -1) {
         edits.insert[e.layerName].splice(index, 1);
       }
     } else if (e.action === 'modify') {
         console.log('modify');
     } else if (e.action === 'delete') {
-        console.log('delete');
+      //TODO check if feature in insert
+      index = edits.delete[e.layerName].indexOf(e.feature.getId());
+      if (index > -1) {
+        edits.delete[e.layerName].splice(index, 1);
+      }
     }
   }
 
@@ -72,8 +87,8 @@ var editsStore = function featureStore() {
 
   }
 
-  function getFeatures() {
-    // return store.getItem('feature');
+  function getEdits() {
+    return edits;
   }
 
   function syncFeatures() {
