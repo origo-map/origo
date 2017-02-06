@@ -134,8 +134,8 @@ function createStroke(strokeProperties) {
   return stroke;
 }
 
-function addInfoTextButton(item) {
-  var infoTextButton =  '<div class="o-legend-item-info o-infotext" id="o-legend-item-info-' + item + '">' +
+function addAbstractButton(item) {
+  var infoTextButton =  '<div class="o-legend-item-info o-abstract" id="o-legend-item-info-' + item + '">' +
                           '<svg class="o-icon-fa-info-circle"><use xlink:href="css/svg/fa-icons.svg#fa-info-circle"></use></svg>' +
                         '</div>';
   return infoTextButton;
@@ -162,8 +162,8 @@ function createLegendItem(layerid, layerStyle, inSubgroup) {
                   '</div>';
     legendItem += '<div class="o-legend-item-title">' + layer.get('title') + '</div>';
 
-    if(layer.get('infotext')){
-      legendItem += addInfoTextButton(layername);
+    if(layer.get('abstract')){
+      legendItem += addAbstractButton(layername);
     }
 
     if (layerStyle[0][0].hasOwnProperty('legend')) {
@@ -194,8 +194,8 @@ function createLegendItem(layerid, layerStyle, inSubgroup) {
     legendItem +=  layer.get('styleName') ? getSymbol(styleSettings[layer.get('styleName')]) : '';
     legendItem += '<div class="o-legend-item-title">' + layer.get('title') + '</div>';
 
-    if(layer.get('infotext')){
-      legendItem += addInfoTextButton(layername);
+    if(layer.get('abstract')){
+      legendItem += addAbstractButton(layername);
     }
 
     legendItem += '</div></li>';
@@ -207,17 +207,18 @@ function createLegendItem(layerid, layerStyle, inSubgroup) {
 function createGroup(group, parentGroup) {
   var legendGroup;
   var overlayGroup;
+  var abstract = '';
 
   if (group.hasOwnProperty('overlayGroup')) {
     overlayGroup = group.name;
   }
-  if (parentGroup) {
-    var infotext = '';
-    var indent = $(parentGroup).parent().closest('ul').hasClass('o-legend-group') ? 'o-legend-indent' : '';
 
-    if (group.infotext) {
-      infotext += addInfoTextButton(name);
-    }
+  if (group.abstract) {
+    abstract += addAbstractButton(group.name);
+  }
+
+  if (parentGroup) {
+    var indent = $(parentGroup).parent().closest('ul').hasClass('o-legend-group') ? 'o-legend-indent' : '';
 
     legendGroup = '<li class="o-legend ' + group.name + ' o-top-item" id="' + group.name + '">' +
                     '<ul id="o-group-' + group.name + '" class="o-legend-group o-legend-subgroup ' + indent +'">' +
@@ -229,7 +230,7 @@ function createGroup(group, parentGroup) {
                         '<div class="o-icon-expand">' +
                           '<svg class="o-icon-fa-chevron-right"><use xlink:href="css/svg/fa-icons.svg#fa-angle-double-right"></use></svg>' +
                           '<svg class="o-icon-fa-chevron-down"><use xlink:href="css/svg/fa-icons.svg#fa-angle-double-down"></use></svg>' +
-                        '</div>' + infotext +
+                        '</div>' + abstract +
                       '</div></li>' +
                     '</ul>' +
                   '</li>';
@@ -241,7 +242,7 @@ function createGroup(group, parentGroup) {
                         '<div class="o-icon-expand">' +
                           '<svg class="o-icon-fa-chevron-right"><use xlink:href="css/svg/fa-icons.svg#fa-chevron-right"></use></svg>' +
                           '<svg class="o-icon-fa-chevron-down"><use xlink:href="css/svg/fa-icons.svg#fa-chevron-down"></use></svg>' +
-                        '</div>' +
+                        '</div>' + abstract +
                       '</div></li>' +
                     '</ul>' +
                   '</li>';
@@ -261,12 +262,12 @@ function createGroup(group, parentGroup) {
 
     if ($(evt.target).closest('div').hasClass('o-checkbox')) {
       toggleSubGroupCheck($(this).parent(), true);
-    } else if ($(evt.target).closest('div').hasClass('o-infotext')) {
+    } else if ($(evt.target).closest('div').hasClass('o-abstract')) {
 
-      $(this).each(function() {
+      /* $(this).each(function() {
         var that = this;
-        showInfoText($(that).attr("id"));
-      });
+        showAbstract($(that).attr("id"));
+      }); */
 
     } else {
       toggleGroup($(this));
@@ -318,9 +319,9 @@ function addLegend(groups) {
     var inSubgroup = $('#o-group-' + layer.get('group')).closest('ul').parent().closest('ul').hasClass('o-legend-group');
     var title = '<div class="o-legend-item-title">' + layer.get('title') + '</div>';
 
-    //Add infotext button
-    if(layer.get('infotext')){
-      title += addInfoTextButton(name);
+    //Add abstract button
+    if(layer.get('abstract')){
+      title += addAbstractButton(name);
     }
     title += '</div></li>';
 
@@ -417,17 +418,27 @@ function addLegend(groups) {
       evt.preventDefault();
     });
 
-    if(layer.get('infotext')){
-      $('#' + name + ' .o-infotext').on('click', function(evt) {
+    /* if(layer.get('abstract')){
+      $('#' + name + ' .o-abstract').on('click', function(evt) {
         $(this).each(function() {
           var that = this;
-          showInfoText($(that).attr("id"));
+          showAbstract($(that).attr("id"));
         });
 
         evt.preventDefault();
         evt.stopPropagation();
       });
-    };
+    }; */
+    
+  });
+  
+  $('.o-abstract').on('click', function(evt) {
+    $(this).each(function() {
+      var that = this;
+      showAbstract($(that));
+    });
+
+    evt.preventDefault();
   });
 
   //Toggle map legend
@@ -625,31 +636,33 @@ function toggleOverlay() {
 }
 
 //Set content for info button popup
-function showInfoText(layerid) {
+function showAbstract($abstractButton) {
   var layer;
-  var layername = layerid.split('o-legend-item-info-').pop();
-  var infotext = {
+  var $item = $abstractButton.closest('li');
+  var layername = $abstractButton.attr('id').split('o-legend-item-info-').pop();
+  var abstract = {
     title: '',
     content: ''
   };
 
-  //If info button is connected to layer
-  if (viewer.getLayer(layername)) {
-    layer = viewer.getLayer(layername);
-    infotext.title = layer.get('title');
-    infotext.content = layer.get('infotext');
-  } else { // If info button is connected to subgroup
-    var subgroups = viewer.getSubgroups();
+  //If info button is connected group
+  if ($item.hasClass('o-legend-header')) {
+    var groups = viewer.getGroups();
+    groups = groups.concat(viewer.getSubgroups());
 
-    var group = $.grep(subgroups, function(obj) {
+    var group = $.grep(groups, function(obj) {
       return (obj.name == layername);
     });
 
-    infotext.title = group[0].title;
-    infotext.content = group[0].infotext
+    abstract.title = group[0].title;
+    abstract.content = group[0].abstract
+  } else { // If info button is connected to layer
+    layer = viewer.getLayer(layername);
+    abstract.title = layer.get('title');
+    abstract.content = layer.get('abstract');
   }
 
-  modal.createModal('#o-map', {title: infotext.title, content: infotext.content});
+  modal.createModal('#o-map', {title: abstract.title, content: abstract.content});
   modal.showModal();
 }
 
