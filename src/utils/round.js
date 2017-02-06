@@ -4,7 +4,8 @@
  * ======================================================================== */
 "use strict";
 
-module.exports = function isUrl(s) {
-   var regexp = new RegExp('^(?:[a-z]+:)?//', 'i');
-   return regexp.test(s);
+var round = function round(value, decimals) {
+  return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
 }
+
+module.exports = round;

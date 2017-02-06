@@ -8,72 +8,73 @@ var $ = require('jquery');
 var viewer = require('./viewer');
 var utils = require('./utils');
 var modal = require('./modal');
+var validateUrl = require('./utils/validateurl');
 
 var symbolSize = 20;
 var styleSettings;
-
-var mapMenu;
+var baseUrl;
 var hasMapLegend;
 
 function init(opt_options) {
   var options = opt_options || {};
 
+  baseUrl = viewer.getBaseUrl();
   hasMapLegend = options.hasOwnProperty('hasMapLegend') ? options.hasMapLegend : true;
-
   styleSettings = viewer.getStyleSettings();
 
-  mapMenu = $('#o-mapmenu');
+  render();
+  addLegend(viewer.getGroups());
+}
+
+function render() {
   $('#o-menutools').append('<li class="o-menu-item"><div class="o-menu-item-divider"></div><li>');
-  addLegend(viewer.getGroups());    
 }
 
 function getSymbol(style) {
   var symbol='';
   var s = style[0];
-
   if (s[0].hasOwnProperty('icon')) {
-    var src = s[0].icon.src;
+    var src = validateUrl(s[0].icon.src, baseUrl);
     // var scale = style.icon.scale || undefined;
     var format = s[0].format || 'png';
     if (format == 'png') {
-      symbol = '<div class="o-legend-item-img"><img style="width: auto; height: 20px;" src="' + src + '"></div>'
-    } else if (format == 'svg') {
-      var o = '<object type="image/svg+xml" data="' + src + '" style="width: 20px;"></object>';
-      var inlineStyle = 'background: url(' + src + ') no-repeat;width: 20px; height: 20px;background-size: 20px;';
-      symbol = '<div class="o-legend-item-img">' + o + '</div>';
+        symbol = '<div class="o-legend-item-img"><img style="width: auto; height: 20px;" src="' + src + '"></div>'
     }
-  } else if (s[0].hasOwnProperty('fill')) {
+    else if (format == 'svg') {
+        var o = '<object type="image/svg+xml" data="' + src + '" style="width: 20px;"></object>';
+        var inlineStyle = 'background: url(' + src + ') no-repeat;width: 20px; height: 20px;background-size: 20px;';
+        symbol = '<div class="o-legend-item-img">' + o + '</div>';
+    }
+  }
+  else if (s[0].hasOwnProperty('fill')) {
     var fill = '';
-
-    s.forEach(function(style){
-      fill += createFill(style);
-    });
-
+    for(var i=0; i<s.length; i++) {
+      fill += createFill(s[i]);
+    }
     symbol += '<div class="o-legend-item-img"><svg height="' + symbolSize + '" width="' + symbolSize + '">';
     symbol += fill;
     symbol += '</svg></div>';
-  } else if (s[0].hasOwnProperty('stroke')) {
+  }
+  else if (s[0].hasOwnProperty('stroke')) {
     var stroke = '';
-
-    s.forEach(function(style){
-      stroke += createStroke(style);
-    });
-
+    for(var i=0; i<s.length; i++) {
+      stroke += createStroke(s[i]);
+    }
     symbol += '<div class="o-legend-item-img"><svg height="' + symbolSize + '" width="' + symbolSize + '">';
     symbol += stroke;
     symbol += '</svg></div>';
-  } else if (s[0].hasOwnProperty('circle')) {
+  }
+  else if (s[0].hasOwnProperty('circle')) {
     var circle = '';
-
-    s.forEach(function(style){
-      circle += createCircle(style);
-    });
-
+    for(var i=0; i<s.length; i++) {
+      circle += createCircle(s[i]);
+    }
     symbol += '<div class="o-legend-item-img"><svg height="' + symbolSize + '" width="' + symbolSize + '">';
     symbol += circle;
     symbol += '</svg></div>';
-  } else if (s[0].hasOwnProperty('image')) {
-    var src = s[0].image.src;
+  }
+  else if (s[0].hasOwnProperty('image')) {
+    var src = validateUrl(s[0].image.src, baseUrl);
     var inlineStyle = 'background: url(' + src + ') no-repeat;width: 30px; height: 30px;background-size: 30px;';
     symbol = '<div class="o-legend-item-img" style="' + inlineStyle +'"></div>';
   }
@@ -264,11 +265,6 @@ function createGroup(group, parentGroup) {
       toggleSubGroupCheck($(this).parent(), true);
     } else if ($(evt.target).closest('div').hasClass('o-abstract')) {
 
-      /* $(this).each(function() {
-        var that = this;
-        showAbstract($(that).attr("id"));
-      }); */
-
     } else {
       toggleGroup($(this));
     }
@@ -417,19 +413,6 @@ function addLegend(groups) {
 
       evt.preventDefault();
     });
-
-    /* if(layer.get('abstract')){
-      $('#' + name + ' .o-abstract').on('click', function(evt) {
-        $(this).each(function() {
-          var that = this;
-          showAbstract($(that).attr("id"));
-        });
-
-        evt.preventDefault();
-        evt.stopPropagation();
-      });
-    }; */
-    
   });
   
   $('.o-abstract').on('click', function(evt) {

@@ -28,7 +28,7 @@ function createModal(modalTarget, options) {
     settings.modal = '<div id="o-modal">' +
               '<div class="o-modal-screen"></div>' +
               '<div class="o-modal">' +
-              '<div class="o-close-button"><svg class="o-icon-fa-times"><use xlink:href="css/svg/fa-icons.svg#fa-times"></use></svg></div>' +
+              '<div class="o-close-button"><svg class="o-icon-fa-times"><use xlink:href="#fa-times"></use></svg></div>' +
               '<div class="o-modal-title">' + title + '</div>' +
               '<div class="o-modal-content">' + content +'</div>' +
               '</div>' +

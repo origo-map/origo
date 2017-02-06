@@ -4,7 +4,9 @@
  * ======================================================================== */
 "use strict";
 
-module.exports = function isUrl(s) {
-   var regexp = new RegExp('^(?:[a-z]+:)?//', 'i');
-   return regexp.test(s);
+var ol = require('openlayers');
+
+module.exports = function vector(options, source) {
+  options.source = source;
+  return new ol.layer.Tile(options);
 }

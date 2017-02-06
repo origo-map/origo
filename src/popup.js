@@ -19,7 +19,7 @@ module.exports = function(target) {
 function render(target) {
   var pop = '<div id="o-popup">' +
       '<div class="o-popup">' +
-        '<div class="o-close-button"><svg class="o-icon-fa-times"><use xlink:href="css/svg/fa-icons.svg#fa-times"></use></svg></div>' +
+        '<div class="o-close-button"><svg class="o-icon-fa-times"><use xlink:href="#fa-times"></use></svg></div>' +
         '<div class="o-popup-title"></div>' +
         '<div class="o-popup-content"></div>' +
       '</div>' +

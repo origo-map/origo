@@ -3,8 +3,10 @@
  * Licensed under BSD 2-Clause (https://github.com/origo-map/origo/blob/master/LICENSE.txt)
  * ======================================================================== */
 "use strict";
+var isUrl = require('./isurl');
 
-module.exports = function isUrl(s) {
-   var regexp = new RegExp('^(?:[a-z]+:)?//', 'i');
-   return regexp.test(s);
+//Checks if str is a valid url. If not append str to baseUrl
+module.exports = function validateUrl(str, baseUrl) {
+   var url = isUrl(str) ? str : baseUrl + str;
+   return url;
 }

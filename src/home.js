@@ -26,7 +26,7 @@ function render() {
   var el = utils.createButton({
     id: 'o-home-button',
     iconCls: 'o-icon-fa-home',
-    src: 'css/svg/fa-icons.svg#fa-home',
+    src: '#fa-home',
     tooltipText: tooltip
   });
   $('#o-map').append(el);

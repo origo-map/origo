@@ -44,6 +44,9 @@ b, strong{
 		position: absolute;
 		z-index: 10;
 }
+.o-control-active svg{
+	fill: #007AFF;
+}
 .o-btn-2 {
 		height: 2rem;
 		width: 2rem;
@@ -1677,6 +1680,11 @@ input.o-search-field::-ms-clear {
 }
 .o-icon-search-fa-times {
 	padding: .5em;
+	height: 1em;
+	width: 1em;
+}
+.o-icon-fa-info-circle {
+	padding: .25em;
 	height: 1em;
 	width: 1em;
 }

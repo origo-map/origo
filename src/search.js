@@ -16,6 +16,7 @@ var getFeature = require('./getfeature');
 var getAttributes = require('./getattributes');
 var featureInfo = require('./featureinfo');
 var mapUtils = require('./maputils');
+var getCenter = require('./geometry/getcenter');
 var utils = require('./utils');
 
 var adress;
@@ -63,12 +64,12 @@ function init(options){
                     '<input class="o-search-field typeahead form-control" type="text" placeholder="' + hintText + '">' +
                     '<button id="o-search-button">' +
                         '<svg class="o-icon-fa-search">' +
-                            '<use xlink:href="css/svg/fa-icons.svg#fa-search"></use>' +
+                            '<use xlink:href="#fa-search"></use>' +
                         '</svg>' +
                     '</button>' +
                     '<button id="o-search-button-close">' +
                         '<svg class="o-icon-search-fa-times">' +
-                            '<use xlink:href="css/svg/fa-icons.svg#fa-times"></use>' +
+                            '<use xlink:href="#fa-times"></use>' +
                         '</svg>' +
                     '</button>' +
                 '</div>' +
@@ -183,7 +184,7 @@ function showFeatureInfo(features, title, content) {
     obj.feature = features[0];
     obj.title = title;
     obj.content = content;
-    featureInfo.identify([obj], 'overlay', mapUtils.getCenter(features[0].getGeometry()));
+    featureInfo.identify([obj], 'overlay', getCenter(features[0].getGeometry()));
     mapUtils.zoomToExent(features[0].getGeometry(), maxZoomLevel);
 }
 

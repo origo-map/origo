@@ -19,7 +19,7 @@ function init(){
     var el = utils.createListButton({
         id: 'o-share',
         iconCls: 'o-icon-fa-share-square-o',
-        src: 'css/svg/fa-icons.svg#fa-share-square-o',
+        src: '#fa-share-square-o',
         text: 'Dela karta'
     });
     $('#o-menutools').append(el);
