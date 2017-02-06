@@ -65,7 +65,7 @@ function setEditLayer(options) {
     features: select.getFeatures()
   });
   select.getFeatures().on('add', onSelectAdd, this);
-  select.getFeatures().on('remove', onUnSelect, this);
+  // select.getFeatures().on('remove', onUnSelect, this);
   dirty = {};
   map.addInteraction(select);
   map.addInteraction(modify);
@@ -112,7 +112,7 @@ function saveFeatures() {
       features = getFeaturesByIds(editType,layer, ids);
       if (features.length) {
         saveToRemote({
-          feature: features[0],
+          feature: features,
           layerName: layerName,
           action: editType
         });
@@ -146,10 +146,11 @@ function saveToRemote(change) {
       insertRemote(change);
       break;
     case 'update':
-      //updateRemote(change);
+      updateRemote(change);
       break;
     case 'delete':
       deleteRemote(change);
+      break;
   }
 }
 
@@ -165,20 +166,20 @@ function onDeleteSelected() {
         action: 'delete'
       });
       select.getFeatures().clear();
-      editSource.removeFeature(feature);
+      editSource.removeFeature(editSource.getFeatureById(feature.getId()));
     }
   }
 }
 
 function deleteRemote(change) {
   var feature = change.feature;
-  var node = writeTransaction('delete', [feature]);
+  var node = writeTransaction('delete', feature);
   doRequest(node, successDelete, errorDelete);
 
   function successDelete(data) {
     var result = readResponse(data);
     if (result) {
-      if (result.transactionSummary.totalDeleted === 1) {
+      if (result.transactionSummary.totalDeleted > 0) {
         change.status = 'finished';
         emitChangeFeature(change);
       } else {
@@ -215,9 +216,12 @@ function getSelect() {
 
 function onSelectAdd(evt) {
   var feature = evt.element;
-  var fid = feature.getId();
   feature.on('change', function(evt) {
-    dirty[evt.target.getId()] = true;
+    saveFeature({
+      feature: editSource.getFeatureById(evt.target.getId()),
+      layerName: featureType,
+      action: 'update'
+    });
   }, this);
 }
 
@@ -233,14 +237,22 @@ function onUnSelect(evt) {
     delete properties.bbox;
     var clone = new ol.Feature(properties);
     clone.setId(fid);
-    var node = writeTransaction('update', [clone]);
-    doRequest(node, updateSucces, updateError);
+    saveFeature({
+      feature: clone,
+      layerName: featureType,
+      action: 'update'
+    });
   }
+}
+
+function updateRemote(change) {
+  var node = writeTransaction('update', change.feature);
+  doRequest(node, updateSucces, updateError);
 
   function updateSucces(data) {
     var result = readResponse(data);
-    if (result && result.transactionSummary.totalUpdated === 1) {
-      delete dirty[fid];
+    if (result && result.transactionSummary.totalUpdated > 0) {
+      // delete dirty[fid];
     }
   }
 
@@ -265,7 +277,7 @@ function onDrawEnd(evt) {
 
 function insertRemote(change) {
   var feature = change.feature;
-  var node = writeTransaction('insert', [feature]);
+  var node = writeTransaction('insert', feature);
   doRequest(node, insertSuccess, insertError);
 
   function insertSuccess(data) {
@@ -273,14 +285,10 @@ function insertRemote(change) {
     if (result) {
       change.status = 'finished';
       emitChangeFeature(change);
-      var insertId = result.insertIds[0];
-      if (insertId === 'new0') {
-
-        // reload data if we're dealing with a shapefile store
-        editSource.clear();
-      } else {
-        feature.setId(insertId);
-      }
+      var insertIds = result.insertIds;
+      insertIds.forEach(function(insertId, index) {
+        feature[index].setId(insertId);
+      });
     }
   }
 
@@ -362,18 +370,11 @@ function attributesSaveHandler(f, el) {
     }
   }
 
-  var node = writeTransaction('update', [clone]);
-  doRequest(node, successAttributes, errorAttributes);
-
-  function successAttributes(data) {
-    console.log('Attribut uppdaterades');
-  }
-
-  function errorAttributes(e) {
-    var errorMsg = e ? (e.status + ' ' + e.statusText) : "";
-    alert('Error saving this feature to the server...<br><br>' +
-      errorMsg);
-  }
+  saveFeature({
+    feature: clone,
+    layerName: featureType,
+    action: 'update'
+  });
 }
 
 function removeInteractions() {
