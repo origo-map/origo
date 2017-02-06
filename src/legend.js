@@ -38,12 +38,12 @@ function getSymbol(style) {
     // var scale = style.icon.scale || undefined;
     var format = s[0].format || 'png';
     if (format == 'png') {
-        symbol = '<div class="o-legend-item-img"><img style="width: auto; height: 20px;" src="' + src + '"></div>'
+      symbol = '<div class="o-legend-item-img"><img style="width: auto; height: 20px;" src="' + src + '"></div>'
     }
     else if (format == 'svg') {
-        var o = '<object type="image/svg+xml" data="' + src + '" style="width: 20px;"></object>';
-        var inlineStyle = 'background: url(' + src + ') no-repeat;width: 20px; height: 20px;background-size: 20px;';
-        symbol = '<div class="o-legend-item-img">' + o + '</div>';
+      var o = '<object type="image/svg+xml" data="' + src + '" style="width: 20px;"></object>';
+      var inlineStyle = 'background: url(' + src + ') no-repeat;width: 20px; height: 20px;background-size: 20px;';
+      symbol = '<div class="o-legend-item-img">' + o + '</div>';
     }
   }
   else if (s[0].hasOwnProperty('fill')) {
@@ -414,7 +414,7 @@ function addLegend(groups) {
       evt.preventDefault();
     });
   });
-  
+
   $('.o-abstract').on('click', function(evt) {
     $(this).each(function() {
       var that = this;
@@ -630,8 +630,7 @@ function showAbstract($abstractButton) {
 
   //If info button is connected group
   if ($item.hasClass('o-legend-header')) {
-    var groups = viewer.getGroups();
-    groups = groups.concat(viewer.getSubgroups());
+    var groups = viewer.getAllGroups();
 
     var group = $.grep(groups, function(obj) {
       return (obj.name == layername);
