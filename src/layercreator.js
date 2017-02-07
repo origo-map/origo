@@ -44,7 +44,8 @@ var layerCreator = function layerCreator(opt_options) {
     type: undefined,
     extent: undefined,
     attributes: undefined,
-	tileSize: [256,256]
+    timeline: undefined,
+    tileSize: [256,256]
   };
   var projection = viewer.getProjection();
   var options = opt_options || {};

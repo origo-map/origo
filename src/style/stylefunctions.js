@@ -5,16 +5,19 @@
 "use strict";
 
 	var ol = require('openlayers');
-  function stylefunctions(sf) {
+  function stylefunctions(sf, val) {
 	  if(sf=='byggnadsar'){
 	  var fill = new ol.style.Fill({color: ''});
 	  var stroke = new ol.style.Stroke({color: '', width: 0.1, lineCap:'square', lineJoin:'round'});
 	  var polygon = new ol.style.Style({fill: fill, zIndex: 1});
 	  var strokedPolygon = new ol.style.Style({fill: fill, stroke: stroke, zIndex: 2});
 	  var styles = [];
+	  var min = val ? val[0] : undefined;
+	  var max = val ? val[1] : undefined;
 	  return function(feature, resolution) {
 		var length = 0;
 		var ba = feature.get('ar_nybygg');
+   if ((min<1866 && ba<min) || (ba >= min && ba <= max)) {
 		if(ba<1866){
 			stroke.setColor('rgba(204,0,0,1)'); 
 			stroke.setWidth(1);          
@@ -87,6 +90,7 @@
 			fill.setColor('rgba(0,0,255,1)');
 			styles[length++] = strokedPolygon;
 		}
+	}
 		styles.length = length;
 		return styles;
 	  }

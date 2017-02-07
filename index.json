@@ -28,6 +28,9 @@
     },
     {
       "name": "measure"
+    },
+    {
+      "name": "timeline"
     }
   ],
   "projectionCode": "EPSG:3008",
@@ -90,7 +93,8 @@
 		"type": "VECTORTILE",
 		"tileSize": [512, 512],
 		"visible": true,
-		"queryable": true
+		"queryable": true,
+    "timeline": "byggnadsar"
     },
     {
 		"name": "GL_BASEMAP2",
