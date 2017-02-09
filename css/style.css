@@ -1642,10 +1642,6 @@ input.o-search-field::-ms-clear {
 	height: 1em;
 	width: 1em;
 }
-.o-link {
-  text-decoration: none;
-  color: inherit;
-}
 #o-editor-toolbar .o-icon-fa-times {
 	height: 1rem;
 	padding: 0;
