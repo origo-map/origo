@@ -17,6 +17,7 @@ type.WMS = require('./layer/wms');
 type.WMTS = require('./layer/wmts');
 type.AGS_TILE = require('./layer/agstile');
 type.XYZ = require('./layer/xyz');
+type.OSM = require('./layer/osm');
 type.GROUP = groupLayer;
 
 var layerCreator = function layerCreator(opt_options) {
