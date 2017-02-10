@@ -143,6 +143,7 @@
     "ol.geom.Geometry#getExtent",
     "ol.geom.Geometry#transform",
     "ol.geom.GeometryCollection",
+    "ol.geom.GeometryCollection#getType",
     "ol.geom.LineString",
     "ol.geom.LineString#appendCoordinate",
     "ol.geom.LineString#clone",
