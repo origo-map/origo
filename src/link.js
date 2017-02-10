@@ -34,7 +34,7 @@ function render() {
 
 function bindUIActions() {
   $linkButton.on('click', function (e) {
-    location.href = url;
+    window.open(url);
   });
 }
 
