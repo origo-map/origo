@@ -30,54 +30,50 @@
       "name": "measure"
     }
   ],
-  "projectionCode": "EPSG:3010",
+  "projectionCode": "EPSG:3857",
   "projectionExtent": [
-    -1678505.1838360203,
-    4665380,
-    2431912.7361639794,
-    8775797.92
-  ],
-  "proj4Defs": [
-      {
-          "code": "EPSG:3010",
-          "alias": "urn:ogc:def:crs:EPSG::3010",
-          "projection": "+proj=tmerc +lat_0=0 +lon_0=16.5 +k=1 +x_0=150000 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
-      }
+    -20026376.39,
+    -20048966.10,
+    20026376.39,
+    20048966.10
   ],
   "extent": [
-    -1678505.1838360203,
-    4665380,
-    2431912.7361639794,
-    8775797.92
+    -20026376.39,
+    -20048966.10,
+    20026376.39,
+    20048966.10
   ],
   "center": [
-    162429,
-    6599905
+    1700000,
+    8275000
   ],
-  "zoom": 3,
+  "zoom": 8,
   "resolutions": [
-    1146.8799999999999,
-    573.4399999999999,
-    286.71999999999997,
-    143.35999999999999,
-    71.67999999999999,
-    35.839999999999996,
-    17.919999999999998,
-    8.959999999999999,
-    4.4799999999999995,
-    2.2399999999999998,
-    1.1199999999999999,
-    0.5599999999999999,
-    0.27999999999999997,
-    0.13999999999999999
+    156543.03,
+    78271.52,
+    39135.76,
+    19567.88,
+    9783.94,
+    4891.97,
+    2445.98,
+    1222.99,
+    611.50,
+    305.75,
+    152.87,
+    76.437,
+    38.219,
+    19.109,
+    9.5546,
+    4.7773,
+    2.3887,
+    1.1943,
+    0.5972
   ],
   "source": {
     "local": {
       "url": "http://localhost/geoserver/wms"
     },
-    "basemap": {
-      "url": "https://www.malardalskartan.se/geowebcache/service/wmts"
-    }
+    "osm": {}
   },
   "groups": [
     {
@@ -96,7 +92,7 @@
       "name": "origo-cities",
       "title": "Origokommuner",
       "group": "test",
-      "source": "data/origo-cities-3010.geojson",
+      "source": "data/origo-cities-3857.geojson",
       "style": "origo-logo",
       "type": "GEOJSON",
       "attributes": [
@@ -107,37 +103,25 @@
       "visible": true
     },
     {
-      "name": "mdk",
-      "opacity": 0.15,
-      "title": "4k",
+      "name": "origo-mask",
+      "opacity": 0.25,
+      "title": "origo-mask",
       "group": "none",
       "queryable": false,
-      "source": "data/mdk.geojson",
+      "source": "data/origo-mask-3857.geojson",
       "style": "mask",
       "type": "GEOJSON",
       "visible": true
     },
     {
-      "attribution": "&copy Lantmäteriet Geodatasamverkan",
-      "format": "image/png",
+      "name": "osm",
+      "title": "OpenStreetMap",
       "group": "background",
-      "name": "topowebbkartan_nedtonad",
-      "source": "basemap",
-      "title": "Karta, grå",
-      "type": "WMTS",
-      "style": "karta_gra",
-      "visible": true
-    },
-    {
-      "attribution": "&copy Lantmäteriet Geodatasamverkan",
-      "format": "image/png",
-      "group": "background",
-      "name": "topowebbkartan",
-      "source": "basemap",
-      "title": "Karta, färg",
-      "type": "WMTS",
+      "queryable": false,
+	  "source": "osm",
       "style": "karta_farg",
-      "visible": false
+      "type": "OSM",
+      "visible": true
     }
   ],
   "styles": {
