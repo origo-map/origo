@@ -33,7 +33,7 @@ function render() {
 }
 
 function bindUIActions() {
-  $linkButton.on('click', function (e) {
+  $linkButton.on('click', function() {
     window.open(url);
   });
 }
