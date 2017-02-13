@@ -11,7 +11,7 @@ var modal = require('../modal');
 var featureInfo = require('../featureinfo');
 var editsStore = require('./editsstore')();
 var generateUUID = require('../utils/generateuuid');
-var transactionHandler = require('./transactionhandler')();
+var transactionHandler = require('./transactionhandler');
 var dispatcher = require('./editdispatcher');
 
 var autoSave = undefined;
@@ -414,7 +414,7 @@ function saveFeatures() {
         transaction[editType] = features;
       }
     });
-    transactionHandler.wfsTransaction(transaction, layerName);
+    transactionHandler(transaction, layerName);
   });
 }
 

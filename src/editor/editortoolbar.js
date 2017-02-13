@@ -164,8 +164,7 @@ function setEditProps(options, map, srsName) {
       source: layer.getSource(),
       geometryType: layer.get('geometryType') || undefined,
       geometryName: layer.get('geometryName') || undefined,
-      srsName: srsName,
-      layerName: layer.get('featureType'),
+      layerName: layerName,
       attributes: layer.get('attributes'),
       title: layer.get('title') || 'Information',
       map: map
