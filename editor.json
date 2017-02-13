@@ -20,7 +20,7 @@
       "options": {
         "editableLayers": ["test_byggnadsytor", "test_punkt"],
         "isActive": true,
-        "autoSave": true
+        "autoSave": false
       }
     },
     {

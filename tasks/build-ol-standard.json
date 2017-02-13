@@ -141,7 +141,7 @@
     "ol.geom.Circle#getType",
     "ol.geom.Geometry",
     "ol.geom.Geometry#getExtent",
-    "ol.geom.Geometry#on",    
+    "ol.geom.Geometry#on",
     "ol.geom.Geometry#transform",
     "ol.geom.GeometryCollection",
     "ol.geom.LineString",

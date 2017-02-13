@@ -30,7 +30,6 @@ var hasSnap = undefined;
 var select = undefined;
 var modify = undefined;
 var snap = undefined;
-var dirty = undefined;
 var format = undefined;
 var serializer = undefined;
 
@@ -64,14 +63,12 @@ function setEditLayer(options) {
   modify = new ol.interaction.Modify({
     features: select.getFeatures()
   });
-  select.getFeatures().on('add', onSelectAdd, this);
-  // select.getFeatures().on('remove', onUnSelect, this);
-  dirty = {};
   map.addInteraction(select);
   map.addInteraction(modify);
   map.addInteraction(draw);
   format = new ol.format.WFS();
   serializer = new XMLSerializer();
+  modify.on('modifyend', onModifyEnd, this);
   draw.on('drawend', onDrawEnd, this);
   setActive();
 
@@ -172,10 +169,6 @@ function onDeleteSelected() {
   }
 }
 
-function getSelect() {
-  return select;
-}
-
 function onSelectAdd(evt) {
   var feature = evt.element;
     feature.getGeometry().on('change', function(e) {
@@ -187,24 +180,13 @@ function onSelectAdd(evt) {
     }, this);
 }
 
-function onUnSelect(evt) {
-  var feature = evt.element;
-  var fid = feature.getId();
-  if (dirty[fid]) {
-
-    // do a WFS transaction to update the geometry
-    var properties = feature.getProperties();
-
-    // get rid of bbox which is not a real property
-    delete properties.bbox;
-    var clone = new ol.Feature(properties);
-    clone.setId(fid);
-    saveFeature({
-      feature: clone,
-      layerName: featureType,
-      action: 'update'
-    });
-  }
+function onModifyEnd(evt) {
+  var feature = evt.features.item(0);
+  saveFeature({
+    feature: feature,
+    layerName: featureType,
+    action: 'update'
+  });
 }
 
 function onDrawEnd(evt) {
