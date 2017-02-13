@@ -8,6 +8,7 @@ var ol = require('openlayers');
 var $ = require('jquery');
 var viewer = require('../viewer');
 var editortemplate = require("../templates/editortoolbar.template.handlebars");
+var dispatcher = require('./editdispatcher');
 
 var activeClass = 'o-control-active';
 var map = undefined;
@@ -77,23 +78,23 @@ function render(selectOptions) {
 function bindUIActions() {
   var self = this;
   $editDraw.on('click', function(e) {
-    emitToggleEdit('draw');
+    dispatcher.emitToggleEdit('draw');
     $editDraw.blur();
     e.preventDefault();
     return false;
   });
   $editAttribute.on('click', function(e) {
-    emitToggleEdit('attribute');
+    dispatcher.emitToggleEdit('attribute');
     $editAttribute.blur();
     e.preventDefault();
   });
   $editDelete.on('click', function(e) {
-    emitToggleEdit('delete');
+    dispatcher.emitToggleEdit('delete');
     $editDelete.blur();
     e.preventDefault();
   });
   $editSave.on('click', function(e) {
-    emitToggleEdit('save');
+    dispatcher.emitToggleEdit('save');
     $editSave.blur();
     e.preventDefault();
   });
@@ -108,7 +109,7 @@ function bindUIActions() {
   });
   $('select[name="layer-dropdown"]').change(function() {
     currentLayer = $(this).val();
-    emitToggleEdit('edit', {
+    dispatcher.emitToggleEdit('edit', {
       options: editableLayers[currentLayer]
     });
   });
@@ -118,12 +119,12 @@ function onEnableInteraction(e) {
   e.stopPropagation();
   if (e.interaction === 'editor') {
     setActive(true);
-    emitToggleEdit('edit', {
+    dispatcher.emitToggleEdit('edit', {
       options: editableLayers[currentLayer]
     });
   } else {
     setActive(false);
-    emitToggleEdit('cancel');
+    dispatcher.emitToggleEdit('cancel');
   }
 }
 
@@ -142,16 +143,6 @@ function emitEnableInteraction() {
   });
 }
 
-function emitToggleEdit(tool, opt_options) {
-  var options = opt_options || {};
-  var e = {
-    type: 'toggleEdit',
-    tool: tool
-  };
-  $.extend(e, options);
-  $.event.trigger(e);
-}
-
 function selectionModel(layerNames) {
   var selectOptions = layerNames.map(function(layerName) {
     var obj = {};
@@ -168,20 +159,15 @@ function setEditProps(options, map, srsName) {
   var result = layerNames.reduce(function(layerProps, layerName) {
     var layer = viewer.getLayer(layerName);
 
-    //get the layers source options
-    var source = viewer.getMapSource()[layer.get('sourceName')];
-
     layerProps[layerName] = {
       editableLayer: layer,
       source: layer.getSource(),
       geometryType: layer.get('geometryType') || undefined,
       geometryName: layer.get('geometryName') || undefined,
       srsName: srsName,
-      featureNS: source.workspace,
-      featureType: layer.get('featureType'),
+      layerName: layer.get('featureType'),
       attributes: layer.get('attributes'),
       title: layer.get('title') || 'Information',
-      url: source.url,
       map: map
     };
     layerProps[layerName].snap = options.hasOwnProperty('snap') ? options.snap : true;
