@@ -6,8 +6,8 @@
 
 var $ = require('jquery');
 var utils = require('./utils');
-var transactionhandler = require('./transactionhandler');
-var editortoolbar = require('./editortoolbar');
+var transactionhandler = require('./editor/transactionhandler');
+var editortoolbar = require('./editor/editortoolbar');
 
 var $editorButton;
 

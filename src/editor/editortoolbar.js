@@ -6,8 +6,8 @@
 
 var ol = require('openlayers');
 var $ = require('jquery');
-var viewer = require('./viewer');
-var editortemplate = require("./templates/editortoolbar.template.handlebars");
+var viewer = require('../viewer');
+var editortemplate = require("../templates/editortoolbar.template.handlebars");
 
 var activeClass = 'o-control-active';
 var map = undefined;

@@ -6,11 +6,11 @@
 
 var ol = require('openlayers');
 var $ = require('jquery');
-var viewer = require('./viewer');
-var modal = require('./modal');
-var featureInfo = require('./featureinfo');
-var editsStore = require('./editor/editsstore')();
-var generateUUID = require('./utils/generateuuid');
+var viewer = require('../viewer');
+var modal = require('../modal');
+var featureInfo = require('../featureinfo');
+var editsStore = require('./editsstore')();
+var generateUUID = require('../utils/generateuuid');
 
 var autoSave = undefined;
 var srsName = undefined;
