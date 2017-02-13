@@ -6,16 +6,11 @@ var editsStore = function featureStore() {
 
   $(document).on('changeFeature', featureChange);
 
-  var edits = {
-    update: {},
-    insert: {},
-    delete: {}
-  };
+  var edits = {};
 
   return {
     getEdits: getEdits,
-    saveFeatures: saveFeatures,
-    syncFeatures: syncFeatures
+    hasFeature: hasFeature
   };
 
   function addEdit(e) {
@@ -41,16 +36,8 @@ var editsStore = function featureStore() {
     }
   }
 
-  function saveFeatures() {
-
-  }
-
   function getEdits() {
     return edits;
-  }
-
-  function syncFeatures() {
-
   }
 
   function featureChange(e) {
@@ -62,8 +49,8 @@ var editsStore = function featureStore() {
   }
 
   function hasFeature(type, feature, layerName) {
-    if (edits[type].hasOwnProperty(layerName)) {
-      if (edits[type][layerName].indexOf(feature.getId()) > -1) {
+    if (edits.hasOwnProperty(layerName)) {
+      if (edits[layerName][type].indexOf(feature.getId()) > -1) {
         return true;
       }
     }
@@ -71,22 +58,53 @@ var editsStore = function featureStore() {
   }
 
   function addFeature(type, feature, layerName) {
-    if (edits[type].hasOwnProperty(layerName) === false) {
-      edits[type][layerName] = [];
+    if (edits.hasOwnProperty(layerName) === false) {
+      edits[layerName] = createEditsObj();
     }
-    edits[type][layerName].push(feature.getId());
+    if (hasFeature(type, feature, layerName) === false) {
+      edits[layerName][type].push(feature.getId());
+    }
   }
 
   function removeFeature(type, feature, layerName) {
     var index = 0;
-    if (edits[type].hasOwnProperty(layerName)) {
-      index = edits[type][layerName].indexOf(feature.getId());
+    if (edits.hasOwnProperty(layerName)) {
+      index = edits[layerName][type].indexOf(feature.getId());
       if (index > -1) {
-        edits[type][layerName].splice(index, 1);
+        edits[layerName][type].splice(index, 1);
+        isFinished(layerName);
         return true;
       }
     }
     return false;
+  }
+
+  function isFinished(layerName) {
+    var editTypes;
+    var finished = true;
+    if (edits.hasOwnProperty(layerName)) {
+      editTypes = Object.getOwnPropertyNames(edits[layerName]);
+      editTypes.forEach(function(editType) {
+        if (edits[layerName][editType].length) {
+          finished = false;
+          return finished;
+        }
+      });
+      if (finished) {
+        delete edits[layerName];
+        return finished;
+      }
+    } else {
+      return finished;
+    }
+  }
+
+  function createEditsObj() {
+    return {
+      update: [],
+      insert: [],
+      delete: []
+    }
   }
 }
 

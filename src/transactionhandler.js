@@ -96,29 +96,44 @@ function isActive() {
 function saveFeature(change) {
   emitChangeFeature(change);
   if (autoSave) {
-    saveToRemote(change);
+    saveFeatures(change);
   }
 }
 
 function saveFeatures() {
   var edits = editsStore.getEdits();
-  var editTypes = Object.getOwnPropertyNames(edits);
-  editTypes.forEach(function(editType) {
-    var layerNames = Object.getOwnPropertyNames(edits[editType]);
-    layerNames.forEach(function(layerName) {
+  var layerNames = Object.getOwnPropertyNames(edits);
+  layerNames.forEach(function(layerName) {
+    var t = {
+      insert: null,
+      delete: null,
+      update: null
+    };
+    var editTypes = Object.getOwnPropertyNames(edits[layerName]);
+    editTypes.forEach(function(editType) {
       var layer = viewer.getLayer(layerName);
-      var ids = edits[editType][layerName];
+      var ids = edits[layerName][editType];
       var features;
-      features = getFeaturesByIds(editType,layer, ids);
+      features = getFeaturesByIds(editType,layer,ids);
       if (features.length) {
-        saveToRemote({
-          feature: features,
-          layerName: layerName,
-          action: editType
-        });
+        t[editType] = features;
       }
     });
+    var transaction = writeTransactionObj(t, layerName);
+    wfsTransaction(transaction, t, layerName);
   });
+}
+
+function writeTransactionObj(transObj, layerName) {
+  var node = format.writeTransaction(transObj.insert, transObj.update, transObj.delete, {
+    gmlOptions: {
+      srsName: srsName
+    },
+    featureNS: featureNS,
+    featurePrefix: featureNS,
+    featureType: layerName
+  });
+  return node;
 }
 
 function getFeaturesByIds(type, layer, ids) {
@@ -140,20 +155,6 @@ function getFeaturesByIds(type, layer, ids) {
   return features;
 }
 
-function saveToRemote(change) {
-  switch (change.action) {
-    case 'insert':
-      insertRemote(change);
-      break;
-    case 'update':
-      updateRemote(change);
-      break;
-    case 'delete':
-      deleteRemote(change);
-      break;
-  }
-}
-
 function onDeleteSelected() {
   var features = select.getFeatures();
   if (features.getLength() === 1) {
@@ -171,58 +172,19 @@ function onDeleteSelected() {
   }
 }
 
-function deleteRemote(change) {
-  var feature = change.feature;
-  var node = writeTransaction('delete', feature);
-  doRequest(node, successDelete, errorDelete);
-
-  function successDelete(data) {
-    var result = readResponse(data);
-    if (result) {
-      if (result.transactionSummary.totalDeleted > 0) {
-        change.status = 'finished';
-        emitChangeFeature(change);
-      } else {
-        alert("There was an issue deleting the feature.");
-      }
-    }
-  }
-
-  function errorDelete(e) {
-
-  }
-}
-
-function writeTransaction(type, features) {
-  var t = {
-    insert: null,
-    delete: null,
-    update: null
-  };
-  t[type] = features;
-  var node = format.writeTransaction(t.insert, t.update, t.delete, {
-    gmlOptions: {
-      srsName: srsName
-    },
-    featureNS: featureNS,
-    featureType: featureType
-  });
-  return node;
-}
-
 function getSelect() {
   return select;
 }
 
 function onSelectAdd(evt) {
   var feature = evt.element;
-  feature.on('change', function(evt) {
-    saveFeature({
-      feature: editSource.getFeatureById(evt.target.getId()),
-      layerName: featureType,
-      action: 'update'
-    });
-  }, this);
+    feature.getGeometry().on('change', function(e) {
+      saveFeature({
+        feature: editSource.getFeatureById(feature.getId()),
+        layerName: featureType,
+        action: 'update'
+      });
+    }, this);
 }
 
 function onUnSelect(evt) {
@@ -245,22 +207,6 @@ function onUnSelect(evt) {
   }
 }
 
-function updateRemote(change) {
-  var node = writeTransaction('update', change.feature);
-  doRequest(node, updateSucces, updateError);
-
-  function updateSucces(data) {
-    var result = readResponse(data);
-    if (result && result.transactionSummary.totalUpdated > 0) {
-      // delete dirty[fid];
-    }
-  }
-
-  function updateError(data) {
-    alert('Det inträffade ett fel när förändringarna skulle sparas');
-  }
-}
-
 function onDrawEnd(evt) {
   var feature = evt.feature;
   feature.setId(generateUUID());
@@ -275,33 +221,7 @@ function onDrawEnd(evt) {
   emitChangeEdit('draw', false);
 }
 
-function insertRemote(change) {
-  var feature = change.feature;
-  var node = writeTransaction('insert', feature);
-  doRequest(node, insertSuccess, insertError);
-
-  function insertSuccess(data) {
-    var result = readResponse(data);
-    if (result) {
-      change.status = 'finished';
-      emitChangeFeature(change);
-      var insertIds = result.insertIds;
-      insertIds.forEach(function(insertId, index) {
-        feature[index].setId(insertId);
-      });
-    }
-  }
-
-  function insertError(e) {
-    setActive();
-    hasDraw = false;
-    var errorMsg = e ? (e.status + ' ' + e.statusText) : "";
-    alert('Error saving this feature to the server...<br><br>' +
-      errorMsg);
-  }
-}
-
-function doRequest(node, success, error) {
+function wfsTransaction(node, transObj, layerName) {
   $.ajax({
     type: "POST",
     url: url,
@@ -311,6 +231,51 @@ function doRequest(node, success, error) {
     error: error,
     context: this
   });
+
+  function success(data) {
+    var result = readResponse(data);
+    if (result) {
+      if (result.transactionSummary.totalUpdated > 0) {
+        emitChangeFeature({
+          feature: transObj.update,
+          layerName: layerName,
+          status: 'finished',
+          action: 'update'
+        });
+      }
+      if (result.transactionSummary.totalDeleted > 0) {
+        emitChangeFeature({
+          feature: transObj.delete,
+          layerName: layerName,
+          status: 'finished',
+          action: 'delete'
+        });
+      }
+      if (result.transactionSummary.totalInserted > 0) {
+        var feature = transObj.insert;
+        emitChangeFeature({
+          feature: transObj.insert,
+          layerName: layerName,
+          status: 'finished',
+          action: 'insert'
+        });
+        var insertIds = result.insertIds;
+        insertIds.forEach(function(insertId, index) {
+          feature[index].setId(insertId);
+        });
+      }
+    } else {
+      error();
+    }
+  }
+
+  function error(e) {
+    setActive();
+    hasDraw = false;
+    var errorMsg = e ? (e.status + ' ' + e.statusText) : "";
+    alert('Det inträffade ett fel när ändringarna skulle sparas till servern...<br><br>' +
+      errorMsg);
+  }
 }
 
 function cancelDraw() {
@@ -329,25 +294,26 @@ function onAttributesSave(feature, attributes) {
     var editEl = {};
 
     //Read values from form
-    for (var i = 0; i < attributes.length; i++) {
+    attributes.forEach(function(attribute) {
 
       //Get the input container class
-      var containerClass = '.' + attributes[i].elId.slice(1);
+      var containerClass = '.' + attribute.elId.slice(1);
 
       // If hidden element it should be excluded
-      if ($(containerClass).hasClass('hidden') === false) {
+      if ($(containerClass).hasClass('o-hidden') === false) {
 
         //Check if checkbox. If checkbox read state.
-        if ($(attributes[i].elId).attr('type') === 'checkbox') {
-          editEl[attributes[i].name] = $(attributes[i].elId).is(':checked') ? 1 : 0;
+        if ($(attribute.elId).attr('type') === 'checkbox') {
+          editEl[attribute.name] = $(attribute.elId).is(':checked') ? 1 : 0;
         }
 
         //Read value from input text, textarea or select
         else {
-          editEl[attributes[i].name] = $(attributes[i].elId).val();
+          editEl[attribute.name] = $(attribute.elId).val();
         }
       }
-    }
+    });
+
     modal.closeModal();
     attributesSaveHandler(feature, editEl);
     $('#o-save-button').blur();
@@ -355,23 +321,16 @@ function onAttributesSave(feature, attributes) {
   });
 }
 
-function attributesSaveHandler(f, el) {
-  var formEl = el;
-  var feature = f;
-  var fid = feature.getId();
-  var clone = new ol.Feature();
-  clone.setId(fid);
+function attributesSaveHandler(feature, formEl) {
 
-  //get DOM values and set attribute values to cloned feature
-  for (var i = 0; i < attributes.length; i++) {
-    if (formEl.hasOwnProperty(attributes[i].name)) {
-      feature.set(attributes[i].name, formEl[attributes[i].name]);
-      clone.set(attributes[i].name, formEl[attributes[i].name]);
+  //get DOM values and set attribute values to feature
+  attributes.forEach(function(attribute) {
+    if (formEl.hasOwnProperty(attribute.name)) {
+      feature.set(attribute.name, formEl[attribute.name]);
     }
-  }
-
+  });
   saveFeature({
-    feature: clone,
+    feature: feature,
     layerName: featureType,
     action: 'update'
   });
@@ -550,7 +509,7 @@ function createForm(obj) {
   var id = obj.elId.slice(1);
   var cls = obj.cls || '';
   cls += id;
-  cls += obj.isVisible ? "" : " hidden";
+  cls += obj.isVisible ? "" : " o-hidden";
   var label = obj.title;
   var val = obj.isVisible ? obj.val : '';
   var type = obj.type;
