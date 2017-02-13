@@ -11,7 +11,6 @@ var wktToFeature = require('./maputils')['wktToFeature'];
 var Popup = require('./popup');
 var typeahead = require("typeahead.js-browserify");
 typeahead.loadjQueryPlugin();
-var Bloodhound = require("typeahead.js-browserify").Bloodhound;
 var getFeature = require('./getfeature');
 var getAttributes = require('./getattributes');
 var featureInfo = require('./featureinfo');
@@ -80,30 +79,6 @@ function init(options){
         // constructs the suggestion engine
         // fix for internet explorer
     $.support.cors = true;
-    adress = new Bloodhound({
-      datumTokenizer: Bloodhound.tokenizers.obj.whitespace(name),
-      queryTokenizer: Bloodhound.tokenizers.whitespace,
-      limit: 10,
-      remote: {
-        url: url + '?q=&QUERY',
-        wildcard: '&QUERY',
-        ajax: {
-          contentType:'application/json',
-          type: 'POST',
-          crossDomain: true,
-          success: function(data) {
-            data.sort(function(a, b) {
-              return a[name].localeCompare(b[name]);
-            });
-          },
-          error: function(jqXHR, textStatus, errorThrown) {
-            console.log(errorThrown);
-          }
-        }
-      }
-    });
-
-    adress.initialize();
 
     $('.typeahead').typeahead({
       autoSelect: true,
@@ -115,12 +90,11 @@ function init(options){
       name: 'adress',
       limit: 9,
       displayKey: name,
-      source: adress.ttAdapter()
-      // templates: {
-      //   suggestion: function(data) {
-      //     return data.NAMN;
-      //   }
-      // }
+      source: function(query, syncResults, asyncResults) {
+      $.get(url + '?q=' + query, function(data) {
+            asyncResults(data);
+      })
+      },
     });
 
     bindUIActions();
