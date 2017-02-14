@@ -183,17 +183,6 @@
       ]
     },
     {
-      "name": "mdk",
-      "opacity": 0.15,
-      "title": "4k",
-      "group": "none",
-      "queryable": false,
-      "source": "data/mdk.geojson",
-      "style": "mask",
-      "type": "GEOJSON",
-      "visible": true
-    },
-    {
       "attribution": "&copy Lantmäteriet Geodatasamverkan",
       "format": "image/png",
       "group": "background",

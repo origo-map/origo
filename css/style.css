@@ -243,6 +243,9 @@ button.ol-zoom-out {
   list-style: none;
   line-height: inherit;
 }
+.ol-attribution li a{
+  color:#bbb;
+}
 .ol-attribution li:not(:last-child):after {
   content: " ";
 }
