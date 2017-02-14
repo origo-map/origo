@@ -6,8 +6,7 @@
 
 var $ = require('jquery');
 var utils = require('./utils');
-var editHandler = require('./editor/editHandler');
-var editortoolbar = require('./editor/editortoolbar');
+var editorToolbar = require('./editor/editortoolbar');
 
 var $editorButton;
 
@@ -18,14 +17,14 @@ module.exports = function() {
   };
 }();
 
-function Init(options) {
-  var editOptions = {};
-  editOptions.autoSave = options.hasOwnProperty('autoSave') ? options.autoSave : true;
-  editHandler(editOptions);
+function Init(opt_options) {
+  var options = opt_options || {};
+  options.autoSave = options.hasOwnProperty('autoSave') ? options.autoSave : true;
+  options.currentLayer = options.defaultLayer || options.editableLayers[0];
+  editorToolbar.init(options);
   render();
   $editorButton = $('#o-editor-button');
   bindUIActions();
-  editortoolbar.init(options);
 }
 
 function bindUIActions() {

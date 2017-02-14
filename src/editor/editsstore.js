@@ -1,6 +1,7 @@
 var $ = require('jquery');
 var ol = require('openlayers');
 var viewer = require('../viewer');
+var dispatcher = require('./editdispatcher');
 
 var editsStore = function featureStore() {
 
@@ -26,6 +27,9 @@ var editsStore = function featureStore() {
         addFeature('delete', e.feature, e.layerName);
       }
     }
+    if (hasEdits() === true) {
+      dispatcher.emitEditsChange(1);
+    }
   }
 
   function removeEdit(e) {
@@ -33,6 +37,9 @@ var editsStore = function featureStore() {
       e.feature.forEach(function(feature) {
         removeFeature(e.action, feature, e.layerName)
       });
+    }
+    if (hasEdits() === false) {
+      dispatcher.emitEditsChange(0);
     }
   }
 
@@ -104,6 +111,14 @@ var editsStore = function featureStore() {
       update: [],
       insert: [],
       delete: []
+    }
+  }
+
+  function hasEdits() {
+    if (Object.getOwnPropertyNames(edits).length) {
+      return true;
+    } else {
+      return false;
     }
   }
 }

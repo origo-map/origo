@@ -9,7 +9,9 @@ var $ = require('jquery');
 module.exports = {
   emitChangeEdit: emitChangeEdit,
   emitChangeFeature: emitChangeFeature,
-  emitToggleEdit: emitToggleEdit
+  emitToggleEdit: emitToggleEdit,
+  emitEnableInteraction: emitEnableInteraction,
+  emitEditsChange, emitEditsChange
 }
 
 function emitChangeEdit(tool, state) {
@@ -38,4 +40,18 @@ function emitToggleEdit(tool, opt_options) {
   };
   $.extend(e, options);
   $.event.trigger(e);
+}
+
+function emitEnableInteraction() {
+  $.event.trigger({
+    type: 'enableInteraction',
+    interaction: 'editor'
+  });
+}
+
+function emitEditsChange(edits) {
+  $.event.trigger({
+    type: 'editsChange',
+    edits: edits
+  });
 }

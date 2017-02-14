@@ -13,13 +13,16 @@ var editsStore = require('./editsstore')();
 var generateUUID = require('../utils/generateuuid');
 var transactionHandler = require('./transactionhandler');
 var dispatcher = require('./editdispatcher');
+var editForm = require('./editform');
 
+var editLayers = {};
 var autoSave = undefined;
 var editSource = undefined;
 var geometryType = undefined;
 var geometryName = undefined;
 var map = undefined;
 var currentLayer = undefined;
+var editableLayers = undefined;
 var attributes = undefined;
 var title = undefined;
 var draw = undefined;
@@ -31,28 +34,45 @@ var modify = undefined;
 var snap = undefined;
 
 module.exports = function(options) {
+  map = viewer.getMap();
+
+  currentLayer = options.currentLayer;
+  editableLayers = options.editableLayers;
+
+  //set edit properties for editable layers
+  editLayers = setEditProps(options);
+  editableLayers.forEach(function(layerName) {
+    var layer = viewer.getLayer(layerName);
+    layer.getSource().once('addfeature', function(e) {
+      editLayers[layerName].geometryType = layer.getSource().getFeatures()[0].getGeometry().getType();
+      editLayers[layerName].geometryName = layer.getSource().getFeatures()[0].getGeometryName();
+      if (layerName === currentLayer && options.isActive) {
+        dispatcher.emitEnableInteraction();
+      }
+    });
+  });
+
   autoSave = options.autoSave;
   $(document).on('toggleEdit', toggleEdit);
 }
 
-function setEditLayer(options) {
+function setEditLayer(layerName) {
+  var editLayer = editLayers[layerName];
+  var layer = viewer.getLayer(layerName);
+  currentLayer = layerName;
+  editSource = layer.getSource();
+  attributes = layer.get('attributes');
+  title = layer.get('title') || 'Information';
   removeInteractions();
-  editSource = options.source;
-  geometryType = options.geometryType;
-  geometryName = options.geometryName;
-  map = options.map;
-  currentLayer = options.layerName;
-  attributes = options.attributes;
-  title = options.title;
   draw = new ol.interaction.Draw({
     source: editSource,
-    'type': geometryType,
-    geometryName: geometryName
+    'type': editLayer.geometryType,
+    geometryName: editLayer.geometryName
   });
   hasDraw = false;
   hasAttribute = false;
   select = new ol.interaction.Select({
-    layers: [options.editableLayer]
+    layers: [layer]
   });
   modify = new ol.interaction.Modify({
     features: select.getFeatures()
@@ -65,13 +85,29 @@ function setEditLayer(options) {
   setActive();
 
   //If snap should be active then add snap internactions for all snap layers
-  hasSnap = options.hasOwnProperty('snap') ? options.snap : true;
+  hasSnap = editLayer.snap;
   if (hasSnap) {
     var selectionSource = featureInfo.getSelectionLayer().getSource();
-    var snapSources = options.snapLayers ? getSnapSources(options.snapLayers) : [editSource];
+    var snapSources = editLayer.snapLayers ? getSnapSources(editLayer.snapLayers) : [editLayer.source];
     snapSources.push(selectionSource);
     snap = addSnapInteraction(snapSources);
   }
+}
+
+function setEditProps(options) {
+  var initialValue = {};
+  var result = editableLayers.reduce(function(layerProps, layerName) {
+    var layer = viewer.getLayer(layerName);
+
+    layerProps[layerName] = {
+      geometryType: layer.get('geometryType') || undefined,
+      geometryName: layer.get('geometryName') || undefined,
+    };
+    layerProps[layerName].snap = options.hasOwnProperty('snap') ? options.snap : true;
+    layerProps[layerName].snapLayers = options.snapLayers || editableLayers;
+    return layerProps;
+  }, initialValue);
+  return result;
 }
 
 function isActive() {
@@ -196,9 +232,11 @@ function removeInteractions() {
     map.removeInteraction(modify);
     map.removeInteraction(select);
     map.removeInteraction(draw);
-    snap.forEach(function(snapInteraction) {
-      map.removeInteraction(snapInteraction);
-    });
+    if (snap) {
+      snap.forEach(function(snapInteraction) {
+        map.removeInteraction(snapInteraction);
+      });
+    }
     modify = undefined;
     select = undefined;
     draw = undefined;
@@ -245,7 +283,7 @@ function toggleEdit(e) {
   } else if (e.tool === 'delete') {
       onDeleteSelected();
   } else if (e.tool === 'edit') {
-      setEditLayer(e.options);
+      setEditLayer(e.currentLayer);
   } else if (e.tool === 'cancel') {
       removeInteractions();
   } else if (e.tool === 'save') {
@@ -324,7 +362,7 @@ function editAttributes() {
           obj.isVisible = true;
           obj.elId = '#input-' + obj.name;
         }
-        obj.formElement = createForm(obj);
+        obj.formElement = editForm(obj);
         return obj;
       });
 
@@ -347,45 +385,6 @@ function editAttributes() {
 
     onAttributesSave(feature, attributeObjects);
   }
-}
-
-function createForm(obj) {
-  var id = obj.elId.slice(1);
-  var cls = obj.cls || '';
-  cls += id;
-  cls += obj.isVisible ? "" : " o-hidden";
-  var label = obj.title;
-  var val = obj.isVisible ? obj.val : '';
-  var type = obj.type;
-  var maxLength = obj.maxLength ? ' maxlength="' + obj.maxLength + '" ' : '';
-  var dropdownOptions = obj.options || [];
-  var el;
-  switch (type) {
-    case 'text':
-      el = '<div><label>' + label + '</label><br><input type="text" id="' + id + '" value="' + val + '"' + maxLength + '></div>';
-      break;
-    case 'textarea':
-      el = '<div><label>' + label + '</label><br><textarea id="' + id + '"' + maxLength + 'rows="3">' + val + '</textarea></div>';
-      break;
-    case 'checkbox':
-      var checked = val === true ? ' checked' : '';
-      el = '<div class="o-form-checkbox"><label>' + label + '</label><input type="checkbox" id="' + id + '" value="' + val + '"' + checked + '></div>';
-      break;
-    case 'dropdown':
-      var firstOption;
-      if (val) {
-        firstOption = '<option value="' + val + '" selected>' + val + '</option>';
-      } else {
-        firstOption = '<option value="" selected>Välj</option>';
-      }
-      el = '<div class="' + cls + '"><label>' + label + '</label><br><select id=' + id + '>' + firstOption;
-      for (var i = 0; i < dropdownOptions.length; i++) {
-        el += '<option value="' + dropdownOptions[i] + '">' + dropdownOptions[i] + '</option>';
-      }
-      el += '</select></div>';
-      break;
-  }
-  return el;
 }
 
 function saveFeature(change) {

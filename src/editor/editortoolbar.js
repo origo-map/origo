@@ -9,21 +9,17 @@ var $ = require('jquery');
 var viewer = require('../viewer');
 var editortemplate = require("../templates/editortoolbar.template.handlebars");
 var dispatcher = require('./editdispatcher');
+var editHandler = require('./edithandler');
 
 var activeClass = 'o-control-active';
-var map = undefined;
-var srsName = undefined;
-var currentLayer;
-var editableLayers = {};
-var editableLayer = undefined;
+var disableClass = 'o-disabled';
+var currentLayer = undefined;
+var editableLayers = undefined;
 var $editAttribute = undefined;
 var $editDraw = undefined;
 var $editDelete = undefined;
 var $editSave = undefined;
 var $editClose = undefined;
-var options = {
-  autoSave: true
-};
 
 module.exports = function() {
 
@@ -32,32 +28,16 @@ module.exports = function() {
   };
 }()
 
-function Init(opt_options) {
-  $.extend(options, opt_options)
-  currentLayer = options.defaultLayer || options.editableLayers[0];
+function Init(options) {
+  currentLayer = options.currentLayer;
+  editableLayers = options.editableLayers;
 
-  map = viewer.getMap();
-  srsName = viewer.getProjectionCode();
+  editHandler(options);
+  render(selectionModel(editableLayers));
 
-  render(selectionModel(options.editableLayers));
-
-  $('.o-map').on('enableInteraction', onEnableInteraction);
-
+  $(document).on('enableInteraction', onEnableInteraction);
   $(document).on('changeEdit', toggleState);
-
-  //set edit properties for editable console
-  editableLayers = setEditProps(options, map, srsName);
-  //
-  options.editableLayers.forEach(function(layerName) {
-    var layer = viewer.getLayer(layerName);
-    layer.getSource().once('addfeature', function(e) {
-      editableLayers[layerName].geometryType = layer.getSource().getFeatures()[0].getGeometry().getType();
-      editableLayers[layerName].geometryName = layer.getSource().getFeatures()[0].getGeometryName();
-      if (layerName === currentLayer && options.isActive) {
-        emitEnableInteraction();
-      }
-    });
-  });
+  $(document).on('editsChange', toggleSave);
 
   bindUIActions();
 
@@ -110,7 +90,7 @@ function bindUIActions() {
   $('select[name="layer-dropdown"]').change(function() {
     currentLayer = $(this).val();
     dispatcher.emitToggleEdit('edit', {
-      options: editableLayers[currentLayer]
+      currentLayer: currentLayer
     });
   });
 }
@@ -120,7 +100,7 @@ function onEnableInteraction(e) {
   if (e.interaction === 'editor') {
     setActive(true);
     dispatcher.emitToggleEdit('edit', {
-      options: editableLayers[currentLayer]
+      currentLayer: currentLayer
     });
   } else {
     setActive(false);
@@ -136,13 +116,6 @@ function setActive(state) {
   }
 }
 
-function emitEnableInteraction() {
-  $('.o-map').first().trigger({
-    type: 'enableInteraction',
-    interaction: 'editor'
-  });
-}
-
 function selectionModel(layerNames) {
   var selectOptions = layerNames.map(function(layerName) {
     var obj = {};
@@ -153,29 +126,6 @@ function selectionModel(layerNames) {
   return selectOptions;
 }
 
-function setEditProps(options, map, srsName) {
-  var layerNames = options.editableLayers;
-  var initialValue = {};
-  var result = layerNames.reduce(function(layerProps, layerName) {
-    var layer = viewer.getLayer(layerName);
-
-    layerProps[layerName] = {
-      editableLayer: layer,
-      source: layer.getSource(),
-      geometryType: layer.get('geometryType') || undefined,
-      geometryName: layer.get('geometryName') || undefined,
-      layerName: layerName,
-      attributes: layer.get('attributes'),
-      title: layer.get('title') || 'Information',
-      map: map
-    };
-    layerProps[layerName].snap = options.hasOwnProperty('snap') ? options.snap : true;
-    layerProps[layerName].snapLayers = options.snapLayers || options.editableLayers;
-    return layerProps;
-  }, initialValue);
-  return result;
-}
-
 function toggleState(e) {
   if (e.tool === 'draw') {
     if (e.active === false) {
@@ -183,5 +133,15 @@ function toggleState(e) {
     } else {
       $editDraw.addClass(activeClass);
     }
+  }
+}
+
+function toggleSave(e) {
+  if (e.edits) {
+    if ($editSave.hasClass(disableClass)) {
+      $editSave.removeClass(disableClass);
+    }
+  } else {
+    $editSave.addClass(disableClass);
   }
 }
