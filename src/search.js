@@ -7,58 +7,60 @@
 var ol = require('openlayers');
 var $ = require('jquery');
 var Viewer = require('./viewer');
-var wktToFeature = require('./maputils')['wktToFeature'];
+var wktToFeature = require('./maputils').wktToFeature;
 var Popup = require('./popup');
-var typeahead = require("typeahead.js-browserify");
-typeahead.loadjQueryPlugin();
+var typeahead = require('typeahead.js-browserify');
 var getFeature = require('./getfeature');
 var getAttributes = require('./getattributes');
 var featureInfo = require('./featureinfo');
 var mapUtils = require('./maputils');
 var getCenter = require('./geometry/getcenter');
 var utils = require('./utils');
+var map;
+var name;
+var northing;
+var easting;
+var geometryAttribute;
+var idAttribute;
+var layerNameAttribute;
+var layerName;
+var titleAttribute;
+var contentAttribute;
+var maxZoomLevel;
+var url;
+var title;
+var hintText;
+var hint;
+var highlight;
+var projectionCode;
 
-var adress;
-var map,
-    name,
-    northing,
-    easting,
-    geometryAttribute,
-    idAttribute,
-    layerNameAttribute,
-    layerName,
-    titleAttribute,
-    contentAttribute,
-    maxZoomLevel,
-    url,
-    title,
-    hintText,
-    hint,
-    highlight,
-    projectionCode;
+typeahead.loadjQueryPlugin();
 
-function init(options){
+function init(options) {
+  var el;
+  name = options.searchAttribute;
+  northing = options.northing || undefined;
+  easting = options.easting || undefined;
+  geometryAttribute = options.geometryAttribute;
 
-    name = options.searchAttribute;
-    northing = options.northing || undefined;
-    easting = options.easting || undefined;
-    geometryAttribute = options.geometryAttribute;
-    idAttribute = options.idAttribute; //idAttribute in combination with layerNameAttribute must be defined if search result should be selected
-    layerNameAttribute = options.layerNameAttribute || undefined;
-    layerName = options.layerName || undefined;
-    url = options.url;
-    title = options.title || '';
-    titleAttribute = options.titleAttribute || undefined;
-    contentAttribute = options.contentAttribute || undefined;
-    maxZoomLevel: options.maxZoomLevel || 2;
-    hintText = options.hintText || "Sök...";
-    hint = options.hasOwnProperty('hint') ? options.hint : true;
-    highlight = options.hasOwnProperty('highlight') ? options.highlight : true;
-    projectionCode = Viewer.getProjectionCode();
+  /** idAttribute in combination with layerNameAttribute
+  must be defined if search result should be selected */
+  idAttribute = options.idAttribute;
+  layerNameAttribute = options.layerNameAttribute || undefined;
+  layerName = options.layerName || undefined;
+  url = options.url;
+  title = options.title || '';
+  titleAttribute = options.titleAttribute || undefined;
+  contentAttribute = options.contentAttribute || undefined;
+  maxZoomLevel: options.maxZoomLevel || 2;
+  hintText = options.hintText || 'Sök...';
+  hint = options.hasOwnProperty('hint') ? options.hint : true;
+  highlight = options.hasOwnProperty('highlight') ? options.highlight : true;
+  projectionCode = Viewer.getProjectionCode();
 
-    map = Viewer.getMap();
+  map = Viewer.getMap();
 
-    var el = '<div id="o-search-wrapper">' +
+  el = '<div id="o-search-wrapper">' +
                 '<div id="o-search" class="o-search o-search-false">' +
                     '<input class="o-search-field typeahead form-control" type="text" placeholder="' + hintText + '">' +
                     '<button id="o-search-button">' +
@@ -73,50 +75,48 @@ function init(options){
                     '</button>' +
                 '</div>' +
               '</div>';
-    $('#o-map').append(el);
-    // constructs the suggestion engine
-    // fix for internet explorer
-        // constructs the suggestion engine
-        // fix for internet explorer
-    $.support.cors = true;
+  $('#o-map').append(el);
 
-    $('.typeahead').typeahead({
-      autoSelect: true,
-      hint: hint,
-      highlight: highlight,
-      minLength: 4
-    },
+  // fix for internet explorer
+  $.support.cors = true;
+
+  $('.typeahead').typeahead({
+    autoSelect: true,
+    hint: hint,
+    highlight: highlight,
+    minLength: 4
+  },
     {
       name: 'adress',
       limit: 9,
       displayKey: name,
-      source: function(query, syncResults, asyncResults) {
-      $.get(url + '?q=' + query, function(data) {
-            asyncResults(data);
-      })
-      },
+      source: function (query, syncResults, asyncResults) {
+        $.get(url + '?q=' + query, function (data) {
+          asyncResults(data);
+        });
+      }
     });
 
-    bindUIActions();
+  bindUIActions();
 }
-function bindUIActions() {
-        $('.typeahead').on('typeahead:selected', selectHandler);
 
-        $('#o-search .o-search-field').on('input', function() {
-          if($('#o-search .o-search-field.tt-input').val() &&  $('#o-search').hasClass('o-search-false')) {
+function bindUIActions() {
+  $('.typeahead').on('typeahead:selected', selectHandler);
+
+  $('#o-search .o-search-field').on('input', function() {
+          if ($('#o-search .o-search-field.tt-input').val() && $('#o-search').hasClass('o-search-false')) {
             $('#o-search').removeClass('o-search-false');
             $('#o-search').addClass('o-search-true');
             onClearSearch();
-          }
-          else if(!($('#o-search .o-search-field.tt-input').val()) &&  $('#o-search').hasClass('o-search-true')) {
+          } else if (!($('#o-search .o-search-field.tt-input').val()) && $('#o-search').hasClass('o-search-true')) {
             $('#o-search').removeClass('o-search-true');
             $('#o-search').addClass('o-search-false');
-            offClearSearch();
           }
         });
 }
+
 function onClearSearch() {
-    $('#o-search-button-close').on('click', function(e) {
+  $('#o-search-button-close').on('click', function (e) {
       $('.typeahead').typeahead('val', '');
       featureInfo.clear();
       Viewer.removeOverlays();
@@ -127,42 +127,39 @@ function onClearSearch() {
       e.preventDefault();
     });
 }
-function offClearSearch() {
-    console.log('offClearSearch');
-    // $('#search-button').off('click', function(e) {
-    //   e.preventDefault();
-    // });
-}
+
 function showOverlay(data, coord) {
-    Viewer.removeOverlays();
-    var popup = Popup('#o-map');
-    var overlay = new ol.Overlay({
-        element: popup.getEl()
+  var popup;
+  var overlay;
+  var content;
+  Viewer.removeOverlays();
+  popup = Popup('#o-map');
+  overlay = new ol.Overlay({
+      element: popup.getEl()
     });
 
-    map.addOverlay(overlay);
+  map.addOverlay(overlay);
 
-    overlay.setPosition(coord);
-    var content = data[name];
-    // content += '<br>' + data.postnr + '&nbsp;' + data.postort;
-    popup.setContent({
-        content: content,
-        title: title
+  overlay.setPosition(coord);
+  content = data[name];
+  popup.setContent({
+      content: content,
+      title: title
     });
-    popup.setVisibility(true);
-
-    mapUtils.zoomToExent(new ol.geom.Point(coord), maxZoomLevel);
+  popup.setVisibility(true);
+  mapUtils.zoomToExent(new ol.geom.Point(coord), maxZoomLevel);
 }
+
 function showFeatureInfo(features, title, content) {
-    var obj = {};
-    obj.feature = features[0];
-    obj.title = title;
-    obj.content = content;
-    featureInfo.identify([obj], 'overlay', getCenter(features[0].getGeometry()));
-    mapUtils.zoomToExent(features[0].getGeometry(), maxZoomLevel);
+  var obj = {};
+  obj.feature = features[0];
+  obj.title = title;
+  obj.content = content;
+  featureInfo.identify([obj], 'overlay', getCenter(features[0].getGeometry()));
+  mapUtils.zoomToExent(features[0].getGeometry(), maxZoomLevel);
 }
 
-/**There are several different ways to handle selected search result.
+/** There are several different ways to handle selected search result.
  * Option 1. Feature info is requested from a map service.
  * In this case idAttribute and layerNameAttribute must be provided.
  * A map service is used to get the geometry and attributes. The layer is defined
@@ -176,44 +173,52 @@ function showFeatureInfo(features, title, content) {
  * In this case geometryAttribute and title must be defined.
  * Option 5. Feature info is shown without selection in the map.
  * This is a simple single table search. In this case title, northing and easting
- * must be defined.
- */
-function selectHandler(evt, data) {
+ * must be defined. */
 
-    if (layerNameAttribute && idAttribute) {
-        var layer = Viewer.getLayer(data[layerNameAttribute]);
-        var id = data[idAttribute];
-        var promise = getFeature(id, layer)
-            .done(function(res) {
-                if (res.length > 0) {
-                    showFeatureInfo(res, layer.get('title'), getAttributes(res[0], layer));
-                }
-                //Fallback if no geometry in response
-                else if (geometryAttribute) {
-                    var feature = wktToFeature(data[geometryAttribute], projectionCode);
-                    var coord = feature.getGeometry().getCoordinates();
-                    showOverlay(data, coord);
-                }
+function selectHandler(evt, data) {
+  var layer;
+  var id;
+  var feature;
+  var content;
+  var coord;
+  if (layerNameAttribute && idAttribute) {
+    layer = Viewer.getLayer(data[layerNameAttribute]);
+    id = data[idAttribute];
+    getFeature(id, layer)
+      .done(function (res) {
+              var featureWkt;
+              var coordWkt;
+              if (res.length > 0) {
+                showFeatureInfo(res, layer.get('title'), getAttributes(res[0], layer));
+              }
+
+              // Fallback if no geometry in response
+              else if (geometryAttribute) {
+                featureWkt = wktToFeature(data[geometryAttribute], projectionCode);
+                coordWkt = featureWkt.getGeometry().getCoordinates();
+                showOverlay(data, coordWkt);
+              }
             });
-    } else if (geometryAttribute && layerName) {
-        var feature = wktToFeature(data[geometryAttribute], projectionCode);
-        var layer = Viewer.getLayer(data[layerName]);
-        showFeatureInfo([feature], layer.get('title'), getAttributes(feature, layer));
-    } else if (titleAttribute && contentAttribute && geometryAttribute) {
-        var feature = wktToFeature(data[geometryAttribute], projectionCode);
-        //Make sure the response is wrapped in a html element
-        var content = utils.createElement('div', data[contentAttribute])
-        showFeatureInfo([feature], data[titleAttribute], content);
-    } else if (geometryAttribute && title) {
-        var feature = wktToFeature(data[geometryAttribute], projectionCode);
-        var content = utils.createElement('div', data[name]);
-        showFeatureInfo([feature], title, content);
-    } else if (easting && northing && title) {
-        var coord = [data[easting], data[northing]];
-        showOverlay(data, coord);
-    } else {
-        console.log('Search options are missing');
-    }
+  } else if (geometryAttribute && layerName) {
+    feature = wktToFeature(data[geometryAttribute], projectionCode);
+    layer = Viewer.getLayer(data[layerName]);
+    showFeatureInfo([feature], layer.get('title'), getAttributes(feature, layer));
+  } else if (titleAttribute && contentAttribute && geometryAttribute) {
+    feature = wktToFeature(data[geometryAttribute], projectionCode);
+
+    // Make sure the response is wrapped in a html element
+    content = utils.createElement('div', data[contentAttribute]);
+    showFeatureInfo([feature], data[titleAttribute], content);
+  } else if (geometryAttribute && title) {
+    feature = wktToFeature(data[geometryAttribute], projectionCode);
+    content = utils.createElement('div', data[name]);
+    showFeatureInfo([feature], title, content);
+  } else if (easting && northing && title) {
+    coord = [data[easting], data[northing]];
+    showOverlay(data, coord);
+  } else {
+    console.log('Search options are missing');
+  }
 }
 
 module.exports.init = init;
