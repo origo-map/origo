@@ -18,7 +18,7 @@
     {
       "name": "editor",
       "options": {
-        "editableLayers": ["test_byggnadsytor", "test_punkt"],
+        "editableLayers": ["test_ags"],
         "isActive": true,
         "autoSave": false
       }
@@ -76,6 +76,9 @@
       "url": "http://localhost:9090/geoserver/sqlserver/wfs",
       "workspace": "sqlserver"
     },
+    "ags_editor": {
+      "url": "http://vst00212s/arcgis/rest/services/test/sbf_test_editing/FeatureServer/"
+    },
     "basemap": {
       "url": "https://www.malardalskartan.se/geowebcache/service/wmts"
     }
@@ -103,7 +106,7 @@
       "source": "local",
       "style": "mask",
       "type": "WFS",
-      "visible": true,
+      "visible": false,
       "attributes": [
           {
             "name": "typ",
@@ -168,6 +171,29 @@
           219773,
           6628182
         ],
+      "visible": false,
+      "attributes": [
+          {
+            "name": "typ",
+            "title": "Typ",
+            "type": "dropdown",
+            "options": [
+                "Villa",
+                "Radhus",
+                "Lägenhet"
+            ]
+          }
+      ]
+    },
+    {
+      "name": "test_ags",
+      "id": "0",
+      "title": "Test ags",
+      "group": "test",
+      "queryable": true,
+      "source": "ags_editor",
+      "style": "cirkel",
+      "type": "AGS_FEATURE",
       "visible": true,
       "attributes": [
           {

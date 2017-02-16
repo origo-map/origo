@@ -6,8 +6,10 @@
 
 var viewer = require('../viewer');
 var wfsTransaction = require('./wfstransaction');
+var agsTransaction = require('./agstransaction');
 var transactions = {
-  WFS: wfsTransaction
+  WFS: wfsTransaction,
+  AGS_FEATURE: agsTransaction
 };
 
 module.exports = function(transaction, layerName) {
