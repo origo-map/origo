@@ -1553,6 +1553,10 @@ input.o-search-field::-ms-clear {
   height: 1.25rem;
   width: 1.25rem;
 }
+.o-disabled [class^="o-icon-"],
+.o-disabled [class*=" o-icon-"] {
+  fill: rgba(0,0,0,0.26);
+}
 .ol-control>button:hover [class^="o-icon-"],
 .ol-control>button:hover [class*=" o-icon-"],
 .o-button:hover [class^="o-icon-"],
@@ -1562,6 +1566,10 @@ input.o-search-field::-ms-clear {
 .o-toolbar button:hover [class^="o-icon-"],
 .o-toolbar button:hover [class*="o-icon-"] {
 	fill: #007AFF;
+}
+.o-toolbar button.o-disabled:hover [class^="o-icon-"],
+.o-toolbar button.o-disabled:hover [class*="o-icon-"] {
+	fill: rgba(0,0,0,0.26);
 }
 #o-editor-toolbar button {
 	float: left;

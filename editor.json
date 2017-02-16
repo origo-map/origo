@@ -19,7 +19,8 @@
       "name": "editor",
       "options": {
         "editableLayers": ["test_byggnadsytor", "test_punkt"],
-        "isActive": true
+        "isActive": true,
+        "autoSave": false
       }
     },
     {
