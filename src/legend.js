@@ -23,7 +23,7 @@ function init(opt_options) {
   styleSettings = viewer.getStyleSettings();
 
   render();
-  addLegend(viewer.getGroups());
+  addLegend(viewer.getGroups('top'));
 }
 
 function render() {
@@ -630,7 +630,7 @@ function showAbstract($abstractButton) {
 
   //If info button is connected group
   if ($item.hasClass('o-legend-header')) {
-    var groups = viewer.getAllGroups();
+    var groups = viewer.getGroups();
 
     var group = $.grep(groups, function(obj) {
       return (obj.name == layername);

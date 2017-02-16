@@ -299,8 +299,14 @@ function getGroup(group) {
   return group;
 }
 
-function getGroups() {
-  return settings.groups;
+function getGroups(opt) {
+  if(opt == 'top') {
+    return settings.groups;
+  } else if (opt == 'sub') {
+    return getSubgroups();
+  } else {
+    return settings.groups.concat(getSubgroups());
+  }
 }
 
 function getSubgroups() {
@@ -324,12 +330,6 @@ function getSubgroups() {
 
   findSubgroups(settings.groups, 0);
   return subgroups;
-}
-
-function getAllGroups() {
-  var groups = getGroups();
-  var subGroups = getSubgroups();
-  return groups.concat(subGroups);
 }
 
 function getProjectionCode() {
@@ -464,8 +464,6 @@ module.exports.getControlNames = getControlNames;
 module.exports.getQueryableLayers = getQueryableLayers;
 module.exports.getGroup = getGroup;
 module.exports.getGroups = getGroups;
-module.exports.getSubgroups = getSubgroups;
-module.exports.getAllGroups = getAllGroups;
 module.exports.getProjectionCode = getProjectionCode;
 module.exports.getProjection = getProjection;
 module.exports.getMapSource = getMapSource;

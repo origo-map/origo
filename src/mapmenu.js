@@ -49,7 +49,6 @@ function init() {
     $closeButton = $('#o-mapmenu-button-close');
 
     bindUIActions();
-    // addLegend(viewer.getGroups());
 }
 function bindUIActions() {
     $menuButton.on('click', function(e) {
