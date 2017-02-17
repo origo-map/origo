@@ -299,8 +299,37 @@ function getGroup(group) {
   return group;
 }
 
-function getGroups() {
-  return settings.groups;
+function getGroups(opt) {
+  if(opt == 'top') {
+    return settings.groups;
+  } else if (opt == 'sub') {
+    return getSubgroups();
+  } else {
+    return settings.groups.concat(getSubgroups());
+  }
+}
+
+function getSubgroups() {
+  var subgroups = [];
+
+  function findSubgroups(groups, n) {
+    if (n >= groups.length) {
+      return;
+    }
+
+    if (groups[n].groups) {
+      groups[n].groups.forEach(function(subgroup) {
+        subgroups.push(subgroup);
+      });
+
+      findSubgroups(groups[n].groups, 0);
+    }
+
+    findSubgroups(groups, n+1);
+  }
+
+  findSubgroups(settings.groups, 0);
+  return subgroups;
 }
 
 function getProjectionCode() {
