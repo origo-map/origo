@@ -29,6 +29,8 @@ var editsStore = function featureStore() {
     }
     if (hasEdits() === true) {
       dispatcher.emitEditsChange(1);
+    } else {
+      dispatcher.emitEditsChange(0);
     }
   }
 
