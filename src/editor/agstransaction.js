@@ -15,7 +15,7 @@ var urlSuffix = {
   update: 'updateFeatures',
   insert: 'addFeatures',
   delete: 'deleteFeatures'
-}
+};
 
 module.exports = function(transObj, layerName) {
   agsTransaction(transObj, layerName);
