@@ -14,7 +14,7 @@ var format = new ol.format.EsriJSON();
 var urlSuffix = {
   update: 'updateFeatures',
   insert: 'addFeatures',
-  delete: ''
+  delete: 'deleteFeatures'
 }
 
 module.exports = function(transObj, layerName) {
@@ -24,12 +24,19 @@ module.exports = function(transObj, layerName) {
 function writeAgsTransaction(features, options) {
   var data = {};
 
-  var agsFeatures = features.map(function(feature) {
-    return format.writeFeature(feature, {
-      featureProjection: options.projection
+  if (options.type === 'delete') {
+    var objectIds = features.map(function(feature) {
+      return feature.getId();
     });
-  });
-  data.features = '[' + agsFeatures + ']';
+    data.objectIds = objectIds.join(',');
+  } else {
+    var agsFeatures = features.map(function(feature) {
+      return format.writeFeature(feature, {
+        featureProjection: options.projection
+      });
+    });
+    data.features = '[' + agsFeatures + ']';
+  }
   data.f = 'json';
   return data;
 }
@@ -43,13 +50,14 @@ function agsTransaction(transObj, layerName) {
   var cb = {
     update: updateSuccess,
     insert: insertSuccess,
-    delete: ''
+    delete: deleteSuccess
   };
   types.forEach(function(type) {
     if (transObj[type]) {
       var url = source.url  + '/' + id + '/' + urlSuffix[type];
       var datat = writeAgsTransaction(transObj[type], {
-        projection: projection
+        projection: projection,
+        type: type
       });
       $.ajax({
         type: "POST",
@@ -63,15 +71,16 @@ function agsTransaction(transObj, layerName) {
   });
 
   function updateSuccess(data) {
+    var feature = transObj.update;
     var result = JSON.parse(data);
     if (result) {
       if (result.updateResults.length > 0) {
-        result.updateResults.forEach(function(update) {
+        result.updateResults.forEach(function(update, index) {
           if (update.success !== true) {
-            throwError(update.error);
+            throwServerError(update.error);
           } else {
             dispatcher.emitChangeFeature({
-              feature: [layer.getSource().getFeatureById(update.objectId)],
+              feature: [feature[index]],
               layerName: layerName,
               status: 'finished',
               action: 'update'
@@ -79,35 +88,6 @@ function agsTransaction(transObj, layerName) {
           }
         });
       }
-      // if (result.transactionSummary.totalUpdated > 0) {
-      //   dispatcher.emitChangeFeature({
-      //     feature: transObj.update,
-      //     layerName: layerName,
-      //     status: 'finished',
-      //     action: 'update'
-      //   });
-      // }
-      // if (result.transactionSummary.totalDeleted > 0) {
-      //   dispatcher.emitChangeFeature({
-      //     feature: transObj.delete,
-      //     layerName: layerName,
-      //     status: 'finished',
-      //     action: 'delete'
-      //   });
-      // }
-      // if (result.transactionSummary.totalInserted > 0) {
-      //   var feature = transObj.insert;
-      //   dispatcher.emitChangeFeature({
-      //     feature: transObj.insert,
-      //     layerName: layerName,
-      //     status: 'finished',
-      //     action: 'insert'
-      //   });
-      //   var insertIds = result.insertIds;
-      //   insertIds.forEach(function(insertId, index) {
-      //     feature[index].setId(insertId);
-      //   });
-      // }
     } else {
       error();
     }
@@ -120,7 +100,7 @@ function agsTransaction(transObj, layerName) {
       if (result.addResults.length > 0) {
         result.addResults.forEach(function(insert, index) {
           if (insert.success !== true) {
-            throwError(insert.error);
+            throwServerError(insert.error);
           } else {
             dispatcher.emitChangeFeature({
               feature: [feature[index]],
@@ -138,13 +118,36 @@ function agsTransaction(transObj, layerName) {
     }
   }
 
+  function deleteSuccess(data) {
+    var feature = transObj.delete;
+    var result = JSON.parse(data);
+    if (result) {
+      if (result.deleteResults.length > 0) {
+        result.deleteResults.forEach(function(deleted, index) {
+          if (deleted.success !== true) {
+            throwServerError(deleted.error);
+          } else {
+            dispatcher.emitChangeFeature({
+              feature: [feature[index]],
+              layerName: layerName,
+              status: 'finished',
+              action: 'delete'
+            });
+          }
+        });
+      }
+    } else {
+      error();
+    }
+  }
+
   function error(e) {
     var errorMsg = e ? (e.status + ' ' + e.statusText) : "";
     alert('Det inträffade ett fel när ändringarna skulle sparas till servern...<br><br>' +
       errorMsg);
   }
 
-  function throwError(error) {
+  function throwServerError(error) {
     alert(error.description + ' (' + error.code + ')');
   }
 }
