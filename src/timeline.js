@@ -146,20 +146,26 @@ function timeline() {
 };
 
 function setHandleLabelValue(val) {
-  if (utilSettings.tickArray.includes(val[0])) {
-    $('.ui-slider-label-min').addClass('o-hidden');
-  } else {
-    $('.ui-slider-label-min').removeClass('o-hidden');
-    $('.ui-slider-label-min > span').text(val[0]);
-  }
+    var includesLeftVal = utilSettings.tickArray.filter(function(arrVal){
+      return arrVal == val[0];
+    });
+    var includesRightVal = utilSettings.tickArray.filter(function(arrVal){
+      return arrVal == val[1];
+    });
+   
+    if (includesLeftVal.length) {
+      $('.ui-slider-label-min').addClass('o-hidden');
+    } else {
+      $('.ui-slider-label-min').removeClass('o-hidden');
+      $('.ui-slider-label-min > span').text(val[0]);
+    }
 
-  if (utilSettings.tickArray.includes(val[1])) {
-    $('.ui-slider-label-max').addClass('o-hidden');
-  } else {
-    $('.ui-slider-label-max').removeClass('o-hidden');
-    $('.ui-slider-label-max > span').text(val[1]);      
-  }
-
+    if (includesRightVal.length) {
+      $('.ui-slider-label-max').addClass('o-hidden');
+    } else {
+      $('.ui-slider-label-max').removeClass('o-hidden');
+      $('.ui-slider-label-max > span').text(val[1]);      
+    }
 }
 
 function setHandleLabelPosition(val) {
