@@ -11,12 +11,15 @@ var utils = require('./utils');
 
 var isPanning = false;
 var markerId = 'o-centerposition-marker';
+var resultId = 'o-centerposition-result';
+var toggleId = 'o-centerposition-toggle';
+var coordsId = 'o-centerposition-coords';
 var map;
 var view;
 var consoleId;
 var prefix;
 var suffix;
-var o;
+var overlay;
 
 function Init(opt_options) {
   var options = opt_options || {};
@@ -27,24 +30,47 @@ function Init(opt_options) {
   consoleId = Viewer.getConsoleId();
 
   addListener();
-  // render();
+  render();
   // bindUIActions();
 }
 
-function renderMarker() {
-  var pointStyle = [
-    'border: 3px solid rgba(0,0,0,0.8);',
-    'border-radius: 50%;'
+function render() {
+  var buttonStyle = [
+    'background-color: #000;',
+    'color: #fff;',
+    'font-size: 10px;',
+    'padding: 5px 8px;',
+    'border-radius: 10px;',
+    'display: inline-block;',
+    '"Helvetica Neue",sans-serif'
   ].join(' ');
-  var point = utils.createElement('div','', {
-    style: pointStyle
+  var toggleButton = utils.createElement('button', prefix, {
+    id: toggleId,
+    style: buttonStyle,
+    value: prefix
   });
+  var coordsDiv = utils.createElement('div', '', {
+    id: coordsId,
+    style: 'display: inline-block; padding-left: 5px;'
+  });
+  var resultContainer = utils.createElement('div', toggleButton + coordsDiv, {
+    id: resultId,
+    style: 'display: inline-block'
+  });
+  $('#' + consoleId).append(resultContainer);
+}
+
+function renderMarker() {
   var markerStyle = [
-    'background-color: rgba(255,255,255,0.6);',
+    'background-color: rgba(255,255,255,0.4);',
     'border-radius: 50%;',
-    'padding: 10px;'
+    'font-size: 1rem;',
+    'line-height: 2rem;',
+    'width: 2rem;',
+    'height: 2rem;',
+    'text-align: center;'
   ].join(' ');
-  var marker = utils.createElement('div', point, {
+  var marker = utils.createElement('div', '+', {
     id: markerId,
     style: markerStyle
   });
@@ -71,27 +97,22 @@ function onChangeCenter() {
 
 function onMoveStart() {
   isPanning = true;
-  var center = view.getCenter().map(function(coord) {
-    return Math.round(coord);
-  });
   renderMarker();
-  o = createOverlay(center, document.getElementById(markerId));
-  map.addOverlay(o);
+  overlay = createOverlay(getCenter(), document.getElementById(markerId));
+  map.addOverlay(overlay);
 }
 
 function onMoveEnd() {
   isPanning = false;
-  map.removeOverlay(o);
+  map.removeOverlay(overlay);
   $('#' + markerId).remove();
 }
 
 function onMoving() {
-  var center = view.getCenter().map(function(coord) {
-    return Math.round(coord);
-  });
-  center = prefix + center.join(', ') + suffix;
-  $('#' + consoleId).html(center);
-  o.setPosition(center);
+  var coord = getCenter();
+  var center = coord.join(', ') + suffix;
+  $('#' + coordsId).html(center);
+  overlay.setPosition(coord);
 }
 
 function createOverlay(coord, el) {
@@ -99,6 +120,12 @@ function createOverlay(coord, el) {
     position: coord,
     element: el,
     positioning: 'center-center'
+  });
+}
+
+function getCenter() {
+  return view.getCenter().map(function(coord) {
+    return Math.round(coord);
   });
 }
 
