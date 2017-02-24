@@ -53,12 +53,6 @@
     162429,
     6599905
   ],
-  "home": [
-    105085,
-    6571627,
-    219773,
-    6628182
-  ],
   "zoom": 3,
   "resolutions": [
     1146.8799999999999,
@@ -82,7 +76,7 @@
       "workspace": "sqlserver"
     },
     "basemap": {
-      "url": "http://www.malardalskartan.se/geowebcache/service/wmts"
+      "url": "https://www.malardalskartan.se/geowebcache/service/wmts"
     }
   },
   "groups": [
@@ -186,17 +180,6 @@
             ]
           }
       ]
-    },
-    {
-      "name": "mdk",
-      "opacity": 0.15,
-      "title": "4k",
-      "group": "none",
-      "queryable": false,
-      "source": "data/mdk.geojson",
-      "style": "mask",
-      "type": "GEOJSON",
-      "visible": true
     },
     {
       "attribution": "&copy Lantmäteriet Geodatasamverkan",

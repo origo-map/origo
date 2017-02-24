@@ -11,8 +11,8 @@ module.exports = function(features, map) {
   var collection = features ? [features] : [];
   var featureLayerStore = new ol.source.Vector({
       features: collection
-  }),
-  featureLayer = new ol.layer.Vector({
+  });
+  var featureLayer = new ol.layer.Vector({
     source: featureLayerStore,
     map: map
   });
@@ -24,7 +24,7 @@ module.exports = function(features, map) {
           return featureLayerStore.getFeatures();
       },
       getFeatureLayer: function getFeatureLayer() {
-          return featurelayer;
+          return featureLayer;
       },
       getFeatureStore: function getFeatureStore() {
           return featureLayerStore;

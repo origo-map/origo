@@ -20,7 +20,7 @@ function init() {
         id: 'o-mapmenu-button',
         cls: 'o-mapmenu-button-true',
         iconCls: 'o-icon-fa-bars',
-        src: 'css/svg/fa-icons.svg#fa-bars',
+        src: '#fa-bars',
         tooltipText: 'Meny',
         tooltipPlacement: 'west'
     });
@@ -41,7 +41,7 @@ function init() {
         id: 'o-mapmenu-button-close',
         cls: 'o-no-boxshadow',
         iconCls: 'o-icon-menu-fa-times',
-        src: 'css/svg/fa-icons.svg#fa-times',
+        src: '#fa-times',
         tooltipText: 'Stäng meny',
         tooltipPlacement: 'west'
     });
@@ -49,7 +49,6 @@ function init() {
     $closeButton = $('#o-mapmenu-button-close');
 
     bindUIActions();
-    // addLegend(viewer.getGroups());
 }
 function bindUIActions() {
     $menuButton.on('click', function(e) {

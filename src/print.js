@@ -13,11 +13,13 @@ var printWith = 800;
 var $printButton;
 var attribution;
 var map;
+var baseUrl;
 
 function Init(opt_options) {
   var options = opt_options || {};
   attribution = options.attribution || '© Lantmäteriet Geodatasamverkan';
   map = Viewer.getMap();
+  baseUrl = Viewer.getBaseUrl();
 
   render();
   bindUIActions();
@@ -27,7 +29,7 @@ function render() {
   var el = utils.createListButton({
     id: 'o-print',
     iconCls: 'o-icon-fa-print',
-    src: 'css/svg/fa-icons.svg#fa-print',
+    src: '#fa-print',
     text: 'Skriv ut'
   });
   $('#o-menutools').append(el);
@@ -52,6 +54,7 @@ function imageToPrint($printCanvas) {
     var templateOptions = {};
     templateOptions.src = imageCrop.src;
     templateOptions.attribution = attribution;
+    templateOptions.logoSrc = baseUrl + 'css/png/logo_print.png';
     var pw = template(templateOptions);
     var printWindow = window.open('', '', 'width=800,height=820');
     printWindow.document.write(pw);

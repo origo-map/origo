@@ -11,7 +11,7 @@ var Popup = require('./popup');
 var sidebar = require('./sidebar');
 var maputils = require('./maputils');
 var featurelayer = require('./featurelayer');
-var style = require('./style');
+var style = require('./style')();
 var styleTypes = require('./style/styletypes');
 var getFeatureInfo = require('./getfeatureinfo');
 var owlCarousel = require('../externs/owlcarousel-browserify');
@@ -62,6 +62,10 @@ function init(opt_options) {
 
 }
 
+function getSelectionLayer() {
+  return selectionLayer.getFeatureLayer();
+}
+
 function getSelection() {
     var selection = {};
     selection.geometryType = selectionLayer.getFeatures()[0].getGeometry().getType();
@@ -72,6 +76,7 @@ function getPin() {
     return savedPin;
 }
 function identify(items, target, coordinate) {
+    Viewer.removeOverlays();
     var content = items.map(function(i){
         return i.content;
     }).join('');
@@ -108,7 +113,6 @@ function identify(items, target, coordinate) {
     }
 }
 function onClick(evt) {
-    Viewer.removeOverlays();
     savedPin = undefined;
     //Featurinfo in two steps. Concat serverside and clientside when serverside is finished
     var clientResult = getFeatureInfo.getFeaturesAtPixel(evt, clusterFeatureinfoLevel);
@@ -172,7 +176,7 @@ function initCarousel(id, options, cb) {
       paginationSpeed : 400,
       singleItem:true,
       rewindSpeed:200,
-      navigationText: ['<svg class="o-icon-fa-chevron-left"><use xlink:href="css/svg/fa-icons.svg#fa-chevron-left"></use></svg>', '<svg class="o-icon-fa-chevron-right"><use xlink:href="css/svg/fa-icons.svg#fa-chevron-right"></use></svg>'],
+      navigationText: ['<svg class="o-icon-fa-chevron-left"><use xlink:href="#fa-chevron-left"></use></svg>', '<svg class="o-icon-fa-chevron-right"><use xlink:href="#fa-chevron-right"></use></svg>'],
       afterAction: cb
     };
     return $(id).owlCarousel(carouselOptions);
@@ -180,6 +184,7 @@ function initCarousel(id, options, cb) {
 
 module.exports.init = init;
 module.exports.clear = clear;
+module.exports.getSelectionLayer = getSelectionLayer;
 module.exports.getSelection = getSelection;
 module.exports.getPin = getPin;
 module.exports.identify = identify;

@@ -71,7 +71,6 @@ module.exports = {
       switch (type) {
           case "Polygon":
               center = geometry.getInteriorPoint().getCoordinates();
-              console.log(center);
               break;
           case "MultiPolygon":
               center = geometry.getInteriorPoints()[0].getCoordinates();
@@ -93,5 +92,11 @@ module.exports = {
               break;
       }
       return center;
+  },
+  scaleToResolution: function scaleToResolution(scale, projection) {
+    var dpi = 25.4 / 0.28;
+    var mpu = projection.getMetersPerUnit();
+    var resolution = scale / (mpu * 39.37 * dpi);
+    return resolution;
   }
 }
