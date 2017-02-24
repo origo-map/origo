@@ -2,6 +2,16 @@
   right: .5em;
   top: .5em;
   z-index: 5;
+  .o-icon-fa-bars {
+  	padding: .4em;
+    height: 1.2em;
+    width: 1.2em;
+  }
+}
+.o-icon-menu-fa-times {
+	padding: .5rem;
+	height: 1rem;
+	width: 1rem;
 }
 #o-mapmenu-button button.o-button:hover .o-icon-fa-bars{
 	fill: #fff;

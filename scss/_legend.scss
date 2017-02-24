@@ -9,6 +9,58 @@
   position: absolute;
   z-index: 1;
 }
+.o-icon-fa-chevron-down,
+.o-icon-fa-chevron-right {
+	height: .9em;
+	padding: .1em;
+	width: .9em;
+}
+.o-icon-fa-check {
+	height: 1em;
+	padding: 0.05em;
+	width: 1em;
+}
+.o-icon-fa-square-o,
+.o-icon-fa-check-square-o {
+	height: 1em;
+	padding: 0.1em;
+	width: 1em;
+}
+.o-icon-fa-plus,
+.o-icon-fa-minus {
+	padding: .65em;
+	height: .7em;
+	width: .7em;
+}
+.o-icon-fa-print,
+.o-icon-fa-share-square-o {
+	padding: 0.25em;
+	height: 1em;
+	width: 1em;
+}
+.o-icon-fa-times {
+	padding: .65em;
+	height: 1.129em;
+	width: 1.129em;
+}
+.o-icon-fa-angle-double-down,
+.o-icon-fa-angle-double-up {
+	padding: .05em;
+	height: 1em;
+	width: 1em;
+}
+.o-icon-fa-angle-double-right,
+.ol-collapsed .o-icon-fa-info {
+	fill: #fff;
+	height: .9em;
+	padding: .3em;
+	width: .9em;
+}
+.o-legend-header .o-icon-fa-info-circle {
+	padding: 0;
+	height: 1em;
+	width: 1em;
+}
 li .o-legend-header {
   border-bottom: 1px solid #C5C5C5;
 }
@@ -114,17 +166,6 @@ li .o-legend-subitem-title {
 }
 #o-map-legend .o-legend-item {
   padding-left: 0;
-}
-.o-icon-fa-info-circle {
-  height: 1.2em;
-  padding: 0;
-  width: 1.2em;
-  fill: #424242;
-}
-.o-legend-header .o-icon-fa-info-circle {
-	padding: 0;
-	height: 1em;
-	width: 1em;
 }
 #o-map-legend-background li {
   display: inline;
