@@ -1291,13 +1291,13 @@ li .o-legend-header {
   border-bottom: 1px solid #C5C5C5;
 }
 li .o-legend-subheader {
-  border-bottom: none;  
+  border-bottom: none;
 }
 .o-legend-group li:last-child {
   border-bottom: 1px solid #C5C5C5;
 }
 .o-legend-subgroup li:last-child {
-  border-bottom: none;  
+  border-bottom: none;
 }
 ul.o-legendlist:first-child {
   border-top: 1px solid #C5C5C5;
@@ -1389,7 +1389,7 @@ li .o-legend-subitem-title {
 }
 .o-legend-subheader .o-checkbox {
 	padding-top: 0;
-} 
+}
 #o-map-legend .o-legend-item {
   padding-left: 0;
 }

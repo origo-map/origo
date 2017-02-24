@@ -17,25 +17,33 @@ var coordsId = 'o-centerposition-coords';
 var map = undefined;
 var view = undefined;
 var consoleId = undefined;
-var title = undefined;
 var suffix = undefined;
-var defaultProjection = undefined;
+var currentProjection = undefined;
 var projections = undefined;
 var projectionCodes = undefined;
 var projection = undefined;
+var mapProjection = undefined;
 
 function Init(opt_options) {
   var options = opt_options || {};
+  var title = options.title || undefined;
   suffix = options.suffix || '';
-  title = options.title || '';
   map = Viewer.getMap();
   view = map.getView();
   projection = view.getProjection();
+  mapProjection = Viewer.getProjectionCode();
   consoleId = Viewer.getConsoleId();
   projections = options.projections || {};
-  defaultProjection = Viewer.getProjectionCode();
   projectionCodes = Object.getOwnPropertyNames(projections);
-  projections[defaultProjection] = title;
+  if (title) {
+    currentProjection = mapProjection;
+    projections[currentProjection] = title;
+    projectionCodes.unshift(mapProjection);
+  } else if (projectionCodes.length) {
+    currentProjection = projectionCodes[0];
+  } else {
+    alert('No title or projection is set for centerposition');
+  }
 
   addListener();
   render();
@@ -48,15 +56,16 @@ function render() {
     'color: #fff;',
     'font-size: 10px;',
     'line-height: 10px;',
-    'padding: 5px 15px;',
+    'min-width: 110px;',
+    'padding: 5px;',
     'border-radius: 10px;',
     'display: inline-block;',
     'font-family: Arial, \'Helvetica Neue\', sans-serif;'
   ].join(' ');
-  var toggleButton = utils.createElement('button', title, {
+  var toggleButton = utils.createElement('button', projections[currentProjection], {
     id: toggleId,
     style: buttonStyle,
-    value: defaultProjection
+    value: currentProjection
   });
   var coordsDiv = utils.createElement('div', '', {
     id: coordsId,
@@ -71,8 +80,8 @@ function render() {
 
 function bindUIActions() {
   $('#' + toggleId).on('click', function(e) {
-    var proj = toggleProjectionVal(this.value);
-    updateResult(proj);
+    currentProjection = toggleProjectionVal(this.value);
+    updateResult(currentProjection);
     onChangeCenter();
     this.blur();
     e.preventDefault();
@@ -83,6 +92,7 @@ function renderMarker() {
   var markerStyle = [
     'background-color: rgba(255,255,255,0.4);',
     'border-radius: 50%;',
+    'cursor: default;',
     'font-size: 1rem;',
     'line-height: 2rem;',
     'width: 2rem;',
@@ -110,19 +120,13 @@ function addListener() {
 function toggleProjectionVal(val) {
   var index;
   var proj = undefined;
-  if (projectionCodes.length) {
-    index = projectionCodes.indexOf(val);
-    if (index === -1) {
-      proj = projectionCodes[0];
-    } else if (index === projectionCodes.length -1) {
-      proj = defaultProjection;
-    } else if (index < projectionCodes.length -1) {
-      proj = projectionCodes[index + 1];
-    }
-    return proj;
-  } else {
-    return val;
+  index = projectionCodes.indexOf(val);
+  if (index === projectionCodes.length - 1) {
+    proj = projectionCodes[0];
+  } else if (index < projectionCodes.length - 1) {
+    proj = projectionCodes[index + 1];
   }
+  return proj;
 }
 
 function onChangeCenter() {
@@ -146,8 +150,7 @@ function onMoveEnd() {
 }
 
 function onMoving() {
-  var proj = $('#' + toggleId).val();
-  updateCoords(proj, view.getCenter());
+  updateCoords(view.getCenter());
 }
 
 function round(coords, decimals) {
@@ -162,23 +165,23 @@ function round(coords, decimals) {
   }
 }
 
-function updateResult(proj) {
-  $('#' + toggleId).val(proj);
-  $('#' + toggleId).text(projections[proj]);
-  updateCoords(proj, view.getCenter());
+function updateResult() {
+  $('#' + toggleId).val(currentProjection);
+  $('#' + toggleId).text(projections[currentProjection]);
+  updateCoords(view.getCenter());
 }
 
-function updateCoords(proj, sourceCoords) {
+function updateCoords(sourceCoords) {
   var coords = sourceCoords;
   var geometry;
   var center;
-  if (proj !== defaultProjection) {
+  if (currentProjection !== mapProjection) {
     geometry = new ol.Feature({
       geometry: new ol.geom.Point(coords)
     }).getGeometry();
-    coords = geometry.transform(projection, proj).getCoordinates();
+    coords = geometry.transform(projection, currentProjection).getCoordinates();
   }
-  if (proj === 'EPSG:4326') {
+  if (currentProjection === 'EPSG:4326') {
     coords = round(coords, 5);
   } else {
     coords = round(coords);
