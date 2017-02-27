@@ -215,6 +215,10 @@ function getSettings() {
   return settings;
 }
 
+function getExtent() {
+  return settings.extent;
+}
+
 function getBaseUrl() {
   return settings.baseUrl;
 }
@@ -454,6 +458,7 @@ function checkSize() {
 module.exports.init = init;
 module.exports.createLayers = createLayers;
 module.exports.getBaseUrl = getBaseUrl;
+module.exports.getExtent = getExtent;
 module.exports.getSettings = getSettings;
 module.exports.getStyleSettings = getStyleSettings;
 module.exports.getMapUrl = getMapUrl;

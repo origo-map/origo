@@ -18,6 +18,7 @@ type.WMTS = require('./layer/wmts');
 type.AGS_TILE = require('./layer/agstile');
 type.XYZ = require('./layer/xyz');
 type.OSM = require('./layer/osm');
+type.FEATURE = require('./layer/featurelayer');;
 type.GROUP = groupLayer;
 
 var layerCreator = function layerCreator(opt_options) {
@@ -49,6 +50,7 @@ var layerCreator = function layerCreator(opt_options) {
   var layerOptions = $.extend(defaultOptions, options);
   layerOptions.minResolution = layerOptions.hasOwnProperty('minScale') ? mapUtils.scaleToResolution(layerOptions.minScale, projection): undefined;
   layerOptions.maxResolution = layerOptions.hasOwnProperty('maxScale') ? mapUtils.scaleToResolution(layerOptions.maxScale, projection): undefined;
+  layerOptions.extent = layerOptions.extent || viewer.getExtent();
   layerOptions.sourceName = layerOptions.source;
   layerOptions.styleName = layerOptions.style;
 
