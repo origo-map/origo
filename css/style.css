@@ -1691,6 +1691,11 @@ input.o-search-field::-ms-clear {
 	height: 1em;
 	width: 1em;
 }
+.o-icon-fa-external-link {
+	padding: .25em;
+  height: 1em;
+  width: 1em;
+}
 .o-legend-header .o-icon-fa-info-circle {
 	padding: 0;
 	height: 1em;
