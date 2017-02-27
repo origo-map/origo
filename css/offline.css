@@ -1,0 +1,11 @@
+.o-downloads-container {
+  background-color: "#fff";
+  width: 100%;
+  z-index: 10000;
+}
+.o-downloads-container header {
+  text-align: center;
+}
+.o-downloads-content {
+  width: inherit;
+}
