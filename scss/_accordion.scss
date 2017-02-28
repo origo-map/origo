@@ -1,0 +1,114 @@
+.o-accordion {
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+
+  .collapse {
+    display: block;
+    overflow: hidden;
+    transition: all ease .3s;
+  }
+
+  .collapse:not(.card-block) {
+    height: 0;
+  }
+
+  a:focus,
+  a:hover,
+  a:active {
+    outline: 0;
+    text-decoration: none;
+  }
+
+  .card {
+    border-width: 0 0 1px 0;
+    border-style: solid;
+    border-color: rgba(0,0,0,0.12);
+    background: none;
+    box-shadow: none;
+    color: rgba(0,0,0,.87);
+    margin: 0;
+    padding: 0;
+  }
+
+  .card:last-child {
+    border-bottom: none;
+  }
+
+  .card-group > .card:first-child .card-header {
+    border-radius: 4px 4px 0 0;
+  }
+
+  .card-group .card {
+    border-radius: 0;
+  }
+
+  .card-group .card + .card {
+    margin-top: 0;
+  }
+
+  .card-header {
+    background-color: #fff;
+    border-radius: 0;
+    border: none;
+    // color: #fff;
+    padding: 0;
+  }
+
+  .card-title a {
+    color: rgba(0,0,0,.87);
+    display: block;
+    padding: 15px;
+    position: relative;
+    font-size: 16px;
+    font-weight: 400;
+  }
+
+  .card-body {
+    background: #fff;
+  }
+
+  .card:last-child .card-body {
+    border-radius: 0 0 4px 4px;
+  }
+
+  .card:last-child .card-header {
+    border-radius: 0 0 4px 4px;
+    transition: border-radius 0.3s linear 0.2s;
+  }
+
+  .card:last-child .card-header.active {
+    border-radius: 0;
+    transition: border-radius linear 0s;
+  }
+
+  .o-icon-fa-chevron-down {
+    fill: rgba(0,0,0,.54);
+  }
+
+  .card-header .o-accordion-icon {
+    display: inline-block;
+    position: absolute;
+    right: 10px;
+    top: 15px;
+    // font-size: 24px;
+    transition: all 0.5s;
+    transform: scale(1);
+  }
+
+  .card-header.active .o-accordion-icon {
+    transition: all 0.5s;
+    transform: scale(0);
+  }
+
+  .card-header .o-accordion-icon {
+    transform: rotate(0deg);
+    transition: all 0.3s;
+  }
+
+  .card-header .active .o-accordion-icon {
+    transform: rotate(-180deg);
+    transition: all 0.3s;
+  }
+
+}
