@@ -10,8 +10,8 @@ var Viewer = require('./viewer');
 var utils = require('./utils');
 
 var isPanning = false;
+var controlId = 'o-centerposition';
 var markerId = 'o-centerposition-marker';
-var resultId = 'o-centerposition-result';
 var toggleId = 'o-centerposition-toggle';
 var coordsId = 'o-centerposition-coords';
 var map = undefined;
@@ -51,31 +51,21 @@ function Init(opt_options) {
 }
 
 function render() {
-  var buttonStyle = [
-    'background-color: #000;',
-    'color: #fff;',
-    'font-size: 10px;',
-    'line-height: 10px;',
-    'min-width: 110px;',
-    'padding: 5px;',
-    'border-radius: 10px;',
-    'display: inline-block;',
-    'font-family: Arial, \'Helvetica Neue\', sans-serif;'
-  ].join(' ');
   var toggleButton = utils.createElement('button', projections[currentProjection], {
     id: toggleId,
-    style: buttonStyle,
+    cls: 'o-centerposition-button',
     value: currentProjection
   });
   var coordsDiv = utils.createElement('div', '', {
     id: coordsId,
     style: 'display: inline-block; padding-left: 5px;'
   });
-  var resultContainer = utils.createElement('div', toggleButton + coordsDiv, {
-    id: resultId,
-    style: 'display: inline-block'
+  var controlContainer = utils.createElement('div', toggleButton + coordsDiv, {
+    id: controlId,
+    cls: controlId,
+    style: 'display: inline-block;'
   });
-  $('#' + consoleId).append(resultContainer);
+  $('#' + consoleId).append(controlContainer);
 }
 
 function bindUIActions() {
@@ -89,25 +79,9 @@ function bindUIActions() {
 }
 
 function renderMarker() {
-  var markerStyle = [
-    'background-color: rgba(255,255,255,0.4);',
-    'border-radius: 50%;',
-    'cursor: default;',
-    'font-size: 1rem;',
-    'line-height: 2rem;',
-    'width: 2rem;',
-    'height: 2rem;',
-    'text-align: center;',
-    'top: 50%;',
-    'left: 50%;',
-    'margin-top: -1rem;',
-    'margin-left: -1rem;',
-    'z-index: 10000;',
-    'position: absolute;',
-  ].join(' ');
   var marker = utils.createElement('div', '+', {
     id: markerId,
-    style: markerStyle
+    cls: 'o-centerposition-marker'
   });
   $('#o-map').append(marker);
 }
