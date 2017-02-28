@@ -1,31 +1,11 @@
 #o-popup {
-  font-size: 0.875em;
-  line-height: 1.42857143;
-  position: absolute;
   width: 270px;
 }
 #o-identify-carousel,
 #o-identify {
 	height: 100%;
 }
-.o-popup a:active,
-.o-popover a:hover {
-  outline: 0;
-}
-.o-sidebar a,
-.o-popup a {
-  color: #428bca;
-  text-decoration: none;
-}
-.o-sidebar a:hover,
-.o-sidebar a:focus,
-.o-popup a:hover,
-.o-popup a:focus {
-  color: #2a6496;
-  text-decoration: underline;
-}
 .o-popup {
-  position: absolute;
   display: none;
   bottom: 12px;
   left: -50%;
@@ -33,7 +13,6 @@
   z-index: 1010;
   padding: 1px;
   text-align: left;
-  background-color: #ffffff;
   background-clip: padding-box;
   border: 1px solid #cccccc;
   border: 1px solid rgba(0, 0, 0, 0.2);
@@ -42,7 +21,8 @@
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   white-space: normal;
 }
-.o-popup:before, .o-popup:after {
+.o-popup:before,
+.o-popup:after {
   display: block;
   border: solid transparent;
   content: " ";
@@ -64,59 +44,6 @@
   left: 50%;
   margin-left: -11px;
   bottom: -22px;
-}
-.o-sidebar-title,
-.o-popup-title {
-  margin: 0;
-  padding: 8px 14px;
-  font-size: 14px;
-  font-weight: bold;
-  line-height: 18px;
-  background-color: #f7f7f7;
-  border-bottom: 1px solid #ebebeb;
-  border-radius: 5px 5px 0 0;
-}
-// .o-sidebar-content,
-.o-popup-content {
-  padding: 9px 14px;
-  width: 90%;
-}
-.o-sidebar,
-.o-sidebar-content {
-	height: 100%;
-}
-#o-sidebar .o-header1,
-#o-popup .o-header1 {
-  font-weight: bold;
-  font-size: 1.2em;
-}
-/*.sidebar .image-container,
-.popup .image-container{
-  margin-bottom: 10px;
-  margin-left: -14px;
-  margin-right: -14px;
-  margin-top: -9px;
-  position: relative;
-}*/
-.o-sidebar .o-image-container img,
-.o-popup .o-image-container img{
-  vertical-align: top;
-  width: 100%;
-}
-.o-sidebar .o-image-attribution,
-.o-popup .o-image-attribution{
-  background-color: rgba(0,0,0,0.5);
-  box-sizing: border-box;
-  color: rgb(220,220,220);
-  text-align: right;
-  font-size: 0.7em;
-  font-style: italic;
-  height: 15px;
-  line-height: 15px;
-  padding-right: 5px;
-  position: absolute;
-  bottom: 0;
-  width: 100%;
 }
 @media screen and (max-width: 320px) {
 #o-popup {

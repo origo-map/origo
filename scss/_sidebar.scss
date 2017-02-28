@@ -4,15 +4,11 @@
 	transform: translateX(-270px);
 }
 #o-sidebar {
-  background-color: #FFF;
-  background-color: rgba(255,255,255,1);
   border-radius: 1px; /*workaround for box-shadow bug in ios*/
   -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.45);
   box-shadow: 0 0 5px rgba(0,0,0,0.45);
-	font-size: 0.875em;
   height: 100%;
-  line-height: 1.42857143;
-  position: absolute;
+	position: absolute;
   right: -270px;
   top: 0px;
   width: 270px;
@@ -23,4 +19,22 @@
   -ms-transition: .1s ease all;
   -webkit-transition: .1s ease all;
   transition: .1s ease all;
+}
+.o-sidebar,
+.o-sidebar .o-card-content {
+	height: 100%;
+}
+#o-sidebar .owl-carousel .owl-wrapper-outer {
+	overflow-y: auto;
+}
+@media screen and (max-width: 320px) {
+#o-sidebar {
+  width: 100%;
+  right: -320px;
+}
+#o-sidebar.o-sidebar-show {
+  -ms-transform: translateX(-320px);
+  -webkit-transform: translateX(-320px);
+  transform: translateX(-320px);
+}
 }

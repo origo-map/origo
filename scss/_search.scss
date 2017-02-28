@@ -1,5 +1,5 @@
+@import 'externs/twitter-typeahead.scss';
 #o-search-wrapper {
-  /*background-color: transparent;*/
   background-color: #fff;
   border: 1px solid #878786;
   border-radius: 4px;
@@ -21,8 +21,6 @@
   overflow: hidden;
   padding: .5em;
   padding-right: 0;
-/*  position: relative;
-  float: left;*/
   width: 260px;
 }
 .o-icon-search-fa-times {
@@ -52,60 +50,6 @@ input.o-search-field::-ms-clear {
   color: black;
 }
 
-/*End search module*/
-.o-more-button {
-  background-color: #38A800;
-  border-radius: 4px;
-  color: #fff;
-  cursor: pointer;
-  font-weight: bold;
-  text-align: center;
-  padding: 5px;
-  width: calc(100% - 10px);
-}
-.o-modal li {
-  /*cursor: pointer;*/
-  font-family: Arial,sans-serif;
-  font-size: 14px;
-  line-height: 14px;
-  padding: 3px 5px;
-  margin-left: -15px;
-  margin-right: -15px;
-}
-#o-querylist li {
-  padding: 5px;
-}
-#o-querylist li:first-child {
-  /*background-color: #F7F7F7;*/
-  border-bottom: 1px solid #C5C5C5;
-  border-top: 1px solid #C5C5C5;
-  font-weight: bold;
-}
-#o-querylist li {
-  border-bottom: 1px solid #C5C5C5;
-}
-#o-querylist li:last-child {
-  border-bottom: none;
-}
-.o-query-item {
-  display: inline-block;
-}
-#o-querylist {
-  padding-top: 10px;
-}
-#o-querylist a:active,
-#o-querylist a:hover {
-  outline: 0;
-}
-#o-querylist a {
-  color: #428bca;
-  text-decoration: none;
-}
-#o-querylist a:hover,
-#o-querylist a:focus {
-  color: #2a6496;
-  text-decoration: underline;
-}
 @media screen and (max-width: 768px) {
 #o-search-wrapper {
 	border: none;

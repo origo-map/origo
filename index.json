@@ -24,6 +24,13 @@
       }
     },
     {
+      "name": "link",
+      "options": {
+        "title": "Origo",
+        "url": "https://github.com/origo-map/origo"
+      }
+    },
+    {
       "name": "legend"
     },
     {

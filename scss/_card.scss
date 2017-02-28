@@ -1,0 +1,50 @@
+.o-card {
+  font-size: 0.875em;
+  line-height: 1.42857143;
+  background-color: #fff;
+}
+.o-card .o-header1 {
+  font-weight: bold;
+  font-size: 1.2em;
+}
+.o-card-title {
+  margin: 0;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 18px;
+  background-color: #f7f7f7;
+  border-bottom: 1px solid #ebebeb;
+  border-radius: 5px 5px 0 0;
+}
+.o-card a {
+  color: #428bca;
+  text-decoration: none;
+}
+.o-card a:hover,
+.o-card a:focus {
+  color: #2a6496;
+  text-decoration: underline;
+}
+.o-card a:active,
+.o-card a:hover {
+  outline: 0;
+}
+.o-card .o-image-attribution{
+  background-color: rgba(0,0,0,0.5);
+  box-sizing: border-box;
+  color: rgb(220,220,220);
+  text-align: right;
+  font-size: 0.7em;
+  font-style: italic;
+  height: 15px;
+  line-height: 15px;
+  padding-right: 5px;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+.o-card-content {
+  padding: 9px 14px;
+  width: 90%;
+}
