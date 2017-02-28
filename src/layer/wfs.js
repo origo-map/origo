@@ -15,7 +15,7 @@ var wfs = function wfs(layerOptions) {
   var sourceDefault = {};
   var wfsOptions = $.extend(wfsDefault, layerOptions);
   var sourceOptions = $.extend(sourceDefault, viewer.getMapSource()[layerOptions.sourceName]);
-  wfsOptions.featureType = sourceOptions.featureType = wfsOptions.name.split('__').shift();
+  wfsOptions.featureType = sourceOptions.featureType = wfsOptions.id;
   sourceOptions.geometryName = wfsOptions.geometryName;
   sourceOptions.filter = wfsOptions.filter;
   sourceOptions.attribution = wfsOptions.attribution;
