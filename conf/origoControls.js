@@ -11,5 +11,6 @@ controls.measure = require('../src/measure');
 controls.about = require('../src/about');
 controls.scale = require('../src/scale');
 controls.offline = require('../src/offline');
+controls.link = require('../src/link');
 
 module.exports = controls;
