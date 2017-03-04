@@ -19,14 +19,22 @@ var Downloader = function Downloader() {
   }
 
   function render() {
-    $('#o-wrapper').html(template);
+    $('#o-map').prepend(template);
 
     var layers = getOfflineLayers();
     if (layers) {
       renderLayers(layers);
+      bindUIActions();
     } else {
       console.log('Det finns inga offline-lager');
     }
+  }
+
+  function bindUIActions() {
+    $('.o-downloader .o-close-button').on('click', function(evt) {
+        closeDownloader();
+        evt.preventDefault();
+    });
   }
 
   function renderLayers(layers) {
@@ -36,9 +44,13 @@ var Downloader = function Downloader() {
       var tr = utils.createElement('tr', td, {
         cls: cls
       });
-      $('.o-downloader-table').append(tr);
+      $('.o-downloader .o-table').append(tr);
       bindLayerAction(cls);
     });
+  }
+
+  function closeDownloader() {
+    $('.o-downloader').remove();
   }
 
   function getOfflineLayers() {

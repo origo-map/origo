@@ -10,9 +10,11 @@
   @import 'helpers.scss';
   @import 'ol.scss';
   @import 'externs/owl-carousel.scss';
+  @import 'table.scss';  
   @import 'card.scss';
+  @import 'container-fluid.scss';
   @import 'button.scss';
-  @import 'image.scss';  
+  @import 'image.scss';
   @import 'modal.scss';
   @import 'popup.scss';
   @import 'sidebar.scss';
@@ -34,6 +36,7 @@
   @import 'measure.scss';
   @import 'legend.scss';
   @import 'search.scss';
+  @import 'offline.scss';
   @import 'hidden.scss';
 }
 html,
@@ -41,6 +44,7 @@ body {
   height: 100%;
   margin: 0;
 }
+#o-wrapper,
 #app-wrapper {
 	height: 100%;
 	overflow: hidden;
