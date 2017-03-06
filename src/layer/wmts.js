@@ -34,7 +34,7 @@ var wmts = function wmts(layerOptions) {
     sourceOptions.matrixIds[i] = sourceOptions.matrixIdsPrefix + i;
   });
   sourceOptions.projectionExtent = viewer.getProjection().getExtent();
-  sourceOptions.name = wmtsOptions.name;
+  sourceOptions.id = wmtsOptions.id;
 
   var wmtsSource = createSource(sourceOptions);
   return tile(wmtsOptions, wmtsSource);
@@ -45,7 +45,7 @@ var wmts = function wmts(layerOptions) {
       attributions: options.attribution,
       url: options.url,
       projection: options.projectionCode,
-      layer: options.name,
+      layer: options.id,
       matrixSet: options.matrixSet,
       format: options.format,
       tileGrid: new ol.tilegrid.WMTS({

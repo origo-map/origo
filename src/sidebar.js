@@ -12,17 +12,16 @@ var sidebar;
 
 function init() {
     var el = '<div id="o-sidebar">' +
-                '<div class="o-sidebar">' +
+                '<div class="o-sidebar o-card">' +
                   '<div class="o-close-button"><svg class="o-icon-fa-times"><use xlink:href="#fa-times"></use></svg></div>' +
-                  '<div class="o-sidebar-title"></div>' +
-                  '<div class="o-sidebar-content"></div>' +
+                  '<div class="o-card-title"></div>' +
+                  '<div class="o-card-content"></div>' +
                 '</div>' +
               '</div>';
     $('#o-map').append(el);
     sidebar = $('#o-sidebar');
 
     bindUIActions();
-    // addLegend(viewer.getGroups());
 }
 function bindUIActions() {
     $('#o-sidebar .o-sidebar .o-close-button').on('click', function(evt) {
@@ -34,11 +33,11 @@ function setVisibility(visible) {
     visible == true ? $('#o-sidebar').addClass('o-sidebar-show') : $('#o-sidebar').removeClass('o-sidebar-show');
 }
 function setTitle(title) {
-    $('#o-sidebar .o-sidebar-title').html(title);
+    $('#o-sidebar .o-card-title').html(title);
 }
 function setContent(config) {
-    config.title ? $('#o-sidebar .o-sidebar .o-sidebar-title').html(config.title): $('#o-sidebar .o-sidebar .o-sidebar-title').html('');
-    config.content ? $('#o-sidebar .o-sidebar .o-sidebar-content').html(config.content): $('#o-sidebar .o-sidebar .o-sidebar-content').html('');
+    config.title ? $('#o-sidebar .o-sidebar .o-card-title').html(config.title): $('#o-sidebar .o-sidebar .o-card-title').html('');
+    config.content ? $('#o-sidebar .o-sidebar .o-card-content').html(config.content): $('#o-sidebar .o-sidebar .o-card-content').html('');
 }
 function closeSidebar() {
     setVisibility(false);

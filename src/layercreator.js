@@ -47,10 +47,15 @@ var layerCreator = function layerCreator(opt_options) {
   var projection = viewer.getProjection();
   var options = opt_options || {};
   var layerOptions = $.extend(defaultOptions, options);
+  var name = layerOptions.name;
   layerOptions.minResolution = layerOptions.hasOwnProperty('minScale') ? mapUtils.scaleToResolution(layerOptions.minScale, projection): undefined;
   layerOptions.maxResolution = layerOptions.hasOwnProperty('maxScale') ? mapUtils.scaleToResolution(layerOptions.maxScale, projection): undefined;
   layerOptions.sourceName = layerOptions.source;
   layerOptions.styleName = layerOptions.style;
+  if (layerOptions.id === undefined) {
+    layerOptions.id = name.split('__').shift();
+  }
+  layerOptions.name = name.split(':').pop();
 
   if (type.hasOwnProperty(layerOptions.type)) {
     return type[layerOptions.type](layerOptions, layerCreator);

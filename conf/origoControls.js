@@ -10,5 +10,6 @@ controls.home = require('../src/home');
 controls.measure = require('../src/measure');
 controls.about = require('../src/about');
 controls.scale = require('../src/scale');
+controls.link = require('../src/link');
 
 module.exports = controls;
