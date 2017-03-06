@@ -11,8 +11,8 @@ module.exports = {
   emitChangeFeature: emitChangeFeature,
   emitToggleEdit: emitToggleEdit,
   emitEnableInteraction: emitEnableInteraction,
-  emitEditsChange, emitEditsChange
-}
+  emitEditsChange: emitEditsChange
+};
 
 function emitChangeEdit(tool, state) {
   $.event.trigger({
