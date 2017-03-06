@@ -1,13 +1,18 @@
 var $ = require('jquery');
 var ol = require('openlayers');
 var viewer = require('../viewer');
+var localforage = require('localforage');
 // var dispatcher = require('./editdispatcher');
 var lsLayers = {};
 var layerSources = {};
 
 var offlineStore = function offlineStore() {
 
-  // $(document).on('changeFeature', featureChange);
+  var store = localforage.createInstance({
+    name: "origo"
+  });
+  var format = new ol.format.GeoJSON();
+  $(document).on('changeOffline', changeOffline);
 
   return {
     getLsLayers: getLsLayers,
@@ -53,13 +58,13 @@ var offlineStore = function offlineStore() {
     return lsLayers;
   }
 
-  // function featureChange(e) {
-  //   if (e.status === 'pending') {
-  //     addEdit(e);
-  //   } else if (e.status === 'finished') {
-  //     removeEdit(e);
-  //   }
-  // }
+  function changeOffline(e) {
+    if (e.status === 'download') {
+      addDownload(e);
+    } else if (e.status === 'sync') {
+
+    }
+  }
   //
   // function hasFeature(type, feature, layerName) {
   //   if (edits.hasOwnProperty(layerName)) {
@@ -70,14 +75,15 @@ var offlineStore = function offlineStore() {
   //   return false;
   // }
   //
-  // function addFeature(type, feature, layerName) {
-  //   if (edits.hasOwnProperty(layerName) === false) {
-  //     edits[layerName] = createEditsObj();
-  //   }
-  //   if (hasFeature(type, feature, layerName) === false) {
-  //     edits[layerName][type].push(feature.getId());
-  //   }
-  // }
+  function addDownload(e) {
+    if (lsLayers.hasOwnProperty(e.layerName) === false) {
+      lsLayers[e.layerName] = createOfflineObj();
+      saveToLs(e.layerName);
+    }
+    // if (hasFeature(type, feature, layerName) === false) {
+    //   edits[layerName][type].push(feature.getId());
+    // }
+  }
   //
   // function removeFeature(type, feature, layerName) {
   //   var index = 0;
@@ -112,13 +118,18 @@ var offlineStore = function offlineStore() {
   //   }
   // }
   //
-  // function createEditsObj() {
-  //   return {
-  //     update: [],
-  //     insert: [],
-  //     delete: []
-  //   }
-  // }
+  function createOfflineObj() {
+    return {
+      data: {},
+      edits: {}
+    }
+  }
+
+  function saveToLs(layerName) {
+    var features = viewer.getLayer(layerName).getSource().getFeatures();
+    var geojson = format.writeFeaturesObject(features);
+    store.setItem(layerName, geojson);
+  }
   //
   // function hasEdits() {
   //   if (Object.getOwnPropertyNames(edits).length) {

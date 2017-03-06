@@ -7,7 +7,7 @@
 var $ = require('jquery');
 var Viewer = require('../viewer');
 var template = require("./downloader.template.handlebars");
-var offlineStore = require("./offlinestore");
+var offlineStore = require("./offlinestore")();
 var utils = require('../utils');
 var download = require('./download');
 

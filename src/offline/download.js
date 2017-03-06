@@ -6,6 +6,7 @@
 
 var $ = require('jquery');
 var layerCreator = require('../layercreator');
+var dispatcher = require('./offlinedispatcher');
 
 var sources = {};
 sources.WFS = require('./wfs');
@@ -22,6 +23,7 @@ var downloadSources = function downloadSources(layer) {
         options.style = options.styleName;
         source = layerCreator(options).getSource();
         layer.setSource(source);
+        dispatcher.emitChangeOffline(layer.get('name'), 'download');
       });
   }
 }
