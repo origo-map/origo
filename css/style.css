@@ -443,6 +443,12 @@
   .o-map .o-rounded-top {
     border-top-left-radius: 3px;
     border-top-right-radius: 3px; }
+  .o-map .o-text-center {
+    text-align: center; }
+  .o-map .o-text-right {
+    text-align: right; }
+  .o-map .o-text-left {
+    text-align: left; }
   .o-map .ol-unsupported {
     display: none; }
   .o-map .ol-viewport .ol-unselectable {
@@ -964,6 +970,21 @@
   to {
     opacity: 0;
     transform: scale(1.5); } }
+  .o-map h1, .o-map h2, .o-map h3, .o-map h4, .o-map h5, .o-map h6,
+  .o-map .h1, .o-map .h2, .o-map .h3, .o-map .h4, .o-map .h5, .o-map .h6 {
+    margin-bottom: 0.5rem; }
+  .o-map h1, .o-map .h1 {
+    font-size: 2.5rem; }
+  .o-map h2, .o-map .h2 {
+    font-size: 2rem; }
+  .o-map h3, .o-map .h3 {
+    font-size: 1.75rem; }
+  .o-map h4, .o-map .h4 {
+    font-size: 1.5rem; }
+  .o-map h5, .o-map .h5 {
+    font-size: 1.25rem; }
+  .o-map h6, .o-map .h6 {
+    font-size: 1rem; }
   .o-map .o-table {
     width: 100%;
     max-width: 100%;
@@ -985,18 +1006,27 @@
     font-size: 0.875em;
     line-height: 1.42857143;
     background-color: #fff; }
+    .o-map .o-card .o-card-header {
+      background-color: #f7f7f7;
+      border-bottom: 1px solid #ebebeb;
+      border-radius: 5px 5px 0 0;
+      padding: .625rem; }
+    .o-map .o-card .o-card-heading {
+      display: inline-block;
+      margin-bottom: 0; }
+    .o-map .o-card .o-close-button {
+      margin-top: -.28125rem; }
   .o-map .o-card .o-header1 {
     font-weight: bold;
     font-size: 1.2em; }
   .o-map .o-card-title {
+    background-color: #f7f7f7;
+    border-bottom: 1px solid #ebebeb;
     margin: 0;
     padding: 8px 14px;
     font-size: 14px;
     font-weight: bold;
-    line-height: 18px;
-    background-color: #f7f7f7;
-    border-bottom: 1px solid #ebebeb;
-    border-radius: 5px 5px 0 0; }
+    line-height: 18px; }
   .o-map .o-card a {
     color: #428bca;
     text-decoration: none; }
@@ -1021,8 +1051,7 @@
     bottom: 0;
     width: 100%; }
   .o-map .o-card-content {
-    padding: 9px 14px;
-    width: 90%; }
+    padding: 9px 14px; }
   .o-map .o-container-fluid {
     background-color: #fff;
     height: 100%;
@@ -1965,12 +1994,6 @@
       padding: .6em;
       height: .8em;
       width: .8em; } }
-  .o-map .o-downloader .o-card-title {
-    text-align: center; }
-  .o-map .o-downloader .o-card-content {
-    width: 70%;
-    margin-left: auto;
-    margin-right: auto; }
   .o-map .o-downloader .o-table tr:first-child td {
     border-top: 0px; }
   .o-map .o-hidden {
