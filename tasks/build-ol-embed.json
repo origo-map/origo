@@ -2,6 +2,7 @@
   "exports": [
     "ol.Map",
     "ol.Map#addInteraction",
+    "ol.Map#addControl",    
     "ol.Map#addOverlay",
     "ol.Map#beforeRender",
     "ol.Map#forEachFeatureAtPixel",
@@ -16,7 +17,7 @@
     "ol.Map#on",
     "ol.Map#un",
     "ol.proj.Projection",
-    "ol.proj.Projection#getExtent",    
+    "ol.proj.Projection#getExtent",
     "ol.proj.Projection#getMetersPerUnit",
     "ol.View",
     "ol.View#calculateExtent",

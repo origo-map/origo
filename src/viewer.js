@@ -17,8 +17,6 @@ var style = require('./style')();
 var layerCreator = require('./layercreator');
 
 var map;
-var mapControls;
-var attribution;
 var template;
 var settings = {
   projection: '',
@@ -36,8 +34,7 @@ var settings = {
   featureInfoOverlay: undefined,
   editLayer: null
 };
-var cqlQuery, queryFinished = false,
-  urlParams;
+var urlParams;
 
 function init(el, mapOptions) {
   $(el).html(template);
@@ -88,38 +85,11 @@ function init(el, mapOptions) {
     parseArg();
   }
 
-  //Create attribution
-  attribution = new ol.control.Attribution({
-    collapsible: false
-  });
-
-  var zoomControl = new ol.control.Zoom({
-    zoomInTipLabel: ' ',
-    zoomOutTipLabel: ' ',
-    zoomInLabel: $.parseHTML('<svg class="o-icon-fa-plus"><use xlink:href="#fa-plus"></use></svg>')[0],
-    zoomOutLabel: $.parseHTML('<svg class="o-icon-fa-minus"><use xlink:href="#fa-minus"></use></svg>')[0]
-  });
-
-  //Set map controls
-  mapControls = [
-    zoomControl,
-    attribution,
-    new ol.control.Rotate({
-      label: ''
-    }), /*Override default label for compass*/
-    new ol.control.ScaleLine({
-      target: 'o-bottom-tools'
-    })
-  ]
   if (window.top != window.self) {
     mapwindow.init();
   }
 
   loadMap();
-
-  //Check size for attribution mode
-  $(window).on('resize', checkSize);
-  checkSize();
 
   if (urlParams.pin) {
     settings.featureinfoOptions.savedPin = urlParams.pin;
@@ -155,8 +125,8 @@ function createLayers(layerlist, savedLayers) {
 function loadMap() {
   map = new ol.Map({
     target: 'o-map',
-    controls: mapControls,
     layers: settings.layers,
+    controls: [],
     view: new ol.View({
       extent: settings.extent || undefined,
       projection: settings.projection || undefined,
@@ -446,11 +416,6 @@ function removeOverlays(overlays) {
   }
 }
 
-function checkSize() {
-  var small = map.getSize()[0] < 768;
-  attribution.setCollapsible(small);
-  attribution.setCollapsed(small);
-}
 module.exports.init = init;
 module.exports.createLayers = createLayers;
 module.exports.getBaseUrl = getBaseUrl;
@@ -473,7 +438,6 @@ module.exports.getTileGrid = getTileGrid;
 module.exports.autoPan = autoPan;
 module.exports.removeOverlays = removeOverlays;
 module.exports.checkScale= checkScale;
-module.exports.checkSize = checkSize;
 module.exports.getMapName = getMapName;
 module.exports.getConsoleId = getConsoleId;
 module.exports.getUrl = getUrl;
