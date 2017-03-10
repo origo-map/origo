@@ -1419,12 +1419,10 @@
       bottom: 0; }
     .o-map #o-footer {
       display: none; } }
-  .o-map .o-icon-o-compass {
-    height: 2em;
-    padding: 0;
-    width: 2em; }
-  .o-map .ol-control > button:hover .o-icon-o-compass {
-    fill: #000; }
+  .o-map .o-icon-compass {
+    height: 1.75rem;
+    padding: .125rem;
+    width: 1.75rem; }
   .o-map #o-mapmenu-button {
     right: .5em;
     top: .5em;
