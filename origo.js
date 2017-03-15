@@ -27,8 +27,7 @@ function init(config) {
   Viewer.init(config.el, config.options);
 
   //Init controls
-  var controls = config.options.controls || [];
-  controlInitialiser(controls);
+  controlInitialiser(config.options.controls);
 }
 
 module.exports = origo;
