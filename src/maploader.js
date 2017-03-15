@@ -40,7 +40,12 @@ var mapLoader = function(mapOptions, config) {
         urlParams = permalink.parsePermalink(window.location.href);
       }
       var baseUrl = config.baseUrl || '';
-      map.options = mapOptions;
+      map.options = $.extend(config, mapOptions);
+      if (mapOptions.controls) {
+        map.options.controls = config.defaultControls.concat(mapOptions.controls);
+      } else {
+        map.options.controls = config.defaultControls;
+      }
       map.options.url = getUrl();
       map.options.map = undefined;
       map.options.params = urlParams;
@@ -56,7 +61,7 @@ var mapLoader = function(mapOptions, config) {
         urlParams = permalink.parsePermalink(mapOptions);
         var url = mapOptions.split('#')[0];
 
-        //remov file name if included in 
+        //remov file name if included in
         url = trimUrl(url);
 
         var baseUrl = config.baseUrl || url;
@@ -80,7 +85,12 @@ var mapLoader = function(mapOptions, config) {
               dataType: format
             })
             .then(function(data) {
-              map.options = data;
+              map.options = $.extend(config, data);
+              if (data.controls) {
+                map.options.controls = config.defaultControls.concat(data.controls);
+              } else {
+                map.options.controls = config.defaultControls;
+              }
               map.options.url = mapUrl;
               map.options.map = json;
               map.options.params = urlParams;

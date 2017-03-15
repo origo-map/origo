@@ -2,6 +2,7 @@
   "exports": [
     "ol.Map",
     "ol.Map#addInteraction",
+    "ol.Map#addControl",    
     "ol.Map#addOverlay",
     "ol.Map#beforeRender",
     "ol.Map#dispatchEvent",
