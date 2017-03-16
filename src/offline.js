@@ -19,7 +19,7 @@ function Init(opt_options) {
   map = Viewer.getMap();
   baseUrl = Viewer.getBaseUrl();
 
-  offlineStore().init();
+  // offlineStore().init();
 
   render();
   bindUIActions();

@@ -3,21 +3,16 @@ var ol = require('openlayers');
 var viewer = require('../viewer');
 var localforage = require('localforage');
 // var dispatcher = require('./editdispatcher');
-var lsLayers = {};
+var format = new ol.format.GeoJSON();
+var layerStore = {};
 var layerSources = {};
+var map;
+var mapName;
 
-var offlineStore = function offlineStore() {
-
-  var store = localforage.createInstance({
-    name: "origo",
-    storeName: 'byggimport1'
-  });
-
-  var format = new ol.format.GeoJSON();
-  $(document).on('changeOffline', changeOffline);
+function offlineStore() {
 
   return {
-    getLsLayers: getLsLayers,
+    getLayerStore: getLayerStore,
     init: Init
   };
 
@@ -52,12 +47,40 @@ var offlineStore = function offlineStore() {
   //   }
   // }
 
-  function Init() {
+  function Init(opt_options) {
+    var options = opt_options || {};
+    var layers;
+    map = viewer.getMap();
+    mapName = options.name || 'origo-layers';
 
+    layers = getOfflineLayers();
+    layerStore = createInstances(layers);
+
+    $(document).on('changeOffline', changeOffline);
   }
 
-  function getLsLayers() {
-    return lsLayers;
+  function createInstances(layers) {
+    var instances = {};
+    layers.forEach(function(layer) {
+      var layerName = layer.get('name');
+      instances[layerName] = localforage.createInstance({
+        name: mapName,
+        storeName: layerName
+      });
+    });
+    return instances;
+  }
+
+  function getOfflineLayers() {
+    return map.getLayers().getArray().filter(function(layer) {
+      if (layer.get('offline')) {
+        return layer;
+      }
+    });
+  }
+
+  function getLayerStore() {
+    return layerStore;
   }
 
   function changeOffline(e) {
@@ -79,8 +102,8 @@ var offlineStore = function offlineStore() {
   // }
   //
   function addDownload(e) {
-    if (lsLayers.hasOwnProperty(e.layerName) === false) {
-      lsLayers[e.layerName] = createOfflineObj();
+    if (layerStore.hasOwnProperty(e.layerName) === false) {
+      layerStore[e.layerName] = createOfflineObj();
       saveToLs(e.layerName);
     }
     // if (hasFeature(type, feature, layerName) === false) {

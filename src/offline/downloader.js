@@ -7,12 +7,13 @@
 var $ = require('jquery');
 var Viewer = require('../viewer');
 var template = require("./downloader.template.handlebars");
-var offlineStore = require("./offlinestore")();
+var offlineStore = require("./offlinestore");
 var utils = require('../utils');
 var download = require('./download');
 
 var Downloader = function Downloader() {
   var map = Viewer.getMap();
+  offlineStore().init();
 
   return {
     render: render
@@ -21,13 +22,9 @@ var Downloader = function Downloader() {
   function render() {
     $('#o-map').prepend(template);
 
-    var layers = getOfflineLayers();
-    if (layers) {
-      renderLayers(layers);
-      bindUIActions();
-    } else {
-      console.log('Det finns inga offline-lager');
-    }
+    var layers = offlineStore().getLayerStore();
+    renderLayers(layers);
+    bindUIActions();
   }
 
   function bindUIActions() {
@@ -38,9 +35,11 @@ var Downloader = function Downloader() {
   }
 
   function renderLayers(layers) {
-    layers.forEach(function(layer) {
+    var layerNames = Object.getOwnPropertyNames(layers);
+    layerNames.forEach(function(layerName) {
+      var layer = Viewer.getLayer(layerName);
       var td = utils.createElement('td', layer.get('title'),{})
-      var cls = 'o-downloader-tr-' + layer.get('name');
+      var cls = 'o-downloader-tr-' + layerName;
       var tr = utils.createElement('tr', td, {
         cls: cls
       });
@@ -51,14 +50,6 @@ var Downloader = function Downloader() {
 
   function closeDownloader() {
     $('.o-downloader').remove();
-  }
-
-  function getOfflineLayers() {
-    return map.getLayers().getArray().filter(function(layer) {
-      if (layer.get('offline')) {
-        return layer;
-      }
-    });
   }
 
   function bindLayerAction(cls) {
