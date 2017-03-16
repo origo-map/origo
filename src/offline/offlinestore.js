@@ -9,8 +9,10 @@ var layerSources = {};
 var offlineStore = function offlineStore() {
 
   var store = localforage.createInstance({
-    name: "origo"
+    name: "origo",
+    storeName: 'byggimport1'
   });
+
   var format = new ol.format.GeoJSON();
   $(document).on('changeOffline', changeOffline);
 
@@ -59,6 +61,7 @@ var offlineStore = function offlineStore() {
   }
 
   function changeOffline(e) {
+    e.stopImmediatePropagation();
     if (e.status === 'download') {
       addDownload(e);
     } else if (e.status === 'sync') {
@@ -127,8 +130,7 @@ var offlineStore = function offlineStore() {
 
   function saveToLs(layerName) {
     var features = viewer.getLayer(layerName).getSource().getFeatures();
-    var geojson = format.writeFeaturesObject(features);
-    store.setItem(layerName, geojson);
+    setItems(features);
   }
   //
   // function hasEdits() {
@@ -138,6 +140,16 @@ var offlineStore = function offlineStore() {
   //     return false;
   //   }
   // }
+  function setItems(features) {
+    var promises = features.map(function(feature) {
+      var id = feature.getId();
+      var obj = format.writeFeatureObject(feature);
+      return store.setItem(id, obj);
+    });
+    Promise.all(promises).then(function(results) {
+        console.log(results);
+    });
+  }
 }
 
 module.exports = offlineStore;

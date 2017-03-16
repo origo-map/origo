@@ -62,8 +62,10 @@ var Downloader = function Downloader() {
   }
 
   function bindLayerAction(cls) {
-    $('.' + cls).on('click', function(e) {
+    $('.' + cls).on('click', function(evt) {
       download(Viewer.getLayer(cls.split('o-downloader-tr-')[1]));
+      evt.preventDefault();
+      evt.stopPropagation();
     });
   }
 }
