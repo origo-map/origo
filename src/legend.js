@@ -314,18 +314,31 @@ function toggleCheck(layerid) {
     var layername = layerid.split('o-legend-').pop();
     var inMapLegend = layerid.split('o-legend-').length > 1 ? true : false;
     var layer = viewer.getLayer(layername);
+    var linkedLayers = layer.get('linkedLayers') || [];
+	var visible = true;
     //Radio toggle for background
     if(layer.get('group') == 'background') {
         var group = viewer.getGroup('background');
         for(var i=0; i<group.length; i++) {
-            group[i].setVisible(false);
-            $('#' + group[i].get('name') + ' .o-checkbox').removeClass('o-check-true');
-            $('#' + group[i].get('name') + ' .o-checkbox').addClass('o-check-false');
-            //map legend
-            $('#o-legend-' + group[i].get('name')).removeClass('o-check-true-img');
-            $('#o-legend-' + group[i].get('name')).addClass('o-check-false-img');
+          group[i].setVisible(false);
+          $('#' + group[i].get('name') + ' .o-checkbox').removeClass('o-check-true');
+          $('#' + group[i].get('name') + ' .o-checkbox').addClass('o-check-false');
+          //map legend
+          $('#o-legend-' + group[i].get('name')).removeClass('o-check-true-img');
+          $('#o-legend-' + group[i].get('name')).addClass('o-check-false-img');
+          var bgLinkedLayers = group[i].get('linkedLayers') || [];
+          bgLinkedLayers.forEach(function(linkedLayer) {
+            viewer.getLayer(linkedLayer).setVisible(false);
+          $('.' + linkedLayer + ' .o-checkbox').removeClass('o-checkbox-true');
+          $('.' + linkedLayer + ' .o-checkbox').addClass('o-checkbox-false');
+          });
         }
         layer.setVisible(true);
+        linkedLayers.forEach(function(linkedLayer) {
+          viewer.getLayer(linkedLayer).setVisible(true);
+          $('.' + linkedLayer + ' .o-checkbox').removeClass('o-checkbox-false');
+          $('.' + linkedLayer + ' .o-checkbox').addClass('o-checkbox-true');
+        });
         $('#' + layername + ' .o-checkbox').removeClass('o-check-false');
         $('#' + layername + ' .o-checkbox').addClass('o-check-true');
         //map legend
@@ -343,7 +356,12 @@ function toggleCheck(layerid) {
                 layer.set('legend', false);
                 checkToggleOverlay();
             }
-          layer.setVisible(false);
+            layer.setVisible(false);
+            linkedLayers.forEach(function(linkedLayer) {
+              viewer.getLayer(linkedLayer).setVisible(false);
+              $('.' + linkedLayer + ' .o-checkbox').removeClass('o-checkbox-true');
+              $('.' + linkedLayer + ' .o-checkbox').addClass('o-checkbox-false');
+            });
         }
         else {
             if (inMapLegend == false && $('#o-legend-' + layername).length == 0) {
@@ -355,6 +373,11 @@ function toggleCheck(layerid) {
             $('.' + layername + ' .o-checkbox').addClass('o-checkbox-true');
             layer.setVisible(true);
             layer.set('legend', true);
+            linkedLayers.forEach(function(linkedLayer) {
+              viewer.getLayer(linkedLayer).setVisible(true);
+              $('.' + linkedLayer + ' .o-checkbox').removeClass('o-checkbox-false');
+              $('.' + linkedLayer + ' .o-checkbox').addClass('o-checkbox-true');
+            });
         }
     }
 }
