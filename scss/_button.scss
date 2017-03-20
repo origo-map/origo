@@ -1,13 +1,16 @@
 .o-button-container {
+  -webkit-box-shadow: 0 2px 5px rgba(0,0,0,0.45);
+  border-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.45);
   display: inline-block;
   position: absolute;
+  height: 2rem;
+  width: 2rem;
 }
 .o-button {
   border-radius: 4px;
   background-color: $o-btn-bg;
   border: none;
-  -webkit-box-shadow: 0 2px 5px rgba(0,0,0,0.45);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.45);
   color: $o-btn-color;
 	cursor: pointer;
   display: inline-block;
