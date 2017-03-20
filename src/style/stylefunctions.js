@@ -5,97 +5,59 @@
 "use strict";
 
 	var ol = require('openlayers');
-  function stylefunctions(sf, val) {
-	  if(sf=='byggnadsar'){
-	  var fill = new ol.style.Fill({color: ''});
-	  var stroke = new ol.style.Stroke({color: '', width: 0.1, lineCap:'square', lineJoin:'round'});
-	  var polygon = new ol.style.Style({fill: fill, zIndex: 1});
-	  var strokedPolygon = new ol.style.Style({fill: fill, stroke: stroke, zIndex: 2});
-	  var styles = [];
-	  var min = val ? val[0] : undefined;
-	  var max = val ? val[1] : undefined;
+  function customStyle(styleName, params) {
+	  if(styleName=='timeline'){
+		var val=params.values;
+		var colors=params.colors;
+		var step=params.step;
+		var range=params.range;
+		var attrName=params.attrName;
+		var fill = new ol.style.Fill({color: ''});
+		var stroke = new ol.style.Stroke({color: '', width: 0.1, lineCap:'square', lineJoin:'round'});
+		var polygon = new ol.style.Style({fill: fill, zIndex: 1});
+		var strokedPolygon = new ol.style.Style({fill: fill, stroke: stroke, zIndex: 2});
+		  /*var text = new ol.style.Style({text: new ol.style.Text({
+			text: '1909', fill: new ol.style.Fill({color: 'black'}), stroke: stroke,textAlign: 'center',
+    textBaseline: 'middle',
+    font: '12px Verdana'
+		  }), zIndex: 50});*/
+		var styles = [];
+		var min = val ? val[0] : undefined;
+		var max = val ? val[1] : undefined;
+		var from_value = range ? range[0] : undefined;
+		var to_value = range ? range[1] : undefined;
+		var stops = (to_value-from_value)/step;
+		var num_colors = colors.length;
+		var groups = stops/(num_colors-1);
+	  
+	  
 	  return function(feature, resolution) {
 		var length = 0;
-		var ba = feature.get('ar_nybygg');
-   if ((min<1866 && ba<min) || (ba >= min && ba <= max)) {
-		if(ba<1866){
-			stroke.setColor('rgba(204,0,0,1)'); 
-			stroke.setWidth(1);          
-			fill.setColor('rgba(255,0,0,1)');
-			styles[length++] = strokedPolygon;
+		var value = feature.get(attrName);
+		value = value<from_value ? from_value : value;
+		if (value >= min && value <= max) {
+		var group = Math.floor((value-from_value)/groups);
+		var remainder = (value-from_value) % groups;
+		var from_color = getColor(colors[group]);
+		var to_color = getColor(colors[group+1]);
+		var r, g, b;
+		
+		r = from_color[0] + Math.floor(((to_color[0]-from_color[0]) * (remainder / groups)));
+		g = from_color[1] + Math.floor(((to_color[1]-from_color[1]) * (remainder / groups)));
+		b = from_color[2] + Math.floor(((to_color[2]-from_color[2]) * (remainder / groups)));
+		
+		stroke.setColor('rgba('+Math.round(0.8*r)+','+Math.round(0.8*g)+','+Math.round(0.8*b)+',1)');
+		stroke.setWidth(0.7);          
+		fill.setColor('rgba('+r+','+g+','+b+',1)');
+		styles[length++] = strokedPolygon;
+		//text.setGeometry = feature.getGeometry().getInteriorPoint();
+		//styles[length++] = text;
 		}
-		else if(ba<1900){
-			stroke.setColor('rgba(204, 78, 0,1)'); 
-			stroke.setWidth(1);          
-			fill.setColor('rgba(255,98,0,1)');
-			styles[length++] = strokedPolygon;
-		}
-		else if(ba<1920){
-			stroke.setColor('rgba(204, 126, 0,1)'); 
-			stroke.setWidth(1);          
-			fill.setColor('rgba(255, 157, 0,1)');
-			styles[length++] = strokedPolygon;
-		}
-		else if(ba<1930){
-			stroke.setColor('rgba(204, 174, 0,1)'); 
-			stroke.setWidth(1);          
-			fill.setColor('rgba(255, 217, 0,1)');
-			styles[length++] = strokedPolygon;
-		}
-		else if(ba<1940){
-			stroke.setColor('rgba(195, 204, 34,1)'); 
-			stroke.setWidth(1);          
-			fill.setColor('rgba(244, 255, 43,1)');
-			styles[length++] = strokedPolygon;
-		}
-		else if(ba<1950){
-			stroke.setColor('rgba(164, 204, 90,1)'); 
-			stroke.setWidth(1);          
-			fill.setColor('rgba(205, 255, 112,1)');
-			styles[length++] = strokedPolygon;
-		}
-		else if(ba<1960){
-			stroke.setColor('rgba(122, 204, 138,1)'); 
-			stroke.setWidth(1);          
-			fill.setColor('rgba(153, 255, 173,1)');
-			styles[length++] = strokedPolygon;
-		}
-		else if(ba<1970){
-			stroke.setColor('rgba(59, 204, 187,1)'); 
-			stroke.setWidth(1);          
-			fill.setColor('rgba(74, 255, 234,1)');
-			styles[length++] = strokedPolygon;
-		}
-		else if(ba<1980){
-			stroke.setColor('rgba(37, 168, 204,1)'); 
-			stroke.setWidth(1);          
-			fill.setColor('rgba(46, 210, 255,1)');
-			styles[length++] = strokedPolygon;
-		}
-		else if(ba<1990){
-			stroke.setColor('rgba(47, 115, 204,1)'); 
-			stroke.setWidth(1);          
-			fill.setColor('rgba(59, 144, 255,1)');
-			styles[length++] = strokedPolygon;
-		}
-		else if(ba<2000){
-			stroke.setColor('rgba(41, 68, 204,1)'); 
-			stroke.setWidth(1);          
-			fill.setColor('rgba(51, 85, 255, 1)');
-			styles[length++] = strokedPolygon;
-		}
-		else if(ba<2018){
-			stroke.setColor('rgba(0, 0, 204, 1.0)');
-			stroke.setWidth(1);          
-			fill.setColor('rgba(0,0,255,1)');
-			styles[length++] = strokedPolygon;
-		}
-	}
 		styles.length = length;
 		return styles;
 	  }
 	  }
-		else if(sf=='basemap'){
+		else if(styleName=='basemap_dark'){
 	  var fill = new ol.style.Fill({color: ''});
 	  var stroke = new ol.style.Stroke({color: '', width: 0.1, lineCap:'square', lineJoin:'round'});
 	   var noStroke = new ol.style.Stroke({color: '', width: 0.0});
@@ -111,17 +73,6 @@
 		text: '', fill: fill, stroke: stroke
 	  }), zIndex: 50});
 	  var iconCache = {};
-	  function getIcon(iconName) {
-		var icon = iconCache[iconName];
-		if (!icon) {
-		  icon = new ol.style.Style({image: new ol.style.Icon({
-			src: 'https://cdn.rawgit.com/mapbox/maki/master/icons/' + iconName + '-15.svg',
-			imgSize: [15, 15]
-		  })});
-		  iconCache[iconName] = icon;
-		}
-		return icon;
-	  }
 	  var styles = [];
 	  return function(feature, resolution) {
 		polygon.setZIndex(1);
@@ -837,7 +788,1421 @@
 		return styles;
 	}
 	}
-	else if(sf=='labels'){
+			if(styleName=='basemap_bright'){
+	  var fill = new ol.style.Fill({color: ''});
+	  var stroke = new ol.style.Stroke({color: '', width: 0.1, lineCap:'square', lineJoin:'round'});
+	  var overlayedStroke = new ol.style.Stroke({color: '', width: 0.1, lineCap:'square', lineJoin:'round'});
+	  var dashedStroke = new ol.style.Stroke({color: '', width: 1, lineDash: [1, 2]});
+	  var polygon = new ol.style.Style({fill: fill, zIndex: 1});
+	  var strokedPolygon = new ol.style.Style({fill: fill, stroke: stroke, zIndex: 2});
+	  var dashedPolygon = new ol.style.Style({fill: fill, stroke: dashedStroke, zIndex: 2});
+	  var line = new ol.style.Style({stroke: stroke, zIndex: 10});
+	  var overlayedLine = new ol.style.Style({stroke: overlayedStroke, zIndex: 11});
+	  var dashedLine = new ol.style.Style({stroke: dashedStroke, zIndex: 12});
+	  var text = new ol.style.Style({text: new ol.style.Text({
+		text: '', fill: fill, stroke: stroke
+	  }), zIndex: 50});
+	  var iconCache = {};
+	  var styles = [];
+	  return function(feature, resolution) {
+		polygon.setZIndex(1);
+		var length = 0;
+		var layer = feature.get('layer');
+		var cls = feature.get('class');
+		var type = feature.get('type');
+		var kkod = feature.get('KKOD');
+		if (kkod==undefined){kkod = feature.get('DETALJTYP');}
+		if (layer=="by_fast"){kkod = feature.get('ANDAMAL_1');}
+		var detaljtyp = feature.get('detaljtyp');
+		var dt = feature.get('DETALJTYP');
+		var funk = feature.get('FUNKTION');
+		var andamal = feature.get('ANDAMAL_1');
+		var klass = feature.get('klass');
+		var scalerank = feature.get('scalerank');
+		var labelrank = feature.get('labelrank');
+		var adminLevel = feature.get('admin_level');
+		var maritime = feature.get('maritime');
+		var disputed = feature.get('disputed');
+		var maki = feature.get('maki');
+		var geom = feature.getGeometry().getType();
+		
+		if (layer=="my_vagk" || layer=="my_over" || layer=="my_fast"){ //MARKYTOR
+		
+		switch(kkod) {
+			case 302://Annan koncentrerad bebyggelse
+			case 2://Bebyggelseområde
+					 fill.setColor('rgba(245,215,165,0.6)');
+					  styles[length++] = polygon;
+								break;
+								
+			case 303://Tätort
+					 fill.setColor('rgba(245,215,165,0.6)');
+					  styles[length++] = polygon;
+								break;
+								
+			case 601://Skogsmark   
+			case 3://Skog
+					 fill.setColor('rgba(205,215,175,0.6)');
+					  styles[length++] = polygon;
+								break;
+								
+			case 611://Öppen mark
+			case 7://Öppen mark
+					fill.setColor('rgba(255,255,214,0.6)');
+					  styles[length++] = polygon;
+								break;
+								
+			case 901://Vattenyta
+			case 1://Vattenyta
+					stroke.setColor('#18ADFB');  
+					stroke.setWidth(0.1);          
+					fill.setColor('rgba(150,199,212,0.6)');
+					  styles[length++] = strokedPolygon;
+								break;
+								
+			case 911://Sankmark
+			case 4://Sankmark, svårframkomlig
+			case 5://Sankmark, normal, öppen
+			case 6://Sankmark, normal, skogklädd
+			case 13://Sankmark, normal eller svårframkomlig
+					fill.setColor('rgba(180,215,155,0.6)');
+					  styles[length++] = polygon;
+								break;
+			case "VATTEN":// Vatten (sjöar och större vattendrag)
+				stroke.setColor('#18ADFB');  
+				stroke.setWidth(0.1);          
+				fill.setColor('rgba(150,199,212,0.6)');
+				styles[length++] = strokedPolygon;
+				break;
+			case "BEBYGG":// Bebyggelse, ospecificerad
+			case "BEBLÅG":// Låg bebyggelse
+			case "BEBHÖG":// Hög bebyggelse
+			case "BEBSLUT":// Sluten bebyggelse
+				fill.setColor('rgba(245,215,165,0.6)');
+				styles[length++] = polygon;
+				break;
+			case "BEBIND":// Industriområde
+				fill.setColor('rgba(234,234,234,0.6)');
+				styles[length++] = polygon;
+                break;
+			case "ODLÅKER":// Åker    
+			case "ODLFRUKT":// Fruktodling/fröplantage
+			case "ODLEJÅK":// Ej brukad åker   
+				fill.setColor('rgba(255,255,214,0.6)');
+				styles[length++] = polygon;
+                break;
+			case "ÖPMARK":// Annan öppen mark                    
+				fill.setColor('rgba(255,255,220,0.6)');
+				styles[length++] = polygon;
+                break;
+			case "SKOGBARR":// Barr- och blandskog   
+			case "SKOGLÖV":// Lövskog        
+				fill.setColor('rgba(205,215,175,0.6)');
+				styles[length++] = polygon;
+                break;
+			case "ÖPTORG":// Torg                    
+				fill.setColor('rgba(255,255,220,0.6)');
+				styles[length++] = polygon;
+                break;
+			case "SKOGFBJ":// Fjällbjörkskog
+			case "MRKO":// Ej karterat område
+			case "MRKÖVR":// Övrig mark, oklassificerad
+			case "ÖPKFJÄLL":// Kalfjäll
+			case "ÖPGLAC":// Glaciär
+			default:                  
+				fill.setColor('rgba(255,255,255,1)');
+				styles[length++] = polygon;
+                break;					
+			}
+		}
+		else if (layer=="_my_kd"){ //SANKMARK
+		
+		switch(dt) {
+			case "BANA.Y"://       
+			case "IDROTT.Y"://  
+				fill.setColor('rgba(255,255,214,0.6)');
+				styles[length++] = polygon;
+                break;   
+			case "BOSOMR.Y"://   
+				fill.setColor('rgba(245,215,165,0.6)');
+				styles[length++] = polygon;
+				break;        
+			case "BÄCK.Y"://  
+			case "DIKE.Y"://       
+			case "SJÖ.Y"://      
+			case "VATTEN.Y"://      
+			case "ÄLV.Y"://     
+				stroke.setColor('#18ADFB');  
+				stroke.setWidth(0.1);          
+				fill.setColor('rgba(150,199,212,0.6)');
+				styles[length++] = strokedPolygon;
+				break;    
+			case "GÅGATA.Y"://      
+			case "INDOMR.Y"://      
+			case "JÄRNVOMR.Y":// 
+				fill.setColor('rgba(234,234,234,0.6)');
+				styles[length++] = polygon;
+                break;     
+			case "MARK.Y"://      
+			case "NPARK.Y"://      
+			case "PARK.Y"://      
+			case "PARKER.Y"://     
+			case "SKOG.Y"://     
+				fill.setColor('rgba(205,215,175,0.6)');
+				styles[length++] = polygon;
+                break;    
+			case "BUSSGATA.Y":// 
+			case "ÖMARK.Y"://                   
+				fill.setColor('rgba(255,255,220,0.6)');
+				styles[length++] = polygon;
+                break;     
+			default:                  
+				fill.setColor('rgba(255,255,220,0.6)');
+				styles[length++] = polygon;
+                break;	
+		}
+		}
+		else if (layer=="ms_fast"){ //SANKMARK
+		
+		switch(dt) {
+			case "SANK":// Sankmark (Yta)
+				stroke.setColor('#18ADFB');  
+				stroke.setWidth(0.2);          
+				fill.setColor('rgba(230,205,175,0.5)');
+				styles[length++] = strokedPolygon;
+								break;
+			case "SANKSVÅ":// Sankmark, svårframkomlig
+				stroke.setColor('#18ADFB');  
+				stroke.setWidth(0.2);          
+				fill.setColor('rgba(150,200,210,0.5)');
+				styles[length++] = strokedPolygon;
+								break;
+			case "SANKBLE":// Sankmark blekvät
+			default:
+				stroke.setColor('#18ADFB');  
+				stroke.setWidth(0.2);          
+				fill.setColor('rgba(120,120,190,0.5)');
+				styles[length++] = strokedPolygon;
+								break;
+		}
+		}
+		else if (layer=="ba_fast"){
+		switch(funk) {
+		
+			case "Bandyplan": // IDRPLAN
+			case "Fotbollsplan": // IDRPLAN
+			case "Galoppbana": // IDRPLAN
+			case "Idrottsplats": // IDRPLAN
+			case "Idrottsplan, ospecificerat": // IDRPLAN
+			case "Ishockeybana": // IDRPLAN
+			case "Tennisbana": // IDRPLAN
+			case "Travbana": // IDRPLAN
+					dashedStroke.setColor('rgba(120,120,120,1)');
+					dashedStroke.setWidth(1);
+					dashedStroke.setLineDash([15, 5]);
+					dashedStroke.setLineCap('square');
+					fill.setColor('rgba(205,215,175,0.6)');
+					styles[length++] = dashedPolygon;
+				break;
+			
+			case "Golfbana": // ANLOMR
+			case "Motionsanläggning": // ANLOMR
+			case "Motorbana": // IDRPLAN, ANLOMR
+			case "Övrigt": // IDRPLAN, ANLOMR
+			case "Avfallsanläggning": // ANLOMR
+			case "Begravningsplats": // ANLOMR
+			case "Bilskrotningsanläggning": // ANLOMR
+			case "Campingplats": // ANLOMR
+			case "Djurpark": // ANLOMR
+			case "Flygfält": // ANLOMR
+			case "Flygplats": // ANLOMR
+			case "Koloniområde": // ANLOMR
+			case "Skjutbana": // ANLOMR
+			case "Återvinningsanläggning": // ANLOMR
+					dashedStroke.setColor('rgba(120,120,120,1)');
+					dashedStroke.setWidth(1);
+					dashedStroke.setLineDash([15, 5]);
+					dashedStroke.setLineCap('square');
+					fill.setColor('rgba(205,215,175,0.6)');
+					styles[length++] = dashedLine;
+				break;
+				}
+				}
+/*		else if (layer=="my_fast"){
+		
+		switch(dt) {
+			case "VATTEN":// Vatten (sjöar och större vattendrag)
+				stroke.setColor('#18ADFB');  
+				stroke.setWidth(0.1);          
+				fill.setColor('rgba(150,199,212,0.6)');
+				styles[length++] = strokedPolygon;
+				break;
+			case "BEBYGG":// Bebyggelse, ospecificerad
+			case "BEBLÅG":// Låg bebyggelse
+			case "BEBHÖG":// Hög bebyggelse
+			case "BEBSLUT":// Sluten bebyggelse
+				fill.setColor('rgba(245,215,165,0.6)');
+				styles[length++] = polygon;
+				break;
+			case "BEBIND":// Industriområde
+				fill.setColor('rgba(234,234,234,0.6)');
+				styles[length++] = polygon;
+                break;
+			case "ODLÅKER":// Åker    
+			case "ODLFRUKT":// Fruktodling/fröplantage
+			case "ODLEJÅK":// Ej brukad åker   
+				fill.setColor('rgba(255,255,214,0.6)');
+				styles[length++] = polygon;
+                break;
+			case "ÖPMARK":// Annan öppen mark                    
+				fill.setColor('rgba(255,255,220,0.6)');
+				styles[length++] = polygon;
+                break;
+			case "SKOGBARR":// Barr- och blandskog   
+			case "SKOGLÖV":// Lövskog        
+				fill.setColor('rgba(205,215,175,0.6)');
+				styles[length++] = polygon;
+                break;
+			case "ÖPTORG":// Torg                    
+				fill.setColor('rgba(255,255,220,0.6)');
+				styles[length++] = polygon;
+                break;
+			case "SKOGFBJ":// Fjällbjörkskog
+			case "MRKO":// Ej karterat område
+			case "MRKÖVR":// Övrig mark, oklassificerad
+			case "ÖPKFJÄLL":// Kalfjäll
+			case "ÖPGLAC":// Glaciär
+			default:                  
+				fill.setColor('rgba(255,255,255,1)');
+				styles[length++] = polygon;
+                break;
+								}
+								}*/
+		else if (layer=="by_vagk" || layer=="by_fast"){ //BYGGNADER
+		switch(kkod) {
+			case 690://Bebyggelseyta, större byggnad
+					fill.setColor('rgba(150,150,150,1.0)');
+					polygon.setZIndex(25);
+					styles[length++] = polygon;
+					break;
+			case 729://Flygbana
+					fill.setColor('rgba(200,200,200,1.0)');
+					polygon.setZIndex(25);
+					styles[length++] = polygon;
+					break;
+			case 130:// Bostad Småhus, friliggande Småhus med en bostad som inte är sammanbyggt med ett annat småhus. 
+			case 131:// Bostad Småhus, kedjehus Två eller flera, med varandra via garage, förråd eller dylikt sammanbyggda enbostadshus. Varje bostad finns på en egen fastighet, även parhus klassificeras som kedjehus.
+			case 132:// Bostad Småhus, radhus Småhus som ligger i en rad om minst tre hus vars bostadsdelar är direkt sammanbyggda med varandra och där varje bostad finns på egen fastighet.
+			case 133:// Bostad Flerfamiljshus Byggnad som är inrättad med minst tre bostäder. Kan ibland innehålla kontor, butik, hotell, restaurang och liknande. Minst 50% ska dock utgöras av bostad.
+			case 135:// Bostad Småhus med flera lägenheter Småhus med flera bostäder som finns på samma fastighet. T.ex. tvåbostadshus alternativt hyres- eller bostadsrättsradhus om minst tre bostäder.
+			case 199:// Bostad Ospecificerad Bostad med okänt bostadsändamål,. Anges endast av Lantmäteriet vid ajourhållningsmetod där ändamål inte kan avgöras.
+				stroke.setColor('rgba(150,150,150,1.0)');
+				stroke.setWidth(0.5);
+				fill.setColor('rgba(225,200,165,1.0)');
+				if(resolution < 5){styles[length++] = strokedPolygon;}
+				break;
+			case 301:// Samhällsfunktion Badhus Byggnad med offentlig badinrättning. T.ex. badhus, kallbadhus, simhall, äventyrsbad.
+			case 302:// Samhällsfunktion Brandstation Byggnad för räddningstjänsten.
+			case 303:// Samhällsfunktion Busstation Större busshållplats eller resecentrum med flera linjer med byggnad. T.ex. resecentrum.
+			case 304:// Samhällsfunktion Distributionsbyggnad Byggnad i distributionsnätet för gas, värme elektricitet eller vatten. T.ex. transformatorstation, värmecentral, teknikbod (tele, bredband), vattentorn, nätstation
+			case 305:// Samhällsfunktion Djursjukhus Byggnad för stationär vård av sjuka djur.
+			case 306:// Samhällsfunktion Försvarsbyggnad Byggnad som används för försvarsändamål eller försvarsberedskap. T.ex. byggnad i anslutning till en militär anläggning eller ett militärt förråd.
+			case 307:// Samhällsfunktion Vårdcentral Enhet för öppen hälso- och sjukvård. T.ex. hälsocentral, vårdcentral, läkarstation, vårdcentrum. Dock ej privatläkarmottagning.
+			case 308:// Samhällsfunktion Högskola Eftergymnasial skola klassad som högskola.
+			case 309:// Samhällsfunktion Ishall Inbyggd konstfrusen isanläggning. T.ex. för ishockey, bandy eller skridskor.
+			case 310:// Samhällsfunktion Järnvägsstation Station eller hållplats som expedierar person- eller godstrafik enligt SJs författningar (SJF 611) och Rikstidtabellen.
+			case 311:// Samhällsfunktion Kommunhus Huvudbyggnad för kommunledning. T.ex. kommunhus, stadshus, rådhus.
+			case 312:// Samhällsfunktion Kriminalvårdsanstalt Institution för verkställande av fängelsestraff, t.ex. kriminalvårdsanstalt eller fängelse.
+			case 313:// Samhällsfunktion Kulturbyggnad Byggnad som används för kulturellt ändamål. T.ex. teater och museum eller hembygdsgård.
+			case 314:// Samhällsfunktion Polisstation Byggnad inrymmande central för polisverksamhet.
+			case 315:// Samhällsfunktion Reningsverk Byggnad för rening av avloppsvatten.
+			case 316:// Samhällsfunktion Ridhus Byggnad med manege för ridning, t.ex. ridhus, ridskola.
+			case 317:// Samhällsfunktion Samfund Byggnad för fast organiserad religiös gemenskap. T.ex. kyrka, frikyrka, moské, synagoga, tempel, kloster, församlingshem, krematorium, kapell, gravkapell.
+			case 318:// Samhällsfunktion Sjukhus Inrättning för sluten vård och specialiserad öppenvård. T.ex. lasarett, länssjukhus, regionsjukhus.
+			case 319:// Samhällsfunktion Skola Byggnad för undervisning. T.ex. förskola, grundskola, gymnasium, folk-, handels-, jakt-, jordbruk- , lanthushålls-, natur- och kultur-, naturbruks-, nomad-, räddnings-, skogsbruks-, verkstads-, vård-, samisk skola.
+			case 320:// Samhällsfunktion Sporthall Inomhusanläggning för sport och idrott, t.ex. idrotts-, badminton-, curling-, tennis-hall.
+			case 321:// Samhällsfunktion Universitet Eftergymnasial utbildning klassificerad i högskoleförordning.
+			case 322:// Samhällsfunktion Vattenverk Anläggning där grundvatten eller ytvatten bereds till dricksvatten. T.ex. vattenreningsverk.
+			case 324:// Samhällsfunktion Multiarena Flexibel större arena för utövande av sport, kultur och genomförande av många slags arrangemang.
+			case 399:// Samhällsfunktion Ospecificerad Samhällsfunktion med okänt ändamål.
+				stroke.setColor('rgba(120,60,60,1.0)');
+				stroke.setWidth(0.4);
+				fill.setColor('rgba(240,120,120,1.0)');
+				if(resolution < 10){styles[length++] = strokedPolygon;}
+			break;
+			case 699://  Komplementbyggnad Ospecificerad Komplementbyggnad med okänt ändamål.
+					stroke.setColor('rgba(150,150,150,1.0)');
+					stroke.setWidth(0.4);
+					fill.setColor('rgba(200,200,200,1.0)');
+					if(resolution < 2){styles[length++] = strokedPolygon;}
+			break;
+			case 499://  Verksamhet Ospecificerad Verksamhet med okänt ändamål.
+			case 599://  Ekonomibyggnad Ospecificerad Ekonomibyggnad med okänt ändamål.
+			case 799://  Övrig byggnad Ospecificerad Övrig byggnad med okänt ändamål.
+					stroke.setColor('rgba(150,150,150,1.0)');
+					stroke.setWidth(0.4);
+					fill.setColor('rgba(200,200,200,1.0)');
+					if(resolution < 5){styles[length++] = strokedPolygon;}
+			break;
+			case 240:// Industri Annan tillverkningsindustri Byggnad för övrig industriell verksamhet med tillverkning.
+			case 241:// Industri Gasturbinanläggning Anläggning för produktion av el med förbränningsgaser.
+			case 242:// Industri Industrihotell Byggnad som inrymmer flera olika industrier. T.ex. industrihus.
+			case 243:// Industri Kemisk industri Industri för tillverkning eller förädling av kemiska produkter. T.ex. färgindustri, plastindustri, läkemedelsindustri.
+			case 244:// Industri Kondenskraftverk Anläggning för produktion av el ur ånga, tar ej tillvara spillvärme.
+			case 245:// Industri Kärnkraftverk Anläggning för framställning av el ur kärnenergi.
+			case 246:// Industri Livsmedelsindustri Industri för tillverkning av livsmedel bl.a. genom förädling av jordbruksprodukter. T.ex. charkuteri, konservindustri, fruktindustri.
+			case 247:// Industri Metall- eller maskinindustri Industri för tillverkning och förädling av metall och maskiner. T.ex. bilindustri, järnverk, mekanisk industri, metallindustri, varv.
+			case 248:// Industri Textilindustri Industri som tillverkar garn, tyg och dylikt samt bereder dessa. T.ex. tekoindustri, väveri.
+			case 249:// Industri Trävaruindustri Industri för förädling av skogsråvaror. T.ex. trä-, massa- , pappers- och möbelindustri, pappersbruk, sågverk, snickeri.
+			case 250:// Industri Vattenkraftverk Anläggning som omvandlar lägesenergi hos vatten till el.
+			case 251:// Industri Vindkraftverk Anläggning för omvandling av vindenergi till el.
+			case 252:// Industri Värmeverk Anläggning som levererar fjärrvärme med pannor för fast, flytande eller gasformiga bränslen samt el. T.ex. kraftvärmeverk eller fjärrvärmeverk. Industri Övrig industribyggnad Övrig byggnad för industriell verksamhet (även utan väggar) som inte är tillverkning, t.ex. lagerbyggnad, bensinstation, reparationsverkstad.
+			case 299:// Industri Ospecificerad Industri med okänt ändamål.
+			default:
+				stroke.setColor('rgba(60,60,60,1.0)');
+				stroke.setWidth(0.4);
+				fill.setColor('rgba(160,160,160,1.0)');
+				if(resolution < 5){styles[length++] = strokedPolygon;}
+			break;
+		}
+		}
+/*		else if (layer=="by_fast"){
+		
+		switch(andamal) {
+			case 130:// Bostad Småhus, friliggande Småhus med en bostad som inte är sammanbyggt med ett annat småhus. 
+			case 131:// Bostad Småhus, kedjehus Två eller flera, med varandra via garage, förråd eller dylikt sammanbyggda enbostadshus. Varje bostad finns på en egen fastighet, även parhus klassificeras som kedjehus.
+			case 132:// Bostad Småhus, radhus Småhus som ligger i en rad om minst tre hus vars bostadsdelar är direkt sammanbyggda med varandra och där varje bostad finns på egen fastighet.
+			case 133:// Bostad Flerfamiljshus Byggnad som är inrättad med minst tre bostäder. Kan ibland innehålla kontor, butik, hotell, restaurang och liknande. Minst 50% ska dock utgöras av bostad.
+			case 135:// Bostad Småhus med flera lägenheter Småhus med flera bostäder som finns på samma fastighet. T.ex. tvåbostadshus alternativt hyres- eller bostadsrättsradhus om minst tre bostäder.
+			case 199:// Bostad Ospecificerad Bostad med okänt bostadsändamål,. Anges endast av Lantmäteriet vid ajourhållningsmetod där ändamål inte kan avgöras.
+				stroke.setColor('rgba(150,150,150,1.0)');
+				stroke.setWidth(0.5);
+				fill.setColor('rgba(225,200,165,1.0)');
+				if(resolution < 5){styles[length++] = strokedPolygon;}
+				break;
+			case 301:// Samhällsfunktion Badhus Byggnad med offentlig badinrättning. T.ex. badhus, kallbadhus, simhall, äventyrsbad.
+			case 302:// Samhällsfunktion Brandstation Byggnad för räddningstjänsten.
+			case 303:// Samhällsfunktion Busstation Större busshållplats eller resecentrum med flera linjer med byggnad. T.ex. resecentrum.
+			case 304:// Samhällsfunktion Distributionsbyggnad Byggnad i distributionsnätet för gas, värme elektricitet eller vatten. T.ex. transformatorstation, värmecentral, teknikbod (tele, bredband), vattentorn, nätstation
+			case 305:// Samhällsfunktion Djursjukhus Byggnad för stationär vård av sjuka djur.
+			case 306:// Samhällsfunktion Försvarsbyggnad Byggnad som används för försvarsändamål eller försvarsberedskap. T.ex. byggnad i anslutning till en militär anläggning eller ett militärt förråd.
+			case 307:// Samhällsfunktion Vårdcentral Enhet för öppen hälso- och sjukvård. T.ex. hälsocentral, vårdcentral, läkarstation, vårdcentrum. Dock ej privatläkarmottagning.
+			case 308:// Samhällsfunktion Högskola Eftergymnasial skola klassad som högskola.
+			case 309:// Samhällsfunktion Ishall Inbyggd konstfrusen isanläggning. T.ex. för ishockey, bandy eller skridskor.
+			case 310:// Samhällsfunktion Järnvägsstation Station eller hållplats som expedierar person- eller godstrafik enligt SJs författningar (SJF 611) och Rikstidtabellen.
+			case 311:// Samhällsfunktion Kommunhus Huvudbyggnad för kommunledning. T.ex. kommunhus, stadshus, rådhus.
+			case 312:// Samhällsfunktion Kriminalvårdsanstalt Institution för verkställande av fängelsestraff, t.ex. kriminalvårdsanstalt eller fängelse.
+			case 313:// Samhällsfunktion Kulturbyggnad Byggnad som används för kulturellt ändamål. T.ex. teater och museum eller hembygdsgård.
+			case 314:// Samhällsfunktion Polisstation Byggnad inrymmande central för polisverksamhet.
+			case 315:// Samhällsfunktion Reningsverk Byggnad för rening av avloppsvatten.
+			case 316:// Samhällsfunktion Ridhus Byggnad med manege för ridning, t.ex. ridhus, ridskola.
+			case 317:// Samhällsfunktion Samfund Byggnad för fast organiserad religiös gemenskap. T.ex. kyrka, frikyrka, moské, synagoga, tempel, kloster, församlingshem, krematorium, kapell, gravkapell.
+			case 318:// Samhällsfunktion Sjukhus Inrättning för sluten vård och specialiserad öppenvård. T.ex. lasarett, länssjukhus, regionsjukhus.
+			case 319:// Samhällsfunktion Skola Byggnad för undervisning. T.ex. förskola, grundskola, gymnasium, folk-, handels-, jakt-, jordbruk- , lanthushålls-, natur- och kultur-, naturbruks-, nomad-, räddnings-, skogsbruks-, verkstads-, vård-, samisk skola.
+			case 320:// Samhällsfunktion Sporthall Inomhusanläggning för sport och idrott, t.ex. idrotts-, badminton-, curling-, tennis-hall.
+			case 321:// Samhällsfunktion Universitet Eftergymnasial utbildning klassificerad i högskoleförordning.
+			case 322:// Samhällsfunktion Vattenverk Anläggning där grundvatten eller ytvatten bereds till dricksvatten. T.ex. vattenreningsverk.
+			case 324:// Samhällsfunktion Multiarena Flexibel större arena för utövande av sport, kultur och genomförande av många slags arrangemang.
+			case 399:// Samhällsfunktion Ospecificerad Samhällsfunktion med okänt ändamål.
+				stroke.setColor('rgba(120,60,60,1.0)');
+				stroke.setWidth(0.4);
+				fill.setColor('rgba(240,120,120,1.0)');
+				if(resolution < 10){styles[length++] = strokedPolygon;}
+			break;
+			case 699://  Komplementbyggnad Ospecificerad Komplementbyggnad med okänt ändamål.
+					stroke.setColor('rgba(150,150,150,1.0)');
+					stroke.setWidth(0.4);
+					fill.setColor('rgba(200,200,200,1.0)');
+					if(resolution < 2){styles[length++] = strokedPolygon;}
+			break;
+			case 499://  Verksamhet Ospecificerad Verksamhet med okänt ändamål.
+			case 599://  Ekonomibyggnad Ospecificerad Ekonomibyggnad med okänt ändamål.
+			case 799://  Övrig byggnad Ospecificerad Övrig byggnad med okänt ändamål.
+					stroke.setColor('rgba(150,150,150,1.0)');
+					stroke.setWidth(0.4);
+					fill.setColor('rgba(200,200,200,1.0)');
+					if(resolution < 5){styles[length++] = strokedPolygon;}
+			break;
+			case 240:// Industri Annan tillverkningsindustri Byggnad för övrig industriell verksamhet med tillverkning.
+			case 241:// Industri Gasturbinanläggning Anläggning för produktion av el med förbränningsgaser.
+			case 242:// Industri Industrihotell Byggnad som inrymmer flera olika industrier. T.ex. industrihus.
+			case 243:// Industri Kemisk industri Industri för tillverkning eller förädling av kemiska produkter. T.ex. färgindustri, plastindustri, läkemedelsindustri.
+			case 244:// Industri Kondenskraftverk Anläggning för produktion av el ur ånga, tar ej tillvara spillvärme.
+			case 245:// Industri Kärnkraftverk Anläggning för framställning av el ur kärnenergi.
+			case 246:// Industri Livsmedelsindustri Industri för tillverkning av livsmedel bl.a. genom förädling av jordbruksprodukter. T.ex. charkuteri, konservindustri, fruktindustri.
+			case 247:// Industri Metall- eller maskinindustri Industri för tillverkning och förädling av metall och maskiner. T.ex. bilindustri, järnverk, mekanisk industri, metallindustri, varv.
+			case 248:// Industri Textilindustri Industri som tillverkar garn, tyg och dylikt samt bereder dessa. T.ex. tekoindustri, väveri.
+			case 249:// Industri Trävaruindustri Industri för förädling av skogsråvaror. T.ex. trä-, massa- , pappers- och möbelindustri, pappersbruk, sågverk, snickeri.
+			case 250:// Industri Vattenkraftverk Anläggning som omvandlar lägesenergi hos vatten till el.
+			case 251:// Industri Vindkraftverk Anläggning för omvandling av vindenergi till el.
+			case 252:// Industri Värmeverk Anläggning som levererar fjärrvärme med pannor för fast, flytande eller gasformiga bränslen samt el. T.ex. kraftvärmeverk eller fjärrvärmeverk. Industri Övrig industribyggnad Övrig byggnad för industriell verksamhet (även utan väggar) som inte är tillverkning, t.ex. lagerbyggnad, bensinstation, reparationsverkstad.
+			case 299:// Industri Ospecificerad Industri med okänt ändamål.
+			default:
+				stroke.setColor('rgba(60,60,60,1.0)');
+				stroke.setWidth(0.4);
+				fill.setColor('rgba(160,160,160,1.0)');
+				if(resolution < 5){styles[length++] = strokedPolygon;}
+			break;
+		}
+		}*/
+		else if (layer=="hl_vagk" || layer=="hl_over" || layer=="hl_fast"){ //HYDROGRAFI
+		switch(kkod) {
+			//case 441:// Vattendrag, storleksklass 1
+			//case 455:// Vattendrag, storleksklass 2
+			//case 456:// Vattendrag, storleksklass 3
+			//case 458:// Vattendrag, under markyta
+			default:// Alla
+				stroke.setColor('rgba(150,200,210,1.0)');
+				stroke.setWidth(1);
+				styles[length++] = line;
+				break;
+		}
+		}
+		/*else if (layer=="jl_fast"){
+		switch(kkod) {
+			case "JVGR1.M":// Järnväg med enkelspår 
+			case "JVGR2.M":// Järnväg med dubbelspår
+			case "JVGU.M":// Underfart/tunnel för järnväg
+			case "JVGÖ.M":// Övrig järnväg
+			case "JVGBY.M":// Järnväg under byggnation
+			case "JVGÖU.M":// Övrig järnväg i tunnel
+						stroke.setColor('rgba(120,120,120,1.0)');
+						stroke.setWidth(2);
+						styles[length++] = line;
+					dashedStroke.setColor('rgba(255,255,255,1.0)');
+					dashedStroke.setWidth(1.6);
+					dashedStroke.setLineDash([4, 10]);
+					dashedStroke.setLineCap('square');
+					styles[length++] = dashedLine;
+					break;
+					
+			default:// Alla
+						stroke.setColor('rgba(120,120,120,1.0)');
+						stroke.setWidth(1);
+						styles[length++] = line;
+					dashedStroke.setColor('rgba(255,255,255,1.0)');
+					dashedStroke.setWidth(0.8);
+					dashedStroke.setLineDash([2, 5]);
+					dashedStroke.setLineCap('square');
+					styles[length++] = dashedLine;
+					break;
+					}
+					}
+					*/
+		else if (layer=="jl_vagk" || layer=="jl_fast"){ //JÄRNVÄG
+		switch(kkod) {
+			case "JVGR1.M":// Järnväg med enkelspår 
+			case "JVGR2.M":// Järnväg med dubbelspår
+			case "JVGU.M":// Underfart/tunnel för järnväg
+			case "JVGÖ.M":// Övrig järnväg
+			case "JVGBY.M":// Järnväg under byggnation
+			case "JVGÖU.M":// Övrig järnväg i tunnel
+			case 270:// Järnväg under byggnad (byggnation)
+			case 271:// Järnväg med enkelspår, ej elektrifierad
+			case 272:// Järnväg med enkelspår, elektrifierad
+			case 273:// Järnväg med dubbelspår, elektrifierad
+			case 291:// Järnväg, enkelspår, ej elektrifierad, i underfart
+			case 292:// Järnväg, enkelspår, elektrifierad, i underfart
+			case 293:// Järnväg, dubbelspår, elektrifierad, i underfart
+						//stroke.setColor('rgba(120,120,120,1.0)');
+						//stroke.setWidth(3);
+						//styles[length++] = line;
+						stroke.setColor('rgba(120,120,120,1.0)');
+						stroke.setWidth(2);
+						styles[length++] = line;
+					dashedStroke.setColor('rgba(255,255,255,1.0)');
+					dashedStroke.setWidth(1.6);
+					dashedStroke.setLineDash([4, 10]);
+					dashedStroke.setLineCap('square');
+					styles[length++] = dashedLine;
+					break;
+			case 274:// Smalspårig ej elektrifierad järnväg
+			case 275:// Smalspårig elektrifierad järnväg med enkelspår
+			case 276:// Smalspårig elektrifierad järnväg med dubbelspår
+			case 279:// Industrispår
+			case 294:// Smalspårig ej elektrifierad järnväg, i underfart
+			case 295:// Smalspårig el. järnväg med enkelspår, i underfart
+			case 296:// Smalspårig el. järnväg med dubbelspår, i underfart
+			case 299:// Industrispår eller museijärnväg, i underfart
+			default:// Alla
+						stroke.setColor('rgba(120,120,120,1.0)');
+						stroke.setWidth(1);
+						styles[length++] = line;
+					dashedStroke.setColor('rgba(255,255,255,1.0)');
+					dashedStroke.setWidth(0.8);
+					dashedStroke.setLineDash([2, 5]);
+					dashedStroke.setLineCap('square');
+					styles[length++] = dashedLine;
+					break;
+					}
+					}
+		else if (layer=="vl_fast"){
+		switch(dt) {
+			case "VÄGMO.D":// Motorväg, körbanemitt
+			case "VÄGMOU.D":// Motorväg, körbanemitt, underfart/tunnel
+			case "VAGMO.D":// Motorväg, körbanemitt
+			case "VAGMOU.D":// Motorväg, körbanemitt, underfart/tunnel
+				stroke.setColor('rgba(220,120,20,1.0)');
+				stroke.setWidth(3+5/(resolution));
+				stroke.setWidth(40);
+				styles[length++] = line;
+            break;
+			case "VÄGKV.M":// Kvartersväg
+			case "VÄGBN.M":// Bilväg/gata
+			case "VÄGBNU.M":// Bilväg/gata i underfart/tunnel
+			case "VAGKV.M":// Kvartersväg
+			case "VAGBN.M":// Bilväg/gata
+			case "VAGBNU.M":// Bilväg/gata i underfart/tunnel
+				stroke.setColor('rgba(150,150,150,1.0)');
+				stroke.setWidth(0.8);
+				if(resolution < 5){stroke.setWidth(3);}
+				if(resolution < 2){stroke.setWidth(5);}
+				if(resolution < 1){stroke.setWidth(10);}
+				styles[length++] = line;
+				
+				if(resolution < 5){
+				overlayedStroke.setColor('rgba(230,230,230,1.0)');
+				overlayedStroke.setWidth(2);
+				if(resolution < 2){overlayedStroke.setWidth(4);}
+				if(resolution < 1){overlayedStroke.setWidth(9);}
+				styles[length++] = overlayedLine;
+				}
+				break;
+				
+			case "VÄGBS.M":// Sämre bilväg 
+			case "VÄGBSU.M":// Sämre bilväg i underfart/tunnel
+			case "VAGBS.M":// Sämre bilväg 
+			case "VAGBSU.M":// Sämre bilväg i underfart/tunnel
+				dashedStroke.setColor('rgba(220,120,20,1.0)');
+				dashedStroke.setWidth(1.2);
+				dashedStroke.setLineDash([12, 5]);
+				if(resolution < 15){styles[length++] = dashedLine;}
+				break;
+				
+			case "FÄRJELED":// Färjeled
+			case "VÄGA1.M":// Allmän väg klass I, vägmitt
+			case "VÄGA1U.M":// Allmän väg klass I, vägmitt, underfart
+			case "VÄGA2.M":// Allmän väg klass II, vägmitt.
+			case "VÄGA2U.M":// Allmän väg klass II, vägmitt, underfart
+			case "VÄGA3.M":// Allmän väg klass III, vägmitt
+			case "VÄGA3U.M":// Allmän väg klass III, vägmitt, underfart
+			case "VÄGAS.D":// Allmän väg, skilda körbanor, körbanemitt
+			case "VÄGASU.D":// Allmän väg, skilda körbanor, körbanemitt, underfart
+			case "VÄGGG.D":// Genomfartsgata/-led, körbanemitt
+			case "VÄGGG.M":// Genomfartsgata/-led, gatumitt
+			case "VÄGGGU.D":// Genomfartsgata/- led, körbanemitt, underfart
+			case "VÄGGGU.M":// Genomfartsgata/-led, gatumitt, underfart/tunnel
+			case "VÄGA0BY.M":// Väg under byggnation
+			default:
+				stroke.setColor('rgba(220,120,20,1.0)');
+				stroke.setWidth(3);
+				if(resolution < 2){stroke.setWidth(4.5);}
+				if(resolution < 1){stroke.setWidth(7.5);}
+				styles[length++] = line;
+				break;
+}
+}
+		else if (layer=="vagkant_kd_"){ //VÄGKANT
+		//console.log(dt);
+		switch(dt) {
+			case "BRO.K"://
+			case "BRYGGA.K"://
+			case "KÖRBANA.K"://
+			case "KÖRBKST.K"://
+			case "REFUG.K"://
+			case "TUNNEL.K"://
+						stroke.setColor('rgba(50,50,50,1.0)');
+						stroke.setWidth(0.5);
+						styles[length++] = line;
+								break;
+		}}
+		else if (layer=="vl_vagk" || layer=="vl_fast"){ //VÄGAR
+		switch(kkod) {
+			case 5011:// Motorväg, riksväg
+			case 5016:// Motorväg, ej riksväg
+			case 5811:// Motorväg, riksväg, i underfart/tunnel
+			case 5816:// Motorväg, ej riksväg, i underfart/tunnel
+						stroke.setColor('rgba(220,120,20,1.0)');
+						stroke.setWidth(4);
+						styles[length++] = line;
+								break;
+			case 5012:// Motortrafikled, riksväg
+			case 5017:// Motortrafikled, ej riksväg
+			case 5812:// Motortrafikled, riksväg, i underfart/tunnel
+			case 5817:// Motortrafikled, ej riksväg, i underfart/tunnel
+			case 5014:// Allmän väg under byggnad, ej riksväg
+			case 5018:// Allmän väg under byggnad, riksväg
+			case 5021:// Allmän väg > 7 m, riksväg
+			case 5022:// Allmän väg > 7 m, ej riksväg
+			case 5821:// Allmän väg > 7 m, riksväg, i underfart/tunnel
+			case 5822:// Allmän väg > 7 m, ej riksväg, i underfart/tunnel
+						stroke.setColor('rgba(220,120,20,1.0)');
+						stroke.setWidth(2.5);
+						styles[length++] = line;
+								break;
+			case 5024:// Allmän väg 5-7 m, riksväg
+			case 5025:// Allmän väg 5-7 m, ej riksväg
+			case 5824:// Allmän väg 5-7 m, riksväg, i underfart/tunnel
+			case 5825:// Allmän väg 5-7 m, ej riksväg, i underfart/tunnel
+			case 5028:// Allmän väg < 5 m, riksväg
+			case 5029:// Allmän väg < 5 m, ej riksväg
+			case 5828:// Allmän väg < 5 m, riksväg, i underfart/tunnel
+			case 5829:// Allmän väg < 5 m, ej riksväg, i underfart/tunnel
+			case 5033:// På- och avfartsväg
+			case 5036:// På- och avfartsväg, riksväg
+			case 5833:// På- och avfartsväg, i underfart/tunnel
+			case 5836:// På- och avfartsväg, riksväg, i underfart/tunnel
+						stroke.setColor('rgba(220,120,20,1.0)');
+						stroke.setWidth(1.8);
+						styles[length++] = line;
+								break;
+			case 5040:// Gata
+			case 5045:// Gata, större, gatumitt
+			case 5840:// Gata, i underfart/tunnel
+			case 5845:// Gata, större, gatumitt, i underfart/tunnel
+						stroke.setColor('rgba(150,150,150,1.0)');
+						stroke.setWidth(0.8);
+						styles[length++] = line;
+								break;
+			case 5061:// Bättre bilväg
+			case 5861:// Bättre bilväg, i underfart/tunnel
+			case 5071:// Bilväg
+			case 5871:// Bilväg, i underfart/tunnel
+			case 5091:// Uppfartsväg
+			case 5891:// Uppfartsväg, i underfart/tunnel
+						stroke.setColor('rgba(220,120,20,1.0)');
+						stroke.setWidth(1.2);
+						styles[length++] = line;
+								break;
+			case 5082:// Sämre bilväg
+			case 5882:// Sämre bilväg, i underfart/tunnel
+						dashedStroke.setColor('rgba(220,120,20,1.0)');
+						dashedStroke.setWidth(1.2);
+						dashedStroke.setLineDash([12, 5]);
+						if(resolution < 15){styles[length++] = dashedLine;}
+								break;
+			
+			case "VÄGMO.D":// Motorväg, körbanemitt
+			case "VÄGMOU.D":// Motorväg, körbanemitt, underfart/tunnel
+				stroke.setColor('rgba(220,120,20,1.0)');
+				stroke.setWidth(5);
+				if(resolution < 2){stroke.setWidth(7.5);}
+				if(resolution < 1){stroke.setWidth(12.5);}
+				styles[length++] = line;
+            break;
+			case "VÄGKV.M":// Kvartersväg
+			case "VÄGBN.M":// Bilväg/gata
+			case "VÄGBNU.M":// Bilväg/gata i underfart/tunnel
+				stroke.setColor('rgba(150,150,150,1.0)');
+				stroke.setWidth(0.8);
+				if(resolution < 5){stroke.setWidth(3);}
+				if(resolution < 2){stroke.setWidth(5);}
+				if(resolution < 1){stroke.setWidth(10);}
+				styles[length++] = line;
+				
+				if(resolution < 5){
+				overlayedStroke.setColor('rgba(230,230,230,1.0)');
+				overlayedStroke.setWidth(2);
+				if(resolution < 2){overlayedStroke.setWidth(4);}
+				if(resolution < 1){overlayedStroke.setWidth(9);}
+				styles[length++] = overlayedLine;
+				}
+				break;
+				
+			case "VÄGBS.M":// Sämre bilväg 
+			case "VÄGBSU.M":// Sämre bilväg i underfart/tunnel
+				dashedStroke.setColor('rgba(220,120,20,1.0)');
+				dashedStroke.setWidth(1.2);
+				dashedStroke.setLineDash([12, 5]);
+				if(resolution < 15){styles[length++] = dashedLine;}
+				break;
+				
+			case "FÄRJELED":// Färjeled
+			case "VÄGA1.M":// Allmän väg klass I, vägmitt
+			case "VÄGA1U.M":// Allmän väg klass I, vägmitt, underfart
+			case "VÄGA2.M":// Allmän väg klass II, vägmitt.
+			case "VÄGA2U.M":// Allmän väg klass II, vägmitt, underfart
+			case "VÄGA3.M":// Allmän väg klass III, vägmitt
+			case "VÄGA3U.M":// Allmän väg klass III, vägmitt, underfart
+			case "VÄGAS.D":// Allmän väg, skilda körbanor, körbanemitt
+			case "VÄGASU.D":// Allmän väg, skilda körbanor, körbanemitt, underfart
+			case "VÄGGG.D":// Genomfartsgata/-led, körbanemitt
+			case "VÄGGG.M":// Genomfartsgata/-led, gatumitt
+			case "VÄGGGU.D":// Genomfartsgata/- led, körbanemitt, underfart
+			case "VÄGGGU.M":// Genomfartsgata/-led, gatumitt, underfart/tunnel
+			case "VÄGA0BY.M":// Väg under byggnation
+			default:
+				stroke.setColor('rgba(220,120,20,1.0)');
+				stroke.setWidth(3);
+				if(resolution < 2){stroke.setWidth(4.5);}
+				if(resolution < 1){stroke.setWidth(7.5);}
+				styles[length++] = line;
+				break;
+		}
+		}		
+		else if (layer=="vl_over"){ //VÄGAR
+		switch(kkod) {
+			case 5011:// Motorväg, vägnummer E4-99
+			case 5012:// Motorväg, vägnummer E4-99, underfart
+			case 5013:// Motorväg, vägnummer E4-99, tunnel
+			case 5021:// Motorväg, vägnummer 100-499
+			case 5022:// Motorväg, vägnummer 100-499, underfart
+			case 5023:// Motorväg, vägnummer 100-499,tunnel
+			case 5031:// Motorväg, vägnummer >500
+			case 5032:// Motorväg, vägnummer >500, underfart
+			case 5033:// Motorväg, vägnummer >500, tunnel
+						stroke.setColor('rgba(220,120,20,1.0)');
+						stroke.setWidth(3);
+						styles[length++] = line;
+								break;
+			case 5111:// Motortrafikled, vägnummer E4-99
+			case 5112:// Motortrafikled, vägnummer E4-99,underfart
+			case 5113:// Motortrafikled, vägnummer E4-99,tunnel
+			case 5121:// Motortrafikled, vägnummer 100-499
+			case 5122:// Motortrafikled, vägnummer 100-499, underfart
+			case 5123:// Motortrafikled, vägnummer 100-499, tunnel
+			case 5131:// Motortrafikled, vägnummer >500
+			case 5132:// Motortrafikled, vägnummer >500,underfart
+			case 5133:// Motortrafikled, vägnummer >500,tunnel
+			case 5211:// Allmän väg >7m, vägnummer E4-99
+			case 5212:// Allmän väg >7m, vägnummer E4-99, underfart
+			case 5213:// Allmän väg >7m, vägnummer E4-99, tunnel
+			case 5221:// Allmän väg >7m, vägnummer 100-499
+			case 5222:// Allmän väg >7m, vägnummer 100-499, underfart
+			case 5223:// Allmän väg >7m, vägnummer 100-499, tunnel
+			case 5225:// Allmän väg >7m, vägnummer 100-499, färja
+			case 5231:// Allmän väg >7m, vägnummer >500
+			case 5232:// Allmän väg >7m, vägnummer>500, underfart
+			case 5233:// Allmän väg >7m, vägnummer>500, tunnel
+			case 5235:// Allmän väg >7m, vägnummer>500, färja
+						stroke.setColor('rgba(220,120,20,1.0)');
+						stroke.setWidth(2);
+						styles[length++] = line;
+								break;
+			case 5311:// Allmän väg 5-7m, vägnummer E4-99
+			case 5312:// Allmän väg 5-7m, vägnummer E4-99, underfart
+			case 5313:// Allmän väg 5-7m, vägnummer E4-99, tunnel
+			case 5321:// Allmän väg 5-7m, vägnummer 100-499
+			case 5322:// Allmän väg 5-7m, vägnummer 100-499, underfart
+			case 5323:// Allmän väg 5-7m, vägnummer 100-499, tunnel
+			case 5325:// Allmän väg 5-7m, vägnummer 100-499, färja
+			case 5331:// Allmän väg 5-7m, vägnummer>500
+			case 5332:// Allmän väg 5-7m, vägnummer>500, underfart
+			case 5333:// Allmän väg 5-7m, vägnummer>500, tunnel
+			case 5334:// Väg under byggnad
+			case 5335:// Allmän väg 5-7m, vägnummer>500, färja
+			case 5411:// Allmän väg <5m, vägnummer E4-99
+			case 5412:// Allmän väg <5m, vägnummer E4-99, underfart
+			case 5413:// Allmän väg <5m, vägnummer E4-99, tunnel
+			case 5421:// Allmän väg <5m, vägnummer 100-499
+			case 5422:// Allmän väg <5m, vägnummer 100-499, underfart
+			case 5423:// Allmän väg <5m, vägnummer 100-499, tunnel
+			case 5425:// Allmän väg <5m, vägnummer 100-499, färja
+			case 5431:// Allmän väg <5m, vägnummer >500
+			case 5432:// Allmän väg <5m, vägnummer>500, underfart
+			case 5433:// Allmän väg <5m, vägnummer>500, tunnel
+			case 5435:// Allmän väg <5m, vägnummer>500, färja
+						stroke.setColor('rgba(220,120,20,1.0)');
+						stroke.setWidth(1);
+						styles[length++] = line;
+								break;
+			case 5551:// Enskild väg
+			case 5552:// Enskild väg, underfart
+			case 5553:// Enskild väg, tunnel
+			case 5555:// Enskild väg, färja
+						stroke.setColor('rgba(150,150,150,1.0)');
+						stroke.setWidth(0.8);
+						styles[length++] = line;
+								break;
+		}
+		}
+		else if (layer=="vo_fast"){
+		switch(dt) {
+			case "ÖVÄGCYK.M":// Cykelväg/parkväg Mittlinje för cykel- eller parkväg.
+				dashedStroke.setColor('rgba(220,20,20,1.0)');
+				dashedStroke.setWidth(0.8);
+				dashedStroke.setLineDash([8, 4]);
+				if(resolution < 5){styles[length++] = dashedLine;}
+						break;
+			case "ÖVÄGELS.M":// Elljusspår
+				stroke.setColor('rgba(220,220,20,1.0)');
+				stroke.setWidth(2);
+				if(resolution < 5){styles[length++] = line;}
+				dashedStroke.setWidth(2);
+				dashedStroke.setLineDash([1, 5]);
+				if(resolution < 5){styles[length++] = dashedLine;}
+						break;
+			case "ÖVÄGSTI.M":// Gångstig Mittlinje för tydlig gångstig.
+				dashedStroke.setColor('rgba(150,150,150,1.0)');
+				dashedStroke.setWidth(1.5);
+				dashedStroke.setLineDash([1, 5]);
+				if(resolution < 15){styles[length++] = dashedLine;}
+						break;
+			case "ÖVÄGTRA.M":// Traktorväg
+			case "ÖVÄGUND.M":// Underfart/tunnel för övrig väg eller led
+			case "GÅNGBRO.M":// Gångbro
+			case "VANDLED":// Vandringsled
+				dashedStroke.setColor('rgba(220,120,20,1.0)');
+				dashedStroke.setWidth(0.8);
+				dashedStroke.setLineDash([8, 4]);
+				if(resolution < 15){styles[length++] = dashedLine;}
+						break;
+		}
+		}
+		else if (layer=="vo_vagk" || layer=="vo_fast"){
+		switch(kkod) {
+			case 264:// Gångstig
+			case 289:// Annan led
+			case 332:// Gångbro
+						dashedStroke.setColor('rgba(220,120,20,1.0)');
+						dashedStroke.setWidth(0.6);
+						dashedStroke.setLineDash([8, 4]);
+						if(resolution < 15){styles[length++] = dashedLine;}
+						break;
+			case 265:// Vandringsled
+			case 268:// Vandringsled, längs väg
+			case 336:// Färjeled
+						dashedStroke.setColor('rgba(220,120,20,1.0)');
+						dashedStroke.setWidth(0.8);
+						dashedStroke.setLineDash([8, 4]);
+						if(resolution < 15){styles[length++] = dashedLine;}
+								break;
+			case "ÖVÄGCYK.M":// Cykelväg/parkväg Mittlinje för cykel- eller parkväg.
+				dashedStroke.setColor('rgba(220,20,20,1.0)');
+				dashedStroke.setWidth(0.8);
+				dashedStroke.setLineDash([8, 4]);
+				if(resolution < 5){styles[length++] = dashedLine;}
+						break;
+			case "ÖVÄGELS.M":// Elljusspår
+				stroke.setColor('rgba(220,220,20,1.0)');
+				stroke.setWidth(2);
+				if(resolution < 5){styles[length++] = line;}
+				dashedStroke.setWidth(2);
+				dashedStroke.setLineDash([1, 5]);
+				if(resolution < 5){styles[length++] = dashedLine;}
+						break;
+			case "ÖVÄGSTI.M":// Gångstig Mittlinje för tydlig gångstig.
+				dashedStroke.setColor('rgba(150,150,150,1.0)');
+				dashedStroke.setWidth(1.5);
+				dashedStroke.setLineDash([1, 5]);
+				if(resolution < 15){styles[length++] = dashedLine;}
+						break;
+			case "ÖVÄGTRA.M":// Traktorväg
+			case "ÖVÄGUND.M":// Underfart/tunnel för övrig väg eller led
+			case "GÅNGBRO.M":// Gångbro
+			case "VANDLED":// Vandringsled
+				dashedStroke.setColor('rgba(220,120,20,1.0)');
+				dashedStroke.setWidth(0.8);
+				dashedStroke.setLineDash([8, 4]);
+				if(resolution < 15){styles[length++] = dashedLine;}
+						break;
+		}
+		}
+/*		else if (layer=="vl_vagk_BLAHA" || layer=="vl_over_BLAHA"){
+			if(resolution < 1){
+				switch(kkod) {
+					case "0":
+						stroke.setColor('rgba(140,70,70,1.0)');
+						stroke.setWidth(20);
+						styles[length++] = line;
+					break;
+					default:
+						//stroke.setColor('rgba(210,210,210,1.0)');
+						stroke.setColor('rgba(160,160,160,1.0)');
+						stroke.setWidth(8);
+						overlayedStroke.setColor('rgba(240,240,240,1.0)');
+						overlayedStroke.setWidth(7);
+						styles[length++] = line;
+						styles[length++] = overlayedLine;
+				}
+			}
+			else if(resolution < 30){
+				switch(kkod) {
+					case "0":
+						//stroke.setColor('rgba(140,70,70,1.0)');
+						//stroke.setWidth(6);
+						//styles[length++] = line;
+						stroke.setColor('rgba(140,70,70,1.0)');
+						stroke.setWidth(6);
+						overlayedStroke.setColor('rgba(240,240,240,1.0)');
+						overlayedStroke.setWidth(1);
+						styles[length++] = line;
+						styles[length++] = overlayedLine;
+					break;
+					case "1":
+						//stroke.setColor('rgba(140,70,70,1.0)');
+						//stroke.setWidth(4);
+						//styles[length++] = line;
+						stroke.setColor('rgba(140,70,70,1.0)');
+						stroke.setWidth(4);
+						overlayedStroke.setColor('rgba(240,240,240,1.0)');
+						overlayedStroke.setWidth(1);
+						styles[length++] = line;
+						styles[length++] = overlayedLine;
+					break;
+					case "2":
+						stroke.setColor('rgba(140,70,70,1.0)');
+						stroke.setWidth(4);
+						overlayedStroke.setColor('rgba(240,240,240,1.0)');
+						overlayedStroke.setWidth(1);
+						styles[length++] = line;
+						styles[length++] = overlayedLine;
+					break;
+					case "3":
+						stroke.setColor('rgba(140,70,70,1.0)');
+						stroke.setWidth(4);
+						overlayedStroke.setColor('rgba(240,240,240,1.0)');
+						overlayedStroke.setWidth(1);
+						styles[length++] = line;
+						styles[length++] = overlayedLine;
+					break;
+					case "4":
+						stroke.setColor('rgba(140,70,70,1.0)');
+						stroke.setWidth(4);
+						overlayedStroke.setColor('rgba(240,240,240,1.0)');
+						overlayedStroke.setWidth(1);
+						styles[length++] = line;
+						styles[length++] = overlayedLine;
+					break;
+					case "5":
+						stroke.setColor('rgba(140,70,70,1.0)');
+						stroke.setWidth(4);
+						overlayedStroke.setColor('rgba(240,240,240,1.0)');
+						overlayedStroke.setWidth(1);
+						styles[length++] = line;
+						styles[length++] = overlayedLine;
+					break;
+					case "6":
+						stroke.setColor('rgba(160,160,160,1.0)');
+						stroke.setWidth(4);
+						overlayedStroke.setColor('rgba(240,240,240,1.0)');
+						overlayedStroke.setWidth(3);
+						styles[length++] = line;
+						styles[length++] = overlayedLine;
+					break;
+					case "7":
+						stroke.setColor('rgba(160,160,160,1.0)');
+						stroke.setWidth(4);
+						overlayedStroke.setColor('rgba(240,240,240,1.0)');
+						overlayedStroke.setWidth(3);
+						styles[length++] = line;
+						styles[length++] = overlayedLine;
+					break;
+					default:
+						stroke.setColor('rgba(120,120,120,1.0)');
+						stroke.setWidth(0.4);
+						styles[length++] = line;			   
+				}
+			}
+			else if(resolution < 500){
+				switch(kkod) {
+					case "0":
+						stroke.setColor('rgba(140,70,70,1.0)');
+						stroke.setWidth(2);
+						styles[length++] = line;
+					break;	
+					case "1":
+						//stroke.setColor('rgba(140,70,70,1.0)');
+						//stroke.setWidth(4);
+						//styles[length++] = line;
+						stroke.setColor('rgba(140,70,70,1.0)');
+						stroke.setWidth(1);
+						styles[length++] = line;
+					break;
+					case "2":
+						stroke.setColor('rgba(140,70,70,1.0)');
+						stroke.setWidth(1);
+						styles[length++] = line;
+					break; 
+					case "3":
+						stroke.setColor('rgba(140,70,70,1.0)');
+						stroke.setWidth(0.75);
+						styles[length++] = line;
+					break;   
+					case "4":
+						stroke.setColor('rgba(140,70,70,1.0)');
+						stroke.setWidth(0.5);
+						styles[length++] = line;
+					break;   
+					case "6":
+						stroke.setColor('rgba(140,70,70,1.0)');
+						stroke.setWidth(0.5);
+						styles[length++] = line;
+					break;   
+					default:
+						stroke.setColor('rgba(140,70,70,1.0)');
+						stroke.setWidth(0.5);
+						styles[length++] = line;
+					break;    
+					
+				}
+			}
+		}
+		else if (layer=="BYGGNADER"){
+			if(resolution < 2){
+				switch(detaljtyp) {
+					case 'OFBYGG.Y':
+					stroke.setColor('rgba(80,80,80,1.0)');
+					stroke.setWidth(0.3);          
+					fill.setColor('rgba(255,100,100,1.0)');
+					styles[length++] = strokedPolygon;
+					break;
+					case 'BOSTAD.Y':
+					stroke.setColor('rgba(80,80,80,1.0)');
+					stroke.setWidth(0.3);          
+					fill.setColor('rgba(227,199,163,1.0)');
+					styles[length++] = strokedPolygon;
+					break;
+					case 'INDUST.Y':
+					stroke.setColor('rgba(80,80,80,1.0)');
+					stroke.setWidth(0.3);          
+					fill.setColor('rgba(130,130,130,1.0)');
+					styles[length++] = strokedPolygon;
+					break;
+					case 'TRAFO.Y':
+					stroke.setColor('rgba(80,80,80,1.0)');
+					stroke.setWidth(0.3);          
+					fill.setColor('rgba(100,100,100,1.0)');
+					styles[length++] = strokedPolygon;
+					break;
+					case 'UTHUS.Y':
+					stroke.setColor('rgba(80,80,80,1.0)');
+					stroke.setWidth(0.3);          
+					fill.setColor('rgba(216,173,148,1.0)');
+					styles[length++] = strokedPolygon;
+					break;
+				}
+			}
+		}*/
+		/*
+		else{
+         fill.setColor('rgba(234,100,100,1.0)');
+		  styles[length++] = polygon;
+	  }
+	  */
+	  //else console.log(feature);
+		styles.length = length;
+		return styles;
+	}
+	}
+	else if(styleName=='labels'){
+      var light = true;
+	  var fill = new ol.style.Fill({color: ''});
+	  var stroke = new ol.style.Stroke({color: '', width: 0.1, lineCap:'square', lineJoin:'round'});
+	  var rotation = 0;
+	  var textAlign = 'start';
+	  var textBaseline = 'alphabetic';
+	  var text = new ol.style.Style({text: new ol.style.Text({
+		text: '', fill: fill, stroke: stroke, rotation: rotation, textAlign: textAlign, textBaseline: textBaseline
+	  }), zIndex: 50});
+	  var styles = [];
+	  return function(feature, resolution) {
+		text.getText().setRotation(0);
+		var length = 0;
+		var dt = feature.get('DETALJTYP');
+		var trikt = feature.get('TRIKT');
+		var tjust = feature.get('TJUST');
+		var thojd = feature.get('THOJD');
+		var ttext = feature.get('TEXT');
+		
+	  if (feature.get('TEXT') && resolution <= 150){
+		  
+		  
+			switch(tjust) {
+			case 1: 
+					text.getText().setTextBaseline('bottom');
+					text.getText().setTextAlign('left');
+					break
+			case 4: 
+					text.getText().setTextBaseline('middle');
+					text.getText().setTextAlign('left');
+					break
+			case 7: 
+					text.getText().setTextBaseline('top');
+					text.getText().setTextAlign('left');
+					break;
+			case 8: 
+					text.getText().setTextBaseline('top');
+					text.getText().setTextAlign('center');
+					break;
+			case 5: 
+					text.getText().setTextBaseline('middle');
+					text.getText().setTextAlign('center');
+					break;
+			case 2: 
+					text.getText().setTextBaseline('bottom');
+					text.getText().setTextAlign('center');
+					break;
+			case 9: 
+					text.getText().setTextBaseline('top');
+					text.getText().setTextAlign('right');
+					break;
+			case 6: 
+					text.getText().setTextBaseline('middle');
+					text.getText().setTextAlign('right');
+					break;
+			case 3: 
+					text.getText().setTextBaseline('bottom');
+					text.getText().setTextAlign('right');
+					break;
+			}
+		text.getText().setText(ttext);
+		text.getText().setFont('italic '+(thojd*1.8/(Math.sqrt(resolution)))+'px sans-serif');
+		light ? stroke.setColor('rgba(240,240,240,1)') : stroke.setColor('rgba(40,40,40,1)');
+		stroke.setWidth((thojd*3/(Math.sqrt(resolution)))/10);
+		fill.setColor('rgba(130,130,130,1.0)');
+	  if(dt=='BEBTÄTTX'){ 
+		text.getText().setFont(((thojd/1.4)-(resolution/25))+'px sans-serif');
+		light ? fill.setColor('rgba(55,55,55,1.0)') : fill.setColor('rgba(200,200,200,1.0)');
+		if(resolution > 10 && thojd > 14){
+		styles[length++] = text;
+		}
+		}
+	  else if(dt=='BEBTX' && resolution < 10){ 
+		text.getText().setFont((thojd*1.9/(Math.sqrt(resolution)))+'px sans-serif');
+		light ? fill.setColor('rgba(80,80,80,1.0)') : fill.setColor('rgba(175,175,175,1.0)');
+		if(
+		(thojd==14 && resolution < 10) ||
+		(thojd==12 && resolution < 5) ||
+		(thojd==10 && resolution < 2)){ 
+		styles[length++] = text;
+		}
+		}
+	  else if((dt=='SANKTX') && resolution < 10){ 
+		if(
+		(thojd==14 && resolution < 10) ||
+		(thojd==12 && resolution < 5) ||
+		(thojd==10 && resolution < 2)){ 
+		styles[length++] = text;
+		}
+		}
+	  else if((dt=='TERRTX' || dt=='NATTX') && resolution < 15){ 
+		if(thojd>14 || 
+		(thojd==14 && resolution < 10) ||
+		(thojd==12 && resolution < 5) ||
+		(thojd==10 && resolution < 2)){ 
+		styles[length++] = text;
+		}
+		}
+	  else if((dt=='KULTURTX' || dt=='ANLTX' || dt=='ANLUTX') && resolution < 3){ 
+		text.getText().setRotation((360-trikt)/360*2*Math.PI);
+		if(
+		(thojd==14 && resolution < 10) ||
+		(thojd==12 && resolution < 5) ||
+		(thojd==10 && resolution < 2)){ 
+		styles[length++] = text;
+		}
+		}
+	  else if((dt=='VATTDELTX' || dt=='VATTDRTX' || dt=='VATTTX') && resolution < 40){ 
+		text.getText().setRotation((360-trikt)/360*2*Math.PI);
+		stroke.setColor('rgba(0,0,0,0)');
+		light ? fill.setColor('rgba(90,120,160,1.0)') : fill.setColor('rgba(70,95,130,1.0)');
+		if(dt=='VATTTX' && thojd>=25){
+			if(resolution >= 5){
+			styles[length++] = text;}
+			
+		}
+		else if(resolution < 10 && (thojd>20 || 
+		(thojd>=14 && resolution < 10) ||
+		(thojd==12 && resolution < 5) ||
+		(thojd==10 && resolution < 2))){ 
+		styles[length++] = text;
+		}
+		}
+	  /*else{ 
+		text.getText().setText(ttext);
+		text.getText().setFont((thojd*2/(Math.sqrt(resolution)))+'px sans-serif');
+		stroke.setColor('rgba(40,40,40,1)');
+		stroke.setWidth((thojd*4/(Math.sqrt(resolution)))/10);
+		fill.setColor('rgba(255,0,0,1.0)');
+		//styles[length++] = text;
+		}*/
+	  }
+		styles.length = length;
+		return styles;
+	}
+	}
+	else if(styleName=='labels_byggnadsar'){
+	  var fill = new ol.style.Fill({color: 'rgba(0,0,0,1.0)'});
+	  var stroke = new ol.style.Stroke({color: 'rgba(200,200,200,0)', width: 1.5});
+	  var text = new ol.style.Style({text: new ol.style.Text({
+		text: '', fill: fill, stroke: stroke}), zIndex: 50});
+	  var styles = [];
+	  return function(feature, resolution) {
+		var length = 0;
+		if(resolution < 1){
+		var ar_nybygg = feature.get('ar_nybygg');
+		/*var label = '' + ar_nybygg;
+		console.log(feature.get('ar_nybygg'));*/
+		text.getText().setText(ar_nybygg);
+		text.getText().setFont('10px sans-serif');
+		styles[length++] = text;
+	  }
+		styles.length = length;
+		return styles;
+	}
+	}
+	/*
+	else if(styleName=='labels_light'){
+	  var fill = new ol.style.Fill({color: ''});
+	  var stroke = new ol.style.Stroke({color: '', width: 0.1, lineCap:'square', lineJoin:'round'});
+	  var rotation = 0;
+	  var textAlign = 'start';
+	  var textBaseline = 'alphabetic';
+	  var text = new ol.style.Style({text: new ol.style.Text({
+		text: '', fill: fill, stroke: stroke, rotation: rotation, textAlign: textAlign, textBaseline: textBaseline
+	  }), zIndex: 50});
+	  var styles = [];
+	  return function(feature, resolution) {
+		text.getText().setRotation(0);
+		var length = 0;
+		var dt = feature.get('DETALJTYP');
+		var trikt = feature.get('TRIKT');
+		var tjust = feature.get('TJUST');
+		var thojd = feature.get('THOJD');
+		var ttext = feature.get('TEXT');
+		
+	  if (feature.get('TEXT') && resolution <= 150){
+		  
+		  
+			switch(tjust) {
+			case 1: 
+					text.getText().setTextBaseline('bottom');
+					text.getText().setTextAlign('left');
+					break
+			case 4: 
+					text.getText().setTextBaseline('middle');
+					text.getText().setTextAlign('left');
+					break
+			case 7: 
+					text.getText().setTextBaseline('top');
+					text.getText().setTextAlign('left');
+					break;
+			case 8: 
+					text.getText().setTextBaseline('top');
+					text.getText().setTextAlign('center');
+					break;
+			case 5: 
+					text.getText().setTextBaseline('middle');
+					text.getText().setTextAlign('center');
+					break;
+			case 2: 
+					text.getText().setTextBaseline('bottom');
+					text.getText().setTextAlign('center');
+					break;
+			case 9: 
+					text.getText().setTextBaseline('top');
+					text.getText().setTextAlign('right');
+					break;
+			case 6: 
+					text.getText().setTextBaseline('middle');
+					text.getText().setTextAlign('right');
+					break;
+			case 3: 
+					text.getText().setTextBaseline('bottom');
+					text.getText().setTextAlign('right');
+					break;
+			}
+	  if(dt=='BEBTÄTTX'){ 
+		text.getText().setText(ttext);
+		text.getText().setFont(((thojd/1.4)-(resolution/25))+'px sans-serif');
+		stroke.setColor('rgba(240,240,240,1)');
+		stroke.setWidth((thojd*5/(Math.sqrt(resolution)))/10);
+		fill.setColor('rgba(55,55,55,1.0)');
+		if(resolution > 10 && thojd > 14){
+		styles[length++] = text;
+		}
+		}
+	  else if(dt=='BEBTX' && resolution < 10){ 
+		text.getText().setText(ttext);
+		text.getText().setFont((thojd*1.9/(Math.sqrt(resolution)))+'px sans-serif');
+		stroke.setColor('rgba(240,240,240,1)');
+		stroke.setWidth((thojd*3/(Math.sqrt(resolution)))/10);
+		fill.setColor('rgba(80,80,80,1.0)');
+		if(
+		(thojd==14 && resolution < 10) ||
+		(thojd==12 && resolution < 5) ||
+		(thojd==10 && resolution < 2)){ 
+		styles[length++] = text;
+		}
+		}
+	  else if((dt=='SANKTX') && resolution < 10){ 
+		text.getText().setText(ttext);
+		text.getText().setFont('italic '+(thojd*2/(Math.sqrt(resolution)))+'px sans-serif');
+		stroke.setColor('rgba(240,240,240,1)');
+		stroke.setWidth((thojd*4/(Math.sqrt(resolution)))/10);
+		fill.setColor('rgba(130,130,130,1.0)');
+		if(
+		(thojd==14 && resolution < 10) ||
+		(thojd==12 && resolution < 5) ||
+		(thojd==10 && resolution < 2)){ 
+		styles[length++] = text;
+		}
+		}
+	  else if((dt=='TERRTX' || dt=='NATTX') && resolution < 15){ 
+		text.getText().setText(ttext);
+		text.getText().setFont('italic '+(thojd*2/(Math.sqrt(resolution)))+'px sans-serif');
+		stroke.setColor('rgba(240,240,240,1)');
+		stroke.setWidth((thojd*4/(Math.sqrt(resolution)))/10);
+		fill.setColor('rgba(130,130,130,1.0)');
+		if(thojd>14 || 
+		(thojd==14 && resolution < 10) ||
+		(thojd==12 && resolution < 5) ||
+		(thojd==10 && resolution < 2)){ 
+		styles[length++] = text;
+		}
+		}
+	  else if((dt=='KULTURTX' || dt=='ANLTX' || dt=='ANLUTX') && resolution < 3){ 
+		text.getText().setText(ttext);
+		text.getText().setFont('italic '+(thojd*2/(Math.sqrt(resolution)))+'px sans-serif');
+		stroke.setColor('rgba(240,240,240,1)');
+		stroke.setWidth((thojd*4/(Math.sqrt(resolution)))/10);
+		fill.setColor('rgba(130,130,130,1.0)');
+		if(
+		(thojd==14 && resolution < 10) ||
+		(thojd==12 && resolution < 5) ||
+		(thojd==10 && resolution < 2)){ 
+		styles[length++] = text;
+		}
+		}
+	  else if((dt=='VATTDELTX' || dt=='VATTDRTX' || dt=='VATTTX') && resolution < 40){ 
+		text.getText().setRotation((360-trikt)/360*2*Math.PI);
+		text.getText().setText(ttext);
+		text.getText().setFont('italic '+(thojd*2/(Math.sqrt(resolution)))+'px sans-serif');
+		stroke.setColor('rgba(40,40,40,0)');
+		stroke.setWidth((thojd*1/(Math.sqrt(resolution)))/10);
+		fill.setColor('rgba(90,120,160,1.0)');
+		//fill.setColor('rgba(65,85,125,1.0)');
+		if(dt=='VATTTX' && thojd>=25){
+			if(resolution >= 5){
+			styles[length++] = text;}
+			//else if(resolution <= 10 && thojd<=25){
+			//styles[length++] = text;}
+			
+		}
+		else if(resolution < 10 && (thojd>20 || 
+		(thojd>=14 && resolution < 10) ||
+		(thojd==12 && resolution < 5) ||
+		(thojd==10 && resolution < 2))){ 
+		styles[length++] = text;
+		}
+		}
+	  else{ 
+		text.getText().setText(ttext);
+		text.getText().setFont((thojd*2/(Math.sqrt(resolution)))+'px sans-serif');
+		stroke.setColor('rgba(40,40,40,1)');
+		stroke.setWidth((thojd*4/(Math.sqrt(resolution)))/10);
+		fill.setColor('rgba(255,0,0,1.0)');
+		//styles[length++] = text;
+		}
+	  }
+		styles.length = length;
+		return styles;
+	}
+	}
+	*/
+	/*
+	else if(styleName=='labels'){
 	  var fill = new ol.style.Fill({color: ''});
 	  var stroke = new ol.style.Stroke({color: '', width: 0.1, lineCap:'square', lineJoin:'round'});
 	  var overlayedStroke = new ol.style.Stroke({color: '', width: 0.1, lineCap:'square', lineJoin:'round'});
@@ -896,7 +2261,19 @@
 		styles.length = length;
 		return styles;
 	}
-	}
-	}
+	}*/
 
-module.exports = stylefunctions;
+	}
+	function getColor(color){
+			switch(color) {
+			case 'red': return [255,0,0];
+			case 'yellow': return [255,255,0];
+			case 'green': return [0,255,0];
+			case 'cyan': return [0,255,255];
+			case 'blue': return [0,0,255];
+			case 'magenta': return [255,0,255];
+			default: return [255,255,255];
+		}
+	}
+module.exports.customStyle = customStyle;
+module.exports.getColor = getColor;

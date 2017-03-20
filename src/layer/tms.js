@@ -27,6 +27,7 @@ var tms = function tms(layerOptions) {
 
   function createSource(options, tmsOptions) {
 	options.url += tmsOptions.layerName + '@'  + tmsOptions.gridset + '@' + tmsOptions.format + '/{z}/{x}/{-y}.'+ tmsOptions.format;
+	options.crossOrigin = 'anonymous';
     return new ol.source.XYZ(options);
   }
 }

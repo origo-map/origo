@@ -14,25 +14,30 @@ var layers, settings, check, timelineLayers, utilSettings;
 var br = '<br class="rwd-break" />';
 
 function init() {
-
-	utilSettings = {
-			range: true,
-			min: 1865,
-			max: 2017,
-			values: [1865,2017],
-			step: 1,
-      tickArray: [1865,2017],
-      tickLabels_h: {1865: 'Före 1865', 2017: '2017'},
-      tickLabels_v: {1865: 'Före 1865', 2017: '2017'}
-			
-	}
 		
 	$('#o-map').append('<div class="wrapper-vertical"><div id="slider-labeled-v"></div></div>');
 	$('#o-map').append('<div class="wrapper-horizontal"><div id="slider-labeled-h"></div></div>');
 
 	timelineLayers = Viewer.getLayers().filter(function(l) { 
-		return l.get('timeline') == 'byggnadsar';
+		return l.get('timeline');
 	});
+	
+	var timelineOptions=timelineLayers[0].getProperties().timeline;
+	
+	utilSettings = {
+		name: timelineOptions.name,
+		attrName: timelineOptions.attrName,
+		colors: timelineOptions.colors,
+			range: true,
+			min: timelineOptions.range[0],
+			max: timelineOptions.range[1],
+			values: timelineOptions.range,
+			step: timelineOptions.step,
+      tickArray: timelineOptions.range,
+      tickLabels_h: timelineOptions.tickLabels_h,
+      tickLabels_v: timelineOptions.tickLabels_v
+			
+	}
   
   if (timelineLayers.length > 0) {
     timelineLayers[0].on('change:visible', function(evt) {
@@ -116,19 +121,27 @@ function timeline() {
 		},
 		create: function(event, ui) {
       var val = utilSettings.range ? $( "#slider-labeled-h" ).labeledslider( "values" ) : $( "#slider-labeled-h" ).labeledslider( "value" );
-			var val = utilSettings.range ? $( "#slider-labeled-v" ).labeledslider( "values" ) : $( "#slider-labeled-v" ).labeledslider( "value" );
+		//var val = utilSettings.range ? $( "#slider-labeled-v" ).labeledslider( "values" ) : $( "#slider-labeled-v" ).labeledslider( "value" );
 
-      timelineLayers[0].setStyle(stylefunctions('byggnadsar', val));
+      timelineLayers[0].setStyle(stylefunctions.customStyle('timeline', {
+            "attrName": utilSettings.attrName,
+            "range": utilSettings.values,
+			"step": utilSettings.step,
+			"colors": utilSettings.colors,
+			"values": val
+          }));
 
-      $('#slider-labeled-h.ui-widget-content').addClass('ui-bg-byggnadsar-h');
-      $('#slider-labeled-v.ui-widget-content').addClass('ui-bg-byggnadsar-v');
+      $('#slider-labeled-h.ui-widget-content').addClass('ui-bg-'+utilSettings.name+'-h');
+      $('#slider-labeled-v.ui-widget-content').addClass('ui-bg-'+utilSettings.name+'-v');
 
       $( '.ui-widget.horizontal .ui-slider-labels' ).append('<div class="ui-slider-label-min ui-slider-label-ticks horizontal"><span>'+val[0]+'</span></div>');
       $( '.ui-widget.horizontal .ui-slider-labels' ).append('<div class="ui-slider-label-max ui-slider-label-ticks horizontal"><span>'+val[1]+'</span></div>');
 
       $( '.ui-widget.vertical .ui-slider-labels' ).append('<div class="ui-slider-label-min ui-slider-label-ticks vertical"><span>'+val[0]+'</span></div>');
       $( '.ui-widget.vertical .ui-slider-labels' ).append('<div class="ui-slider-label-max ui-slider-label-ticks vertical"><span>'+val[1]+'</span></div>');
-      
+      $('.ui-bg-'+utilSettings.name+'-v').css('cssText', styleSlider(utilSettings.colors, false));
+      $('.ui-bg-'+utilSettings.name+'-h').css('cssText', styleSlider(utilSettings.colors, true));
+
       setHandleLabelValue(val);
       setHandleLabelPosition(val);
 		}
@@ -141,7 +154,13 @@ function timeline() {
 
     setHandleLabelValue(ui.values);
     setHandleLabelPosition(ui.values);
-    timelineLayers[0].setStyle(stylefunctions('byggnadsar', ui.values));
+    timelineLayers[0].setStyle(stylefunctions.customStyle('timeline', {
+            "attrName": utilSettings.attrName,
+            "range": utilSettings.values,
+			"step": utilSettings.step,
+			"colors": utilSettings.colors,
+			"values": ui.values
+          }));
 	}
 };
 
@@ -180,5 +199,25 @@ function setHandleLabelPosition(val) {
   });
 
 }
+	
+	function styleSlider(colors, horizontal){
+		var content = '';
+		var i;
+		for(i=0; i<colors.length; i++){
+			content += 'rgba('+stylefunctions.getColor(colors[i])[0]+', '+stylefunctions.getColor(colors[i])[1]+', '+stylefunctions.getColor(colors[i])[2]+', 1.0)';
+			if(i>0 && i<(colors.length-1)){
+				content += ' '+i*Math.round(100/(colors.length-1))+'%,';
+			}
+			else if(i==0){
+				content += ',';
+			}
+		}
+		var insert = horizontal ? ['left','to right'] : ['bottom','to top'];
+		var cssString='background: -webkit-linear-gradient(' + insert[0]  + ',' + content + '); ' + 
+		'background: -o-linear-gradient(' + insert[0]  + ',' + content + '); ' + 
+		'background: -moz-linear-gradient(' + insert[0]  + ',' + content + '); ' + 
+		'background: linear-gradient('+ insert[1]  + ',' + content + '); ';
+		return cssString;
+	}
 
 module.exports.init = init;

@@ -49,22 +49,26 @@
   "extent": [110000,6540000,200000,6650000],
   "center": [144000,6584200],
   "home": [120000, 6556000, 191000, 6635000],
-  "zoom": 2,
+  "zoom": 4,
   "resolutions": [128,64,32,16,8,4,2,1,0.5,0.25,0.125],
-  "tileSize":512,
+  "tileSize":256,
+  "featureinfoOptions":{
+    "overlay":false
+  },
   "source": {
-    "local": {
-      "url": "http://localhost/geoserver/wms"
-    },
     "geoserver_gi": {
-			"url": "http://gi.karlstad.se/geoserver/ows",
+			"url": "https://gi.karlstad.se:8443/geoserver/ows",
+			"version": "1.1.0"
+	},
+    "geoserver_local": {
+			"url": "http://localhost:8080/geoserver/ows",
 			"version": "1.1.0"
 	},
     "geoserver_tms": {
-      "url": "http://gi.karlstad.se/geoserver/gwc/service/tms/1.0.0/"
+      "url": "https://gi.karlstad.se:8443/geoserver/gwc/service/tms/1.0.0/"
     },
-	"basemap": {
-      "url": "http://www.malardalskartan.se/geowebcache/service/wmts"
+    "geoserver_tms_local": {
+      "url": "http://localhost:8080/geoserver/gwc/service/tms/1.0.0/"
     }
   },
   "groups": [
@@ -74,6 +78,11 @@
       "expanded": true
     },
     {
+      "name": "historiskakartor",
+      "title": "Historiska kartor",
+      "expanded": false
+    },
+    {
       "name": "background",
       "title": "Bakgrundskartor",
       "expanded": true
@@ -81,52 +90,320 @@
   ],
   "layers": [
     {
+      "name": "mask",
+      "opacity": 0.75,
+      "title": "kd",
+      "group": "none",
+      "queryable": false,
+      "source": "data/kdkn.geojson",
+      "style": "mask",
+      "type": "GEOJSON",
+      "visible": true
+    },
+    {
+      "name": "buffer",
+      "opacity": 1,
+      "title": "buffer",
+      "group": "none",
+      "queryable": false,
+      "source": "data/kdbuffer10.geojson",
+      "style": "mask",
+      "type": "GEOJSON",
+      "visible": true
+    },
+    {
+      "name": "stadsvandring",
+      "opacity": 1,
+      "title": "Stadsvandring",
+      "group": "test",
+      "queryable": true,
+      "source": "data/stadsvandring.geojson",
+      "style": "mask",
+      "type": "GEOJSON",
+      "visible": false,
+      "attributes": [
+    {
+      "html": "<img style='width:100%;' src='https://gi.karlstad.se/files/stadsvandring/bilder/{{bild}}' /><b>{{namn}}</b><p>{{text}}</p>"
+    }  ]
+    },
+    {
+			"name": "vy_webbkarta_byggnadsar_centroid",
+			"title": "Texter byggnadsår",
+			"source": "geoserver_gi",
+			"group": "test",
+			"queryable": false,
+			"style": "mask",
+			"type": "WFS",
+			"featuretype": 5,
+			"visible": false,
+			"customStyle": "labels_byggnadsar"
+		}, 
+    {
+			"name": "TX",
+			"title": "Texter",
+			"source": "geoserver_gi",
+			"group": "test",
+      "queryable": false,
+			"style": "mask",
+			"type": "WFS",
+			"featuretype": 5,
+			"visible": false,
+			"customStyle": "labels"
+		}, 
+    {
+			"name": "kulprog_byggnad",
+			"title": "Värdefulla byggnader",
+			"source": "geoserver_gi",
+			"group": "test",
+			"subgroup": "Kulprog",
+			"style": "kulprog_byggnader",
+			"type": "WFS",
+			"featuretype": 3,
+			"visible": false,
+			"attributes": [{
+				"title": "Namn: ",
+				"name": "gammal_fastighet",
+				"urlPrefix": "http://gi.karlstad.se/kulprog/visa.php?typ=byggnad&id=",
+				"url": "id"
+			}]
+		}, {
+			"name": "kulprog_miljo",
+			"title": "Värdefulla miljöer",
+			"source": "geoserver_gi",
+			"group": "test",
+			"subgroup": "Kulprog",
+			"style": "kulprog_miljoer",
+			"type": "WFS",
+			"featuretype": 3,
+			"visible": false,
+			"attributes": [{
+				"title": "Namn: ",
+				"name": "namn",
+				"urlPrefix": "http://gi.karlstad.se/kulprog/visa.php?typ=miljo&id=",
+				"url": "id"
+			}]
+		},{
 		"name": "ByggnadsarVT",
-		"layerName": "Kulprog%3Abyggnadsar",
-		"gridset": "basemap",
+		"layerName": "webbkartan%3Avy_webbkarta_byggnadsar",
+		"gridset": "basemap256",
 		"format":"topojson",
 		"title": "Byggnadsår",
 		"group": "test",
 		"source": "geoserver_tms",
 		"style": "red",
-		"styleFunction": "byggnadsar",
 		"type": "VECTORTILE",
-		"tileSize": [512, 512],
-		"visible": true,
-		"queryable": true,
-    "timeline": "byggnadsar"
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false,
+		"linkedLayers": ["vy_webbkarta_byggnadsar_centroid"],
+        "attributes": [
+          {
+            "name": "ar_nybygg"
+          }
+        ],
+        "timeline": {
+		  "name": "byggnadsar",
+		  "attrName": "ar_nybygg",
+		  "range": [1865,2017],
+		  "step": 1,
+		  "colors": ["magenta", "red", "yellow", "green", "cyan", "blue"],
+		  "tickLabels_h": {"1865": "Före 1865", "2017": "2017"},
+		  "tickLabels_v": {"1865": "Före 1865", "2017": "2017"}
+	    }
+    },
+    {
+		"name": "1646",
+		"layerName": "webbkartan%3A1646",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "1646",
+		"group": "historiskakartor",
+		"source": "geoserver_tms",
+		"style": "hist",
+		"opacity":0.8,
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },
+    {
+		"name": "1696",
+		"layerName": "webbkartan%3A1696",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "1696",
+		"group": "historiskakartor",
+		"source": "geoserver_tms",
+		"style": "hist",
+		"opacity":0.8,
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },
+    {
+		"name": "1713",
+		"layerName": "webbkartan%3A1713",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "1713",
+		"group": "historiskakartor",
+		"source": "geoserver_tms",
+		"style": "hist",
+		"opacity":0.8,
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },
+    {
+		"name": "1753",
+		"layerName": "webbkartan%3A1753",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "1753",
+		"group": "historiskakartor",
+		"source": "geoserver_tms",
+		"style": "hist",
+		"opacity":0.8,
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },
+    {
+		"name": "GL_BASEMAP2_local",
+		"layerName": "GL_BASEMAP2",
+		"gridset": "basemap256",
+		"format":"pbf",
+		"title": "Basemap Mörk local",
+		"group": "background",
+		"source": "geoserver_tms_local",
+		"style": "red",
+		"type": "VECTORTILE",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false,
+		"bgColor": "#000"
     },
     {
 		"name": "GL_BASEMAP2",
 		"layerName": "GL_BASEMAP2",
-		"gridset": "basemap",
+		"gridset": "basemap256",
 		"format":"pbf",
-		"title": "VectorTileBasemap",
-		"group": "test",
+		"title": "Basemap Mörk",
+		"group": "background",
 		"source": "geoserver_tms",
 		"style": "mask",
-		"styleFunction": "basemap",
+		"customStyle": "basemap_dark",
 		"type": "VECTORTILE",
-		"tileSize": [512, 512],
-		"visible": true,
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false,
+		"bgColor": "#000"
+    },
+    {
+		"name": "GL_BASEMAP2_color",
+		"layerName": "GL_BASEMAP2",
+		"gridset": "basemap256",
+		"format":"pbf",
+		"title": "Basemap Ljus",
+		"group": "background",
+		"source": "geoserver_tms",
+		"style": "mask",
+		"customStyle": "basemap_bright",
+		"linkedLayers": ["TX"],
+		"type": "VECTORTILE",
+		"tileSize": [256, 256],
+		"visible": false,
 		"queryable": false
-    },{
+    },
+    {
+		"name": "ortofoto025_lm",
+		"layerName": "EXTERN%3Alm_visning_orto025",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "Ortofoto 0.25m",
+		"group": "background",
+		"source": "geoserver_tms",
+		"style": "orto",
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },
+    {
+		"name": "ortofoto_lm",
+		"layerName": "EXTERN%3Alm_visning_orto",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "Ortofoto 0.5m",
+		"group": "background",
+		"source": "geoserver_tms",
+		"style": "orto",
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },
+	{
     "attribution": "&copy Lantmäteriet Geodatasamverkan",
 	"name": "terrangskuggning",
 	"layerName": "EXTERN%3Aterrangskuggning",
-	"gridset": "basemap",
+	"gridset": "basemap256",
 	"format":"jpeg",
+    "group": "test",
+    "source": "geoserver_tms",
+    "title": "Terrängskugga",
+    "type": "TMS",
+    "style": "red",
+	"opacity":0.25,
+    "visible": false,
+    "queryable": false
+    },{
+    "attribution": "&copy Lantmäteriet Geodatasamverkan",
+	"name": "topowebb_nedtonad",
+	"layerName": "EXTERN%3Atopowebbkartan_nedtonad",
+	"gridset": "basemap256",
+	"format":"png8",
     "group": "background",
     "source": "geoserver_tms",
-    "title": "Terrain",
+    "title": "Topowebb Nedtonad",
     "type": "TMS",
     "style": "karta_gra",
-	"opacity":0.25,
     "visible": true,
     "queryable": false
     }
   ],
   "styles": {
+      "stadsvandring": [
+        [
+          {
+            "fontSymbol": {
+				"glyph": "fa-eye",
+				"form": "circle", 
+				"fontSize": 0.7,
+				"radius": 35,
+				"border":3,
+				"offsetX": 0,
+				"rotation": 0,
+				"scale": 0.5,
+				"rotateWithView": true,
+				"offsetY": 0,
+				"gradient": false,
+				"shadow":false,
+				"color": "#eee",
+				"fill": {
+					"color": "rgba(150,75,20,1.0)"
+				},
+				"stroke": {
+					"color": "black",
+					"width": 2
+				}
+            }
+          }
+        ]
+      ],
       "mask": [
         [
           {
@@ -143,10 +420,23 @@
         [
           {
             "stroke": {
-              "color": "rgba(255,0,0,1.0)"
+              "color": "rgba(255,0,0,1.0)",
+                "width": 5
             },
             "fill": {
               "color": "rgba(255,0,0,1.0)"
+            }
+          }
+        ]
+      ],
+      "hist": [
+        [
+          {
+            "stroke": {
+              "color": "rgba(0,0,0,1.0)"
+            },
+            "fill": {
+              "color": "rgba(0,0,0,1.0)"
             }
           }
         ]
@@ -185,11 +475,11 @@
             "circle": {
               "radius": 6,
               "stroke": {
-                "color": "rgba(0,0,0,1)",
+                "color": "rgba(0,0,255,1)",
                 "width": 2
               },
               "fill": {
-                "color": "rgba(0,0,0,0.5)"
+                "color": "rgba(37,129,196,1)"
               }
             }
           }
@@ -221,6 +511,65 @@
             }
           }
         ]
-      ]
+      ],
+		"kulprog_byggnader": [
+			[{
+				"stroke": {
+					"color": "rgba(255, 71, 25, 1.0)",
+					"width": 1
+				},
+				"fill": {
+					"color": "rgba(255, 0, 0, 0.4)"
+				},
+				"filter": "[klassificering] == 'Byggnad med särskilt värde'",
+				"legend": "Särsk. värdefull byggn."
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(71,25,255,1.0)",
+					"width": 1
+				},
+				"fill": {
+					"color": "rgba(0, 0, 255, 0.4)"
+				},
+				"filter": "[klassificering] == 'Byggnad med visst värde'",
+				"legend": "Byggn. med visst värde"
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(255, 180, 0, 1.0)",
+					"width": 1
+				},
+				"fill": {
+					"color": "rgba(255, 255, 0, 0.4)"
+				},
+				"filter": "[klassificering] == 'Ej utpekad'",
+				"legend": "Ej särskilt utpekad"
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(180, 0, 255, 1.0)",
+					"width": 1
+				},
+				"fill": {
+					"color": "rgba(255, 0, 255, 0.4)"
+				},
+				"filter": "[klassificering] == 'Byggnadsminne'",
+				"legend": "Byggnadsminnen"
+			}]
+
+		],
+		"kulprog_miljoer": [
+			[{
+				"stroke": {
+					"color": "rgba(153, 51, 0, 1.0)",
+					"width": 1
+				},
+				"fill": {
+					"color": "rgba(153, 51, 0, 0.4)"
+				}
+			}]
+
+		]
   }
 }

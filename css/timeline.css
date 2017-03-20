@@ -49,18 +49,20 @@
 	display: inline-block; 
 	position: relative;
 }
+/*
 .ui-widget-content.ui-bg-byggnadsar-h {
-		background: -webkit-linear-gradient(left,rgba(255,0,0,1.0),rgba(255, 98, 0, 1.0) 9%,rgba(255, 157, 0, 1.0) 18%,rgba(255, 217, 0, 1.0) 27%,rgba(244, 255, 43, 1.0) 36%,rgba(205, 255, 112, 1.0) 45%,rgba(153, 255, 173, 1.0) 54%,rgba(74, 255, 234, 1.0) 63%,rgba(46, 210, 255, 1.0) 72%,rgba(59, 144, 255, 1.0) 81%,rgba(51, 85, 255, 1.0) 90%,rgba(0, 0, 255, 1.0));
-		background: -o-linear-gradient(left,rgba(255,0,0,1.0),rgba(255, 98, 0, 1.0) 9%,rgba(255, 157, 0, 1.0) 18%,rgba(255, 217, 0, 1.0) 27%,rgba(244, 255, 43, 1.0) 36%,rgba(205, 255, 112, 1.0) 45%,rgba(153, 255, 173, 1.0) 54%,rgba(74, 255, 234, 1.0) 63%,rgba(46, 210, 255, 1.0) 72%,rgba(59, 144, 255, 1.0) 81%,rgba(51, 85, 255, 1.0) 90%,rgba(0, 0, 255, 1.0));
-		background: -moz-linear-gradient(left,rgba(255,0,0,1.0),rgba(255, 98, 0, 1.0) 9%,rgba(255, 157, 0, 1.0) 18%,rgba(255, 217, 0, 1.0) 27%,rgba(244, 255, 43, 1.0) 36%,rgba(205, 255, 112, 1.0) 45%,rgba(153, 255, 173, 1.0) 54%,rgba(74, 255, 234, 1.0) 63%,rgba(46, 210, 255, 1.0) 72%,rgba(59, 144, 255, 1.0) 81%,rgba(51, 85, 255, 1.0) 90%,rgba(0, 0, 255, 1.0));
-		background: linear-gradient(to right,rgba(255,0,0,1.0),rgba(255, 98, 0, 1.0) 9%,rgba(255, 157, 0, 1.0) 18%,rgba(255, 217, 0, 1.0) 27%,rgba(244, 255, 43, 1.0) 36%,rgba(205, 255, 112, 1.0) 45%,rgba(153, 255, 173, 1.0) 54%,rgba(74, 255, 234, 1.0) 63%,rgba(46, 210, 255, 1.0) 72%,rgba(59, 144, 255, 1.0) 81%,rgba(51, 85, 255, 1.0) 90%,rgba(0, 0, 255, 1.0));
+		background: -webkit-linear-gradient(left,rgba(255,0,0,1.0),rgba(255, 255, 0, 1.0) 25%,rgba(0, 255, 0, 1.0) 50%,rgba(0, 255, 255, 1.0) 75%,rgba(0, 0, 255, 1.0));
+		background: -o-linear-gradient(left,rgba(255,0,0,1.0),rgba(255, 255, 0, 1.0) 25%,rgba(0, 255, 0, 1.0) 50%,rgba(0, 255, 255, 1.0) 75%,rgba(0, 0, 255, 1.0));
+		background: -moz-linear-gradient(left,rgba(255,0,0,1.0),rgba(255, 255, 0, 1.0) 25%,rgba(0, 255, 0, 1.0) 50%,rgba(0, 255, 255, 1.0) 75%,rgba(0, 0, 255, 1.0));
+		background: linear-gradient(to right,rgba(255,0,0,1.0),rgba(255, 255, 0, 1.0) 25%,rgba(0, 255, 0, 1.0) 50%,rgba(0, 255, 255, 1.0) 75%,rgba(0, 0, 255, 1.0));
 	}
 .ui-widget-content.ui-bg-byggnadsar-v {
-		background: -webkit-linear-gradient(bottom, rgba(255,0,0,1.0),rgba(255, 98, 0, 1.0) 9%,rgba(255, 157, 0, 1.0) 18%,rgba(255, 217, 0, 1.0) 27%,rgba(244, 255, 43, 1.0) 36%,rgba(205, 255, 112, 1.0) 45%,rgba(153, 255, 173, 1.0) 54%,rgba(74, 255, 234, 1.0) 63%,rgba(46, 210, 255, 1.0) 72%,rgba(59, 144, 255, 1.0) 81%,rgba(51, 85, 255, 1.0) 90%,rgba(0, 0, 255, 1.0));
-		background: -o-linear-gradient(bottom, rgba(255,0,0,1.0),rgba(255, 98, 0, 1.0) 9%,rgba(255, 157, 0, 1.0) 18%,rgba(255, 217, 0, 1.0) 27%,rgba(244, 255, 43, 1.0) 36%,rgba(205, 255, 112, 1.0) 45%,rgba(153, 255, 173, 1.0) 54%,rgba(74, 255, 234, 1.0) 63%,rgba(46, 210, 255, 1.0) 72%,rgba(59, 144, 255, 1.0) 81%,rgba(51, 85, 255, 1.0) 90%,rgba(0, 0, 255, 1.0));
-		background: -moz-linear-gradient(bottom, rgba(255,0,0,1.0),rgba(255, 98, 0, 1.0) 9%,rgba(255, 157, 0, 1.0) 18%,rgba(255, 217, 0, 1.0) 27%,rgba(244, 255, 43, 1.0) 36%,rgba(205, 255, 112, 1.0) 45%,rgba(153, 255, 173, 1.0) 54%,rgba(74, 255, 234, 1.0) 63%,rgba(46, 210, 255, 1.0) 72%,rgba(59, 144, 255, 1.0) 81%,rgba(51, 85, 255, 1.0) 90%,rgba(0, 0, 255, 1.0));
-		background: linear-gradient(to top, rgba(255,0,0,1.0),rgba(255, 98, 0, 1.0) 9%,rgba(255, 157, 0, 1.0) 18%,rgba(255, 217, 0, 1.0) 27%,rgba(244, 255, 43, 1.0) 36%,rgba(205, 255, 112, 1.0) 45%,rgba(153, 255, 173, 1.0) 54%,rgba(74, 255, 234, 1.0) 63%,rgba(46, 210, 255, 1.0) 72%,rgba(59, 144, 255, 1.0) 81%,rgba(51, 85, 255, 1.0) 90%,rgba(0, 0, 255, 1.0));
+		background: -webkit-linear-gradient(bottom,rgba(255,0,0,1.0),rgba(255, 255, 0, 1.0) 25%,rgba(0, 255, 0, 1.0) 50%,rgba(0, 255, 255, 1.0) 75%,rgba(0, 0, 255, 1.0));
+		background: -o-linear-gradient(bottom,rgba(255,0,0,1.0),rgba(255, 255, 0, 1.0) 25%,rgba(0, 255, 0, 1.0) 50%,rgba(0, 255, 255, 1.0) 75%,rgba(0, 0, 255, 1.0));
+		background: -moz-linear-gradient(bottom,rgba(255,0,0,1.0),rgba(255, 255, 0, 1.0) 25%,rgba(0, 255, 0, 1.0) 50%,rgba(0, 255, 255, 1.0) 75%,rgba(0, 0, 255, 1.0));
+		background: linear-gradient(to top,rgba(255,0,0,1.0),rgba(255, 255, 0, 1.0) 25%,rgba(0, 255, 0, 1.0) 50%,rgba(0, 255, 255, 1.0) 75%,rgba(0, 0, 255, 1.0));
 	}
+	*/
 .ui-slider-handle:after {
     content:'';
     position:absolute;
