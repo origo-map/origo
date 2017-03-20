@@ -13,7 +13,8 @@ module.exports = function vector(options, source) {
   switch (options.layerType) {
     case 'vector':
       options.source = source;
-      options.style = style.createStyle(options.style);
+      //options.style = style.createStyle(options.style);
+		options.style = options.customStyle ? stylefunctions.customStyle(options.customStyle, options.styleParams) : style.createStyle(options.style);
       vectorLayer = new ol.layer.Vector(options);
       break;
     case 'cluster':
@@ -35,7 +36,10 @@ module.exports = function vector(options, source) {
 	case 'vectortile':
 		options.source = source;
 		options.renderMode= 'image';
-		options.style = options.styleFunction ? stylefunctions(options.styleFunction) : style.createStyle(options.style);
+		//options.renderBuffer = 500;
+		options.updateWhileAnimating = true;
+		options.updateWhileInteracting = true;
+		options.style = options.customStyle ? stylefunctions.customStyle(options.customStyle, options.styleParams) : style.createStyle(options.style);
 		vectorLayer = new ol.layer.VectorTile(options);
 	break;
   }
