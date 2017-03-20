@@ -230,12 +230,12 @@ li .o-legend-subitem-title {
   margin: 0.8em 0;
 }
 
-@media screen and (max-width: 768px) {
+&[class*=#{$media-l}] {
 #o-map-legend {
   bottom: .5em;
 }
 }
-@media screen and (max-width: 500px) {
+&[class*=#{$media-l-m}] {
 #o-map-legend {
   display: none;
 }

@@ -42,12 +42,12 @@
 .tt-suggestion p {
     margin: 0;
 }
-@media screen and (max-width: 768px) {
+&[class*=#{$media-l}] {
 .tt-menu {
 	max-width: calc(258px + 2em);
 }
 }
-@media screen and (max-width: 320px) {
+&[class*=#{$media-l-m-s}] {
 span.twitter-typeahead {
 	max-width: calc(100% - 40px);
 }

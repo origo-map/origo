@@ -2,6 +2,7 @@
 @import 'variables';
 .o-map {
   height: 100%;
+  overflow: hidden;
   -ms-touch-action: manipulation;
   touch-action: manipulation;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
