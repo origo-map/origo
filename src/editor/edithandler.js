@@ -122,7 +122,7 @@ function onDeleteSelected() {
   var features = select.getFeatures();
   if (features.getLength() === 1) {
     var feature = features.item(0);
-    var r = confirm("Är du säker på att du vill ta bort det här objektet?");
+    var r = confirm('Är du säker på att du vill ta bort det här objektet?');
     if (r === true) {
       saveFeature({
         feature: feature,
@@ -133,17 +133,6 @@ function onDeleteSelected() {
       editSource.removeFeature(editSource.getFeatureById(feature.getId()));
     }
   }
-}
-
-function onSelectAdd(evt) {
-  var feature = evt.element;
-    feature.getGeometry().on('change', function(e) {
-      saveFeature({
-        feature: editSource.getFeatureById(feature.getId()),
-        layerName: currentLayer,
-        action: 'update'
-      });
-    }, this);
 }
 
 function onModifyEnd(evt) {
@@ -332,6 +321,7 @@ function setActive(editType) {
 }
 
 function editAttributes() {
+  var attributeObjects;
 
   //Get attributes from selected feature and fill DOM elements with the values
   var features = select.getFeatures();
@@ -341,7 +331,7 @@ function editAttributes() {
     if (attributes.length > 0) {
 
       //Create an array of defined attributes and corresponding values from selected feature
-      var attributeObjects = attributes.map(function(attributeObject) {
+      attributeObjects = attributes.map(function(attributeObject) {
         var obj = {};
         $.extend(obj, attributeObject);
         obj.val = feature.get(obj.name) || '';
@@ -356,7 +346,7 @@ function editAttributes() {
             obj.elId = '#input-' + obj.name + '-' + obj.requiredVal;
             obj.elDependencyId = '#input-' + constraintProps[1];
           } else {
-            alert('Constraint properties are not written correct, it should written as for example change:attribute:value');
+            alert('Villkor verkar inte vara rätt formulerat. Villkor formuleras enligt principen change:attribute:value');
           }
         } else {
           obj.isVisible = true;

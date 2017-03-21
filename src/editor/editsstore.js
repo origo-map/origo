@@ -1,13 +1,11 @@
 var $ = require('jquery');
 var ol = require('openlayers');
-var viewer = require('../viewer');
 var dispatcher = require('./editdispatcher');
 
 var editsStore = function featureStore() {
+  var edits = {};
 
   $(document).on('changeFeature', featureChange);
-
-  var edits = {};
 
   return {
     getEdits: getEdits,

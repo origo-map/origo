@@ -15,6 +15,8 @@ module.exports = function createForm(obj) {
   var maxLength = obj.maxLength ? ' maxlength="' + obj.maxLength + '" ' : '';
   var dropdownOptions = obj.options || [];
   var el;
+  var checked;
+  var firstOption;
   switch (type) {
     case 'text':
       el = '<div><label>' + label + '</label><br><input type="text" id="' + id + '" value="' + val + '"' + maxLength + '></div>';
@@ -23,11 +25,11 @@ module.exports = function createForm(obj) {
       el = '<div><label>' + label + '</label><br><textarea id="' + id + '"' + maxLength + 'rows="3">' + val + '</textarea></div>';
       break;
     case 'checkbox':
-      var checked = val ? ' checked' : '';
+      checked = val ? ' checked' : '';
       el = '<div class="o-form-checkbox"><label>' + label + '</label><input type="checkbox" id="' + id + '" value="' + val + '"' + checked + '></div>';
       break;
     case 'dropdown':
-      var firstOption;
+      firstOption;
       if (val) {
         firstOption = '<option value="' + val + '" selected>' + val + '</option>';
       } else {
