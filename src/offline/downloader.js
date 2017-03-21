@@ -9,7 +9,7 @@ var Viewer = require('../viewer');
 var template = require("./downloader.template.handlebars");
 var offlineStore = require("./offlinestore");
 var utils = require('../utils');
-var download = require('./download');
+var download = require('./downloadhandler');
 
 var Downloader = function Downloader() {
   var map = Viewer.getMap();

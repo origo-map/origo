@@ -102,8 +102,8 @@ function offlineStore() {
   // }
   //
   function addDownload(e) {
-    if (layerStore.hasOwnProperty(e.layerName) === false) {
-      layerStore[e.layerName] = createOfflineObj();
+    if (layerStore[e.layerName]) {
+      // layerStore[e.layerName] = createOfflineObj();
       saveToLs(e.layerName);
     }
     // if (hasFeature(type, feature, layerName) === false) {
@@ -153,7 +153,7 @@ function offlineStore() {
 
   function saveToLs(layerName) {
     var features = viewer.getLayer(layerName).getSource().getFeatures();
-    setItems(features);
+    setItems(layerName, features);
   }
   //
   // function hasEdits() {
@@ -163,11 +163,11 @@ function offlineStore() {
   //     return false;
   //   }
   // }
-  function setItems(features) {
+  function setItems(layerName, features) {
     var promises = features.map(function(feature) {
       var id = feature.getId();
       var obj = format.writeFeatureObject(feature);
-      return store.setItem(id, obj);
+      return layerStore[layerName].setItem(id, obj);
     });
     Promise.all(promises).then(function(results) {
         console.log(results);
