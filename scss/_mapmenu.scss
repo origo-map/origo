@@ -1,11 +1,12 @@
 #o-mapmenu-button {
-  right: .5em;
-  top: .5em;
+  right: .5rem;
+  top: .5rem;
+  width: 5.3125rem;
   z-index: 5;
   .o-icon-fa-bars {
-  	padding: .4em;
-    height: 1.2em;
-    width: 1.2em;
+  	padding: .4rem;
+    height: 1.2rem;
+    width: 1.2rem;
   }
 }
 .o-icon-menu-fa-times {
@@ -13,10 +14,10 @@
 	height: 1rem;
 	width: 1rem;
 }
-#o-mapmenu-button button.o-button:hover .o-icon-fa-bars{
+#o-mapmenu-button .o-button:hover .o-icon-fa-bars{
 	fill: #fff;
 }
-#o-mapmenu-button button.o-button {
+#o-mapmenu-button .o-button {
 	padding-right: 0;
 	width: 5.3125em;
 }
@@ -26,17 +27,11 @@
 		top: .5rem;
 }
 /*remove the boxshadow when selected*/
-.o-button.o-mapmenu-button-true {
-  -webkit-box-shadow: 0 2px 5px rgba(0,0,0,0.45);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.45);
-}
-.o-button.o-mapmenu-button-false {
+.o-mapmenu-show .o-button-container {
   background-color: rgba(255,255,255,0.5);
   box-shadow: none;
 }
-#o-mapmenu-button .o-button.o-mapmenu-button-false {
-	width: 2em;
-}
+
 .o-no-boxshadow #o-mapmenu-button .o-button {
   border: none;
 }
@@ -116,8 +111,9 @@ li .o-menu-button:hover {
 	display: none;
 }
 @media screen and (max-width: 768px) {
+#o-mapmenu-button,
 #o-mapmenu-button button.o-button {
-	width: 2em;
+	width: 2rem;
 }
 #o-mapmenu-button .o-button-text {
 	display: none;
