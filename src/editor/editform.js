@@ -23,7 +23,7 @@ module.exports = function createForm(obj) {
       el = '<div><label>' + label + '</label><br><textarea id="' + id + '"' + maxLength + 'rows="3">' + val + '</textarea></div>';
       break;
     case 'checkbox':
-      var checked = val === true ? ' checked' : '';
+      var checked = val ? ' checked' : '';
       el = '<div class="o-form-checkbox"><label>' + label + '</label><input type="checkbox" id="' + id + '" value="' + val + '"' + checked + '></div>';
       break;
     case 'dropdown':
