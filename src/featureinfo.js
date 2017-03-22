@@ -58,7 +58,7 @@ function init(opt_options) {
     clusterFeatureinfoLevel = options.hasOwnProperty('clusterFeatureinfoLevel') ? options.clusterFeatureinfoLevel : 1;
 
     map.on('click', onClick);
-    $('.o-map').on('enableInteraction', onEnableInteraction);
+    $(document).on('enableInteraction', onEnableInteraction);
 
 }
 

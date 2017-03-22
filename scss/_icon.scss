@@ -16,6 +16,10 @@
 .o-toolbar button:hover [class*="o-icon-"] {
 	fill: $o-btn-active-color;
 }
+.o-disabled [class^="o-icon-"],
+.o-disabled [class*=" o-icon-"] {
+    fill: rgba(0,0,0,0.26);
+}
 .owl-prev .o-icon-fa-chevron-left,
 .owl-next .o-icon-fa-chevron-right {
 	fill: #424242;
