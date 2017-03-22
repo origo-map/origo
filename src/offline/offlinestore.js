@@ -2,6 +2,8 @@ var $ = require('jquery');
 var ol = require('openlayers');
 var viewer = require('../viewer');
 var localforage = require('localforage');
+var layerCreator = require('../layercreator');
+var offlineLayer = require('./offlinelayer');
 // var dispatcher = require('./editdispatcher');
 var format = new ol.format.GeoJSON();
 var layerStore = {};
@@ -55,6 +57,7 @@ function offlineStore() {
 
     layers = getOfflineLayers();
     layerStore = createInstances(layers);
+    initLayers();
 
     $(document).on('changeOffline', changeOffline);
   }
@@ -104,7 +107,7 @@ function offlineStore() {
   function addDownload(e) {
     if (layerStore[e.layerName]) {
       // layerStore[e.layerName] = createOfflineObj();
-      saveToLs(e.layerName);
+      saveToStorage(e.layerName);
     }
     // if (hasFeature(type, feature, layerName) === false) {
     //   edits[layerName][type].push(feature.getId());
@@ -151,7 +154,7 @@ function offlineStore() {
     }
   }
 
-  function saveToLs(layerName) {
+  function saveToStorage(layerName) {
     var features = viewer.getLayer(layerName).getSource().getFeatures();
     setItems(layerName, features);
   }
@@ -170,7 +173,29 @@ function offlineStore() {
       return layerStore[layerName].setItem(id, obj);
     });
     Promise.all(promises).then(function(results) {
-        console.log(results);
+      console.log(results);
+    });
+  }
+
+  function getItems(layerName) {
+    var layer = viewer.getLayer(layerName);
+    var features = [];
+    layerStore[layerName].iterate(function(value, key, index) {
+      features.push(format.readFeature(value));
+    })
+    .then(function() {
+      if (features.length) {
+        offlineLayer(layer, features);
+      } else {
+        console.log('No features in ' + layerName);
+      }
+    });
+  }
+
+  function initLayers() {
+    var layerNames = Object.getOwnPropertyNames(layerStore);
+    layerNames.forEach(function(layerName) {
+      getItems(layerName);
     });
   }
 }

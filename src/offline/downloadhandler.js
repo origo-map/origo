@@ -5,7 +5,7 @@
 "use strict";
 
 var $ = require('jquery');
-var layerCreator = require('../layercreator');
+var offlineLayer = require('./offlinelayer');
 var dispatcher = require('./offlinedispatcher');
 
 var sources = {};
@@ -16,13 +16,7 @@ var downloadSources = function downloadSources(layer) {
   if (sources.hasOwnProperty(type)) {
     sources[type](layer)
       .done(function(result) {
-        var source;
-        var options = layer.getProperties();
-        options.type = 'FEATURE';
-        options.features = result;
-        options.style = options.styleName;
-        source = layerCreator(options).getSource();
-        layer.setSource(source);
+        offlineLayer(layer, result);
         dispatcher.emitChangeOffline(layer.get('name'), 'download');
       });
   }
