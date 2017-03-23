@@ -25,7 +25,9 @@ var overlayArray = [];
 var drawStart = false;
 var isActive = false;
 
-function init() {
+function init(opt_options) {
+  var options = opt_options || {};
+  var target = options.target || '#o-toolbar-maptools';
   map = Viewer.getMap();
   source = new ol.source.Vector();
   measureStyleOptions = styleTypes.getStyle('measure');
@@ -42,7 +44,7 @@ function init() {
 
   $('.o-map').on('enableInteraction', onEnableInteraction);
 
-  render();
+  render(target);
   bindUIActions();
 
   defaultButton = $('#o-measure-line-button button');
@@ -86,7 +88,15 @@ function setActive(state) {
 
 }
 
-function render() {
+function render(target) {
+
+  var toolbar = utils.createElement('div', '', {
+    id: 'o-measure-toolbar',
+    cls: 'o-toolbar-horizontal'
+  });
+
+  $(target).append(toolbar);
+
   var mb = utils.createButton({
     id: 'o-measure-button',
     cls: 'o-measure-button',
@@ -94,8 +104,7 @@ function render() {
     src: '#steady-measure',
     tooltipText: 'Mät i kartan'
   });
-
-  $('#o-map').append(mb);
+  $('#' + 'o-measure-toolbar').append(mb);
 
   var lb = utils.createButton({
     id: 'o-measure-line-button',
@@ -105,8 +114,8 @@ function render() {
     tooltipText: 'Linje',
     tooltipPlacement: 'north'
   });
+  $('#' + 'o-measure-toolbar').append(lb);
 
-  $('#o-map').append(lb);
   $('#o-measure-line-button').addClass('o-hidden');
 
   var pb = utils.createButton({
@@ -118,7 +127,7 @@ function render() {
     tooltipPlacement: 'north'
   });
 
-  $('#o-map').append(pb);
+  $('#' + 'o-measure-toolbar').append(pb);
   $('#o-measure-polygon-button').addClass('o-hidden');
 }
 

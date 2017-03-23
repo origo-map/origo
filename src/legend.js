@@ -161,7 +161,7 @@ function createLegendItem(layerid, layerStyle, inSubgroup) {
                     '<svg class="o-icon-fa-square-o"><use xlink:href="#fa-square-o"></use></svg>' +
                     '<svg class="o-icon-fa-check-square-o"><use xlink:href="#fa-check-square-o"></use></svg>' +
                   '</div>';
-    legendItem += '<div class="o-legend-item-title">' + layer.get('title') + '</div>';
+    legendItem += '<div class="o-legend-item-title o-truncate">' + layer.get('title') + '</div>';
 
     if(layer.get('abstract')){
       legendItem += addAbstractButton(layername);
@@ -193,7 +193,7 @@ function createLegendItem(layerid, layerStyle, inSubgroup) {
                     '<svg class="o-icon-fa-check-square-o"><use xlink:href="#fa-check-square-o"></use></svg>' +
                   '</div>';
     legendItem +=  layer.get('styleName') ? getSymbol(styleSettings[layer.get('styleName')]) : '';
-    legendItem += '<div class="o-legend-item-title">' + layer.get('title') + '</div>';
+    legendItem += '<div class="o-legend-item-title o-truncate">' + layer.get('title') + '</div>';
 
     if(layer.get('abstract')){
       legendItem += addAbstractButton(layername);
@@ -227,7 +227,10 @@ function createGroup(group, parentGroup) {
                         '<div class="o-checkbox">' +
                           '<svg class="o-icon-fa-square-o"><use xlink:href="#fa-square-o"></use></svg>' +
                           '<svg class="o-icon-fa-check-square-o"><use xlink:href="#fa-check-square-o"></use></svg>' +
-                        '</div>' + group.title +
+                        '</div>' +
+                        '<div class="o-legend-subgroup-title o-truncate">' +
+                          group.title +
+                        '</div>' +
                         '<div class="o-icon-expand">' +
                           '<svg class="o-icon-fa-chevron-right"><use xlink:href="#fa-angle-double-right"></use></svg>' +
                           '<svg class="o-icon-fa-chevron-down"><use xlink:href="#fa-angle-double-down"></use></svg>' +
@@ -313,7 +316,7 @@ function addLegend(groups) {
     var layerStyle = styleSettings[layer.get('styleName')];
     //Check if layer belongs to subgroup
     var inSubgroup = $('#o-group-' + layer.get('group')).closest('ul').parent().closest('ul').hasClass('o-legend-group');
-    var title = '<div class="o-legend-item-title">' + layer.get('title') + '</div>';
+    var title = '<div class="o-legend-item-title o-truncate">' + layer.get('title') + '</div>';
 
     //Add abstract button
     if(layer.get('abstract')){

@@ -15,21 +15,22 @@ var extent;
 
 function Init(opt_options) {
   var options = opt_options || {};
+  var target = options.target || '#o-toolbar-navigation';
   map = Viewer.getMap();
   tooltip = options.tooltipText || 'Zooma till hela kartan';
   extent = options.extent || map.getView().calculateExtent(map.getSize());
-  render();
+  render(target);
   bindUIActions();
 }
 
-function render() {
+function render(target) {
   var el = utils.createButton({
     id: 'o-home-button',
     iconCls: 'o-icon-fa-home',
     src: '#fa-home',
     tooltipText: tooltip
   });
-  $('#o-map').append(el);
+  $(target).append(el);
 }
 
 function bindUIActions() {

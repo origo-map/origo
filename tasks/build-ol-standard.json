@@ -3,6 +3,7 @@
     "ol.Map",
     "ol.Map#addInteraction",
     "ol.Map#addLayer",
+    "ol.Map#addControl",
     "ol.Map#addOverlay",
     "ol.Map#beforeRender",
     "ol.Map#forEachFeatureAtPixel",

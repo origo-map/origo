@@ -4,10 +4,9 @@ var viewer = require('../viewer');
 var dispatcher = require('./editdispatcher');
 
 var editsStore = function featureStore() {
+  var edits = {};
 
   $(document).on('changeFeature', featureChange);
-
-  var edits = {};
 
   return {
     getEdits: getEdits,
@@ -29,6 +28,8 @@ var editsStore = function featureStore() {
     }
     if (hasEdits() === true) {
       dispatcher.emitEditsChange(1);
+    } else {
+      dispatcher.emitEditsChange(0);
     }
   }
 

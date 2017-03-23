@@ -24,16 +24,15 @@
   background-color: rgba(255,255,255,0.6);
 }
 .ol-zoom {
-  top: .5em;
-  left: .5em;
+  width: 2rem;
 }
 .ol-rotate {
-  top: 12.5em;
-  left: .5em;
   transition: opacity .25s;
 }
 .ol-rotate.ol-hidden {
   opacity: 0;
+  visibility: hidden;
+  transition: opacity .25s linear, visibility 0s linear .25s;
 }
 @media print {
   .ol-zoom,
@@ -92,10 +91,9 @@ button.ol-zoom-out {
   background: #ffffff;
   background: rgba(255,255,255,0.7);
   border-radius: 4px;
-  bottom: .5em;
-  right: .5em;
+  float: right;
   padding: 2px;
-  position: absolute;
+  position: relative;
 }
 .ol-scale-line-inner {
   border-bottom-right-radius: 3px;
@@ -246,15 +244,5 @@ button.ol-zoom-out {
   color: #fff;
   height: 1.5em;
   width: 1.5em;
-}
-}
-@media screen and (max-width: 500px) {
-.ol-zoom {
-  top: auto;
-	bottom: 8em;
-}
-.ol-rotate {
-  bottom: 12.5em;
-	top: auto;
 }
 }

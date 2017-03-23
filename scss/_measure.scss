@@ -1,15 +1,3 @@
-#o-measure-button {
-  left: .5em;
-  top: 10em;
-}
-#o-measure-line-button {
-  left: 3em;
-  top: 10em;
-}
-#o-measure-polygon-button {
-  left: 5.5em;
-  top: 10em;
-}
 .o-icon-minicons-square-vector {
   padding: .3em;
   height: 1.4em;
@@ -36,11 +24,4 @@
 .o-measure-button-true .o-icon-minicons-square-vector,
 .o-measure-button-true .o-icon-minicons-line-vector {
   fill: $o-btn-active-color;
-}
-@media screen and (max-width: 500px) {
-#o-measure-button, #o-measure-line-button,
-  #o-measure-polygon-button  {
-    bottom: .5em;
-    top: auto;
-  }
 }

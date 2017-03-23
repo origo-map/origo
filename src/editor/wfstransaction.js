@@ -85,7 +85,7 @@ function wfsTransaction(transObj, layerName) {
 
   function error(e) {
     var errorMsg = e ? (e.status + ' ' + e.statusText) : "";
-    alert('Det inträffade ett fel när ändringarna skulle sparas till servern...<br><br>' +
+    alert('Det inträffade ett fel när ändringarna skulle sparas till servern...\n' +
       errorMsg);
   }
 }
