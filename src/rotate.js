@@ -22,7 +22,8 @@ function Init(opt_options) {
 
   rotateControl = new ol.control.Rotate({
     label: $.parseHTML('<span>' + icon + '</span>')[0],
-    tipLabel: ' '
+    tipLabel: ' ',
+    target: 'o-toolbar-misc'
   });
   map.addControl(rotateControl);
 }
