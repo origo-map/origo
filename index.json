@@ -139,7 +139,7 @@
 			"customStyle": "labels_byggnadsar"
 		}, 
     {
-			"name": "TX",
+			"name": "TX_dark",
 			"title": "Texter",
 			"source": "geoserver_gi",
 			"group": "test",
@@ -148,7 +148,21 @@
 			"type": "WFS",
 			"featuretype": 5,
 			"visible": false,
-			"customStyle": "labels"
+			"customStyle": "labels",
+			"styleParams": "dark"
+		}, 
+    {
+			"name": "TX_light",
+			"title": "Texter",
+			"source": "geoserver_gi",
+			"group": "test",
+      "queryable": false,
+			"style": "mask",
+			"type": "WFS",
+			"featuretype": 5,
+			"visible": false,
+			"customStyle": "labels",
+			"styleParams": "light"
 		}, 
     {
 			"name": "kulprog_byggnad",
@@ -296,6 +310,7 @@
 		"source": "geoserver_tms",
 		"style": "mask",
 		"customStyle": "basemap_dark",
+		"linkedLayers": ["TX_dark"],
 		"type": "VECTORTILE",
 		"tileSize": [256, 256],
 		"visible": false,
@@ -312,7 +327,7 @@
 		"source": "geoserver_tms",
 		"style": "mask",
 		"customStyle": "basemap_bright",
-		"linkedLayers": ["TX"],
+		"linkedLayers": ["TX_light"],
 		"type": "VECTORTILE",
 		"tileSize": [256, 256],
 		"visible": false,
