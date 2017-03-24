@@ -15,9 +15,9 @@
     {
       "name": "about",
       "options": {
-        "buttontext": "Om Origo",
-        "title": "Om Origo",
-        "content": "<p>Origo är ett ramverk för webbkartor. Ramverket bygger på JavaScript-biblioteket OpenLayers 3. Du kan använda Origo för att skapa egna webbaserade kartapplikationer.</p><br><p>Projektet drivs och underhålls av ett antal svenska kommuner. Besök gärna <a href='https://github.com/origo-map/origo' target='_blank'>Origo på GitHub</a> för mer information.</p>"
+        "buttontext": "Om Kulturmiljö Karlstad",
+        "title": "Om Kulturmiljö Karlstad",
+        "content": "<p>Kulturmiljöprogrammet.</p><br><p>Projektet drivs och underhålls av ett antal svenska kommuner. Besök gärna <a href='https://github.com/origo-map/origo' target='_blank'>Origo på GitHub</a> för mer information.</p>"
       }
     },
     {
@@ -51,9 +51,9 @@
       }
   ],
   "extent": [110000,6540000,200000,6650000],
-  "center": [144000,6584200],
+  "center": [150000,6584200],
   "home": [120000, 6556000, 191000, 6635000],
-  "zoom": 4,
+  "zoom": 2,
   "resolutions": [128,64,32,16,8,4,2,1,0.5,0.25,0.125],
   "tileSize":256,
   "featureinfoOptions":{
@@ -64,26 +64,29 @@
 			"url": "https://gi.karlstad.se:8443/geoserver/ows",
 			"version": "1.1.0"
 	},
-    "geoserver_local": {
-			"url": "http://localhost:8080/geoserver/ows",
-			"version": "1.1.0"
-	},
     "geoserver_tms": {
       "url": "https://gi.karlstad.se:8443/geoserver/gwc/service/tms/1.0.0/"
-    },
-    "geoserver_tms_local": {
-      "url": "http://localhost:8080/geoserver/gwc/service/tms/1.0.0/"
     }
   },
   "groups": [
     {
-      "name": "test",
-      "title": "Test",
+      "name": "km",
+      "title": "Kulturmiljö",
       "expanded": true
+    },
+    {
+      "name": "terrang",
+      "title": "Terrängskuggning",
+      "expanded": false
     },
     {
       "name": "historiskakartor",
       "title": "Historiska kartor",
+      "expanded": false
+    },
+    {
+      "name": "historiskaortofoton",
+      "title": "Historiska ortofoton",
       "expanded": false
     },
     {
@@ -116,104 +119,59 @@
       "visible": true
     },
     {
-      "name": "stadsvandring",
-      "opacity": 1,
-      "title": "Stadsvandring",
-      "group": "test",
-      "queryable": true,
-      "source": "data/stadsvandring.geojson",
-      "style": "mask",
-      "type": "GEOJSON",
-      "visible": false,
-      "attributes": [
-    {
-      "html": "<img style='width:100%;' src='https://gi.karlstad.se/files/stadsvandring/bilder/{{bild}}' /><b>{{namn}}</b><p>{{text}}</p>"
-    }  ]
-    },
-    {
-			"name": "vy_webbkarta_byggnadsar_centroid",
-			"title": "Texter byggnadsår",
-			"source": "geoserver_gi",
-			"group": "test",
-			"queryable": false,
-			"style": "mask",
-			"type": "WFS",
-			"featuretype": 5,
-			"visible": false,
-			"customStyle": "labels_byggnadsar"
+		"name": "vy_webbkarta_byggnadsar_centroid",
+		"title": "Texter byggnadsår",
+		"source": "geoserver_gi",
+		"group": "none",
+		"queryable": false,
+		"style": "mask",
+		"type": "WFS",
+		"featuretype": 5,
+		"visible": false,
+		"customStyle": "labels_byggnadsar"
 		}, 
     {
-			"name": "TX_dark",
-			"title": "Texter",
-			"source": "geoserver_gi",
-			"group": "test",
-      "queryable": false,
-			"style": "mask",
-			"type": "WFS",
-			"featuretype": 5,
-			"visible": false,
-			"customStyle": "labels",
-			"styleParams": "dark"
+		"id": "TX",
+		"name": "TX_dark",
+		"title": "Texter mörk",
+		"source": "geoserver_gi",
+		"group": "none",
+		"queryable": false,
+		"style": "mask",
+		"type": "WFS",
+		"featuretype": 5,
+		"visible": false,
+		"customStyle": "labels",
+		"styleParams": "dark"
 		}, 
     {
-			"name": "TX_light",
-			"title": "Texter",
-			"source": "geoserver_gi",
-			"group": "test",
-      "queryable": false,
-			"style": "mask",
-			"type": "WFS",
-			"featuretype": 5,
-			"visible": false,
-			"customStyle": "labels",
-			"styleParams": "light"
+		"id": "TX",
+		"name": "TX_light",
+		"title": "Texter ljus",
+		"source": "geoserver_gi",
+		"group": "none",
+		"queryable": false,
+		"style": "mask",
+		"type": "WFS",
+		"featuretype": 5,
+		"visible": true,
+		"customStyle": "labels",
+		"styleParams": "light"
 		}, 
     {
-			"name": "kulprog_byggnad",
-			"title": "Värdefulla byggnader",
-			"source": "geoserver_gi",
-			"group": "test",
-			"subgroup": "Kulprog",
-			"style": "kulprog_byggnader",
-			"type": "WFS",
-			"featuretype": 3,
-			"visible": false,
-			"attributes": [{
-				"title": "Namn: ",
-				"name": "gammal_fastighet",
-				"urlPrefix": "http://gi.karlstad.se/kulprog/visa.php?typ=byggnad&id=",
-				"url": "id"
-			}]
-		}, {
-			"name": "kulprog_miljo",
-			"title": "Värdefulla miljöer",
-			"source": "geoserver_gi",
-			"group": "test",
-			"subgroup": "Kulprog",
-			"style": "kulprog_miljoer",
-			"type": "WFS",
-			"featuretype": 3,
-			"visible": false,
-			"attributes": [{
-				"title": "Namn: ",
-				"name": "namn",
-				"urlPrefix": "http://gi.karlstad.se/kulprog/visa.php?typ=miljo&id=",
-				"url": "id"
-			}]
-		},{
 		"name": "ByggnadsarVT",
 		"layerName": "webbkartan%3Avy_webbkarta_byggnadsar",
 		"gridset": "basemap256",
 		"format":"topojson",
 		"title": "Byggnadsår",
-		"group": "test",
+		"group": "km",
 		"source": "geoserver_tms",
 		"style": "red",
 		"type": "VECTORTILE",
 		"tileSize": [256, 256],
 		"visible": false,
 		"queryable": false,
-		"linkedLayers": ["vy_webbkarta_byggnadsar_centroid"],
+		"linkedLayers": ["vy_webbkarta_byggnadsar_centroid","GL_BASEMAP2"],
         "attributes": [
           {
             "name": "ar_nybygg"
@@ -228,7 +186,39 @@
 		  "tickLabels_h": {"1865": "Före 1865", "2017": "2017"},
 		  "tickLabels_v": {"1865": "Före 1865", "2017": "2017"}
 	    }
-    },
+    },{
+		"name": "kulprog_byggnad",
+		"title": "Värdefulla byggnader",
+		"source": "geoserver_gi",
+		"group": "km",
+		"subgroup": "Kulprog",
+		"style": "kulprog_byggnader",
+		"type": "WFS",
+		"featuretype": 3,
+		"visible": false,
+		"attributes": [{
+			"title": "Namn: ",
+			"name": "gammal_fastighet",
+			"urlPrefix": "http://gi.karlstad.se/kulprog/visa.php?typ=byggnad&id=",
+			"url": "id"
+		}]
+		}, {
+		"name": "kulprog_miljo",
+		"title": "Värdefulla miljöer",
+		"source": "geoserver_gi",
+		"group": "km",
+		"subgroup": "Kulprog",
+		"style": "kulprog_miljoer",
+		"type": "WFS",
+		"featuretype": 3,
+		"visible": false,
+		"attributes": [{
+			"title": "Namn: ",
+			"name": "namn",
+			"urlPrefix": "http://gi.karlstad.se/kulprog/visa.php?typ=miljo&id=",
+			"url": "id"
+		}]
+		},
     {
 		"name": "1646",
 		"layerName": "webbkartan%3A1646",
@@ -275,46 +265,16 @@
 		"queryable": false
     },
     {
-		"name": "1753",
-		"layerName": "webbkartan%3A1753",
-		"gridset": "basemap256",
-		"format":"jpeg",
-		"title": "1753",
-		"group": "historiskakartor",
-		"source": "geoserver_tms",
-		"style": "hist",
-		"opacity":0.8,
-		"type": "TMS",
-		"tileSize": [256, 256],
-		"visible": false,
-		"queryable": false
-    },
-    {
-		"name": "GL_BASEMAP2_local",
-		"layerName": "GL_BASEMAP2",
-		"gridset": "basemap256",
-		"format":"pbf",
-		"title": "Basemap Mörk local",
-		"group": "background",
-		"source": "geoserver_tms_local",
-		"style": "red",
-		"type": "VECTORTILE",
-		"tileSize": [256, 256],
-		"visible": false,
-		"queryable": false,
-		"bgColor": "#000"
-    },
-    {
 		"name": "GL_BASEMAP2",
 		"layerName": "GL_BASEMAP2",
 		"gridset": "basemap256",
 		"format":"pbf",
-		"title": "Basemap Mörk",
+		"title": "Mörk",
 		"group": "background",
 		"source": "geoserver_tms",
 		"style": "mask",
 		"customStyle": "basemap_dark",
-		"linkedLayers": ["TX_dark"],
+		"labelLayer": "TX_dark",
 		"type": "VECTORTILE",
 		"tileSize": [256, 256],
 		"visible": false,
@@ -326,16 +286,30 @@
 		"layerName": "GL_BASEMAP2",
 		"gridset": "basemap256",
 		"format":"pbf",
-		"title": "Basemap Ljus",
+		"title": "Ljus",
 		"group": "background",
 		"source": "geoserver_tms",
 		"style": "mask",
 		"customStyle": "basemap_bright",
-		"linkedLayers": ["TX_light"],
+		"labelLayer": "TX_light",
 		"type": "VECTORTILE",
 		"tileSize": [256, 256],
-		"visible": false,
+		"visible": true,
 		"queryable": false
+    },
+	{
+    "attribution": "&copy Lantmäteriet Geodatasamverkan",
+	"name": "topowebb_nedtonad",
+	"layerName": "EXTERN%3Atopowebbkartan_nedtonad",
+	"gridset": "basemap256",
+	"format":"png8",
+    "group": "background",
+    "source": "geoserver_tms",
+    "title": "Topowebb Nedtonad",
+    "type": "TMS",
+    "style": "karta_gra",
+    "visible": false,
+    "queryable": false
     },
     {
 		"name": "ortofoto025_lm",
@@ -371,26 +345,13 @@
 	"layerName": "EXTERN%3Aterrangskuggning",
 	"gridset": "basemap256",
 	"format":"jpeg",
-    "group": "test",
+    "group": "terrang",
     "source": "geoserver_tms",
     "title": "Terrängskugga",
     "type": "TMS",
     "style": "red",
 	"opacity":0.25,
     "visible": false,
-    "queryable": false
-    },{
-    "attribution": "&copy Lantmäteriet Geodatasamverkan",
-	"name": "topowebb_nedtonad",
-	"layerName": "EXTERN%3Atopowebbkartan_nedtonad",
-	"gridset": "basemap256",
-	"format":"png8",
-    "group": "background",
-    "source": "geoserver_tms",
-    "title": "Topowebb Nedtonad",
-    "type": "TMS",
-    "style": "karta_gra",
-    "visible": true,
     "queryable": false
     }
   ],

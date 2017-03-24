@@ -142,6 +142,14 @@ function addAbstractButton(item) {
   return infoTextButton;
 }
 
+function addLabelButton(item) {
+  var labelButton =  '<div class="o-legend-item-info o-toggle-labels o-toggle-on" id="o-legend-item-info-' + item + '">' +
+                          '<svg class="o-icon-fa-font"><use xlink:href="#fa-font"></use></svg>' +
+                          '<svg class="o-icon-fa-font-off"><use xlink:href="#fa-font"></use></svg>' +
+                        '</div>';
+  return labelButton;
+}
+
 function createLegendItem(layerid, layerStyle, inSubgroup) {
   var layername = layerid.split('o-legend-').pop();
   var layer = viewer.getLayer(layername);
@@ -165,6 +173,9 @@ function createLegendItem(layerid, layerStyle, inSubgroup) {
 
     if(layer.get('abstract')){
       legendItem += addAbstractButton(layername);
+    }
+    if(layer.get('labelLayer')){
+      legendItem += addLabelButton(layername);
     }
 
     if (layerStyle[0][0].hasOwnProperty('legend')) {
@@ -197,6 +208,9 @@ function createLegendItem(layerid, layerStyle, inSubgroup) {
 
     if(layer.get('abstract')){
       legendItem += addAbstractButton(layername);
+    }
+    if(layer.get('labelLayer')){
+      legendItem += addLabelButton(layername);
     }
 
     legendItem += '</div></li>';
@@ -322,6 +336,9 @@ function addLegend(groups) {
     if(layer.get('abstract')){
       title += addAbstractButton(name);
     }
+    if(layer.get('labelLayer')){
+      title += addLabelButton(name);
+    }
     title += '</div></li>';
 
     //Append layer to group in legend. Add to default group if not defined.
@@ -398,6 +415,9 @@ function addLegend(groups) {
     $('#' + name).on('click', function(evt) {
       if ($(evt.target).closest('div').hasClass('o-icon-expand')) {
         toggleGroup($(this));
+      } 
+	  else if ($(evt.target).closest('div').hasClass('o-toggle-labels')) {
+        toggleLabels($(this));
       } else {
         $(this).each(function() {
           var that = this;
@@ -426,7 +446,16 @@ function addLegend(groups) {
 
     evt.preventDefault();
   });
+/*
+  $('.o-toggle-labels').on('click', function(evt) {
+    $(this).each(function() {
+      var that = this;
+      //toggleLabels($(that));
+    });
 
+    evt.preventDefault();
+  });
+*/
   //Toggle map legend
   $('#o-legend-overlay .o-toggle-button').on('click', function(evt) {
     toggleOverlay();
@@ -560,6 +589,15 @@ function toggleCheck(layerid) {
           $('.' + linkedLayer + ' .o-checkbox').removeClass('o-checkbox-true');
           $('.' + linkedLayer + ' .o-checkbox').addClass('o-checkbox-false');
           });
+		  if(group[i].get('labelLayer') && group[i].get('name')!=layername){
+			var labelLayer = viewer.getLayer(group[i].get('labelLayer'));
+        if($('#o-legend-item-info-' + group[i].get('name')).hasClass('o-toggle-on')) {
+			$('#o-legend-item-info-' + group[i].get('name')).removeClass('o-toggle-on');
+			$('#o-legend-item-info-' + group[i].get('name')).addClass('o-toggle-off');
+			labelLayer.setVisible(false);
+		}
+			  
+		  }
         }
         layer.setVisible(true);
         linkedLayers.forEach(function(linkedLayer) {
@@ -567,6 +605,14 @@ function toggleCheck(layerid) {
           $('.' + linkedLayer + ' .o-checkbox').removeClass('o-checkbox-false');
           $('.' + linkedLayer + ' .o-checkbox').addClass('o-checkbox-true');
         });
+		if(layer.get('labelLayer')){
+			var labelLayer = viewer.getLayer(layer.get('labelLayer'));
+        if($('#o-legend-item-info-' + layername).hasClass('o-toggle-off')) {
+			$('#o-legend-item-info-' + layername).removeClass('o-toggle-off');
+			$('#o-legend-item-info-' + layername).addClass('o-toggle-on');
+			labelLayer.setVisible(true);
+		}
+		}
         $('#' + layername + ' .o-checkbox').removeClass('o-check-false');
         $('#' + layername + ' .o-checkbox').addClass('o-check-true');
         //map legend
@@ -663,6 +709,24 @@ function showAbstract($abstractButton) {
 
   modal.createModal('#o-map', {title: abstract.title, content: abstract.content});
   modal.showModal();
+}
+
+function toggleLabels($labelButton) {
+  var layer;
+  var $item = $labelButton.closest('li');
+  var layername = $labelButton.attr('id').split('o-legend-item-info-').pop();
+	var labelLayer = viewer.getLayer(layername).get('labelLayer');
+    layer = viewer.getLayer(labelLayer);
+        if($('#o-legend-item-info-' + layername).hasClass('o-toggle-on')) {
+			$('#o-legend-item-info-' + layername).removeClass('o-toggle-on');
+			$('#o-legend-item-info-' + layername).addClass('o-toggle-off');
+			layer.setVisible(false);
+		}
+        else {
+			$('#o-legend-item-info-' + layername).removeClass('o-toggle-off');
+			$('#o-legend-item-info-' + layername).addClass('o-toggle-on');
+			layer.setVisible(true);
+		}
 }
 
 module.exports.init = init;
