@@ -4,17 +4,17 @@ var viewer = require('../viewer');
 var localforage = require('localforage');
 var layerCreator = require('../layercreator');
 var offlineLayer = require('./offlinelayer');
-// var dispatcher = require('./editdispatcher');
+var dispatcher = require('./offlinedispatcher');
 var format = new ol.format.GeoJSON();
-var layerStore = {};
-var layerSources = {};
+var storage = {};
+var offlineLayers = {};
 var map;
 var mapName;
 
 function offlineStore() {
 
   return {
-    getLayerStore: getLayerStore,
+    getOfflineLayers: getOfflineLayers,
     init: Init
   };
 
@@ -54,9 +54,8 @@ function offlineStore() {
     var layers;
     map = viewer.getMap();
     mapName = options.name || 'origo-layers';
-
-    layers = getOfflineLayers();
-    layerStore = createInstances(layers);
+    layers = setOfflineLayers();
+    storage = createInstances(layers);
     initLayers();
 
     $(document).on('changeOffline', changeOffline);
@@ -75,23 +74,29 @@ function offlineStore() {
   }
 
   function getOfflineLayers() {
+    return offlineLayers;
+  }
+
+  function setOfflineLayers() {
     return map.getLayers().getArray().filter(function(layer) {
+      var layerName;
       if (layer.get('offline')) {
+        layerName = layer.get('name');
+        offlineLayers[layerName] = createOfflineObj();
         return layer;
       }
     });
   }
 
-  function getLayerStore() {
-    return layerStore;
-  }
-
   function changeOffline(e) {
     e.stopImmediatePropagation();
-    if (e.status === 'download') {
-      addDownload(e);
-    } else if (e.status === 'sync') {
+    if (e.action === 'download') {
+      addDownloaded(e);
+    } else if (e.action === 'sync') {
 
+    } else if (e.action === 'remove') {
+      removeDownloaded(e);
+      removeEdits(e);
     }
   }
   //
@@ -104,14 +109,25 @@ function offlineStore() {
   //   return false;
   // }
   //
-  function addDownload(e) {
-    if (layerStore[e.layerName]) {
-      // layerStore[e.layerName] = createOfflineObj();
+  function addDownloaded(e) {
+    if (storage[e.layerName]) {
+      setDownloaded(e.layerName, true);
       saveToStorage(e.layerName);
     }
     // if (hasFeature(type, feature, layerName) === false) {
     //   edits[layerName][type].push(feature.getId());
     // }
+  }
+
+  function removeDownloaded(e) {
+    if (offlineLayers[e.layerName]) {
+      setDownloaded(e.layerName, false);
+      storage[e.layerName].clear();
+    }
+  }
+
+  function removeEdits(e) {
+
   }
   //
   // function removeFeature(type, feature, layerName) {
@@ -149,12 +165,21 @@ function offlineStore() {
   //
   function createOfflineObj() {
     return {
-      data: {},
-      edits: {}
+      downloaded: false,
+      edits: false
+    }
+  }
+
+  function setDownloaded(layerName, downloaded) {
+    if (downloaded) {
+      offlineLayers[layerName].downloaded = true;
+    } else {
+      offlineLayers[layerName].downloaded = false;
     }
   }
 
   function saveToStorage(layerName) {
+    dispatcher.emitChangeOfflineStart(layerName, 'download');
     var features = viewer.getLayer(layerName).getSource().getFeatures();
     setItems(layerName, features);
   }
@@ -170,32 +195,35 @@ function offlineStore() {
     var promises = features.map(function(feature) {
       var id = feature.getId();
       var obj = format.writeFeatureObject(feature);
-      return layerStore[layerName].setItem(id, obj);
+      return storage[layerName].setItem(id, obj);
     });
     Promise.all(promises).then(function(results) {
-      console.log(results);
+      dispatcher.emitChangeOfflineEnd(layerName, 'download');
     });
   }
 
   function getItems(layerName) {
     var layer = viewer.getLayer(layerName);
     var features = [];
-    layerStore[layerName].iterate(function(value, key, index) {
+    return storage[layerName].iterate(function(value, key, index) {
       features.push(format.readFeature(value));
     })
     .then(function() {
-      if (features.length) {
-        offlineLayer(layer, features);
-      } else {
-        console.log('No features in ' + layerName);
-      }
+      return features;
     });
   }
 
   function initLayers() {
-    var layerNames = Object.getOwnPropertyNames(layerStore);
+    var layerNames = Object.getOwnPropertyNames(storage);
     layerNames.forEach(function(layerName) {
-      getItems(layerName);
+      getItems(layerName).then(function(features) {
+        if (features.length) {
+          setDownloaded(layerName, true);
+          offlineLayer(viewer.getLayer(layerName), features);
+        } else {
+          console.log('No features in ' + layerName);
+        }
+      });
     });
   }
 }

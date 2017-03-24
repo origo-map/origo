@@ -7,13 +7,39 @@
 var $ = require('jquery');
 
 module.exports = {
-  emitChangeOffline: emitChangeOffline
+  emitChangeOffline: emitChangeOffline,
+  emitChangeDownload: emitChangeDownload,
+  emitChangeOfflineStart: emitChangeOfflineStart,
+  emitChangeOfflineEnd: emitChangeOfflineEnd  
 }
 
-function emitChangeOffline(layerName, state) {
+function emitChangeOffline(layerName, action) {
   $.event.trigger({
     type: 'changeOffline',
     layerName: layerName,
-    status: state
+    action: action
+  });
+}
+
+function emitChangeDownload(layerName, action) {
+  $.event.trigger({
+    type: 'changeDownload',
+    layerName: layerName,
+    action: action
+  });
+}
+
+function emitChangeOfflineStart(layerName, state) {
+  $.event.trigger({
+    type: 'changeOfflineStart',
+    layerName: layerName
+  });
+}
+
+function emitChangeOfflineEnd(layerName, action) {
+  $.event.trigger({
+    type: 'changeOfflineEnd',
+    layerName: layerName,
+    action: action
   });
 }

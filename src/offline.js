@@ -7,8 +7,9 @@
 var $ = require('jquery');
 var Viewer = require('./viewer');
 var utils = require('./utils');
-var offlineStore = require('./offline/offlineStore');
 var downloader = require('./offline/downloader');
+var downloadHandler = require('./offline/downloadhandler');
+var offlineStore = require('./offline/offlineStore')();
 
 var map = undefined;
 var baseUrl = undefined;
@@ -19,7 +20,8 @@ function Init(opt_options) {
   map = Viewer.getMap();
   baseUrl = Viewer.getBaseUrl();
 
-  // offlineStore().init();
+  downloadHandler();
+  offlineStore.init();
 
   render();
   bindUIActions();
@@ -38,7 +40,7 @@ function render() {
 
 function bindUIActions() {
   $offlineButton.on('click', function(e) {
-    downloader().render();
+    downloader(offlineStore.getOfflineLayers());
     e.preventDefault();
   });
 }

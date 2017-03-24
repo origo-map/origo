@@ -5,21 +5,48 @@
 "use strict";
 
 var $ = require('jquery');
+var Viewer = require('../viewer');
+var utils = require('../utils');
+var layerCreator = require('../layercreator');
 var offlineLayer = require('./offlinelayer');
+var downloadSources = require('./downloadsources');
 var dispatcher = require('./offlinedispatcher');
 
-var sources = {};
-sources.WFS = require('./wfs');
+var downloadHandler = function downloadHandler() {
+  $(document).on('changeDownload', changeDownload);
 
-var downloadSources = function downloadSources(layer) {
-  var type = layer.get('type');
-  if (sources.hasOwnProperty(type)) {
-    sources[type](layer)
-      .done(function(result) {
-        offlineLayer(layer, result);
-        dispatcher.emitChangeOffline(layer.get('name'), 'download');
-      });
+  function changeDownload(e) {
+    e.stopImmediatePropagation();
+    if (e.action === 'download') {
+      download(e.layerName);
+    } else if (e.action === 'sync') {
+
+    } else if (e.action === 'remove') {
+      removeDownloaded(e.layerName);
+    }
+  }
+
+  function removeDownloaded(layerName) {
+    var layer = Viewer.getLayer(layerName);
+    var props = layer.getProperties();
+    props.style = props.styleName;
+    props.source = props.sourceName;
+    var source = layerCreator(props).getSource();
+    layer.setSource(source);
+    dispatcher.emitChangeOffline(layer.get('name'), 'remove');
+  }
+
+  function download(layerName) {
+    var layer = Viewer.getLayer(layerName);
+    var type = layer.get('type');
+    if (downloadSources.hasOwnProperty(type)) {
+      downloadSources[type](layer)
+        .done(function(result) {
+          offlineLayer(layer, result);
+          dispatcher.emitChangeOffline(layer.get('name'), 'download');
+        });
+    }
   }
 }
 
-module.exports = downloadSources;
+module.exports = downloadHandler;
