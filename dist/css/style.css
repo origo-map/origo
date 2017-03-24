@@ -1275,6 +1275,9 @@
   .o-map .o-toolbar button:hover [class^="o-icon-"],
   .o-map .o-toolbar button:hover [class*="o-icon-"] {
     fill: #007aff; }
+  .o-map .o-disabled [class^="o-icon-"],
+  .o-map .o-disabled [class*=" o-icon-"] {
+    fill: rgba(0, 0, 0, 0.26); }
   .o-map .owl-prev .o-icon-fa-chevron-left,
   .o-map .owl-next .o-icon-fa-chevron-right {
     fill: #424242;

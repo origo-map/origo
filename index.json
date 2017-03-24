@@ -4,9 +4,6 @@
       "name": "home"
     },
     {
-      "name": "geoposition"
-    },
-    {
       "name": "mapmenu"
     },
     {
@@ -24,6 +21,13 @@
       }
     },
     {
+      "name": "link",
+      "options": {
+        "title": "Origo",
+        "url": "https://github.com/origo-map/origo"
+      }
+    },
+    {
       "name": "legend"
     },
     {
@@ -34,7 +38,7 @@
     }
   ],
   "projectionCode": "EPSG:3008",
-  "projectionExtent": [120000, 6556000, 191000, 6635000],
+  "projectionExtent": [110000,6540000,200000,6650000],
   "proj4Defs": [
       {
           "code": "EPSG:3008",

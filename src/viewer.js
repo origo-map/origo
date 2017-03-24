@@ -17,8 +17,6 @@ var style = require('./style')();
 var layerCreator = require('./layercreator');
 
 var map;
-var mapControls;
-var attribution;
 var template;
 var settings = {
   projection: '',
@@ -36,8 +34,7 @@ var settings = {
   featureInfoOverlay: undefined,
   editLayer: null
 };
-var cqlQuery, queryFinished = false,
-  urlParams;
+var urlParams;
 
 function init(el, mapOptions) {
   $(el).html(template);
@@ -58,7 +55,6 @@ function init(el, mapOptions) {
   settings.map = mapOptions.map;
   settings.url = mapOptions.url;
   settings.baseUrl = mapOptions.baseUrl;
-  settings.tileSize = mapOptions.tileSize ? [mapOptions.tileSize,mapOptions.tileSize] : [256,256];
   if (mapOptions.hasOwnProperty('proj4Defs')) {
     // Projection to be used in map
     settings.projectionCode = mapOptions.projectionCode || undefined;
@@ -67,9 +63,8 @@ function init(el, mapOptions) {
       code: settings.projectionCode,
       extent: settings.projectionExtent
     });
-	settings.extent = mapOptions.extent;
     settings.resolutions = mapOptions.resolutions || undefined;
-    settings.tileGrid = maputils.tileGrid(settings.extent, settings.resolutions, settings.tileSize);
+    settings.tileGrid = maputils.tileGrid(settings.projectionExtent, settings.resolutions);
   }
 
   settings.extent = mapOptions.extent || undefined;
@@ -84,44 +79,18 @@ function init(el, mapOptions) {
   settings.controls = mapOptions.controls;
   settings.consoleId = mapOptions.consoleId || 'o-console';
   settings.featureinfoOptions = mapOptions.featureinfoOptions || {};
+  settings.tileSize = mapOptions.tileSize ? [mapOptions.tileSize,mapOptions.tileSize] : [256,256];
 
   //If url arguments, parse this settings
   if (window.location.search) {
     parseArg();
   }
 
-  //Create attribution
-  attribution = new ol.control.Attribution({
-    collapsible: false
-  });
-
-  var zoomControl = new ol.control.Zoom({
-    zoomInTipLabel: ' ',
-    zoomOutTipLabel: ' ',
-    zoomInLabel: $.parseHTML('<svg class="o-icon-fa-plus"><use xlink:href="#fa-plus"></use></svg>')[0],
-    zoomOutLabel: $.parseHTML('<svg class="o-icon-fa-minus"><use xlink:href="#fa-minus"></use></svg>')[0]
-  });
-
-  //Set map controls
-  mapControls = [
-    zoomControl,
-    attribution,
-    new ol.control.Rotate({
-      label: ''
-    }), /*Override default label for compass*/
-    new ol.control.ScaleLine({
-      target: 'o-bottom-tools'
-    })
-  ]
   if (window.top != window.self) {
     mapwindow.init();
   }
 
   loadMap();
-
-  //Check size for attribution mode
-  $(window).on('resize', checkSize);
-  checkSize();
 
   if (urlParams.pin) {
     settings.featureinfoOptions.savedPin = urlParams.pin;
@@ -157,9 +126,8 @@ function createLayers(layerlist, savedLayers) {
 function loadMap() {
   map = new ol.Map({
     target: 'o-map',
-    controls: mapControls,
     layers: settings.layers,
-	renderer: 'canvas',
+    controls: [],
     view: new ol.View({
       extent: settings.extent || undefined,
       projection: settings.projection || undefined,
@@ -302,8 +270,37 @@ function getGroup(group) {
   return group;
 }
 
-function getGroups() {
-  return settings.groups;
+function getGroups(opt) {
+  if(opt == 'top') {
+    return settings.groups;
+  } else if (opt == 'sub') {
+    return getSubgroups();
+  } else {
+    return settings.groups.concat(getSubgroups());
+  }
+}
+
+function getSubgroups() {
+  var subgroups = [];
+
+  function findSubgroups(groups, n) {
+    if (n >= groups.length) {
+      return;
+    }
+
+    if (groups[n].groups) {
+      groups[n].groups.forEach(function(subgroup) {
+        subgroups.push(subgroup);
+      });
+
+      findSubgroups(groups[n].groups, 0);
+    }
+
+    findSubgroups(groups, n+1);
+  }
+
+  findSubgroups(settings.groups, 0);
+  return subgroups;
 }
 
 function getProjectionCode() {
@@ -420,11 +417,6 @@ function removeOverlays(overlays) {
   }
 }
 
-function checkSize() {
-  var small = map.getSize()[0] < 768;
-  attribution.setCollapsible(small);
-  attribution.setCollapsed(small);
-}
 module.exports.init = init;
 module.exports.createLayers = createLayers;
 module.exports.getBaseUrl = getBaseUrl;
@@ -447,7 +439,6 @@ module.exports.getTileGrid = getTileGrid;
 module.exports.autoPan = autoPan;
 module.exports.removeOverlays = removeOverlays;
 module.exports.checkScale= checkScale;
-module.exports.checkSize = checkSize;
 module.exports.getMapName = getMapName;
 module.exports.getConsoleId = getConsoleId;
 module.exports.getUrl = getUrl;

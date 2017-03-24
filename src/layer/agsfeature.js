@@ -38,9 +38,9 @@ var agsFeature = function agsFeature(layerOptions) {
           encodeURI('/query?f=json&' +
             'returnGeometry=true' +
             '&spatialRel=esriSpatialRelIntersects' +
-            '&geometry=' + encodeURIComponent('{"xmin":' + extent[0] + ',"ymin":' +
+            '&geometry=' + '{"xmin":' + extent[0] + ',"ymin":' +
               extent[1] + ',"xmax":' + extent[2] + ',"ymax":' + extent[3] +
-              ',"spatialReference":{"wkid":' + esriSrs + '}}') +
+              ',"spatialReference":{"wkid":' + esriSrs + '}}' +
             '&geometryType=esriGeometryEnvelope' +
             '&inSR=' + esriSrs + '&outFields=*' + '' +
             '&returnIdsOnly=false&returnCountOnly=false' +
