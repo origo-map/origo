@@ -11,9 +11,14 @@
   "license": "BSD-2-Clause",
   "main": "origo.js",
   "scripts": {
-    "start": "budo origo.js:dist/origo.js --live -- --s origo --d",
+    "start": "npm run prebuild-sass | run-p start-origo watch-sass",
+    "start-origo": "budo origo.js:dist/origo.js --live -- --s origo --d",
     "watch": "watchify origo.js --s origo --d --outfile dist/origo.js",
-    "build": "browserify origo.js --s origo | uglifyjs --compress --mangle --output dist/origo.min.js",
+    "watch-sass": "node-sass -w --include-path scss scss/origo.scss css/style.css",
+    "prebuild-sass": "node-sass --include-path scss scss/origo.scss css/style.css",
+    "build": "npm run build-origo && npm run build-sass",
+    "build-sass": "node-sass --include-path scss scss/origo.scss dist/css/style.css",
+    "build-origo": "browserify origo.js --s origo | uglifyjs --compress --mangle --output dist/origo.min.js",
     "build-ol": "node node_modules/openlayers/tasks/build.js tasks/build-ol-standard.json node_modules/openlayers/dist/ol.js"
   },
   "dependencies": {
@@ -30,6 +35,8 @@
     "budo": "^9.0.0",
     "handlebars": "4.0.5",
     "hbsfy": "2.5.1",
+    "node-sass": "^3.13.0",
+    "npm-run-all": "^3.1.2",
     "uglify-js": "2.4.24",
     "vinyl-source-stream": "1.1.0",
     "watchify": "3.3.1"

@@ -1,0 +1,58 @@
+#o-popup {
+  width: 270px;
+}
+#o-identify-carousel,
+#o-identify {
+	height: 100%;
+}
+.o-popup {
+  display: none;
+  bottom: 12px;
+  left: -50%;
+  width: 100%;
+  z-index: 1010;
+  padding: 1px;
+  position: absolute;
+  text-align: left;
+  background-clip: padding-box;
+  border: 1px solid #cccccc;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  white-space: normal;
+}
+.o-popup:before,
+.o-popup:after {
+  display: block;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.o-popup:after {
+  border-top-color: white;
+  border-width: 10px;
+  left: 50%;
+  margin-left: -10px;
+  bottom: -20px;
+}
+.o-popup:before {
+  border-top-color: #999999;
+  border-width: 11px;
+  left: 50%;
+  margin-left: -11px;
+  bottom: -22px;
+}
+@media screen and (max-width: 320px) {
+#o-popup {
+  width: 240px;
+}
+}
+@media screen and (max-width: 240px) {
+#o-popup {
+  width: 200px;
+}
+}
