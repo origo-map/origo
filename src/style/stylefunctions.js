@@ -1344,7 +1344,6 @@
 			case "VAGMOU.D":// Motorväg, körbanemitt, underfart/tunnel
 				stroke.setColor('rgba(220,120,20,1.0)');
 				stroke.setWidth(3+5/(resolution));
-				stroke.setWidth(40);
 				styles[length++] = line;
             break;
 			case "VÄGKV.M":// Kvartersväg

@@ -368,6 +368,12 @@ function addLegend(groups) {
       if (layer.getVisible()==true) {
         $('#' + name + ' .o-checkbox').addClass('o-check-true');
         $('#o-legend-' + name).addClass('o-check-true-img');
+        if(layer.getProperties().bgColor){	
+        $("body").css("background", layer.getProperties().bgColor);
+        }
+        else{	
+        $("body").css("background", "#FFF");
+        }
       } else {
         $('#' + name + ' .o-checkbox').addClass('o-check-false');
         $('#o-legend-' + name).addClass('o-check-false-img');
@@ -572,6 +578,13 @@ function toggleCheck(layerid) {
         //map legend
         $('#o-legend-' + layername).removeClass('o-check-false-img');
         $('#o-legend-' + layername).addClass('o-check-true-img');
+        
+        if(layer.getProperties().bgColor){	
+        $("body").css("background", layer.getProperties().bgColor);
+        }
+        else{	
+        $("body").css("background", "#FFF");
+        }
     }
     //Toggle check for alla groups except background
     else {
@@ -586,9 +599,12 @@ function toggleCheck(layerid) {
             }
             layer.setVisible(false);
             linkedLayers.forEach(function(linkedLayer) {
-              viewer.getLayer(linkedLayer).setVisible(false);
-              $('.' + linkedLayer + ' .o-checkbox').removeClass('o-checkbox-true');
-              $('.' + linkedLayer + ' .o-checkbox').addClass('o-checkbox-false');
+              if(viewer.getLayer(linkedLayer).get('group') != 'background')
+              {
+                viewer.getLayer(linkedLayer).setVisible(false);
+                $('.' + linkedLayer + ' .o-checkbox').removeClass('o-checkbox-true');
+                $('.' + linkedLayer + ' .o-checkbox').addClass('o-checkbox-false');
+              }
             });
         }
         else {
@@ -602,6 +618,43 @@ function toggleCheck(layerid) {
             layer.setVisible(true);
             layer.set('legend', true);
             linkedLayers.forEach(function(linkedLayer) {
+              if(viewer.getLayer(linkedLayer).get('group') == 'background')
+              {
+                var group = viewer.getGroup('background');
+                for(var i=0; i<group.length; i++) {
+                  group[i].setVisible(false);
+                  $('#' + group[i].get('name') + ' .o-checkbox').removeClass('o-check-true');
+                  $('#' + group[i].get('name') + ' .o-checkbox').addClass('o-check-false');
+                  //map legend
+                  $('#o-legend-' + group[i].get('name')).removeClass('o-check-true-img');
+                  $('#o-legend-' + group[i].get('name')).addClass('o-check-false-img');
+                  var bgLinkedLayers = group[i].get('linkedLayers') || [];
+                  bgLinkedLayers.forEach(function(linkedLayer) {
+                    viewer.getLayer(linkedLayer).setVisible(false);
+                  $('.' + linkedLayer + ' .o-checkbox').removeClass('o-checkbox-true');
+                  $('.' + linkedLayer + ' .o-checkbox').addClass('o-checkbox-false');
+                  });
+                }
+                viewer.getLayer(linkedLayer).setVisible(true);
+                var bgLinkedLayers =  viewer.getLayer(linkedLayer).get('linkedLayers') || [];
+                bgLinkedLayers.forEach(function(linkedLayer) {
+                  viewer.getLayer(linkedLayer).setVisible(true);
+                  $('.' + linkedLayer + ' .o-checkbox').removeClass('o-checkbox-false');
+                  $('.' + linkedLayer + ' .o-checkbox').addClass('o-checkbox-true');
+                });
+                $('#' + linkedLayer + ' .o-checkbox').removeClass('o-check-false');
+                $('#' + linkedLayer + ' .o-checkbox').addClass('o-check-true');
+                //map legend
+                $('#o-legend-' + linkedLayer).removeClass('o-check-false-img');
+                $('#o-legend-' + linkedLayer).addClass('o-check-true-img');
+                
+                if(viewer.getLayer(linkedLayer).getProperties().bgColor){	
+                $("body").css("background", viewer.getLayer(linkedLayer).getProperties().bgColor);
+                }
+                else{	
+                $("body").css("background", "#FFF");
+                }
+              }
               viewer.getLayer(linkedLayer).setVisible(true);
               $('.' + linkedLayer + ' .o-checkbox').removeClass('o-checkbox-false');
               $('.' + linkedLayer + ' .o-checkbox').addClass('o-checkbox-true');
