@@ -539,59 +539,74 @@ function toggleSubGroupCheck(subgroup, toggleAll) {
 
 //Toggle layers
 function toggleCheck(layerid) {
-  var layername = layerid.split('o-legend-').pop();
-  var inMapLegend = layerid.split('o-legend-').length > 1 ? true : false;
-  var layer = viewer.getLayer(layername);
-
-  //Radio toggle for background
-  if (layer.get('group') == 'background') {
-    var groups = viewer.getGroup('background');
-
-    groups.forEach(function(group) {
-      group.setVisible(false);
-      $('#' + group.get('name') + ' .o-checkbox').removeClass('o-check-true');
-      $('#' + group.get('name') + ' .o-checkbox').addClass('o-check-false');
-      //map legend
-      $('#o-legend-' + group.get('name')).removeClass('o-check-true-img');
-      $('#o-legend-' + group.get('name')).addClass('o-check-false-img');
-    });
-
-    layer.setVisible(true);
-    $('#' + layername + ' .o-checkbox').removeClass('o-check-false');
-    $('#' + layername + ' .o-checkbox').addClass('o-check-true');
-    //map legend
-    $('#o-legend-' + layername).removeClass('o-check-false-img');
-    $('#o-legend-' + layername).addClass('o-check-true-img');
-  } else { //Toggle check for all groups except background
-
-    if ($('.' + layername + ' .o-checkbox').hasClass('o-checkbox-true')) {
-      $('.' + layername + ' .o-checkbox').removeClass('o-checkbox-true');
-      $('.' + layername + ' .o-checkbox').addClass('o-checkbox-false');
-
-      if (inMapLegend == false) {
-        offToggleCheck('o-legend-' + layername);
-        $('#o-legend-' + layername).remove();
-        layer.set('legend', false);
-        checkToggleOverlay();
-      }
-
-      layer.setVisible(false);
-    } else {
-
-      if (inMapLegend == false && $('#o-legend-' + layername).length == 0) {
-        $('#o-overlay-list').append(createLegendItem('o-legend-' + layername));
-        onToggleCheck('o-legend-' + layername);
-        checkToggleOverlay();
-      }
-
-      $('.' + layername + ' .o-checkbox').removeClass('o-checkbox-false');
-      $('.' + layername + ' .o-checkbox').addClass('o-checkbox-true');
-      layer.setVisible(true);
-      layer.set('legend', true);
+    var layername = layerid.split('o-legend-').pop();
+    var inMapLegend = layerid.split('o-legend-').length > 1 ? true : false;
+    var layer = viewer.getLayer(layername);
+    var linkedLayers = layer.get('linkedLayers') || [];
+	var visible = true;
+    //Radio toggle for background
+    if(layer.get('group') == 'background') {
+        var group = viewer.getGroup('background');
+        for(var i=0; i<group.length; i++) {
+          group[i].setVisible(false);
+          $('#' + group[i].get('name') + ' .o-checkbox').removeClass('o-check-true');
+          $('#' + group[i].get('name') + ' .o-checkbox').addClass('o-check-false');
+          //map legend
+          $('#o-legend-' + group[i].get('name')).removeClass('o-check-true-img');
+          $('#o-legend-' + group[i].get('name')).addClass('o-check-false-img');
+          var bgLinkedLayers = group[i].get('linkedLayers') || [];
+          bgLinkedLayers.forEach(function(linkedLayer) {
+            viewer.getLayer(linkedLayer).setVisible(false);
+          $('.' + linkedLayer + ' .o-checkbox').removeClass('o-checkbox-true');
+          $('.' + linkedLayer + ' .o-checkbox').addClass('o-checkbox-false');
+          });
+        }
+        layer.setVisible(true);
+        linkedLayers.forEach(function(linkedLayer) {
+          viewer.getLayer(linkedLayer).setVisible(true);
+          $('.' + linkedLayer + ' .o-checkbox').removeClass('o-checkbox-false');
+          $('.' + linkedLayer + ' .o-checkbox').addClass('o-checkbox-true');
+        });
+        $('#' + layername + ' .o-checkbox').removeClass('o-check-false');
+        $('#' + layername + ' .o-checkbox').addClass('o-check-true');
+        //map legend
+        $('#o-legend-' + layername).removeClass('o-check-false-img');
+        $('#o-legend-' + layername).addClass('o-check-true-img');
     }
-
-    if ($('#' + layername).find('.o-legend-subitem').length > 0) {
-      toggleSubGroupCheck($('#' + layername).parents('ul').has('.o-legend-header').first(), false);
+    //Toggle check for alla groups except background
+    else {
+        if($('.' + layername + ' .o-checkbox').hasClass('o-checkbox-true')) {
+            $('.' + layername + ' .o-checkbox').removeClass('o-checkbox-true');
+            $('.' + layername + ' .o-checkbox').addClass('o-checkbox-false');
+            if (inMapLegend == false) {
+                offToggleCheck('o-legend-' + layername);
+                $('#o-legend-' + layername).remove();
+                layer.set('legend', false);
+                checkToggleOverlay();
+            }
+            layer.setVisible(false);
+            linkedLayers.forEach(function(linkedLayer) {
+              viewer.getLayer(linkedLayer).setVisible(false);
+              $('.' + linkedLayer + ' .o-checkbox').removeClass('o-checkbox-true');
+              $('.' + linkedLayer + ' .o-checkbox').addClass('o-checkbox-false');
+            });
+        }
+        else {
+            if (inMapLegend == false && $('#o-legend-' + layername).length == 0) {
+                $('#o-overlay-list').append(createLegendItem('o-legend-' + layername));
+                onToggleCheck('o-legend-' + layername);
+                checkToggleOverlay();
+            }
+            $('.' + layername + ' .o-checkbox').removeClass('o-checkbox-false');
+            $('.' + layername + ' .o-checkbox').addClass('o-checkbox-true');
+            layer.setVisible(true);
+            layer.set('legend', true);
+            linkedLayers.forEach(function(linkedLayer) {
+              viewer.getLayer(linkedLayer).setVisible(true);
+              $('.' + linkedLayer + ' .o-checkbox').removeClass('o-checkbox-false');
+              $('.' + linkedLayer + ' .o-checkbox').addClass('o-checkbox-true');
+            });
+        }
     }
   }
 }
