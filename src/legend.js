@@ -608,7 +608,6 @@ function toggleCheck(layerid) {
             });
         }
     }
-  }
 }
 
 function checkToggleOverlay() {
