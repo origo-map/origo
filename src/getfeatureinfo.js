@@ -36,31 +36,41 @@ function getFeatureInfoRequests(evt) {
     //Check for support of crossOrigin in image, absent in IE 8 and 9
     if('crossOrigin' in new(Image)) {
         map.forEachLayerAtPixel(evt.pixel, function(layer) {
-            var item = getGetFeatureInfoRequest(layer, evt.coordinate);
-            if(item) {requests.push(item)};
+            if (layer.get('queryable')) {
+              var item = getGetFeatureInfoRequest(layer, evt.coordinate);
+              if(item) {requests.push(item)};
+            }
         });
     }
     //If canvas is tainted
     else if(isTainted(evt.pixel)) {
         var layers = Viewer.getQueryableLayers();
         layers.forEach(function(layer) {
-            //If layer is tainted, then create request for layer
-            if(isTainted(evt.pixel, layer)) {
-                var item = getGetFeatureInfoRequest(layer, evt.coordinate);
-                if(item) {requests.push(item)};
-            }
-            //If layer is not tainted, test if layer hit at pixel
-            else if(layerAtPixel(evt.pixel, layer)){
-                var item = getGetFeatureInfoRequest(layer, evt.coordinate);
-                if(item) {requests.push(item)};
+            if (layer.get('queryable')) {
+
+              //If layer is tainted, then create request for layer
+              if(isTainted(evt.pixel, layer)) {
+                  var item = getGetFeatureInfoRequest(layer, evt.coordinate);
+                  if(item) {requests.push(item)};
+              }
+
+              //If layer is not tainted, test if layer hit at pixel
+              else if(layerAtPixel(evt.pixel, layer)){
+                  var item = getGetFeatureInfoRequest(layer, evt.coordinate);
+                  if(item) {requests.push(item)};
+              }
             }
         });
     }
     //If crossOrigin is not supported and canvas not tainted
     else {
         map.forEachLayerAtPixel(evt.pixel, function(layer) {
-            var item = getGetFeatureInfoRequest(layer, evt.coordinate);
-            if(item) {requests.push(item)};
+            if (layer.get('queryable') === true) {
+              var item = getGetFeatureInfoRequest(layer, evt.coordinate);
+              if (item) {
+                requests.push(item)
+              };
+            }
         });
     }
     return requests;

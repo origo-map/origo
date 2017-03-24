@@ -1,0 +1,9 @@
+.o-control {
+		background-color: #fff;
+		color: #000;
+		position: absolute;
+		z-index: 10;
+}
+.o-control-active svg{
+  fill: #007AFF;
+}

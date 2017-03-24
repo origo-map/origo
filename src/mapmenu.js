@@ -49,7 +49,6 @@ function init() {
     $closeButton = $('#o-mapmenu-button-close');
 
     bindUIActions();
-    // addLegend(viewer.getGroups());
 }
 function bindUIActions() {
     $menuButton.on('click', function(e) {
@@ -66,13 +65,9 @@ function bindUIActions() {
 function toggleMenu() {
     if($mapMenu.hasClass('o-mapmenu-show')){
       $mapMenu.removeClass('o-mapmenu-show');
-      $menuButton.removeClass('o-mapmenu-button-false');
-      $menuButton.addClass('o-mapmenu-button-true');
     }
     else {
       $mapMenu.addClass('o-mapmenu-show');
-      $menuButton.removeClass('o-mapmenu-button-true');
-      $menuButton.addClass('o-mapmenu-button-false');
     }
 }
 function getTarget() {

@@ -1344,7 +1344,6 @@
 			case "VAGMOU.D":// Motorväg, körbanemitt, underfart/tunnel
 				stroke.setColor('rgba(220,120,20,1.0)');
 				stroke.setWidth(3+5/(resolution));
-				stroke.setWidth(40);
 				styles[length++] = line;
             break;
 			case "VÄGKV.M":// Kvartersväg
@@ -1619,28 +1618,35 @@
 		else if (layer=="vo_fast"){
 		switch(dt) {
 			case "ÖVÄGCYK.M":// Cykelväg/parkväg Mittlinje för cykel- eller parkväg.
+			case "OVAGCYK.M":// Cykelväg/parkväg Mittlinje för cykel- eller parkväg.
 				dashedStroke.setColor('rgba(220,20,20,1.0)');
 				dashedStroke.setWidth(0.8);
 				dashedStroke.setLineDash([8, 4]);
 				if(resolution < 5){styles[length++] = dashedLine;}
 						break;
 			case "ÖVÄGELS.M":// Elljusspår
+			case "OVAGELS.M":// Elljusspår
 				stroke.setColor('rgba(220,220,20,1.0)');
 				stroke.setWidth(2);
 				if(resolution < 5){styles[length++] = line;}
+				dashedStroke.setColor('rgba(220,20,20,1.0)');
 				dashedStroke.setWidth(2);
 				dashedStroke.setLineDash([1, 5]);
 				if(resolution < 5){styles[length++] = dashedLine;}
 						break;
 			case "ÖVÄGSTI.M":// Gångstig Mittlinje för tydlig gångstig.
+			case "OVAGSTI.M":// Gångstig Mittlinje för tydlig gångstig.
 				dashedStroke.setColor('rgba(150,150,150,1.0)');
 				dashedStroke.setWidth(1.5);
 				dashedStroke.setLineDash([1, 5]);
 				if(resolution < 15){styles[length++] = dashedLine;}
 						break;
 			case "ÖVÄGTRA.M":// Traktorväg
+			case "OVAGTRA.M":// Traktorväg
 			case "ÖVÄGUND.M":// Underfart/tunnel för övrig väg eller led
+			case "OVAGUND.M":// Underfart/tunnel för övrig väg eller led
 			case "GÅNGBRO.M":// Gångbro
+			case "GANGBRO.M":// Gångbro
 			case "VANDLED":// Vandringsled
 				dashedStroke.setColor('rgba(220,120,20,1.0)');
 				dashedStroke.setWidth(0.8);
@@ -1698,195 +1704,12 @@
 						break;
 		}
 		}
-/*		else if (layer=="vl_vagk_BLAHA" || layer=="vl_over_BLAHA"){
-			if(resolution < 1){
-				switch(kkod) {
-					case "0":
-						stroke.setColor('rgba(140,70,70,1.0)');
-						stroke.setWidth(20);
-						styles[length++] = line;
-					break;
-					default:
-						//stroke.setColor('rgba(210,210,210,1.0)');
-						stroke.setColor('rgba(160,160,160,1.0)');
-						stroke.setWidth(8);
-						overlayedStroke.setColor('rgba(240,240,240,1.0)');
-						overlayedStroke.setWidth(7);
-						styles[length++] = line;
-						styles[length++] = overlayedLine;
-				}
-			}
-			else if(resolution < 30){
-				switch(kkod) {
-					case "0":
-						//stroke.setColor('rgba(140,70,70,1.0)');
-						//stroke.setWidth(6);
-						//styles[length++] = line;
-						stroke.setColor('rgba(140,70,70,1.0)');
-						stroke.setWidth(6);
-						overlayedStroke.setColor('rgba(240,240,240,1.0)');
-						overlayedStroke.setWidth(1);
-						styles[length++] = line;
-						styles[length++] = overlayedLine;
-					break;
-					case "1":
-						//stroke.setColor('rgba(140,70,70,1.0)');
-						//stroke.setWidth(4);
-						//styles[length++] = line;
-						stroke.setColor('rgba(140,70,70,1.0)');
-						stroke.setWidth(4);
-						overlayedStroke.setColor('rgba(240,240,240,1.0)');
-						overlayedStroke.setWidth(1);
-						styles[length++] = line;
-						styles[length++] = overlayedLine;
-					break;
-					case "2":
-						stroke.setColor('rgba(140,70,70,1.0)');
-						stroke.setWidth(4);
-						overlayedStroke.setColor('rgba(240,240,240,1.0)');
-						overlayedStroke.setWidth(1);
-						styles[length++] = line;
-						styles[length++] = overlayedLine;
-					break;
-					case "3":
-						stroke.setColor('rgba(140,70,70,1.0)');
-						stroke.setWidth(4);
-						overlayedStroke.setColor('rgba(240,240,240,1.0)');
-						overlayedStroke.setWidth(1);
-						styles[length++] = line;
-						styles[length++] = overlayedLine;
-					break;
-					case "4":
-						stroke.setColor('rgba(140,70,70,1.0)');
-						stroke.setWidth(4);
-						overlayedStroke.setColor('rgba(240,240,240,1.0)');
-						overlayedStroke.setWidth(1);
-						styles[length++] = line;
-						styles[length++] = overlayedLine;
-					break;
-					case "5":
-						stroke.setColor('rgba(140,70,70,1.0)');
-						stroke.setWidth(4);
-						overlayedStroke.setColor('rgba(240,240,240,1.0)');
-						overlayedStroke.setWidth(1);
-						styles[length++] = line;
-						styles[length++] = overlayedLine;
-					break;
-					case "6":
-						stroke.setColor('rgba(160,160,160,1.0)');
-						stroke.setWidth(4);
-						overlayedStroke.setColor('rgba(240,240,240,1.0)');
-						overlayedStroke.setWidth(3);
-						styles[length++] = line;
-						styles[length++] = overlayedLine;
-					break;
-					case "7":
-						stroke.setColor('rgba(160,160,160,1.0)');
-						stroke.setWidth(4);
-						overlayedStroke.setColor('rgba(240,240,240,1.0)');
-						overlayedStroke.setWidth(3);
-						styles[length++] = line;
-						styles[length++] = overlayedLine;
-					break;
-					default:
-						stroke.setColor('rgba(120,120,120,1.0)');
-						stroke.setWidth(0.4);
-						styles[length++] = line;			   
-				}
-			}
-			else if(resolution < 500){
-				switch(kkod) {
-					case "0":
-						stroke.setColor('rgba(140,70,70,1.0)');
-						stroke.setWidth(2);
-						styles[length++] = line;
-					break;	
-					case "1":
-						//stroke.setColor('rgba(140,70,70,1.0)');
-						//stroke.setWidth(4);
-						//styles[length++] = line;
-						stroke.setColor('rgba(140,70,70,1.0)');
-						stroke.setWidth(1);
-						styles[length++] = line;
-					break;
-					case "2":
-						stroke.setColor('rgba(140,70,70,1.0)');
-						stroke.setWidth(1);
-						styles[length++] = line;
-					break; 
-					case "3":
-						stroke.setColor('rgba(140,70,70,1.0)');
-						stroke.setWidth(0.75);
-						styles[length++] = line;
-					break;   
-					case "4":
-						stroke.setColor('rgba(140,70,70,1.0)');
-						stroke.setWidth(0.5);
-						styles[length++] = line;
-					break;   
-					case "6":
-						stroke.setColor('rgba(140,70,70,1.0)');
-						stroke.setWidth(0.5);
-						styles[length++] = line;
-					break;   
-					default:
-						stroke.setColor('rgba(140,70,70,1.0)');
-						stroke.setWidth(0.5);
-						styles[length++] = line;
-					break;    
-					
-				}
-			}
-		}
-		else if (layer=="BYGGNADER"){
-			if(resolution < 2){
-				switch(detaljtyp) {
-					case 'OFBYGG.Y':
-					stroke.setColor('rgba(80,80,80,1.0)');
-					stroke.setWidth(0.3);          
-					fill.setColor('rgba(255,100,100,1.0)');
-					styles[length++] = strokedPolygon;
-					break;
-					case 'BOSTAD.Y':
-					stroke.setColor('rgba(80,80,80,1.0)');
-					stroke.setWidth(0.3);          
-					fill.setColor('rgba(227,199,163,1.0)');
-					styles[length++] = strokedPolygon;
-					break;
-					case 'INDUST.Y':
-					stroke.setColor('rgba(80,80,80,1.0)');
-					stroke.setWidth(0.3);          
-					fill.setColor('rgba(130,130,130,1.0)');
-					styles[length++] = strokedPolygon;
-					break;
-					case 'TRAFO.Y':
-					stroke.setColor('rgba(80,80,80,1.0)');
-					stroke.setWidth(0.3);          
-					fill.setColor('rgba(100,100,100,1.0)');
-					styles[length++] = strokedPolygon;
-					break;
-					case 'UTHUS.Y':
-					stroke.setColor('rgba(80,80,80,1.0)');
-					stroke.setWidth(0.3);          
-					fill.setColor('rgba(216,173,148,1.0)');
-					styles[length++] = strokedPolygon;
-					break;
-				}
-			}
-		}*/
-		/*
-		else{
-         fill.setColor('rgba(234,100,100,1.0)');
-		  styles[length++] = polygon;
-	  }
-	  */
-	  //else console.log(feature);
 		styles.length = length;
 		return styles;
 	}
 	}
 	else if(styleName=='labels'){
-      var light = true;
+      var light = (params=='light' ? true : false);
 	  var fill = new ol.style.Fill({color: ''});
 	  var stroke = new ol.style.Stroke({color: '', width: 0.1, lineCap:'square', lineJoin:'round'});
 	  var rotation = 0;

@@ -16,10 +16,10 @@ var xyz = function xyz(layerOptions) {
   };
   var sourceDefault = {};
   var xyzOptions = $.extend(xyzDefault, layerOptions);
-  xyzOptions.sourceName = xyzOptions.name;
+  xyzOptions.sourceName = xyzOptions.id;
   var sourceOptions = $.extend(sourceDefault, viewer.getMapSource()[layerOptions.source]);
-  sourceOptions.attribution = xyzOptions.attribution;
-  sourceOptions.projectionCode = viewer.getProjectionCode() || 'EPSG:3857';
+  sourceOptions.attributions = xyzOptions.attribution;
+  sourceOptions.projection = viewer.getProjectionCode() || 'EPSG:3857';
   sourceOptions.tileGrid = viewer.getTileGrid();
 
   var xyzSource = createSource(sourceOptions);
