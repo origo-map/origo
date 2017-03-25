@@ -385,6 +385,7 @@ function addLegend(groups) {
       if (layer.getVisible()==true) {
         $('#' + name + ' .o-checkbox').addClass('o-check-true');
         $('#o-legend-' + name).addClass('o-check-true-img');
+		$('#o-legend-item-info-' + name).addClass('o-toggle-on');
         if(layer.getProperties().bgColor){	
         $("body").css("background", layer.getProperties().bgColor);
         }
@@ -394,6 +395,7 @@ function addLegend(groups) {
       } else {
         $('#' + name + ' .o-checkbox').addClass('o-check-false');
         $('#o-legend-' + name).addClass('o-check-false-img');
+		$('#o-legend-item-info-' + name).addClass('o-toggle-off');
       }
     } else {
       if (layer.getVisible()==true) {
@@ -680,6 +682,15 @@ function toggleCheck(layerid) {
                   $('.' + linkedLayer + ' .o-checkbox').removeClass('o-checkbox-true');
                   $('.' + linkedLayer + ' .o-checkbox').addClass('o-checkbox-false');
                   });
+				  if(group[i].get('labelLayer') && group[i].get('name')!=layername){
+					var labelLayer = viewer.getLayer(group[i].get('labelLayer'));
+				if($('#o-legend-item-info-' + group[i].get('name')).hasClass('o-toggle-on')) {
+					$('#o-legend-item-info-' + group[i].get('name')).removeClass('o-toggle-on');
+					$('#o-legend-item-info-' + group[i].get('name')).addClass('o-toggle-off');
+					labelLayer.setVisible(false);
+				}
+					  
+				  }
                 }
                 viewer.getLayer(linkedLayer).setVisible(true);
                 var bgLinkedLayers =  viewer.getLayer(linkedLayer).get('linkedLayers') || [];
@@ -688,6 +699,14 @@ function toggleCheck(layerid) {
                   $('.' + linkedLayer + ' .o-checkbox').removeClass('o-checkbox-false');
                   $('.' + linkedLayer + ' .o-checkbox').addClass('o-checkbox-true');
                 });
+				if(viewer.getLayer(linkedLayer).get('labelLayer')){
+					var labelLayer = viewer.getLayer(viewer.getLayer(linkedLayer).get('labelLayer'));
+				if($('#o-legend-item-info-' + linkedLayer).hasClass('o-toggle-off')) {
+					$('#o-legend-item-info-' + linkedLayer).removeClass('o-toggle-off');
+					$('#o-legend-item-info-' + linkedLayer).addClass('o-toggle-on');
+					labelLayer.setVisible(true);
+				}
+				}
                 $('#' + linkedLayer + ' .o-checkbox').removeClass('o-check-false');
                 $('#' + linkedLayer + ' .o-checkbox').addClass('o-check-true');
                 //map legend
