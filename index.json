@@ -200,7 +200,8 @@
 			"title": "Namn: ",
 			"name": "gammal_fastighet",
 			"urlPrefix": "http://gi.karlstad.se/kulprog/visa.php?typ=byggnad&id=",
-			"url": "id"
+			"runFunction": "showInfo",
+			"functionParam": "id"
 		}]
 		}, {
 		"name": "kulprog_miljo",
