@@ -79,16 +79,16 @@ module.exports = function(feature, layer) {
                     var title;
                     if (feature.get(attribute['functionParam'])) {	
                           var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['functionParam']));
-                          val = '<a id="runfunction-link" href="#">' + attribute['html'] + '</a>';
+                          val = '<a id="colorbox-link" href="#" onclick="runfunction.' + attribute['runFunction'] + '(\'' + url + '\');return false;">' + 
+                                                attribute['html'] +
+                                                '</a>';
                         }
                         else if (feature.get(attribute['functionParam']) === undefined) {
                           var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], attribute['functionParam']);
-                          val = '<a id="runfunction-link" href="#">' + attribute['html'] + '</a>';
+                          val = '<a id="colorbox-link" href="#" onclick="runfunction.' + attribute['runFunction'] + '(\'' + url + '\');return false;">' + 
+                                                attribute['name'] +
+                                                '</a>';
                         }
-
-                        $(document).on('click', '#runfunction-link', function(evt) {
-                          runfunction[attribute['runFunction']](url, $(this), evt);
-                        });
                   } else {
                     val = replacer.replace(attribute['html'], feature.getProperties(), {
                       helper: geom,
