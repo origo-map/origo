@@ -580,6 +580,7 @@ function toggleCheck(layerid) {
     var inMapLegend = layerid.split('o-legend-').length > 1 ? true : false;
     var layer = viewer.getLayer(layername);
     var linkedLayers = layer.get('linkedLayers') || [];
+    var hideLayers = layer.get('hideLayers') || [];
 	var visible = true;
     //Radio toggle for background
     if(layer.get('group') == 'background') {
@@ -633,6 +634,76 @@ function toggleCheck(layerid) {
         else{	
         $("body").css("background", "#FFF");
         }
+    }
+    else if(layer.get('group') == 'historiskakartor') {
+        var group = viewer.getGroup('historiskakartor');
+        for(var i=0; i<group.length; i++) {
+			if(group[i].get('name') != layername){
+			var gl = viewer.getLayer(group[i].get('name'));
+          group[i].setVisible(false);
+          $('#' + group[i].get('name') + ' .o-checkbox').removeClass('o-checkbox-true');
+          $('#' + group[i].get('name') + ' .o-checkbox').addClass('o-checkbox-false');
+                offToggleCheck('o-legend-' + group[i].get('name'));
+                $('#o-legend-' + group[i].get('name')).remove();
+                gl.set('legend', false);
+        }
+		}
+		
+        if($('.' + layername + ' .o-checkbox').hasClass('o-checkbox-true')) {
+			console.log("T");
+            $('.' + layername + ' .o-checkbox').removeClass('o-checkbox-true');
+            $('.' + layername + ' .o-checkbox').addClass('o-checkbox-false');
+            layer.setVisible(false);
+		}
+		else {
+            if (inMapLegend == false && $('#o-legend-' + layername).length == 0) {
+                $('#o-overlay-list').append(createLegendItem('o-legend-' + layername));
+                onToggleCheck('o-legend-' + layername);
+                checkToggleOverlay();
+            }
+			console.log("F");
+			console.log("layername");
+            $('.' + layername + ' .o-checkbox').removeClass('o-checkbox-false');
+            $('.' + layername + ' .o-checkbox').addClass('o-checkbox-true');
+            layer.setVisible(true);
+            layer.set('legend', true);
+		}
+        
+    }
+    else if(layer.get('group') == 'historiskaortofoton') {
+        var group = viewer.getGroup('historiskaortofoton');
+        for(var i=0; i<group.length; i++) {
+			if(group[i].get('name') != layername){
+			var gl = viewer.getLayer(group[i].get('name'));
+          group[i].setVisible(false);
+          $('#' + group[i].get('name') + ' .o-checkbox').removeClass('o-checkbox-true');
+          $('#' + group[i].get('name') + ' .o-checkbox').addClass('o-checkbox-false');
+                offToggleCheck('o-legend-' + group[i].get('name'));
+                $('#o-legend-' + group[i].get('name')).remove();
+                gl.set('legend', false);
+        }
+		}
+		
+        if($('.' + layername + ' .o-checkbox').hasClass('o-checkbox-true')) {
+			console.log("T");
+            $('.' + layername + ' .o-checkbox').removeClass('o-checkbox-true');
+            $('.' + layername + ' .o-checkbox').addClass('o-checkbox-false');
+            layer.setVisible(false);
+		}
+		else {
+            if (inMapLegend == false && $('#o-legend-' + layername).length == 0) {
+                $('#o-overlay-list').append(createLegendItem('o-legend-' + layername));
+                onToggleCheck('o-legend-' + layername);
+                checkToggleOverlay();
+            }
+			console.log("F");
+			console.log("layername");
+            $('.' + layername + ' .o-checkbox').removeClass('o-checkbox-false');
+            $('.' + layername + ' .o-checkbox').addClass('o-checkbox-true');
+            layer.setVisible(true);
+            layer.set('legend', true);
+		}
+        
     }
     //Toggle check for alla groups except background
     else {
@@ -723,6 +794,12 @@ function toggleCheck(layerid) {
               viewer.getLayer(linkedLayer).setVisible(true);
               $('.' + linkedLayer + ' .o-checkbox').removeClass('o-checkbox-false');
               $('.' + linkedLayer + ' .o-checkbox').addClass('o-checkbox-true');
+            });
+            hideLayers.forEach(function(hideLayer) {
+				console.log("Y");
+                viewer.getLayer(hideLayer).setVisible(false);
+                $('.' + hideLayer + ' .o-checkbox').removeClass('o-checkbox-true');
+                $('.' + hideLayer + ' .o-checkbox').addClass('o-checkbox-false');
             });
         }
     }
