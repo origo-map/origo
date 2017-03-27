@@ -50,7 +50,7 @@
   "extent": [110000,6540000,200000,6650000],
   "center": [150000,6584200],
   "home": [120000, 6556000, 191000, 6635000],
-  "zoom": 2,
+  "zoom": 4,
   "resolutions": [128,64,32,16,8,4,2,1,0.5,0.25,0.125],
   "tileSize":256,
   "featureinfoOptions":{
@@ -107,6 +107,19 @@
       "source": "data/kdkn.geojson",
       "style": "mask",
       "type": "GEOJSON",
+      "minScale": 20000,
+      "visible": true
+    },
+    {
+      "name": "finemask",
+      "opacity": 0.75,
+      "title": "kd",
+      "group": "none",
+      "queryable": false,
+      "source": "data/mask.geojson",
+      "style": "mask",
+      "type": "GEOJSON",
+      "maxScale": 20000,
       "visible": true
     },
     {
@@ -697,7 +710,7 @@
 		"labelLayer": "TX_light",
 		"type": "VECTORTILE",
 		"tileSize": [256, 256],
-		"visible": true,
+		"visible": false,
 		"queryable": false
     },
     {
@@ -713,9 +726,9 @@
 		"labelLayer": "TX_light",
 		"type": "VECTORTILE",
 		"tileSize": [256, 256],
-		"visible": false,
+		"visible": true,
 		"queryable": false,
-		"bgColor": "#ddd"
+		"bgColor": "#f1f1f1"
     },
 	{
     "attribution": "&copy Lantmäteriet Geodatasamverkan",
