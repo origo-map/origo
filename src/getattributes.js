@@ -41,20 +41,16 @@ module.exports = function(feature, layer) {
                       if (attribute['runFunction']) {
                         var title;
                         if (feature.get(attribute['functionParam'])) {	
-                          var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['functionParam']));								
-                          val = '<a id="colorbox-link" href="#" ' + attribute['runFunction'] + '(\'' + url + '\');return false;">' + 
-                                      feature.get(attribute['name']) +
-                                      '</a>';
+                          var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['functionParam']));
+                          val = '<a id="runfunction-link" href="#">' + feature.get(attribute['name']) + '</a>';
                         }
                         else if (feature.get(attribute['functionParam']) === undefined) {
                           var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], attribute['functionParam']);
-                          val = '<a id="colorbox-link" href="#" ' + attribute['runFunction'] + '(\'' + url + '\');return false;">' + 
-                                      feature.get(attribute['name']) +
-                                      '</a>';
+                          val = '<a id="runfunction-link" href="#">' + feature.get(attribute['name']) + '</a>';
                         }
-                        
-                        $('body').on('click', '#colorbox-link', function() {
-                          runfunction[attribute['runFunction']](url);
+
+                        $(document).on('click', '#runfunction-link', function(evt) {
+                          runfunction[attribute['runFunction']](url, $(this), evt);
                         });
                       }
                   }
@@ -81,21 +77,17 @@ module.exports = function(feature, layer) {
                   if (attribute['runFunction'] && attribute['functionParam']) {
                     var title;
                     if (feature.get(attribute['functionParam'])) {	
-                      var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['functionParam']));								
-                      val = '<a id="colorbox-link" href="#" ' + attribute['runFunction'] + '(\'' + url + '\');return false;">' + 
-                                  attribute['html'] +
-                                  '</a>';
-                    }
-                    else if (feature.get(attribute['functionParam']) === undefined) {
-                      var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], attribute['functionParam']);
-                      val = '<a id="colorbox-link" href="#" ' + attribute['runFunction'] + '(\'' + url + '\');return false;">' + 
-                                  attribute['name'] +
-                                  '</a>';
-                    }
-                    
-                    $('body').on('click', '#colorbox-link', function() {
-                      runfunction[attribute['runFunction']](url);
-                    });
+                          var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['functionParam']));
+                          val = '<a id="runfunction-link" href="#">' + attribute['html'] + '</a>';
+                        }
+                        else if (feature.get(attribute['functionParam']) === undefined) {
+                          var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], attribute['functionParam']);
+                          val = '<a id="runfunction-link" href="#">' + attribute['html'] + '</a>';
+                        }
+
+                        $(document).on('click', '#runfunction-link', function(evt) {
+                          runfunction[attribute['runFunction']](url, $(this), evt);
+                        });
                   } else {
                     val = replacer.replace(attribute['html'], feature.getProperties(), {
                       helper: geom,
