@@ -1267,8 +1267,8 @@
     width: 1.3em;
     float: right;
     fill: #424242; }
-  .o-map .o-mapmenu [class^="o-icon-"],
-  .o-map .o-mapmenu [class*=" o-icon-"] {
+  .o-map .o-menu-button [class^="o-icon-"],
+  .o-map .o-menu-button [class*=" o-icon-"] {
     padding: 0.25em;
     height: 1em;
     width: 1em; }
