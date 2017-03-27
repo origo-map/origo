@@ -10,21 +10,18 @@
       "name": "sharemap"
     },
     {
-      "name": "print"
-    },
-    {
       "name": "about",
       "options": {
         "buttontext": "Om Kulturmiljö Karlstad",
         "title": "Om Kulturmiljö Karlstad",
-        "content": "<p>Kulturmiljöprogrammet.</p><br><p>Projektet drivs och underhålls av ett antal svenska kommuner. Besök gärna <a href='https://github.com/origo-map/origo' target='_blank'>Origo på GitHub</a> för mer information.</p>"
+        "content": "<p>Kartan bygger på Karlstads kulturmiljöprogram som är en bas för kommunens kulturmiljöarbete.</p><p>Vi behöver känna vår kommun och veta vad vi har för kulturhistoriska värden för att kunna ta hand om dem i plan- och byggprocessen. Kulturmiljöprogrammet är ett kunskapsunderlag som pekar ut kulturhistoriska värden. Det ger möjlighet att göra välgrundade beslut men är inte ett skydd i sig. Kulturmiljöprogrammet bidrar även till att stärka kommunens identitet genom kunskapen om dess historia och hur staden har växt fram.</p><p>Besök gärna <a href='http://karlstad.se/Bygga-och-bo/Bygglov-tillstand-och-fastighetsfragor/Kulturhistoriska-byggnader/Kulturmiljoprogrammet/' target='_blank'>karlstad.se</a> för mer information.</p>"
       }
     },
     {
       "name": "link",
       "options": {
-        "title": "Origo",
-        "url": "https://github.com/origo-map/origo"
+        "title": "Mer information",
+        "url": "http://karlstad.se/Bygga-och-bo/Bygglov-tillstand-och-fastighetsfragor/Kulturhistoriska-byggnader/Kulturmiljoprogrammet/"
       }
     },
     {
@@ -61,17 +58,22 @@
   },
   "source": {
     "geoserver_gi": {
-			"url": "https://gi.karlstad.se:8443/geoserver/ows",
+			"url": "http://gi.karlstad.se:8080/geoserver/ows",
 			"version": "1.1.0"
 	},
     "geoserver_tms": {
-      "url": "https://gi.karlstad.se:8443/geoserver/gwc/service/tms/1.0.0/"
+      "url": "http://gi.karlstad.se:8080/geoserver/gwc/service/tms/1.0.0/"
     }
   },
   "groups": [
     {
       "name": "km",
-      "title": "Kulturmiljö",
+      "title": "Kulturmiljöprogrammet",
+      "expanded": true
+    },
+    {
+      "name": "byggnadsar",
+      "title": "Byggnadsår",
       "expanded": true
     },
     {
@@ -119,18 +121,6 @@
       "visible": true
     },
     {
-		"name": "vy_webbkarta_byggnadsar_centroid",
-		"title": "Texter byggnadsår",
-		"source": "geoserver_gi",
-		"group": "none",
-		"queryable": false,
-		"style": "mask",
-		"type": "WFS",
-		"featuretype": 5,
-		"visible": false,
-		"customStyle": "labels_byggnadsar"
-		}, 
-    {
 		"id": "TX",
 		"name": "TX_dark",
 		"title": "Texter mörk",
@@ -159,34 +149,6 @@
 		"styleParams": "light"
 		}, 
     {
-		"name": "ByggnadsarVT",
-		"layerName": "webbkartan%3Avy_webbkarta_byggnadsar",
-		"gridset": "basemap256",
-		"format":"topojson",
-		"title": "Byggnadsår",
-		"group": "km",
-		"source": "geoserver_tms",
-		"style": "red",
-		"type": "VECTORTILE",
-		"tileSize": [256, 256],
-		"visible": false,
-		"queryable": false,
-		"linkedLayers": ["vy_webbkarta_byggnadsar_centroid","GL_BASEMAP2"],
-        "attributes": [
-          {
-            "name": "ar_nybygg"
-          }
-        ],
-        "timeline": {
-		  "name": "byggnadsar",
-		  "attrName": "ar_nybygg",
-		  "range": [1865,2017],
-		  "step": 1,
-		  "colors": ["magenta", "red", "yellow", "green", "cyan", "blue"],
-		  "tickLabels_h": {"1865": "Före 1865", "2017": "2017"},
-		  "tickLabels_v": {"1865": "Före 1865", "2017": "2017"}
-	    }
-    },{
 		"name": "kulprog_byggnad",
 		"title": "Värdefulla byggnader",
 		"source": "geoserver_gi",
@@ -220,6 +182,46 @@
 		}]
 		},
     {
+		"name": "vy_webbkarta_byggnadsar_centroid",
+		"title": "Texter byggnadsår",
+		"source": "geoserver_gi",
+		"group": "none",
+		"queryable": false,
+		"style": "mask",
+		"type": "WFS",
+		"featuretype": 5,
+		"visible": false,
+		"customStyle": "labels_byggnadsar"
+		}, 
+    {
+		"name": "ByggnadsarVT",
+		"layerName": "webbkartan%3Avy_webbkarta_byggnadsar",
+		"gridset": "basemap256",
+		"format":"topojson",
+		"title": "Byggnadsår",
+		"group": "byggnadsar",
+		"source": "geoserver_tms",
+		"style": "red",
+		"type": "VECTORTILE",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false,
+		"linkedLayers": ["vy_webbkarta_byggnadsar_centroid","GL_BASEMAP2"],
+        "attributes": [
+          {
+            "name": "ar_nybygg"
+          }
+        ],
+        "timeline": {
+		  "name": "byggnadsar",
+		  "attrName": "ar_nybygg",
+		  "range": [1865,2017],
+		  "step": 1,
+		  "colors": ["magenta", "red", "yellow", "green", "cyan", "blue"],
+		  "tickLabels_h": {"1865": "Före 1865", "2017": "2017"},
+		  "tickLabels_v": {"1865": "Före 1865", "2017": "2017"}
+	    }
+    },{
 		"name": "1646",
 		"layerName": "webbkartan%3A1646",
 		"gridset": "basemap256",
@@ -263,8 +265,76 @@
 		"tileSize": [256, 256],
 		"visible": false,
 		"queryable": false
-    },
-    {
+    },{
+		"name": "ortofoto1929",
+		"layerName": "Ortofoton%3Aortofoto1929",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "Ortofoto 1929",
+		"group": "historiskaortofoton",
+		"source": "geoserver_tms",
+		"style": "historto",
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },{
+		"attribution": "&copy Lantmäteriet Geodatasamverkan",
+		"name": "ortofoto1960",
+		"layerName": "Ortofoton%3Aortofoto1960",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "Ortofoto 1960",
+		"group": "historiskaortofoton",
+		"source": "geoserver_tms",
+		"style": "historto",
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },{
+		"attribution": "&copy Lantmäteriet Geodatasamverkan",
+		"name": "ortofoto1994",
+		"layerName": "Ortofoton%3Aortofoto1994",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "Ortofoto 1994",
+		"group": "historiskaortofoton",
+		"source": "geoserver_tms",
+		"style": "historto",
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },{
+		"attribution": "&copy Lantmäteriet Geodatasamverkan",
+		"name": "ortofoto2000",
+		"layerName": "Ortofoton%3Aortofoto2000",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "Ortofoto 2000",
+		"group": "historiskaortofoton",
+		"source": "geoserver_tms",
+		"style": "historto",
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },{
+		"attribution": "&copy Lantmäteriet Geodatasamverkan",
+		"name": "ortofoton2008",
+		"layerName": "Ortofoton%3Aortofoton2008",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "Ortofoto 2008",
+		"group": "historiskaortofoton",
+		"source": "geoserver_tms",
+		"style": "historto",
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },{
 		"name": "GL_BASEMAP2",
 		"layerName": "GL_BASEMAP2",
 		"gridset": "basemap256",
@@ -297,6 +367,23 @@
 		"visible": true,
 		"queryable": false
     },
+    {
+		"name": "GL_BASEMAP2_grey",
+		"layerName": "GL_BASEMAP2",
+		"gridset": "basemap256",
+		"format":"pbf",
+		"title": "Grå",
+		"group": "background",
+		"source": "geoserver_tms",
+		"style": "mask",
+		"customStyle": "basemap_grey",
+		"labelLayer": "TX_light",
+		"type": "VECTORTILE",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false,
+		"bgColor": "#ddd"
+    },
 	{
     "attribution": "&copy Lantmäteriet Geodatasamverkan",
 	"name": "topowebb_nedtonad",
@@ -312,6 +399,7 @@
     "queryable": false
     },
     {
+    "attribution": "&copy Lantmäteriet Geodatasamverkan",
 		"name": "ortofoto025_lm",
 		"layerName": "EXTERN%3Alm_visning_orto025",
 		"gridset": "basemap256",
@@ -326,6 +414,7 @@
 		"queryable": false
     },
     {
+    "attribution": "&copy Lantmäteriet Geodatasamverkan",
 		"name": "ortofoto_lm",
 		"layerName": "EXTERN%3Alm_visning_orto",
 		"gridset": "basemap256",
@@ -483,6 +572,16 @@
           }
         ]
       ],
+      "historto": [
+        [
+          {
+            "image": {
+              "src": "img/png/orto.png",
+			  "size": [20,20]
+            }
+          }
+        ]
+      ],
       "orto": [
         [
           {
@@ -492,6 +591,53 @@
           }
         ]
       ],
+		"kulprog_byggnader_ram": [
+			[{
+				"stroke": {
+					"color": "rgba(255, 0, 0, 1.0)",
+					"width": 3
+				},
+				"fill": {
+					"color": "rgba(255, 0, 0, 0.8)"
+				},
+				"filter": "[klassificering] == 'Byggnad med särskilt värde'",
+				"legend": "Särsk. värdefull byggn."
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(0,0,255,1.0)",
+					"width": 3
+				},
+				"fill": {
+					"color": "rgba(0, 0, 255, 0.8)"
+				},
+				"filter": "[klassificering] == 'Byggnad med visst värde'",
+				"legend": "Byggn. med visst värde"
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(220, 220, 0, 1.0)",
+					"width": 3
+				},
+				"fill": {
+					"color": "rgba(255, 255, 0, 0.8)"
+				},
+				"filter": "[klassificering] == 'Ej utpekad'",
+				"legend": "Ej särskilt utpekad"
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(180, 0, 255, 1.0)",
+					"width": 3
+				},
+				"fill": {
+					"color": "rgba(255, 0, 255, 0.8)"
+				},
+				"filter": "[klassificering] == 'Byggnadsminne'",
+				"legend": "Byggnadsminnen"
+			}]
+
+		],
 		"kulprog_byggnader": [
 			[{
 				"stroke": {
@@ -499,7 +645,7 @@
 					"width": 1
 				},
 				"fill": {
-					"color": "rgba(255, 0, 0, 0.4)"
+					"color": "rgba(255, 0, 0, 0.7)"
 				},
 				"filter": "[klassificering] == 'Byggnad med särskilt värde'",
 				"legend": "Särsk. värdefull byggn."
@@ -510,29 +656,29 @@
 					"width": 1
 				},
 				"fill": {
-					"color": "rgba(0, 0, 255, 0.4)"
+					"color": "rgba(0, 0, 255, 0.7)"
 				},
 				"filter": "[klassificering] == 'Byggnad med visst värde'",
 				"legend": "Byggn. med visst värde"
 			}],
 			[{
 				"stroke": {
-					"color": "rgba(255, 180, 0, 1.0)",
+					"color": "rgba(255, 255, 0, 1.0)",
 					"width": 1
 				},
 				"fill": {
-					"color": "rgba(255, 255, 0, 0.4)"
+					"color": "rgba(255, 255, 0, 0.7)"
 				},
 				"filter": "[klassificering] == 'Ej utpekad'",
 				"legend": "Ej särskilt utpekad"
 			}],
 			[{
 				"stroke": {
-					"color": "rgba(180, 0, 255, 1.0)",
+					"color": "rgba(255, 0, 255, 1.0)",
 					"width": 1
 				},
 				"fill": {
-					"color": "rgba(255, 0, 255, 0.4)"
+					"color": "rgba(255, 0, 255, 0.7)"
 				},
 				"filter": "[klassificering] == 'Byggnadsminne'",
 				"legend": "Byggnadsminnen"
@@ -543,7 +689,7 @@
 			[{
 				"stroke": {
 					"color": "rgba(153, 51, 0, 1.0)",
-					"width": 1
+					"width": 2.5
 				},
 				"fill": {
 					"color": "rgba(153, 51, 0, 0.4)"
