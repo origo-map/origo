@@ -152,7 +152,7 @@ function addLabelButton(item) {
 }
 
 function addSpyButton(item) {
-  var spyButton =  '<div class="o-legend-item-info o-layerspy o-layerspy-off" id="o-legend-item-info-' + item + '">' +
+  var spyButton =  '<div class="o-legend-item-info o-layerspy o-layerspy-off" id="o-legend-item-info-' + item + '_layerspy">' +
                           '<svg class="o-icon-fa-search-on"><use xlink:href="#fa-search"></use></svg>' +
                           '<svg class="o-icon-fa-search-off"><use xlink:href="#fa-search"></use></svg>' +
                         '</div>';
@@ -666,7 +666,6 @@ function toggleCheck(layerid) {
 		}
 		
         if($('.' + layername + ' .o-checkbox').hasClass('o-checkbox-true')) {
-			console.log("T");
             $('.' + layername + ' .o-checkbox').removeClass('o-checkbox-true');
             $('.' + layername + ' .o-checkbox').addClass('o-checkbox-false');
             layer.setVisible(false);
@@ -677,8 +676,6 @@ function toggleCheck(layerid) {
                 onToggleCheck('o-legend-' + layername);
                 checkToggleOverlay();
             }
-			console.log("F");
-			console.log("layername");
             $('.' + layername + ' .o-checkbox').removeClass('o-checkbox-false');
             $('.' + layername + ' .o-checkbox').addClass('o-checkbox-true');
             layer.setVisible(true);
@@ -701,7 +698,6 @@ function toggleCheck(layerid) {
 		}
 		
         if($('.' + layername + ' .o-checkbox').hasClass('o-checkbox-true')) {
-			console.log("T");
             $('.' + layername + ' .o-checkbox').removeClass('o-checkbox-true');
             $('.' + layername + ' .o-checkbox').addClass('o-checkbox-false');
             layer.setVisible(false);
@@ -712,8 +708,6 @@ function toggleCheck(layerid) {
                 onToggleCheck('o-legend-' + layername);
                 checkToggleOverlay();
             }
-			console.log("F");
-			console.log("layername");
             $('.' + layername + ' .o-checkbox').removeClass('o-checkbox-false');
             $('.' + layername + ' .o-checkbox').addClass('o-checkbox-true');
             layer.setVisible(true);
@@ -812,7 +806,6 @@ function toggleCheck(layerid) {
               $('.' + linkedLayer + ' .o-checkbox').addClass('o-checkbox-true');
             });
             hideLayers.forEach(function(hideLayer) {
-				console.log("Y");
                 viewer.getLayer(hideLayer).setVisible(false);
                 $('.' + hideLayer + ' .o-checkbox').removeClass('o-checkbox-true');
                 $('.' + hideLayer + ' .o-checkbox').addClass('o-checkbox-false');
@@ -902,20 +895,23 @@ function toggleLayerSpy($spyButton) {
 			var spyLayer = viewer.getLayer(layername+'_layerspy');
 	//var labelLayer = viewer.getLayer(layername).get('labelLayer');
     //layer = viewer.getLayer(labelLayer);
-        if($('#o-legend-item-info-' + layername).hasClass('o-layerspy-on')) {
-			console.log(map.getInteractions);
-			$('#o-legend-item-info-' + layername).removeClass('o-layerspy-on');
-			$('#o-legend-item-info-' + layername).addClass('o-layerspy-off');
+        if($('#o-legend-item-info-' + layername+'_layerspy').hasClass('o-layerspy-on')) {
+			$('#o-legend-item-info-' + layername+'_layerspy').removeClass('o-layerspy-on');
+			$('#o-legend-item-info-' + layername+'_layerspy').addClass('o-layerspy-off');
 			spyLayer.setVisible(false);
-			layer.setVisible(false);
+			//layer.setVisible(false);
 		}
         else {
-			$('#o-legend-item-info-' + layername).removeClass('o-layerspy-off');
-			$('#o-legend-item-info-' + layername).addClass('o-layerspy-on');
-			var clip = new ol.interaction.Clip({ radius: 200, layers:spyLayer });
+			var group = viewer.getGroup('spy');
+        for(var i=0; i<group.length; i++) {
+			$('#o-legend-item-info-' + group[i].get('name')).removeClass('o-layerspy-on');
+			$('#o-legend-item-info-' + group[i].get('name')).addClass('o-layerspy-off');
+          group[i].setVisible(false);
+		}
+			$('#o-legend-item-info-' + layername+'_layerspy').removeClass('o-layerspy-off');
+			$('#o-legend-item-info-' + layername+'_layerspy').addClass('o-layerspy-on');
+			var clip = new ol.interaction.Clip({ radius: 150, layers:spyLayer });
 			var map = viewer.getMap();
-			console.log(clip);
-			console.log(map);
 			map.addInteraction(clip);
 			spyLayer.setVisible(true);
 		}
