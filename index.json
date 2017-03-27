@@ -539,6 +539,20 @@
 		"layerSpy": true
     },{
 		"attribution": "&copy Lantmäteriet Geodatasamverkan",
+		"name": "ortofoto1960_layerspy",
+		"layerName": "Ortofoton%3Aortofoto1960",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "Ortofoto 1960",
+		"group": "none",
+		"source": "geoserver_tms",
+		"style": "historto_bw",
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },{
+		"attribution": "&copy Lantmäteriet Geodatasamverkan",
 		"name": "ortofoto1960",
 		"layerName": "Ortofoton%3Aortofoto1960",
 		"gridset": "basemap256",

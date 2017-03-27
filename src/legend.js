@@ -152,7 +152,7 @@ function addLabelButton(item) {
 }
 
 function addSpyButton(item) {
-  var spyButton =  '<div class="o-legend-item-info o-layerspy o-layerspy-on" id="o-legend-item-info-' + item + '">' +
+  var spyButton =  '<div class="o-legend-item-info o-layerspy o-layerspy-off" id="o-legend-item-info-' + item + '">' +
                           '<svg class="o-icon-fa-search-on"><use xlink:href="#fa-search"></use></svg>' +
                           '<svg class="o-icon-fa-search-off"><use xlink:href="#fa-search"></use></svg>' +
                         '</div>';
@@ -899,23 +899,25 @@ function toggleLayerSpy($spyButton) {
   var $item = $spyButton.closest('li');
   var layername = $spyButton.attr('id').split('o-legend-item-info-').pop();
 			var map = viewer.getMap();
+			var spyLayer = viewer.getLayer(layername+'_layerspy');
 	//var labelLayer = viewer.getLayer(layername).get('labelLayer');
     //layer = viewer.getLayer(labelLayer);
         if($('#o-legend-item-info-' + layername).hasClass('o-layerspy-on')) {
 			console.log(map.getInteractions);
 			$('#o-legend-item-info-' + layername).removeClass('o-layerspy-on');
 			$('#o-legend-item-info-' + layername).addClass('o-layerspy-off');
-			//layer.setVisible(false);
+			spyLayer.setVisible(false);
+			layer.setVisible(false);
 		}
         else {
 			$('#o-legend-item-info-' + layername).removeClass('o-layerspy-off');
 			$('#o-legend-item-info-' + layername).addClass('o-layerspy-on');
-			var clip = new ol.interaction.Clip({ radius: 100, layers:viewer.getLayer(layername) });
+			var clip = new ol.interaction.Clip({ radius: 200, layers:spyLayer });
 			var map = viewer.getMap();
 			console.log(clip);
 			console.log(map);
 			map.addInteraction(clip);
-			//layer.setVisible(true);
+			spyLayer.setVisible(true);
 		}
 }
 
