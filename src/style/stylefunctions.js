@@ -1012,7 +1012,7 @@
 					dashedStroke.setWidth(1);
 					dashedStroke.setLineDash([8, 3]);
 					dashedStroke.setLineCap('square');
-					fill.setColor('rgba(180,180,180,0.6)');
+					fill.setColor('rgba(206,206,206,0.6)');
 					styles[length++] = dashedPolygon;
 				break;
 			
@@ -1035,7 +1035,7 @@
 					dashedStroke.setWidth(1);
 					dashedStroke.setLineDash([15, 5]);
 					dashedStroke.setLineCap('square');
-					fill.setColor('rgba(180,180,180,0.6)');
+					fill.setColor('rgba(206,206,206,0.6)');
 					styles[length++] = dashedLine;
 				break;
 				}
@@ -1043,9 +1043,9 @@
 		else if (layer=="by_vagk" || layer=="by_fast"){ //BYGGNADER
 		switch(kkod) {
 			default:
-				stroke.setColor('rgba(80,80,80,1.0)');
+				stroke.setColor('rgba(100,100,100,1)');
 				stroke.setWidth(0.4);
-				fill.setColor('rgba(200,200,200,1.0)');
+				fill.setColor('rgba(220,220,220,1)');
 				if(resolution < 5){styles[length++] = strokedPolygon;}
 			break;
 		}
