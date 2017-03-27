@@ -1289,8 +1289,8 @@
   .o-map .o-check-false .o-icon-fa-check,
   .o-map .o-icon-expand-false .o-icon-fa-chevron-down,
   .o-map .o-icon-expand-true .o-icon-fa-chevron-right,
-  .o-map .o-toggle-on .o-icon-fa-font-off,
   .o-map .o-toggle-off .o-icon-fa-font,
+  .o-map .o-toggle-on .o-icon-fa-font-off,
   .o-map .o-search-true #o-search-button,
   .o-map .o-search-false #o-search-button-close {
     display: none; }
@@ -1664,16 +1664,6 @@
     z-index: 1; }
     .o-map #o-map-legend .o-legend-item-info {
       display: none; }
-  .o-map .o-icon-fa-font {
-    fill: #111;
-    height: 1em;
-    padding: .3em;
-    width: 1em; }
-  .o-map .o-icon-fa-font-off {
-    fill: #ddd;
-    height: 1em;
-    padding: .3em;
-    width: 1em; }
   .o-map .o-icon-fa-chevron-down,
   .o-map .o-icon-fa-chevron-right {
     height: .9em;

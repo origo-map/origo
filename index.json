@@ -158,7 +158,7 @@
 		"type": "WFS",
 		"featuretype": 3,
 		"visible": false,
-		"hideLayers": ["ByggnadsarVT"],
+		"hideLayers": ["ByggnadsarVT","vy_webbkarta_byggnadsar_centroid"],
 		"attributes": [{
 			"html": "<p><b>{{beteckning}}</b></p><img style='width:100%;' src='{{sokvag}}' /><p><i>{{klassificering}}</i></p><p>{{vardemotivering}}</p>"
 		},{
@@ -177,7 +177,7 @@
 		"type": "WFS",
 		"featuretype": 3,
 		"visible": false,
-		"hideLayers": ["ByggnadsarVT"],
+		"hideLayers": ["ByggnadsarVT","vy_webbkarta_byggnadsar_centroid"],
 		"attributes": [{
 			"title": "Namn: ",
 			"name": "namn",

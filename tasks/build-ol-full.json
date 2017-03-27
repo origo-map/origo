@@ -3,7 +3,7 @@
   "umd": true,
   "compile": {
     "externs": [
-      "externs/bingmaps.js",
+      "externs/closure-compiler.js",
       "externs/geojson.js",
       "externs/esrijson.js",
       "externs/oli.js",
@@ -13,11 +13,16 @@
       "externs/topojson.js"
     ],
     "define": [
-      "ol.DEBUG=false"
+      "ol.ENABLE_DOM=false",
+      "ol.ENABLE_WEBGL=true",
+      "ol.ENABLE_PROJ4JS=true",
+      "ol.ENABLE_IMAGE=false",
+      "goog.DEBUG=false"
     ],
-    "compilation_level": "ADVANCED",
-    "output_wrapper": "(function(){%output%})();",
-    "use_types_for_optimization": true,
+    "extra_annotation_name": [
+      "api", "observable"
+    ],
+    "compilation_level": "SIMPLE_OPTIMIZATIONS",
     "manage_closure_dependencies": true
   }
 }
