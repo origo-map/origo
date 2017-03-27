@@ -157,7 +157,7 @@
 		"style": "kulprog_byggnader",
 		"type": "WFS",
 		"featuretype": 3,
-		"visible": false,
+		"visible": true,
 		"attributes": [{
 			"title": "Namn: ",
 			"name": "gammal_fastighet",
