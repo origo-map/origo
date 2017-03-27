@@ -149,7 +149,7 @@
 		"styleParams": "light"
 		}, 
     {
-		"name": "kulprog_byggnad",
+		"name": "kulprog_byggnad_m_bild",
 		"title": "Värdefulla byggnader",
 		"source": "geoserver_gi",
 		"group": "km",
@@ -159,10 +159,11 @@
 		"featuretype": 3,
 		"visible": true,
 		"attributes": [{
-			"title": "Namn: ",
-			"name": "gammal_fastighet",
-			"urlPrefix": "http://gi.karlstad.se/kulprog/visa.php?typ=byggnad&id=",
+			"html": "<p><b>{{beteckning}}</b></p><img style='width:100%;' src='{{sokvag}}' /><p><i>{{klassificering}}</i></p><p>{{vardemotivering}}</p>"
+		},{
+			"html": "<p>Läs mer...</p>",
 			"runFunction": "showInfo",
+			"urlPrefix": "http://gi.karlstad.se/kulprog/visa.php?typ=byggnad&id=",
 			"functionParam": "id"
 		}]
 		}, {
@@ -258,6 +259,258 @@
 		"gridset": "basemap256",
 		"format":"jpeg",
 		"title": "1713",
+		"group": "historiskakartor",
+		"source": "geoserver_tms",
+		"style": "hist",
+		"opacity":0.8,
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },{
+		"name": "1753",
+		"layerName": "webbkartan%3A1753",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "1753",
+		"group": "historiskakartor",
+		"source": "geoserver_tms",
+		"style": "hist",
+		"opacity":0.8,
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },{
+		"name": "1865innan",
+		"layerName": "webbkartan%3A1865innan",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "1865 (före branden)",
+		"group": "historiskakartor",
+		"source": "geoserver_tms",
+		"style": "hist",
+		"opacity":0.8,
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },{
+		"name": "1865efter",
+		"layerName": "webbkartan%3A1865efter",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "1865 (efter branden)",
+		"group": "historiskakartor",
+		"source": "geoserver_tms",
+		"style": "hist",
+		"opacity":0.8,
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },{
+		"name": "1866",
+		"layerName": "webbkartan%3A1866",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "1866",
+		"group": "historiskakartor",
+		"source": "geoserver_tms",
+		"style": "hist",
+		"opacity":0.8,
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },{
+		"name": "1882",
+		"layerName": "webbkartan%3A1882",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "1882",
+		"group": "historiskakartor",
+		"source": "geoserver_tms",
+		"style": "hist",
+		"opacity":0.8,
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },{
+		"name": "1893",
+		"layerName": "webbkartan%3A1893",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "1893",
+		"group": "historiskakartor",
+		"source": "geoserver_tms",
+		"style": "hist",
+		"opacity":0.8,
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },{
+		"name": "1908",
+		"layerName": "webbkartan%3A1908",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "1908",
+		"group": "historiskakartor",
+		"source": "geoserver_tms",
+		"style": "hist",
+		"opacity":0.8,
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },{
+		"name": "1923",
+		"layerName": "webbkartan%3A1923",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "1923",
+		"group": "historiskakartor",
+		"source": "geoserver_tms",
+		"style": "hist",
+		"opacity":0.8,
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },{
+		"name": "1937",
+		"layerName": "webbkartan%3A1937",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "1937",
+		"group": "historiskakartor",
+		"source": "geoserver_tms",
+		"style": "hist",
+		"opacity":0.8,
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },{
+		"name": "1946",
+		"layerName": "webbkartan%3A1946",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "1946",
+		"group": "historiskakartor",
+		"source": "geoserver_tms",
+		"style": "hist",
+		"opacity":0.8,
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },{
+		"name": "1948",
+		"layerName": "webbkartan%3A1948",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "1948",
+		"group": "historiskakartor",
+		"source": "geoserver_tms",
+		"style": "hist",
+		"opacity":0.8,
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },{
+		"name": "1954",
+		"layerName": "webbkartan%3A1954",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "1954",
+		"group": "historiskakartor",
+		"source": "geoserver_tms",
+		"style": "hist",
+		"opacity":0.8,
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },{
+		"name": "1960",
+		"layerName": "webbkartan%3A1960",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "1960",
+		"group": "historiskakartor",
+		"source": "geoserver_tms",
+		"style": "hist",
+		"opacity":0.8,
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },{
+		"name": "1966",
+		"layerName": "webbkartan%3A1966",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "1966",
+		"group": "historiskakartor",
+		"source": "geoserver_tms",
+		"style": "hist",
+		"opacity":0.8,
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },{
+		"name": "1972",
+		"layerName": "webbkartan%3A1972",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "1972",
+		"group": "historiskakartor",
+		"source": "geoserver_tms",
+		"style": "hist",
+		"opacity":0.8,
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },{
+		"name": "1976",
+		"layerName": "webbkartan%3A1976",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "1976",
+		"group": "historiskakartor",
+		"source": "geoserver_tms",
+		"style": "hist",
+		"opacity":0.8,
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },{
+		"name": "1988",
+		"layerName": "webbkartan%3A1988",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "1988",
+		"group": "historiskakartor",
+		"source": "geoserver_tms",
+		"style": "hist",
+		"opacity":0.8,
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },{
+		"name": "2003",
+		"layerName": "webbkartan%3A2003",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "2003",
 		"group": "historiskakartor",
 		"source": "geoserver_tms",
 		"style": "hist",
@@ -398,21 +651,6 @@
     "style": "karta_gra",
     "visible": false,
     "queryable": false
-    },
-    {
-    "attribution": "&copy Lantmäteriet Geodatasamverkan",
-		"name": "ortofoto025_lm",
-		"layerName": "EXTERN%3Alm_visning_orto025",
-		"gridset": "basemap256",
-		"format":"jpeg",
-		"title": "Ortofoto 0.25m",
-		"group": "background",
-		"source": "geoserver_tms",
-		"style": "orto",
-		"type": "TMS",
-		"tileSize": [256, 256],
-		"visible": false,
-		"queryable": false
     },
     {
     "attribution": "&copy Lantmäteriet Geodatasamverkan",
@@ -592,58 +830,11 @@
           }
         ]
       ],
-		"kulprog_byggnader_ram": [
-			[{
-				"stroke": {
-					"color": "rgba(255, 0, 0, 1.0)",
-					"width": 3
-				},
-				"fill": {
-					"color": "rgba(255, 0, 0, 0.8)"
-				},
-				"filter": "[klassificering] == 'Byggnad med särskilt värde'",
-				"legend": "Särsk. värdefull byggn."
-			}],
-			[{
-				"stroke": {
-					"color": "rgba(0,0,255,1.0)",
-					"width": 3
-				},
-				"fill": {
-					"color": "rgba(0, 0, 255, 0.8)"
-				},
-				"filter": "[klassificering] == 'Byggnad med visst värde'",
-				"legend": "Byggn. med visst värde"
-			}],
-			[{
-				"stroke": {
-					"color": "rgba(220, 220, 0, 1.0)",
-					"width": 3
-				},
-				"fill": {
-					"color": "rgba(255, 255, 0, 0.8)"
-				},
-				"filter": "[klassificering] == 'Ej utpekad'",
-				"legend": "Ej särskilt utpekad"
-			}],
-			[{
-				"stroke": {
-					"color": "rgba(180, 0, 255, 1.0)",
-					"width": 3
-				},
-				"fill": {
-					"color": "rgba(255, 0, 255, 0.8)"
-				},
-				"filter": "[klassificering] == 'Byggnadsminne'",
-				"legend": "Byggnadsminnen"
-			}]
-
-		],
 		"kulprog_byggnader": [
 			[{
 				"stroke": {
 					"color": "rgba(255, 71, 25, 1.0)",
-					"width": 1
+					"width": 2
 				},
 				"fill": {
 					"color": "rgba(255, 0, 0, 0.7)"
@@ -654,7 +845,7 @@
 			[{
 				"stroke": {
 					"color": "rgba(71,25,255,1.0)",
-					"width": 1
+					"width": 2
 				},
 				"fill": {
 					"color": "rgba(0, 0, 255, 0.7)"
@@ -665,7 +856,7 @@
 			[{
 				"stroke": {
 					"color": "rgba(255, 255, 0, 1.0)",
-					"width": 1
+					"width": 2
 				},
 				"fill": {
 					"color": "rgba(255, 255, 0, 0.7)"
@@ -676,7 +867,7 @@
 			[{
 				"stroke": {
 					"color": "rgba(255, 0, 255, 1.0)",
-					"width": 1
+					"width": 2
 				},
 				"fill": {
 					"color": "rgba(255, 0, 255, 0.7)"
