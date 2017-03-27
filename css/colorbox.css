@@ -50,8 +50,10 @@
         #cboxPrevious:hover{background-position:-75px -25px;}
         #cboxNext{position:absolute; bottom:0; left:27px; background:url(images/controls.png) no-repeat -50px 0; width:25px; height:25px; text-indent:-9999px;}
         #cboxNext:hover{background-position:-50px -25px;}
-        #cboxClose{position:absolute; bottom:0; right:0; background:url(images/controls.png) no-repeat -25px 0; width:25px; height:25px; text-indent:-9999px;}
-        #cboxClose:hover{background-position:-25px -25px;}
+        /*#cboxClose{position:absolute; bottom:0; right:0; background:url(images/controls.png) no-repeat -25px 0; width:25px; height:25px; text-indent:-9999px;}*/
+        #cboxClose{position:absolute; bottom:0; right:0; background:url(images/close.png) no-repeat; width:25px; height:25px; background-size: 25px; text-indent:-9999px;}
+        /*#cboxClose:hover{background-position:-25px -25px;}*/
+        #cboxClose:hover{background:url(images/close_hover.png) no-repeat; width:25px; height:25px; background-size: 25px;}
 
 /*
   The following fixes a problem where IE7 and IE8 replace a PNG's alpha transparency with a black fill

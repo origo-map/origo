@@ -12,10 +12,7 @@ function showInfo(url, $this, evt) {
 		var w = window.open(url, '_blank');
 	}
 	else {
-    if (!$this.hasClass("colorbox-initialized")) {
-      $this.addClass("colorbox-initialized").colorbox({open: true, width:"95%", height:"95%", top: "0px", escKey: true, iframe:true, href:url});
-      evt.preventDefault();
-    }
+    $.colorbox({width:"95%", height:"95%", top: "0px", escKey: true, iframe:true, href:url});
 	}
 }
 
