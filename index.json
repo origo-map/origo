@@ -274,7 +274,7 @@
 		"title": "Ortofoto 1929",
 		"group": "historiskaortofoton",
 		"source": "geoserver_tms",
-		"style": "historto",
+		"style": "historto_bw",
 		"type": "TMS",
 		"tileSize": [256, 256],
 		"visible": false,
@@ -288,7 +288,7 @@
 		"title": "Ortofoto 1960",
 		"group": "historiskaortofoton",
 		"source": "geoserver_tms",
-		"style": "historto",
+		"style": "historto_bw",
 		"type": "TMS",
 		"tileSize": [256, 256],
 		"visible": false,
@@ -302,7 +302,7 @@
 		"title": "Ortofoto 1994",
 		"group": "historiskaortofoton",
 		"source": "geoserver_tms",
-		"style": "historto",
+		"style": "historto_bw",
 		"type": "TMS",
 		"tileSize": [256, 256],
 		"visible": false,
@@ -316,7 +316,7 @@
 		"title": "Ortofoto 2000",
 		"group": "historiskaortofoton",
 		"source": "geoserver_tms",
-		"style": "historto",
+		"style": "historto_bw",
 		"type": "TMS",
 		"tileSize": [256, 256],
 		"visible": false,
@@ -502,11 +502,9 @@
       "hist": [
         [
           {
-            "stroke": {
-              "color": "rgba(0,0,0,1.0)"
-            },
-            "fill": {
-              "color": "rgba(0,0,0,1.0)"
+            "icon": {
+              "src": "img/png/histkart.png",
+              "size": [20,20]
             }
           }
         ]
@@ -576,9 +574,19 @@
       "historto": [
         [
           {
-            "image": {
+            "icon": {
               "src": "img/png/orto.png",
-			  "size": [20,20]
+              "size": [20,20]
+            }
+          }
+        ]
+      ],
+      "historto_bw": [
+        [
+          {
+            "icon": {
+              "src": "img/png/orto_gra.png",
+              "size": [20,20]
             }
           }
         ]
