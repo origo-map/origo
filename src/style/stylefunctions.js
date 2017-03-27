@@ -848,10 +848,10 @@
 								
 			case 601://Skogsmark   
 			case 3://Skog
-					stroke.setColor('rgba(20,30,20,0.0)');
-					stroke.setWidth(0);          
-					 fill.setColor('rgba(20,30,20,1)');
-					 // styles[length++] = strokedPolygon;
+					//stroke.setColor('rgba(20,30,20,0.0)');
+					//stroke.setWidth(0);          
+					 fill.setColor('rgba(227,227,227,0.6)');
+					  styles[length++] = polygon;
 								break;
 								
 			case 611://Öppen mark
@@ -865,9 +865,9 @@
 			case 901://Vattenyta
 			case 1://Vattenyta
 			case "VATTEN":
-					stroke.setColor('rgba(30,35,40,1)'); 
+					stroke.setColor('rgba(182,196,206,1)'); 
 					stroke.setWidth(1);          
-					fill.setColor('rgba(35,40,45,1)');
+					fill.setColor('rgba(187,201,211,1)');
 					  styles[length++] = strokedPolygon;
 								break;
 								
@@ -876,13 +876,13 @@
 			case 5://Sankmark, normal, öppen
 			case 6://Sankmark, normal, skogklädd
 			case 13://Sankmark, normal eller svårframkomlig
-					fill.setColor('rgba(9,9,9,0.6)');
-				//	  styles[length++] = polygon;
+					fill.setColor('rgba(220,222,220,0.6)');
+					  styles[length++] = polygon;
 								break;
 			case "VATTEN":// Vatten (sjöar och större vattendrag)
 				stroke.setColor('#18ADFB');  
 				stroke.setWidth(0.1);          
-				fill.setColor('rgba(150,199,212,0.6)');
+				fill.setColor('rgba(187,201,211,1)');
 				styles[length++] = strokedPolygon;
 				break;
 			case "BEBYGG":// Bebyggelse, ospecificerad
@@ -908,8 +908,8 @@
                 break;
 			case "SKOGBARR":// Barr- och blandskog   
 			case "SKOGLÖV":// Lövskog        
-				fill.setColor('rgba(205,215,175,0.6)');
-				//styles[length++] = polygon;
+				fill.setColor('rgba(227,227,227,0.6)');
+				styles[length++] = polygon;
                 break;
 			case "ÖPTORG":// Torg                    
 				fill.setColor('rgba(255,255,220,0.6)');
@@ -945,7 +945,7 @@
 			case "ÄLV.Y"://     
 				stroke.setColor('#18ADFB');  
 				stroke.setWidth(0.1);          
-				fill.setColor('rgba(150,199,212,0.6)');
+				fill.setColor('rgba(187,201,211,1)');
 				styles[length++] = strokedPolygon;
 				break;    
 			case "GÅGATA.Y"://      
@@ -959,7 +959,7 @@
 			case "PARK.Y"://      
 			case "PARKER.Y"://     
 			case "SKOG.Y"://     
-				fill.setColor('rgba(205,215,175,0.6)');
+				fill.setColor('rgba(227,227,227,0.6)');
 				styles[length++] = polygon;
                 break;    
 			case "BUSSGATA.Y":// 
@@ -1008,11 +1008,11 @@
 			case "Ishockeybana": // IDRPLAN
 			case "Tennisbana": // IDRPLAN
 			case "Travbana": // IDRPLAN
-					dashedStroke.setColor('rgba(75,80,65,0.7)');
-					dashedStroke.setWidth(1.5);
+					dashedStroke.setColor('rgba(80,80,80,0.6)');
+					dashedStroke.setWidth(1);
 					dashedStroke.setLineDash([8, 3]);
 					dashedStroke.setLineCap('square');
-					fill.setColor('rgba(75,80,65,0.6)');
+					fill.setColor('rgba(180,180,180,0.6)');
 					styles[length++] = dashedPolygon;
 				break;
 			
@@ -1031,11 +1031,11 @@
 			case "Skjutbana": // ANLOMR
 			case "Återvinningsanläggning": // ANLOMR
 			default:
-					dashedStroke.setColor('rgba(120,120,120,1)');
-					dashedStroke.setWidth(1.5);
+					dashedStroke.setColor('rgba(80,80,80,0.6)');
+					dashedStroke.setWidth(1);
 					dashedStroke.setLineDash([15, 5]);
 					dashedStroke.setLineCap('square');
-					fill.setColor('rgba(75,80,65,0.61)');
+					fill.setColor('rgba(180,180,180,0.6)');
 					styles[length++] = dashedLine;
 				break;
 				}
@@ -1043,9 +1043,9 @@
 		else if (layer=="by_vagk" || layer=="by_fast"){ //BYGGNADER
 		switch(kkod) {
 			default:
-				stroke.setColor('rgba(50,50,50,1.0)');
+				stroke.setColor('rgba(80,80,80,1.0)');
 				stroke.setWidth(0.4);
-				fill.setColor('rgba(180,180,180,1.0)');
+				fill.setColor('rgba(200,200,200,1.0)');
 				if(resolution < 5){styles[length++] = strokedPolygon;}
 			break;
 		}
@@ -1057,7 +1057,7 @@
 			//case 456:// Vattendrag, storleksklass 3
 			//case 458:// Vattendrag, under markyta
 			default:// Alla
-				stroke.setColor('rgba(35,40,45,0.71)');
+				stroke.setColor('rgba(187,201,211,1)');
 				stroke.setWidth(0.8);
 				line.setZIndex(8);
 				styles[length++] = line;
@@ -1082,17 +1082,17 @@
 						//stroke.setColor('rgba(120,120,120,1.0)');
 						//stroke.setWidth(3);
 						//styles[length++] = line;
-						stroke.setColor('rgba(80,80,80,1.0)');
-						stroke.setWidth(2);
+						stroke.setColor('rgba(130,130,130,1.0)');
+						stroke.setWidth(2.5);
 						if(resolution > 50){
-						stroke.setWidth(1.25);
+						stroke.setWidth(1.75);
 						}
 						styles[length++] = line;
-					dashedStroke.setColor('rgba(150,150,150,1.0)');
-					dashedStroke.setWidth(1.4);
+					dashedStroke.setColor('rgba(180,180,180,1.0)');
+					dashedStroke.setWidth(1.9);
 					dashedStroke.setLineDash([4, 10]);
 						if(resolution > 50){
-						dashedStroke.setWidth(0.9);
+						dashedStroke.setWidth(1.4);
 					dashedStroke.setLineDash([3, 6]);
 						}
 					dashedStroke.setLineCap('square');
@@ -1107,11 +1107,11 @@
 			case 296:// Smalspårig el. järnväg med dubbelspår, i underfart
 			case 299:// Industrispår eller museijärnväg, i underfart
 			default:// Alla
-						stroke.setColor('rgba(80,80,80,1.0)');
-						stroke.setWidth(1);
+						stroke.setColor('rgba(130,130,130,1.0)');
+						stroke.setWidth(1.4);
 						styles[length++] = line;
-					dashedStroke.setColor('rgba(130,130,130,1.0)');
-					dashedStroke.setWidth(0.7);
+					dashedStroke.setColor('rgba(180,180,180,1.0)');
+					dashedStroke.setWidth(0.9);
 					dashedStroke.setLineDash([2, 5]);
 					dashedStroke.setLineCap('square');
 					if(resolution < 10){
