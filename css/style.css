@@ -1371,6 +1371,11 @@
     width: 1.3em;
     float: right;
     fill: #424242; }
+  .o-map .o-menu-button [class^="o-icon-"],
+  .o-map .o-menu-button [class*=" o-icon-"] {
+    padding: 0.25em;
+    height: 1em;
+    width: 1em; }
   .o-map .ol-control > button:hover [class^="o-icon-"],
   .o-map .ol-control > button:hover [class*=" o-icon-"],
   .o-map .o-button:hover [class^="o-icon-"],
@@ -1729,14 +1734,6 @@
     margin: 0 -8px;
     padding: 5px;
     width: 100%; }
-  .o-map .o-icon-fa-info-circle {
-    padding: .25em;
-    height: 1em;
-    width: 1em; }
-  .o-map .o-icon-fa-external-link {
-    padding: .25em;
-    height: 1em;
-    width: 1em; }
   .o-map .o-icon-minicons-square-vector {
     padding: .3em;
     height: 1.4em;
@@ -1791,11 +1788,6 @@
     padding: .65em;
     height: .7em;
     width: .7em; }
-  .o-map .o-icon-fa-print,
-  .o-map .o-icon-fa-share-square-o {
-    padding: 0.25em;
-    height: 1em;
-    width: 1em; }
   .o-map .o-icon-fa-times {
     padding: .65em;
     height: 1.129em;
