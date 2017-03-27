@@ -48,9 +48,9 @@
       }
   ],
   "extent": [110000,6540000,200000,6650000],
-  "center": [150000,6584200],
+  "center": [151000,6587500],
   "home": [120000, 6556000, 191000, 6635000],
-  "zoom": 4,
+  "zoom": 3,
   "resolutions": [128,64,32,16,8,4,2,1,0.5,0.25,0.125],
   "tileSize":256,
   "featureinfoOptions":{
@@ -143,7 +143,7 @@
 		"style": "mask",
 		"type": "WFS",
 		"featuretype": 5,
-		"visible": false,
+		"visible": true,
 		"customStyle": "labels",
 		"styleParams": "dark"
 		}, 
@@ -157,7 +157,7 @@
 		"style": "mask",
 		"type": "WFS",
 		"featuretype": 5,
-		"visible": true,
+		"visible": false,
 		"customStyle": "labels",
 		"styleParams": "light"
 		}, 
@@ -207,7 +207,7 @@
 		"style": "mask",
 		"type": "WFS",
 		"featuretype": 5,
-		"visible": false,
+		"visible": true,
 		"customStyle": "labels_byggnadsar"
 		}, 
     {
@@ -221,7 +221,7 @@
 		"style": "timeline",
 		"type": "VECTORTILE",
 		"tileSize": [256, 256],
-		"visible": false,
+		"visible": true,
 		"queryable": false,
 		"linkedLayers": ["vy_webbkarta_byggnadsar_centroid","GL_BASEMAP2"],
 		"hideLayers": ["kulprog_byggnad_m_bild","kulprog_miljo"],
@@ -693,7 +693,7 @@
 		"labelLayer": "TX_dark",
 		"type": "VECTORTILE",
 		"tileSize": [256, 256],
-		"visible": false,
+		"visible": true,
 		"queryable": false,
 		"bgColor": "#000"
     },
@@ -726,7 +726,7 @@
 		"labelLayer": "TX_light",
 		"type": "VECTORTILE",
 		"tileSize": [256, 256],
-		"visible": true,
+		"visible": false,
 		"queryable": false,
 		"bgColor": "#f1f1f1"
     },
@@ -772,7 +772,7 @@
     "type": "TMS",
     "style": "hillshade",
 	"opacity":0.25,
-    "visible": false,
+    "visible": true,
     "queryable": false
     }
   ],
