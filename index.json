@@ -157,7 +157,8 @@
 		"style": "kulprog_byggnader",
 		"type": "WFS",
 		"featuretype": 3,
-		"visible": true,
+		"visible": false,
+		"hideLayers": ["ByggnadsarVT"],
 		"attributes": [{
 			"html": "<p><b>{{beteckning}}</b></p><img style='width:100%;' src='{{sokvag}}' /><p><i>{{klassificering}}</i></p><p>{{vardemotivering}}</p>"
 		},{
@@ -176,6 +177,7 @@
 		"type": "WFS",
 		"featuretype": 3,
 		"visible": false,
+		"hideLayers": ["ByggnadsarVT"],
 		"attributes": [{
 			"title": "Namn: ",
 			"name": "namn",
@@ -209,6 +211,7 @@
 		"visible": false,
 		"queryable": false,
 		"linkedLayers": ["vy_webbkarta_byggnadsar_centroid","GL_BASEMAP2"],
+		"hideLayers": ["kulprog_byggnad_m_bild","kulprog_miljo"],
         "attributes": [
           {
             "name": "ar_nybygg"
