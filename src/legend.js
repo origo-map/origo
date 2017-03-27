@@ -5,6 +5,7 @@
 "use strict";
 
 var $ = require('jquery');
+var ol = require('openlayers');
 var viewer = require('./viewer');
 var utils = require('./utils');
 var modal = require('./modal');
@@ -150,6 +151,14 @@ function addLabelButton(item) {
   return labelButton;
 }
 
+function addSpyButton(item) {
+  var spyButton =  '<div class="o-legend-item-info o-layerspy o-layerspy-on" id="o-legend-item-info-' + item + '">' +
+                          '<svg class="o-icon-fa-search-on"><use xlink:href="#fa-search"></use></svg>' +
+                          '<svg class="o-icon-fa-search-off"><use xlink:href="#fa-search"></use></svg>' +
+                        '</div>';
+  return spyButton;
+}
+
 function createLegendItem(layerid, layerStyle, inSubgroup) {
   var layername = layerid.split('o-legend-').pop();
   var layer = viewer.getLayer(layername);
@@ -211,6 +220,9 @@ function createLegendItem(layerid, layerStyle, inSubgroup) {
     }
     if(layer.get('labelLayer')){
       legendItem += addLabelButton(layername);
+    }
+    if(layer.get('layerSpy')){
+      legendItem += addSpyButton(layername);
     }
 
     legendItem += '</div></li>';
@@ -426,7 +438,11 @@ function addLegend(groups) {
       } 
 	  else if ($(evt.target).closest('div').hasClass('o-toggle-labels')) {
         toggleLabels($(this));
-      } else {
+	  }
+	  else if ($(evt.target).closest('div').hasClass('o-layerspy')) {
+        toggleLayerSpy($(this));
+      } 
+	  else {
         $(this).each(function() {
           var that = this;
           toggleCheck($(that).attr("id"));
@@ -875,6 +891,31 @@ function toggleLabels($labelButton) {
 			$('#o-legend-item-info-' + layername).removeClass('o-toggle-off');
 			$('#o-legend-item-info-' + layername).addClass('o-toggle-on');
 			layer.setVisible(true);
+		}
+}
+
+function toggleLayerSpy($spyButton) {
+  var layer;
+  var $item = $spyButton.closest('li');
+  var layername = $spyButton.attr('id').split('o-legend-item-info-').pop();
+			var map = viewer.getMap();
+	//var labelLayer = viewer.getLayer(layername).get('labelLayer');
+    //layer = viewer.getLayer(labelLayer);
+        if($('#o-legend-item-info-' + layername).hasClass('o-layerspy-on')) {
+			console.log(map.getInteractions);
+			$('#o-legend-item-info-' + layername).removeClass('o-layerspy-on');
+			$('#o-legend-item-info-' + layername).addClass('o-layerspy-off');
+			//layer.setVisible(false);
+		}
+        else {
+			$('#o-legend-item-info-' + layername).removeClass('o-layerspy-off');
+			$('#o-legend-item-info-' + layername).addClass('o-layerspy-on');
+			var clip = new ol.interaction.Clip({ radius: 100, layers:viewer.getLayer(layername) });
+			var map = viewer.getMap();
+			console.log(clip);
+			console.log(map);
+			map.addInteraction(clip);
+			//layer.setVisible(true);
 		}
 }
 

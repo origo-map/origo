@@ -535,7 +535,8 @@
 		"type": "TMS",
 		"tileSize": [256, 256],
 		"visible": false,
-		"queryable": false
+		"queryable": false,
+		"layerSpy": true
     },{
 		"attribution": "&copy Lantmäteriet Geodatasamverkan",
 		"name": "ortofoto1960",
@@ -549,7 +550,8 @@
 		"type": "TMS",
 		"tileSize": [256, 256],
 		"visible": false,
-		"queryable": false
+		"queryable": false,
+		"layerSpy": true
     },{
 		"attribution": "&copy Lantmäteriet Geodatasamverkan",
 		"name": "ortofoto1994",
@@ -563,7 +565,8 @@
 		"type": "TMS",
 		"tileSize": [256, 256],
 		"visible": false,
-		"queryable": false
+		"queryable": false,
+		"layerSpy": true
     },{
 		"attribution": "&copy Lantmäteriet Geodatasamverkan",
 		"name": "ortofoto2000",
@@ -577,7 +580,8 @@
 		"type": "TMS",
 		"tileSize": [256, 256],
 		"visible": false,
-		"queryable": false
+		"queryable": false,
+		"layerSpy": true
     },{
 		"attribution": "&copy Lantmäteriet Geodatasamverkan",
 		"name": "ortofoton2008",
@@ -591,7 +595,8 @@
 		"type": "TMS",
 		"tileSize": [256, 256],
 		"visible": false,
-		"queryable": false
+		"queryable": false,
+		"layerSpy": true
     },{
 		"name": "GL_BASEMAP2",
 		"layerName": "GL_BASEMAP2",

@@ -1291,6 +1291,8 @@
   .o-map .o-icon-expand-true .o-icon-fa-chevron-right,
   .o-map .o-toggle-off .o-icon-fa-font,
   .o-map .o-toggle-on .o-icon-fa-font-off,
+  .o-map .o-layerspy-off .o-icon-fa-search-on,
+  .o-map .o-layerspy-on .o-icon-fa-search-off,
   .o-map .o-search-true #o-search-button,
   .o-map .o-search-false #o-search-button-close {
     display: none; }
@@ -1706,6 +1708,26 @@
   .o-map .o-legend-header .o-icon-fa-info-circle {
     padding: 0;
     height: 1em;
+    width: 1em; }
+  .o-map .o-icon-fa-font {
+    fill: #111;
+    height: 1em;
+    padding: .3em;
+    width: 1em; }
+  .o-map .o-icon-fa-font-off {
+    fill: #ddd;
+    height: 1em;
+    padding: .3em;
+    width: 1em; }
+  .o-map .o-icon-fa-search-on {
+    fill: #111;
+    height: 1em;
+    padding: .3em;
+    width: 1em; }
+  .o-map .o-icon-fa-search-off {
+    fill: #bbb;
+    height: 1em;
+    padding: .3em;
     width: 1em; }
   .o-map li .o-legend-header {
     border-bottom: 1px solid #C5C5C5; }
