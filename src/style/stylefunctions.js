@@ -788,6 +788,637 @@
 		return styles;
 	}
 	}
+			else if(styleName=='basemap_grey'){
+	  var fill = new ol.style.Fill({color: ''});
+	  var stroke = new ol.style.Stroke({color: '', width: 0.1, lineCap:'square', lineJoin:'round'});
+	   var noStroke = new ol.style.Stroke({color: '', width: 0.0});
+	  var overlayedStroke = new ol.style.Stroke({color: '', width: 0.1, lineCap:'square', lineJoin:'round'});
+	  var dashedStroke = new ol.style.Stroke({color: '', width: 1, lineDash: [1, 2]});
+	  var polygon = new ol.style.Style({fill: fill, zIndex: 1});
+	  var strokedPolygon = new ol.style.Style({fill: fill, stroke: stroke, zIndex: 2});
+	  var dashedPolygon = new ol.style.Style({fill: fill, stroke: dashedStroke, zIndex: 2});
+	  var line = new ol.style.Style({stroke: stroke, zIndex: 10});
+	  var overlayedLine = new ol.style.Style({stroke: overlayedStroke, zIndex: 11});
+	  var dashedLine = new ol.style.Style({stroke: dashedStroke, zIndex: 12});
+	  var text = new ol.style.Style({text: new ol.style.Text({
+		text: '', fill: fill, stroke: stroke
+	  }), zIndex: 50});
+	  var iconCache = {};
+	  var styles = [];
+	  return function(feature, resolution) {
+		polygon.setZIndex(1);
+		line.setZIndex(10);
+		var length = 0;
+		var layer = feature.get('layer');
+		var cls = feature.get('class');
+		var type = feature.get('type');
+		var kkod = feature.get('KKOD');
+		if (kkod==undefined){kkod = feature.get('DETALJTYP');}
+		if (layer=="by_fast"){kkod = feature.get('ANDAMAL_1');}
+		var detaljtyp = feature.get('detaljtyp');
+		var dt = feature.get('DETALJTYP');
+		var funk = feature.get('FUNKTION');
+		var andamal = feature.get('ANDAMAL_1');
+		var klass = feature.get('klass');
+		var scalerank = feature.get('scalerank');
+		var labelrank = feature.get('labelrank');
+		var adminLevel = feature.get('admin_level');
+		var maritime = feature.get('maritime');
+		var disputed = feature.get('disputed');
+		var maki = feature.get('maki');
+		var geom = feature.getGeometry().getType();
+		
+		if (layer=="my_vagk" || layer=="my_over" || layer=="my_fast"){ //MARKYTOR
+		
+		switch(kkod) {
+			case 302://Annan koncentrerad bebyggelse
+			case 2://Bebyggelseområde
+					stroke.setColor('rgba(0,0,0,1)'); 
+					stroke.setWidth(1);          
+					 fill.setColor('rgba(0,0,0,1)');
+					 // styles[length++] = strokedPolygon;
+								break;
+								
+			case 303://Tätort
+					stroke.setColor('rgba(0,0,0,1)'); 
+					stroke.setWidth(1);          
+					 fill.setColor('rgba(0,0,0,1)');
+					//  styles[length++] = strokedPolygon;
+								break;
+								
+			case 601://Skogsmark   
+			case 3://Skog
+					stroke.setColor('rgba(20,30,20,0.0)');
+					stroke.setWidth(0);          
+					 fill.setColor('rgba(20,30,20,1)');
+					 // styles[length++] = strokedPolygon;
+								break;
+								
+			case 611://Öppen mark
+			case 7://Öppen mark
+					stroke.setColor('rgba(9,9,0,0.0)');
+					stroke.setWidth(0);          
+					fill.setColor('rgba(18,18,0,1)');
+					//  styles[length++] = strokedPolygon;
+								break;
+								
+			case 901://Vattenyta
+			case 1://Vattenyta
+			case "VATTEN":
+					stroke.setColor('rgba(30,35,40,1)'); 
+					stroke.setWidth(1);          
+					fill.setColor('rgba(35,40,45,1)');
+					  styles[length++] = strokedPolygon;
+								break;
+								
+			case 911://Sankmark
+			case 4://Sankmark, svårframkomlig
+			case 5://Sankmark, normal, öppen
+			case 6://Sankmark, normal, skogklädd
+			case 13://Sankmark, normal eller svårframkomlig
+					fill.setColor('rgba(9,9,9,0.6)');
+				//	  styles[length++] = polygon;
+								break;
+			case "VATTEN":// Vatten (sjöar och större vattendrag)
+				stroke.setColor('#18ADFB');  
+				stroke.setWidth(0.1);          
+				fill.setColor('rgba(150,199,212,0.6)');
+				styles[length++] = strokedPolygon;
+				break;
+			case "BEBYGG":// Bebyggelse, ospecificerad
+			case "BEBLÅG":// Låg bebyggelse
+			case "BEBHÖG":// Hög bebyggelse
+			case "BEBSLUT":// Sluten bebyggelse
+				fill.setColor('rgba(245,215,165,0.6)');
+				//styles[length++] = polygon;
+				break;
+			case "BEBIND":// Industriområde
+				fill.setColor('rgba(234,234,234,0.6)');
+				//styles[length++] = polygon;
+                break;
+			case "ODLÅKER":// Åker    
+			case "ODLFRUKT":// Fruktodling/fröplantage
+			case "ODLEJÅK":// Ej brukad åker   
+				fill.setColor('rgba(255,255,214,0.6)');
+				//styles[length++] = polygon;
+                break;
+			case "ÖPMARK":// Annan öppen mark                    
+				fill.setColor('rgba(255,255,220,0.6)');
+				//styles[length++] = polygon;
+                break;
+			case "SKOGBARR":// Barr- och blandskog   
+			case "SKOGLÖV":// Lövskog        
+				fill.setColor('rgba(205,215,175,0.6)');
+				//styles[length++] = polygon;
+                break;
+			case "ÖPTORG":// Torg                    
+				fill.setColor('rgba(255,255,220,0.6)');
+				//styles[length++] = polygon;
+                break;
+			case "SKOGFBJ":// Fjällbjörkskog
+			case "MRKO":// Ej karterat område
+			case "MRKÖVR":// Övrig mark, oklassificerad
+			case "ÖPKFJÄLL":// Kalfjäll
+			case "ÖPGLAC":// Glaciär
+			default:                  
+				fill.setColor('rgba(255,255,255,1)');
+			//	styles[length++] = polygon;
+                break;					
+			}
+		}
+		else if (layer=="_my_kd"){ //SANKMARK
+		
+		switch(dt) {
+			case "BANA.Y"://       
+			case "IDROTT.Y"://  
+				fill.setColor('rgba(255,255,214,0.6)');
+				styles[length++] = polygon;
+                break;   
+			case "BOSOMR.Y"://   
+				fill.setColor('rgba(245,215,165,0.6)');
+				styles[length++] = polygon;
+				break;        
+			case "BÄCK.Y"://  
+			case "DIKE.Y"://       
+			case "SJÖ.Y"://      
+			case "VATTEN.Y"://      
+			case "ÄLV.Y"://     
+				stroke.setColor('#18ADFB');  
+				stroke.setWidth(0.1);          
+				fill.setColor('rgba(150,199,212,0.6)');
+				styles[length++] = strokedPolygon;
+				break;    
+			case "GÅGATA.Y"://      
+			case "INDOMR.Y"://      
+			case "JÄRNVOMR.Y":// 
+				fill.setColor('rgba(234,234,234,0.6)');
+				styles[length++] = polygon;
+                break;     
+			case "MARK.Y"://      
+			case "NPARK.Y"://      
+			case "PARK.Y"://      
+			case "PARKER.Y"://     
+			case "SKOG.Y"://     
+				fill.setColor('rgba(205,215,175,0.6)');
+				styles[length++] = polygon;
+                break;    
+			case "BUSSGATA.Y":// 
+			case "ÖMARK.Y"://                   
+				fill.setColor('rgba(255,255,220,0.6)');
+				styles[length++] = polygon;
+                break;     
+			default:                  
+				fill.setColor('rgba(255,255,220,0.6)');
+				styles[length++] = polygon;
+                break;	
+		}
+		}
+		else if (layer=="_ms_fast"){ //SANKMARK
+		
+		switch(dt) {
+			case "SANK":// Sankmark (Yta)
+				stroke.setColor('#18ADFB');  
+				stroke.setWidth(0.2);          
+				fill.setColor('rgba(230,205,175,0.5)');
+				styles[length++] = strokedPolygon;
+								break;
+			case "SANKSVÅ":// Sankmark, svårframkomlig
+				stroke.setColor('#18ADFB');  
+				stroke.setWidth(0.2);          
+				fill.setColor('rgba(150,200,210,0.5)');
+				styles[length++] = strokedPolygon;
+								break;
+			case "SANKBLE":// Sankmark blekvät
+			default:
+				stroke.setColor('#18ADFB');  
+				stroke.setWidth(0.2);          
+				fill.setColor('rgba(120,120,190,0.5)');
+				styles[length++] = strokedPolygon;
+								break;
+		}
+		}
+		else if (layer=="ba_fast"){
+		switch(funk) {
+		
+			case "Bandyplan": // IDRPLAN
+			case "Fotbollsplan": // IDRPLAN
+			case "Galoppbana": // IDRPLAN
+			case "Idrottsplats": // IDRPLAN
+			case "Idrottsplan, ospecificerat": // IDRPLAN
+			case "Ishockeybana": // IDRPLAN
+			case "Tennisbana": // IDRPLAN
+			case "Travbana": // IDRPLAN
+					dashedStroke.setColor('rgba(75,80,65,0.7)');
+					dashedStroke.setWidth(1.5);
+					dashedStroke.setLineDash([8, 3]);
+					dashedStroke.setLineCap('square');
+					fill.setColor('rgba(75,80,65,0.6)');
+					styles[length++] = dashedPolygon;
+				break;
+			
+			case "Golfbana": // ANLOMR
+			case "Motionsanläggning": // ANLOMR
+			case "Motorbana": // IDRPLAN, ANLOMR
+			case "Övrigt": // IDRPLAN, ANLOMR
+			case "Avfallsanläggning": // ANLOMR
+			case "Begravningsplats": // ANLOMR
+			case "Bilskrotningsanläggning": // ANLOMR
+			case "Campingplats": // ANLOMR
+			case "Djurpark": // ANLOMR
+			case "Flygfält": // ANLOMR
+			case "Flygplats": // ANLOMR
+			case "Koloniområde": // ANLOMR
+			case "Skjutbana": // ANLOMR
+			case "Återvinningsanläggning": // ANLOMR
+			default:
+					dashedStroke.setColor('rgba(120,120,120,1)');
+					dashedStroke.setWidth(1.5);
+					dashedStroke.setLineDash([15, 5]);
+					dashedStroke.setLineCap('square');
+					fill.setColor('rgba(75,80,65,0.61)');
+					styles[length++] = dashedLine;
+				break;
+				}
+				}
+		else if (layer=="by_vagk" || layer=="by_fast"){ //BYGGNADER
+		switch(kkod) {
+			default:
+				stroke.setColor('rgba(50,50,50,1.0)');
+				stroke.setWidth(0.4);
+				fill.setColor('rgba(180,180,180,1.0)');
+				if(resolution < 5){styles[length++] = strokedPolygon;}
+			break;
+		}
+		}
+		else if (layer=="hl_vagk" || layer=="hl_over" || layer=="hl_fast"){ //HYDROGRAFI
+		switch(kkod) {
+			//case 441:// Vattendrag, storleksklass 1
+			//case 455:// Vattendrag, storleksklass 2
+			//case 456:// Vattendrag, storleksklass 3
+			//case 458:// Vattendrag, under markyta
+			default:// Alla
+				stroke.setColor('rgba(35,40,45,0.71)');
+				stroke.setWidth(0.8);
+				line.setZIndex(8);
+				styles[length++] = line;
+				break;
+		}
+		}
+		else if (layer=="jl_vagk" || layer=="jl_fast"){ //JÄRNVÄG
+		switch(kkod) {
+			case "JVGR1.M":// Järnväg med enkelspår 
+			case "JVGR2.M":// Järnväg med dubbelspår
+			case "JVGU.M":// Underfart/tunnel för järnväg
+			case "JVGÖ.M":// Övrig järnväg
+			case "JVGBY.M":// Järnväg under byggnation
+			case "JVGÖU.M":// Övrig järnväg i tunnel
+			case 270:// Järnväg under byggnad (byggnation)
+			case 271:// Järnväg med enkelspår, ej elektrifierad
+			case 272:// Järnväg med enkelspår, elektrifierad
+			case 273:// Järnväg med dubbelspår, elektrifierad
+			case 291:// Järnväg, enkelspår, ej elektrifierad, i underfart
+			case 292:// Järnväg, enkelspår, elektrifierad, i underfart
+			case 293:// Järnväg, dubbelspår, elektrifierad, i underfart
+						//stroke.setColor('rgba(120,120,120,1.0)');
+						//stroke.setWidth(3);
+						//styles[length++] = line;
+						stroke.setColor('rgba(80,80,80,1.0)');
+						stroke.setWidth(2);
+						if(resolution > 50){
+						stroke.setWidth(1.25);
+						}
+						styles[length++] = line;
+					dashedStroke.setColor('rgba(150,150,150,1.0)');
+					dashedStroke.setWidth(1.4);
+					dashedStroke.setLineDash([4, 10]);
+						if(resolution > 50){
+						dashedStroke.setWidth(0.9);
+					dashedStroke.setLineDash([3, 6]);
+						}
+					dashedStroke.setLineCap('square');
+					styles[length++] = dashedLine;
+					break;
+			case 274:// Smalspårig ej elektrifierad järnväg
+			case 275:// Smalspårig elektrifierad järnväg med enkelspår
+			case 276:// Smalspårig elektrifierad järnväg med dubbelspår
+			case 279:// Industrispår
+			case 294:// Smalspårig ej elektrifierad järnväg, i underfart
+			case 295:// Smalspårig el. järnväg med enkelspår, i underfart
+			case 296:// Smalspårig el. järnväg med dubbelspår, i underfart
+			case 299:// Industrispår eller museijärnväg, i underfart
+			default:// Alla
+						stroke.setColor('rgba(80,80,80,1.0)');
+						stroke.setWidth(1);
+						styles[length++] = line;
+					dashedStroke.setColor('rgba(130,130,130,1.0)');
+					dashedStroke.setWidth(0.7);
+					dashedStroke.setLineDash([2, 5]);
+					dashedStroke.setLineCap('square');
+					if(resolution < 10){
+					styles[length++] = dashedLine;}
+					break;
+					}
+					}
+		else if (layer=="vl_fast"){
+			stroke.setColor('rgba(150,150,150,1.0)');
+		switch(dt) {
+			
+			//case "VÄGMO.D":// Motorväg, körbanemitt
+			//case "VÄGMOU.D":// Motorväg, körbanemitt, underfart/tunnel
+			case "VAGMO.D":// Motorväg, körbanemitt
+			case "VAGMOU.D":// Motorväg, körbanemitt, underfart/tunnel
+				stroke.setWidth(3+5/(resolution));
+				styles[length++] = line;
+				break;
+            break;
+			//case "VÄGKV.M":// Kvartersväg
+			//case "VÄGBN.M":// Bilväg/gata
+			//case "VÄGBNU.M":// Bilväg/gata i underfart/tunnel
+			case "VAGKV.M":// Kvartersväg
+			case "VAGBN.M":// Bilväg/gata
+			case "VAGBNU.M":// Bilväg/gata i underfart/tunnel
+				stroke.setWidth(0.8);
+				if(resolution < 5){stroke.setWidth(3);}
+				if(resolution < 2){stroke.setWidth(5);}
+				if(resolution < 1){stroke.setWidth(10);}
+				stroke.setWidth(0.5+3.5/(resolution));
+				styles[length++] = line;
+				/*
+				if(resolution < 1){
+				overlayedStroke.setColor('rgba(170,170,170,1.0)');
+				overlayedStroke.setWidth(2);
+				if(resolution < 2){overlayedStroke.setWidth(4);}
+				if(resolution < 1){overlayedStroke.setWidth(9);}
+				overlayedStroke.setWidth(0.5+3/(resolution));
+				styles[length++] = overlayedLine;
+				}
+				*/
+				break;
+				
+			//case "VÄGBS.M":// Sämre bilväg 
+			//case "VÄGBSU.M":// Sämre bilväg i underfart/tunnel
+			case "VAGBS.M":// Sämre bilväg 
+			case "VAGBSU.M":// Sämre bilväg i underfart/tunnel
+				dashedStroke.setColor('rgba(150,150,150,1.0)');
+				dashedStroke.setWidth(1.2);
+				dashedStroke.setLineDash([12, 5]);
+				if(resolution < 15){
+					styles[length++] = dashedLine;
+					}
+				break;
+				
+			case "FÄRJELED":// Färjeled
+			case "VÄGA1.M":// Allmän väg klass I, vägmitt
+			case "VÄGA1U.M":// Allmän väg klass I, vägmitt, underfart
+			case "VÄGA2.M":// Allmän väg klass II, vägmitt.
+			case "VÄGA2U.M":// Allmän väg klass II, vägmitt, underfart
+			case "VÄGA3.M":// Allmän väg klass III, vägmitt
+			case "VÄGA3U.M":// Allmän väg klass III, vägmitt, underfart
+			case "VÄGAS.D":// Allmän väg, skilda körbanor, körbanemitt
+			case "VÄGASU.D":// Allmän väg, skilda körbanor, körbanemitt, underfart
+			case "VÄGGG.D":// Genomfartsgata/-led, körbanemitt
+			case "VÄGGG.M":// Genomfartsgata/-led, gatumitt
+			case "VÄGGGU.D":// Genomfartsgata/- led, körbanemitt, underfart
+			case "VÄGGGU.M":// Genomfartsgata/-led, gatumitt, underfart/tunnel
+			case "VÄGA0BY.M":// Väg under byggnation
+			default:
+				stroke.setWidth(3);
+				if(resolution < 2){stroke.setWidth(4.5);}
+				if(resolution < 1){stroke.setWidth(7.5);}
+				stroke.setWidth(1.5+3.5/(resolution));
+				
+				styles[length++] = line;
+				break;
+}
+}
+		else if (layer=="vl_vagk" || layer=="_vl_fast"){ //VÄGAR
+						stroke.setColor('rgba(150,150,150,1.0)');
+		switch(kkod) {
+			case 5011:// Motorväg, riksväg
+			case 5016:// Motorväg, ej riksväg
+			case 5811:// Motorväg, riksväg, i underfart/tunnel
+			case 5816:// Motorväg, ej riksväg, i underfart/tunnel
+						stroke.setWidth(2);
+						styles[length++] = line;
+								break;
+			case 5012:// Motortrafikled, riksväg
+			case 5017:// Motortrafikled, ej riksväg
+			case 5812:// Motortrafikled, riksväg, i underfart/tunnel
+			case 5817:// Motortrafikled, ej riksväg, i underfart/tunnel
+						stroke.setWidth(2);
+						styles[length++] = line;
+								break;
+			case 5014:// Allmän väg under byggnad, ej riksväg
+			case 5018:// Allmän väg under byggnad, riksväg
+			case 5021:// Allmän väg > 7 m, riksväg
+			case 5022:// Allmän väg > 7 m, ej riksväg
+			case 5821:// Allmän väg > 7 m, riksväg, i underfart/tunnel
+			case 5822:// Allmän väg > 7 m, ej riksväg, i underfart/tunnel
+						stroke.setWidth(1.3);
+						styles[length++] = line;
+								break;
+			case 5024:// Allmän väg 5-7 m, riksväg
+			case 5025:// Allmän väg 5-7 m, ej riksväg
+			case 5824:// Allmän väg 5-7 m, riksväg, i underfart/tunnel
+			case 5825:// Allmän väg 5-7 m, ej riksväg, i underfart/tunnel
+			case 5028:// Allmän väg < 5 m, riksväg
+			case 5029:// Allmän väg < 5 m, ej riksväg
+			case 5828:// Allmän väg < 5 m, riksväg, i underfart/tunnel
+			case 5829:// Allmän väg < 5 m, ej riksväg, i underfart/tunnel
+			case 5033:// På- och avfartsväg
+			case 5036:// På- och avfartsväg, riksväg
+			case 5833:// På- och avfartsväg, i underfart/tunnel
+			case 5836:// På- och avfartsväg, riksväg, i underfart/tunnel
+						stroke.setWidth(1);
+						styles[length++] = line;
+								break;
+			case 5040:// Gata
+			case 5045:// Gata, större, gatumitt
+			case 5840:// Gata, i underfart/tunnel
+			case 5845:// Gata, större, gatumitt, i underfart/tunnel
+						stroke.setWidth(0.7);
+						if(resolution < 10){
+							styles[length++] = line;
+							}
+								break;
+			case 5061:// Bättre bilväg
+			case 5861:// Bättre bilväg, i underfart/tunnel
+			case 5071:// Bilväg
+			case 5871:// Bilväg, i underfart/tunnel
+			case 5091:// Uppfartsväg
+			case 5891:// Uppfartsväg, i underfart/tunnel
+						stroke.setWidth(1);
+						styles[length++] = line;
+								break;
+			case 5082:// Sämre bilväg
+			case 5882:// Sämre bilväg, i underfart/tunnel
+						dashedStroke.setColor('rgba(150,150,150,1.0)');
+						dashedStroke.setWidth(0.7);
+						dashedStroke.setLineDash([12, 5]);
+						if(resolution < 15){styles[length++] = dashedLine;}
+								break;
+			default:
+				stroke.setWidth(3);
+				if(resolution < 2){stroke.setWidth(4.5);}
+				if(resolution < 1){stroke.setWidth(7.5);}
+				//styles[length++] = line;
+				break;
+		}
+		}		
+		else if (layer=="vl_over"){ //VÄGAR
+		switch(kkod) {
+			case 5011:// Motorväg, vägnummer E4-99
+			case 5012:// Motorväg, vägnummer E4-99, underfart
+			case 5013:// Motorväg, vägnummer E4-99, tunnel
+			case 5021:// Motorväg, vägnummer 100-499
+			case 5022:// Motorväg, vägnummer 100-499, underfart
+			case 5023:// Motorväg, vägnummer 100-499,tunnel
+			case 5031:// Motorväg, vägnummer >500
+			case 5032:// Motorväg, vägnummer >500, underfart
+			case 5033:// Motorväg, vägnummer >500, tunnel
+						stroke.setColor('rgba(150,150,150,1.0)');
+						stroke.setWidth(1.5);
+						if(resolution > 75){
+						stroke.setWidth(1.25);
+						}
+						styles[length++] = line;
+								break;
+			case 5111:// Motortrafikled, vägnummer E4-99
+			case 5112:// Motortrafikled, vägnummer E4-99,underfart
+			case 5113:// Motortrafikled, vägnummer E4-99,tunnel
+			case 5121:// Motortrafikled, vägnummer 100-499
+			case 5122:// Motortrafikled, vägnummer 100-499, underfart
+			case 5123:// Motortrafikled, vägnummer 100-499, tunnel
+			case 5131:// Motortrafikled, vägnummer >500
+			case 5132:// Motortrafikled, vägnummer >500,underfart
+			case 5133:// Motortrafikled, vägnummer >500,tunnel
+						stroke.setColor('rgba(150,150,150,1.0)');
+						stroke.setWidth(1.5);
+						if(resolution > 75){
+						stroke.setWidth(1.25);
+						}
+						styles[length++] = line;
+								break;
+			case 5211:// Allmän väg >7m, vägnummer E4-99
+			case 5212:// Allmän väg >7m, vägnummer E4-99, underfart
+			case 5213:// Allmän väg >7m, vägnummer E4-99, tunnel
+			case 5221:// Allmän väg >7m, vägnummer 100-499
+			case 5222:// Allmän väg >7m, vägnummer 100-499, underfart
+			case 5223:// Allmän väg >7m, vägnummer 100-499, tunnel
+			case 5225:// Allmän väg >7m, vägnummer 100-499, färja
+			case 5231:// Allmän väg >7m, vägnummer >500
+			case 5232:// Allmän väg >7m, vägnummer>500, underfart
+			case 5233:// Allmän väg >7m, vägnummer>500, tunnel
+			case 5235:// Allmän väg >7m, vägnummer>500, färja
+						stroke.setColor('rgba(150,150,150,1.0)');
+						stroke.setWidth(1.3);
+						if(resolution > 75){
+						stroke.setWidth(1);
+						}
+						styles[length++] = line;
+								break;
+			case 5311:// Allmän väg 5-7m, vägnummer E4-99
+			case 5312:// Allmän väg 5-7m, vägnummer E4-99, underfart
+			case 5313:// Allmän väg 5-7m, vägnummer E4-99, tunnel
+			case 5321:// Allmän väg 5-7m, vägnummer 100-499
+			case 5322:// Allmän väg 5-7m, vägnummer 100-499, underfart
+			case 5323:// Allmän väg 5-7m, vägnummer 100-499, tunnel
+			case 5325:// Allmän väg 5-7m, vägnummer 100-499, färja
+			case 5331:// Allmän väg 5-7m, vägnummer>500
+			case 5332:// Allmän väg 5-7m, vägnummer>500, underfart
+			case 5333:// Allmän väg 5-7m, vägnummer>500, tunnel
+			case 5334:// Väg under byggnad
+			case 5335:// Allmän väg 5-7m, vägnummer>500, färja
+			case 5411:// Allmän väg <5m, vägnummer E4-99
+			case 5412:// Allmän väg <5m, vägnummer E4-99, underfart
+			case 5413:// Allmän väg <5m, vägnummer E4-99, tunnel
+			case 5421:// Allmän väg <5m, vägnummer 100-499
+			case 5422:// Allmän väg <5m, vägnummer 100-499, underfart
+			case 5423:// Allmän väg <5m, vägnummer 100-499, tunnel
+			case 5425:// Allmän väg <5m, vägnummer 100-499, färja
+			case 5431:// Allmän väg <5m, vägnummer >500
+			case 5432:// Allmän väg <5m, vägnummer>500, underfart
+			case 5433:// Allmän väg <5m, vägnummer>500, tunnel
+			case 5435:// Allmän väg <5m, vägnummer>500, färja
+						stroke.setColor('rgba(150,150,150,1.0)');
+						stroke.setWidth(0.9);
+						if(resolution > 75){
+						stroke.setWidth(0.6);
+						}
+						styles[length++] = line;
+								break;
+			case 5551:// Enskild väg
+			case 5552:// Enskild väg, underfart
+			case 5553:// Enskild väg, tunnel
+			case 5555:// Enskild väg, färja
+						stroke.setColor('rgba(150,150,150,1.0)');
+						stroke.setWidth(0.6);
+						if(resolution < 75){
+							styles[length++] = line;
+						}
+								break;
+		}
+		}
+		else if (layer=="vo_fast"){
+		switch(dt) {
+			case "ÖVÄGCYK.M":// Cykelväg/parkväg Mittlinje för cykel- eller parkväg.
+			case "OVAGCYK.M":// Cykelväg/parkväg Mittlinje för cykel- eller parkväg.
+				dashedStroke.setColor('rgba(150,150,150,0.75)');
+				dashedStroke.setWidth(0.75);
+				dashedStroke.setLineDash([6, 4]);
+				if(resolution < 5){styles[length++] = dashedLine;}
+						break;
+			case "ÖVÄGELS.M":// Elljusspår
+			case "OVAGELS.M":// Elljusspår
+						stroke.setColor('rgba(150,150,150,1.0)');
+				stroke.setWidth(1);
+				if(resolution < 5){styles[length++] = line;}
+						break;
+			case "ÖVÄGSTI.M":// Gångstig Mittlinje för tydlig gångstig.
+			case "OVAGSTI.M":// Gångstig Mittlinje för tydlig gångstig.
+				dashedStroke.setColor('rgba(150,150,150,1.0)');
+				dashedStroke.setWidth(1);
+				dashedStroke.setLineDash([1, 5]);
+				if(resolution < 15){styles[length++] = dashedLine;}
+						break;
+			case "ÖVÄGTRA.M":// Traktorväg
+			case "OVAGTRA.M":// Traktorväg
+			case "ÖVÄGUND.M":// Underfart/tunnel för övrig väg eller led
+			case "OVAGUND.M":// Underfart/tunnel för övrig väg eller led
+			case "GÅNGBRO.M":// Gångbro
+			case "GANGBRO.M":// Gångbro
+			case "VANDLED":// Vandringsled
+				dashedStroke.setColor('rgba(150,150,150,1.0)');
+				dashedStroke.setWidth(0.75);
+				dashedStroke.setLineDash([8, 4]);
+				if(resolution < 15){styles[length++] = dashedLine;}
+						break;
+		}
+		}
+		else if (layer=="vo_vagk"){
+		switch(kkod) {
+			case 264:// Gångstig
+			case 289:// Annan led
+			case 332:// Gångbro
+						dashedStroke.setColor('rgba(150,150,150,1.0)');
+						dashedStroke.setWidth(0.6);
+						dashedStroke.setLineDash([8, 4]);
+						if(resolution < 15){styles[length++] = dashedLine;}
+						break;
+			case 265:// Vandringsled
+			case 268:// Vandringsled, längs väg
+			case 336:// Färjeled
+						dashedStroke.setColor('rgba(150,150,150,1.0)');
+						dashedStroke.setWidth(0.8);
+						dashedStroke.setLineDash([8, 4]);
+						if(resolution < 15){styles[length++] = dashedLine;}
+								break;
+		}
+		}
+		styles.length = length;
+		return styles;
+	}
+	}
 			if(styleName=='basemap_bright'){
 	  var fill = new ol.style.Fill({color: ''});
 	  var stroke = new ol.style.Stroke({color: '', width: 0.1, lineCap:'square', lineJoin:'round'});
