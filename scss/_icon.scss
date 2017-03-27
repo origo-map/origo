@@ -6,6 +6,12 @@
   float: right;
   fill: $o-btn-color;
 }
+.o-mapmenu [class^="o-icon-"],
+.o-mapmenu [class*=" o-icon-"] {
+	padding: 0.25em;
+	height: 1em;
+	width: 1em;
+}
 .ol-control>button:hover [class^="o-icon-"],
 .ol-control>button:hover [class*=" o-icon-"],
 .o-button:hover [class^="o-icon-"],
