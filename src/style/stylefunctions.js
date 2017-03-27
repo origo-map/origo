@@ -973,27 +973,27 @@
                 break;	
 		}
 		}
-		else if (layer=="_ms_fast"){ //SANKMARK
+		else if (layer=="ms_fast"){ //SANKMARK
 		
 		switch(dt) {
 			case "SANK":// Sankmark (Yta)
-				stroke.setColor('#18ADFB');  
-				stroke.setWidth(0.2);          
-				fill.setColor('rgba(230,205,175,0.5)');
-				styles[length++] = strokedPolygon;
+				//stroke.setColor('#18ADFB');  
+				//stroke.setWidth(0.2);          
+				fill.setColor('rgba(220,222,220,0.6)');
+				styles[length++] = polygon;
 								break;
 			case "SANKSVÅ":// Sankmark, svårframkomlig
-				stroke.setColor('#18ADFB');  
-				stroke.setWidth(0.2);          
-				fill.setColor('rgba(150,200,210,0.5)');
-				styles[length++] = strokedPolygon;
+				//stroke.setColor('#18ADFB');  
+				//stroke.setWidth(0.2);          
+				fill.setColor('rgba(220,222,220,0.6)');
+				styles[length++] = polygon;
 								break;
 			case "SANKBLE":// Sankmark blekvät
 			default:
-				stroke.setColor('#18ADFB');  
-				stroke.setWidth(0.2);          
-				fill.setColor('rgba(120,120,190,0.5)');
-				styles[length++] = strokedPolygon;
+				//stroke.setColor('#18ADFB');  
+				//stroke.setWidth(0.2);          
+				fill.setColor('rgba(220,222,220,0.6)');
+				styles[length++] = polygon;
 								break;
 		}
 		}
