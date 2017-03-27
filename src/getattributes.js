@@ -3,10 +3,11 @@
  * Licensed under BSD 2-Clause (https://github.com/origo-map/origo/blob/master/LICENSE.txt)
  * ======================================================================== */
 "use strict";
+global.runfunction = require('../src/utils/runfunction');
+
 var $ = require('jquery');
 var featureinfotemplates = require('./featureinfotemplates');
 var replacer = require('../src/utils/replacer');
-var runfunction = require('../src/utils/runfunction');
 var geom = require('./geom');
 
 module.exports = function(feature, layer) {
@@ -42,16 +43,16 @@ module.exports = function(feature, layer) {
                         var title;
                         if (feature.get(attribute['functionParam'])) {	
                           var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['functionParam']));
-                          val = '<a id="runfunction-link" href="#">' + feature.get(attribute['name']) + '</a>';
+                          val = '<a id="colorbox-link" href="#" onclick="runfunction.' + attribute['runFunction'] + '(\'' + url + '\');return false;">' + 
+                                                feature.get(attribute['name']) +
+                                                '</a>';
                         }
                         else if (feature.get(attribute['functionParam']) === undefined) {
                           var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], attribute['functionParam']);
-                          val = '<a id="runfunction-link" href="#">' + feature.get(attribute['name']) + '</a>';
+                          val = '<a id="colorbox-link" href="#" onclick="runfunction.' + attribute['runFunction'] + '(\'' + url + '\');return false;">' + 
+                                                feature.get(attribute['name']) +
+                                                '</a>';
                         }
-
-                        $(document).on('click', '#runfunction-link', function(evt) {
-                          runfunction[attribute['runFunction']](url, $(this), evt);
-                        });
                       }
                   }
                 }
