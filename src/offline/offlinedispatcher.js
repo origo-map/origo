@@ -10,7 +10,7 @@ module.exports = {
   emitChangeOffline: emitChangeOffline,
   emitChangeDownload: emitChangeDownload,
   emitChangeOfflineStart: emitChangeOfflineStart,
-  emitChangeOfflineEnd: emitChangeOfflineEnd  
+  emitChangeOfflineEnd: emitChangeOfflineEnd
 }
 
 function emitChangeOffline(layerName, action) {
@@ -29,17 +29,17 @@ function emitChangeDownload(layerName, action) {
   });
 }
 
-function emitChangeOfflineStart(layerName, state) {
+function emitChangeOfflineStart(layerName) {
   $.event.trigger({
     type: 'changeOfflineStart',
     layerName: layerName
   });
 }
 
-function emitChangeOfflineEnd(layerName, action) {
+function emitChangeOfflineEnd(layerName, state) {
   $.event.trigger({
     type: 'changeOfflineEnd',
     layerName: layerName,
-    action: action
+    state: state
   });
 }

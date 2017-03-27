@@ -2077,8 +2077,16 @@
       width: .8em; } }
   .o-map .o-downloader {
     z-index: 1000; }
+    .o-map .o-downloader td {
+      vertical-align: middle; }
     .o-map .o-downloader .o-table tr:first-child td {
       border-top: 0px; }
+    .o-map .o-downloader .o-toolbar-horizontal button {
+      height: 2rem;
+      padding: .3125px;
+      width: 2rem; }
+    .o-map .o-downloader .o-toolbar-horizontal button.o-spinner {
+      padding: 0; }
   .o-map .o-hidden {
     display: none; }
 

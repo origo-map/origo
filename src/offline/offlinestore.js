@@ -123,6 +123,7 @@ function offlineStore() {
     if (offlineLayers[e.layerName]) {
       setDownloaded(e.layerName, false);
       storage[e.layerName].clear();
+      dispatcher.emitChangeOfflineEnd(e.layerName, 'download');
     }
   }
 
@@ -198,7 +199,7 @@ function offlineStore() {
       return storage[layerName].setItem(id, obj);
     });
     Promise.all(promises).then(function(results) {
-      dispatcher.emitChangeOfflineEnd(layerName, 'download');
+      dispatcher.emitChangeOfflineEnd(layerName, 'offline');
     });
   }
 

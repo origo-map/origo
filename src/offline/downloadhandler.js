@@ -20,7 +20,7 @@ var downloadHandler = function downloadHandler() {
     if (e.action === 'download') {
       download(e.layerName);
     } else if (e.action === 'sync') {
-
+      download(e.layerName);
     } else if (e.action === 'remove') {
       removeDownloaded(e.layerName);
     }
