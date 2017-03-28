@@ -11,7 +11,8 @@ module.exports = {
   emitChangeFeature: emitChangeFeature,
   emitToggleEdit: emitToggleEdit,
   emitEnableInteraction: emitEnableInteraction,
-  emitEditsChange: emitEditsChange
+  emitEditsChange: emitEditsChange,
+  emitChangeOfflineEdits: emitChangeOfflineEdits
 }
 
 function emitChangeEdit(tool, state) {
@@ -53,5 +54,13 @@ function emitEditsChange(edits) {
   $.event.trigger({
     type: 'editsChange',
     edits: edits
+  });
+}
+
+function emitChangeOfflineEdits(edits, layerName) {
+  $.event.trigger({
+    type: 'changeOfflineEdits',
+    edits: edits,
+    layerName: layerName
   });
 }
