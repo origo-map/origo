@@ -6,8 +6,10 @@
 var ol = require('openlayers');
 var $ = require('jquery');
 var viewer = require('../viewer');
+var wfsTransaction = require('../editor/wfstransaction');
 
-var wfs = function wfs(layer) {
+var wfs = {};
+wfs.request = function request(layer) {
   var sourceOptions = viewer.getMapSource()[layer.get('sourceName')];
   sourceOptions.featureType = layer.get('name').split('__').shift();
   sourceOptions.geometryName = layer.get('geometryName');
@@ -53,6 +55,10 @@ var wfs = function wfs(layer) {
         return format.readFeatures(response);
       });
   }
+}
+
+wfs.transaction = function(transObj, layerName) {
+  return wfsTransaction(transObj, layerName);
 }
 
 module.exports = wfs;

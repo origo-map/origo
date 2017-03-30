@@ -18,6 +18,9 @@ function offlineStore() {
 
   return {
     getOfflineLayers: getOfflineLayers,
+    getOfflineLayer: getOfflineLayer,
+    getOfflineEdits: getOfflineEdits,
+    getEditsItems: getEditsItems,
     init: Init
   };
 
@@ -28,19 +31,20 @@ function offlineStore() {
     storageName = options.name || 'origo-layers';
     editsStorageName = options.editsName || 'origo-layers-edits';
     layers = setOfflineLayers();
-    storage = createInstances(layers);
+    storage = createInstances(layers, storageName);
+    editsStorage = createInstances(layers, editsStorageName);
     initLayers();
 
     $(document).on('changeOffline', onChangeOffline);
     $(document).on('changeOfflineEdits', onChangeOfflineEdits);
   }
 
-  function createInstances(layers) {
+  function createInstances(layers, name) {
     var instances = {};
     layers.forEach(function(layer) {
       var layerName = layer.get('name');
       instances[layerName] = localforage.createInstance({
-        name: storageName,
+        name: name,
         storeName: layerName
       });
     });
@@ -51,12 +55,26 @@ function offlineStore() {
     return offlineLayers;
   }
 
+  function getOfflineLayer(layerName) {
+    return offlineLayers[layerName];
+  }
+
+  function getOfflineEdits(layerName) {
+    if (offlineLayers[layerName].edits) {
+      return getEditsItems(layerName);
+    } else {
+      return undefined;
+    }
+  }
+
   function setOfflineLayers() {
     return map.getLayers().getArray().filter(function(layer) {
       var layerName;
       if (layer.get('offline')) {
         layerName = layer.get('name');
+        layer.set('onlineType', layer.get('type'));
         offlineLayers[layerName] = createOfflineObj();
+        offlineLayer(layer, []);
         return layer;
       }
     });
@@ -65,12 +83,11 @@ function offlineStore() {
   function onChangeOffline(e) {
     e.stopImmediatePropagation();
     if (e.action === 'download') {
-      addDownloaded(e);
-    } else if (e.action === 'sync') {
-
+      download(e.layerName)
+    } else if (e.action === 'edits') {
+      removeEdits(e.layerName, e.ids);
     } else if (e.action === 'remove') {
-      removeDownloaded(e);
-      removeEdits(e);
+      remove(e.layerName);
     }
   }
 
@@ -85,36 +102,56 @@ function offlineStore() {
       });
     }
     if (e.edits.update) {
-      writeUpdate(e.edits.update, e.layerName);
+      saveUpdate(e.edits.update, e.layerName);
     }
     if (e.edits.insert) {
-      writeInsert(e.edits.insert, e.layerName);
+      saveInsert(e.edits.insert, e.layerName);
     }
     if (e.edits.delete) {
-      writeDelete(e.edits.delete, e.layerName);
+      saveDelete(e.edits.delete, e.layerName);
     }
   }
 
-  function addDownloaded(e) {
-    if (storage[e.layerName]) {
-      setDownloaded(e.layerName, true);
-      saveToStorage(e.layerName);
+  function removeEdits(layerName, ids) {
+    var promises = ids.map(function(id) {
+      return removeFromEditsStorage(id, layerName);
+    });
+    return Promise.all(promises).then(function() {
+      return true;
+    });
+  }
+
+  function removeDownloaded(layerName) {
+    if (offlineLayers[layerName]) {
+      return storage[layerName].clear()
+        .then(function() {
+          setLayerOnline(layerName);
+          dispatcher.emitChangeOfflineEnd(layerName, 'download');
+        });
     }
   }
 
-  function removeDownloaded(e) {
-    var layer;
-    if (offlineLayers[e.layerName]) {
-      layer = viewer.getLayer(e.layerName);
-      layer.set('type', layer.get('onlineType'));
-      setDownloaded(e.layerName, false);
-      storage[e.layerName].clear();
-      dispatcher.emitChangeOfflineEnd(e.layerName, 'download');
+  function download(layerName) {
+    if (offlineLayers[layerName].downloaded) {
+      storage[layerName].clear()
+        .then(function() {
+          saveFeaturesToStorage(layerName);
+        });
+    } else {
+      saveFeaturesToStorage(layerName);
     }
   }
 
-  function removeEdits(e) {
-
+  function remove(layerName) {
+    if (offlineLayers[layerName].edits) {
+      var proceed = confirm('Du har fortfarande offline-ändringar som inte är sparade. Om du fortsätter kommer dessa att försvinna.');
+      if (proceed) {
+        // removeEdits(layerName);
+        removeDownloaded(layerName);
+      }
+    } else {
+      removeDownloaded(layerName);
+    }
   }
 
   function createOfflineObj() {
@@ -132,10 +169,22 @@ function offlineStore() {
     }
   }
 
-  function saveToStorage(layerName) {
-    dispatcher.emitChangeOfflineStart(layerName, 'download');
-    var features = viewer.getLayer(layerName).getSource().getFeatures();
-    setItems(layerName, features);
+  function setEdits(layerName, edits) {
+    if (edits) {
+      offlineLayers[layerName].edits = true;
+    } else {
+      offlineLayers[layerName].edits = false;
+    }
+  }
+
+  function saveFeaturesToStorage(layerName) {
+    if (storage[layerName]) {
+      dispatcher.emitChangeOfflineStart(layerName, 'download');
+      var features = viewer.getLayer(layerName).getSource().getFeatures();
+      setItems(layerName, features);
+    } else {
+      console.log(layerName + ' is missing in storage');
+    }
   }
 
   function setItems(layerName, features) {
@@ -145,19 +194,40 @@ function offlineStore() {
       return storage[layerName].setItem(id, obj);
     });
     Promise.all(promises).then(function(results) {
+      setLayerOffline(layerName, features);
       dispatcher.emitChangeOfflineEnd(layerName, 'offline');
     });
   }
 
   function getItems(layerName) {
     var layer = viewer.getLayer(layerName);
+    var geometryName = layer.get('geometryName');
     var features = [];
     return storage[layerName].iterate(function(value, key, index) {
-      features.push(format.readFeature(value));
-    })
-    .then(function() {
-      return features;
-    });
+        var feature = format.readFeature(value);
+        var geometry = feature.getGeometry();
+        feature.unset(feature.getGeometryName());
+        feature.setGeometryName(geometryName);
+        feature.setGeometry(geometry);
+        // console.log(feature .getGeometryName());
+        features.push(feature);
+      })
+      .then(function() {
+        return features;
+      });
+  }
+
+  function getEditsItems(layerName) {
+    var layer = viewer.getLayer(layerName);
+    var items = [];
+    return editsStorage[layerName].iterate(function(value, key, index) {
+        var obj = {};
+        obj[key] = value;
+        items.push(obj);
+      })
+      .then(function() {
+        return items;
+      });
   }
 
   function initLayers() {
@@ -166,68 +236,126 @@ function offlineStore() {
       getItems(layerName).then(function(features) {
         var layer;
         if (features.length) {
-          layer = viewer.getLayer(layerName);
-          layer.set('onlineType', layer.get('type'));
-          layer.set('type', 'OFFLINE');
-          setDownloaded(layerName, true);
-          offlineLayer(layer, features);
+          setLayerOffline(layerName, features);
         } else {
-          console.log('No features in ' + layerName);
+          setLayerOnline(layerName, features);
+        }
+      });
+      getEditsItems(layerName).then(function(items) {
+        var layer;
+        if (items.length) {
+          setEdits(layerName, true);
+        } else {
+          setEdits(layerName, false);
         }
       });
     });
   }
-}
 
-function writeUpdate(updates, layerName) {
-  updates.forEach(function(feature) {
-    var id = feature.getId();
-    var action = 'update';
-    editsStorage[layerName].getItem(id)
-      .then(function(result) {
-        console.log(result);
-        if (result === null) {
-          editsStorage[layerName].setItem(id, action)
-            .then(function() {
-              emitChangeFeature(feature, layerName, action);
-            });
-        } else {
-          emitChangeFeature(feature, layerName, action);
-        }
-      });
-  });
-}
+  function setLayerOffline(layerName, features) {
+    var layer = viewer.getLayer(layerName);
+    // layer.set('onlineType', layer.get('type'));
+    layer.set('type', 'OFFLINE');
+    offlineLayer(layer, features);
+    setDownloaded(layerName, true);
+  }
 
-function writeInsert(inserts, layerName) {
-  inserts.forEach(function(feature) {
+  function setLayerOnline(layerName) {
+    var layer = viewer.getLayer(layerName);
+    var source;
+    var options;
+    layer.set('type', layer.get('onlineType'));
+    options = layer.getProperties();
+    options.source = options.sourceName;
+    options.style = options.styleName;
+    source = layerCreator(options).getSource();
+    layer.setSource(source);
+    setDownloaded(layerName, false);
+  }
+
+  function saveUpdate(updates, layerName) {
+    updates.forEach(function(feature) {
+      var id = feature.getId();
+      var action = 'update';
+      editsStorage[layerName].getItem(id)
+        .then(function(result) {
+          if (result === null) {
+            saveToEditsStorage(feature, layerName, action);
+          } else {
+            saveFeatureToStorage(feature, layerName, action);
+          }
+        });
+    });
+  }
+
+  function saveInsert(inserts, layerName) {
+    inserts.forEach(function(feature) {
+      var id = feature.getId();
+      var action = 'insert';
+      saveToEditsStorage(feature, layerName, action);
+    });
+  }
+
+  function saveDelete(deletes, layerName) {
+    deletes.forEach(function(feature) {
+      var id = feature.getId();
+      var action = 'delete';
+      editsStorage[layerName].getItem(id)
+        .then(function(result) {
+          if (result === null) {
+            saveToEditsStorage(feature, layerName, action);
+          } else if (result === 'insert'){
+            removeFromEditsStorage(feature.getId(), layerName)
+              .then(function() {
+                emitChangeFeature(feature, layerName, action);
+              });
+          } else {
+            saveFeatureToStorage(feature, layerName, action);
+          }
+        });
+    });
+  }
+
+  function saveToEditsStorage(feature, layerName, action) {
     var id = feature.getId();
-    var action = 'insert';
     editsStorage[layerName].setItem(id, action)
+      .then(function() {
+        setEdits(layerName, true);
+        saveFeatureToStorage(feature, layerName, action);
+      });
+  }
+
+  function removeFromEditsStorage(id, layerName) {
+    return editsStorage[layerName].removeItem(id)
+      .then(function() {
+        editsStorage[layerName].length()
+          .then(function(nr) {
+            if (nr > 0) {
+              setEdits(layerName, true);
+            } else {
+              setEdits(layerName, false);
+            }
+          });
+      });
+  }
+
+  function saveFeatureToStorage(feature, layerName, action) {
+    var id = feature.getId();
+    storage[layerName].setItem(id, format.writeFeatureObject(feature))
       .then(function() {
         emitChangeFeature(feature, layerName, action);
       });
-  });
-}
+  }
 
-function writeDelete(deletes, layerName) {
-  deletes.forEach(function(feature) {
-    var id = feature.getId();
-    editsStorage[layerName].getItem(id)
-    var action = 'delete';
-    editsStorage[layerName].setItem(id, action)
-      .then(function() {
-        emitChangeFeature(feature, layerName, action);
-      });
-  });
-}
+  function emitChangeFeature(feature, layerName, action) {
+    editorDispatcher.emitChangeFeature({
+      feature: [feature],
+      layerName: layerName,
+      status: 'finished',
+      action: action
+    });
+  }
 
-function emitChangeFeature(feature, layerName, action) {
-  editorDispatcher.emitChangeFeature({
-    feature: [feature],
-    layerName: layerName,
-    status: 'finished',
-    action: action
-  });
 }
 
 module.exports = offlineStore;

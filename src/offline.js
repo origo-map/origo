@@ -9,7 +9,7 @@ var Viewer = require('./viewer');
 var utils = require('./utils');
 var downloader = require('./offline/downloader');
 var downloadHandler = require('./offline/downloadhandler');
-var offlineStore = require('./offline/offlineStore')();
+var offlineStore = require('./offline/offlinestore')();
 
 var map = undefined;
 var baseUrl = undefined;
@@ -21,7 +21,6 @@ function Init(opt_options) {
   baseUrl = Viewer.getBaseUrl();
 
   downloadHandler();
-  offlineStore.init();
 
   render();
   bindUIActions();

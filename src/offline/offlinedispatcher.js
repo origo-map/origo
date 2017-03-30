@@ -13,11 +13,12 @@ module.exports = {
   emitChangeOfflineEnd: emitChangeOfflineEnd
 }
 
-function emitChangeOffline(layerName, action) {
+function emitChangeOffline(layerName, action, ids) {
   $.event.trigger({
     type: 'changeOffline',
     layerName: layerName,
-    action: action
+    action: action,
+    ids: ids || undefined
   });
 }
 
