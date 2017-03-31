@@ -6,7 +6,7 @@
 
 var ol = require('openlayers');
 var $ = require('jquery');
-var Viewer = require('../viewer');
+var viewer = require('../viewer');
 var utils = require('../utils');
 var layerCreator = require('../layercreator');
 var offlineLayer = require('./offlinelayer')();
@@ -14,11 +14,15 @@ var downloadSources = require('./downloadsources');
 var dispatcher = require('./offlinedispatcher');
 var offlineStore = require('./offlinestore')();
 
+var downloadErrorMsg = 'Det inträffade ett fel när lagret skulle hämtas. Är du ansluten till internet?'
+var saveErrorMsg =  'Det inträffade ett fel när förändringarna skulle sparas. Försök igen senare.';
+var invalidFormatMsg = 'Invalid format: ';
+
 var downloadHandler = function downloadHandler() {
-  $(document).on('changeDownload', changeDownload);
+  $(document).on('changeDownload', onChangeDownload);
   offlineStore.init();
 
-  function changeDownload(e) {
+  function onChangeDownload(e) {
     e.stopImmediatePropagation();
     if (e.action === 'download') {
       download(e.layerName);
@@ -30,9 +34,10 @@ var downloadHandler = function downloadHandler() {
   }
 
   function removeDownloaded(layerName) {
-    var layer = Viewer.getLayer(layerName);
+    var layer = viewer.getLayer(layerName);
     var props = layer.getProperties();
     var source;
+    dispatcher.emitChangeOfflineStart(layerName);
     props.style = props.styleName;
     props.source = props.sourceName;
     props.type = props.onlineType;
@@ -43,12 +48,16 @@ var downloadHandler = function downloadHandler() {
 
   function sync(layerName) {
     var offlineEdits = offlineStore.getOfflineEdits(layerName);
+    dispatcher.emitChangeOfflineStart(layerName);
     if (offlineEdits) {
-        offlineEdits
+      offlineEdits
         .then(function(editItems) {
           saveToRemote(editItems, layerName)
             .then(function() {
               download(layerName);
+            })
+            .fail(function(err) {
+              abort(layerName, saveErrorMsg, 'alert');
             });
         });
     } else {
@@ -57,7 +66,7 @@ var downloadHandler = function downloadHandler() {
   }
 
   function saveToRemote(editItems, layerName) {
-    var layer = Viewer.getLayer(layerName);
+    var layer = viewer.getLayer(layerName);
     var transObj = {
       delete: [],
       insert: [],
@@ -86,15 +95,38 @@ var downloadHandler = function downloadHandler() {
   }
 
   function download(layerName) {
-    var layer = Viewer.getLayer(layerName);
+    var layer = viewer.getLayer(layerName);
     var type = layer.get('onlineType');
+    dispatcher.emitChangeOfflineStart(layerName);
     if (downloadSources.hasOwnProperty(type)) {
       downloadSources[type].request(layer)
-        .done(function(result) {
-          offlineLayer.setLayerOffline(layerName, result);
+        .then(function(result) {
+          offlineLayer.setOfflineSource(layerName, result);
           dispatcher.emitChangeOffline(layer.get('name'), 'download');
+        })
+        .fail(function(error) {
+          abort(layerName, downloadErrorMsg, 'alert');
         });
+    } else {
+      error = 'Sorry, ' + type + ' is not available as on offline format';
+      abort(layerName, invalidFormatMsg + type);
     }
+  }
+
+  function abort(layerName, error, isAlert) {
+    var action;
+    if (offlineStore.getOfflineLayer(layerName).downloaded) {
+      action = 'offline';
+    } else {
+      action = 'download';
+    }
+    console.log(action);
+    if (isAlert) {
+      alert(error);
+    } else {
+      console.log(error);
+    }
+    dispatcher.emitChangeOfflineEnd(layerName, action);
   }
 }
 

@@ -2,7 +2,6 @@ var $ = require('jquery');
 var ol = require('openlayers');
 var viewer = require('../viewer');
 var localforage = require('localforage');
-var layerCreator = require('../layercreator');
 var offlineLayer = require('./offlinelayer')();
 var dispatcher = require('./offlinedispatcher');
 var editorDispatcher = require('../editor/editdispatcher');
@@ -26,23 +25,23 @@ function offlineStore() {
 
   function Init(opt_options) {
     var options = opt_options || {};
-    var layers;
+    var layersNames;
     map = viewer.getMap();
     storageName = options.name || 'origo-layers';
     editsStorageName = options.editsName || 'origo-layers-edits';
-    layers = setOfflineLayers();
-    storage = createInstances(layers, storageName);
-    editsStorage = createInstances(layers, editsStorageName);
+    layerNames = viewer.getLayersByProperty('offline', true, true);
+    setOfflineLayers(layerNames);
+    storage = createInstances(layerNames, storageName);
+    editsStorage = createInstances(layerNames, editsStorageName);
     initLayers();
 
     $(document).on('changeOffline', onChangeOffline);
     $(document).on('changeOfflineEdits', onChangeOfflineEdits);
   }
 
-  function createInstances(layers, name) {
+  function createInstances(layerNames, name) {
     var instances = {};
-    layers.forEach(function(layer) {
-      var layerName = layer.get('name');
+    layerNames.forEach(function(layerName) {
       instances[layerName] = localforage.createInstance({
         name: name,
         storeName: layerName
@@ -67,27 +66,23 @@ function offlineStore() {
     }
   }
 
-  function setOfflineLayers() {
-    return map.getLayers().getArray().filter(function(layer) {
-      var layerName;
-      if (layer.get('offline')) {
-        layerName = layer.get('name');
-        layer.set('onlineType', layer.get('type'));
-        offlineLayers[layerName] = createOfflineObj();
-        offlineLayer.setLayerOffline(layerName, []);
-        return layer;
-      }
+  function setOfflineLayers(layerNames) {
+    layerNames.forEach(function(layerName) {
+      var layer = viewer.getLayer(layerName);
+      layer.set('onlineType', layer.get('type'));
+      offlineLayers[layerName] = createOfflineObj();
+      offlineLayer.setOfflineSource(layerName, []);
     });
   }
 
   function onChangeOffline(e) {
     e.stopImmediatePropagation();
     if (e.action === 'download') {
-      download(e.layerName)
+      onDownload(e.layerName)
     } else if (e.action === 'edits') {
-      removeEdits(e.layerName, e.ids);
+      ondEdits(e.layerName, e.ids);
     } else if (e.action === 'remove') {
-      remove(e.layerName);
+      onRemove(e.layerName);
     }
   }
 
@@ -112,26 +107,7 @@ function offlineStore() {
     }
   }
 
-  function removeEdits(layerName, ids) {
-    var promises = ids.map(function(id) {
-      return removeFromEditsStorage(id, layerName);
-    });
-    return Promise.all(promises).then(function() {
-      return true;
-    });
-  }
-
-  function removeDownloaded(layerName) {
-    if (offlineLayers[layerName]) {
-      return storage[layerName].clear()
-        .then(function() {
-          setLayerOnline(layerName);
-          dispatcher.emitChangeOfflineEnd(layerName, 'download');
-        });
-    }
-  }
-
-  function download(layerName) {
+  function onDownload(layerName) {
     if (offlineLayers[layerName].downloaded) {
       storage[layerName].clear()
         .then(function() {
@@ -142,15 +118,33 @@ function offlineStore() {
     }
   }
 
-  function remove(layerName) {
+  function ondEdits(layerName, ids) {
+    var promises = ids.map(function(id) {
+      return removeFromEditsStorage(id, layerName);
+    });
+    return Promise.all(promises).then(function() {
+      return true;
+    });
+  }
+
+  function onRemove(layerName) {
     if (offlineLayers[layerName].edits) {
       var proceed = confirm('Du har fortfarande offline-ändringar som inte är sparade. Om du fortsätter kommer dessa att försvinna.');
       if (proceed) {
-        // removeEdits(layerName);
         removeDownloaded(layerName);
       }
     } else {
       removeDownloaded(layerName);
+    }
+  }
+
+  function removeDownloaded(layerName) {
+    if (offlineLayers[layerName]) {
+      return storage[layerName].clear()
+        .then(function() {
+          setLayerOnline(layerName);
+          dispatcher.emitChangeOfflineEnd(layerName, 'download');
+        });
     }
   }
 
@@ -178,9 +172,9 @@ function offlineStore() {
   }
 
   function saveFeaturesToStorage(layerName) {
+    var features;
     if (storage[layerName]) {
-      dispatcher.emitChangeOfflineStart(layerName, 'download');
-      var features = viewer.getLayer(layerName).getSource().getFeatures();
+      features = viewer.getLayer(layerName).getSource().getFeatures();
       setItems(layerName, features);
     } else {
       console.log(layerName + ' is missing in storage');
@@ -249,14 +243,12 @@ function offlineStore() {
   }
 
   function setLayerOffline(layerName, features) {
-    var layer = viewer.getLayer(layerName);
-    layer.set('type', 'OFFLINE');
-    offlineLayer.setLayerOffline(layerName, features);
+    offlineLayer.setOfflineSource(layerName, features);
     setDownloaded(layerName, true);
   }
 
   function setLayerOnline(layerName) {
-    offlineLayer.setLayerOnline(layerName);
+    offlineLayer.setOnlineSource(layerName);
     setDownloaded(layerName, false);
   }
 
@@ -291,7 +283,7 @@ function offlineStore() {
         .then(function(result) {
           if (result === null) {
             saveToEditsStorage(feature, layerName, action);
-          } else if (result === 'insert'){
+          } else if (result === 'insert') {
             removeFromEditsStorage(feature.getId(), layerName)
               .then(function() {
                 emitChangeFeature(feature, layerName, action);

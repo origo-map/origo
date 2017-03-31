@@ -250,6 +250,23 @@ function getLayers() {
   return settings.layers;
 }
 
+function getLayersByProperty(key, val, byName) {
+  var layers = map.getLayers().getArray().filter(function(layer) {
+    if (layer.get(key)) {
+      if (layer.get(key) === val) {
+        return layer;
+      }
+    }
+  });
+  if (byName) {
+    return layers.map(function(layer) {
+      return layer.get('name');
+    });
+  } else {
+    return layers;
+  }
+}
+
 function getLayer(layername) {
   var layer = $.grep(settings.layers, function(obj) {
     return (obj.get('name') == layername);
@@ -429,6 +446,7 @@ module.exports.getStyleSettings = getStyleSettings;
 module.exports.getMapUrl = getMapUrl;
 module.exports.getMap = getMap;
 module.exports.getLayers = getLayers;
+module.exports.getLayersByProperty = getLayersByProperty;
 module.exports.getLayer = getLayer;
 module.exports.getControlNames = getControlNames;
 module.exports.getQueryableLayers = getQueryableLayers;

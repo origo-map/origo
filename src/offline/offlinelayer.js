@@ -11,14 +11,18 @@ var layerCreator = require('../layercreator');
 var offlineLayer = function offlineLayer() {
 
   return {
-    setLayerOffline: setLayerOffline,
-    setLayerOnline: setLayerOnline
+    setOfflineSource: setOfflineSource,
+    setOnlineSource: setOnlineSource
   }
 
-  function setLayerOffline(layerName, features) {
+  function setOfflineSource(layerName, features) {
     var layer = viewer.getLayer(layerName);
     var source;
-    var options = layer.getProperties();
+    var options;
+    layer.set('type', 'OFFLINE');
+
+    // Create a feature layer and get the source
+    options = layer.getProperties();
     options.type = 'FEATURE';
     options.features = features;
     options.style = options.styleName;
@@ -27,10 +31,12 @@ var offlineLayer = function offlineLayer() {
     return layer;
   }
 
-  function setLayerOnline(layerName) {
+  function setOnlineSource(layerName) {
     var layer = viewer.getLayer(layerName);
     var source;
     var options;
+
+    // Create a layer with the online source and get the source
     layer.set('type', layer.get('onlineType'));
     options = layer.getProperties();
     options.source = options.sourceName;
