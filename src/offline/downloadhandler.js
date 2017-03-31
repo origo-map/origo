@@ -120,7 +120,6 @@ var downloadHandler = function downloadHandler() {
     } else {
       action = 'download';
     }
-    console.log(action);
     if (isAlert) {
       alert(error);
     } else {

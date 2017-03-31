@@ -23,7 +23,8 @@ var geojson = function geojson(layerOptions) {
   if (isUrl(geojsonOptions.source)) {
     sourceOptions.url = geojsonOptions.source;
   } else {
-    sourceOptions.url = baseUrl + geojsonOptions.source;
+    geojsonOptions.sourceName = baseUrl + geojsonOptions.source;
+    sourceOptions.url = geojsonOptions.source;
   }
 
   var geojsonSource = createSource(sourceOptions);
