@@ -9,7 +9,7 @@ var $ = require('jquery');
 var Viewer = require('../viewer');
 var utils = require('../utils');
 var layerCreator = require('../layercreator');
-var offlineLayer = require('./offlinelayer');
+var offlineLayer = require('./offlinelayer')();
 var downloadSources = require('./downloadsources');
 var dispatcher = require('./offlinedispatcher');
 var offlineStore = require('./offlinestore')();
@@ -91,7 +91,7 @@ var downloadHandler = function downloadHandler() {
     if (downloadSources.hasOwnProperty(type)) {
       downloadSources[type].request(layer)
         .done(function(result) {
-          // offlineLayer(layer, result);
+          offlineLayer.setLayerOffline(layerName, result);
           dispatcher.emitChangeOffline(layer.get('name'), 'download');
         });
     }

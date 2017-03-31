@@ -3,7 +3,7 @@ var ol = require('openlayers');
 var viewer = require('../viewer');
 var localforage = require('localforage');
 var layerCreator = require('../layercreator');
-var offlineLayer = require('./offlinelayer');
+var offlineLayer = require('./offlinelayer')();
 var dispatcher = require('./offlinedispatcher');
 var editorDispatcher = require('../editor/editdispatcher');
 var format = new ol.format.GeoJSON();
@@ -74,7 +74,7 @@ function offlineStore() {
         layerName = layer.get('name');
         layer.set('onlineType', layer.get('type'));
         offlineLayers[layerName] = createOfflineObj();
-        offlineLayer(layer, []);
+        offlineLayer.setLayerOffline(layerName, []);
         return layer;
       }
     });
@@ -204,12 +204,8 @@ function offlineStore() {
     var geometryName = layer.get('geometryName');
     var features = [];
     return storage[layerName].iterate(function(value, key, index) {
-        var feature = format.readFeature(value);
-        var geometry = feature.getGeometry();
-        feature.unset(feature.getGeometryName());
-        feature.setGeometryName(geometryName);
-        feature.setGeometry(geometry);
-        // console.log(feature .getGeometryName());
+        var storedFeature = format.readFeature(value);
+        var feature = restoreGeometryName(storedFeature, geometryName);
         features.push(feature);
       })
       .then(function() {
@@ -254,22 +250,13 @@ function offlineStore() {
 
   function setLayerOffline(layerName, features) {
     var layer = viewer.getLayer(layerName);
-    // layer.set('onlineType', layer.get('type'));
     layer.set('type', 'OFFLINE');
-    offlineLayer(layer, features);
+    offlineLayer.setLayerOffline(layerName, features);
     setDownloaded(layerName, true);
   }
 
   function setLayerOnline(layerName) {
-    var layer = viewer.getLayer(layerName);
-    var source;
-    var options;
-    layer.set('type', layer.get('onlineType'));
-    options = layer.getProperties();
-    options.source = options.sourceName;
-    options.style = options.styleName;
-    source = layerCreator(options).getSource();
-    layer.setSource(source);
+    offlineLayer.setLayerOnline(layerName);
     setDownloaded(layerName, false);
   }
 
@@ -354,6 +341,14 @@ function offlineStore() {
       status: 'finished',
       action: action
     });
+  }
+
+  function restoreGeometryName(feature, geometryName) {
+    var geometry = feature.getGeometry();
+    feature.unset(feature.getGeometryName());
+    feature.setGeometryName(geometryName);
+    feature.setGeometry(geometry);
+    return feature;
   }
 
 }

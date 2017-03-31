@@ -5,17 +5,40 @@
 "use strict";
 
 var $ = require('jquery');
+var viewer = require('../viewer');
 var layerCreator = require('../layercreator');
 
-var offlineLayer = function offlineLayer(layer, features) {
-  var source;
-  var options = layer.getProperties();
-  options.type = 'FEATURE';
-  options.features = features;
-  options.style = options.styleName;
-  source = layerCreator(options).getSource();
-  layer.setSource(source);
-  return layer;
+var offlineLayer = function offlineLayer() {
+
+  return {
+    setLayerOffline: setLayerOffline,
+    setLayerOnline: setLayerOnline
+  }
+
+  function setLayerOffline(layerName, features) {
+    var layer = viewer.getLayer(layerName);
+    var source;
+    var options = layer.getProperties();
+    options.type = 'FEATURE';
+    options.features = features;
+    options.style = options.styleName;
+    source = layerCreator(options).getSource();
+    layer.setSource(source);
+    return layer;
+  }
+
+  function setLayerOnline(layerName) {
+    var layer = viewer.getLayer(layerName);
+    var source;
+    var options;
+    layer.set('type', layer.get('onlineType'));
+    options = layer.getProperties();
+    options.source = options.sourceName;
+    options.style = options.styleName;
+    source = layerCreator(options).getSource();
+    layer.setSource(source);
+    return layer;
+  }
 }
 
 module.exports = offlineLayer;
