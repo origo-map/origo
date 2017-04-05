@@ -1,0 +1,662 @@
+{
+  "controls": [
+    {
+      "name": "home"
+    },
+    {
+      "name": "mapmenu"
+    },
+    {
+      "name": "sharemap"
+    },
+    {
+      "name": "about",
+      "options": {
+        "buttontext": "Om kartan",
+        "title": "Upphandlingsunderlag",
+        "content": "<p>Plats för mer information.</p>"
+      }
+    },
+    {
+      "name": "geoposition"
+    },
+    {
+      "name": "legend"
+    },
+    {
+      "name": "measure"
+    }
+  ],
+  "projectionCode": "EPSG:3008",
+  "projectionExtent": [110000,6540000,200000,6650000],
+  "proj4Defs": [
+      {
+          "code": "EPSG:3008",
+          "alias": "urn:ogc:def:crs:EPSG::3008",
+          "projection": "+proj=tmerc +lat_0=0 +lon_0=13.5 +k=1 +x_0=150000 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
+      },{
+          "code": "EPSG:3010",
+          "alias": "urn:ogc:def:crs:EPSG::3010",
+          "projection": "+proj=tmerc +lat_0=0 +lon_0=16.5 +k=1 +x_0=150000 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
+      }
+  ],
+  "extent": [110000,6540000,200000,6650000],
+  "center": [151000,6587500],
+  "home": [120000, 6556000, 191000, 6635000],
+  "zoom": 3,
+  "resolutions": [128,64,32,16,8,4,2,1,0.5,0.25,0.125],
+  "tileSize":256,
+  "featureinfoOptions":{
+    "pinning":false
+  },
+  "source": {
+    "geoserver_gi": {
+			"url": "https://gi.karlstad.se:/geoserver/ows",
+			"version": "1.1.0"
+	},
+    "geoserver_tms": {
+      "url": "https://gi.karlstad.se:/geoserver/gwc/service/tms/1.0.0/"
+    }
+  },
+  "groups": [
+    {
+      "name": "kartskikt",
+      "title": "Kartskikt",
+      "expanded": false,
+	  "groups": [
+		{
+		  "name": "vassalvkanter",
+		  "title": "Vass & Älvkanter",
+      "expanded": false
+		},{
+		  "name": "paradgrasbruksgras",
+		  "title": "Paradgräsmatta & Bruksgräs"
+		}
+		]
+    },
+    {
+      "name": "terrang",
+      "title": "Terrängskuggning",
+      "expanded": false
+    },
+    {
+      "name": "background",
+      "title": "Bakgrundskartor",
+      "expanded": true
+    }
+  ],
+  "layers": [
+    {
+      "name": "mask",
+      "opacity": 0.75,
+      "title": "kd",
+      "group": "none",
+      "queryable": false,
+      "source": "data/kdkn.geojson",
+      "style": "mask",
+      "type": "GEOJSON",
+      "minScale": 20000,
+      "visible": true
+    },
+    {
+      "name": "finemask",
+      "opacity": 0.75,
+      "title": "kd",
+      "group": "none",
+      "queryable": false,
+      "source": "data/mask.geojson",
+      "style": "mask",
+      "type": "GEOJSON",
+      "maxScale": 20000,
+      "visible": true
+    },
+    {
+      "name": "buffer",
+      "opacity": 1,
+      "title": "buffer",
+      "group": "none",
+      "queryable": false,
+      "source": "data/kdbuffer10.geojson",
+      "style": "mask",
+      "type": "GEOJSON",
+      "visible": true
+    },
+    {
+		"id": "TX",
+		"name": "TX_dark",
+		"title": "Texter mörk",
+		"source": "geoserver_gi",
+		"group": "none",
+		"queryable": false,
+		"style": "mask",
+		"type": "WFS",
+		"featuretype": 5,
+		"visible": false,
+		"customStyle": "labels",
+		"styleParams": "dark"
+		}, 
+    {
+		"id": "TX",
+		"name": "TX_light",
+		"title": "Texter ljus",
+		"source": "geoserver_gi",
+		"group": "none",
+		"queryable": false,
+		"style": "mask",
+		"type": "WFS",
+		"featuretype": 5,
+		"visible": true,
+		"customStyle": "labels",
+		"styleParams": "light"
+		},  
+    {
+		"name": "Skyddat:na_np_vassrojning",
+		"title": "Vassröjning",
+		"source": "geoserver_gi",
+		"group": "vassalvkanter",
+		"queryable": true,
+		"style": "vassrojning",
+		"type": "WFS",
+		"featuretype": 5,
+		"visible": true,
+		"attributes": [{
+			"title": "Typ: ",
+			"name": "itstitle"
+		},{
+			"title": "Areal: ",
+			"name": "areal_m2"
+		}]
+		},
+    {
+		"name": "Skyddat:na_np_alv_och_sjokanter",
+		"title": "Älv- och sjökanter",
+		"source": "geoserver_gi",
+		"group": "vassalvkanter",
+		"queryable": true,
+		"style": "alv_och_sjokanter",
+		"type": "WFS",
+		"featuretype": 5,
+		"visible": true,
+		"abstract": "Älv- och sjökanter",
+		"attributes": [{
+			"title": "Typ: ",
+			"name": "itstitle"
+		}]
+		}, 
+    {
+		"name": "Skyddat:na_np_vattenvegetationarsbest",
+		"title": "Vattenvegetation",
+		"source": "geoserver_gi",
+		"group": "vassalvkanter",
+		"queryable": true,
+		"style": "na_np_vattenvegetationarsbest",
+		"type": "WFS",
+		"featuretype": 5,
+		"visible": true,
+		"attributes": [{
+			"title": "Typ: ",
+			"name": "itstitle"
+		},{
+			"title": "Plats: ",
+			"name": "plats"
+		}]
+		}, 
+    {
+		"name": "Skyddat:na_np_paradgrasmatta",
+		"title": "Paradgräsmatta",
+		"source": "geoserver_gi",
+		"group": "paradgrasbruksgras",
+		"queryable": true,
+		"style": "paradgrasmatta",
+		"type": "WFS",
+		"featuretype": 5,
+		"visible": false,
+		"attributes": [{
+			"title": "Typ: ",
+			"name": "itstitle"
+		},{
+			"title": "Areal: ",
+			"name": "areal_m2"
+		}]
+		},
+    {
+		"name": "Skyddat:na_np_bruksgras",
+		"title": "Bruksgräsmatta",
+		"source": "geoserver_gi",
+		"group": "paradgrasbruksgras",
+		"queryable": true,
+		"style": "bruksgras",
+		"type": "WFS",
+		"featuretype": 5,
+		"visible": false,
+		"attributes": [{
+			"title": "Typ: ",
+			"name": "itstitle"
+		},{
+			"title": "Areal: ",
+			"name": "areal_m2"
+		}]
+		},
+    {
+		"name": "GL_BASEMAP2_grey",
+		"layerName": "GL_BASEMAP2",
+		"gridset": "basemap256",
+		"format":"pbf",
+		"title": "Ljus",
+		"group": "background",
+		"source": "geoserver_tms",
+		"style": "karta_gra",
+		"customStyle": "basemap_grey",
+		"labelLayer": "TX_light",
+		"type": "VECTORTILE",
+		"tileSize": [256, 256],
+		"visible": true,
+		"queryable": false,
+		"bgColor": "#f1f1f1"
+    },
+    {
+		"name": "GL_BASEMAP2_color",
+		"layerName": "GL_BASEMAP2",
+		"gridset": "basemap256",
+		"format":"pbf",
+		"title": "Färg",
+		"group": "background",
+		"source": "geoserver_tms",
+		"style": "karta_farg",
+		"customStyle": "basemap_bright",
+		"labelLayer": "TX_light",
+		"type": "VECTORTILE",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },
+	{
+    "attribution": "&copy Lantmäteriet Geodatasamverkan",
+	"name": "topowebb_nedtonad",
+	"layerName": "EXTERN%3Atopowebbkartan_nedtonad",
+	"gridset": "basemap256",
+	"format":"png8",
+    "group": "background",
+    "source": "geoserver_tms",
+    "title": "Topowebb Nedtonad",
+    "type": "TMS",
+    "style": "karta_gra",
+    "visible": false,
+    "queryable": false
+    },
+    {
+    "attribution": "&copy Lantmäteriet Geodatasamverkan",
+		"name": "ortofoto_lm",
+		"layerName": "EXTERN%3Alm_visning_orto",
+		"gridset": "basemap256",
+		"format":"jpeg",
+		"title": "Ortofoto 0.5m",
+		"group": "background",
+		"source": "geoserver_tms",
+		"labelLayer": "TX_dark",
+		"style": "orto",
+		"type": "TMS",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
+    },
+	{
+    "attribution": "&copy Lantmäteriet Geodatasamverkan",
+	"name": "terrangskuggning",
+	"layerName": "EXTERN%3Aterrangskuggning",
+	"gridset": "basemap256",
+	"format":"jpeg",
+    "group": "terrang",
+    "source": "geoserver_tms",
+    "title": "Terrängskugga",
+    "type": "TMS",
+    "style": "hillshade",
+	"opacity":0.25,
+    "visible": false,
+    "queryable": false
+    }
+  ],
+  "styles": {
+      "alv_och_sjokanter": [
+        [
+          {
+            "stroke": {
+              "color": "rgba(255,70,60,1.0)",
+              "width": 2
+            },
+            "fill": {
+              "color": "rgba(240,220,120,0.75)"
+            }
+          }
+        ]
+      ],
+	  "vassrojning": [
+        [
+          {
+            "stroke": {
+              "color": "rgba(5,145,165,1.0)",
+              "width": 2
+            },
+            "fill": {
+              "color": "rgba(70,70,255,0.75)"
+            }
+          }
+        ]
+      ],
+		"na_np_vattenvegetationarsbest": [
+			[{
+				"stroke": {
+					"color": "rgba(255, 0, 0, 1.0)",
+					"width": 2
+				},
+				"fill": {
+					"color": "rgba(255, 100, 100, 0.75)"
+				},
+				"filter": "[arsbest] == 'Bågsäv sparas'",
+				"legend": "Bågsäv sparas"
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(0,0,255,1.0)",
+					"width": 2
+				},
+				"fill": {
+					"color": "rgba(80, 255, 50, 0.75)"
+				},
+				"filter": "[arsbest] == 'Röda näckrosor sparas'",
+				"legend": "Röda näckrosor sparas"
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(30, 30, 30, 1.0)",
+					"width": 2
+				},
+				"fill": {
+					"color": "rgba(125, 155, 125, 0.75)"
+				},
+				"filter": "[arsbest] == 'Röjning av näckrosor'",
+				"legend": "Röjning av näckrosor"
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(125, 0, 255, 1.0)",
+					"width": 2
+				},
+				"fill": {
+					"color": "rgba(255, 150, 100, 0.75)"
+				},
+				"filter": "[arsbest] == 'Vass /säv mosaik sparas'",
+				"legend": "Vass /säv mosaik sparas"
+			}]
+
+		],
+	  "paradgrasmatta": [
+        [
+          {
+            "stroke": {
+              "color": "rgba(125,20,255,1.0)",
+              "width": 2
+            },
+            "fill": {
+              "color": "rgba(105,180,180,0.75)"
+            }
+          }
+        ]
+      ],
+	  "bruksgras": [
+        [
+          {
+            "stroke": {
+              "color": "rgba(240,70,50,1.0)",
+              "width": 2
+            },
+            "fill": {
+              "color": "rgba(70,255,70,0.75)"
+            }
+          }
+        ]
+      ],
+	  "stadsvandring": [
+        [
+          {
+            "fontSymbol": {
+				"glyph": "fa-eye",
+				"form": "circle", 
+				"fontSize": 0.7,
+				"radius": 35,
+				"border":3,
+				"offsetX": 0,
+				"rotation": 0,
+				"scale": 0.5,
+				"rotateWithView": true,
+				"offsetY": 0,
+				"gradient": false,
+				"shadow":false,
+				"color": "#eee",
+				"fill": {
+					"color": "rgba(150,75,20,1.0)"
+				},
+				"stroke": {
+					"color": "black",
+					"width": 2
+				}
+            }
+          }
+        ]
+      ],
+      "mask": [
+        [
+          {
+            "stroke": {
+              "color": "rgba(0,0,0,1.0)"
+            },
+            "fill": {
+              "color": "rgba(0,0,0,1.0)"
+            }
+          }
+        ]
+      ],
+      "red": [
+        [
+          {
+            "stroke": {
+              "color": "rgba(255,0,0,1.0)",
+                "width": 5
+            },
+            "fill": {
+              "color": "rgba(255,0,0,1.0)"
+            }
+          }
+        ]
+      ],
+      "hist": [
+        [
+          {
+            "icon": {
+              "src": "img/png/histkart.png",
+              "size": [20,20]
+            }
+          }
+        ]
+      ],
+	  "origo-logo": [
+        [
+          {
+            "circle": {
+              "radius": 16,
+              "stroke": {
+                "color": "rgba(0,0,0,1)",
+                "width": 5
+              },
+              "fill": {
+                "color": "rgba(255,255,255,0.9)"
+              }
+            }
+          },
+          {
+            "circle": {
+              "radius": 4,
+              "stroke": {
+                "color": "rgba(0,0,0,0)",
+                "width": 1
+              },
+              "fill": {
+                "color": "rgba(37,129,196,1)"
+              }
+            }
+          }
+        ]
+      ],
+      "cirkel": [
+        [
+          {
+            "circle": {
+              "radius": 6,
+              "stroke": {
+                "color": "rgba(0,0,255,1)",
+                "width": 2
+              },
+              "fill": {
+                "color": "rgba(37,129,196,1)"
+              }
+            }
+          }
+        ]
+      ],
+      "karta_svart": [
+        [
+          {
+            "image": {
+              "src": "img/png/svart.png"
+            }
+          }
+        ]
+      ],
+      "karta_gra": [
+        [
+          {
+            "image": {
+              "src": "img/png/gra.png"
+            }
+          }
+        ]
+      ],
+      "karta_farg": [
+        [
+          {
+            "image": {
+              "src": "img/png/farg.png"
+            }
+          }
+        ]
+      ],
+      "historto": [
+        [
+          {
+            "icon": {
+              "src": "img/png/orto.png",
+              "size": [20,20]
+            }
+          }
+        ]
+      ],
+      "historto_bw": [
+        [
+          {
+            "icon": {
+              "src": "img/png/orto_gra.png",
+              "size": [20,20]
+            }
+          }
+        ]
+      ],
+      "hillshade": [
+        [
+          {
+            "icon": {
+              "src": "img/png/hillshade.png",
+              "size": [20,20]
+            }
+          }
+        ]
+      ],
+      "timeline": [
+        [
+          {
+            "icon": {
+              "src": "img/png/timeline.png",
+              "size": [20,20]
+            }
+          }
+        ]
+      ],
+      "orto": [
+        [
+          {
+            "image": {
+              "src": "img/png/orto.png"
+            }
+          }
+        ]
+      ],
+		"kulprog_byggnader": [
+			[{
+				"stroke": {
+					"color": "rgba(150, 0, 0, 1.0)",
+					"width": 1.5
+				},
+				"fill": {
+					"color": "rgba(255, 0, 0, 1)"
+				},
+				"filter": "[klassificering] == 'Byggnad med särskilt värde'",
+				"legend": "Särsk. värdefull byggn."
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(0,0,150,1.0)",
+					"width": 1.5
+				},
+				"fill": {
+					"color": "rgba(0, 0, 255, 1)"
+				},
+				"filter": "[klassificering] == 'Byggnad med visst värde'",
+				"legend": "Byggn. med visst värde"
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(150, 150, 0, 1.0)",
+					"width": 1.5
+				},
+				"fill": {
+					"color": "rgba(255, 255, 0, 1)"
+				},
+				"filter": "[klassificering] == 'Ej utpekad'",
+				"legend": "Ej särskilt utpekad"
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(150, 0, 150, 1.0)",
+					"width": 1.5
+				},
+				"fill": {
+					"color": "rgba(255, 0, 255, 1)"
+				},
+				"filter": "[klassificering] == 'Byggnadsminne'",
+				"legend": "Byggnadsminnen"
+			}]
+
+		],
+		"kulprog_miljoer": [
+			[{
+				"stroke": {
+					"color": "rgba(153, 51, 0, 1.0)",
+					"width": 2.5
+				},
+				"fill": {
+					"color": "rgba(153, 51, 0, 0.4)"
+				}
+			}]
+
+		]
+  }
+}
