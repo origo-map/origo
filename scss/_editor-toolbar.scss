@@ -1,20 +1,18 @@
-#o-editor-toolbar {
-		bottom: 0;
+.o-editor-toolbar {
 		left: 50%;
-		-webkit-box-shadow: 0 2px 8px 1px rgba(0,0,0,0.45);
-	  box-shadow: 0 2px 8px 1px rgba(0,0,0,0.45);
-		/*-webkit-transform-style: preserve-3d;
-	  -moz-transform-style: preserve-3d;
-	  transform-style: preserve-3d;		*/
+		// -webkit-box-shadow: 0 2px 8px 1px rgba(0,0,0,0.45);
+	  // box-shadow: 0 2px 8px 1px rgba(0,0,0,0.45);
+		position: absolute;
 		-ms-transform: translate(-50%, 0);
 	  -webkit-transform: translate(-50%, 0);
 	  transform: translate(-50%, 0);
+		z-index: 10;
 }
-#o-editor-toolbar button {
+.o-editor-toolbar button {
 	float: left;
 	position: relative;
 }
-#o-editor-toolbar select {
+.o-editor-toolbar select {
 	border: 1px solid rgba(0, 0, 0, 0.4);
 	float: left;
 	height: 2rem;
@@ -24,7 +22,7 @@
 	vertical-align: middle;
 	width: 150px;
 }
-#o-editor-toolbar .o-icon-fa-times {
+.o-editor-toolbar .o-icon-fa-times {
 	height: 1rem;
 	padding: 0;
 	width: 1rem;

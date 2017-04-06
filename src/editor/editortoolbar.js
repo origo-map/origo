@@ -47,7 +47,7 @@ function Init(options) {
 }
 
 function render(selectOptions) {
-  $("#o-map").append(editortemplate(selectOptions));
+  $("#o-tools-bottom").append(editortemplate(selectOptions));
   $editAttribute = $('#o-editor-attribute');
   $editDraw = $('#o-editor-draw');
   $editDelete = $('#o-editor-delete');

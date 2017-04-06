@@ -1589,21 +1589,17 @@
     padding: 0.25em;
     height: 1em;
     width: 1em; }
-  .o-map #o-editor-toolbar {
-    bottom: 0;
+  .o-map .o-editor-toolbar {
     left: 50%;
-    -webkit-box-shadow: 0 2px 8px 1px rgba(0, 0, 0, 0.45);
-    box-shadow: 0 2px 8px 1px rgba(0, 0, 0, 0.45);
-    /*-webkit-transform-style: preserve-3d;
-	  -moz-transform-style: preserve-3d;
-	  transform-style: preserve-3d;		*/
+    position: absolute;
     -ms-transform: translate(-50%, 0);
     -webkit-transform: translate(-50%, 0);
-    transform: translate(-50%, 0); }
-  .o-map #o-editor-toolbar button {
+    transform: translate(-50%, 0);
+    z-index: 10; }
+  .o-map .o-editor-toolbar button {
     float: left;
     position: relative; }
-  .o-map #o-editor-toolbar select {
+  .o-map .o-editor-toolbar select {
     border: 1px solid rgba(0, 0, 0, 0.4);
     float: left;
     height: 2rem;
@@ -1612,7 +1608,7 @@
     margin-right: .5rem;
     vertical-align: middle;
     width: 150px; }
-  .o-map #o-editor-toolbar .o-icon-fa-times {
+  .o-map .o-editor-toolbar .o-icon-fa-times {
     height: 1rem;
     padding: 0;
     width: 1rem; }
