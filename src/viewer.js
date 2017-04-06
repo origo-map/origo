@@ -11,7 +11,6 @@ var Modal = require('./modal');
 var utils = require('./utils');
 var isUrl = require('./utils/isurl');
 var featureinfo = require('./featureinfo');
-var mapwindow = require('./mapwindow');
 var maputils = require('./maputils');
 var style = require('./style')();
 var layerCreator = require('./layercreator');
@@ -37,6 +36,7 @@ var settings = {
 var urlParams;
 
 function init(el, mapOptions) {
+  settings.target = el;
   $(el).html(template);
 
   // Read and set projection
@@ -83,10 +83,6 @@ function init(el, mapOptions) {
   //If url arguments, parse this settings
   if (window.location.search) {
     parseArg();
-  }
-
-  if (window.top != window.self) {
-    mapwindow.init();
   }
 
   loadMap();
@@ -321,6 +317,10 @@ function getControlNames() {
   return controlNames;
 }
 
+function getTarget() {
+  return settings.target;
+}
+
 function checkScale(scale, maxScale, minScale) {
   if (maxScale || minScale) {
 
@@ -434,6 +434,7 @@ module.exports.getProjection = getProjection;
 module.exports.getMapSource = getMapSource;
 module.exports.getResolutions = getResolutions;
 module.exports.getScale = getScale;
+module.exports.getTarget = getTarget;
 module.exports.getTileGrid = getTileGrid;
 module.exports.autoPan = autoPan;
 module.exports.removeOverlays = removeOverlays;
