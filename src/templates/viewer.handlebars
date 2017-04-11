@@ -9,6 +9,17 @@
   <div id="o-footer" class="o-footer">
     <div id="o-console" class="o-footer-left">&nbsp;</div>
     <div class="o-footer-middle">
+      <div class="o-footer-middle-content">
+        {{#if img}}
+        <img src="{{this.img}}">
+        {{/if}}
+        {{#if url}}
+        <a href="{{this.url}}">{{this.urlText}}</a>
+        {{/if}}
+        {{#if text}}
+        <p>{{this.text}}</p>
+        {{/if}}
+      </div>
     </div>
     <div class="o-footer-right">
     </div>

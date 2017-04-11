@@ -15,7 +15,7 @@
 }
 .o-tools-bottom {
   bottom: 1.7rem;
-  box-sizing: border-box;  
+  box-sizing: border-box;
   height: auto;
   left: 0;
   padding: .5rem;
@@ -55,15 +55,18 @@
   text-align: center;
   width: 40%;
 }
-.o-footer .o-footer-middle .o-logo {
+.o-footer .o-footer-middle .o-footer-middle-content {
   padding: 0.25em 0;
 }
 .o-footer .o-footer-middle img {
   height: 2em;
   padding-right: 5px;
 }
-.o-footer .o-footer-middle .o-logo span{
-  vertical-align: top;
+.o-footer .o-footer-middle img + a {
+	vertical-align: top;
+}
+.o-footer .o-footer-middle .o-footer-middle-content p {
+  display: inline;
 }
 .o-footer .o-footer-right {
   position: relative;
