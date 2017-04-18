@@ -62,7 +62,7 @@ function init(el, mapOptions) {
     settings.projection = new ol.proj.Projection({
       code: settings.projectionCode,
       extent: settings.projectionExtent,
-	  units: proj4.defs(settings.projectionCode).units || undefined
+      units: proj4.defs(settings.projectionCode).units || undefined
     });
     settings.resolutions = mapOptions.resolutions || undefined;
     settings.tileGrid = maputils.tileGrid(settings.projectionExtent, settings.resolutions);
