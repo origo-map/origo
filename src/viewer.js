@@ -391,13 +391,10 @@ function autoPan() {
     if (offsetY < 0) {
       dy = (-offsetY) * map.getView().getResolution();
     }
-    var pan = ol.animation.pan({
-      duration: 300,
-      source: center
+    map.getView().animate({
+      center: ([center[0] + dx, center[1] + dy]),
+	  duration:300
     });
-    map.beforeRender(pan);
-    map.getView().setCenter([center[0] + dx, center[1] + dy]);
-
   }
   /*End workaround*/
 }
