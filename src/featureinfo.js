@@ -28,6 +28,7 @@ var showOverlay;
 var identifyTarget;
 var clusterFeatureinfoLevel;
 var overlay;
+var hitTolerance;
 
 function init(opt_options) {
     map = Viewer.getMap();
@@ -59,6 +60,8 @@ function init(opt_options) {
 
     map.on('click', onClick);
     $(document).on('enableInteraction', onEnableInteraction);
+	
+	hitTolerance = options.hasOwnProperty('hitTolerance') ? options.hitTolerance : 0;
 
 }
 
@@ -74,6 +77,9 @@ function getSelection() {
 }
 function getPin() {
     return savedPin;
+}
+function getHitTolerance() {
+    return hitTolerance;
 }
 function identify(items, target, coordinate) {
     clear();
@@ -188,4 +194,5 @@ module.exports.clear = clear;
 module.exports.getSelectionLayer = getSelectionLayer;
 module.exports.getSelection = getSelection;
 module.exports.getPin = getPin;
+module.exports.getHitTolerance = getHitTolerance;
 module.exports.identify = identify;

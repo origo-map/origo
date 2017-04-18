@@ -8,6 +8,7 @@ var $ = require('jquery');
 var Viewer = require('./viewer');
 var maputils = require('./maputils');
 var getAttributes = require('./getattributes');
+var featureInfo = require('./featureinfo');
 
 var map;
 
@@ -186,8 +187,11 @@ function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
               item.content = getAttributes(feature,l)
               result.push(item);
           }
-
+        }, 
+        {
+          hitTolerance: featureInfo.getHitTolerance()
         });
+
     if(cluster) {
         return false;
     }
