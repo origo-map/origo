@@ -17,7 +17,7 @@ function Init(opt_options) {
   var options = opt_options || {};
   var target = options.target || '#o-toolbar-navigation';
   mapTarget = viewer.getTarget();
-  tooltip = options.tooltipText || "Visa stor karta";
+  tooltip = options.tooltipText || 'Visa stor karta';
 
   render(target);
   bindUIActions();
