@@ -2,7 +2,7 @@ module.exports = {
   crossDomain: true,
   target: '#app-wrapper',
   svgSpritePath: 'css/svg/',
-  svgSprites: ['fa-icons.svg', 'miscellaneous.svg', 'custom.svg'],
+  svgSprites: ['fa-icons-all.svg', 'miscellaneous.svg', 'custom.svg'],
   defaultControls: [
     {
       "name": "scaleline"

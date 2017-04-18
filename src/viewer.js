@@ -79,6 +79,7 @@ function init(el, mapOptions) {
   settings.controls = mapOptions.controls;
   settings.consoleId = mapOptions.consoleId || 'o-console';
   settings.featureinfoOptions = mapOptions.featureinfoOptions || {};
+  settings.tileSize = mapOptions.tileSize ? [mapOptions.tileSize,mapOptions.tileSize] : [256,256];
 
   //If url arguments, parse this settings
   if (window.location.search) {

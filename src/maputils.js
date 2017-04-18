@@ -15,12 +15,13 @@ module.exports = {
           extent: extent
       });
   },
-  tileGrid: function(extent, resolutions) {
+  tileGrid: function(extent, resolutions, tileSize) {
       var origin = ol.extent.getTopLeft(extent);
       return new ol.tilegrid.TileGrid({
           extent: extent,
           origin: origin,
-          resolutions: resolutions
+          resolutions: resolutions,
+		  tileSize: tileSize || [256,256]
       });
   },
   checkZoomChange: function checkZoomChange(resolution, currentResolution) {

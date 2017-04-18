@@ -1,10 +1,4 @@
-@supports (background: linear-gradient(90deg, black, white)) or (background: -webkit-linear-gradient(90deg, black, white)) {
-  .o-map-grid {
-    background-color: #fff;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 0, 0, 0.3) 1px, transparent 1px), linear-gradient(rgba(0, 0, 0, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 0, 0, 0.2) 1px, transparent 1px);
-    background-size: 140px 140px, 140px 140px, 20px 20px, 20px 20px;
-    background-position: -1px -1px, -1px -1px, -1px -1px, -1px -1px; } }
-
+/*@import 'background-grid.scss';*/
 .o-map {
   height: 100%;
   -ms-touch-action: manipulation;
@@ -1275,6 +1269,9 @@
   .o-map .o-toolbar button:hover [class^="o-icon-"],
   .o-map .o-toolbar button:hover [class*="o-icon-"] {
     fill: #007aff; }
+  .o-map .o-disabled [class^="o-icon-"],
+  .o-map .o-disabled [class*=" o-icon-"] {
+    fill: rgba(0, 0, 0, 0.26); }
   .o-map .owl-prev .o-icon-fa-chevron-left,
   .o-map .owl-next .o-icon-fa-chevron-right {
     fill: #424242;

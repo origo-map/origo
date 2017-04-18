@@ -10,6 +10,7 @@ controls.home = require('../src/home');
 controls.measure = require('../src/measure');
 controls.about = require('../src/about');
 controls.scale = require('../src/scale');
+controls.timeline = require('../src/timeline');
 controls.link = require('../src/link');
 controls.scaleline = require('../src/scaleline');
 controls.zoom = require('../src/zoom');
