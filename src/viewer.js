@@ -55,13 +55,14 @@ function init(el, mapOptions) {
   settings.map = mapOptions.map;
   settings.url = mapOptions.url;
   settings.baseUrl = mapOptions.baseUrl;
-  if (mapOptions.hasOwnProperty('proj4Defs')) {
+  if (mapOptions.hasOwnProperty('proj4Defs') || mapOptions.projectionCode=="EPSG:3857" || mapOptions.projectionCode=="EPSG:4326") {
     // Projection to be used in map
     settings.projectionCode = mapOptions.projectionCode || undefined;
     settings.projectionExtent = mapOptions.projectionExtent;
     settings.projection = new ol.proj.Projection({
       code: settings.projectionCode,
-      extent: settings.projectionExtent
+      extent: settings.projectionExtent,
+	  units: proj4.defs(settings.projectionCode).units || undefined
     });
     settings.resolutions = mapOptions.resolutions || undefined;
     settings.tileGrid = maputils.tileGrid(settings.projectionExtent, settings.resolutions);
