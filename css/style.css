@@ -1267,6 +1267,11 @@
     width: 1.3em;
     float: right;
     fill: #424242; }
+  .o-map .o-menu-button [class^="o-icon-"],
+  .o-map .o-menu-button [class*=" o-icon-"] {
+    padding: 0.25em;
+    height: 1em;
+    width: 1em; }
   .o-map .ol-control > button:hover [class^="o-icon-"],
   .o-map .ol-control > button:hover [class*=" o-icon-"],
   .o-map .o-button:hover [class^="o-icon-"],
@@ -1625,14 +1630,33 @@
     margin: 0 -8px;
     padding: 5px;
     width: 100%; }
-  .o-map .o-icon-fa-info-circle {
-    padding: .25em;
-    height: 1em;
-    width: 1em; }
-  .o-map .o-icon-fa-external-link {
-    padding: .25em;
-    height: 1em;
-    width: 1em; }
+  .o-map .o-centerposition {
+    padding-right: 5px; }
+  .o-map .o-centerposition-button {
+    background-color: #000;
+    color: #fff;
+    font-size: 10px;
+    line-height: 10px;
+    min-width: 110px;
+    padding: 5px;
+    border-radius: 10px;
+    display: inline-block;
+    font-family: Arial, "Helvetica Neue", sans-serif; }
+  .o-map .o-centerposition-marker {
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    cursor: default;
+    font-size: 1rem;
+    line-height: 2rem;
+    width: 2rem;
+    height: 2rem;
+    text-align: center;
+    top: 50%;
+    left: 50%;
+    margin-top: -1rem;
+    margin-left: -1rem;
+    z-index: 10000;
+    position: absolute; }
   .o-map .o-icon-minicons-square-vector {
     padding: .3em;
     height: 1.4em;
@@ -1687,11 +1711,6 @@
     padding: .65em;
     height: .7em;
     width: .7em; }
-  .o-map .o-icon-fa-print,
-  .o-map .o-icon-fa-share-square-o {
-    padding: 0.25em;
-    height: 1em;
-    width: 1em; }
   .o-map .o-icon-fa-times {
     padding: .65em;
     height: 1.129em;

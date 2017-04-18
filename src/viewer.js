@@ -40,7 +40,7 @@ function init(el, mapOptions) {
   $(el).html(template);
 
   // Read and set projection
-  if (mapOptions.hasOwnProperty('proj4Defs') && proj4) {
+  if (mapOptions.hasOwnProperty('proj4Defs') && window.proj4) {
     var proj = mapOptions['proj4Defs'];
 
     //Register proj4 projection definitions
