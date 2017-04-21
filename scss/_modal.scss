@@ -113,7 +113,7 @@
 .o-modal .o-form-checkbox {
   margin: 5px 0;
 }
-@media screen and (max-width: 768px) {
+&[class*=#{$media-l}] {
 .o-modal {
   max-width: 300px;
   width: 90%;

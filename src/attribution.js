@@ -12,6 +12,7 @@ var map;
 
 function Init(opt_options) {
   var options = opt_options || {};
+  var breakPoint = options.breakPoint || [768, 500];
   var attribution;
   map = Viewer.getMap();
 
@@ -25,9 +26,10 @@ function Init(opt_options) {
   checkSize();
 
   function checkSize() {
-    var small = map.getSize()[0] < 768;
-    attribution.setCollapsible(small);
-    attribution.setCollapsed(small);
+    var mapSize = map.getSize();
+    var collapsed = (mapSize[0] <= breakPoint[0] || mapSize[1] <= breakPoint[1]);
+    attribution.setCollapsible(collapsed);
+    attribution.setCollapsed(collapsed);
   }
 }
 

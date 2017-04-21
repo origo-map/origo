@@ -50,7 +50,7 @@ input.o-search-field::-ms-clear {
   color: black;
 }
 
-@media screen and (max-width: 768px) {
+&[class*=#{$media-l}] {
 #o-search-wrapper {
 	border: none;
 	height: 2em;
@@ -91,5 +91,10 @@ input.o-search-field::-ms-clear {
 	padding: .6em;
 	height: .8em;
 	width: .8em;
+}
+}
+&[class*=#{$media-l-m-s-xs}] {
+#o-search-wrapper {
+  display: none;
 }
 }
