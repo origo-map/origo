@@ -15,5 +15,6 @@ controls.scaleline = require('../src/scaleline');
 controls.zoom = require('../src/zoom');
 controls.rotate = require('../src/rotate');
 controls.attribution = require('../src/attribution');
+controls.fullscreen = require('../src/fullscreen');
 
 module.exports = controls;
