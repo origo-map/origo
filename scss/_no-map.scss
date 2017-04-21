@@ -1,14 +1,12 @@
-#o-no-map {
-  display: none;
-}
-.o-no-canvas #o-no-map {
+.o-no-map {
   background-color: #EEEEEE;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   display: block;
   height: 100%;
   width: 100%;
   z-index: 100000;
 }
-.o-no-canvas #o-no-map .o-no-map-message {
+.o-no-map-message {
   margin: auto;
   position: relative;
   text-align: center;

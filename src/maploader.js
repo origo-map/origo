@@ -4,6 +4,7 @@
  * ======================================================================== */
 "use strict";
 var $ = require('jquery');
+var supports = require('./utils/supports');
 var permalink = require('./permalink/permalink');
 var getUrl = require('./utils/geturl');
 var isUrl = require('./utils/isurl');
@@ -23,6 +24,12 @@ var mapLoader = function(mapOptions, config) {
   }
   map.el = mapEl;
 
+  // Check browser support
+  if (supports('browser', mapEl) === false) {
+    return undefined;
+  }
+
+  // Check if authorization is required before map options is loaded
   if (config.authorizationUrl) {
     return $.ajax({
         url: config.authorizationUrl

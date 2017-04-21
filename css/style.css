@@ -1,3 +1,17 @@
+.o-no-map {
+  background-color: #EEEEEE;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  display: block;
+  height: 100%;
+  width: 100%;
+  z-index: 100000; }
+
+.o-no-map-message {
+  margin: auto;
+  position: relative;
+  text-align: center;
+  top: 50%; }
+
 @supports (background: linear-gradient(90deg, black, white)) or (background: -webkit-linear-gradient(90deg, black, white)) {
   .o-map-grid {
     background-color: #fff;
@@ -426,19 +440,6 @@
   .o-map h1, .o-map h2, .o-map h3, .o-map h4, .o-map h5, .o-map h6 {
     margin-top: 0;
     margin-bottom: .5rem; }
-  .o-map #o-no-map {
-    display: none; }
-  .o-map .o-no-canvas #o-no-map {
-    background-color: #EEEEEE;
-    display: block;
-    height: 100%;
-    width: 100%;
-    z-index: 100000; }
-  .o-map .o-no-canvas #o-no-map .o-no-map-message {
-    margin: auto;
-    position: relative;
-    text-align: center;
-    top: 50%; }
   .o-map .o-rounded-top {
     border-top-left-radius: 3px;
     border-top-right-radius: 3px; }
