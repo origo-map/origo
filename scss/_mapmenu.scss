@@ -50,7 +50,7 @@
 	right: -230px;
 	top: 0px;
 	width: 230px;
-	z-index: 20;
+	z-index: 100;
 	-ms-transform: translateX(0);
 	-webkit-transform: translateX(0);
 	transform: translateX(0);
@@ -110,7 +110,7 @@ li .o-menu-button:hover {
 .o-button.o-mapmenu-button-false span.o-button-text {
 	display: none;
 }
-@media screen and (max-width: 768px) {
+&[class*=#{$media-l}] {
 #o-mapmenu-button,
 #o-mapmenu-button button.o-button {
 	width: 2rem;
@@ -119,16 +119,17 @@ li .o-menu-button:hover {
 	display: none;
 }
 }
-@media screen and (max-width: 320px) {
+&[class*=#{$media-l-m-s}] {
 #o-sidebar,
 #o-mapmenu {
+  max-width: 230px;
   width: 100%;
-  right: -320px;
 }
-#o-sidebar.o-sidebar-show,
-#o-mapmenu.o-mapmenu-show {
-  -ms-transform: translateX(-320px);
-  -webkit-transform: translateX(-320px);
-  transform: translateX(-320px);
+}
+&[class*=#{$media-l-m-s-xs}] {
+#o-mapmenu-button,
+#o-sidebar,
+#o-mapmenu {
+  display: none;
 }
 }

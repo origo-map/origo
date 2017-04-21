@@ -10,6 +10,7 @@ var template = require("./templates/viewer.handlebars");
 var Modal = require('./modal');
 var utils = require('./utils');
 var isUrl = require('./utils/isurl');
+var elQuery = require('./utils/elquery');
 var featureinfo = require('./featureinfo');
 var maputils = require('./maputils');
 var style = require('./style')();
@@ -86,6 +87,11 @@ function init(el, mapOptions) {
   }
 
   loadMap();
+
+  elQuery(map, {
+    breakPoints: mapOptions.breakPoints,
+    breakPointsPrefix: mapOptions.breakPointsPrefix,
+  });
 
   if (urlParams.pin) {
     settings.featureinfoOptions.savedPin = urlParams.pin;
