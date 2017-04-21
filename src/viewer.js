@@ -35,10 +35,10 @@ var settings = {
   editLayer: null
 };
 var urlParams;
+var footerTemplate = {};
 
 function init(el, mapOptions) {
-  settings.target = el;
-  $(el).html(template);
+  render(el, mapOptions);
 
   // Read and set projection
   if (mapOptions.hasOwnProperty('proj4Defs') && window.proj4) {
@@ -421,6 +421,25 @@ function removeOverlays(overlays) {
     map.getOverlays().clear();
   }
 }
+
+function render(el, mapOptions) {
+    if (mapOptions.hasOwnProperty('footer')) {
+      if (mapOptions.footer[0].hasOwnProperty('img')) {
+        footerTemplate.img = mapOptions.footer[0].img;
+      }
+      if (mapOptions.footer[0].hasOwnProperty('text')) {
+        footerTemplate.text = mapOptions.footer[0].text;
+      }
+      if (mapOptions.footer[0].hasOwnProperty('url')) {
+        footerTemplate.url = mapOptions.footer[0].url;
+      }
+      if (mapOptions.footer[0].hasOwnProperty('urlText')) {
+        footerTemplate.urlText = mapOptions.footer[0].urlText;
+      }
+    }
+
+    $(el).html(template(footerTemplate));
+  }
 
 module.exports.init = init;
 module.exports.createLayers = createLayers;
