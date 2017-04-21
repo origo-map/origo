@@ -17,7 +17,9 @@ var wmts = function wmts(layerOptions) {
   var sourceDefault = {
     matrixSet: viewer.getProjectionCode(),
     matrixIdsPrefix: viewer.getProjectionCode() + ':',
-    format: 'image/png'
+    format: 'image/png',
+    resolutions: viewer.getResolutions(),
+    tileSize: [256, 256]
   };
   var wmtsOptions = $.extend(wmtsDefault, layerOptions);
   wmtsOptions.name.split(':').pop();
@@ -28,7 +30,6 @@ var wmts = function wmts(layerOptions) {
   }
   sourceOptions.attribution = wmtsOptions.attribution;
   sourceOptions.projectionCode = viewer.getProjectionCode();
-  sourceOptions.resolutions = viewer.getResolutions();
   sourceOptions.matrixIds = [];
   sourceOptions.resolutions.forEach(function(resolution, i) {
     sourceOptions.matrixIds[i] = sourceOptions.matrixIdsPrefix + i;
@@ -49,9 +50,10 @@ var wmts = function wmts(layerOptions) {
       matrixSet: options.matrixSet,
       format: options.format,
       tileGrid: new ol.tilegrid.WMTS({
-        origin: ol.extent.getTopLeft(options.projectionExtent),
+        origin: options.origin || ol.extent.getTopLeft(options.projectionExtent),
         resolutions: options.resolutions,
-        matrixIds: options.matrixIds
+        matrixIds: options.matrixIds,
+        tileSize: options.tileSize
       }),
       style: 'default'
     })
