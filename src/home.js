@@ -35,7 +35,7 @@ function render(target) {
 
 function bindUIActions() {
   $('#o-home-button').on('click', function(e) {
-    map.getView().fit(extent, map.getSize());
+    map.getView().fit(extent);
     $('#o-home-button button').blur();
     e.preventDefault();
   });

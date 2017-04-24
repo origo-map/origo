@@ -5,7 +5,6 @@
     "ol.Map#addLayer",
     "ol.Map#addControl",
     "ol.Map#addOverlay",
-    "ol.Map#beforeRender",
     "ol.Map#forEachFeatureAtPixel",
     "ol.Map#forEachLayerAtPixel",
     "ol.Map#getLayers",
@@ -204,8 +203,7 @@
     "ol.geom.Polygon#getInteriorPoint",
     "ol.geom.Polygon#getType",
     "ol.geom.Polygon#setCoordinates",
-    "ol.loadingstrategy.*",
-    "ol.animation.pan"
+    "ol.loadingstrategy.*"
   ],
   "umd": true,
   "compile": {

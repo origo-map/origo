@@ -28,7 +28,7 @@ $body-color:    $gray-dark !default;
 $border-width: 1px !default;
 $spacer:   1rem !default;
 
-//buttons
+// buttons
 $o-btn-color: #424242;
 $o-btn-bg: #fff;
 $o-btn-active-color: #007aff;
@@ -64,3 +64,9 @@ $table-head-color:              $gray !default;
 
 $table-border-width:            $border-width !default;
 $table-border-color:            $gray-lighter !default;
+
+// element query cls names
+$media-l: o-media-l;
+$media-l-m: o-media-l-m;
+$media-l-m-s: o-media-l-m-s;
+$media-l-m-s-xs: o-media-l-m-s-xs;
