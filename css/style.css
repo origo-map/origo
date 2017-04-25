@@ -440,6 +440,33 @@
   .o-map h1, .o-map h2, .o-map h3, .o-map h4, .o-map h5, .o-map h6 {
     margin-top: 0;
     margin-bottom: .5rem; }
+  .o-map textarea,
+  .o-map select,
+  .o-map input {
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    box-sizing: border-box;
+    font-size: .875rem;
+    margin-bottom: .375rem;
+    padding: .375rem;
+    line-height: 1.5rem; }
+  .o-map label {
+    font-weight: bold;
+    font-size: .875rem;
+    line-height: 1.5rem; }
+  .o-map input[type=checkbox] {
+    color: #fff;
+    height: 1rem;
+    line-height: 1.5rem;
+    margin: .25rem;
+    vertical-align: bottom;
+    width: 1rem; }
+  .o-map input[type=button] {
+    background-color: #fff;
+    border-radius: 3px;
+    cursor: pointer; }
+  .o-map input[type=button]:hover {
+    background-color: #ccc; }
   .o-map .o-rounded-top {
     border-top-left-radius: 3px;
     border-top-right-radius: 3px; }
@@ -1226,37 +1253,11 @@
     overflow-y: auto; }
   .o-map .o-modal-content .o-share-link {
     padding: 10px 5px; }
-  .o-map .o-modal label {
-    font-weight: bold;
-    font-size: 1em;
-    line-height: 1.5em; }
-  .o-map .o-modal input {
-    border: 2px solid #ddd;
-    border-radius: 3px;
-    font-size: 1em;
-    line-height: 1.5em; }
+  .o-map .o-modal input[type=button],
+  .o-map .o-modal select,
+  .o-map .o-modal textarea,
   .o-map .o-modal input[type=text] {
-    width: 95%; }
-  .o-map .o-modal input[type=button] {
-    background-color: #FF3B30;
-    border: 1px solid #FF3B30;
-    color: #fff;
-    width: 8em; }
-  .o-map .o-modal input[type=checkbox] {
-    color: #fff;
-    vertical-align: middle;
-    width: 1em; }
-  .o-map .o-modal textarea {
-    border: 2px solid #ddd;
-    border-radius: 3px;
-    font-size: 1em;
-    line-height: 1.5em;
-    width: 92%; }
-  .o-map .o-modal select {
-    border-radius: 3px;
-    font-size: 1em;
-    line-height: 1.5em;
-    width: 95%; }
+    width: 100%; }
   .o-map .o-modal li {
     font-family: Arial,sans-serif;
     font-size: 14px;
@@ -1264,15 +1265,6 @@
     padding: 3px 5px;
     margin-left: -15px;
     margin-right: -15px; }
-  .o-map .o-modal .o-form-save {
-    margin: 0;
-    left: 50%;
-    -ms-transform: translate(50%, 0);
-    -webkit-transform: translate(50%, 0);
-    transform: translate(50%, 0);
-    width: 50%; }
-  .o-map .o-modal .o-form-checkbox {
-    margin: 5px 0; }
   .o-map[class*=o-media-l] .o-modal {
     max-width: 300px;
     width: 90%; }
