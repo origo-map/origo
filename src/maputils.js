@@ -58,7 +58,7 @@ module.exports = {
       var maxZoom = level;
       var extent = geometry.getExtent();
       if(extent) {
-          view.fit(extent, map.getSize(), {maxZoom: maxZoom});
+          view.fit(extent, {maxZoom: maxZoom});
           return extent;
       }
       else {

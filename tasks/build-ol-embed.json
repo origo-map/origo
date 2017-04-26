@@ -2,9 +2,8 @@
   "exports": [
     "ol.Map",
     "ol.Map#addInteraction",
-    "ol.Map#addControl",    
+    "ol.Map#addControl",
     "ol.Map#addOverlay",
-    "ol.Map#beforeRender",
     "ol.Map#dispatchEvent",
     "ol.Map#forEachFeatureAtPixel",
     "ol.Map#forEachLayerAtPixel",
@@ -16,7 +15,7 @@
     "ol.Map#removeInteraction",
     "ol.Map#removeOverlay",
     "ol.Map#on",
-    "ol.Map#once",    
+    "ol.Map#once",
     "ol.Map#un",
     "ol.proj.Projection",
     "ol.proj.Projection#getExtent",
@@ -152,8 +151,7 @@
     "ol.geom.Polygon#getInteriorPoint",
     "ol.geom.Polygon#getType",
     "ol.geom.Polygon#setCoordinates",
-    "ol.loadingstrategy.*",
-    "ol.animation.pan"
+    "ol.loadingstrategy.*"
   ],
   "umd": true,
   "compile": {
