@@ -55,6 +55,7 @@ function init(el, mapOptions) {
   settings.params = urlParams = mapOptions.params || {};
   settings.map = mapOptions.map;
   settings.url = mapOptions.url;
+  settings.target = mapOptions.target;
   settings.baseUrl = mapOptions.baseUrl;
   if (mapOptions.hasOwnProperty('proj4Defs')) {
     // Projection to be used in map
