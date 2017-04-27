@@ -43,7 +43,8 @@
     margin: 0;
 }
 .o-search input {
-  box-sizing: initial;
+  box-sizing: content-box;
+  line-height: inherit;
 }
 &[class*=#{$media-l}] {
 .tt-menu {
