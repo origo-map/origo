@@ -28,7 +28,7 @@ function render(target) {
     id: 'o-fullscreen-button',
     cls: 'o-fullscreen-button',
     iconCls: 'o-icon-fa-expand',
-    src: 'css/svg/fa-icons.svg#fa-expand',
+    src: '#fa-expand',
     tooltipText: tooltip,
     tooltipPlacement: 'east'
   });
