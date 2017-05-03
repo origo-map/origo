@@ -62,7 +62,7 @@ function init(el, mapOptions) {
     settings.projection = new ol.proj.Projection({
       code: settings.projectionCode,
       extent: settings.projectionExtent,
-      units: proj4.defs(settings.projectionCode).units || undefined
+      units: getUnits(settings.projectionCode)
     });
     settings.resolutions = mapOptions.resolutions || undefined;
     settings.tileGrid = maputils.tileGrid(settings.projectionExtent, settings.resolutions);
@@ -363,6 +363,21 @@ function getScale(resolution) {
   var scale = resolution * mpu * 39.37 * dpi;
   scale = Math.round(scale);
   return scale;
+}
+
+function getUnits(proj) {
+  var units;
+  switch(proj) {
+    case 'EPSG:3857':
+    units = 'm';
+    break;
+    case 'EPSG:4326':
+    units = 'degrees';
+    break;
+    default:
+	proj4.defs(proj) ? units = proj4.defs(proj).units : units = undefined;
+  }
+  return units;
 }
 
 function autoPan() {
