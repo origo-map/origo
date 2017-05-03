@@ -14,6 +14,7 @@ var generateUUID = require('../utils/generateuuid');
 var transactionHandler = require('./transactionhandler');
 var dispatcher = require('./editdispatcher');
 var editForm = require('./editform');
+var imageresizer = require('../utils/imageresizer');
 
 var editLayers = {};
 var autoSave = undefined;
@@ -172,6 +173,8 @@ function cancelAttribute() {
 function onAttributesSave(feature, attributes) {
   $('#o-save-button').on('click', function(e) {
     var editEl = {};
+    var imageData;
+    var fr = new FileReader();
 
     //Read values from form
     attributes.forEach(function(attribute) {
@@ -192,7 +195,35 @@ function onAttributesSave(feature, attributes) {
           editEl[attribute.name] = $(attribute.elId).val();
         }
       }
+
+      //Check if file. If file, read and trigger resize
+      if ($(attribute.elId).attr('type') === 'file') {
+        var attr = attribute.name;
+        var input = $(attribute.elId)[0];
+        var file = input.files[0];
+
+        if (file) {
+          fr.onload = function() {
+            imageresizer(fr.result, attribute, function(resized) {
+              editEl[attr] = resized;
+              $(document).trigger('imageresized');
+            });
+
+          }
+          fr.readAsDataURL(file);
+        } else if ($(attribute.elId).attr('defaultValue')) {
+          editEl[attr] = $(attribute.elId).attr('defaultValue');
+        }
+      }
     });
+
+    if (fr.readyState == 1) {
+      $(document).on('imageresized', function() {
+        attributesSaveHandler(feature, editEl);
+      });
+    } else {
+      attributesSaveHandler(feature, editEl);
+    }
 
     modal.closeModal();
     attributesSaveHandler(feature, editEl);

@@ -41,6 +41,9 @@ module.exports = function createForm(obj) {
       }
       el += '</select></div>';
       break;
+    case 'image':
+      el = '<div><label>' + label + '</label><br><input type="file" id="' + id + '" defaultValue="' + val + '" accept="image/*"></div>';
+      break;
   }
   return el;
 }
