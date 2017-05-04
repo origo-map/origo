@@ -106,12 +106,6 @@
       "visible": true,
       "attributes": [
           {
-            "name": "bild",
-            "title": "Ladda upp bild: ",
-            "type": "image",
-            "maxSize": 600
-          },
-          {
             "name": "typ",
             "title": "Typ:",
             "type": "dropdown",

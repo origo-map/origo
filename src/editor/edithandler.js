@@ -208,11 +208,8 @@ function onAttributesSave(feature, attributes) {
               editEl[attr] = resized;
               $(document).trigger('imageresized');
             });
-
           }
           fr.readAsDataURL(file);
-        } else if ($(attribute.elId).attr('defaultValue')) {
-          editEl[attr] = $(attribute.elId).attr('defaultValue');
         }
       }
     });
@@ -281,6 +278,33 @@ function addListener() {
       } else {
         $(containerClass).addClass('o-hidden');
       }
+    });
+  }
+  return fn;
+}
+
+function addImageListener() {
+  var fn = function(obj) {
+    var containerClass = '.' + obj.elId.slice(1);
+    $(obj.elId).on('change', function(e) {
+      $(containerClass + ' img').removeClass('o-hidden');
+      $(containerClass + ' input[type=button]').removeClass('o-hidden');
+
+      if (this.files && this.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          $(containerClass + ' img')
+            .attr('src', e.target.result)
+        };
+
+        reader.readAsDataURL(this.files[0]);
+      }
+    });
+
+    $(containerClass + ' input[type=button]').on('click', function(e) {
+      $(obj.elId).val('');
+      $(containerClass + ' img').addClass('o-hidden');
+      $(this).addClass('o-hidden');
     });
   }
   return fn;
@@ -379,6 +403,10 @@ function editAttributes() {
           } else {
             alert('Villkor verkar inte vara rätt formulerat. Villkor formuleras enligt principen change:attribute:value');
           }
+        } else if (obj.type === 'image') {
+          obj.isVisible = true;
+          obj.elId = '#input-' + obj.name;
+          obj.addListener = addImageListener();
         } else {
           obj.isVisible = true;
           obj.elId = '#input-' + obj.name;
