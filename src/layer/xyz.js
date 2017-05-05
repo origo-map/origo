@@ -22,16 +22,22 @@ var xyz = function xyz(layerOptions) {
   sourceOptions.projection = viewer.getProjectionCode() || 'EPSG:3857';
   sourceOptions.tileGrid = viewer.getTileGrid();
 
-  var xyzSource = createSource(sourceOptions);
+  var xyzSource = createSource(sourceOptions, xyzOptions);
   return tile(xyzOptions, xyzSource);
+}
 
-  function createSource(options) {
+function createSource(options, xyzOptions) {
+  if(xyzOptions.layerURL){
+    options.url += xyzOptions.layerURL;
+  }
+  else {
     var format = options.sourceName.split('.')[1],
       url = options.sourceName.split('.')[0] + '/{z}/{x}/{y}.';
     url += format;
-    options.url = format;
-    return new ol.source.XYZ(options);
+    options.url = url;
   }
+  options.crossOrigin = 'anonymous';
+  return new ol.source.XYZ(options);
 }
 
 module.exports = xyz;
