@@ -6,13 +6,14 @@
 
 var ol = require('openlayers');
 var style = require('../style')();
+var stylefunctions = require('../style/stylefunctions');
 
 module.exports = function vector(options, source) {
   var vectorLayer;
   switch (options.layerType) {
     case 'vector':
       options.source = source;
-      options.style = style.createStyle(options.style);
+      options.style = options.customStyle ? stylefunctions.customStyle(options.customStyle, options.styleParams) : style.createStyle(options.style);
       vectorLayer = new ol.layer.Vector(options);
       break;
     case 'cluster':
@@ -30,6 +31,11 @@ module.exports = function vector(options, source) {
         style: style.createStyle(options.style)
       });
       vectorLayer = new ol.layer.Image(options);
+      break;
+    case 'vectortile':
+      options.source = source;
+      options.style = options.customStyle ? stylefunctions.customStyle(options.customStyle, options.styleParams) : style.createStyle(options.style);
+      vectorLayer = new ol.layer.VectorTile(options);
       break;
   }
   return vectorLayer;

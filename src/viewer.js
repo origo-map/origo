@@ -57,6 +57,7 @@ function init(el, mapOptions) {
   settings.url = mapOptions.url;
   settings.target = mapOptions.target;
   settings.baseUrl = mapOptions.baseUrl;
+  settings.tileSize = mapOptions.tileSize ? [mapOptions.tileSize,mapOptions.tileSize] : [256,256];
   if (mapOptions.hasOwnProperty('proj4Defs')) {
     // Projection to be used in map
     settings.projectionCode = mapOptions.projectionCode || undefined;
@@ -66,7 +67,7 @@ function init(el, mapOptions) {
       extent: settings.projectionExtent
     });
     settings.resolutions = mapOptions.resolutions || undefined;
-    settings.tileGrid = maputils.tileGrid(settings.projectionExtent, settings.resolutions);
+    settings.tileGrid = maputils.tileGrid(settings.projectionExtent, settings.resolutions, settings.tileSize);
   }
 
   settings.extent = mapOptions.extent || undefined;
@@ -200,6 +201,9 @@ function getTileGrid() {
   return settings.tileGrid;
 }
 
+function getTileSize() {
+  return settings.tileSize;
+}
 function getUrl() {
   return settings.url;
 }
@@ -459,6 +463,7 @@ module.exports.getResolutions = getResolutions;
 module.exports.getScale = getScale;
 module.exports.getTarget = getTarget;
 module.exports.getTileGrid = getTileGrid;
+module.exports.getTileSize = getTileSize;
 module.exports.autoPan = autoPan;
 module.exports.removeOverlays = removeOverlays;
 module.exports.checkScale= checkScale;

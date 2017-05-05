@@ -18,6 +18,7 @@ type.WMTS = require('./layer/wmts');
 type.AGS_TILE = require('./layer/agstile');
 type.XYZ = require('./layer/xyz');
 type.OSM = require('./layer/osm');
+type.VECTORTILE = require('./layer/vectortile');
 type.GROUP = groupLayer;
 
 var layerCreator = function layerCreator(opt_options) {
@@ -42,7 +43,8 @@ var layerCreator = function layerCreator(opt_options) {
     visible: false,
     type: undefined,
     extent: undefined,
-    attributes: undefined
+    attributes: undefined,
+    tileSize: viewer.getTileSize()
   };
   var projection = viewer.getProjection();
   var options = opt_options || {};
