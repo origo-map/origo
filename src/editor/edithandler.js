@@ -360,10 +360,11 @@ function editAttributes() {
     var formElement = attributeObjects.reduce(function(prev, next) {
       return prev + next.formElement;
     }, '');
-    var form = '<form>' + formElement + '<br><div class="o-form-save"><input id="o-save-button" type="button" value="Spara"></input></div></form>';
+    var form = '<form>' + formElement + '<br><div class="o-form-save"><input id="o-save-button" type="button" value="Ok"></input></div></form>';
     modal.createModal('#o-map', {
       title: title,
-      content: form
+      content: form,
+      static: true
     });
     modal.showModal();
 

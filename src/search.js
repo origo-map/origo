@@ -92,7 +92,7 @@ function init(options) {
       limit: 9,
       displayKey: name,
       source: function (query, syncResults, asyncResults) {
-        $.get(url + '?q=' + query, function (data) {
+        $.get(url + '?q=' + encodeURI(query), function (data) {
           asyncResults(data);
         });
       }

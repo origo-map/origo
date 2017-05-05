@@ -1,12 +1,14 @@
+@import 'no-map.scss';
 @import 'background-grid.scss';
 @import 'variables';
 .o-map {
   height: 100%;
+  overflow: hidden;
   -ms-touch-action: manipulation;
+  position: relative;
   touch-action: manipulation;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   @import 'reset.scss';
-  @import 'no-map.scss';
   @import 'helpers.scss';
   @import 'ol.scss';
   @import 'externs/owl-carousel.scss';

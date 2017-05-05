@@ -17,10 +17,14 @@ origo.map.init = function(options, opt_config) {
   var config = opt_config ? $.extend(origo.config, opt_config) : origo.config;
 
   var map = mapLoader(options, config);
-  map.then(function(config) {
-    init(config);
-  })
-  return Viewer;
+  if (map) {
+    map.then(function(config) {
+      init(config);
+    })
+    return Viewer;
+  } else {
+    return undefined;
+  }
 }
 
 function init(config) {
