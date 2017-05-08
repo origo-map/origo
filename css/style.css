@@ -1046,6 +1046,7 @@
       position: relative; }
   .o-map .o-toolbar-horizontal {
     display: block;
+    float: left;
     margin: 0;
     position: relative; }
     .o-map .o-toolbar-horizontal .o-button-container,
@@ -1056,6 +1057,8 @@
       position: relative; }
     .o-map .o-toolbar-horizontal .o-button-container.o-hidden {
       display: none; }
+    .o-map .o-toolbar-horizontal button {
+      margin-right: .5rem; }
   .o-map .o-button-container {
     -webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
     border-radius: 4px;
@@ -1099,6 +1102,21 @@
   .o-map .o-btn-3 {
     height: 3rem;
     width: 3rem; }
+  .o-map .o-button-lg {
+    border-radius: 50%;
+    background-color: #fff;
+    border: none;
+    -webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
+    color: #424242;
+    cursor: pointer;
+    display: inline-block;
+    height: 2.5rem;
+    position: relative;
+    padding: .25rem;
+    text-align: center;
+    text-decoration: none;
+    width: 2.5rem; }
   .o-map .o-image-container img {
     vertical-align: top;
     width: 100%; }
@@ -1211,6 +1229,14 @@
     width: 240px; }
   .o-map[class*=o-media-l-m-s-xs] #o-popup {
     width: 200px; }
+  .o-map .o-dropup {
+    background-color: #fff;
+    bottom: 3.5rem;
+    display: inline-block;
+    margin: 0 0 0 -150px;
+    padding: .5rem;
+    position: absolute;
+    width: 250px; }
   .o-map #o-sidebar.o-sidebar-show {
     -ms-transform: translateX(-270px);
     -webkit-transform: translateX(-270px);
@@ -1584,15 +1610,14 @@
     height: 1em;
     width: 1em; }
   .o-map .o-editor-toolbar {
+    bottom: 0;
     left: 50%;
+    margin-bottom: .5rem;
     position: absolute;
     -ms-transform: translate(-50%, 0);
     -webkit-transform: translate(-50%, 0);
     transform: translate(-50%, 0);
     z-index: 10; }
-  .o-map .o-editor-toolbar button {
-    float: left;
-    position: relative; }
   .o-map .o-editor-toolbar select {
     border: 1px solid rgba(0, 0, 0, 0.4);
     float: left;
@@ -1603,9 +1628,9 @@
     vertical-align: middle;
     width: 150px; }
   .o-map .o-editor-toolbar .o-icon-fa-times {
-    height: 1rem;
-    padding: 0;
-    width: 1rem; }
+    height: 1.3rem;
+    padding: .35rem;
+    width: 1.3rem; }
   .o-map #o-window-button {
     left: .5em;
     top: 10em;

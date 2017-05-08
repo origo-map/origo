@@ -1,16 +1,14 @@
 .o-editor-toolbar {
+		bottom: 0;
 		left: 50%;
 		// -webkit-box-shadow: 0 2px 8px 1px rgba(0,0,0,0.45);
 	  // box-shadow: 0 2px 8px 1px rgba(0,0,0,0.45);
+		margin-bottom: .5rem;
 		position: absolute;
 		-ms-transform: translate(-50%, 0);
 	  -webkit-transform: translate(-50%, 0);
 	  transform: translate(-50%, 0);
 		z-index: 10;
-}
-.o-editor-toolbar button {
-	float: left;
-	position: relative;
 }
 .o-editor-toolbar select {
 	border: 1px solid rgba(0, 0, 0, 0.4);
@@ -23,7 +21,7 @@
 	width: 150px;
 }
 .o-editor-toolbar .o-icon-fa-times {
-	height: 1rem;
-	padding: 0;
-	width: 1rem;
+	height: 1.3rem;
+	padding: .35rem;
+	width: 1.3rem;
 }
