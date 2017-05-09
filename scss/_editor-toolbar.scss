@@ -1,8 +1,6 @@
 .o-editor-toolbar {
 		bottom: 0;
 		left: 50%;
-		// -webkit-box-shadow: 0 2px 8px 1px rgba(0,0,0,0.45);
-	  // box-shadow: 0 2px 8px 1px rgba(0,0,0,0.45);
 		margin-bottom: .5rem;
 		position: absolute;
 		-ms-transform: translate(-50%, 0);
@@ -19,9 +17,4 @@
 	margin-right: .5rem;
 	vertical-align: middle;
 	width: 150px;
-}
-.o-editor-toolbar .o-icon-fa-times {
-	height: 1.3rem;
-	padding: .35rem;
-	width: 1.3rem;
 }

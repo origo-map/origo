@@ -1113,7 +1113,7 @@
     display: inline-block;
     height: 2.5rem;
     position: relative;
-    padding: .25rem;
+    padding: .5rem;
     text-align: center;
     text-decoration: none;
     width: 2.5rem; }
@@ -1283,6 +1283,12 @@
     height: 1.3em;
     width: 1.3em;
     float: right;
+    fill: #424242; }
+  .o-map [class^="o-icon-24"],
+  .o-map [class*=" o-icon-24"] {
+    padding: 0;
+    height: 1.5rem;
+    width: 1.5rem;
     fill: #424242; }
   .o-map .o-menu-button [class^="o-icon-"],
   .o-map .o-menu-button [class*=" o-icon-"] {
@@ -1627,10 +1633,6 @@
     margin-right: .5rem;
     vertical-align: middle;
     width: 150px; }
-  .o-map .o-editor-toolbar .o-icon-fa-times {
-    height: 1.3rem;
-    padding: .35rem;
-    width: 1.3rem; }
   .o-map #o-window-button {
     left: .5em;
     top: 10em;

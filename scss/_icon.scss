@@ -6,6 +6,13 @@
   float: right;
   fill: $o-btn-color;
 }
+[class^="o-icon-24"],
+[class*=" o-icon-24"] {
+  padding: 0;
+  height: 1.5rem;
+  width: 1.5rem;
+  fill: $o-btn-color;
+}
 .o-menu-button [class^="o-icon-"],
 .o-menu-button [class*=" o-icon-"] {
 	padding: 0.25em;
