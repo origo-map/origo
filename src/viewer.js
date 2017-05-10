@@ -369,13 +369,13 @@ function getUnits(proj) {
   var units;
   switch(proj) {
     case 'EPSG:3857':
-    units = 'm';
-    break;
+      units = 'm';
+      break;
     case 'EPSG:4326':
-    units = 'degrees';
-    break;
+      units = 'degrees';
+      break;
     default:
-	proj4.defs(proj) ? units = proj4.defs(proj).units : units = undefined;
+      units = proj4.defs(proj) ? proj4.defs(proj).units : undefined;
   }
   return units;
 }
