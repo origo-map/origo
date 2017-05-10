@@ -1,9 +1,9 @@
 <div id="o-editor-toolbar" class="o-editor-toolbar o-toolbar o-toolbar-horizontal o-padding-horizontal-8 o-rounded-top o-hidden">
-    <select name="layer-dropdown">
+    <!-- <select name="layer-dropdown">
       {{#each this}}
         <option value="{{this.value}}">{{this.name}}</option>
       {{/each}}
-    </select>
+    </select> -->
     <div id="o-editor-toolbar-drawtools" class="o-toolbar-horizontal">
       <button id="o-editor-draw" class="o-button-lg" type="button" name="button">
           <svg class="o-icon-24">
@@ -27,11 +27,6 @@
       </svg>
     </button>
     <div id="editor-toolbar-layers-dropup" class="o-dropup">
-      <ul>
-        {{#each this}}
-          <li data-layer="{{this.value}}">{{this.name}}</li>
-        {{/each}}
-      </ul>
     </div>
     <button id="o-editor-save" class="o-button-lg o-disabled" type="button" name="button">
       <svg class="o-icon-24">

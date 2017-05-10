@@ -158,7 +158,7 @@ function clear() {
     selectionLayer.clear();
     sidebar.setVisibility(false);
     if (overlay) {
-      Viewer.removeOverlays(overlay);      
+      Viewer.removeOverlays(overlay);
     }
     console.log("Clearing selection");
 }

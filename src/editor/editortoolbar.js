@@ -10,6 +10,7 @@ var viewer = require('../viewer');
 var editortemplate = require("../templates/editortoolbar.template.handlebars");
 var dispatcher = require('./editdispatcher');
 var editHandler = require('./edithandler');
+var listGroup = require('../listgroup');
 
 var activeClass = 'o-control-active';
 var disableClass = 'o-disabled';
@@ -49,6 +50,9 @@ function Init(options) {
 
 function render(selectOptions) {
   $("#o-tools-bottom").append(editortemplate(selectOptions));
+  listGroup('editor-toolbar-layers-dropup', selectOptions, {
+    dataAttribute: 'layer'
+  });
   $editAttribute = $('#o-editor-attribute');
   $editDraw = $('#o-editor-draw');
   $editDelete = $('#o-editor-delete');
@@ -98,6 +102,12 @@ function bindUIActions() {
     currentLayer = $(this).val();
     dispatcher.emitToggleEdit('edit', {
       currentLayer: currentLayer
+    });
+  });
+  $(document).on('changeDropdown', function(e) {
+    e.stopImmediatePropagation(e);
+    dispatcher.emitToggleEdit('edit', {
+      currentLayer: e.dataAttribute
     });
   });
 }
