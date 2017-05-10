@@ -21,21 +21,20 @@ var xyz = function xyz(layerOptions) {
   sourceOptions.attributions = xyzOptions.attribution;
   sourceOptions.projection = viewer.getProjectionCode() || 'EPSG:3857';
   sourceOptions.tileGrid = viewer.getTileGrid();
-
-  var xyzSource = createSource(sourceOptions, xyzOptions);
+  if(xyzOptions.layerURL){
+    sourceOptions.url += xyzOptions.layerURL;
+  }
+  else {
+    var format = sourceOptions.sourceName.split('.')[1],
+      url = sourceOptions.sourceName.split('.')[0] + '/{z}/{x}/{y}.';
+    url += format;
+    sourceOptions.url = url;
+  }
+  var xyzSource = createSource(sourceOptions);
   return tile(xyzOptions, xyzSource);
 }
 
-function createSource(options, xyzOptions) {
-  if(xyzOptions.layerURL){
-    options.url += xyzOptions.layerURL;
-  }
-  else {
-    var format = options.sourceName.split('.')[1],
-      url = options.sourceName.split('.')[0] + '/{z}/{x}/{y}.';
-    url += format;
-    options.url = url;
-  }
+function createSource(options) {
   options.crossOrigin = 'anonymous';
   return new ol.source.XYZ(options);
 }
