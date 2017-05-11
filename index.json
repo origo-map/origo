@@ -10,21 +10,18 @@
       "name": "sharemap"
     },
     {
-      "name": "print"
-    },
-    {
       "name": "about",
       "options": {
-        "buttontext": "Om Origo",
-        "title": "Om Origo",
-        "content": "<p>Origo är ett ramverk för webbkartor. Ramverket bygger på JavaScript-biblioteket OpenLayers 3. Du kan använda Origo för att skapa egna webbaserade kartapplikationer.</p><br><p>Projektet drivs och underhålls av ett antal svenska kommuner. Besök gärna <a href='https://github.com/origo-map/origo' target='_blank'>Origo på GitHub</a> för mer information.</p>"
+        "buttontext": "Om Kulturmiljö Karlstad",
+        "title": "Om Kulturmiljö Karlstad",
+        "content": "<p>Kartan bygger på Karlstads kulturmiljöprogram som är en bas för kommunens kulturmiljöarbete.</p><p>Vi behöver känna vår kommun och veta vad vi har för kulturhistoriska värden för att kunna ta hand om dem i plan- och byggprocessen. Kulturmiljöprogrammet är ett kunskapsunderlag som pekar ut kulturhistoriska värden. Det ger möjlighet att göra välgrundade beslut men är inte ett skydd i sig. Kulturmiljöprogrammet bidrar även till att stärka kommunens identitet genom kunskapen om dess historia och hur staden har växt fram.</p><p>Besök gärna <a href='http://karlstad.se/Bygga-och-bo/Bygglov-tillstand-och-fastighetsfragor/Kulturhistoriska-byggnader/Kulturmiljoprogrammet/' target='_blank'>karlstad.se</a> för mer information.</p>"
       }
     },
     {
       "name": "link",
       "options": {
-        "title": "Origo",
-        "url": "https://github.com/origo-map/origo"
+        "title": "Mer information",
+        "url": "http://karlstad.se/Bygga-och-bo/Bygglov-tillstand-och-fastighetsfragor/Kulturhistoriska-byggnader/Kulturmiljoprogrammet/"
       }
     },
     {
@@ -32,69 +29,67 @@
     },
     {
       "name": "measure"
+    },
+    {
+      "name": "timeline"
     }
   ],
-  "footer": [{
-    "img": "img/png/logo.png",
-    "url" : "https://github.com/origo-map/origo",
-    "urlText": "Origo"
-  }],
-  "projectionCode": "EPSG:3857",
-  "projectionExtent": [
-    -20026376.39,
-    -20048966.10,
-    20026376.39,
-    20048966.10
-  ],
+  "projectionCode": "EPSG:3008",
+  "projectionExtent": [110000,6540000,200000,6650000],
   "proj4Defs": [
       {
-        "code": "EPSG:3857",
-        "alias": "urn:ogc:def:crs:EPSG::3857",
-        "projection": "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs"
+          "code": "EPSG:3008",
+          "alias": "urn:ogc:def:crs:EPSG::3008",
+          "projection": "+proj=tmerc +lat_0=0 +lon_0=13.5 +k=1 +x_0=150000 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
+      },{
+          "code": "EPSG:3010",
+          "alias": "urn:ogc:def:crs:EPSG::3010",
+          "projection": "+proj=tmerc +lat_0=0 +lon_0=16.5 +k=1 +x_0=150000 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
       }
   ],
-  "extent": [
-    -20026376.39,
-    -20048966.10,
-    20026376.39,
-    20048966.10
-  ],
-  "center": [
-    1700000,
-    8275000
-  ],
-  "zoom": 8,
-  "resolutions": [
-    156543.03,
-    78271.52,
-    39135.76,
-    19567.88,
-    9783.94,
-    4891.97,
-    2445.98,
-    1222.99,
-    611.50,
-    305.75,
-    152.87,
-    76.437,
-    38.219,
-    19.109,
-    9.5546,
-    4.7773,
-    2.3887,
-    1.1943,
-    0.5972
-  ],
+  "extent": [110000,6540000,200000,6650000],
+  "center": [151000,6587500],
+  "home": [120000, 6556000, 191000, 6635000],
+  "zoom": 3,
+  "resolutions": [128,64,32,16,8,4,2,1,0.5,0.25,0.125],
+  "tileSize":256,
+  "featureinfoOptions":{
+    "overlay":false
+  },
   "source": {
-    "local": {
-      "url": "http://localhost/geoserver/wms"
+    "geoserver_gi": {
+			"url": "http://gi.karlstad.se:8080/geoserver/ows",
+			"version": "1.1.0"
+	},
+    "geoserver_tms": {
+      "url": "http://gi.karlstad.se:8080/geoserver/gwc/service/tms/1.0.0/"
     }
   },
   "groups": [
     {
-      "name": "test",
-      "title": "Test",
+      "name": "km",
+      "title": "Kulturmiljöprogrammet",
       "expanded": true
+    },
+    {
+      "name": "byggnadsar",
+      "title": "Byggnadsår",
+      "expanded": true
+    },
+    {
+      "name": "terrang",
+      "title": "Terrängskuggning",
+      "expanded": false
+    },
+    {
+      "name": "historiskakartor",
+      "title": "Historiska kartor",
+      "expanded": false
+    },
+    {
+      "name": "historiskaortofoton",
+      "title": "Historiska ortofoton",
+      "expanded": false
     },
     {
       "name": "background",
@@ -104,41 +99,64 @@
   ],
   "layers": [
     {
-      "name": "origo-cities",
-      "title": "Origokommuner",
-      "group": "test",
-      "source": "data/origo-cities-3857.geojson",
-      "style": "origo-logo",
-      "type": "GEOJSON",
-      "attributes": [
-          {
-            "name": "name"
-          }
-      ],
-      "visible": true
+		"name": "GL_BASEMAP2_color",
+		"layerName": "GL_BASEMAP2",
+		"gridset": "basemap256",
+		"format":"pbf",
+		"title": "Ljus",
+		"group": "background",
+		"source": "geoserver_tms",
+		"style": "mask",
+		"customStyle": "basemap_bright",
+		"type": "VECTORTILE",
+		"tileSize": [256, 256],
+		"visible": true,
+		"queryable": false
     },
     {
-      "name": "origo-mask",
-      "opacity": 0.25,
-      "title": "origo-mask",
-      "group": "none",
-      "queryable": false,
-      "source": "data/origo-mask-3857.geojson",
-      "style": "mask",
-      "type": "GEOJSON",
-      "visible": true
-    },
-    {
-      "name": "osm",
-      "title": "OpenStreetMap",
-      "group": "background",
-      "queryable": false,
-      "style": "karta_farg",
-      "type": "OSM",
-      "visible": true
+		"name": "GL_BASEMAP2_grey",
+		"layerURL":"GL_BASEMAP2@basemap256@pbf/{z}/{x}/{-y}.pbf",
+		"format":"pbf",
+		"title": "Grå",
+		"group": "background",
+		"source": "geoserver_tms",
+		"style": "mask",
+		"customStyle": "basemap_grey",
+		"type": "VECTORTILE",
+		"tileSize": [256, 256],
+		"visible": false,
+		"queryable": false
     }
   ],
   "styles": {
+      "stadsvandring": [
+        [
+          {
+            "fontSymbol": {
+				"glyph": "fa-eye",
+				"form": "circle", 
+				"fontSize": 0.7,
+				"radius": 35,
+				"border":3,
+				"offsetX": 0,
+				"rotation": 0,
+				"scale": 0.5,
+				"rotateWithView": true,
+				"offsetY": 0,
+				"gradient": false,
+				"shadow":false,
+				"color": "#eee",
+				"fill": {
+					"color": "rgba(150,75,20,1.0)"
+				},
+				"stroke": {
+					"color": "black",
+					"width": 2
+				}
+            }
+          }
+        ]
+      ],
       "mask": [
         [
           {
@@ -151,7 +169,30 @@
           }
         ]
       ],
-      "origo-logo": [
+      "red": [
+        [
+          {
+            "stroke": {
+              "color": "rgba(255,0,0,1.0)",
+                "width": 5
+            },
+            "fill": {
+              "color": "rgba(255,0,0,1.0)"
+            }
+          }
+        ]
+      ],
+      "hist": [
+        [
+          {
+            "icon": {
+              "src": "img/png/histkart.png",
+              "size": [20,20]
+            }
+          }
+        ]
+      ],
+	  "origo-logo": [
         [
           {
             "circle": {
@@ -185,11 +226,11 @@
             "circle": {
               "radius": 6,
               "stroke": {
-                "color": "rgba(0,0,0,1)",
+                "color": "rgba(0,0,255,1)",
                 "width": 2
               },
               "fill": {
-                "color": "rgba(0,0,0,0.5)"
+                "color": "rgba(37,129,196,1)"
               }
             }
           }
@@ -213,6 +254,46 @@
           }
         ]
       ],
+      "historto": [
+        [
+          {
+            "icon": {
+              "src": "img/png/orto.png",
+              "size": [20,20]
+            }
+          }
+        ]
+      ],
+      "historto_bw": [
+        [
+          {
+            "icon": {
+              "src": "img/png/orto_gra.png",
+              "size": [20,20]
+            }
+          }
+        ]
+      ],
+      "hillshade": [
+        [
+          {
+            "icon": {
+              "src": "img/png/hillshade.png",
+              "size": [20,20]
+            }
+          }
+        ]
+      ],
+      "timeline": [
+        [
+          {
+            "icon": {
+              "src": "img/png/timeline.png",
+              "size": [20,20]
+            }
+          }
+        ]
+      ],
       "orto": [
         [
           {
@@ -221,6 +302,65 @@
             }
           }
         ]
-      ]
+      ],
+		"kulprog_byggnader": [
+			[{
+				"stroke": {
+					"color": "rgba(150, 0, 0, 1.0)",
+					"width": 1.5
+				},
+				"fill": {
+					"color": "rgba(255, 0, 0, 1)"
+				},
+				"filter": "[klassificering] == 'Byggnad med särskilt värde'",
+				"legend": "Särsk. värdefull byggn."
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(0,0,150,1.0)",
+					"width": 1.5
+				},
+				"fill": {
+					"color": "rgba(0, 0, 255, 1)"
+				},
+				"filter": "[klassificering] == 'Byggnad med visst värde'",
+				"legend": "Byggn. med visst värde"
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(150, 150, 0, 1.0)",
+					"width": 1.5
+				},
+				"fill": {
+					"color": "rgba(255, 255, 0, 1)"
+				},
+				"filter": "[klassificering] == 'Ej utpekad'",
+				"legend": "Ej särskilt utpekad"
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(150, 0, 150, 1.0)",
+					"width": 1.5
+				},
+				"fill": {
+					"color": "rgba(255, 0, 255, 1)"
+				},
+				"filter": "[klassificering] == 'Byggnadsminne'",
+				"legend": "Byggnadsminnen"
+			}]
+
+		],
+		"kulprog_miljoer": [
+			[{
+				"stroke": {
+					"color": "rgba(153, 51, 0, 1.0)",
+					"width": 2.5
+				},
+				"fill": {
+					"color": "rgba(153, 51, 0, 0.4)"
+				}
+			}]
+
+		]
   }
 }
