@@ -1,3 +1,4 @@
+"use strict";
 var $ = require('jquery');
 
 var modal = function() {
