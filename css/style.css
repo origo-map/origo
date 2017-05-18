@@ -1057,7 +1057,8 @@
       position: relative; }
     .o-map .o-toolbar-horizontal .o-button-container.o-hidden {
       display: none; }
-    .o-map .o-toolbar-horizontal button {
+    .o-map .o-toolbar-horizontal > div,
+    .o-map .o-toolbar-horizontal > button {
       margin-right: .5rem; }
   .o-map .o-button-container {
     -webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
@@ -1229,14 +1230,59 @@
     width: 240px; }
   .o-map[class*=o-media-l-m-s-xs] #o-popup {
     width: 200px; }
-  .o-map .o-dropup {
-    background-color: #fff;
-    bottom: 3.5rem;
+  .o-map .o-popover-container {
     display: inline-block;
-    margin: 0 0 0 -150px;
-    padding: .5rem;
+    position: relative; }
+  .o-map .o-popover {
+    background-color: #fff;
+    border: 1px solid #cccccc;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+    border-radius: 6px;
+    -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    bottom: 100%;
+    display: inline-block;
+    left: 50%;
+    margin: 0 0 10px -125px;
+    padding: .5rem 0;
     position: absolute;
     width: 250px; }
+  .o-map .o-popover:before,
+  .o-map .o-popover:after {
+    display: block;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none; }
+  .o-map .o-popover:after {
+    border-top-color: white;
+    border-width: 10px;
+    left: 50%;
+    margin-left: -10px;
+    bottom: -20px; }
+  .o-map .o-popover:before {
+    border-top-color: #999999;
+    border-width: 11px;
+    left: 50%;
+    margin-left: -11px;
+    bottom: -22px; }
+  .o-map .o-popover.o-active {
+    display: inline-block; }
+  .o-map .o-dropdown li {
+    height: 1.5rem;
+    line-height: 1.5rem;
+    padding: .25rem .75rem; }
+  .o-map .o-dropdown li:hover {
+    background-color: #eeeeee;
+    cursor: pointer; }
+  .o-map .o-dropdown .o-icon {
+    display: none;
+    float: right; }
+  .o-map .o-dropdown .o-active .o-icon {
+    display: inline-block; }
   .o-map #o-sidebar.o-sidebar-show {
     -ms-transform: translateX(-270px);
     -webkit-transform: translateX(-270px);

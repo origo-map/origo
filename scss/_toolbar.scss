@@ -24,7 +24,8 @@
   .o-button-container.o-hidden {
     display: none;
   }
-  button {
+  > div,
+  > button {
     margin-right: .5rem;
   }
 }

@@ -10,7 +10,7 @@ var viewer = require('../viewer');
 var editortemplate = require("../templates/editortoolbar.template.handlebars");
 var dispatcher = require('./editdispatcher');
 var editHandler = require('./edithandler');
-var listGroup = require('../listgroup');
+var editorLayers = require('./editorlayers');
 
 var activeClass = 'o-control-active';
 var disableClass = 'o-disabled';
@@ -35,7 +35,7 @@ function Init(options) {
   editableLayers = options.editableLayers;
 
   editHandler(options);
-  render(selectionModel(editableLayers));
+  render();
 
   $(document).on('enableInteraction', onEnableInteraction);
   $(document).on('changeEdit', toggleState);
@@ -48,11 +48,8 @@ function Init(options) {
   }
 }
 
-function render(selectOptions) {
-  $("#o-tools-bottom").append(editortemplate(selectOptions));
-  listGroup('editor-toolbar-layers-dropup', selectOptions, {
-    dataAttribute: 'layer'
-  });
+function render() {
+  $("#o-tools-bottom").append(editortemplate());
   $editAttribute = $('#o-editor-attribute');
   $editDraw = $('#o-editor-draw');
   $editDelete = $('#o-editor-delete');
@@ -81,6 +78,7 @@ function bindUIActions() {
   });
   $editLayers.on('click', function(e) {
     dispatcher.emitToggleEdit('layers');
+    editorLayers(editableLayers, currentLayer);
     $editLayers.blur();
     e.preventDefault();
   });
@@ -97,18 +95,6 @@ function bindUIActions() {
     $editClose.blur();
     e.stopPropagation();
     e.preventDefault();
-  });
-  $('select[name="layer-dropdown"]').change(function() {
-    currentLayer = $(this).val();
-    dispatcher.emitToggleEdit('edit', {
-      currentLayer: currentLayer
-    });
-  });
-  $(document).on('changeDropdown', function(e) {
-    e.stopImmediatePropagation(e);
-    dispatcher.emitToggleEdit('edit', {
-      currentLayer: e.dataAttribute
-    });
   });
 }
 
@@ -133,22 +119,19 @@ function setActive(state) {
   }
 }
 
-function selectionModel(layerNames) {
-  var selectOptions = layerNames.map(function(layerName) {
-    var obj = {};
-    obj.name = viewer.getLayer(layerName).get('title');
-    obj.value = layerName;
-    return obj;
-  });
-  return selectOptions;
-}
-
 function toggleState(e) {
   if (e.tool === 'draw') {
     if (e.active === false) {
       $editDraw.removeClass(activeClass);
     } else {
       $editDraw.addClass(activeClass);
+    }
+  } else if (e.tool === 'layers') {
+    console.log('aa');
+    if (e.active === false) {
+      $editLayers.removeClass(activeClass);
+    } else {
+      $editLayers.addClass(activeClass);
     }
   }
 }
