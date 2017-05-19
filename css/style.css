@@ -552,9 +552,10 @@
     background: #ffffff;
     background: rgba(255, 255, 255, 0.7);
     border-radius: 4px;
-    float: right;
+    bottom: .5rem;
+    right: .5rem;
     padding: 2px;
-    position: relative; }
+    position: absolute; }
   .o-map .ol-scale-line-inner {
     border-bottom-right-radius: 3px;
     border-bottom-left-radius: 3px;
@@ -1242,7 +1243,7 @@
     -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
     bottom: 100%;
-    display: inline-block;
+    display: none;
     left: 50%;
     margin: 0 0 10px -125px;
     padding: .5rem 0;
@@ -1349,6 +1350,8 @@
   .o-map .o-toolbar button:hover [class^="o-icon-"],
   .o-map .o-toolbar button:hover [class*="o-icon-"] {
     fill: #007aff; }
+  .o-map button.o-disabled:hover [class^="o-icon-"],
+  .o-map button.o-disabled:hover [class*=" o-icon-"],
   .o-map .o-disabled [class^="o-icon-"],
   .o-map .o-disabled [class*=" o-icon-"] {
     fill: rgba(0, 0, 0, 0.26); }
@@ -1665,20 +1668,12 @@
     bottom: 0;
     left: 50%;
     margin-bottom: .5rem;
-    position: absolute;
+    max-width: 80%;
+    position: relative;
     -ms-transform: translate(-50%, 0);
     -webkit-transform: translate(-50%, 0);
     transform: translate(-50%, 0);
     z-index: 10; }
-  .o-map .o-editor-toolbar select {
-    border: 1px solid rgba(0, 0, 0, 0.4);
-    float: left;
-    height: 2rem;
-    line-height: 2rem;
-    margin-top: .5rem;
-    margin-right: .5rem;
-    vertical-align: middle;
-    width: 150px; }
   .o-map #o-window-button {
     left: .5em;
     top: 10em;

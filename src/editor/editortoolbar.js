@@ -32,6 +32,9 @@ function Init(options) {
 
   editHandler(options);
   render();
+  editorLayers(editableLayers, {
+    activeLayer: currentLayer
+  });
 
   $(document).on('enableInteraction', onEnableInteraction);
   $(document).on('changeEdit', toggleState);
@@ -74,7 +77,6 @@ function bindUIActions() {
   });
   $editLayers.on('click', function(e) {
     dispatcher.emitToggleEdit('layers');
-    editorLayers(editableLayers, currentLayer);
     $editLayers.blur();
     e.preventDefault();
   });
@@ -123,7 +125,6 @@ function toggleState(e) {
       $editDraw.addClass(activeClass);
     }
   } else if (e.tool === 'layers') {
-    console.log('aa');
     if (e.active === false) {
       $editLayers.removeClass(activeClass);
     } else {

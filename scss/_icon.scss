@@ -29,6 +29,8 @@
 .o-toolbar button:hover [class*="o-icon-"] {
 	fill: $o-btn-active-color;
 }
+button.o-disabled:hover [class^="o-icon-"],
+button.o-disabled:hover [class*=" o-icon-"],
 .o-disabled [class^="o-icon-"],
 .o-disabled [class*=" o-icon-"] {
     fill: rgba(0,0,0,0.26);

@@ -2,19 +2,10 @@
 		bottom: 0;
 		left: 50%;
 		margin-bottom: .5rem;
-		position: absolute;
+		max-width: 80%;
+		position: relative;
 		-ms-transform: translate(-50%, 0);
 	  -webkit-transform: translate(-50%, 0);
 	  transform: translate(-50%, 0);
 		z-index: 10;
-}
-.o-editor-toolbar select {
-	border: 1px solid rgba(0, 0, 0, 0.4);
-	float: left;
-	height: 2rem;
-	line-height: 2rem;
-	margin-top: .5rem;
-	margin-right: .5rem;
-	vertical-align: middle;
-	width: 150px;
 }

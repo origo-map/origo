@@ -7,6 +7,7 @@ module.exports = function(target, items, options) {
   var dataAttribute = 'data-' + options.dataAttribute || 'default';
   var $target = $('#' + target);
   var activeItem = options.active || undefined;
+  var activeCls = 'o-active';
   var ul;
   var li = [];
   var cls = 'o-dropdown-li';
@@ -27,7 +28,7 @@ module.exports = function(target, items, options) {
       });
       obj[dataAttribute] = item.value;
       if (item.value === activeItem) {
-        obj.cls = 'o-active';
+        obj.cls = activeCls;
       }
       li[index] = utils.createElement('li', item.name + active, obj);
     });
@@ -49,7 +50,7 @@ module.exports = function(target, items, options) {
   }
 
   function toggleActive($active) {
-    $target.find('li').removeClass('o-active');
-    $active.addClass('o-active');
+    $target.find('li').removeClass(activeCls);
+    $active.addClass(activeCls);
   }
 };

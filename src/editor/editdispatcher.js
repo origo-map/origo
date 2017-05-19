@@ -36,7 +36,6 @@ function emitToggleEdit(tool, opt_options) {
   };
   $.extend(e, options);
   $.event.trigger(e);
-  console.log(e);
 }
 
 function emitEnableInteraction() {
