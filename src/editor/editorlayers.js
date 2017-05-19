@@ -48,22 +48,30 @@ module.exports = function editorLayers(editableLayers, opt_options) {
   function toggleEdit(e) {
     if (e.tool === 'layers') {
       if (active) {
-        active = false;
-        $('#' + target).removeClass(activeCls);
+        setActive(false);
       } else {
-        active = true;
-        $('#' + target).addClass(activeCls);
+        setActive(true);
       }
+    } else if(e.tool !== 'edit'){
+      setActive(false);
+    }
+    e.stopImmediatePropagation();
+  }
+
+  function setActive(state) {
+    if (state) {
+      active = true;
+      $('#' + target).addClass(activeCls);
+    } else {
+      active = false;
+      $('#' + target).removeClass(activeCls);
     }
     dispatcher.emitChangeEdit('layers', active);
-    e.stopImmediatePropagation();
   }
 
   function close() {
     if (active) {
-      active = false;
-      $('#' + target).removeClass(activeCls);
-      dispatcher.emitChangeEdit('layers', false);
+      setActive(false);
     }
   }
 
