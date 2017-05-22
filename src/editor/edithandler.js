@@ -28,12 +28,14 @@ var hasSnap = undefined;
 var select = undefined;
 var modify = undefined;
 var snap = undefined;
+var geometryFn = undefined;
 
 module.exports = function(options) {
   map = viewer.getMap();
-
+  options.geometryFn = ol.interaction.Draw.createBox();
   currentLayer = options.currentLayer;
   editableLayers = options.editableLayers;
+  geometryFn = options.geometryFn || undefined;
 
   //set edit properties for editable layers
   editLayers = setEditProps(options);
@@ -55,16 +57,20 @@ module.exports = function(options) {
 function setEditLayer(layerName) {
   var editLayer = editLayers[layerName];
   var layer = viewer.getLayer(layerName);
+  var drawOptions = {};
   currentLayer = layerName;
   editSource = layer.getSource();
   attributes = layer.get('attributes');
   title = layer.get('title') || 'Information';
   removeInteractions();
-  draw = new ol.interaction.Draw({
-    source: editSource,
-    'type': editLayer.geometryType,
-    geometryName: editLayer.geometryName
-  });
+  drawOptions.source = editSource;
+  drawOptions.type = editLayer.geometryType;
+  drawOptions.geometryName = editLayer.geometryName;
+  if (geometryFn) {
+    drawOptions.geometryFunction = geometryFn;
+    drawOptions.type = 'Circle';
+  }
+  draw = new ol.interaction.Draw(drawOptions);
   hasDraw = false;
   hasAttribute = false;
   select = new ol.interaction.Select({

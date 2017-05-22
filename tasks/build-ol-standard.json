@@ -67,6 +67,7 @@
     "ol.control.ScaleLine",
     "ol.control.defaults",
     "ol.interaction.Draw",
+    "ol.interaction.Draw.createBox",
     "ol.interaction.Draw#on",
     "ol.interaction.Draw#setActive",
     "ol.interaction.Draw#un",

@@ -6,6 +6,7 @@ var viewer = require('../viewer');
 var editortemplate = require("../templates/editortoolbar.template.handlebars");
 var dispatcher = require('./editdispatcher');
 var editHandler = require('./edithandler');
+var drawTools = require('./drawtools');
 var editorLayers = require('./editorlayers');
 
 var activeClass = 'o-control-active';
@@ -32,6 +33,7 @@ function Init(options) {
 
   editHandler(options);
   render();
+  drawTools(undefined);
   editorLayers(editableLayers, {
     activeLayer: currentLayer
   });
@@ -50,7 +52,7 @@ function Init(options) {
 function render() {
   $("#o-tools-bottom").append(editortemplate());
   $editAttribute = $('#o-editor-attribute');
-  $editDraw = $('#o-editor-draw');
+  $editDraw = $('#o-editor-drawtools');
   $editDelete = $('#o-editor-delete');
   $editLayers = $('#o-editor-layers');
   $editSave = $('#o-editor-save');
