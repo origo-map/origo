@@ -35,12 +35,6 @@
 	height: .7em;
 	width: .7em;
 }
-.o-icon-fa-print,
-.o-icon-fa-share-square-o {
-	padding: 0.25em;
-	height: 1em;
-	width: 1em;
-}
 .o-icon-fa-times {
 	padding: .65em;
 	height: 1.129em;
@@ -230,12 +224,12 @@ li .o-legend-subitem-title {
   margin: 0.8em 0;
 }
 
-@media screen and (max-width: 768px) {
+&[class*=#{$media-l}] {
 #o-map-legend {
   bottom: .5em;
 }
 }
-@media screen and (max-width: 500px) {
+&[class*=#{$media-l-m}] {
 #o-map-legend {
   display: none;
 }

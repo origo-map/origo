@@ -5,7 +5,6 @@
     "ol.Map#addLayer",
     "ol.Map#addControl",
     "ol.Map#addOverlay",
-    "ol.Map#beforeRender",
     "ol.Map#forEachFeatureAtPixel",
     "ol.Map#forEachLayerAtPixel",
     "ol.Map#getLayers",
@@ -196,12 +195,13 @@
     "ol.geom.Polygon#getInteriorPoint",
     "ol.geom.Polygon#getType",
     "ol.geom.Polygon#setCoordinates",
-    "ol.loadingstrategy.*",
-    "ol.animation.pan"
+    "ol.loadingstrategy.*"
   ],
   "umd": true,
   "compile": {
     "externs": [
+      "externs/bingmaps.js",
+      "externs/cartodb.js",
       "externs/closure-compiler.js",
       "externs/geojson.js",
       "externs/esrijson.js",
@@ -212,11 +212,9 @@
       "externs/topojson.js"
     ],
     "define": [
-      "ol.ENABLE_DOM=false",
       "ol.ENABLE_WEBGL=false",
       "ol.ENABLE_PROJ4JS=true",
-      "ol.ENABLE_IMAGE=false",
-      "goog.DEBUG=false"
+      "ol.ENABLE_RASTER_REPROJECTION=false"
     ],
     "extra_annotation_name": [
       "api", "observable"

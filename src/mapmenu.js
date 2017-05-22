@@ -1,7 +1,3 @@
-/* ========================================================================
- * Copyright 2016 Origo
- * Licensed under BSD 2-Clause (https://github.com/origo-map/origo/blob/master/LICENSE.txt)
- * ======================================================================== */
 "use strict";
 
 var $ = require('jquery');
@@ -27,7 +23,7 @@ function init() {
     $('#o-map').append(el);
     $menuButton = $('#o-mapmenu-button button');
 
-    var menuEl = '<div id="o-mapmenu">' +
+    var menuEl = '<div id="o-mapmenu" class="o-mapmenu">' +
                     '<div class="o-block">' +
                       '<ul id="o-menutools">' +
                         '<li></li>' +

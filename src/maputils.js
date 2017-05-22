@@ -1,7 +1,3 @@
-/* ========================================================================
- * Copyright 2016 Origo
- * Licensed under BSD 2-Clause (https://github.com/origo-map/origo/blob/master/LICENSE.txt)
- * ======================================================================== */
 "use strict";
 
 var ol = require('openlayers');
@@ -58,7 +54,7 @@ module.exports = {
       var maxZoom = level;
       var extent = geometry.getExtent();
       if(extent) {
-          view.fit(extent, map.getSize(), {maxZoom: maxZoom});
+          view.fit(extent, {maxZoom: maxZoom});
           return extent;
       }
       else {

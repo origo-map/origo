@@ -1,7 +1,3 @@
-/* ========================================================================
- * Copyright 2016 Origo
- * Licensed under BSD 2-Clause (https://github.com/origo-map/origo/blob/master/LICENSE.txt)
- * ======================================================================== */
 "use strict";
 
 var ol = require('openlayers');
@@ -33,6 +29,7 @@ var hintText;
 var hint;
 var highlight;
 var projectionCode;
+var overlay;
 
 typeahead.loadjQueryPlugin();
 
@@ -91,7 +88,7 @@ function init(options) {
       limit: 9,
       displayKey: name,
       source: function (query, syncResults, asyncResults) {
-        $.get(url + '?q=' + query, function (data) {
+        $.get(url + '?q=' + encodeURI(query), function (data) {
           asyncResults(data);
         });
       }
@@ -119,7 +116,6 @@ function onClearSearch() {
   $('#o-search-button-close').on('click', function (e) {
       $('.typeahead').typeahead('val', '');
       featureInfo.clear();
-      Viewer.removeOverlays();
       $('#o-search').removeClass('o-search-true');
       $('#o-search').addClass('o-search-false');
       $('#o-search .o-search-field.tt-input').val('');
@@ -130,9 +126,9 @@ function onClearSearch() {
 
 function showOverlay(data, coord) {
   var popup;
-  var overlay;
   var content;
-  Viewer.removeOverlays();
+  featureInfo.clear();
+  clear();
   popup = Popup('#o-map');
   overlay = new ol.Overlay({
       element: popup.getEl()
@@ -157,6 +153,10 @@ function showFeatureInfo(features, title, content) {
   obj.content = content;
   featureInfo.identify([obj], 'overlay', getCenter(features[0].getGeometry()));
   mapUtils.zoomToExent(features[0].getGeometry(), maxZoomLevel);
+}
+
+function clear() {
+  Viewer.removeOverlays(overlay);
 }
 
 /** There are several different ways to handle selected search result.
