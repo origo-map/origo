@@ -25,7 +25,7 @@ function offlineStore() {
 
   function Init(opt_options) {
     var options = opt_options || {};
-    var layersNames;
+    var layerNames;
     map = viewer.getMap();
     storageName = options.name || 'origo-layers';
     editsStorageName = options.editsName || 'origo-layers-edits';
@@ -47,6 +47,7 @@ function offlineStore() {
         storeName: layerName
       });
     });
+
     return instances;
   }
 
@@ -269,7 +270,6 @@ function offlineStore() {
 
   function saveInsert(inserts, layerName) {
     inserts.forEach(function(feature) {
-      var id = feature.getId();
       var action = 'insert';
       saveToEditsStorage(feature, layerName, action);
     });

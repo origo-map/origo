@@ -1,7 +1,3 @@
-/* ========================================================================
- * Copyright 2016 Origo
- * Licensed under BSD 2-Clause (https://github.com/origo-map/origo/blob/master/LICENSE.txt)
- * ======================================================================== */
 "use strict";
 
 var $ = require('jquery');
@@ -9,6 +5,7 @@ var viewer = require('./viewer');
 var mapUtils = require('./maputils');
 var group = require('./layer/group');
 var type = {};
+var layerCreator;
 type.WFS = require('./layer/wfs');
 type.AGS_FEATURE = require('./layer/agsfeature');
 type.TOPOJSON = require('./layer/topojson');
@@ -21,7 +18,7 @@ type.OSM = require('./layer/osm');
 type.FEATURE = require('./layer/featurelayer');;
 type.GROUP = groupLayer;
 
-var layerCreator = function layerCreator(opt_options) {
+layerCreator = function layerCreator(opt_options) {
   var defaultOptions = {
     name: undefined,
     id: undefined,
@@ -57,6 +54,7 @@ var layerCreator = function layerCreator(opt_options) {
   if (layerOptions.id === undefined) {
     layerOptions.id = name.split('__').shift();
   }
+
   layerOptions.name = name.split(':').pop();
 
   if (type.hasOwnProperty(layerOptions.type)) {
@@ -68,11 +66,14 @@ var layerCreator = function layerCreator(opt_options) {
 }
 
 function groupLayer(options) {
+  var layers;
+  var layerOptions;
   if (options.hasOwnProperty('layers')) {
-    var layers = options.layers.map(function(layer) {
+    layers = options.layers.map(function(layer) {
       return layerCreator(layer);
     });
-    var layerOptions = {};
+
+    layerOptions = {};
     layerOptions.layers = layers;
     return group($.extend(options, layerOptions));
   } else {

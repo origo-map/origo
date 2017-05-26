@@ -1,7 +1,3 @@
-/* ========================================================================
- * Copyright 2016 Origo
- * Licensed under BSD 2-Clause (https://github.com/origo-map/origo/blob/master/LICENSE.txt)
- * ======================================================================== */
 "use strict";
 
 var ol = require('openlayers');
@@ -16,6 +12,7 @@ var topojson = function topojson(layerOptions) {
     layerType: 'vector'
   };
   var topojsonOptions = $.extend(topojsonDefault, layerOptions);
+  var topojsonSource;
   var sourceOptions = {};
   sourceOptions.attribution = topojsonOptions.attribution;
   sourceOptions.projectionCode = viewer.getProjectionCode();
@@ -27,7 +24,7 @@ var topojson = function topojson(layerOptions) {
     sourceOptions.url = topojsonOptions.source;
   }
 
-  var topojsonSource = createSource(sourceOptions);
+  topojsonSource = createSource(sourceOptions);
   return vector(topojsonOptions, topojsonSource);
 
   function createSource(options) {

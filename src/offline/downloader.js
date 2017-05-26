@@ -1,7 +1,3 @@
-/* ========================================================================
- * Copyright 2016 Origo
- * Licensed under BSD 2-Clause (https://github.com/origo-map/origo/blob/master/LICENSE.txt)
- * ======================================================================== */
 "use strict";
 
 var $ = require('jquery');
@@ -14,7 +10,6 @@ var dispatcher = require('./offlinedispatcher');
 var toolbarPrefix = 'o-downloader-td-toolbar-';
 
 var Downloader = function Downloader(layersObj) {
-  var map = Viewer.getMap();
   render(layersObj);
   addListeners();
 
@@ -69,7 +64,7 @@ var Downloader = function Downloader(layersObj) {
     });
     var state;
     $('.o-downloader .o-table').append(tr);
-    state =  layersObj[layerName].downloaded === true ? 'offline': 'download';
+    state =  layersObj[layerName].downloaded === true ? 'offline' : 'download';
     renderButtons('#' + toolbarId, state, layerName);
   }
 

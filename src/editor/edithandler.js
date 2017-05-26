@@ -1,7 +1,3 @@
-/* ========================================================================
- * Copyright 2016 Origo
- * Licensed under BSD 2-Clause (https://github.com/origo-map/origo/blob/master/LICENSE.txt)
- * ======================================================================== */
 "use strict";
 
 var ol = require('openlayers');
@@ -257,6 +253,7 @@ function removeInteractions() {
         map.removeInteraction(snapInteraction);
       });
     }
+
     modify = undefined;
     select = undefined;
     draw = undefined;
@@ -315,6 +312,7 @@ function getSnapSources(layers) {
   var sources = layers.map(function(layer) {
     return viewer.getLayer(layer).getSource();
   });
+
   return sources;
 }
 
@@ -383,6 +381,7 @@ function editAttributes() {
           obj.isVisible = true;
           obj.elId = '#input-' + obj.name;
         }
+
         obj.formElement = editForm(obj);
         return obj;
       });
@@ -429,11 +428,12 @@ function saveFeatures() {
       var layer = viewer.getLayer(layerName);
       var ids = edits[layerName][editType];
       var features;
-      features = getFeaturesByIds(editType,layer,ids);
+      features = getFeaturesByIds(editType, layer, ids);
       if (features.length) {
         transaction[editType] = features;
       }
     });
+
     transactionHandler(transaction, layerName);
   });
 }
@@ -454,5 +454,6 @@ function getFeaturesByIds(type, layer, ids) {
       }
     });
   }
+
   return features;
 }
