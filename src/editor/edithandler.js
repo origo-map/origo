@@ -10,6 +10,8 @@ var generateUUID = require('../utils/generateuuid');
 var transactionHandler = require('./transactionhandler');
 var dispatcher = require('./editdispatcher');
 var editForm = require('./editform');
+var shapes = require('./shapes');
+var drawTools = require('./drawtools');
 
 var editLayers = {};
 var autoSave = undefined;
@@ -28,14 +30,13 @@ var hasSnap = undefined;
 var select = undefined;
 var modify = undefined;
 var snap = undefined;
-var geometryFn = undefined;
+var tools = undefined;
 
 module.exports = function(options) {
   map = viewer.getMap();
-  options.geometryFn = ol.interaction.Draw.createBox();
   currentLayer = options.currentLayer;
   editableLayers = options.editableLayers;
-  geometryFn = options.geometryFn || undefined;
+  tools = options.drawTools || [];
 
   //set edit properties for editable layers
   editLayers = setEditProps(options);
@@ -52,24 +53,30 @@ module.exports = function(options) {
 
   autoSave = options.autoSave;
   $(document).on('toggleEdit', toggleEdit);
+  $(document).on('editorShapes', onChangeShape);
 }
 
 function setEditLayer(layerName) {
-  var editLayer = editLayers[layerName];
-  var layer = viewer.getLayer(layerName);
-  var drawOptions = {};
   currentLayer = layerName;
+  setInteractions();
+}
+
+function setInteractions(drawType) {
+  var editLayer = editLayers[currentLayer];
+  var layer = viewer.getLayer(currentLayer);
+  var drawOptions;
   editSource = layer.getSource();
   attributes = layer.get('attributes');
   title = layer.get('title') || 'Information';
-  removeInteractions();
-  drawOptions.source = editSource;
-  drawOptions.type = editLayer.geometryType;
-  drawOptions.geometryName = editLayer.geometryName;
-  if (geometryFn) {
-    drawOptions.geometryFunction = geometryFn;
-    drawOptions.type = 'Circle';
+  drawOptions = {
+    source: editSource,
+    type: editLayer.geometryType,
+    geometryName: editLayer.geometryName
+  };
+  if (drawType) {
+    $.extend(drawOptions, shapes(drawType));
   }
+  removeInteractions();
   draw = new ol.interaction.Draw(drawOptions);
   hasDraw = false;
   hasAttribute = false;
@@ -166,6 +173,11 @@ function cancelDraw() {
   dispatcher.emitChangeEdit('draw', false);
 }
 
+function onChangeShape(e) {
+  setInteractions(e.shape);
+  startDraw();
+}
+
 function cancelAttribute() {
   modal.closeModal();
   dispatcher.emitChangeEdit('attribute', false);
@@ -260,7 +272,13 @@ function addListener() {
 function toggleEdit(e) {
   e.stopPropagation();
   if (e.tool === 'draw') {
-    if (hasDraw === false) {
+    if (e.active) {
+      if (e.active === false) {
+        cancelDraw();
+      }
+    } else if (hasDraw === false) {
+      drawTools(tools, editLayers[currentLayer].geometryType);
+      setInteractions();
       startDraw();
     } else {
       cancelDraw();

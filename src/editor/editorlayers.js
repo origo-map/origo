@@ -41,6 +41,7 @@ module.exports = function editorLayers(editableLayers, opt_options) {
       });
     });
     $(document).on('toggleEdit', toggleEdit);
+    $(document).on('changeEdit', onChangeEdit);
     map.getView().on('change:center', close);
     map.on('click', close);
   }
@@ -52,10 +53,15 @@ module.exports = function editorLayers(editableLayers, opt_options) {
       } else {
         setActive(true);
       }
-    } else if(e.tool !== 'edit'){
-      setActive(false);
     }
     e.stopImmediatePropagation();
+  }
+
+  function onChangeEdit(e) {
+    if (e.tool !== 'layers' && e.active === true) {
+      setActive(false);
+    }
+    e.stopPropagation();
   }
 
   function setActive(state) {
