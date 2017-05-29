@@ -53,13 +53,14 @@ function init(el, mapOptions) {
   settings.url = mapOptions.url;
   settings.target = mapOptions.target;
   settings.baseUrl = mapOptions.baseUrl;
-  if (mapOptions.hasOwnProperty('proj4Defs')) {
+  if (mapOptions.hasOwnProperty('proj4Defs') || mapOptions.projectionCode=="EPSG:3857" || mapOptions.projectionCode=="EPSG:4326") {
     // Projection to be used in map
     settings.projectionCode = mapOptions.projectionCode || undefined;
     settings.projectionExtent = mapOptions.projectionExtent;
     settings.projection = new ol.proj.Projection({
       code: settings.projectionCode,
-      extent: settings.projectionExtent
+      extent: settings.projectionExtent,
+      units: getUnits(settings.projectionCode)
     });
     settings.resolutions = mapOptions.resolutions || undefined;
     settings.tileGrid = maputils.tileGrid(settings.projectionExtent, settings.resolutions);
@@ -365,6 +366,21 @@ function getScale(resolution) {
   var scale = resolution * mpu * 39.37 * dpi;
   scale = Math.round(scale);
   return scale;
+}
+
+function getUnits(proj) {
+  var units;
+  switch(proj) {
+    case 'EPSG:3857':
+      units = 'm';
+      break;
+    case 'EPSG:4326':
+      units = 'degrees';
+      break;
+    default:
+      units = proj4.defs(proj) ? proj4.defs(proj).units : undefined;
+  }
+  return units;
 }
 
 function autoPan() {
