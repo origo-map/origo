@@ -53,46 +53,11 @@
 .o-modal-content .o-share-link {
   padding: 10px 5px;
 }
-.o-modal-footer {
-
-}
-.o-modal label {
-  font-weight: bold;
-  font-size: 1em;
-  line-height: 1.5em;
-}
-.o-modal input {
-  border: 2px solid #ddd;
-  border-radius: 3px;
-  font-size: 1em;
-  line-height: 1.5em;
-}
+.o-modal input[type=button],
+.o-modal select,
+.o-modal textarea,
 .o-modal input[type=text] {
-  width: 95%;
-}
-.o-modal input[type=button] {
-  background-color: #FF3B30;
-  border: 1px solid #FF3B30;
-  color: #fff;
-  width: 8em;
-}
-.o-modal input[type=checkbox] {
-  color: #fff;
-  vertical-align: middle;
-  width: 1em;
-}
-.o-modal textarea {
-  border: 2px solid #ddd;
-  border-radius: 3px;
-  font-size: 1em;
-  line-height: 1.5em;
-  width: 92%;
-}
-.o-modal select {
-  border-radius: 3px;
-  font-size: 1em;
-  line-height: 1.5em;
-  width: 95%;
+  width: 100%;
 }
 .o-modal li {
   font-family: Arial,sans-serif;
@@ -102,18 +67,8 @@
   margin-left: -15px;
   margin-right: -15px;
 }
-.o-modal .o-form-save {
-  margin: 0;
-  left: 50%;
-  -ms-transform: translate(50%,0);
-  -webkit-transform: translate(50%,0);
-  transform: translate(50%,0);
-  width: 50%;
-}
-.o-modal .o-form-checkbox {
-  margin: 5px 0;
-}
-@media screen and (max-width: 768px) {
+
+&[class*=#{$media-l}] {
 .o-modal {
   max-width: 300px;
   width: 90%;

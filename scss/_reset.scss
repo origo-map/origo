@@ -1,40 +1,74 @@
-  @import 'externs/normalize.scss';
-  ul {
-    list-style:none
-  }
-  ul, li {
-    margin:0;padding:0
-  }
-  *:focus {
-      outline: none;
-  }
-  svg,
-  object{
-    width: 100%;
-  }
-  svg {
-    pointer-events: none;
-  }
-  span {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  }
-  i {
-    font-style: italic;
-  }
-  b, strong {
-    font-weight: bold;
-  }
-  button {
-  	background-color: $o-btn-bg;
-    border: none;
-  	color: $o-btn-color;
-  	cursor: pointer;
-  }
-  button:focus {
-  	outline: none;
-  }
+@import 'externs/normalize.scss';
+ul {
+  list-style:none
+}
+ul, li {
+  margin:0;padding:0
+}
+*:focus {
+    outline: none;
+}
+svg,
+object{
+  width: 100%;
+}
+svg {
+  pointer-events: none;
+}
+span {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+i {
+  font-style: italic;
+}
+b, strong {
+  font-weight: bold;
+}
+button {
+	background-color: $o-btn-bg;
+  border: none;
+	color: $o-btn-color;
+	cursor: pointer;
+}
+button:focus {
+	outline: none;
+}
 
-  h1, h2, h3, h4, h5, h6 {
-    margin-top: 0;
-    margin-bottom: .5rem;
-  }
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  margin-bottom: .5rem;
+}
+
+// form
+textarea,
+select,
+input {
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  box-sizing: border-box;
+  font-size: .875rem;
+  margin-bottom: .375rem;
+  padding: .375rem;
+  line-height: 1.5rem;
+}
+label {
+  font-weight: bold;
+  font-size: .875rem;
+  line-height: 1.5rem;
+}
+input[type=checkbox] {
+  color: #fff;
+  height: 1rem;
+  line-height: 1.5rem;
+  margin: .25rem;
+  vertical-align: bottom;
+  width: 1rem;
+}
+input[type=button] {
+  background-color: #fff;
+  border-radius: 3px;
+  cursor: pointer;
+}
+input[type=button]:hover {
+  background-color: #ccc;
+}

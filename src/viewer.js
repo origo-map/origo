@@ -1,7 +1,3 @@
-/* ========================================================================
- * Copyright 2016 Origo
- * Licensed under BSD 2-Clause (https://github.com/origo-map/origo/blob/master/LICENSE.txt)
- * ======================================================================== */
 "use strict";
 
 var ol = require('openlayers');
@@ -10,8 +6,8 @@ var template = require("./templates/viewer.handlebars");
 var Modal = require('./modal');
 var utils = require('./utils');
 var isUrl = require('./utils/isurl');
+var elQuery = require('./utils/elquery');
 var featureinfo = require('./featureinfo');
-var mapwindow = require('./mapwindow');
 var maputils = require('./maputils');
 var style = require('./style')();
 var layerCreator = require('./layercreator');
@@ -35,9 +31,10 @@ var settings = {
   editLayer: null
 };
 var urlParams;
+var footerTemplate = {};
 
 function init(el, mapOptions) {
-  $(el).html(template);
+  render(el, mapOptions);
 
   // Read and set projection
   if (mapOptions.hasOwnProperty('proj4Defs') && window.proj4) {
@@ -54,14 +51,16 @@ function init(el, mapOptions) {
   settings.params = urlParams = mapOptions.params || {};
   settings.map = mapOptions.map;
   settings.url = mapOptions.url;
+  settings.target = mapOptions.target;
   settings.baseUrl = mapOptions.baseUrl;
-  if (mapOptions.hasOwnProperty('proj4Defs')) {
+  if (mapOptions.hasOwnProperty('proj4Defs') || mapOptions.projectionCode=="EPSG:3857" || mapOptions.projectionCode=="EPSG:4326") {
     // Projection to be used in map
     settings.projectionCode = mapOptions.projectionCode || undefined;
     settings.projectionExtent = mapOptions.projectionExtent;
     settings.projection = new ol.proj.Projection({
       code: settings.projectionCode,
-      extent: settings.projectionExtent
+      extent: settings.projectionExtent,
+      units: getUnits(settings.projectionCode)
     });
     settings.resolutions = mapOptions.resolutions || undefined;
     settings.tileGrid = maputils.tileGrid(settings.projectionExtent, settings.resolutions);
@@ -85,11 +84,12 @@ function init(el, mapOptions) {
     parseArg();
   }
 
-  if (window.top != window.self) {
-    mapwindow.init();
-  }
-
   loadMap();
+
+  elQuery(map, {
+    breakPoints: mapOptions.breakPoints,
+    breakPointsPrefix: mapOptions.breakPointsPrefix,
+  });
 
   if (urlParams.pin) {
     settings.featureinfoOptions.savedPin = urlParams.pin;
@@ -321,6 +321,10 @@ function getControlNames() {
   return controlNames;
 }
 
+function getTarget() {
+  return settings.target;
+}
+
 function checkScale(scale, maxScale, minScale) {
   if (maxScale || minScale) {
 
@@ -364,6 +368,21 @@ function getScale(resolution) {
   return scale;
 }
 
+function getUnits(proj) {
+  var units;
+  switch(proj) {
+    case 'EPSG:3857':
+      units = 'm';
+      break;
+    case 'EPSG:4326':
+      units = 'degrees';
+      break;
+    default:
+      units = proj4.defs(proj) ? proj4.defs(proj).units : undefined;
+  }
+  return units;
+}
+
 function autoPan() {
   /*Workaround to remove when autopan implemented for overlays */
   var el = $('.o-popup');
@@ -391,13 +410,10 @@ function autoPan() {
     if (offsetY < 0) {
       dy = (-offsetY) * map.getView().getResolution();
     }
-    var pan = ol.animation.pan({
-      duration: 300,
-      source: center
+    map.getView().animate({
+      center: ([center[0] + dx, center[1] + dy]),
+	  duration:300
     });
-    map.beforeRender(pan);
-    map.getView().setCenter([center[0] + dx, center[1] + dy]);
-
   }
   /*End workaround*/
 }
@@ -415,6 +431,25 @@ function removeOverlays(overlays) {
     map.getOverlays().clear();
   }
 }
+
+function render(el, mapOptions) {
+    if (mapOptions.hasOwnProperty('footer')) {
+      if (mapOptions.footer[0].hasOwnProperty('img')) {
+        footerTemplate.img = mapOptions.footer[0].img;
+      }
+      if (mapOptions.footer[0].hasOwnProperty('text')) {
+        footerTemplate.text = mapOptions.footer[0].text;
+      }
+      if (mapOptions.footer[0].hasOwnProperty('url')) {
+        footerTemplate.url = mapOptions.footer[0].url;
+      }
+      if (mapOptions.footer[0].hasOwnProperty('urlText')) {
+        footerTemplate.urlText = mapOptions.footer[0].urlText;
+      }
+    }
+
+    $(el).html(template(footerTemplate));
+  }
 
 module.exports.init = init;
 module.exports.createLayers = createLayers;
@@ -434,6 +469,7 @@ module.exports.getProjection = getProjection;
 module.exports.getMapSource = getMapSource;
 module.exports.getResolutions = getResolutions;
 module.exports.getScale = getScale;
+module.exports.getTarget = getTarget;
 module.exports.getTileGrid = getTileGrid;
 module.exports.autoPan = autoPan;
 module.exports.removeOverlays = removeOverlays;
