@@ -7,6 +7,7 @@ var editortemplate = require("../templates/editortoolbar.template.handlebars");
 var dispatcher = require('./editdispatcher');
 var editHandler = require('./edithandler');
 var editorLayers = require('./editorlayers');
+var drawTools = require('./drawtools');
 
 var activeClass = 'o-control-active';
 var disableClass = 'o-disabled';
@@ -35,9 +36,10 @@ function Init(options) {
   editorLayers(editableLayers, {
     activeLayer: currentLayer
   });
+  drawTools(options.drawTools, currentLayer);
 
   $(document).on('enableInteraction', onEnableInteraction);
-  $(document).on('changeEdit', toggleState);
+  $(document).on('changeEdit', onChangeEdit);
   $(document).on('editsChange', toggleSave);
 
   bindUIActions();
@@ -117,19 +119,22 @@ function setActive(state) {
   }
 }
 
-function toggleState(e) {
+function onChangeEdit(e) {
   if (e.tool === 'draw') {
     if (e.active === false) {
       $editDraw.removeClass(activeClass);
     } else {
       $editDraw.addClass(activeClass);
     }
-  } else if (e.tool === 'layers') {
+  }
+  if (e.tool === 'layers') {
     if (e.active === false) {
       $editLayers.removeClass(activeClass);
     } else {
       $editLayers.addClass(activeClass);
     }
+  } else if (e.active) {
+    $editLayers.removeClass(activeClass);
   }
 }
 

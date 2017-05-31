@@ -11,7 +11,6 @@ var transactionHandler = require('./transactionhandler');
 var dispatcher = require('./editdispatcher');
 var editForm = require('./editform');
 var shapes = require('./shapes');
-var drawTools = require('./drawtools');
 
 var editLayers = {};
 var autoSave = undefined;
@@ -43,8 +42,8 @@ module.exports = function(options) {
   editableLayers.forEach(function(layerName) {
     var layer = viewer.getLayer(layerName);
     layer.getSource().once('addfeature', function(e) {
-      editLayers[layerName].geometryType = layer.getSource().getFeatures()[0].getGeometry().getType();
-      editLayers[layerName].geometryName = layer.getSource().getFeatures()[0].getGeometryName();
+      editLayers[layerName].set('geometryType', layer.getSource().getFeatures()[0].getGeometry().getType());
+      editLayers[layerName].set('geometryName', layer.getSource().getFeatures()[0].getGeometryName());
       if (layerName === currentLayer && options.isActive) {
         dispatcher.emitEnableInteraction();
       }
@@ -52,7 +51,8 @@ module.exports = function(options) {
   });
 
   autoSave = options.autoSave;
-  $(document).on('toggleEdit', toggleEdit);
+  $(document).on('toggleEdit', onToggleEdit);
+  $(document).on('changeEdit', onChangeEdit);
   $(document).on('editorShapes', onChangeShape);
 }
 
@@ -63,15 +63,14 @@ function setEditLayer(layerName) {
 
 function setInteractions(drawType) {
   var editLayer = editLayers[currentLayer];
-  var layer = viewer.getLayer(currentLayer);
   var drawOptions;
-  editSource = layer.getSource();
-  attributes = layer.get('attributes');
-  title = layer.get('title') || 'Information';
+  editSource = editLayer.getSource();
+  attributes = editLayer.get('attributes');
+  title = editLayer.get('title') || 'Information';
   drawOptions = {
     source: editSource,
-    type: editLayer.geometryType,
-    geometryName: editLayer.geometryName
+    type: editLayer.get('geometryType'),
+    geometryName: editLayer.get('geometryName')
   };
   if (drawType) {
     $.extend(drawOptions, shapes(drawType));
@@ -81,7 +80,7 @@ function setInteractions(drawType) {
   hasDraw = false;
   hasAttribute = false;
   select = new ol.interaction.Select({
-    layers: [layer]
+    layers: [editLayer]
   });
   modify = new ol.interaction.Modify({
     features: select.getFeatures()
@@ -94,10 +93,10 @@ function setInteractions(drawType) {
   setActive();
 
   //If snap should be active then add snap internactions for all snap layers
-  hasSnap = editLayer.snap;
+  hasSnap = editLayer.get('snap');
   if (hasSnap) {
     var selectionSource = featureInfo.getSelectionLayer().getSource();
-    var snapSources = editLayer.snapLayers ? getSnapSources(editLayer.snapLayers) : [editLayer.source];
+    var snapSources = editLayer.get('snapLayers') ? getSnapSources(editLayer.get('snapLayers')) : [editLayer.get('source')];
     snapSources.push(selectionSource);
     snap = addSnapInteraction(snapSources);
   }
@@ -107,13 +106,11 @@ function setEditProps(options) {
   var initialValue = {};
   var result = editableLayers.reduce(function(layerProps, layerName) {
     var layer = viewer.getLayer(layerName);
-
-    layerProps[layerName] = {
-      geometryType: layer.get('geometryType') || undefined,
-      geometryName: layer.get('geometryName') || undefined,
-    };
-    layerProps[layerName].snap = options.hasOwnProperty('snap') ? options.snap : true;
-    layerProps[layerName].snapLayers = options.snapLayers || editableLayers;
+    var snap = options.hasOwnProperty('snap') ? options.snap : true;
+    var snapLayers = options.snapLayers || editableLayers;
+    layer.set('snap', snap);
+    layer.set('snapLayers', snapLayers);
+    layerProps[layerName] = layer;
     return layerProps;
   }, initialValue);
   return result;
@@ -269,15 +266,10 @@ function addListener() {
   return fn;
 }
 
-function toggleEdit(e) {
+function onToggleEdit(e) {
   e.stopPropagation();
   if (e.tool === 'draw') {
-    if (e.active) {
-      if (e.active === false) {
-        cancelDraw();
-      }
-    } else if (hasDraw === false) {
-      drawTools(tools, editLayers[currentLayer].geometryType);
+    if (hasDraw === false) {
       setInteractions();
       startDraw();
     } else {
@@ -297,6 +289,12 @@ function toggleEdit(e) {
       removeInteractions();
   } else if (e.tool === 'save') {
       saveFeatures();
+  }
+}
+
+function onChangeEdit(e) {
+  if (e.tool!== 'draw' && e.active) {
+    cancelDraw();
   }
 }
 

@@ -7,7 +7,6 @@ var dispatcher = require('./editdispatcher');
 var createElement = require('../utils').createElement;
 
 module.exports = function editorLayers(editableLayers, opt_options) {
-  var map = viewer.getMap();
   var active = false;
   var activeCls = 'o-active';
   var target = 'editor-toolbar-layers-dropdown';
@@ -36,17 +35,16 @@ module.exports = function editorLayers(editableLayers, opt_options) {
   function addListener() {
     $('#' + target).on('changeDropdown', function(e) {
       e.stopImmediatePropagation(e);
+      setActive(false);
       dispatcher.emitToggleEdit('edit', {
         currentLayer: e.dataAttribute
       });
     });
-    $(document).on('toggleEdit', toggleEdit);
+    $(document).on('toggleEdit', onToggleEdit);
     $(document).on('changeEdit', onChangeEdit);
-    map.getView().on('change:center', close);
-    map.on('click', close);
   }
 
-  function toggleEdit(e) {
+  function onToggleEdit(e) {
     if (e.tool === 'layers') {
       if (active) {
         setActive(false);
@@ -54,7 +52,7 @@ module.exports = function editorLayers(editableLayers, opt_options) {
         setActive(true);
       }
     }
-    e.stopImmediatePropagation();
+    e.stopPropagation();
   }
 
   function onChangeEdit(e) {
