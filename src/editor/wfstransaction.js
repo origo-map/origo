@@ -10,7 +10,7 @@ var format = new ol.format.WFS();
 var serializer = new XMLSerializer();
 
 module.exports = function(transObj, layerName) {
-  wfsTransaction(transObj, layerName);
+  return wfsTransaction(transObj, layerName);
 }
 
 function writeWfsTransaction(transObj, options) {
@@ -32,7 +32,7 @@ function wfsTransaction(transObj, layerName) {
     featureType: featureType
   };
   var node = writeWfsTransaction(transObj, options);
-  $.ajax({
+  return $.ajax({
     type: "POST",
     url: source.url,
     data: serializer.serializeToString(node),
@@ -40,10 +40,21 @@ function wfsTransaction(transObj, layerName) {
     success: success,
     error: error,
     context: this
-  });
+  })
+    .then(function(data) {
+      var result = readResponse(data);
+      var nr = 0;
+      if (result) {
+        nr += result.transactionSummary.totalUpdated;
+        nr += result.transactionSummary.totalDeleted;
+        nr += result.transactionSummary.totalInserted;
+      }
+      return nr;
+    });
 
   function success(data) {
     var result = readResponse(data);
+    var feature;
     if (result) {
       if (result.transactionSummary.totalUpdated > 0) {
         dispatcher.emitChangeFeature({
@@ -53,6 +64,7 @@ function wfsTransaction(transObj, layerName) {
           action: 'update'
         });
       }
+
       if (result.transactionSummary.totalDeleted > 0) {
         dispatcher.emitChangeFeature({
           feature: transObj.delete,
@@ -61,8 +73,9 @@ function wfsTransaction(transObj, layerName) {
           action: 'delete'
         });
       }
+
       if (result.transactionSummary.totalInserted > 0) {
-        var feature = transObj.insert;
+        feature = transObj.insert;
         dispatcher.emitChangeFeature({
           feature: transObj.insert,
           layerName: layerName,
@@ -95,5 +108,6 @@ function readResponse(data) {
   } else {
     result = format.readTransactionResponse(data);
   }
+
   return result;
 }

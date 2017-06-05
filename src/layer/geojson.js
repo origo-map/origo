@@ -12,6 +12,7 @@ var geojson = function geojson(layerOptions) {
     layerType: 'vector'
   };
   var geojsonOptions = $.extend(geojsonDefault, layerOptions);
+  var geojsonSource;
   var sourceOptions = {};
   sourceOptions.attribution = geojsonOptions.attribution;
   sourceOptions.projectionCode = viewer.getProjectionCode();
@@ -19,10 +20,11 @@ var geojson = function geojson(layerOptions) {
   if (isUrl(geojsonOptions.source)) {
     sourceOptions.url = geojsonOptions.source;
   } else {
-    sourceOptions.url = baseUrl + geojsonOptions.source;
+    geojsonOptions.sourceName = baseUrl + geojsonOptions.source;
+    sourceOptions.url = geojsonOptions.source;
   }
 
-  var geojsonSource = createSource(sourceOptions);
+  geojsonSource = createSource(sourceOptions);
   return vector(geojsonOptions, geojsonSource);
 
   function createSource(options) {

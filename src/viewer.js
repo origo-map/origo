@@ -185,6 +185,10 @@ function getSettings() {
   return settings;
 }
 
+function getExtent() {
+  return settings.extent;
+}
+
 function getBaseUrl() {
   return settings.baseUrl;
 }
@@ -244,6 +248,24 @@ function getMap() {
 
 function getLayers() {
   return settings.layers;
+}
+
+function getLayersByProperty(key, val, byName) {
+  var layers = map.getLayers().getArray().filter(function(layer) {
+    if (layer.get(key)) {
+      if (layer.get(key) === val) {
+        return layer;
+      }
+    }
+  });
+
+  if (byName) {
+    return layers.map(function(layer) {
+      return layer.get('name');
+    });
+  } else {
+    return layers;
+  }
 }
 
 function getLayer(layername) {
@@ -454,11 +476,13 @@ function render(el, mapOptions) {
 module.exports.init = init;
 module.exports.createLayers = createLayers;
 module.exports.getBaseUrl = getBaseUrl;
+module.exports.getExtent = getExtent;
 module.exports.getSettings = getSettings;
 module.exports.getStyleSettings = getStyleSettings;
 module.exports.getMapUrl = getMapUrl;
 module.exports.getMap = getMap;
 module.exports.getLayers = getLayers;
+module.exports.getLayersByProperty = getLayersByProperty;
 module.exports.getLayer = getLayer;
 module.exports.getControlNames = getControlNames;
 module.exports.getQueryableLayers = getQueryableLayers;
