@@ -91,9 +91,10 @@ button.ol-zoom-out {
   background: #ffffff;
   background: rgba(255,255,255,0.7);
   border-radius: 4px;
-  float: right;
+  bottom: .5rem;
+  right: .5rem;
   padding: 2px;
-  position: relative;
+  position: absolute;
 }
 .ol-scale-line-inner {
   border-bottom-right-radius: 3px;

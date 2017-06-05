@@ -11,6 +11,7 @@
 }
 .o-toolbar-horizontal {
   display: block;
+  float: left;
   margin: 0;
   position: relative;
   .o-button-container,
@@ -22,5 +23,9 @@
   }
   .o-button-container.o-hidden {
     display: none;
+  }
+  > div,
+  > button {
+    margin-right: .5rem;
   }
 }
