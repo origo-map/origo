@@ -53,7 +53,7 @@ var Downloader = function Downloader(layersObj) {
     var toolbarId = toolbarPrefix + layerName;
     var toolbar = utils.createElement('div', '', {
       cls: 'o-toolbar-horizontal',
-      style: 'text-align: right;',
+      style: 'text-align: right; float: right;',
       id: toolbarId
     });
     var tdToolbar = utils.createElement('td', toolbar, {});
