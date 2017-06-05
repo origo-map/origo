@@ -2,8 +2,10 @@
 
 var viewer = require('../viewer');
 var wfsTransaction = require('./wfstransaction');
+var indexedDb = require('./indexeddb');
 var transactions = {
-  WFS: wfsTransaction
+  WFS: wfsTransaction,
+  OFFLINE: indexedDb
 };
 
 module.exports = function(transaction, layerName) {

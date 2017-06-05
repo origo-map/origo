@@ -1,0 +1,19 @@
+.o-downloader {
+  z-index: 1000;
+  td {
+    vertical-align: middle;
+  }
+  .o-table tr:first-child td {
+    border-top: 0px;
+  }
+  .o-toolbar-horizontal {
+    button {
+      height: 2rem;
+      padding: .3125px;
+      width: 2rem;
+    }
+    button.o-spinner {
+      padding: 0;
+    }
+  }
+}
