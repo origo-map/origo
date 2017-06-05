@@ -1,7 +1,3 @@
-/* ========================================================================
- * Copyright 2016 Origo
- * Licensed under BSD 2-Clause (https://github.com/origo-map/origo/blob/master/LICENSE.txt)
- * ======================================================================== */
 "use strict";
 
 var ol = require('openlayers');
@@ -92,7 +88,7 @@ function init(options) {
       limit: 9,
       displayKey: name,
       source: function (query, syncResults, asyncResults) {
-        $.get(url + '?q=' + query, function (data) {
+        $.get(url + '?q=' + encodeURI(query), function (data) {
           asyncResults(data);
         });
       }

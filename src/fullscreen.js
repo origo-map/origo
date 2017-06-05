@@ -1,7 +1,3 @@
-/* ========================================================================
- * Copyright 2016 Mälardalskartan
- * Licensed under BSD 2-Clause (https://github.com/malardalskartan/mdk/blob/master/LICENSE.txt)
- * ======================================================================== */
 "use strict";
 
 var $ = require('jquery');
@@ -28,7 +24,7 @@ function render(target) {
     id: 'o-fullscreen-button',
     cls: 'o-fullscreen-button',
     iconCls: 'o-icon-fa-expand',
-    src: 'css/svg/fa-icons.svg#fa-expand',
+    src: '#fa-expand',
     tooltipText: tooltip,
     tooltipPlacement: 'east'
   });

@@ -1,3 +1,5 @@
+Copyright 2016-present Origo.
+
 The BSD 2-Clause License
 
 Copyright (c) 2016, Origo

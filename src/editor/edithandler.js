@@ -1,7 +1,3 @@
-/* ========================================================================
- * Copyright 2016 Origo
- * Licensed under BSD 2-Clause (https://github.com/origo-map/origo/blob/master/LICENSE.txt)
- * ======================================================================== */
 "use strict";
 
 var ol = require('openlayers');
@@ -177,6 +173,9 @@ function onModifyEnd(evt) {
 
 function onDrawEnd(evt) {
   var feature = evt.feature;
+  var layer = viewer.getLayer(currentLayer);
+  var attributes = getDefaultValues(layer.get('attributes'));
+  feature.setProperties(attributes);  
   feature.setId(generateUUID());
   editSource.addFeature(feature);
   setActive();
@@ -456,4 +455,16 @@ function getFeaturesByIds(type, layer, ids) {
     });
   }
   return features;
+}
+
+function getDefaultValues(attributes) {
+  return attributes.filter(function(attribute) {
+      if (attribute.name && attribute.defaultValue) {
+        return attribute;
+      }
+    })
+    .reduce(function(prev, curr) {
+      prev[curr.name] = curr.defaultValue
+      return prev;
+    },{});
 }
