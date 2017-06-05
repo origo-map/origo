@@ -12,6 +12,7 @@ var topojson = function topojson(layerOptions) {
     layerType: 'vector'
   };
   var topojsonOptions = $.extend(topojsonDefault, layerOptions);
+  var topojsonSource;
   var sourceOptions = {};
   sourceOptions.attribution = topojsonOptions.attribution;
   sourceOptions.projectionCode = viewer.getProjectionCode();
@@ -23,7 +24,7 @@ var topojson = function topojson(layerOptions) {
     sourceOptions.url = topojsonOptions.source;
   }
 
-  var topojsonSource = createSource(sourceOptions);
+  topojsonSource = createSource(sourceOptions);
   return vector(topojsonOptions, topojsonSource);
 
   function createSource(options) {

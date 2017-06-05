@@ -1,13 +1,8 @@
-/* ========================================================================
- * Copyright 2016 Origo
- * Licensed under BSD 2-Clause (https://github.com/origo-map/origo/blob/master/LICENSE.txt)
- * ======================================================================== */
 "use strict";
 
 var ol = require('openlayers');
 var $ = require('jquery');
 var viewer = require('../viewer');
-var utils = require('../utils');
 var layerCreator = require('../layercreator');
 var offlineLayer = require('./offlinelayer')();
 var downloadSources = require('./downloadsources');
@@ -15,7 +10,7 @@ var dispatcher = require('./offlinedispatcher');
 var offlineStore = require('./offlinestore')();
 
 var downloadErrorMsg = 'Det inträffade ett fel när lagret skulle hämtas. Är du ansluten till internet?'
-var saveErrorMsg =  'Det inträffade ett fel när förändringarna skulle sparas. Försök igen senare.';
+var saveErrorMsg = 'Det inträffade ett fel när förändringarna skulle sparas. Försök igen senare.';
 var invalidFormatMsg = 'Invalid format: ';
 
 var downloadHandler = function downloadHandler() {
@@ -76,16 +71,18 @@ var downloadHandler = function downloadHandler() {
     editItems.forEach(function(item) {
       var id = Object.getOwnPropertyNames(item)[0];
       var feature = layer.getSource().getFeatureById(id);
+      var dummy;
       if (feature) {
         transObj[item[id]].push(feature);
         ids.push(id);
       } else if (item[id] === 'delete') {
-        var dummy = new ol.Feature();
+        dummy = new ol.Feature();
         dummy.setId(id);
         transObj[item[id]].push(dummy);
         ids.push(id);
       }
     });
+
     return downloadSources[layer.get('onlineType')].transaction(transObj, layerName)
       .then(function(result) {
         if (result > 0) {
@@ -120,11 +117,13 @@ var downloadHandler = function downloadHandler() {
     } else {
       action = 'download';
     }
+
     if (isAlert) {
       alert(error);
     } else {
       console.log(error);
     }
+
     dispatcher.emitChangeOfflineEnd(layerName, action);
   }
 }

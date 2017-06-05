@@ -258,6 +258,7 @@ function getLayersByProperty(key, val, byName) {
       }
     }
   });
+
   if (byName) {
     return layers.map(function(layer) {
       return layer.get('name');

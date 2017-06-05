@@ -54,6 +54,7 @@ function wfsTransaction(transObj, layerName) {
 
   function success(data) {
     var result = readResponse(data);
+    var feature;
     if (result) {
       if (result.transactionSummary.totalUpdated > 0) {
         dispatcher.emitChangeFeature({
@@ -63,6 +64,7 @@ function wfsTransaction(transObj, layerName) {
           action: 'update'
         });
       }
+
       if (result.transactionSummary.totalDeleted > 0) {
         dispatcher.emitChangeFeature({
           feature: transObj.delete,
@@ -71,8 +73,9 @@ function wfsTransaction(transObj, layerName) {
           action: 'delete'
         });
       }
+
       if (result.transactionSummary.totalInserted > 0) {
-        var feature = transObj.insert;
+        feature = transObj.insert;
         dispatcher.emitChangeFeature({
           feature: transObj.insert,
           layerName: layerName,
@@ -105,5 +108,6 @@ function readResponse(data) {
   } else {
     result = format.readTransactionResponse(data);
   }
+
   return result;
 }

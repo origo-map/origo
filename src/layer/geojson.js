@@ -12,6 +12,7 @@ var geojson = function geojson(layerOptions) {
     layerType: 'vector'
   };
   var geojsonOptions = $.extend(geojsonDefault, layerOptions);
+  var geojsonSource;
   var sourceOptions = {};
   sourceOptions.attribution = geojsonOptions.attribution;
   sourceOptions.projectionCode = viewer.getProjectionCode();
@@ -23,7 +24,7 @@ var geojson = function geojson(layerOptions) {
     sourceOptions.url = geojsonOptions.source;
   }
 
-  var geojsonSource = createSource(sourceOptions);
+  geojsonSource = createSource(sourceOptions);
   return vector(geojsonOptions, geojsonSource);
 
   function createSource(options) {

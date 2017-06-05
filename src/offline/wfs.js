@@ -1,7 +1,3 @@
-/* ========================================================================
- * Copyright 2016 Origo
- * Licensed under BSD 2-Clause (https://github.com/origo-map/origo/blob/master/LICENSE.txt)
- * ======================================================================== */
 "use strict";
 var ol = require('openlayers');
 var $ = require('jquery');
@@ -28,6 +24,7 @@ wfs.request = function request(layer) {
 
     var serverUrl = options.url;
     var queryFilter;
+    var url;
 
     //If cql filter then bbox must be used in the filter.
     if (options.filter) {
@@ -40,7 +37,7 @@ wfs.request = function request(layer) {
         options.extent.join(',') + ',' + options.projectionCode;
     }
 
-    var url = serverUrl +
+    url = serverUrl +
       '?service=WFS&' +
       'version=1.1.0&request=GetFeature&typeName=' + options.featureType +
       '&outputFormat=application/json' +
