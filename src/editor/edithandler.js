@@ -41,10 +41,10 @@ module.exports = function(options) {
   editLayers = setEditProps(options);
   editableLayers.forEach(function(layerName) {
     var layer = viewer.getLayer(layerName);
-    layer.on('change:source', onSourceChange);
     verifyLayer(layerName);
     if (layerName === currentLayer && options.isActive) {
       dispatcher.emitEnableInteraction();
+      setEditLayer(layerName);
     }
   });
 
@@ -100,19 +100,9 @@ function setInteractions(drawType) {
   }
 }
 
-function onSourceChange(e) {
-  if (e.target.getSource().getFeatures().length) {
-    setGeometryProps(e.target);
-  } else {
-    verifyLayer(e.target.get('name'));
-  }
-}
-
 function verifyLayer(layerName) {
   if (!(editLayers[layerName].get('geometryType'))) {
     addFeatureAddListener(layerName);
-  } else {
-    setEditLayer(layerName);
   }
 }
 
@@ -155,6 +145,9 @@ function isActive() {
 
 function onDeleteSelected() {
   var features = select.getFeatures();
+
+  // Make sure all features are loaded in the source
+  editSource = editLayers[currentLayer].getSource();
   if (features.getLength() === 1) {
     var feature = features.item(0);
     var r = confirm('Är du säker på att du vill ta bort det här objektet?');
@@ -317,7 +310,7 @@ function onToggleEdit(e) {
   } else if (e.tool === 'delete') {
       onDeleteSelected();
   } else if (e.tool === 'edit') {
-      verifyLayer(e.currentLayer);
+      setEditLayer(e.currentLayer);
   } else if (e.tool === 'cancel') {
       removeInteractions();
   } else if (e.tool === 'save') {

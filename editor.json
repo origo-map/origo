@@ -103,6 +103,7 @@
       "style": "mask",
       "type": "WFS",
       "visible": true,
+      "offline": true,
       "attributes": [
           {
             "name": "typ",
