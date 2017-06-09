@@ -27,7 +27,7 @@ var layerCreator = function layerCreator(opt_options) {
     geometryType: undefined,
     filter: undefined,
     layerType: undefined,
-    legend: false,
+    legend: undefined,
     sourceName: undefined,
     attribution: undefined,
     style: 'default',
@@ -48,6 +48,7 @@ var layerCreator = function layerCreator(opt_options) {
   layerOptions.maxResolution = layerOptions.hasOwnProperty('maxScale') ? mapUtils.scaleToResolution(layerOptions.maxScale, projection): undefined;
   layerOptions.sourceName = layerOptions.source;
   layerOptions.styleName = layerOptions.style;
+  layerOptions.legend = layerOptions.legend || false;
   if (layerOptions.id === undefined) {
     layerOptions.id = name.split('__').shift();
   }
