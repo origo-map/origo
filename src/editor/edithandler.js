@@ -39,13 +39,11 @@ module.exports = function(options) {
   editLayers = setEditProps(options);
   editableLayers.forEach(function(layerName) {
     var layer = viewer.getLayer(layerName);
-    layer.getSource().once('addfeature', function(e) {
-      editLayers[layerName].geometryType = layer.getSource().getFeatures()[0].getGeometry().getType();
-      editLayers[layerName].geometryName = layer.getSource().getFeatures()[0].getGeometryName();
-      if (layerName === currentLayer && options.isActive) {
-        dispatcher.emitEnableInteraction();
-      }
-    });
+    layer.on('change:source', onSourceChange);
+    verifyLayer(layerName);
+    if (layerName === currentLayer && options.isActive) {
+      dispatcher.emitEnableInteraction();
+    }
   });
 
   autoSave = options.autoSave;
@@ -55,6 +53,7 @@ module.exports = function(options) {
 function setEditLayer(layerName) {
   var editLayer = editLayers[layerName];
   var layer = viewer.getLayer(layerName);
+
   currentLayer = layerName;
   editSource = layer.getSource();
   attributes = layer.get('attributes');
@@ -88,6 +87,38 @@ function setEditLayer(layerName) {
     snapSources.push(selectionSource);
     snap = addSnapInteraction(snapSources);
   }
+}
+
+function onSourceChange(e) {
+  if (e.target.getSource().getFeatures().length) {
+    setGeometryProps(e.target);
+  } else {
+    verifyLayer(e.target.get('name'));
+  }
+}
+
+function verifyLayer(layerName) {
+  if (!(editLayers[layerName].geometryType)) {
+    addFeatureAddListener(layerName);
+  } else {
+    setEditLayer(layerName);
+  }
+}
+
+function setGeometryProps(layer) {
+  var layerName = layer.get('name');
+  editLayers[layerName].geometryType = layer.getSource().getFeatures()[0].getGeometry().getType();
+  // editLayers[layerName].geometryName = layer.getSource().getFeatures()[0].getGeometryName();
+  if (layerName === currentLayer) {
+    setEditLayer(layerName);
+  }
+}
+
+function addFeatureAddListener(layerName) {
+  var layer = viewer.getLayer(layerName);
+  layer.getSource().once('addfeature', function(e) {
+    setGeometryProps(layer);
+  });
 }
 
 function setEditProps(options) {
@@ -142,6 +173,9 @@ function onModifyEnd(evt) {
 
 function onDrawEnd(evt) {
   var feature = evt.feature;
+  var layer = viewer.getLayer(currentLayer);
+  var attributes = getDefaultValues(layer.get('attributes'));
+  feature.setProperties(attributes);  
   feature.setId(generateUUID());
   editSource.addFeature(feature);
   setActive();
@@ -222,6 +256,7 @@ function removeInteractions() {
         map.removeInteraction(snapInteraction);
       });
     }
+
     modify = undefined;
     select = undefined;
     draw = undefined;
@@ -268,7 +303,7 @@ function toggleEdit(e) {
   } else if (e.tool === 'delete') {
       onDeleteSelected();
   } else if (e.tool === 'edit') {
-      setEditLayer(e.currentLayer);
+      verifyLayer(e.currentLayer);
   } else if (e.tool === 'cancel') {
       removeInteractions();
   } else if (e.tool === 'save') {
@@ -280,6 +315,7 @@ function getSnapSources(layers) {
   var sources = layers.map(function(layer) {
     return viewer.getLayer(layer).getSource();
   });
+
   return sources;
 }
 
@@ -348,6 +384,7 @@ function editAttributes() {
           obj.isVisible = true;
           obj.elId = '#input-' + obj.name;
         }
+
         obj.formElement = editForm(obj);
         return obj;
       });
@@ -395,11 +432,12 @@ function saveFeatures() {
       var layer = viewer.getLayer(layerName);
       var ids = edits[layerName][editType];
       var features;
-      features = getFeaturesByIds(editType,layer,ids);
+      features = getFeaturesByIds(editType, layer, ids);
       if (features.length) {
         transaction[editType] = features;
       }
     });
+
     transactionHandler(transaction, layerName);
   });
 }
@@ -420,5 +458,18 @@ function getFeaturesByIds(type, layer, ids) {
       }
     });
   }
+
   return features;
+}
+
+function getDefaultValues(attributes) {
+  return attributes.filter(function(attribute) {
+      if (attribute.name && attribute.defaultValue) {
+        return attribute;
+      }
+    })
+    .reduce(function(prev, curr) {
+      prev[curr.name] = curr.defaultValue
+      return prev;
+    },{});
 }
