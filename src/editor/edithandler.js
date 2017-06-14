@@ -11,6 +11,7 @@ var transactionHandler = require('./transactionhandler');
 var dispatcher = require('./editdispatcher');
 var editForm = require('./editform');
 var imageresizer = require('../utils/imageresizer');
+var getImageOrientation = require('../utils/getimageorientation');
 
 var editLayers = {};
 var autoSave = undefined;
@@ -203,8 +204,10 @@ function cancelAttribute() {
 function onAttributesSave(feature, attributes) {
   $('#o-save-button').on('click', function(e) {
     var editEl = {};
+    var fileReader = new FileReader();
     var imageData;
-    var fr = new FileReader();
+    var input;
+    var file;
 
     //Read values from form
     attributes.forEach(function(attribute) {
@@ -228,23 +231,27 @@ function onAttributesSave(feature, attributes) {
 
       //Check if file. If file, read and trigger resize
       if ($(attribute.elId).attr('type') === 'file') {
-        var attr = attribute.name;
-        var input = $(attribute.elId)[0];
-        var file = input.files[0];
+        input = $(attribute.elId)[0];
+        file = input.files[0];
 
         if (file) {
-          fr.onload = function() {
-            imageresizer(fr.result, attribute, function(resized) {
-              editEl[attr] = resized;
+          /* getImageOrientation(file, function(orientation) {
+
+          }); */
+
+          fileReader.onload = function() {
+            imageresizer(fileReader.result, attribute, function(resized) {
+              editEl[attribute.name] = resized;
               $(document).trigger('imageresized');
             });
           }
-          fr.readAsDataURL(file);
+
+          fileReader.readAsDataURL(file);
         }
       }
     });
 
-    if (fr.readyState == 1) {
+    if (fileReader.readyState == 1) {
       $(document).on('imageresized', function() {
         attributesSaveHandler(feature, editEl);
       });
@@ -311,18 +318,19 @@ function addListener() {
       }
     });
   }
+
   return fn;
 }
 
 function addImageListener() {
   var fn = function(obj) {
+    var reader = new FileReader();
     var containerClass = '.' + obj.elId.slice(1);
     $(obj.elId).on('change', function(e) {
       $(containerClass + ' img').removeClass('o-hidden');
       $(containerClass + ' input[type=button]').removeClass('o-hidden');
 
       if (this.files && this.files[0]) {
-        var reader = new FileReader();
         reader.onload = function (e) {
           $(containerClass + ' img')
             .attr('src', e.target.result)
@@ -338,6 +346,7 @@ function addImageListener() {
       $(this).addClass('o-hidden');
     });
   }
+
   return fn;
 }
 
@@ -513,7 +522,13 @@ function getFeaturesByIds(type, layer, ids) {
   } else {
     ids.forEach(function(id) {
       if (source.getFeatureById(id)) {
-        features.push(source.getFeatureById(id));
+        /*** REMOVE ***/
+        var feature = source.getFeatureById(id);
+        feature.unset('bbox');
+        features.push(feature);
+        /*** *** ***/
+        
+        //features.push(source.getFeatureById(id));
       }
     });
   }

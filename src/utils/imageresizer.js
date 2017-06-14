@@ -6,9 +6,11 @@ module.exports = function imageresizer(imageData, opt_options, callback) {
 
   image.onload = function(imageEvent) {
     var canvas = document.createElement('canvas');
+    var context = canvas.getContext('2d');
     var max_size = options.maxSize || 600;
     var width = image.width;
     var height = image.height;
+    var dataUrl;
 
     if (width > height) {
       if (width > max_size) {
@@ -24,8 +26,10 @@ module.exports = function imageresizer(imageData, opt_options, callback) {
 
     canvas.width = width;
     canvas.height = height;
-    canvas.getContext('2d').drawImage(image, 0, 0, width, height);
-    var dataUrl = canvas.toDataURL('image/jpeg');
+    context.translate(canvas.width,canvas.height);
+    context.rotate(180*Math.PI/180);
+    context.drawImage(image, 0, 0, width, height);
+    dataUrl = canvas.toDataURL('image/jpeg');
     callback(dataUrl);
   }
 

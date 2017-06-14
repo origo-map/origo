@@ -18,9 +18,8 @@
     {
       "name": "editor",
       "options": {
-        "editableLayers": ["test_byggnadsytor", "test_punkt"],
-        "isActive": true,
-        "autoSave": false
+        "editableLayers": ["mi_miljo_hallbart_konsumtion"],
+        "isActive": true
       }
     },
     {
@@ -30,55 +29,41 @@
       }
     }
   ],
-  "projectionCode": "EPSG:3010",
-  "projectionExtent": [
-    -1678505.1838360203,
-    4665380,
-    2431912.7361639794,
-    8775797.92
-  ],
+  "projectionCode": "EPSG:3008",
+  "projectionExtent": [120000, 6556000, 191000, 6635000],
   "proj4Defs": [
       {
           "code": "EPSG:3010",
           "alias": "urn:ogc:def:crs:EPSG::3010",
           "projection": "+proj=tmerc +lat_0=0 +lon_0=16.5 +k=1 +x_0=150000 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
+      },
+      {
+        "code": "EPSG:3008",
+        "alias": "urn:ogc:def:crs:EPSG::3008",
+        "projection": "+proj=tmerc +lat_0=0 +lon_0=13.5 +k=1 +x_0=150000 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
       }
   ],
-  "extent": [
-    -1678505.1838360203,
-    4665380,
-    2431912.7361639794,
-    8775797.92
-  ],
-  "center": [
-    162429,
-    6599905
-  ],
-  "zoom": 3,
-  "resolutions": [
-    1146.8799999999999,
-    573.4399999999999,
-    286.71999999999997,
-    143.35999999999999,
-    71.67999999999999,
-    35.839999999999996,
-    17.919999999999998,
-    8.959999999999999,
-    4.4799999999999995,
-    2.2399999999999998,
-    1.1199999999999999,
-    0.5599999999999999,
-    0.27999999999999997,
-    0.13999999999999999
-  ],
+  "extent": [120000, 6556000, 191000, 6635000],
+	"center": [149500, 6585000],
+	"home": [120000, 6556000, 191000, 6635000],
+	"zoom": 6,
+	"resolutions": [112, 56, 28, 14, 7, 4.2, 2.8, 1.82, 1.12, 0.7, 0.42, 0.28, 0.182, 0.112, 0.07, 0.042, 0.021],
   "source": {
     "local": {
       "url": "http://localhost:9090/geoserver/sqlserver/wfs",
       "workspace": "sqlserver"
     },
     "basemap": {
-      "url": "https://www.malardalskartan.se/geowebcache/service/wmts"
-    }
+      "url": "http://www.malardalskartan.se/geowebcache/service/wmts"
+    },
+    "geoserver_gi": {
+			"url": "http://gi.karlstad.se/geoserver/ows",
+			"version": "1.1.0"
+		},
+    "webbkartan_edit": {
+			"url": "http://gi.karlstad.se/geoserver/webbkartan_edit/ows",
+      "workspace": "webbkartan_edit"
+		}
   },
   "groups": [
     {
@@ -94,116 +79,54 @@
   ],
   "layers": [
     {
-      "name": "test_byggnadsytor",
-      "title": "Byggnadsytor",
+      "name": "mi_miljo_hallbart_konsumtion",
+      "title": "Hållbar konsumtion",
       "group": "test",
       "extent": [105085,6571627,219773,6628182],
-      "geometryName": "ogr_geometry",
+      "geometryName": "geom",
       "queryable": true,
-      "source": "local",
-      "style": "mask",
+      "source": "webbkartan_edit",
+      "style": "reparatorer",
       "type": "WFS",
       "visible": true,
       "attributes": [
           {
-            "name": "typ",
-            "title": "Typ:",
+            "name": "kategori",
+            "title": "Kategori: ",
             "type": "dropdown",
-            "maxLength": 20,
+            "maxLength": 30,
+            "constraint": "change:verksamhet:Reparatörer",
             "options": [
-                "Villa",
-                "Radhus",
-                "Lägenhet"
+                "Cykelreparatör",
+                "Elektronikreparatör",
+                "Mobilreparatör",
+                "Skomakare",
+                "Skräddare",
+                "Vitvarureparatör",
+								"Övrigt"
             ]
           },
-          {
-            "name": "stomme1",
-            "title": "Stomme:",
-            "type": "dropdown",
-            "maxLength": 20,
-            "constraint": "change:typ:Villa",
-            "options": [
-                "mexitegel",
-                "träpanel",
-                "eternit"
-            ]
-          },
-          {
-            "name": "stomme1",
-            "title": "Stomme:",
-            "type": "dropdown",
-            "maxLength": 20,
-            "constraint": "change:typ:Lägenhet",
-            "options": [
-                "betong",
-                "cement",
-                "puts"
-            ]
-          },
-          {
-            "name": "fastighet",
-            "title": "Fastighet: ",
-            "type": "text",
-            "maxLength": 15
-          },
-          {
-            "name": "byggtyp",
-            "title": "Typ:",
-            "type": "checkbox"
+					{
+            "name": "bild",
+            "title": "Ladda upp bild: ",
+            "type": "image"
           }
+          
       ]
     },
     {
-      "name": "test_punkt",
-      "title": "Byggnadspunkter",
-      "group": "test",
-      "geometryName": "ogr_geometry",
-      "queryable": true,
-      "source": "local",
-      "style": "cirkel",
-      "type": "WFS",
-      "extent": [
-          105085,
-          6571627,
-          219773,
-          6628182
-        ],
-      "visible": true,
-      "attributes": [
-          {
-            "name": "typ",
-            "title": "Typ",
-            "type": "dropdown",
-            "options": [
-                "Villa",
-                "Radhus",
-                "Lägenhet"
-            ]
-          }
-      ]
-    },
-    {
-      "attribution": "&copy Lantmäteriet Geodatasamverkan",
-      "format": "image/png",
-      "group": "background",
-      "name": "topowebbkartan_nedtonad",
-      "source": "basemap",
-      "title": "Karta, grå",
-      "type": "WMTS",
-      "style": "karta_gra",
-      "visible": true
-    },
-    {
-      "attribution": "&copy Lantmäteriet Geodatasamverkan",
-      "format": "image/png",
-      "group": "background",
-      "name": "topowebbkartan",
-      "source": "basemap",
-      "title": "Karta, färg",
-      "type": "WMTS",
-      "style": "karta_farg",
-      "visible": false
-    }
+			"attribution": "&copy Karlstads kommun, &copy Lantmäteriet Geodatasamverkan",
+			"format": "image/jpeg",
+			"group": "background",
+			"name": "Test:BGkarta",
+			"source": "geoserver_gi",
+			"style": "karta_farg",
+			"title": "Kommunens baskarta",
+			"type": "WMS",
+			"visible": true,
+      "queryable": false,
+			"tileSize": 512
+		}
   ],
   "styles": {
       "mask": [
@@ -218,6 +141,16 @@
           }
         ]
       ],
+			"empty": [
+				[{
+					"stroke": {
+						"color": "rgba(0,0,0,0)"
+					},
+					"fill": {
+						"color": "rgba(0,0,0,0)"
+					}
+				}]
+			],
       "cirkel": [
         [
           {
@@ -229,6 +162,143 @@
               },
               "fill": {
                 "color": "rgba(0,0,0,0.5)"
+              }
+            }
+          }
+        ]
+      ],
+			 "cirkel_ljusgron": [
+        [
+          {
+            "circle": {
+              "radius": 8,
+              "stroke": {
+                "color": "rgba(0,0,0,1)",
+                "width": 2
+              },
+              "fill": {
+                "color": "rgba(144,196,164,0.9)"
+              }
+            }
+          }
+        ]
+      ],
+			"reparatorer": [
+        [
+          {
+            "circle": {
+              "radius": 8,
+              "stroke": {
+                "color": "rgba(0,0,0,1)",
+                "width": 2
+              },
+              "fill": {
+                "color": "rgba(112,108,97,0.9)"
+              }
+            },
+            "filter": "[kategori] == 'Cykelreparatör'"
+          }
+        ],
+        [
+          {
+            "circle": {
+              "radius": 8,
+              "stroke": {
+                "color": "rgba(0,0,0,1)",
+                "width": 2
+              },
+              "fill": {
+                "color": "rgba(137,158,139,0.9)"
+              }
+            },
+            "filter": "[kategori] == 'Elektronikreparatör'"
+          }
+        ],
+        [
+          {
+            "circle": {
+              "radius": 8,
+              "stroke": {
+                "color": "rgba(0,0,0,1)",
+                "width": 2
+              },
+              "fill": {
+                "color": "rgba(153,197,181,0.9)"
+              }
+            },
+            "filter": "[kategori] == 'Mobilreparatör'"
+          }
+        ],
+        [
+          {
+            "circle": {
+              "radius": 8,
+              "stroke": {
+                "color": "rgba(0,0,0,1)",
+                "width": 2
+              },
+              "fill": {
+                "color": "rgba(129,244,153,0.9)"
+              }
+            },
+            "filter": "[kategori] == 'Skomakare'"
+          }
+        ],
+        [
+          {
+            "circle": {
+              "radius": 8,
+              "stroke": {
+                "color": "rgba(0,0,0,1)",
+                "width": 2
+              },
+              "fill": {
+                "color": "rgba(175,236,231,0.9)"
+              }
+            },
+            "filter": "[kategori] == 'Skräddare'"
+          }
+        ],
+        [
+          {
+            "circle": {
+              "radius": 8,
+              "stroke": {
+                "color": "rgba(0,0,0,1)",
+                "width": 2
+              },
+              "fill": {
+                "color": "rgba(153,186,197,0.9)"
+              }
+            },
+            "filter": "[kategori] == 'Vitvarureparatör'"
+          }
+        ],
+        [
+          {
+            "circle": {
+              "radius": 8,
+              "stroke": {
+                "color": "rgba(0,0,0,1)",
+                "width": 2
+              },
+              "fill": {
+                "color": "rgba(197,153,194,0.9)"
+              }
+            },
+            "filter": "[kategori] == 'Övrigt'"
+          }
+        ],
+        [
+          {
+            "circle": {
+              "radius": 8,
+              "stroke": {
+                "color": "rgba(204,0,0,1)",
+                "width": 2
+              },
+              "fill": {
+                "color": "rgba(255,255,255,0.6)"
               }
             }
           }
