@@ -204,10 +204,11 @@ function cancelAttribute() {
 function onAttributesSave(feature, attributes) {
   $('#o-save-button').on('click', function(e) {
     var editEl = {};
-    var fileReader = new FileReader();
+    var fileReader;
     var imageData;
     var input;
     var file;
+    var orientation;
 
     //Read values from form
     attributes.forEach(function(attribute) {
@@ -235,23 +236,24 @@ function onAttributesSave(feature, attributes) {
         file = input.files[0];
 
         if (file) {
-          /* getImageOrientation(file, function(orientation) {
-
-          }); */
-
+          fileReader = new FileReader();
           fileReader.onload = function() {
-            imageresizer(fileReader.result, attribute, function(resized) {
-              editEl[attribute.name] = resized;
-              $(document).trigger('imageresized');
+            getImageOrientation(file, function(orientation) {
+              imageresizer(fileReader.result, attribute, orientation, function(resized) {
+                editEl[attribute.name] = resized;
+                $(document).trigger('imageresized');
+              });
             });
           }
 
           fileReader.readAsDataURL(file);
+        } else {
+          editEl[attribute.name] = $(attributes[0].elId).attr('value');
         }
       }
     });
 
-    if (fileReader.readyState == 1) {
+    if (fileReader && fileReader.readyState == 1) {
       $(document).on('imageresized', function() {
         attributesSaveHandler(feature, editEl);
       });
@@ -260,7 +262,6 @@ function onAttributesSave(feature, attributes) {
     }
 
     modal.closeModal();
-    attributesSaveHandler(feature, editEl);
     $('#o-save-button').blur();
     e.preventDefault();
   });
@@ -324,24 +325,23 @@ function addListener() {
 
 function addImageListener() {
   var fn = function(obj) {
-    var reader = new FileReader();
+    var fileReader = new FileReader();
     var containerClass = '.' + obj.elId.slice(1);
     $(obj.elId).on('change', function(e) {
       $(containerClass + ' img').removeClass('o-hidden');
       $(containerClass + ' input[type=button]').removeClass('o-hidden');
 
       if (this.files && this.files[0]) {
-        reader.onload = function (e) {
-          $(containerClass + ' img')
-            .attr('src', e.target.result)
+        fileReader.onload = function (e) {
+          $(containerClass + ' img').attr('src', e.target.result);
         };
 
-        reader.readAsDataURL(this.files[0]);
+        fileReader.readAsDataURL(this.files[0]);
       }
     });
 
     $(containerClass + ' input[type=button]').on('click', function(e) {
-      $(obj.elId).val('');
+      $(obj.elId).attr('value', '');
       $(containerClass + ' img').addClass('o-hidden');
       $(this).addClass('o-hidden');
     });
