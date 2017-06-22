@@ -8,6 +8,7 @@ module.exports = {
   emitToggleEdit: emitToggleEdit,
   emitEnableInteraction: emitEnableInteraction,
   emitEditsChange: emitEditsChange,
+  emitChangeEditorShapes: emitChangeEditorShapes,
   emitChangeOfflineEdits: emitChangeOfflineEdits
 }
 
@@ -50,6 +51,13 @@ function emitEditsChange(edits) {
   $.event.trigger({
     type: 'editsChange',
     edits: edits
+  });
+}
+
+function emitChangeEditorShapes(shape) {
+  $.event.trigger({
+    type: 'editorShapes',
+    shape: shape
   });
 }
 

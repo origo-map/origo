@@ -1,32 +1,38 @@
-<div id="o-editor-toolbar" class="o-control o-toolbar o-padding-horizontal-8 o-rounded-top o-hidden">
-    <select name="layer-dropdown">
-      {{#each this}}
-        <option value="{{this.value}}">{{this.name}}</option>
-      {{/each}}
-    </select>
-    <button id="o-editor-draw" class="o-btn-3" type="button" name="button">
-        <svg class="o-icon-fa-pencil">
-            <use xlink:href="#fa-pencil"></use>
+<div id="o-editor-toolbar" class="o-editor-toolbar o-toolbar o-toolbar-horizontal o-padding-horizontal-8 o-rounded-top o-hidden">
+    <div id="o-editor-toolbar-drawtools" class="o-toolbar-horizontal">
+      <div class="o-popover-container">
+        <button id="o-editor-draw" class="o-button-lg" type="button" name="button">
+          <svg class="o-icon-24">
+              <use xlink:href="#ic_mode_edit_24px"></use>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <button id="o-editor-attribute" class="o-button-lg" type="button" name="button">
+      <svg class="o-icon-24">
+          <use xlink:href="#ic_title_24px"></use>
+      </svg>
+    </button>
+    <button id="o-editor-delete" class="o-button-lg" type="button" name="button">
+      <svg class="o-icon-24">
+          <use xlink:href="#ic_delete_24px"></use>
+      </svg>
+    </button>
+    <div class="o-popover-container">
+      <button id="o-editor-layers" class="o-button-lg" type="button" name="button">
+        <svg class="o-icon-24">
+            <use xlink:href="#ic_layers_24px"></use>
         </svg>
-    </button>
-    <button id="o-editor-attribute" class="o-btn-3" type="button" name="button">
-      <svg class="o-icon-fa-font">
-          <use xlink:href="#fa-font"></use>
+      </button>
+    </div>
+    <button id="o-editor-save" class="o-button-lg o-disabled" type="button" name="button">
+      <svg class="o-icon-24">
+          <use xlink:href="#ic_save_24px"></use>
       </svg>
     </button>
-    <button id="o-editor-delete" class="o-btn-3" type="button" name="button">
-      <svg class="o-icon-fa-trash">
-          <use xlink:href="#fa-trash"></use>
-      </svg>
-    </button>
-    <button id="o-editor-save" class="o-btn-3 o-disabled" type="button" name="button">
-      <svg class="o-icon-fa-floppy-o">
-          <use xlink:href="#fa-floppy-o"></use>
-      </svg>
-    </button>
-    <button id="o-editor-close" class="o-btn-3" type="button" name="button">
-        <svg class="o-icon-fa-times">
-            <use xlink:href="#fa-times"></use>
+    <button id="o-editor-close" class="o-button-lg" type="button" name="button">
+        <svg class="o-icon-24">
+            <use xlink:href="#ic_close_24px"></use>
         </svg>
     </button>
 </div>
