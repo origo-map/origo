@@ -119,10 +119,23 @@ li .o-legend-item {
   padding: 5px;
   position: relative;
   white-space: nowrap;
+  &:hover {
+    background-color: #EEEEEE;
+  }
+  .o-legend-item-toggle-btn {
+    border: none;
+  }
+  .o-legend-item-img {
+    border: none;
+  }
+  .legend-toggler {
+    float: none;
+  }
+  &:hover .o-legend-item-img {
+    //border: 1px solid #ccc;
+  }
 }
-li .o-legend-item:hover {
-  background-color: #EEEEEE;
-}
+
 li .o-legend-item-title {
   cursor: pointer;
   display: block;
@@ -132,13 +145,31 @@ li .o-legend-item-title {
   padding-right: 15px;
   vertical-align: top;
 }
+
 li .o-legend-item-img {
   cursor: pointer;
   display: inline-block;
   float: left;
   height: 20px;
   width: 20px;
+  border: 1px solid #FFF;
+  margin-left: -1px;
 }
+
+li .o-legend-item-toggle-btn {
+  cursor: pointer;
+  display: inline-block;
+  float: left;
+  height: 20px;
+  width: 20px;
+  border: 1px solid #FFF;
+  margin-left: -1px;
+}
+
+li .o-legend .hidden {
+  display: none;
+}
+
 li .o-legend-subitem {
   cursor: pointer;
   font-family: Arial,sans-serif;
@@ -146,6 +177,7 @@ li .o-legend-subitem {
   line-height: 14px;
   padding: 5px 5px 5px 24px;
 }
+
 li .o-legend-subitem-title {
   cursor: pointer;
   display: inline-block;
@@ -233,4 +265,16 @@ li .o-legend-subitem-title {
 #o-map-legend {
   display: none;
 }
+}
+
+.block-legend {
+  display: block;
+  .o-legend-item-img {
+    float: none;
+    height: inherit;
+    width: inherit;
+    display: block;
+    border: none;
+    margin: 0;
+  }
 }

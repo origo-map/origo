@@ -26,9 +26,49 @@ function render() {
   $('#o-menutools').append('<li class="o-menu-item"><div class="o-menu-item-divider"></div><li>');
 }
 
-function getSymbol(style) {
+function getLegendGraphicStyle(layer) {
+
+  function objectAsQueryString(o) {
+    return Object.keys(o).reduce(function (s, k, i, a) {
+      s += k + "=" + o[k];
+      if (i < a.length - 1) s += "&";
+      return s;
+    }, "?")
+  }
+
+  var urls = layer.getSource().getUrls(),
+      url = "",
+      properties = {
+        request: "getLegendGraphic",
+        layer: layer.getProperties().id,
+        format: "image/png"
+      };
+
+  if (layer.getProperties().legendGraphicSettings) {
+    properties = layer.getProperties().legendGraphicSettings;
+    properties.request = "getLegendGraphic";
+  }
+
+  if (urls.length > 0) {
+    url = urls[0] + objectAsQueryString(properties);
+  }
+
+  return {
+    image: {
+      src: url
+    }
+  };
+}
+
+function getSymbol(style, layer, force) {
+
+  if (layer && layer.getProperties().type === "WMS" && layer.getProperties().useLegendGraphics) {
+    style = [[getLegendGraphicStyle(layer)]];
+  }
+
   var symbol='';
   var s = style[0];
+
   if (s[0].hasOwnProperty('icon')) {
     var src = validateUrl(s[0].icon.src, baseUrl);
     // var scale = style.icon.scale || undefined;
@@ -70,9 +110,25 @@ function getSymbol(style) {
     symbol += '</svg></div>';
   }
   else if (s[0].hasOwnProperty('image')) {
+
     var src = validateUrl(s[0].image.src, baseUrl);
-    var inlineStyle = 'background: url(' + src + ') no-repeat;width: 30px; height: 30px;background-size: 30px;';
-    symbol = '<div class="o-legend-item-img" style="' + inlineStyle +'"></div>';
+    var inlineStyle = 'background: url(' + src + ') no-repeat;';
+
+    if (layer) {
+      if (layer.getProperties().legendGraphicType === "toggleable") {
+        if (force === false) {
+          symbol = '';
+        }
+        if (force === true) {
+          symbol = '<div class="o-legend-item-img">';
+          symbol += '<img src="' + src + '"></img>';
+          symbol += '</div>';
+        }
+      } else {
+        inlineStyle += "background-size: 20px";
+        symbol = '<div class="o-legend-item-img" style="' + inlineStyle +'"></div>';
+      }
+    }
   }
 
   return symbol;
@@ -177,7 +233,7 @@ function createLegendItem(layerid, layerStyle, inSubgroup) {
       layerStyle.forEach(function (styleArray) {
         legendItem += '<li class="o-legend ' + layername + '" id="' + layername + '"><div class ="o-legend-subitem">';
         legendItem += '<div class="o-checkbox o-checkbox-false"></div>';
-        legendItem += layer.get('styleName') ? getSymbol([styleArray]) : '';
+        legendItem += layer.get('styleName') ? getSymbol([styleArray], layer, false) : '';
         legendItem += '<div class="o-legend-subitem-title">' + styleArray[0].legend + '</div></div></li>';
       });
 
@@ -188,14 +244,36 @@ function createLegendItem(layerid, layerStyle, inSubgroup) {
                     '<svg class="o-icon-fa-square-o"><use xlink:href="#fa-square-o"></use></svg>' +
                     '<svg class="o-icon-fa-check-square-o"><use xlink:href="#fa-check-square-o"></use></svg>' +
                   '</div>';
-    legendItem +=  layer.get('styleName') ? getSymbol(styleSettings[layer.get('styleName')]) : '';
-    legendItem += '<div class="o-legend-item-title o-truncate">' + layer.get('title') + '</div>';
+    legendItem +=  layer.get('styleName') ? getSymbol(styleSettings[layer.get('styleName')], layer, false) : '';
+    legendItem += '<div class="o-legend-item-title o-truncate">' + layer.get('title');
+
+    if (layer && layer.getProperties() && layer.getProperties().legendGraphicType) {
+      if (layer.getProperties().legendGraphicType === 'toggleable') {
+          legendItem += '<div class="o-menu-button legend-toggler o-legend-item-img">';
+            legendItem += '<div class="o-legend-item-toggle-btn o-button-icon">';
+              legendItem += '<svg class="o-icon-fa-caret-right"><use xlink:href="#fa-caret-right"></use></svg>';
+            legendItem += '</div>';
+          legendItem += '</div>';
+      }
+    }
+
+    legendItem += '</div>';
 
     if(layer.get('abstract')){
       legendItem += addAbstractButton(layername);
     }
 
-    legendItem += '</div></li>';
+    legendItem += '</div>';
+
+    if (layer && layer.getProperties() && layer.getProperties().legendGraphicType) {
+      if (layer.getProperties().legendGraphicType === 'toggleable') {
+        legendItem += "<div class='hidden block-legend'>";
+        legendItem +=  layer.get('styleName') ? getSymbol(styleSettings[layer.get('styleName')], layer, true) : '';
+        legendItem += "</div>";
+      }
+    }
+
+    legendItem += '</li>';
   }
 
   return legendItem;
@@ -312,17 +390,15 @@ function addLegend(groups) {
     var layerStyle = styleSettings[layer.get('styleName')];
     //Check if layer belongs to subgroup
     var inSubgroup = $('#o-group-' + layer.get('group')).closest('ul').parent().closest('ul').hasClass('o-legend-group');
-    var title = '<div class="o-legend-item-title o-truncate">' + layer.get('title') + '</div>';
+    var title = '<div class="o-legend-item-title o-truncate">' + layer.get('title') + '';
 
     //Add abstract button
     if(layer.get('abstract')){
       title += addAbstractButton(name);
     }
-    title += '</div></li>';
 
     //Append layer to group in legend. Add to default group if not defined.
-    if(layer.get('group') == 'background') {
-
+    if (layer.get('group') === 'background') {
       //Append background layers to menu
       item = '<li class="o-legend ' + name + '" id="' + name + '"><div class ="o-legend-item"><div class="o-checkbox"><svg class="o-icon-fa-check"><use xlink:href="#fa-check"></use></svg></div>';
       item += title;
@@ -330,11 +406,13 @@ function addLegend(groups) {
 
       //Append background layers to map legend
       item = '<li class="o-legend ' + name + '" id="o-legend-' + name + '"><div class ="o-legend-item">'
-      item += layer.get('styleName') ? getSymbol(styleSettings[layer.get('styleName')]) : '';
+      item += layer.get('styleName') ? getSymbol(styleSettings[layer.get('styleName')], layer, false) : '';
       item += '</div>';
       $('#o-map-legend-background').prepend(item);
 
-    } else if(layer.get('group') && ((layer.get('group') != 'none'))) {
+      title += '</div></li>';
+
+    } else if (layer.get('group') && ((layer.get('group') != 'none'))) {
 
       //Append layer to group
       item = createLegendItem(name, layerStyle, inSubgroup);
@@ -344,15 +422,43 @@ function addLegend(groups) {
         $('#o-group-' + layer.get('group') + ' .o-legend-header').after(item);
       }
 
-      if(layer.get('legend') == true || layer.getVisible(true)) {
+      if (layer.get('legend') === true || layer.getVisible(true)) {
         //Append to map legend
         item = '<li class="o-legend ' + name + '" id="o-legend-' + name + '"><div class ="o-legend-item"><div class="o-checkbox">' +
                   '<svg class="o-icon-fa-square-o"><use xlink:href="#fa-square-o"></use></svg>' +
                   '<svg class="o-icon-fa-check-square-o"><use xlink:href="#fa-check-square-o"></use></svg>' +
                 '</div>';
-        item += layer.get('styleName') ? getSymbol(styleSettings[layer.get('styleName')]) : '';
+        item += layer.get('styleName') ? getSymbol(styleSettings[layer.get('styleName')], layer, false) : '';
         item += title;
+
+        if (layer && layer.getProperties() && layer.getProperties().legendGraphicType) {
+          if (layer.getProperties().legendGraphicType === 'toggleable') {
+              item += '<div class="o-menu-button legend-toggler o-legend-item-img">';
+                item += '<div class="o-legend-item-toggle-btn o-button-icon">';
+                  item += '<svg class="o-icon-fa-caret-right"><use xlink:href="#fa-caret-right"></use></svg>';
+                item += '</div>';
+              item += '</div>';
+
+              item += "</div>";
+          }
+        } else {
+          item += "</div>";
+        }
+
+        if (layer && layer.getProperties() && layer.getProperties().legendGraphicType) {
+          if (layer.getProperties().legendGraphicType === 'toggleable') {
+            item += "<div class='hidden block-legend'>";
+            item +=  layer.get('styleName') ? getSymbol(styleSettings[layer.get('styleName')], layer, true) : '';
+            item += "</div>";
+          }
+        }
+
+        item += "</li>";
+
+        console.log("Item title", title);
+
         $('#o-overlay-list').append(item);
+
       }
     }
 
@@ -428,6 +534,9 @@ function addLegend(groups) {
     toggleOverlay();
     evt.preventDefault();
   });
+
+  // Bind toggle layer legend
+  bindBlockLegendToggler();
 }
 
 function onToggleCheck(layername) {
@@ -590,6 +699,23 @@ function toggleCheck(layerid) {
       toggleSubGroupCheck($('#' + layername).parents('ul').has('.o-legend-header').first(), false);
     }
   }
+
+  bindBlockLegendToggler();
+
+}
+
+function bindBlockLegendToggler() {
+  $('.legend-toggler').off('click');
+  $('.legend-toggler').on('click', function(e) {
+    e.stopPropagation();
+    var item = $(this).closest('.o-legend').find('.block-legend');
+    item.toggleClass('hidden');
+    if (item.hasClass('hidden')) {
+      $(this).html('<svg class="o-icon-fa-caret-right"><use xlink:href="#fa-caret-right"></use></svg>');
+    } else {
+      $(this).html('<svg class="o-icon-fa-caret-down"><use xlink:href="#fa-caret-down"></use></svg>');
+    }
+  });
 }
 
 function checkToggleOverlay() {

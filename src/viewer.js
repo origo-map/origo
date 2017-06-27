@@ -123,6 +123,7 @@ function createLayers(layerlist, savedLayers) {
 }
 
 function loadMap() {
+
   map = new ol.Map({
     target: 'o-map',
     layers: settings.layers,

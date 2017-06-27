@@ -20,6 +20,7 @@ var wmts = function wmts(layerOptions) {
   var wmtsOptions = $.extend(wmtsDefault, layerOptions);
   wmtsOptions.name.split(':').pop();
   wmtsOptions.sourceName = wmtsOptions.name;
+  var foundSource = viewer.getMapSource()[layerOptions.source];
   var sourceOptions = $.extend(sourceDefault, viewer.getMapSource()[layerOptions.source]);
   if (wmtsOptions.hasOwnProperty('format')) {
     sourceOptions.format = wmtsOptions.format;
@@ -32,10 +33,8 @@ var wmts = function wmts(layerOptions) {
   });
   sourceOptions.projectionExtent = viewer.getProjection().getExtent();
   sourceOptions.id = wmtsOptions.id;
-
   var wmtsSource = createSource(sourceOptions);
   return tile(wmtsOptions, wmtsSource);
-
   function createSource(options) {
     return new ol.source.WMTS({
       crossOrigin: 'anonymous',

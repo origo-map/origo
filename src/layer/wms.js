@@ -21,10 +21,8 @@ var wms = function wms(layerOptions) {
   sourceOptions.attribution = wmsOptions.attribution;
   sourceOptions.projectionCode = viewer.getProjectionCode();
   sourceOptions.id = wmsOptions.id;
-
   var wmsSource = createSource(sourceOptions);
   return tile(wmsOptions, wmsSource);
-
   function createSource(options) {
     return new ol.source.TileWMS(({
       attributions: options.attribution,
@@ -35,7 +33,8 @@ var wms = function wms(layerOptions) {
       params: {
         'LAYERS': options.id,
         'TILED': true,
-        VERSION: options.version
+        VERSION: options.version,
+        'SRS': "EPSG:3857"
       }
     }))
   }

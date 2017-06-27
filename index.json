@@ -42,48 +42,37 @@
     "url" : "https://github.com/origo-map/origo",
     "urlText": "Origo"
   }],
-  "projectionCode": "EPSG:3857",
+  "proj4Defs": {
+    "EPSG:3006": "+proj=utm +zone=33 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
+  },
+  "projectionCode": "EPSG:3006",
   "projectionExtent": [
-    -20026376.39,
-    -20048966.10,
-    20026376.39,
-    20048966.10
+    -1200000,
+    2994304,
+    4305696,
+    8500000
   ],
   "extent": [
-    -20026376.39,
-    -20048966.10,
-    20026376.39,
-    20048966.10
+    -1200000,
+    2994304,
+    4305696,
+    8500000
   ],
   "center": [
-    1700000,
-    8275000
+    414241,
+    6600100
   ],
   "zoom": 8,
-  "resolutions": [
-    156543.03,
-    78271.52,
-    39135.76,
-    19567.88,
-    9783.94,
-    4891.97,
-    2445.98,
-    1222.99,
-    611.50,
-    305.75,
-    152.87,
-    76.437,
-    38.219,
-    19.109,
-    9.5546,
-    4.7773,
-    2.3887,
-    1.1943,
-    0.5972
-  ],
+  "resolutions": [4096, 2048, 1024, 512, 256, 128, 64, 32, 16, 8, 4, 2, 1, 0.5],
   "source": {
     "local": {
-      "url": "http://localhost/geoserver/wms"
+      "url": "/geoserver/wms"
+    },
+    "wmts": {
+      "resolutions": [4096, 2048, 1024, 512, 256, 128, 64, 32, 16, 8, 4, 2, 1, 0.5],
+      "matrixIdsPrefix": "",
+      "matrixSet": "3006",
+      "url": "/lmproxy/wmts"
     }
   },
   "groups": [
@@ -100,38 +89,51 @@
   ],
   "layers": [
     {
-      "name": "origo-cities",
-      "title": "Origokommuner",
+      "name": "badplats",
+      "title": "Badplatser",
       "group": "test",
-      "source": "data/origo-cities-3857.geojson",
-      "style": "origo-logo",
-      "type": "GEOJSON",
-      "attributes": [
-          {
-            "name": "name"
-          }
-      ],
-      "visible": true
+      "queryable": true,
+      "type": "WMS",
+      "visible": true,
+      "id": "badplats",
+      "source": "local",
+      "style": "orto",
+      "useLegendGraphics": true,
+      "legendGraphicType": "inline",
+      "legendGraphicSettings": {
+        "format": "image/png",
+        "layer": "badplats",
+        "width": 20,
+        "height": 20
+      }
     },
     {
-      "name": "origo-mask",
-      "opacity": 0.25,
-      "title": "origo-mask",
-      "group": "none",
-      "queryable": false,
-      "source": "data/origo-mask-3857.geojson",
-      "style": "mask",
-      "type": "GEOJSON",
-      "visible": true
+      "name": "vagnat",
+      "title": "Vägnät",
+      "group": "test",
+      "queryable": true,
+      "type": "WMS",
+      "visible": true,
+      "id": "vagnat",
+      "source": "local",
+      "style": "orto",
+      "useLegendGraphics": true,
+      "legendGraphicType": "toggleable",
+      "legendGraphicSettings": {
+        "format": "image/png",
+        "layer": "vagnat"
+      }
     },
     {
-      "name": "osm",
-      "title": "OpenStreetMap",
+      "name": "topowebb",
+      "title": "Topowebb",
       "group": "background",
       "queryable": false,
       "style": "karta_farg",
-      "type": "OSM",
-      "visible": true
+      "type": "WMTS",
+      "visible": true,
+      "source": "wmts",
+      "legend": false
     }
   ],
   "styles": {
