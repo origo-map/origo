@@ -254,7 +254,7 @@ function onAttributesSave(feature, attributes) {
 
           fileReader.readAsDataURL(file);
         } else {
-          editEl[attribute.name] = $(attributes[0].elId).attr('value');
+          editEl[attribute.name] = $(attribute.elId).attr('value');
         }
       }
     });
@@ -535,13 +535,7 @@ function getFeaturesByIds(type, layer, ids) {
   } else {
     ids.forEach(function(id) {
       if (source.getFeatureById(id)) {
-        /*** REMOVE ***/
-        var feature = source.getFeatureById(id);
-        feature.unset('bbox');
-        features.push(feature);
-        /*** *** ***/
-        
-        //features.push(source.getFeatureById(id));
+        features.push(source.getFeatureById(id));
       }
     });
   }
