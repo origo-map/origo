@@ -84,7 +84,7 @@ ul.o-legendlist > li:last-child .o-legend-subgroup li:last-child {
   border-bottom: none;
 }
 li .o-legend-header:hover {
-  background-color: #EEEEEE;
+  //background-color: #EEEEEE;
 }
 li .o-icon-expand {
   display: inline;
@@ -120,7 +120,7 @@ li .o-legend-item {
   position: relative;
   white-space: nowrap;
   &:hover {
-    background-color: #EEEEEE;
+    //background-color: #EEEEEE;
   }
   .o-legend-item-toggle-btn {
     border: none;
@@ -245,7 +245,7 @@ li .o-legend-subitem-title {
   width: 1.2em;
 }
 #o-legend-overlay .o-toggle-button:hover {
-  color: #636363;
+  //color: #636363;
   cursor: pointer;
 }
 .o-menu-item-divider {
@@ -276,5 +276,20 @@ li .o-legend-subitem-title {
     display: block;
     border: none;
     margin: 0;
+  }
+}
+
+.o-menu-button:hover {
+  background-color: inherit !important;
+}
+
+#o-menutools {
+  li {
+    .o-menu-button {
+      padding: 4px 0;
+      &:hover {
+        background-color: #dedede !important;
+      }
+    }
   }
 }
