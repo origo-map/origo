@@ -97,6 +97,7 @@
       "visible": true,
       "source": "local",
       "style": "orto",
+      "infoFormat": "text/html",
       "useLegendGraphics": true,
       "legendGraphicType": "inline",
       "legendGraphicSettings": {
@@ -112,7 +113,7 @@
       "group": "test",
       "queryable": true,
       "type": "WMS",
-      "visible": false,
+      "visible": true,
       "id": "vagnat",
       "source": "local",
       "style": "orto",

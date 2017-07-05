@@ -4,17 +4,22 @@ var replacer = require('../src/utils/replacer');
 var geom = require('./geom');
 
 module.exports = function(feature, layer) {
-    var content = '<div><ul>';
-    var attribute, li = '', title, val;
+
+    var content = '<div><ul>',
+        attribute,
+        attributes = {},
+        li = '',
+        title,
+        val;
+
     //If layer is configured with attributes
-    if(layer.get('attributes')) {
-          //If attributes is string then use template named with the string
-          if(typeof layer.get('attributes') === 'string') {
-              //Use attributes with the template
-              li = featureinfotemplates(layer.get('attributes'),feature.getProperties());
-          }
-          else {
-              for(var i=0; i<layer.get('attributes').length; i++) {
+    if (layer.get('attributes')) {
+        //If attributes is string then use template named with the string
+        if (typeof layer.get('attributes') === 'string') {
+            //Use attributes with the template
+            l = featureinfotemplates(layer.get('attributes'), feature.getProperties());
+        } else {
+            for (var i = 0; i < layer.get('attributes').length; i++) {
                 attribute = layer.get('attributes')[i];
                 title = '';
                 val = '';
@@ -64,12 +69,15 @@ module.exports = function(feature, layer) {
                 li += '<li' + cls +'>' + title + val + '</li>';
               }
         }
-    }
-    else {
-      //Clean feature attributes from non-wanted properties
-      var attributes = filterObject(feature.getProperties(), ['FID_', 'geometry']);
-      //Use attributes with the template
-      li = featureinfotemplates('default',attributes);
+    } else {
+        if (feature && feature.getProperties) {
+            //Clean feature attributes from non-wanted properties
+            attributes = filterObject(feature.getProperties(), ['FID_', 'geometry']);
+            //Use attributes with the template
+            li = featureinfotemplates('default', attributes);
+        } else {
+            li = feature;
+        }
     }
     content += li + '</ul></div>';
     return content;

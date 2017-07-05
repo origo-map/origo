@@ -9,25 +9,26 @@ var featureInfo = require('./featureinfo');
 var map;
 
 function getFeaturesFromRemote(evt) {
-        map = Viewer.getMap();
-        var requestResult = [];
-        var requestPromises = getFeatureInfoRequests(evt).map(function(request) {
-            return request.fn.then(function(feature) {
-                var layer = Viewer.getLayer(request.layer);
-                if(feature) {
-                    requestResult.push({
-                        title: layer.get('title'),
-                        feature: feature,
-                        content: getAttributes(feature, layer)
-                    });
-                    return requestResult;
-                }
-            });
+    map = Viewer.getMap();
+    var requestResult = [];
+    var requestPromises = getFeatureInfoRequests(evt).map(function(request) {
+        return request.fn.then(function(feature) {
+            var layer = Viewer.getLayer(request.layer);
+            if(feature) {
+                requestResult.push({
+                    title: layer.get('title'),
+                    feature: feature,
+                    content: getAttributes(feature, layer)
+                });
+                return requestResult;
+            }
         });
-        return $.when.apply($, requestPromises).then(function(data) {
-            return requestResult;
-        });
+    });
+    return $.when.apply($, requestPromises).then(function(data) {
+        return requestResult;
+    });
 }
+
 function getFeatureInfoRequests(evt) {
     var requests = [];
     //Check for support of crossOrigin in image, absent in IE 8 and 9
@@ -72,6 +73,7 @@ function getFeatureInfoRequests(evt) {
     }
     return requests;
 }
+
 function getGetFeatureInfoRequest(layer, coordinate) {
     var layerType = layer.get('type'),
     obj = {};
@@ -79,33 +81,29 @@ function getGetFeatureInfoRequest(layer, coordinate) {
 
     switch (layerType) {
       case 'WMTS':
-        if(layer.get('featureinfoLayer')) {
+        if (layer.get('featureinfoLayer')) {
             var featureinfoLayerName = layer.get('featureinfoLayer'),
             featureinfoLayer = Viewer.getLayer(featureinfoLayerName);
             return getGetFeatureInfoRequest(featureinfoLayer, coordinate);
-        }
-        else {
+        } else {
             return undefined;
         }
-        break;
       case 'WMS':
-        if(layer.get('featureinfoLayer')) {
+        if (layer.get('featureinfoLayer')) {
             var featureinfoLayerName = layer.get('featureinfoLayer'),
             featureinfoLayer = Viewer.getLayer(featureinfoLayerName);
             return getGetFeatureInfoRequest(featureinfoLayer, coordinate);
-        }
-        else {
+        } else {
             obj.cb = "GEOJSON";
             obj.fn = getGetFeatureInfoUrl(layer, coordinate);
             return obj;
         }
         case 'AGS_TILE':
-            if(layer.get('featureinfoLayer')) {
+            if (layer.get('featureinfoLayer')) {
                 var featureinfoLayerName = layer.get('featureinfoLayer'),
                 featureinfoLayer = Viewer.getLayer(featureinfoLayerName);
                 return getGetFeatureInfoRequest(featureinfoLayer, coordinate);
-            }
-            else {
+            } else {
                 obj.fn = getAGSIdentifyUrl(layer, coordinate);
                 return obj;
             }
@@ -113,28 +111,29 @@ function getGetFeatureInfoRequest(layer, coordinate) {
         return undefined;
     }
 }
+
 function isTainted(pixel, layerFilter) {
     try {
-        if(layerFilter) {
+        if (layerFilter) {
             map.forEachLayerAtPixel(pixel, function(layer) {
                 return layerFilter === layer;
             });
-        }
-        else {
+        } else {
             map.forEachLayerAtPixel(pixel, function(layer) {});
         }
         return false;
-    }
-    catch(e) {
-        console.log(e);
+    } catch(e) {
+        console.error(e);
         return true;
     }
 }
+
 function layerAtPixel(pixel, matchLayer) {
     map.forEachLayerAtPixel(pixel, function(layer) {
         return matchLayer === layer;
     })
 }
+
 function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
     map = Viewer.getMap();
     var result = [],
@@ -160,11 +159,11 @@ function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
                 }
                 else {
                     collection.forEach(function(f) {
-                          var item = {};
-                          item.title = l.get('title');
-                          item.feature = f;
-                          item.content =  getAttributes(f,l);
-                          result.push(item);
+                        var item = {};
+                        item.title = l.get('title');
+                        item.feature = f;
+                        item.content = getAttributes(f, l)
+                        result.push(item);
                     });
                 }
               }
@@ -172,7 +171,7 @@ function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
                   var item = {};
                   item.title = l.get('title');
                   item.feature = collection[0];
-                  item.content = getAttributes(collection[0],l);
+                  item.content = getAttributes(collection[0], l);
                   result.push(item);
               }
           }
@@ -180,10 +179,10 @@ function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
               var item = {};
               item.title = l.get('title');
               item.feature = feature;
-              item.content = getAttributes(feature,l)
+              item.content = getAttributes(feature, l)
               result.push(item);
           }
-        }, 
+        },
         {
           hitTolerance: featureInfo.getHitTolerance()
         });
@@ -195,24 +194,29 @@ function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
         return result;
     }
 }
-function getGetFeatureInfoUrl(layer, coordinate) {
-    var url = layer.getSource().getGetFeatureInfoUrl(
-    coordinate, map.getView().getResolution(), Viewer.getProjection(),
-    {'INFO_FORMAT': 'application/json'});
 
-    return $.ajax(url, {
-      type: 'post'
-    })
-    .then(function(response) {
-        if(response.error) {
-            return [];
+function getGetFeatureInfoUrl(layer, coordinate) {
+    var url = "",
+        infoFormat = layer.getProperties().infoFormat || 'application/json',
+
+    url = layer.getSource().getGetFeatureInfoUrl(
+        coordinate,
+        map.getView().getResolution(),
+        Viewer.getProjection(),
+        {
+            'INFO_FORMAT': infoFormat
         }
-        else {
-            return maputils.geojsonToFeature(response);
-        }
-    }
     );
+
+    return $.ajax(url, {type: 'post'}).then(function(response) {
+        return response.error
+        ? []
+        : infoFormat === 'application/json'
+            ? maputils.geojsonToFeature(response)
+            : response;
+    });
 }
+
 function getAGSIdentifyUrl(layer, coordinate) {
   var projectionCode = Viewer.getProjectionCode();
   var esriSrs = projectionCode.split(':').pop();

@@ -78,37 +78,45 @@ function getHitTolerance() {
   return hitTolerance;
 }
 function identify(items, target, coordinate) {
+
+  var content = items.map(function (i) { return i.content }).join(''),
+      popup = Popup('#o-map');
+
   clear();
-  var content = items.map(function(i){
-    return i.content;
-  }).join('');
   content = '<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme">' + content + '</div></div>';
+
   switch (target) {
     case 'overlay':
-      var popup = Popup('#o-map');
       overlay = new ol.Overlay({
         element: popup.getEl()
       });
       map.addOverlay(overlay);
-      var geometry = items[0].feature.getGeometry();
-      var coord;
-      geometry.getType() == 'Point' ? coord = geometry.getCoordinates() : coord = coordinate;
-      overlay.setPosition(coord);
+      if (items[0].feature.getGeometry) {
+        coordinate = items[0].feature.getGeometry().getType() == 'Point' ? geometry.getCoordinates() : coordinate;
+      }
+
+      overlay.setPosition(coordinate);
       popup.setContent({content: content, title: items[0].title});
       popup.setVisibility(true);
-      var owl = initCarousel('#o-identify-carousel', undefined, function(){
+
+      var owl = initCarousel('#o-identify-carousel', undefined, function () {
         var currentItem = this.owl.currentItem;
-        selectionLayer.clearAndAdd(items[currentItem].feature.clone(), selectionStyles[items[currentItem].feature.getGeometry().getType()]);
+        if (typeof items[currentItem].feature === "object") {
+          selectionLayer.clearAndAdd(items[currentItem].feature.clone(), selectionStyles[items[currentItem].feature.getGeometry().getType()]);
+        }
         popup.setTitle(items[currentItem].title);
       });
       Viewer.autoPan();
       break;
+
     case 'sidebar':
       sidebar.setContent({content: content, title: items[0].title});
       sidebar.setVisibility(true);
       var owl = initCarousel('#o-identify-carousel', undefined, function(){
         var currentItem = this.owl.currentItem;
-        selectionLayer.clearAndAdd(items[currentItem].feature.clone(), selectionStyles[items[currentItem].feature.getGeometry().getType()]);
+        if (typeof items[currentItem].feature === "object") {
+          selectionLayer.clearAndAdd(items[currentItem].feature.clone(), selectionStyles[items[currentItem].feature.getGeometry().getType()]);
+        }
         sidebar.setTitle(items[currentItem].title);
       });
       break;
@@ -160,7 +168,7 @@ function clear() {
   selectionLayer.clear();
   sidebar.setVisibility(false);
   if (overlay) {
-    Viewer.removeOverlays(overlay);      
+    Viewer.removeOverlays(overlay);
   }
   console.log("Clearing selection");
 }
