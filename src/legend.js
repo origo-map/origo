@@ -301,7 +301,11 @@ function createLegendItem(layerid, layerStyle, inSubgroup) {
       if (layer.getProperties().legendGraphicType === 'toggleable') {
           legendItem += '<div class="o-menu-button legend-toggler o-legend-item-img">';
             legendItem += '<div class="o-legend-item-toggle-btn o-button-icon">';
-              legendItem += '<svg class="o-icon-fa-caret-right"><use xlink:href="#fa-caret-right"></use></svg>';
+              if (layer.getVisible()) {
+                legendItem += '<svg class="o-icon-fa-caret-right"><use xlink:href="#fa-caret-down"></use></svg>';
+              } else {
+                legendItem += '<svg class="o-icon-fa-caret-right"><use xlink:href="#fa-caret-right"></use></svg>';
+              }
             legendItem += '</div>';
           legendItem += '</div>';
       }
@@ -309,15 +313,18 @@ function createLegendItem(layerid, layerStyle, inSubgroup) {
 
     legendItem += '</div>';
 
-    if(layer.get('abstract')){
+    if (layer.get('abstract')) {
       legendItem += addAbstractButton(layername);
     }
 
     legendItem += '</div>';
-
     if (layer && layer.getProperties() && layer.getProperties().legendGraphicType) {
       if (layer.getProperties().legendGraphicType === 'toggleable') {
-        legendItem += "<div class='hidden block-legend'>";
+        if (layer.getVisible()) {
+          legendItem += "<div class='block-legend'>";
+        } else {
+          legendItem += "<div class='hidden block-legend'>";
+        }
         legendItem +=  layer.get('styleName') ? getSymbol(styleSettings[layer.get('styleName')], layer, true) : '';
         legendItem += "</div>";
       }
@@ -497,7 +504,11 @@ function addLegend(groups) {
 
         if (layer && layer.getProperties() && layer.getProperties().legendGraphicType) {
           if (layer.getProperties().legendGraphicType === 'toggleable') {
-            item += "<div class='hidden block-legend'>";
+            if (layer.getVisible()) {
+              item += "<div class='block-legend'>";
+            } else {
+              item += "<div class='hidden block-legend'>";
+            }
             item +=  layer.get('styleName') ? getSymbol(styleSettings[layer.get('styleName')], layer, true) : '';
             item += "</div>";
           }
