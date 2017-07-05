@@ -737,7 +737,14 @@ function toggleCheck(layerid) {
 
       $('.' + layername + ' .o-checkbox').removeClass('o-checkbox-false');
       $('.' + layername + ' .o-checkbox').addClass('o-checkbox-true');
+
       layer.setVisible(true);
+
+      var toggler = $('.' + layername + ' .o-checkbox').parent().find('.legend-toggler');
+      if (toggler) {
+        toggleBlockLegend.call(toggler, true);
+      }
+
       layer.set('legend', true);
     }
 
@@ -745,22 +752,29 @@ function toggleCheck(layerid) {
       toggleSubGroupCheck($('#' + layername).parents('ul').has('.o-legend-header').first(), false);
     }
   }
-
   bindBlockLegendToggler();
-
 }
 
-function bindBlockLegendToggler() {
-  $('.legend-toggler').off('click');
-  $('.legend-toggler').on('click', function(e) {
-    e.stopPropagation();
-    var item = $(this).closest('.o-legend').find('.block-legend');
+function toggleBlockLegend(force) {
+  var item = $(this).closest('.o-legend').find('.block-legend');
+  if (force) {
+    item.removeClass('hidden');
+    $(this).html('<svg class="o-icon-fa-caret-down"><use xlink:href="#fa-caret-down"></use></svg>');
+  } else {
     item.toggleClass('hidden');
     if (item.hasClass('hidden')) {
       $(this).html('<svg class="o-icon-fa-caret-right"><use xlink:href="#fa-caret-right"></use></svg>');
     } else {
       $(this).html('<svg class="o-icon-fa-caret-down"><use xlink:href="#fa-caret-down"></use></svg>');
     }
+  }
+}
+
+function bindBlockLegendToggler() {
+  $('.legend-toggler').off('click');
+  $('.legend-toggler').on('click', function(e) {
+    e.stopPropagation();
+    toggleBlockLegend.call(this);
   });
 }
 

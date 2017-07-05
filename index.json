@@ -112,7 +112,7 @@
       "group": "test",
       "queryable": true,
       "type": "WMS",
-      "visible": true,
+      "visible": false,
       "id": "vagnat",
       "source": "local",
       "style": "orto",
