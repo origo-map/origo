@@ -5,6 +5,7 @@ var viewer = require('./viewer');
 var utils = require('./utils');
 var modal = require('./modal');
 var validateUrl = require('./utils/validateurl');
+var ol = require('openlayers');
 
 var symbolSize = 20;
 var styleSettings;
@@ -12,7 +13,8 @@ var baseUrl;
 var hasMapLegend;
 
 function init(opt_options) {
-  var options = opt_options || {};
+  var options = opt_options || {},
+      isMapResolutionChanged = false;
 
   baseUrl = viewer.getBaseUrl();
   hasMapLegend = options.hasOwnProperty('hasMapLegend') ? options.hasMapLegend : true;
@@ -20,6 +22,46 @@ function init(opt_options) {
 
   render();
   addLegend(viewer.getGroups('top'));
+
+  viewer.getMap().getView().on('change:resolution', (e) => {
+    isMapResolutionChanged = true;
+  });
+
+  viewer.getMap().on('moveend', () => {
+    if (isMapResolutionChanged) {
+      onZoomEnd();
+    }
+    isMapResolutionChanged = false;
+  });
+
+}
+
+function getMapScale() {
+
+  var res = viewer.getMap().getView().getResolution(),
+      dpi = 25.4 / 0.28,
+      ipm = 39.37;
+
+  return res * ipm * dpi;
+}
+
+function onZoomEnd() {
+
+  function updateLegendImage(layer) {
+    var id, images;
+    if (layer.getProperties().useLegendGraphics) {
+        id = layer.getProperties().id;
+        $('.legend-img[data-layer="' + id + '"]').each(function () {
+          var src = getLegendGraphicStyle(layer).image.src;
+          $(this).attr('src', src);
+        });
+    }
+  }
+
+  viewer.getMap()
+        .getLayers()
+        .getArray()
+        .forEach(updateLegendImage);
 }
 
 function render() {
@@ -48,6 +90,8 @@ function getLegendGraphicStyle(layer) {
     properties = layer.getProperties().legendGraphicSettings;
     properties.request = "getLegendGraphic";
   }
+
+  properties.scale = getMapScale();
 
   if (urls.length > 0) {
     url = urls[0] + objectAsQueryString(properties);
@@ -121,12 +165,18 @@ function getSymbol(style, layer, force) {
         }
         if (force === true) {
           symbol = '<div class="o-legend-item-img">';
-          symbol += '<img src="' + src + '"></img>';
+          symbol += '<img class="legend-img" data-layer="' + layer.getProperties().id + '" src="' + src + '"></img>';
           symbol += '</div>';
         }
       } else {
         inlineStyle += "background-size: 20px";
-        symbol = '<div class="o-legend-item-img" style="' + inlineStyle +'"></div>';
+        if (layer.getProperties().useLegendGraphics) {
+          symbol = '<div class="o-legend-item-img">';
+          symbol += '<img class="legend-img" data-layer="' + layer.getProperties().id + '" src="' + src + '"></img>';
+          symbol += '</div>';
+        } else {
+          symbol = '<div class="o-legend-item-img" style="' + inlineStyle +'"></div>';
+        }
       }
     }
   }
@@ -454,11 +504,7 @@ function addLegend(groups) {
         }
 
         item += "</li>";
-
-        console.log("Item title", title);
-
         $('#o-overlay-list').append(item);
-
       }
     }
 

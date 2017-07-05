@@ -79,12 +79,12 @@
     {
       "name": "test",
       "title": "Test",
-      "expanded": true
+      "expanded": false
     },
     {
       "name": "background",
       "title": "Bakgrundskartor",
-      "expanded": true
+      "expanded": false
     }
   ],
   "layers": [
@@ -95,7 +95,6 @@
       "queryable": true,
       "type": "WMS",
       "visible": true,
-      "id": "badplats",
       "source": "local",
       "style": "orto",
       "useLegendGraphics": true,
