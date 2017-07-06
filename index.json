@@ -42,6 +42,7 @@
         "url": "search.aspx",
         "maxZoomLevel": 14,
         "layers": "badplats;vagnat;",
+        "idAttribute": "id",
         "searchAttribute": "NAMN",
         "northing": "N",
         "easting": "E",

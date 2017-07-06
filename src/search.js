@@ -192,7 +192,7 @@ function searchSuggestionItemClick(spec, e) {
       request: "GetFeature",
       outputFormat: "json",
       typeNames: spec.layername,
-      featureID: spec.fid
+      filter: '<ogc:Filter xmlns:ogc="http://www.opengis.net/ogc"><ogc:PropertyIsEqualTo><ogc:PropertyName>' + (idAttribute || "sokid") + '</ogc:PropertyName><ogc:Literal>' + spec.fid + '</ogc:Literal></ogc:PropertyIsEqualTo></ogc:Filter>'
     });
 
     $.get(url, function (rsp) {

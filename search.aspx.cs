@@ -129,7 +129,7 @@ public partial class Search : System.Web.UI.Page
 
         System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
         Response.Clear();
-        Response.ContentType = "application/json; charset=UTF-8";
+        Response.ContentType = "text/html; charset=UTF-8";
         Response.Write(serializer.Serialize(data));
         Response.End();
     }
