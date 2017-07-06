@@ -174,7 +174,7 @@ function displaySearchSuggestions(groups) {
   });
 
   if (groups.length === 0) {
-    srl.html($("<div>Sökningen gav inget träff</div>"));
+    srl.html($("<div>Sökningen gav ingen träff.</div>"));
   }
 
 }
