@@ -35,6 +35,19 @@
     },
     {
       "name": "scaleLine"
+    },
+    {
+      "name": "search",
+      "options": {
+        "url": "search.aspx",
+        "maxZoomLevel": 14,
+        "layers": "badplats;vagnat;",
+        "searchAttribute": "NAMN",
+        "northing": "N",
+        "easting": "E",
+        "title": "Adress",
+        "type": "postgis"
+      }
     }
   ],
   "footer": [{
@@ -98,6 +111,7 @@
       "source": "local",
       "style": "orto",
       "infoFormat": "text/html",
+      "geometryName": "geom",
       "useLegendGraphics": true,
       "legendGraphicType": "inline",
       "legendGraphicSettings": {
@@ -113,10 +127,10 @@
       "group": "test",
       "queryable": true,
       "type": "WMS",
-      "visible": true,
-      "id": "vagnat",
+      "visible": false,
       "source": "local",
       "style": "orto",
+      "geometryName": "geom",
       "useLegendGraphics": true,
       "legendGraphicType": "toggleable",
       "legendGraphicSettings": {

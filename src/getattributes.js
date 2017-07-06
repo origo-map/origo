@@ -23,6 +23,7 @@ module.exports = function(feature, layer) {
                 attribute = layer.get('attributes')[i];
                 title = '';
                 val = '';
+
                 if (attribute['name']) {
                   if(feature.get(attribute['name'])) {
                       val = feature.get(attribute['name']);
@@ -72,7 +73,7 @@ module.exports = function(feature, layer) {
     } else {
         if (feature && feature.getProperties) {
             //Clean feature attributes from non-wanted properties
-            attributes = filterObject(feature.getProperties(), ['FID_', 'geometry']);
+            attributes = filterObject(feature.getProperties(), ['FID_', 'geometry', "geom"]);
             //Use attributes with the template
             li = featureinfotemplates('default', attributes);
         } else {

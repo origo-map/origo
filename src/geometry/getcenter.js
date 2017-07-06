@@ -23,7 +23,8 @@ var getCenter = function getCenter(geometry_in, destination, axisOrientation) {
             center = geometry.getCoordinates();
             break;
         case "MultiPoint":
-            center = geometry[0].getCoordinates();
+            //center = geometry[0].getCoordinates();
+            center = geometry.getFirstCoordinate();
             break;
         case "LineString":
             center = geometry.getCoordinateAt(0.5);

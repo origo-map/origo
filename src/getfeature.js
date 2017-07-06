@@ -9,7 +9,14 @@ var source;
 module.exports = function(id, layer) {
     projectionCode = viewer.getProjectionCode();
     source = viewer.getMapSource();
-    var serverUrl = source[layer.get('sourceName')].url;
+
+    var serverUrl = "";
+    if (layer.get('sourceName')) {
+        serverUrl = source[layer.get('sourceName')].url;
+    } else {
+        serverUrl = layer.getSource().urls[0];
+    }
+
     var type = layer.get('type');
     //returns a promise with features as result
     return sourceType[type](id, layer, serverUrl);

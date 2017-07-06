@@ -30,6 +30,7 @@ var hint;
 var highlight;
 var projectionCode;
 var overlay;
+var srl;
 
 typeahead.loadjQueryPlugin();
 
@@ -49,7 +50,7 @@ function init(options) {
   title = options.title || '';
   titleAttribute = options.titleAttribute || undefined;
   contentAttribute = options.contentAttribute || undefined;
-  maxZoomLevel: options.maxZoomLevel || 2;
+  maxZoomLevel = options.maxZoomLevel || 2;
   hintText = options.hintText || 'Sök...';
   hint = options.hasOwnProperty('hint') ? options.hint : true;
   highlight = options.hasOwnProperty('highlight') ? options.highlight : true;
@@ -58,20 +59,21 @@ function init(options) {
   map = Viewer.getMap();
 
   el = '<div id="o-search-wrapper">' +
-                '<div id="o-search" class="o-search o-search-false">' +
-                    '<input class="o-search-field typeahead form-control" type="text" placeholder="' + hintText + '">' +
-                    '<button id="o-search-button">' +
-                        '<svg class="o-icon-fa-search">' +
-                            '<use xlink:href="#fa-search"></use>' +
-                        '</svg>' +
-                    '</button>' +
-                    '<button id="o-search-button-close">' +
-                        '<svg class="o-icon-search-fa-times">' +
-                            '<use xlink:href="#fa-times"></use>' +
-                        '</svg>' +
-                    '</button>' +
-                '</div>' +
-              '</div>';
+          '<div id="o-search" class="o-search o-search-false">' +
+              '<input class="o-search-field typeahead form-control" type="text" placeholder="' + hintText + '">' +
+              '<button id="o-search-button">' +
+                  '<svg class="o-icon-fa-search">' +
+                      '<use xlink:href="#fa-search"></use>' +
+                  '</svg>' +
+              '</button>' +
+              '<button id="o-search-button-close">' +
+                  '<svg class="o-icon-search-fa-times">' +
+                      '<use xlink:href="#fa-times"></use>' +
+                  '</svg>' +
+              '</button>' +
+          '</div>' +
+        '</div>';
+
   $('#o-map').append(el);
 
   // fix for internet explorer
@@ -83,45 +85,155 @@ function init(options) {
     highlight: highlight,
     minLength: 4
   },
-    {
-      name: 'adress',
-      limit: 9,
-      displayKey: name,
-      source: function (query, syncResults, asyncResults) {
+  {
+    name: 'adress',
+    limit: 9,
+    displayKey: name,
+    source: function (query, syncResults, asyncResults) {
+      var data = {
+        searchstring: encodeURI(query),
+        layers: options.layers,
+        date: new Date().getTime()
+      };
+      if (options.type === "postgis") {
+        $.post(url, data, function (data) {
+          displaySearchSuggestions(data);
+        });
+      } else {
         $.get(url + '?q=' + encodeURI(query), function (data) {
           asyncResults(data);
         });
       }
-    });
+    }
+  });
+
+  if (options.type === "postgis") {
+    srl = $("<div class='o-search-result-list'></div>");
+    $('.o-map').append(srl);
+    srl.hide();
+  }
 
   bindUIActions();
+}
+
+function objectAsQueryString(o) {
+  return Object.keys(o).reduce(function (s, k, i, a) {
+    s += k + "=" + o[k];
+    if (i < a.length - 1) s += "&";
+    return s;
+  }, "?")
+}
+
+/**
+ * Display search suggestions.
+ * This will override the default typehead behaviour.
+ * @param {Array} groups
+ */
+function displaySearchSuggestions(groups) {
+  srl.empty();
+  srl.show();
+
+  groups.forEach(function (group) {
+
+    var groupDiv  = $('<div></div>')
+    ,   caption   = $('<div></div>')
+    ,   ul        = $('<ul></ul>')
+    ,   layer;
+
+    layer = Viewer
+      .getMap()
+      .getLayers()
+      .getArray()
+      .filter(function (mapLayer) {
+        return mapLayer.getProperties().id === group.layername;
+      })[0];
+
+    if (layer) {
+
+      groupDiv.addClass("group");
+      caption.html(layer.getProperties().title || group.layername).addClass('caption');
+
+      group.hits.forEach(function (hit) {
+        var li = $('<li></li>');
+        li.html(hit.title);
+        li.id = hit.id;
+        li.click(searchSuggestionItemClick.bind(this, {
+          layer: layer,
+          layername: group.layername,
+          caption: layer.getProperties().title || group.layername,
+          fid: hit.id
+        }));
+        ul.append(li);
+      });
+
+      groupDiv.append(caption, ul);
+      srl.append(groupDiv);
+    }
+  });
+}
+
+function searchSuggestionItemClick(spec, e) {
+  var url = spec.layer.getSource().getUrls()[0];
+
+  srl.hide();
+
+  if (url) {
+    url = url.replace('wms', 'wfs');
+    url += objectAsQueryString({
+      service: "wfs",
+      version: "1.1.0",
+      request: "GetFeature",
+      outputFormat: "json",
+      typeNames: spec.layername,
+      featureID: spec.fid
+    });
+
+    $.get(url, function (rsp) {
+      var readOptions = {
+        geometryName: spec.layer.getProperties().geometryName || "geom"
+      };
+      var features = (new ol.format.GeoJSON(readOptions)).readFeatures(rsp);
+      showFeatureInfo(features, spec.caption, getAttributes(features[0], spec.layer));
+    });
+  }
 }
 
 function bindUIActions() {
   $('.typeahead').on('typeahead:selected', selectHandler);
 
   $('#o-search .o-search-field').on('input', function() {
-          if ($('#o-search .o-search-field.tt-input').val() && $('#o-search').hasClass('o-search-false')) {
-            $('#o-search').removeClass('o-search-false');
-            $('#o-search').addClass('o-search-true');
-            onClearSearch();
-          } else if (!($('#o-search .o-search-field.tt-input').val()) && $('#o-search').hasClass('o-search-true')) {
-            $('#o-search').removeClass('o-search-true');
-            $('#o-search').addClass('o-search-false');
-          }
-        });
-}
-
-function onClearSearch() {
-  $('#o-search-button-close').on('click', function (e) {
-      $('.typeahead').typeahead('val', '');
-      featureInfo.clear();
+    if ($('#o-search .o-search-field.tt-input').val() && $('#o-search').hasClass('o-search-false')) {
+      $('#o-search').removeClass('o-search-false');
+      $('#o-search').addClass('o-search-true');
+      bindClearSearch();
+    } else if (!($('#o-search .o-search-field.tt-input').val()) && $('#o-search').hasClass('o-search-true')) {
       $('#o-search').removeClass('o-search-true');
       $('#o-search').addClass('o-search-false');
-      $('#o-search .o-search-field.tt-input').val('');
-      $('#o-search-button').blur();
-      e.preventDefault();
-    });
+      if (srl) {
+        srl.empty();
+        srl.hide();
+      }
+    }
+  });
+
+}
+
+function onClearSearch(e) {
+  $('.typeahead').typeahead('val', '');
+  featureInfo.clear();
+  $('#o-search').removeClass('o-search-true');
+  $('#o-search').addClass('o-search-false');
+  $('#o-search .o-search-field.tt-input').val('');
+  $('#o-search-button').blur();
+  e.preventDefault();
+  if (srl) {
+    srl.empty();
+    srl.hide();
+  }
+}
+
+function bindClearSearch() {
+  $('#o-search-button-close').on('click', onClearSearch);
 }
 
 function showOverlay(data, coord) {

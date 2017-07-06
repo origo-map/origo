@@ -98,3 +98,37 @@ input.o-search-field::-ms-clear {
   display: none;
 }
 }
+
+.o-search-result-list {
+  position: absolute;
+  left: 50%;
+  width: 300px;
+  margin-left: -155px;
+  top: 3.5em;
+  background: white;
+  border-radius: 4px;
+  border: 1px solid #878786;
+  padding: 5px;
+  max-height: 400px;
+  overflow: auto;
+  z-index: 10000;
+  @media screen and (max-width: 350px) {
+    width: 92%;
+  }
+  .caption {
+    font-weight: bold;
+    padding: 5px 0;
+  }
+  ul {
+    list-style: none;
+    padding: 0
+  }
+  li {
+    cursor: pointer;
+    user-select: none;
+    padding: 5px;
+    &:hover {
+      background: #dedede;
+    }
+  }
+}
