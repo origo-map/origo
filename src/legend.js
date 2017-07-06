@@ -23,11 +23,11 @@ function init(opt_options) {
   render();
   addLegend(viewer.getGroups('top'));
 
-  viewer.getMap().getView().on('change:resolution', (e) => {
+  viewer.getMap().getView().on('change:resolution', function(e) {
     isMapResolutionChanged = true;
   });
 
-  viewer.getMap().on('moveend', () => {
+  viewer.getMap().on('moveend', function() {
     if (isMapResolutionChanged) {
       onZoomEnd();
     }
