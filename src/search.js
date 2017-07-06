@@ -170,6 +170,11 @@ function displaySearchSuggestions(groups) {
       srl.append(groupDiv);
     }
   });
+
+  if (groups.length === 0) {
+    srl.html($("<div>Sökningen gav inget träff</div>"));
+  }
+
 }
 
 function searchSuggestionItemClick(spec, e) {
