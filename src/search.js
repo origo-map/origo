@@ -91,7 +91,7 @@ function init(options) {
     displayKey: name,
     source: function (query, syncResults, asyncResults) {
       var data = {
-        searchstring: encodeURI(query),
+        searchstring: query,
         layers: options.layers,
         date: new Date().getTime()
       };
