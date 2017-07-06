@@ -97,7 +97,9 @@ function init(options) {
       };
       if (options.type === "postgis") {
         $.post(url, data, function (data) {
+          if (typeof data === "string") data = JSON.parse(data);
           displaySearchSuggestions(data);
+
         });
       } else {
         $.get(url + '?q=' + encodeURI(query), function (data) {
