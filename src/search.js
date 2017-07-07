@@ -179,6 +179,25 @@ function displaySearchSuggestions(groups) {
 
 }
 
+function getWMSFeatureInfo(spec, callback) {
+
+  var mapView = Viewer.getMap().getView();
+
+  var url = spec.layer.getSource().getGetFeatureInfoUrl(
+    spec.feature.getGeometry().getFirstCoordinate(),
+    mapView.getResolution(),
+    mapView.getProjection(),
+    {
+      'INFO_FORMAT': 'text/html',
+      'feature_count': 1
+    }
+  );
+
+  $.get(url, function (r) {
+    callback(r);
+  });
+}
+
 function searchSuggestionItemClick(spec, e) {
   var url = spec.layer.getSource().getUrls()[0];
 
@@ -200,7 +219,12 @@ function searchSuggestionItemClick(spec, e) {
         geometryName: spec.layer.getProperties().geometryName || "geom"
       };
       var features = (new ol.format.GeoJSON(readOptions)).readFeatures(rsp);
-      showFeatureInfo(features, spec.caption, getAttributes(features[0], spec.layer));
+      getWMSFeatureInfo({
+        layer: spec.layer,
+        feature: features[0]
+      }, function (data) {
+        showFeatureInfo(features, spec.caption, "<div>"  + data  + "</div>");
+      });
     });
   }
 }

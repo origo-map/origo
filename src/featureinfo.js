@@ -84,7 +84,6 @@ function identify(items, target, coordinate) {
 
   clear();
   content = '<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme">' + content + '</div></div>';
-
   switch (target) {
     case 'overlay':
       overlay = new ol.Overlay({
@@ -170,7 +169,6 @@ function clear() {
   if (overlay) {
     Viewer.removeOverlays(overlay);
   }
-  console.log("Clearing selection");
 }
 function onEnableInteraction(e) {
   if(e.interaction === 'featureInfo') {
