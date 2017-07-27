@@ -10,6 +10,8 @@ var generateUUID = require('../utils/generateuuid');
 var transactionHandler = require('./transactionhandler');
 var dispatcher = require('./editdispatcher');
 var editForm = require('./editform');
+var imageresizer = require('../utils/imageresizer');
+var getImageOrientation = require('../utils/getimageorientation');
 var shapes = require('./shapes');
 
 var editLayers = {};
@@ -208,6 +210,11 @@ function cancelAttribute() {
 function onAttributesSave(feature, attributes) {
   $('#o-save-button').on('click', function(e) {
     var editEl = {};
+    var fileReader;
+    var imageData;
+    var input;
+    var file;
+    var orientation;
 
     //Read values from form
     attributes.forEach(function(attribute) {
@@ -228,10 +235,39 @@ function onAttributesSave(feature, attributes) {
           editEl[attribute.name] = $(attribute.elId).val();
         }
       }
+
+      //Check if file. If file, read and trigger resize
+      if ($(attribute.elId).attr('type') === 'file') {
+        input = $(attribute.elId)[0];
+        file = input.files[0];
+
+        if (file) {
+          fileReader = new FileReader();
+          fileReader.onload = function() {
+            getImageOrientation(file, function(orientation) {
+              imageresizer(fileReader.result, attribute, orientation, function(resized) {
+                editEl[attribute.name] = resized;
+                $(document).trigger('imageresized');
+              });
+            });
+          }
+
+          fileReader.readAsDataURL(file);
+        } else {
+          editEl[attribute.name] = $(attributes[0].elId).attr('value');
+        }
+      }
     });
 
+    if (fileReader && fileReader.readyState == 1) {
+      $(document).on('imageresized', function() {
+        attributesSaveHandler(feature, editEl);
+      });
+    } else {
+      attributesSaveHandler(feature, editEl);
+    }
+
     modal.closeModal();
-    attributesSaveHandler(feature, editEl);
     $('#o-save-button').blur();
     e.preventDefault();
   });
@@ -289,6 +325,34 @@ function addListener() {
       }
     });
   }
+
+  return fn;
+}
+
+function addImageListener() {
+  var fn = function(obj) {
+    var fileReader = new FileReader();
+    var containerClass = '.' + obj.elId.slice(1);
+    $(obj.elId).on('change', function(e) {
+      $(containerClass + ' img').removeClass('o-hidden');
+      $(containerClass + ' input[type=button]').removeClass('o-hidden');
+
+      if (this.files && this.files[0]) {
+        fileReader.onload = function (e) {
+          $(containerClass + ' img').attr('src', e.target.result);
+        };
+
+        fileReader.readAsDataURL(this.files[0]);
+      }
+    });
+
+    $(containerClass + ' input[type=button]').on('click', function(e) {
+      $(obj.elId).attr('value', '');
+      $(containerClass + ' img').addClass('o-hidden');
+      $(this).addClass('o-hidden');
+    });
+  }
+
   return fn;
 }
 
@@ -393,6 +457,10 @@ function editAttributes() {
           } else {
             alert('Villkor verkar inte vara rätt formulerat. Villkor formuleras enligt principen change:attribute:value');
           }
+        } else if (obj.type === 'image') {
+          obj.isVisible = true;
+          obj.elId = '#input-' + obj.name;
+          obj.addListener = addImageListener();
         } else {
           obj.isVisible = true;
           obj.elId = '#input-' + obj.name;
@@ -467,7 +535,13 @@ function getFeaturesByIds(type, layer, ids) {
   } else {
     ids.forEach(function(id) {
       if (source.getFeatureById(id)) {
-        features.push(source.getFeatureById(id));
+        /*** REMOVE ***/
+        var feature = source.getFeatureById(id);
+        feature.unset('bbox');
+        features.push(feature);
+        /*** *** ***/
+        
+        //features.push(source.getFeatureById(id));
       }
     });
   }
