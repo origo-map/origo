@@ -4,7 +4,7 @@ An easy to configure framework for creating your own web mapping applications.
 
 ## What is Origo?
 
-Origo is a web mapping framework. It is based on the [OpenLayers 3 library](https://github.com/openlayers/ol3). You can use Origo to create your own desktop-like web mapping applications. The project is run and maintained by a number of Swedish municipalities.
+Origo is a web mapping framework. It is based on the [OpenLayers library](https://github.com/openlayers/openlayers). You can use Origo to create your own desktop-like web mapping applications. The project is run and maintained by a number of Swedish municipalities.
 
 ## Features
 

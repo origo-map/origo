@@ -24,7 +24,8 @@
   "dependencies": {
     "browserify": "11.0.1",
     "jquery": "2.1.4",
-    "openlayers": "4.1.0",
+    "localforage": "1.5.0",
+    "openlayers": "^4.1.1",
     "proj4": "2.3.10",
     "typeahead.js-browserify": "1.0.7"
   },

@@ -42,6 +42,10 @@
 .tt-suggestion p {
     margin: 0;
 }
+.o-search input {
+  box-sizing: content-box;
+  line-height: inherit;
+}
 &[class*=#{$media-l}] {
 .tt-menu {
 	max-width: calc(258px + 2em);

@@ -1,7 +1,3 @@
-/* ========================================================================
- * Copyright 2016 Origo
- * Licensed under BSD 2-Clause (https://github.com/origo-map/origo/blob/master/LICENSE.txt)
- * ======================================================================== */
 "use strict";
 
 var ol = require('openlayers');
@@ -12,20 +8,23 @@ var isUrl = require('../utils/isurl');
 
 var topojson = function topojson(layerOptions) {
   var baseUrl = viewer.getBaseUrl();
-  var toposonDefault = {
+  var topojsonDefault = {
     layerType: 'vector'
   };
   var topojsonOptions = $.extend(topojsonDefault, layerOptions);
+  var topojsonSource;
+  var sourceOptions = {};
   sourceOptions.attribution = topojsonOptions.attribution;
   sourceOptions.projectionCode = viewer.getProjectionCode();
-  sourceOptions.sourceName.layerOptions.sourceName;
-  if (isUrl(geojsonOptions.source)) {
-    sourceOptions.url = geojsonOptions.source;
+  sourceOptions.sourceName = layerOptions.source;
+  if (isUrl(topojsonOptions.source)) {
+    sourceOptions.url = topojsonOptions.source;
   } else {
-    sourceOptions.url = baseUrl + geojsonOptions.source;
+    topojsonOptions.sourceName = baseUrl + topojsonOptions.source;
+    sourceOptions.url = topojsonOptions.source;
   }
 
-  var topojsonSource = createSource(topojsonOptions);
+  topojsonSource = createSource(sourceOptions);
   return vector(topojsonOptions, topojsonSource);
 
   function createSource(options) {

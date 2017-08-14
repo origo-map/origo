@@ -1,7 +1,3 @@
-/* ========================================================================
- * Copyright 2016 Origo
- * Licensed under BSD 2-Clause (https://github.com/origo-map/origo/blob/master/LICENSE.txt)
- * ======================================================================== */
 "use strict";
 
 var ol = require('openlayers');
@@ -55,14 +51,16 @@ function init(el, mapOptions) {
   settings.params = urlParams = mapOptions.params || {};
   settings.map = mapOptions.map;
   settings.url = mapOptions.url;
+  settings.target = mapOptions.target;
   settings.baseUrl = mapOptions.baseUrl;
-  if (mapOptions.hasOwnProperty('proj4Defs')) {
+  if (mapOptions.hasOwnProperty('proj4Defs') || mapOptions.projectionCode=="EPSG:3857" || mapOptions.projectionCode=="EPSG:4326") {
     // Projection to be used in map
     settings.projectionCode = mapOptions.projectionCode || undefined;
     settings.projectionExtent = mapOptions.projectionExtent;
     settings.projection = new ol.proj.Projection({
       code: settings.projectionCode,
-      extent: settings.projectionExtent
+      extent: settings.projectionExtent,
+      units: getUnits(settings.projectionCode)
     });
     settings.resolutions = mapOptions.resolutions || undefined;
     settings.tileGrid = maputils.tileGrid(settings.projectionExtent, settings.resolutions);
@@ -187,6 +185,10 @@ function getSettings() {
   return settings;
 }
 
+function getExtent() {
+  return settings.extent;
+}
+
 function getBaseUrl() {
   return settings.baseUrl;
 }
@@ -246,6 +248,24 @@ function getMap() {
 
 function getLayers() {
   return settings.layers;
+}
+
+function getLayersByProperty(key, val, byName) {
+  var layers = map.getLayers().getArray().filter(function(layer) {
+    if (layer.get(key)) {
+      if (layer.get(key) === val) {
+        return layer;
+      }
+    }
+  });
+
+  if (byName) {
+    return layers.map(function(layer) {
+      return layer.get('name');
+    });
+  } else {
+    return layers;
+  }
 }
 
 function getLayer(layername) {
@@ -370,6 +390,21 @@ function getScale(resolution) {
   return scale;
 }
 
+function getUnits(proj) {
+  var units;
+  switch(proj) {
+    case 'EPSG:3857':
+      units = 'm';
+      break;
+    case 'EPSG:4326':
+      units = 'degrees';
+      break;
+    default:
+      units = proj4.defs(proj) ? proj4.defs(proj).units : undefined;
+  }
+  return units;
+}
+
 function autoPan() {
   /*Workaround to remove when autopan implemented for overlays */
   var el = $('.o-popup');
@@ -441,11 +476,13 @@ function render(el, mapOptions) {
 module.exports.init = init;
 module.exports.createLayers = createLayers;
 module.exports.getBaseUrl = getBaseUrl;
+module.exports.getExtent = getExtent;
 module.exports.getSettings = getSettings;
 module.exports.getStyleSettings = getStyleSettings;
 module.exports.getMapUrl = getMapUrl;
 module.exports.getMap = getMap;
 module.exports.getLayers = getLayers;
+module.exports.getLayersByProperty = getLayersByProperty;
 module.exports.getLayer = getLayer;
 module.exports.getControlNames = getControlNames;
 module.exports.getQueryableLayers = getQueryableLayers;

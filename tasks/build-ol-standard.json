@@ -69,6 +69,7 @@
     "ol.control.ScaleLine",
     "ol.control.defaults",
     "ol.interaction.Draw",
+    "ol.interaction.Draw.createBox",
     "ol.interaction.Draw#on",
     "ol.interaction.Draw#setActive",
     "ol.interaction.Draw#un",
@@ -103,6 +104,9 @@
     "ol.source.XYZ",
     "ol.source.Cluster",
     "ol.layer.Layer#getSource",
+    "ol.layer.Layer#getProperties",
+    "ol.layer.Layer#setSource",
+    "ol.layer.Layer#un",
     "ol.layer.Base#getVisible",
     "ol.layer.Base#setVisible",
     "ol.layer.Base#on",
@@ -119,8 +123,12 @@
     "ol.Feature#getProperties",
     "ol.Feature#getStyle",
     "ol.Feature#setId",
+    "ol.Feature#setProperties",
     "ol.Feature#setStyle",
+    "ol.Feature#setGeometry",
+    "ol.Feature#setGeometryName",
     "ol.Feature#on",
+    "ol.Feature#unset",
     "ol.Collection",
     "ol.Collection#getArray",
     "ol.Collection#getLength",
@@ -129,7 +137,10 @@
     "ol.format.EsriJSON",
     "ol.format.EsriJSON#readFeatures",
     "ol.format.GeoJSON",
+    "ol.format.GeoJSON#readFeature",
     "ol.format.GeoJSON#readFeatures",
+    "ol.format.GeoJSON#writeFeatureObject",
+    "ol.format.GeoJSON#writeFeaturesObject",
     "ol.format.TopoJSON",
     "ol.format.TopoJSON#readFeatures",
     "ol.format.WKT",
@@ -201,6 +212,8 @@
   "umd": true,
   "compile": {
     "externs": [
+      "externs/bingmaps.js",
+      "externs/cartodb.js",
       "externs/closure-compiler.js",
       "externs/geojson.js",
       "externs/esrijson.js",
@@ -211,11 +224,9 @@
       "externs/topojson.js"
     ],
     "define": [
-      "ol.ENABLE_DOM=false",
       "ol.ENABLE_WEBGL=false",
       "ol.ENABLE_PROJ4JS=true",
-      "ol.ENABLE_IMAGE=false",
-      "goog.DEBUG=false"
+      "ol.ENABLE_RASTER_REPROJECTION=false"
     ],
     "extra_annotation_name": [
       "api", "observable"
