@@ -13,12 +13,14 @@ var geolocation = undefined;
 var marker = undefined;
 var markerEl = undefined;
 var baseUrl = undefined;
+var zoom;
 
 function init(opt_options) {
   var options = opt_options || {};
   var target = options.target || '#o-toolbar-navigation';
   map = viewer.getMap();
   baseUrl = viewer.getBaseUrl();
+  zoom = options.zoom || undefined;
 
   render(target);
 
@@ -107,7 +109,11 @@ function addPosition(current) {
 
   if (enabled === false && geolocation.getTracking()) {
     marker.setPosition(position);
-    map.getView().animate({center: position}, {zoom: 10});
+    if (zoom === true) {
+      map.getView().animate({center: position}, {resolution: (viewer.getResolutions().length - 3)});
+    } else {
+      map.getView().animate({center: position});
+    }
     enabled = true;
   } else if (geolocation.getTracking()) {
     marker.setPosition(position);
