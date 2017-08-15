@@ -2,7 +2,7 @@ module.exports = {
   crossDomain: true,
   target: '#app-wrapper',
   svgSpritePath: 'css/svg/',
-  svgSprites: ['fa-icons.svg', 'miscellaneous.svg', 'custom.svg'],
+  svgSprites: ['fa-icons.svg', 'material-icons.svg', 'miscellaneous.svg', 'custom.svg'],
   breakPoints: {
     xs: [240, 320],
     s: [320, 320],
