@@ -274,7 +274,7 @@ function createMeasureTooltip() {
 function formatLength(line) {
   var length, output;
   var coordinates = line.getCoordinates();
-  length = getLength(coordinates);
+  length = coordinates.reduce(getLength,0);
 
   if (length > 100) {
     output = (Math.round(length / 1000 * 100) / 100) +
@@ -283,19 +283,17 @@ function formatLength(line) {
     output = (Math.round(length * 100) / 100) +
       ' ' + 'm';
   }
-
   return output;
 };
 
-function getLength(coordinates){
-  var length = 0;
-  var sourceProj = map.getView().getProjection();
-  for (var i = 0, ii = coordinates.length - 1; i < ii; ++i) {
-    var c1 = ol.proj.transform(coordinates[i], sourceProj, 'EPSG:4326');
-    var c2 = ol.proj.transform(coordinates[i + 1], sourceProj, 'EPSG:4326');
-    length += wgs84Sphere.haversineDistance(c1, c2);
+function getLength(total, value, index, arr){
+  if(index<arr.length-1){
+    var sourceProj = map.getView().getProjection();
+    var c1 = ol.proj.transform(arr[index], sourceProj, 'EPSG:4326');
+    var c2 = ol.proj.transform(arr[index + 1], sourceProj, 'EPSG:4326');
+    total += wgs84Sphere.haversineDistance(c1, c2);
   }
-  return length;
+  return total;
 }
 
 function formatArea(polygon) {
