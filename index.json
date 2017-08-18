@@ -31,11 +31,12 @@
       "name": "legend"
     },
     {
-      "name": "centerposition",
+      "name": "position",
       "options": {
-        "title": "Pseudo-Mercator",
+        "title": "Web Mercator",
         "projections": {
-          "EPSG:4326": "WGS84"
+          "EPSG:4326": "WGS84",
+          "EPSG:3006": "Sweref99 TM"
         }
       }
     },
