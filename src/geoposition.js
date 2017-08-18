@@ -110,9 +110,15 @@ function addPosition(current) {
   if (enabled === false && geolocation.getTracking()) {
     marker.setPosition(position);
     if (zoomLevel) {
-      map.getView().animate({center: position}, {zoom: zoomLevel});
+      map.getView().animate({
+        center: position,
+        zoom: zoomLevel
+      });
     } else {
-      map.getView().animate({center: position}, {resolution: (viewer.getResolutions().length - 3)});
+      map.getView().animate({
+        center: position,
+        resolution: (viewer.getResolutions().length - 3)
+      });
     }
     enabled = true;
   } else if (geolocation.getTracking()) {
