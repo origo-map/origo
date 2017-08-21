@@ -1,9 +1,69 @@
+// Colors
+// Font
+// Tables
+
+// Start with assigning color names to specific hex values.
+$white:  #fff !default;
+$black:  #000 !default;
+$red:    #d9534f !default;
+$orange: #f0ad4e !default;
+$yellow: #ffd500 !default;
+$green:  #5cb85c !default;
+$blue:   #0275d8 !default;
+$teal:   #5bc0de !default;
+$pink:   #ff5b77 !default;
+$purple: #613d7c !default;
+
+// Create grayscale
+$gray-dark:                 #292b2c !default;
+$gray:                      #464a4c !default;
+$gray-light:                #636c72 !default;
+$gray-lighter:              #eceeef !default;
+$gray-lightest:             #f7f7f9 !default;
+
+$body-bg:       $white !default;
+$body-color:    $gray-dark !default;
+
+//spacings
+$border-width: 1px !default;
+$spacer:   1rem !default;
+
 // buttons
 $o-btn-color: #424242;
 $o-btn-bg: #fff;
 $o-btn-active-color: #007aff;
 $o-btn-hover-color: #eee;
 $o-btn-hover-bg: #424242;
+
+
+//Font
+$font-size-h1: 2.5rem !default;
+$font-size-h2: 2rem !default;
+$font-size-h3: 1.75rem !default;
+$font-size-h4: 1.5rem !default;
+$font-size-h5: 1.25rem !default;
+$font-size-h6: 1rem !default;
+
+$headings-margin-bottom: ($spacer / 2) !default;
+
+//tables
+$table-cell-padding:            .75rem !default;
+$table-sm-cell-padding:         .3rem !default;
+
+$table-bg:                      transparent !default;
+
+$table-inverse-bg:              $gray-dark !default;
+$table-inverse-color:           $body-bg !default;
+
+$table-bg-accent:               rgba($black,.05) !default;
+$table-bg-hover:                rgba($black,.075) !default;
+$table-bg-active:               $table-bg-hover !default;
+
+$table-head-bg:                 $gray-lighter !default;
+$table-head-color:              $gray !default;
+
+$table-border-width:            $border-width !default;
+$table-border-color:            $gray-lighter !default;
 
 // element query cls names
 $media-l: o-media-l;

@@ -3,9 +3,11 @@
 var viewer = require('../viewer');
 var wfsTransaction = require('./wfstransaction');
 var agsTransaction = require('./agstransaction');
+var indexedDb = require('./indexeddb');
 var transactions = {
   WFS: wfsTransaction,
-  AGS_FEATURE: agsTransaction
+  AGS_FEATURE: agsTransaction,
+  OFFLINE: indexedDb
 };
 
 module.exports = function(transaction, layerName) {

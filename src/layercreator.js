@@ -5,6 +5,7 @@ var viewer = require('./viewer');
 var mapUtils = require('./maputils');
 var group = require('./layer/group');
 var type = {};
+var layerCreator;
 type.WFS = require('./layer/wfs');
 type.AGS_FEATURE = require('./layer/agsfeature');
 type.TOPOJSON = require('./layer/topojson');
@@ -14,9 +15,10 @@ type.WMTS = require('./layer/wmts');
 type.AGS_TILE = require('./layer/agstile');
 type.XYZ = require('./layer/xyz');
 type.OSM = require('./layer/osm');
+type.FEATURE = require('./layer/featurelayer');;
 type.GROUP = groupLayer;
 
-var layerCreator = function layerCreator(opt_options) {
+layerCreator = function layerCreator(opt_options) {
   var defaultOptions = {
     name: undefined,
     id: undefined,
@@ -46,11 +48,13 @@ var layerCreator = function layerCreator(opt_options) {
   var name = layerOptions.name;
   layerOptions.minResolution = layerOptions.hasOwnProperty('minScale') ? mapUtils.scaleToResolution(layerOptions.minScale, projection): undefined;
   layerOptions.maxResolution = layerOptions.hasOwnProperty('maxScale') ? mapUtils.scaleToResolution(layerOptions.maxScale, projection): undefined;
+  layerOptions.extent = layerOptions.extent || viewer.getExtent();
   layerOptions.sourceName = layerOptions.source;
   layerOptions.styleName = layerOptions.style;
   if (layerOptions.id === undefined) {
     layerOptions.id = name.split('__').shift();
   }
+
   layerOptions.name = name.split(':').pop();
 
   if (type.hasOwnProperty(layerOptions.type)) {
@@ -62,11 +66,14 @@ var layerCreator = function layerCreator(opt_options) {
 }
 
 function groupLayer(options) {
+  var layers;
+  var layerOptions;
   if (options.hasOwnProperty('layers')) {
-    var layers = options.layers.map(function(layer) {
+    layers = options.layers.map(function(layer) {
       return layerCreator(layer);
     });
-    var layerOptions = {};
+
+    layerOptions = {};
     layerOptions.layers = layers;
     return group($.extend(options, layerOptions));
   } else {

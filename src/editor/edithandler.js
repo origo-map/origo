@@ -10,9 +10,13 @@ var generateUUID = require('../utils/generateuuid');
 var transactionHandler = require('./transactionhandler');
 var dispatcher = require('./editdispatcher');
 var editForm = require('./editform');
+var imageresizer = require('../utils/imageresizer');
+var getImageOrientation = require('../utils/getimageorientation');
+var shapes = require('./shapes');
 
 var editLayers = {};
 var autoSave = undefined;
+var autoForm = undefined;
 var editSource = undefined;
 var geometryType = undefined;
 var geometryName = undefined;
@@ -28,47 +32,57 @@ var hasSnap = undefined;
 var select = undefined;
 var modify = undefined;
 var snap = undefined;
+var tools = undefined;
 
 module.exports = function(options) {
   map = viewer.getMap();
-
   currentLayer = options.currentLayer;
   editableLayers = options.editableLayers;
+  tools = options.drawTools || [];
 
   //set edit properties for editable layers
   editLayers = setEditProps(options);
   editableLayers.forEach(function(layerName) {
     var layer = viewer.getLayer(layerName);
-    layer.getSource().once('addfeature', function(e) {
-      editLayers[layerName].geometryType = layer.getSource().getFeatures()[0].getGeometry().getType();
-      editLayers[layerName].geometryName = layer.getSource().getFeatures()[0].getGeometryName();
-      if (layerName === currentLayer && options.isActive) {
-        dispatcher.emitEnableInteraction();
-      }
-    });
+    verifyLayer(layerName);
+    if (layerName === currentLayer && options.isActive) {
+      dispatcher.emitEnableInteraction();
+      setEditLayer(layerName);
+    }
   });
 
   autoSave = options.autoSave;
-  $(document).on('toggleEdit', toggleEdit);
+  autoForm = options.autoForm;
+  $(document).on('toggleEdit', onToggleEdit);
+  $(document).on('changeEdit', onChangeEdit);
+  $(document).on('editorShapes', onChangeShape);
 }
 
 function setEditLayer(layerName) {
-  var editLayer = editLayers[layerName];
-  var layer = viewer.getLayer(layerName);
   currentLayer = layerName;
-  editSource = layer.getSource();
-  attributes = layer.get('attributes');
-  title = layer.get('title') || 'Information';
-  removeInteractions();
-  draw = new ol.interaction.Draw({
+  setInteractions();
+}
+
+function setInteractions(drawType) {
+  var editLayer = editLayers[currentLayer];
+  var drawOptions;
+  editSource = editLayer.getSource();
+  attributes = editLayer.get('attributes');
+  title = editLayer.get('title') || 'Information';
+  drawOptions = {
     source: editSource,
-    'type': editLayer.geometryType,
-    geometryName: editLayer.geometryName
-  });
+    type: editLayer.get('geometryType'),
+    geometryName: editLayer.get('geometryName')
+  };
+  if (drawType) {
+    $.extend(drawOptions, shapes(drawType));
+  }
+  removeInteractions();
+  draw = new ol.interaction.Draw(drawOptions);
   hasDraw = false;
   hasAttribute = false;
   select = new ol.interaction.Select({
-    layers: [layer]
+    layers: [editLayer]
   });
   modify = new ol.interaction.Modify({
     features: select.getFeatures()
@@ -81,26 +95,45 @@ function setEditLayer(layerName) {
   setActive();
 
   //If snap should be active then add snap internactions for all snap layers
-  hasSnap = editLayer.snap;
+  hasSnap = editLayer.get('snap');
   if (hasSnap) {
     var selectionSource = featureInfo.getSelectionLayer().getSource();
-    var snapSources = editLayer.snapLayers ? getSnapSources(editLayer.snapLayers) : [editLayer.source];
+    var snapSources = editLayer.get('snapLayers') ? getSnapSources(editLayer.get('snapLayers')) : [editLayer.get('source')];
     snapSources.push(selectionSource);
     snap = addSnapInteraction(snapSources);
   }
+}
+
+function verifyLayer(layerName) {
+  if (!(editLayers[layerName].get('geometryType'))) {
+    addFeatureAddListener(layerName);
+  }
+}
+
+function setGeometryProps(layer) {
+  var layerName = layer.get('name');
+  editLayers[layerName].set('geometryType', layer.getSource().getFeatures()[0].getGeometry().getType());
+  if (layerName === currentLayer) {
+    setEditLayer(layerName);
+  }
+}
+
+function addFeatureAddListener(layerName) {
+  var layer = viewer.getLayer(layerName);
+  layer.getSource().once('addfeature', function(e) {
+    setGeometryProps(layer);
+  });
 }
 
 function setEditProps(options) {
   var initialValue = {};
   var result = editableLayers.reduce(function(layerProps, layerName) {
     var layer = viewer.getLayer(layerName);
-
-    layerProps[layerName] = {
-      geometryType: layer.get('geometryType') || undefined,
-      geometryName: layer.get('geometryName') || undefined,
-    };
-    layerProps[layerName].snap = options.hasOwnProperty('snap') ? options.snap : true;
-    layerProps[layerName].snapLayers = options.snapLayers || editableLayers;
+    var snap = options.hasOwnProperty('snap') ? options.snap : true;
+    var snapLayers = options.snapLayers || editableLayers;
+    layer.set('snap', snap);
+    layer.set('snapLayers', snapLayers);
+    layerProps[layerName] = layer;
     return layerProps;
   }, initialValue);
   return result;
@@ -116,6 +149,9 @@ function isActive() {
 
 function onDeleteSelected() {
   var features = select.getFeatures();
+
+  // Make sure all features are loaded in the source
+  editSource = editLayers[currentLayer].getSource();
   if (features.getLength() === 1) {
     var feature = features.item(0);
     var r = confirm('Är du säker på att du vill ta bort det här objektet?');
@@ -142,6 +178,9 @@ function onModifyEnd(evt) {
 
 function onDrawEnd(evt) {
   var feature = evt.feature;
+  var layer = viewer.getLayer(currentLayer);
+  var attributes = getDefaultValues(layer.get('attributes'));
+  feature.setProperties(attributes);
   feature.setId(generateUUID());
   editSource.addFeature(feature);
   setActive();
@@ -152,12 +191,20 @@ function onDrawEnd(evt) {
     action: 'insert'
   });
   dispatcher.emitChangeEdit('draw', false);
+  if (autoForm) {
+    editAttributes(feature);
+  }
 }
 
 function cancelDraw() {
   setActive();
   hasDraw = false;
   dispatcher.emitChangeEdit('draw', false);
+}
+
+function onChangeShape(e) {
+  setInteractions(e.shape);
+  startDraw();
 }
 
 function cancelAttribute() {
@@ -168,6 +215,11 @@ function cancelAttribute() {
 function onAttributesSave(feature, attributes) {
   $('#o-save-button').on('click', function(e) {
     var editEl = {};
+    var fileReader;
+    var imageData;
+    var input;
+    var file;
+    var orientation;
 
     //Read values from form
     attributes.forEach(function(attribute) {
@@ -188,10 +240,39 @@ function onAttributesSave(feature, attributes) {
           editEl[attribute.name] = $(attribute.elId).val();
         }
       }
+
+      //Check if file. If file, read and trigger resize
+      if ($(attribute.elId).attr('type') === 'file') {
+        input = $(attribute.elId)[0];
+        file = input.files[0];
+
+        if (file) {
+          fileReader = new FileReader();
+          fileReader.onload = function() {
+            getImageOrientation(file, function(orientation) {
+              imageresizer(fileReader.result, attribute, orientation, function(resized) {
+                editEl[attribute.name] = resized;
+                $(document).trigger('imageresized');
+              });
+            });
+          }
+
+          fileReader.readAsDataURL(file);
+        } else {
+          editEl[attribute.name] = $(attributes[0].elId).attr('value');
+        }
+      }
     });
 
+    if (fileReader && fileReader.readyState == 1) {
+      $(document).on('imageresized', function() {
+        attributesSaveHandler(feature, editEl);
+      });
+    } else {
+      attributesSaveHandler(feature, editEl);
+    }
+
     modal.closeModal();
-    attributesSaveHandler(feature, editEl);
     $('#o-save-button').blur();
     e.preventDefault();
   });
@@ -222,6 +303,7 @@ function removeInteractions() {
         map.removeInteraction(snapInteraction);
       });
     }
+
     modify = undefined;
     select = undefined;
     draw = undefined;
@@ -248,13 +330,42 @@ function addListener() {
       }
     });
   }
+
   return fn;
 }
 
-function toggleEdit(e) {
+function addImageListener() {
+  var fn = function(obj) {
+    var fileReader = new FileReader();
+    var containerClass = '.' + obj.elId.slice(1);
+    $(obj.elId).on('change', function(e) {
+      $(containerClass + ' img').removeClass('o-hidden');
+      $(containerClass + ' input[type=button]').removeClass('o-hidden');
+
+      if (this.files && this.files[0]) {
+        fileReader.onload = function (e) {
+          $(containerClass + ' img').attr('src', e.target.result);
+        };
+
+        fileReader.readAsDataURL(this.files[0]);
+      }
+    });
+
+    $(containerClass + ' input[type=button]').on('click', function(e) {
+      $(obj.elId).attr('value', '');
+      $(containerClass + ' img').addClass('o-hidden');
+      $(this).addClass('o-hidden');
+    });
+  }
+
+  return fn;
+}
+
+function onToggleEdit(e) {
   e.stopPropagation();
   if (e.tool === 'draw') {
     if (hasDraw === false) {
+      setInteractions();
       startDraw();
     } else {
       cancelDraw();
@@ -276,10 +387,17 @@ function toggleEdit(e) {
   }
 }
 
+function onChangeEdit(e) {
+  if (e.tool!== 'draw' && e.active) {
+    cancelDraw();
+  }
+}
+
 function getSnapSources(layers) {
   var sources = layers.map(function(layer) {
     return viewer.getLayer(layer).getSource();
   });
+
   return sources;
 }
 
@@ -316,11 +434,17 @@ function setActive(editType) {
   }
 }
 
-function editAttributes() {
+function editAttributes(feature) {
   var attributeObjects;
+  var features;
 
-  //Get attributes from selected feature and fill DOM elements with the values
-  var features = select.getFeatures();
+  //Get attributes from the created, or the selected, feature and fill DOM elements with the values
+  if (feature) {
+    features = new ol.Collection();
+    features.push(feature);
+  } else {
+    features = select.getFeatures();
+  }
   if (features.getLength() === 1) {
     dispatcher.emitChangeEdit('attribute', true);
     var feature = features.item(0);
@@ -344,10 +468,15 @@ function editAttributes() {
           } else {
             alert('Villkor verkar inte vara rätt formulerat. Villkor formuleras enligt principen change:attribute:value');
           }
+        } else if (obj.type === 'image') {
+          obj.isVisible = true;
+          obj.elId = '#input-' + obj.name;
+          obj.addListener = addImageListener();
         } else {
           obj.isVisible = true;
           obj.elId = '#input-' + obj.name;
         }
+
         obj.formElement = editForm(obj);
         return obj;
       });
@@ -395,11 +524,12 @@ function saveFeatures() {
       var layer = viewer.getLayer(layerName);
       var ids = edits[layerName][editType];
       var features;
-      features = getFeaturesByIds(editType,layer,ids);
+      features = getFeaturesByIds(editType, layer, ids);
       if (features.length) {
         transaction[editType] = features;
       }
     });
+
     transactionHandler(transaction, layerName);
   });
 }
@@ -416,9 +546,28 @@ function getFeaturesByIds(type, layer, ids) {
   } else {
     ids.forEach(function(id) {
       if (source.getFeatureById(id)) {
-        features.push(source.getFeatureById(id));
+        /*** REMOVE ***/
+        var feature = source.getFeatureById(id);
+        feature.unset('bbox');
+        features.push(feature);
+        /*** *** ***/
+
+        //features.push(source.getFeatureById(id));
       }
     });
   }
+
   return features;
+}
+
+function getDefaultValues(attributes) {
+  return attributes.filter(function(attribute) {
+      if (attribute.name && attribute.defaultValue) {
+        return attribute;
+      }
+    })
+    .reduce(function(prev, curr) {
+      prev[curr.name] = curr.defaultValue
+      return prev;
+    },{});
 }
