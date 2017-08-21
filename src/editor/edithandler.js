@@ -16,6 +16,7 @@ var shapes = require('./shapes');
 
 var editLayers = {};
 var autoSave = undefined;
+var autoForm = undefined;
 var editSource = undefined;
 var geometryType = undefined;
 var geometryName = undefined;
@@ -51,6 +52,7 @@ module.exports = function(options) {
   });
 
   autoSave = options.autoSave;
+  autoForm = options.autoForm;
   $(document).on('toggleEdit', onToggleEdit);
   $(document).on('changeEdit', onChangeEdit);
   $(document).on('editorShapes', onChangeShape);
@@ -189,6 +191,9 @@ function onDrawEnd(evt) {
     action: 'insert'
   });
   dispatcher.emitChangeEdit('draw', false);
+  if (autoForm) {
+    editAttributes(feature);
+  }
 }
 
 function cancelDraw() {
@@ -429,11 +434,17 @@ function setActive(editType) {
   }
 }
 
-function editAttributes() {
+function editAttributes(feature) {
   var attributeObjects;
+  var features;
 
-  //Get attributes from selected feature and fill DOM elements with the values
-  var features = select.getFeatures();
+  //Get attributes from the created, or the selected, feature and fill DOM elements with the values
+  if (feature) {
+    features = new ol.Collection();
+    features.push(feature);
+  } else {
+    features = select.getFeatures();
+  }
   if (features.getLength() === 1) {
     dispatcher.emitChangeEdit('attribute', true);
     var feature = features.item(0);
