@@ -135,6 +135,7 @@
     "ol.Collection#on",
     "ol.format.EsriJSON",
     "ol.format.EsriJSON#readFeatures",
+    "ol.format.EsriJSON#writeFeature",
     "ol.format.GeoJSON",
     "ol.format.GeoJSON#readFeature",
     "ol.format.GeoJSON#readFeatures",
