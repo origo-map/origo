@@ -40,7 +40,7 @@ function render() {
   var el = utils.createListButton({
     id: 'o-editor',
     iconCls: 'o-icon-fa-pencil',
-    src: 'css/svg/fa-icons.svg#fa-pencil',
+    src: '#fa-pencil',
     text: 'Redigera'
   });
   $('#o-menutools').append(el);
