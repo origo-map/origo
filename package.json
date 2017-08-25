@@ -34,6 +34,7 @@
     "browserify": "11.0.1",
     "browserify-shim": "3.8.10",
     "budo": "^9.0.0",
+    "gulp": "^3.9.1",
     "gulp-uglify": "^3.0.0",
     "gulp-util": "^3.0.8",
     "handlebars": "4.0.5",
