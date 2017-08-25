@@ -1277,6 +1277,8 @@
   .o-map .o-modal input[type=button],
   .o-map .o-modal select,
   .o-map .o-modal textarea,
+  .o-map .o-modal img,
+  .o-map .o-modal input[type=file],
   .o-map .o-modal input[type=text] {
     width: 100%; }
   .o-map .o-modal li {
