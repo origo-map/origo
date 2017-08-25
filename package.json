@@ -12,8 +12,8 @@
   "main": "origo.js",
   "scripts": {
     "start": "npm run prebuild-sass | run-p start-origo watch-sass",
-    "start-origo": "budo origo.js:dist/origo.js --live -- --s origo --d",
-    "watch": "watchify origo.js --s origo --d --outfile dist/origo.js",
+    "start-origo": "budo origo.js:js/origo.js --live -- --s origo --d",
+    "watch": "watchify origo.js --s origo --d --outfile js/origo.js",
     "watch-sass": "node-sass -w --include-path scss scss/origo.scss css/style.css",
     "prebuild-sass": "node-sass --include-path scss scss/origo.scss css/style.css",
     "build": "npm run build-origo && npm run build-sass",
