@@ -29,7 +29,7 @@ layerCreator = function layerCreator(opt_options) {
     geometryType: undefined,
     filter: undefined,
     layerType: undefined,
-    legend: false,
+    legend: undefined,
     sourceName: undefined,
     attribution: undefined,
     style: 'default',
@@ -51,6 +51,7 @@ layerCreator = function layerCreator(opt_options) {
   layerOptions.extent = layerOptions.extent || viewer.getExtent();
   layerOptions.sourceName = layerOptions.source;
   layerOptions.styleName = layerOptions.style;
+  layerOptions.legend = layerOptions.legend || false;
   if (layerOptions.id === undefined) {
     layerOptions.id = name.split('__').shift();
   }
