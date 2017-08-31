@@ -12,7 +12,6 @@ var agsTile = function agsTile(layerOptions) {
   };
   var sourceDefault = {};
   var agsOptions = $.extend(agsDefault, layerOptions);
-  agsOptions.sourceName = agsOptions.name;
   var sourceOptions = $.extend(sourceDefault, viewer.getMapSource()[layerOptions.source]);
   sourceOptions.attribution = agsOptions.attribution;
   sourceOptions.projectionCode = viewer.getProjectionCode();
