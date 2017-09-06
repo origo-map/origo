@@ -17,5 +17,6 @@ controls.zoom = require('../src/zoom');
 controls.rotate = require('../src/rotate');
 controls.attribution = require('../src/attribution');
 controls.fullscreen = require('../src/fullscreen');
+controls.splash = require('../src/splash');
 
 module.exports = controls;
