@@ -1,6 +1,7 @@
  "use strict";
 
 var $ = require('jquery');
+var viewer = require('./viewer');
 var utils = require('./utils');
 var editorToolbar = require('./editor/editortoolbar');
 
@@ -15,6 +16,10 @@ module.exports = function() {
 
 function Init(opt_options) {
   var options = opt_options || {};
+  var editableLayers = viewer.getLayersByProperty('editable', true, true);
+  if (editableLayers.length) {
+    options.editableLayers = editableLayers;
+  }  
   options.autoSave = options.hasOwnProperty('autoSave') ? options.autoSave : true;
   options.autoForm = options.hasOwnProperty('autoForm') ? options.autoForm : false;
   options.currentLayer = options.defaultLayer || options.editableLayers[0];
