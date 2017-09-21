@@ -545,8 +545,11 @@ function getFeaturesByIds(type, layer, ids) {
     });
   } else {
     ids.forEach(function(id) {
+      var feature;
       if (source.getFeatureById(id)) {
-        features.push(source.getFeatureById(id));
+         feature = source.getFeatureById(id);
+         feature.unset('bbox');
+         features.push(feature);
       }
     });
   }
