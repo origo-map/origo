@@ -8,6 +8,7 @@ var ol = require('openlayers');
 var $ = require('jquery');
 var Viewer = require('./viewer');
 var validateUrl = require('./utils/validateurl');
+var stylefunctions = require('./style/stylefunctions');
 
 var baseUrl;
 
@@ -156,8 +157,13 @@ function createStyleList(styleOptions) {
 function createStyle(styleName, clusterStyleName) {
       var styleSettings = Viewer.getStyleSettings()[styleName];
       if($.isEmptyObject(styleSettings)) {
-          alert('Style ' + styleName + ' is not defined');
+        alert('Style ' + styleName + ' is not defined');
       }
+      if(styleSettings[0][0].hasOwnProperty("stylefunction")){
+        var style = stylefunctions.customStyle(styleSettings[0][0].stylefunction, styleSettings[0][0].params);
+        return style;
+      }
+      else {
       var clusterStyleSettings = Viewer.getStyleSettings()[clusterStyleName];
       var style = (function() {
         //Create style for each rule
@@ -172,6 +178,7 @@ function createStyle(styleName, clusterStyleName) {
 
       })()
       return style;
+      }
 }
 
 function createStyleRule(options) {
