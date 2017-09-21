@@ -11,7 +11,7 @@ var content;
 
 function init(opt_options) {
   var options = opt_options || {};
-  buttonText = options.buttontext || 'Om kartan';
+  buttonText = options.buttonText || 'Om kartan';
   title = options.title || 'Om kartan';
   content = options.content || '<p></p>';
 
