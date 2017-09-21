@@ -159,8 +159,8 @@ function createStyle(styleName, clusterStyleName) {
       if($.isEmptyObject(styleSettings)) {
         alert('Style ' + styleName + ' is not defined');
       }
-      if(styleSettings[0][0].hasOwnProperty("stylefunction")){
-        var style = stylefunctions.customStyle(styleSettings[0][0].stylefunction, styleSettings[0][0].params);
+      if(styleSettings[0][0].hasOwnProperty("customStyle")){
+        var style = stylefunctions.customStyle(styleSettings[0][0].customStyle, styleSettings[0][0].params);
         return style;
       }
       else {
