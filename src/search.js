@@ -1,7 +1,3 @@
-/* ========================================================================
- * Copyright 2016 Origo
- * Licensed under BSD 2-Clause (https://github.com/origo-map/origo/blob/master/LICENSE.txt)
- * ======================================================================== */
 "use strict";
 
 var ol = require('openlayers');
@@ -9,7 +5,7 @@ var $ = require('jquery');
 var Viewer = require('./viewer');
 var wktToFeature = require('./maputils').wktToFeature;
 var Popup = require('./popup');
-var typeahead = require('typeahead.js-browserify');
+var typeahead = require('typeahead.js');
 var getFeature = require('./getfeature');
 var getAttributes = require('./getattributes');
 var featureInfo = require('./featureinfo');
@@ -34,8 +30,7 @@ var hint;
 var highlight;
 var projectionCode;
 var overlay;
-
-typeahead.loadjQueryPlugin();
+var limit;
 
 function init(options) {
   var el;
@@ -53,7 +48,8 @@ function init(options) {
   title = options.title || '';
   titleAttribute = options.titleAttribute || undefined;
   contentAttribute = options.contentAttribute || undefined;
-  maxZoomLevel: options.maxZoomLevel || 2;
+  maxZoomLevel = options.maxZoomLevel || 2;
+  limit = options.limit || 9;
   hintText = options.hintText || 'Sök...';
   hint = options.hasOwnProperty('hint') ? options.hint : true;
   highlight = options.hasOwnProperty('highlight') ? options.highlight : true;
@@ -62,20 +58,20 @@ function init(options) {
   map = Viewer.getMap();
 
   el = '<div id="o-search-wrapper">' +
-                '<div id="o-search" class="o-search o-search-false">' +
-                    '<input class="o-search-field typeahead form-control" type="text" placeholder="' + hintText + '">' +
-                    '<button id="o-search-button">' +
-                        '<svg class="o-icon-fa-search">' +
-                            '<use xlink:href="#fa-search"></use>' +
-                        '</svg>' +
-                    '</button>' +
-                    '<button id="o-search-button-close">' +
-                        '<svg class="o-icon-search-fa-times">' +
-                            '<use xlink:href="#fa-times"></use>' +
-                        '</svg>' +
-                    '</button>' +
-                '</div>' +
-              '</div>';
+    '<div id="o-search" class="o-search o-search-false">' +
+    '<input class="o-search-field typeahead form-control" type="text" placeholder="' + hintText + '">' +
+    '<button id="o-search-button">' +
+    '<svg class="o-icon-fa-search">' +
+    '<use xlink:href="#fa-search"></use>' +
+    '</svg>' +
+    '</button>' +
+    '<button id="o-search-button-close">' +
+    '<svg class="o-icon-search-fa-times">' +
+    '<use xlink:href="#fa-times"></use>' +
+    '</svg>' +
+    '</button>' +
+    '</div>' +
+    '</div>';
   $('#o-map').append(el);
 
   // fix for internet explorer
@@ -86,17 +82,16 @@ function init(options) {
     hint: hint,
     highlight: highlight,
     minLength: 4
-  },
-    {
-      name: 'adress',
-      limit: 9,
-      displayKey: name,
-      source: function (query, syncResults, asyncResults) {
-        $.get(url + '?q=' + encodeURI(query), function (data) {
-          asyncResults(data);
-        });
-      }
-    });
+  }, {
+    name: 'adress',
+    limit: limit,
+    displayKey: name,
+    source: function(query, syncResults, asyncResults) {
+      $.get(url + '?q=' + encodeURI(query), function(data) {
+        asyncResults(data);
+      });
+    }
+  });
 
   bindUIActions();
 }
@@ -105,27 +100,27 @@ function bindUIActions() {
   $('.typeahead').on('typeahead:selected', selectHandler);
 
   $('#o-search .o-search-field').on('input', function() {
-          if ($('#o-search .o-search-field.tt-input').val() && $('#o-search').hasClass('o-search-false')) {
-            $('#o-search').removeClass('o-search-false');
-            $('#o-search').addClass('o-search-true');
-            onClearSearch();
-          } else if (!($('#o-search .o-search-field.tt-input').val()) && $('#o-search').hasClass('o-search-true')) {
-            $('#o-search').removeClass('o-search-true');
-            $('#o-search').addClass('o-search-false');
-          }
-        });
+    if ($('#o-search .o-search-field.tt-input').val() && $('#o-search').hasClass('o-search-false')) {
+      $('#o-search').removeClass('o-search-false');
+      $('#o-search').addClass('o-search-true');
+      onClearSearch();
+    } else if (!($('#o-search .o-search-field.tt-input').val()) && $('#o-search').hasClass('o-search-true')) {
+      $('#o-search').removeClass('o-search-true');
+      $('#o-search').addClass('o-search-false');
+    }
+  });
 }
 
 function onClearSearch() {
-  $('#o-search-button-close').on('click', function (e) {
-      $('.typeahead').typeahead('val', '');
-      featureInfo.clear();
-      $('#o-search').removeClass('o-search-true');
-      $('#o-search').addClass('o-search-false');
-      $('#o-search .o-search-field.tt-input').val('');
-      $('#o-search-button').blur();
-      e.preventDefault();
-    });
+  $('#o-search-button-close').on('click', function(e) {
+    $('.typeahead').typeahead('val', '');
+    featureInfo.clear();
+    $('#o-search').removeClass('o-search-true');
+    $('#o-search').addClass('o-search-false');
+    $('#o-search .o-search-field.tt-input').val('');
+    $('#o-search-button').blur();
+    e.preventDefault();
+  });
 }
 
 function showOverlay(data, coord) {
@@ -135,17 +130,17 @@ function showOverlay(data, coord) {
   clear();
   popup = Popup('#o-map');
   overlay = new ol.Overlay({
-      element: popup.getEl()
-    });
+    element: popup.getEl()
+  });
 
   map.addOverlay(overlay);
 
   overlay.setPosition(coord);
   content = data[name];
   popup.setContent({
-      content: content,
-      title: title
-    });
+    content: content,
+    title: title
+  });
   popup.setVisibility(true);
   mapUtils.zoomToExent(new ol.geom.Point(coord), maxZoomLevel);
 }
@@ -189,20 +184,20 @@ function selectHandler(evt, data) {
     layer = Viewer.getLayer(data[layerNameAttribute]);
     id = data[idAttribute];
     getFeature(id, layer)
-      .done(function (res) {
-              var featureWkt;
-              var coordWkt;
-              if (res.length > 0) {
-                showFeatureInfo(res, layer.get('title'), getAttributes(res[0], layer));
-              }
+      .done(function(res) {
+        var featureWkt;
+        var coordWkt;
+        if (res.length > 0) {
+          showFeatureInfo(res, layer.get('title'), getAttributes(res[0], layer));
+        }
 
-              // Fallback if no geometry in response
-              else if (geometryAttribute) {
-                featureWkt = wktToFeature(data[geometryAttribute], projectionCode);
-                coordWkt = featureWkt.getGeometry().getCoordinates();
-                showOverlay(data, coordWkt);
-              }
-            });
+        // Fallback if no geometry in response
+        else if (geometryAttribute) {
+          featureWkt = wktToFeature(data[geometryAttribute], projectionCode);
+          coordWkt = featureWkt.getGeometry().getCoordinates();
+          showOverlay(data, coordWkt);
+        }
+      });
   } else if (geometryAttribute && layerName) {
     feature = wktToFeature(data[geometryAttribute], projectionCode);
     layer = Viewer.getLayer(data[layerName]);

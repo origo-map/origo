@@ -1,7 +1,3 @@
-/* ========================================================================
- * Copyright 2016 Origo
- * Licensed under BSD 2-Clause (https://github.com/origo-map/origo/blob/master/LICENSE.txt)
- * ======================================================================== */
 "use strict";
 
 var ol = require('openlayers');
@@ -16,7 +12,6 @@ var agsTile = function agsTile(layerOptions) {
   };
   var sourceDefault = {};
   var agsOptions = $.extend(agsDefault, layerOptions);
-  agsOptions.sourceName = agsOptions.name;
   var sourceOptions = $.extend(sourceDefault, viewer.getMapSource()[layerOptions.source]);
   sourceOptions.attribution = agsOptions.attribution;
   sourceOptions.projectionCode = viewer.getProjectionCode();

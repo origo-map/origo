@@ -1,13 +1,10 @@
-/* ========================================================================
- * Copyright 2016 Origo
- * Licensed under BSD 2-Clause (https://github.com/origo-map/origo/blob/master/LICENSE.txt)
- * ======================================================================== */
 "use strict";
 var ol = require('openlayers');
 var $ = require('jquery');
 var Viewer = require('./viewer');
 var maputils = require('./maputils');
 var getAttributes = require('./getattributes');
+var featureInfo = require('./featureinfo');
 
 var map;
 
@@ -186,8 +183,11 @@ function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
               item.content = getAttributes(feature,l)
               result.push(item);
           }
-
+        },
+        {
+          hitTolerance: featureInfo.getHitTolerance()
         });
+
     if(cluster) {
         return false;
     }

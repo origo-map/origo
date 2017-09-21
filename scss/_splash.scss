@@ -1,0 +1,15 @@
+.o-splash .o-modal{
+  width: 400px;
+}
+&[class*=#{$media-l}] {
+  .o-splash .o-modal {
+    max-width: 400px;
+    width: 400px;
+  }
+}
+&[class*=#{$media-l-m}] {
+  .o-splash .o-modal {
+    max-width: 300px;
+    width: 90%;
+  }
+}

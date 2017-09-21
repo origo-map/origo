@@ -1,7 +1,3 @@
-/* ========================================================================
- * Copyright 2016 Origo
- * Licensed under BSD 2-Clause (https://github.com/origo-map/origo/blob/master/LICENSE.txt)
- * ======================================================================== */
 "use strict";
 
 module.exports = function createForm(obj) {
@@ -40,6 +36,14 @@ module.exports = function createForm(obj) {
         el += '<option value="' + dropdownOptions[i] + '">' + dropdownOptions[i] + '</option>';
       }
       el += '</select></div>';
+      break;
+    case 'image':
+      var imageClass = val ? '' : 'o-hidden';
+      el = '<div class="' + cls + '"><label>' + label + '</label><br>';
+      el += '<img src="' + val + '" id="image-upload" class="' + imageClass + '"/>';
+      el += '<input type="file" id="' + id + '" value="' + val + '" accept="image/*">';
+      el += '<input id="o-delete-image-button" class="' + imageClass + '" type="button" value="Ta bort bild">';
+      el += '</div>';
       break;
   }
   return el;

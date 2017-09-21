@@ -1,7 +1,3 @@
- /* ========================================================================
- * Copyright 2016 Origo
- * Licensed under BSD 2-Clause (https://github.com/origo-map/origo/blob/master/LICENSE.txt)
- * ======================================================================== */
 "use strict";
 
 var $ = require('jquery');
@@ -15,7 +11,7 @@ var content;
 
 function init(opt_options) {
   var options = opt_options || {};
-  buttonText = options.buttontext || 'Om kartan';
+  buttonText = options.buttonText || 'Om kartan';
   title = options.title || 'Om kartan';
   content = options.content || '<p></p>';
 

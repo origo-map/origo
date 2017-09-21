@@ -1,7 +1,3 @@
-/* ========================================================================
- * Copyright 2016 Origo
- * Licensed under BSD 2-Clause (https://github.com/origo-map/origo/blob/master/LICENSE.txt)
- * ======================================================================== */
 "use strict";
 
 var ol = require('openlayers');
@@ -9,6 +5,7 @@ var $ = require('jquery');
 var Viewer = require('./viewer');
 var validateUrl = require('./utils/validateurl');
 var stylefunctions = require('./style/stylefunctions');
+var replacer = require('../src/utils/replacer');
 
 var baseUrl;
 
@@ -237,6 +234,8 @@ function checkOptions(feature, scale, styleSettings, styleList, size) {
         s[j].some(function(element, index, array) {
             if (element.hasOwnProperty('text') && size) {
                 styleList[j][index].getText().setText(size);
+            } else if (element.hasOwnProperty('text')) {
+              styleList[j][index].getText().setText(replacer.replace(element.text.text, feature.getProperties()));
             }
         });
         if (s[j][0].hasOwnProperty('filter')) {
@@ -244,6 +243,9 @@ function checkOptions(feature, scale, styleSettings, styleList, size) {
           var featAttr, expr, featMatch;
           var matches = s[j][0].filter.match(/\[(.*?)\]/);
           if (matches) {
+              if (feature.get('features')) {
+                feature = feature.get('features')[0];
+              }
               featAttr = matches[1];
               expr = s[j][0].filter.split(']')[1];
               featMatch = feature.get(featAttr);

@@ -24,6 +24,7 @@ var label;
 var overlayArray = [];
 var drawStart = false;
 var isActive = false;
+var wgs84Sphere = new ol.Sphere(6378137);
 
 function init(opt_options) {
   var options = opt_options || {};
@@ -271,9 +272,9 @@ function createMeasureTooltip() {
 };
 
 function formatLength(line) {
-  var length;
-  length = Math.round(line.getLength() * 100) / 100;
-  var output;
+  var length, output;
+  var coordinates = line.getCoordinates();
+  length = coordinates.reduce(getLength,0);
 
   if (length > 100) {
     output = (Math.round(length / 1000 * 100) / 100) +
@@ -282,13 +283,25 @@ function formatLength(line) {
     output = (Math.round(length * 100) / 100) +
       ' ' + 'm';
   }
-
   return output;
 };
 
+function getLength(total, value, index, arr){
+  if(index<arr.length-1){
+    var sourceProj = map.getView().getProjection();
+    var c1 = ol.proj.transform(arr[index], sourceProj, 'EPSG:4326');
+    var c2 = ol.proj.transform(arr[index + 1], sourceProj, 'EPSG:4326');
+    total += wgs84Sphere.haversineDistance(c1, c2);
+  }
+  return total;
+}
+
 function formatArea(polygon) {
   var area;
-  area = polygon.getArea();
+  var sourceProj = map.getView().getProjection();
+  var geom = /** @type {ol.geom.Polygon} */(polygon.clone().transform(sourceProj, 'EPSG:4326'));
+  var coordinates = geom.getLinearRing(0).getCoordinates();
+  area = Math.abs(wgs84Sphere.geodesicArea(coordinates));
   var output;
 
   if (area > 10000000) {

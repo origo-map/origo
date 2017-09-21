@@ -1,10 +1,7 @@
-/* ========================================================================
- * Copyright 2016 Origo
- * Licensed under BSD 2-Clause (https://github.com/origo-map/origo/blob/master/LICENSE.txt)
- * ======================================================================== */
  "use strict";
 
 var $ = require('jquery');
+var viewer = require('./viewer');
 var utils = require('./utils');
 var editorToolbar = require('./editor/editortoolbar');
 
@@ -19,7 +16,12 @@ module.exports = function() {
 
 function Init(opt_options) {
   var options = opt_options || {};
+  var editableLayers = viewer.getLayersByProperty('editable', true, true);
+  if (editableLayers.length) {
+    options.editableLayers = editableLayers;
+  }  
   options.autoSave = options.hasOwnProperty('autoSave') ? options.autoSave : true;
+  options.autoForm = options.hasOwnProperty('autoForm') ? options.autoForm : false;
   options.currentLayer = options.defaultLayer || options.editableLayers[0];
   editorToolbar.init(options);
   render();
@@ -43,7 +45,7 @@ function render() {
   var el = utils.createListButton({
     id: 'o-editor',
     iconCls: 'o-icon-fa-pencil',
-    src: 'css/svg/fa-icons.svg#fa-pencil',
+    src: '#fa-pencil',
     text: 'Redigera'
   });
   $('#o-menutools').append(el);

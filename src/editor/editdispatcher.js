@@ -1,7 +1,3 @@
-/* ========================================================================
- * Copyright 2016 Origo
- * Licensed under BSD 2-Clause (https://github.com/origo-map/origo/blob/master/LICENSE.txt)
- * ======================================================================== */
 "use strict";
 
 var $ = require('jquery');
@@ -11,7 +7,9 @@ module.exports = {
   emitChangeFeature: emitChangeFeature,
   emitToggleEdit: emitToggleEdit,
   emitEnableInteraction: emitEnableInteraction,
-  emitEditsChange: emitEditsChange
+  emitEditsChange: emitEditsChange,
+  emitChangeEditorShapes: emitChangeEditorShapes,
+  emitChangeOfflineEdits: emitChangeOfflineEdits
 }
 
 function emitChangeEdit(tool, state) {
@@ -53,5 +51,20 @@ function emitEditsChange(edits) {
   $.event.trigger({
     type: 'editsChange',
     edits: edits
+  });
+}
+
+function emitChangeEditorShapes(shape) {
+  $.event.trigger({
+    type: 'editorShapes',
+    shape: shape
+  });
+}
+
+function emitChangeOfflineEdits(edits, layerName) {
+  $.event.trigger({
+    type: 'changeOfflineEdits',
+    edits: edits,
+    layerName: layerName
   });
 }
