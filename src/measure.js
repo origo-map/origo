@@ -8,6 +8,7 @@ var style = require('./style')();
 var styleTypes = require('./style/styletypes');
 
 var map;
+var options;
 var activeButton;
 var defaultButton;
 var measure;
@@ -27,35 +28,51 @@ var isActive = false;
 var wgs84Sphere = new ol.Sphere(6378137);
 
 function init(opt_options) {
-  var options = opt_options || {};
-  var target = options.target || '#o-toolbar-maptools';
-  map = Viewer.getMap();
-  source = new ol.source.Vector();
-  measureStyleOptions = styleTypes.getStyle('measure');
+  options = opt_options || {};
+  options.line = options.line === false ? options.line : true;
+  options.area = options.area === false ? options.area : true;
+  if(options.line || options.area){
+    var target = options.target || '#o-toolbar-maptools';
+    map = Viewer.getMap();
+    source = new ol.source.Vector();
+    measureStyleOptions = styleTypes.getStyle('measure');
 
-  //Drawn features
-  vector = new ol.layer.Vector({
-    source: source,
-    name: 'measure',
-    visible: false,
-    zIndex: 6
-  });
+    //Drawn features
+    vector = new ol.layer.Vector({
+      source: source,
+      name: 'measure',
+      visible: false,
+      zIndex: 6
+    });
 
-  map.addLayer(vector);
+    map.addLayer(vector);
 
-  $('.o-map').on('enableInteraction', onEnableInteraction);
+    $('.o-map').on('enableInteraction', onEnableInteraction);
 
-  render(target);
-  bindUIActions();
-
-  defaultButton = $('#o-measure-line-button button');
+    render(target);
+    bindUIActions();
+    if(options.hasOwnProperty('default')){
+      if(options.default == 'area' && options.area) {
+        defaultButton = $('#o-measure-polygon-button button');
+      }
+      else if(options.default == 'line' && options.line) {
+        defaultButton = $('#o-measure-line-button button');
+      }
+      else{
+        defaultButton = options.line ? $('#o-measure-line-button button') : $('#o-measure-polygon-button button');
+      }
+    }
+    else{
+      defaultButton = options.line ? $('#o-measure-line-button button') : $('#o-measure-polygon-button button');
+    }
+  }
 }
 
 function onEnableInteraction(e) {
   if(e.interaction === 'measure') {
     $('#o-measure-button button').addClass('o-measure-button-true');
-    $('#o-measure-line-button').removeClass('o-hidden');
-    $('#o-measure-polygon-button').removeClass('o-hidden');
+    if(options.line){$('#o-measure-line-button').removeClass('o-hidden');}
+    if(options.area){$('#o-measure-polygon-button').removeClass('o-hidden');}
     $('#o-measure-button').removeClass('tooltip');
     setActive(true);
     defaultButton.trigger('click');
@@ -65,8 +82,8 @@ function onEnableInteraction(e) {
     };
 
     $('#o-measure-button button').removeClass('o-measure-button-true');
-    $('#o-measure-line-button').addClass('o-hidden');
-    $('#o-measure-polygon-button').addClass('o-hidden');
+    if(options.line){$('#o-measure-line-button').addClass('o-hidden');}
+    if(options.area){$('#o-measure-polygon-button').addClass('o-hidden');}
     $('#o-measure-button').addClass('tooltip');
 
     map.un('pointermove', pointerMoveHandler);
@@ -90,68 +107,78 @@ function setActive(state) {
 }
 
 function render(target) {
+  
+  if(options.line || options.area){
+    var toolbar = utils.createElement('div', '', {
+      id: 'o-measure-toolbar',
+      cls: 'o-toolbar-horizontal'
+    });
 
-  var toolbar = utils.createElement('div', '', {
-    id: 'o-measure-toolbar',
-    cls: 'o-toolbar-horizontal'
-  });
+    $(target).append(toolbar);
 
-  $(target).append(toolbar);
+    var mb = utils.createButton({
+      id: 'o-measure-button',
+      cls: 'o-measure-button',
+      iconCls: 'o-icon-steady-measure',
+      src: '#steady-measure',
+      tooltipText: 'Mät i kartan'
+    });
+    $('#' + 'o-measure-toolbar').append(mb);
+  }
+  
+  if(options.line){
+    var lb = utils.createButton({
+      id: 'o-measure-line-button',
+      cls: 'o-measure-type-button',
+      iconCls: 'o-icon-minicons-line-vector',
+      src: '#minicons-line-vector',
+      tooltipText: 'Linje',
+      tooltipPlacement: 'north'
+    });
+    $('#' + 'o-measure-toolbar').append(lb);
+    $('#o-measure-line-button').addClass('o-hidden');
+  }
 
-  var mb = utils.createButton({
-    id: 'o-measure-button',
-    cls: 'o-measure-button',
-    iconCls: 'o-icon-steady-measure',
-    src: '#steady-measure',
-    tooltipText: 'Mät i kartan'
-  });
-  $('#' + 'o-measure-toolbar').append(mb);
-
-  var lb = utils.createButton({
-    id: 'o-measure-line-button',
-    cls: 'o-measure-type-button',
-    iconCls: 'o-icon-minicons-line-vector',
-    src: '#minicons-line-vector',
-    tooltipText: 'Linje',
-    tooltipPlacement: 'north'
-  });
-  $('#' + 'o-measure-toolbar').append(lb);
-
-  $('#o-measure-line-button').addClass('o-hidden');
-
-  var pb = utils.createButton({
-    id: 'o-measure-polygon-button',
-    cls: 'o-measure-type-button',
-    iconCls: 'o-icon-minicons-square-vector',
-    src: '#minicons-square-vector',
-    tooltipText: 'Yta',
-    tooltipPlacement: 'north'
-  });
-
-  $('#' + 'o-measure-toolbar').append(pb);
-  $('#o-measure-polygon-button').addClass('o-hidden');
+  if(options.area){
+    var pb = utils.createButton({
+      id: 'o-measure-polygon-button',
+      cls: 'o-measure-type-button',
+      iconCls: 'o-icon-minicons-square-vector',
+      src: '#minicons-square-vector',
+      tooltipText: 'Yta',
+      tooltipPlacement: 'north'
+    });
+    $('#' + 'o-measure-toolbar').append(pb);
+    $('#o-measure-polygon-button').addClass('o-hidden');
+  }
 }
 
 function bindUIActions() {
-  $('#o-measure-button').on('click', function(e) {
-    toggleMeasure();
-    $('#o-measure-button button').blur();
-    e.preventDefault();
-  });
+  if(options.line || options.area){
+    $('#o-measure-button').on('click', function(e) {
+      toggleMeasure();
+      $('#o-measure-button button').blur();
+      e.preventDefault();
+    });
+  }
 
-  $('#o-measure-line-button').on('click', function(e) {
-    type = 'LineString';
-    toggleType($('#o-measure-line-button button'));
-    $('#o-measure-line-button button').blur();
-    e.preventDefault();
-  });
+  if(options.line){
+    $('#o-measure-line-button').on('click', function(e) {
+      type = 'LineString';
+      toggleType($('#o-measure-line-button button'));
+      $('#o-measure-line-button button').blur();
+      e.preventDefault();
+    });
+  }
 
-  $('#o-measure-polygon-button').on('click', function(e) {
-    type = 'Polygon';
-    toggleType($('#o-measure-polygon-button button'));
-    $('#o-measure-polygon-button button').blur();
-    e.preventDefault();
-  });
+  if(options.area){
+    $('#o-measure-polygon-button').on('click', function(e) {
+      type = 'Polygon';
+      toggleType($('#o-measure-polygon-button button'));
+      $('#o-measure-polygon-button button').blur();
+      e.preventDefault();
+    });
+  }
 
 }
 
