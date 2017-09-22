@@ -1,7 +1,7 @@
 ﻿"use strict";
 
 var ol = require('openlayers');
-function customStyle(styleName, params) {
+function custom(styleName, params) {
   if(styleName=='default'){
     var fill = new ol.style.Fill({color: ''});
     var stroke = new ol.style.Stroke({color: '', width: 0.1, lineCap:'square', lineJoin:'round'});
