@@ -11,7 +11,7 @@ var featureLayer = function featureLayer(layerOptions) {
   sourceOptions.features = layerOptions.features;
 
   vectorSource = createSource(sourceOptions);
-  return vector(options, vectorSource);
+  return vector(options, vectorSource, sourceOptions);
 
   function createSource(options) {
     return new ol.source.Vector({

@@ -78,6 +78,7 @@ function init(el, mapOptions) {
   settings.controls = mapOptions.controls;
   settings.consoleId = mapOptions.consoleId || 'o-console';
   settings.featureinfoOptions = mapOptions.featureinfoOptions || {};
+  settings.enableRotation = mapOptions.enableRotation === false ? false : true;
 
   //If url arguments, parse this settings
   if (window.location.search) {
@@ -103,6 +104,7 @@ function init(el, mapOptions) {
   }
   featureinfo.init(settings.featureinfoOptions);
 
+  setClusterDistance();
 }
 
 function createLayers(layerlist, savedLayers) {
@@ -132,7 +134,8 @@ function loadMap() {
       projection: settings.projection || undefined,
       center: settings.center,
       resolutions: settings.resolutions || undefined,
-      zoom: settings.zoom
+      zoom: settings.zoom,
+      enableRotation: settings.enableRotation
     })
   });
 }
@@ -472,6 +475,28 @@ function render(el, mapOptions) {
 
     $(el).html(template(footerTemplate));
   }
+  
+function setClusterDistance(){
+  var distance = 60;
+  var maxZoom = getResolutions().length-1;
+  map.getView().on('change:resolution', function(evt){
+    var view = evt.target;
+    this.getLayers().getArray().map(function(layer) {
+      var source = layer.getSource();
+      if (source instanceof ol.source.Cluster) {
+        var mapZoom = parseInt(view.getZoom(),10);
+        var clusterDistance = source.getProperties().clusterDistance || distance;
+        var clusterMaxZoom = source.getProperties().clusterMaxZoom || zoom;
+        if (mapZoom > clusterMaxZoom) {
+          source.setDistance(0);
+        }
+        else if (mapZoom <= clusterMaxZoom) {
+          source.setDistance(clusterDistance);
+        }
+      }
+    });
+  }, map);
+}
 
 module.exports.init = init;
 module.exports.createLayers = createLayers;
