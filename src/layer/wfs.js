@@ -18,6 +18,17 @@ var wfs = function wfs(layerOptions) {
   sourceOptions.resolutions = viewer.getResolutions();
   sourceOptions.projectionCode = viewer.getProjectionCode();
 
+  sourceOptions.strategy = layerOptions.strategy ? layerOptions.strategy : sourceOptions.strategy;
+  switch (sourceOptions.strategy) {
+    case 'tile':
+    sourceOptions.strategy = ol.loadingstrategy.tile(ol.tilegrid.createXYZ({
+        maxZoom: sourceOptions.resolutions.length
+      }));
+    break;
+    default:
+    sourceOptions.strategy = ol.loadingstrategy.bbox;
+    break;
+  }
   var wfsSource = createSource(sourceOptions);
   return vector(wfsOptions, wfsSource);
 
@@ -48,9 +59,7 @@ var wfs = function wfs(layerOptions) {
             vectorSource.addFeatures(vectorSource.getFormat().readFeatures(response));
           });
       },
-      strategy: ol.loadingstrategy.tile(ol.tilegrid.createXYZ({
-        maxZoom: options.resolutions.length
-      }))
+      strategy: options.strategy
     });
     return vectorSource;
   }
