@@ -61,5 +61,5 @@ function getColor(color){
   }
 }
 
-module.exports.customStyle = customStyle;
+module.exports.custom = custom;
 module.exports.getColor = getColor;
