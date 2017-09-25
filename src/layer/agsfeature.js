@@ -17,6 +17,12 @@ var agsFeature = function agsFeature(layerOptions) {
   sourceOptions.attribution = agsOptions.attribution;
   sourceOptions.projectionCode = viewer.getProjectionCode();
   sourceOptions.id = agsOptions.id;
+  if(layerOptions.layerType=='cluster'){
+    agsOptions.cluster = {
+      clusterDistance : agsOptions.clusterDistance || sourceOptions.clusterDistance || undefined,
+      clusterMaxZoom : agsOptions.clusterMaxZoom || sourceOptions.clusterMaxZoom || undefined
+    };
+  }
 
   var agsSource = createSource(sourceOptions);
   return vector(agsOptions, agsSource, sourceOptions);

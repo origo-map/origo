@@ -4,7 +4,7 @@ var ol = require('openlayers');
 var style = require('../style')();
 var viewer = require('../viewer');
 
-module.exports = function vector(options, source, sourceOptions) {
+module.exports = function vector(options, source) {
   var vectorLayer;
   switch (options.layerType) {
     case 'vector':
@@ -13,8 +13,8 @@ module.exports = function vector(options, source, sourceOptions) {
       vectorLayer = new ol.layer.Vector(options);
       break;
     case 'cluster':
-      var clusterDistance = options.clusterDistance || sourceOptions.clusterDistance || 60;
-      var clusterMaxZoom = options.clusterMaxZoom || sourceOptions.clusterMaxZoom || viewer.getResolutions().length-1;
+      var clusterDistance = options.cluster.clusterDistance || viewer.getClusterOptions().distance || 60;
+      var clusterMaxZoom = options.cluster.clusterMaxZoom || viewer.getClusterOptions().maxZoom || viewer.getResolutions().length-1;
       var clusterInitialDistance = viewer.getSettings().zoom > clusterMaxZoom ? 0 : clusterDistance;
       options.source = new ol.source.Cluster({
         attributions: options.attribution,
@@ -25,6 +25,7 @@ module.exports = function vector(options, source, sourceOptions) {
         clusterDistance : clusterDistance,
         clusterMaxZoom : clusterMaxZoom
       });
+      console.log(clusterDistance, clusterMaxZoom);
       options.style = style.createStyle(options.style, options.clusterStyle);
       vectorLayer = new ol.layer.Vector(options);
       break;

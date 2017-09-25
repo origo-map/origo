@@ -17,9 +17,15 @@ var wfs = function wfs(layerOptions) {
   sourceOptions.attribution = wfsOptions.attribution;
   sourceOptions.resolutions = viewer.getResolutions();
   sourceOptions.projectionCode = viewer.getProjectionCode();
+  if(layerOptions.layerType=='cluster'){
+    wfsOptions.cluster = {
+      clusterDistance : wfsOptions.clusterDistance || sourceOptions.clusterDistance || undefined,
+      clusterMaxZoom : wfsOptions.clusterMaxZoom || sourceOptions.clusterMaxZoom || undefined
+    };
+  }
 
   var wfsSource = createSource(sourceOptions);
-  return vector(wfsOptions, wfsSource, sourceOptions);
+  return vector(wfsOptions, wfsSource);
 
   function createSource(options) {
     var vectorSource = null;

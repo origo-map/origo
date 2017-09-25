@@ -23,9 +23,15 @@ var geojson = function geojson(layerOptions) {
     geojsonOptions.sourceName = baseUrl + geojsonOptions.source;
     sourceOptions.url = geojsonOptions.source;
   }
+  if(layerOptions.layerType=='cluster'){
+    geojsonOptions.cluster = {
+      clusterDistance : geojsonOptions.clusterDistance || sourceOptions.clusterDistance || undefined,
+      clusterMaxZoom : geojsonOptions.clusterMaxZoom || sourceOptions.clusterMaxZoom || undefined
+    };
+  }
 
   geojsonSource = createSource(sourceOptions);
-  return vector(geojsonOptions, geojsonSource, sourceOptions);
+  return vector(geojsonOptions, geojsonSource);
 
   function createSource(options) {
     return new ol.source.Vector({
