@@ -31,6 +31,7 @@ var highlight;
 var projectionCode;
 var overlay;
 var limit;
+var minLength;
 
 function init(options) {
   var el;
@@ -53,6 +54,7 @@ function init(options) {
   hintText = options.hintText || 'Sök...';
   hint = options.hasOwnProperty('hint') ? options.hint : true;
   highlight = options.hasOwnProperty('highlight') ? options.highlight : true;
+  minLength = options.minLength || 4;
   projectionCode = Viewer.getProjectionCode();
 
   map = Viewer.getMap();
@@ -81,7 +83,7 @@ function init(options) {
     autoSelect: true,
     hint: hint,
     highlight: highlight,
-    minLength: 4
+    minLength: minLength
   }, {
     name: 'adress',
     limit: limit,
