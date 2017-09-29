@@ -101,6 +101,10 @@
     0.5972
   ],
   "source": {
+    "geoserver": {
+			"url": "http://gi.karlstad.se:8080/geoserver/ows",
+			"version": "1.1.0"
+	},
     "local": {
       "url": "http://localhost/geoserver/wms"
     }
@@ -118,6 +122,28 @@
     }
   ],
   "layers": [
+    {
+			"name": "webbkartan:vy_webbkarta_mf_buf_enskforskola",
+			"title": "forskola",
+			"source": "geoserver",
+			"group": "test",
+			"style": "cirkel",
+			"type": "WFS",
+			"visible": true,
+			"featuretype": 5,
+      "filter": "namn = 'Vitlöken'",
+			"attributes": [{
+				"name": "namn",
+				"title": "Skola: ",
+				"url": "lank"
+			}, {
+				"name": "typ",
+				"title": "Typ: "
+			}, {
+				"name": "adress",
+				"title": "Adress: "
+			}]
+		}, 
     {
       "name": "origo-cities",
       "title": "Origokommuner",
