@@ -41,7 +41,7 @@ var wfs = function wfs(layerOptions) {
     var queryFilter;
 
     //If cql filter then bbox must be used in the filter.
-    if(options.strategy == 'all'){
+    if(options.strategy === 'all'){
       queryFilter = options.filter ? '&CQL_FILTER=' + options.filter : '';
     }
     else{
@@ -59,7 +59,7 @@ var wfs = function wfs(layerOptions) {
           'version=1.1.0&request=GetFeature&typeName=' + options.featureType +
           '&outputFormat=application/json' +
           '&srsname=' + options.projectionCode;
-        url += options.strategy == 'all' ? queryFilter : queryFilter + extent.join(',') + ',' + bboxProjectionCode;
+        url += options.strategy === 'all' ? queryFilter : queryFilter + extent.join(',') + ',' + bboxProjectionCode;
         $.ajax({
             url: url,
             cache: false
