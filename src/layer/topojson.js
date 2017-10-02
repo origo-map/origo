@@ -23,15 +23,9 @@ var topojson = function topojson(layerOptions) {
     topojsonOptions.sourceName = baseUrl + topojsonOptions.source;
     sourceOptions.url = topojsonOptions.source;
   }
-  if(layerOptions.layerType=='cluster'){
-    topojsonOptions.cluster = {
-      clusterDistance : topojsonOptions.clusterDistance || sourceOptions.clusterDistance || undefined,
-      clusterMaxZoom : topojsonOptions.clusterMaxZoom || sourceOptions.clusterMaxZoom || undefined
-    };
-  }
 
   topojsonSource = createSource(sourceOptions);
-  return vector(topojsonOptions, topojsonSource);
+  return vector(topojsonOptions, topojsonSource, sourceOptions);
 
   function createSource(options) {
     return new ol.source.Vector({

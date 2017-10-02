@@ -73,7 +73,6 @@ function init(el, mapOptions) {
   settings.groups = mapOptions.groups;
   settings.editLayer = mapOptions.editLayer;
   settings.styles = mapOptions.styles;
-  settings.clusterOptions = mapOptions.clusterOptions || {};
   style.init();
   settings.layers = createLayers(mapOptions.layers, urlParams.layers);
   settings.controls = mapOptions.controls;
@@ -351,10 +350,6 @@ function getTarget() {
   return settings.target;
 }
 
-function getClusterOptions(){
-  return settings.clusterOptions;
-}
-
 function checkScale(scale, maxScale, minScale) {
   if (maxScale || minScale) {
 
@@ -479,7 +474,7 @@ function render(el, mapOptions) {
     }
 
     $(el).html(template(footerTemplate));
-}
+  }
   
 function setClusterDistance(){
   var distance = 60;
@@ -524,7 +519,6 @@ module.exports.getMapSource = getMapSource;
 module.exports.getResolutions = getResolutions;
 module.exports.getScale = getScale;
 module.exports.getTarget = getTarget;
-module.exports.getClusterOptions = getClusterOptions;
 module.exports.getTileGrid = getTileGrid;
 module.exports.autoPan = autoPan;
 module.exports.removeOverlays = removeOverlays;
