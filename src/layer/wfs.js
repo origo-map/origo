@@ -19,7 +19,7 @@ var wfs = function wfs(layerOptions) {
   sourceOptions.projectionCode = viewer.getProjectionCode();
 
   var wfsSource = createSource(sourceOptions);
-  return vector(wfsOptions, wfsSource, sourceOptions);
+  return vector(wfsOptions, wfsSource);
 
   function createSource(options) {
     var vectorSource = null;

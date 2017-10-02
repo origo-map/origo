@@ -25,7 +25,7 @@ var topojson = function topojson(layerOptions) {
   }
 
   topojsonSource = createSource(sourceOptions);
-  return vector(topojsonOptions, topojsonSource, sourceOptions);
+  return vector(topojsonOptions, topojsonSource);
 
   function createSource(options) {
     return new ol.source.Vector({

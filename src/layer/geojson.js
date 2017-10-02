@@ -25,7 +25,7 @@ var geojson = function geojson(layerOptions) {
   }
 
   geojsonSource = createSource(sourceOptions);
-  return vector(geojsonOptions, geojsonSource, sourceOptions);
+  return vector(geojsonOptions, geojsonSource);
 
   function createSource(options) {
     return new ol.source.Vector({

@@ -19,7 +19,7 @@ var agsFeature = function agsFeature(layerOptions) {
   sourceOptions.id = agsOptions.id;
 
   var agsSource = createSource(sourceOptions);
-  return vector(agsOptions, agsSource, sourceOptions);
+  return vector(agsOptions, agsSource);
 
   function createSource(options) {
     var vectorSource = null;
