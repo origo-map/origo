@@ -1,4 +1,4 @@
-,module.exports = {
+module.exports = {
   crossDomain: true,
   target: '#app-wrapper',
   svgSpritePath: 'css/svg/',
