@@ -1,4 +1,4 @@
-module.exports = {
+,module.exports = {
   crossDomain: true,
   target: '#app-wrapper',
   svgSpritePath: 'css/svg/',
@@ -22,6 +22,9 @@ module.exports = {
     },
     {
       "name": "attribution"
+    },
+    {
+       "name": "fullscreen"
     }
   ]
 }
