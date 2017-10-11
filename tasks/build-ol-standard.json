@@ -216,8 +216,8 @@
     "ol.geom.Polygon#getType",
     "ol.geom.Polygon#setCoordinates",
     "ol.Sphere",
-    "ol.Sphere#geodesicArea",
-    "ol.Sphere#haversineDistance",
+    "ol.Sphere.getArea",
+    "ol.Sphere.getLength",
     "ol.loadingstrategy.*"
   ],
   "umd": true,
