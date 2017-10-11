@@ -53,8 +53,12 @@ function init(el, mapOptions) {
   settings.url = mapOptions.url;
   settings.target = mapOptions.target;
   settings.baseUrl = mapOptions.baseUrl;
+  settings.extent = mapOptions.extent || undefined;
+  settings.center = urlParams.center || mapOptions.center;
+  settings.zoom = urlParams.zoom || mapOptions.zoom;
+  mapOptions.tileGrid = mapOptions.tileGrid || {};
   settings.tileSize = mapOptions.tileGrid.tileSize ? [mapOptions.tileGrid.tileSize,mapOptions.tileGrid.tileSize] : [256,256];
-  settings.bottomLeft = mapOptions.tileGrid.bottomLeft;
+  settings.alignTopLeft = mapOptions.tileGrid.alignTopLeft;
   if (mapOptions.hasOwnProperty('proj4Defs') || mapOptions.projectionCode=="EPSG:3857" || mapOptions.projectionCode=="EPSG:4326") {
     // Projection to be used in map
     settings.projectionCode = mapOptions.projectionCode || undefined;
@@ -65,12 +69,9 @@ function init(el, mapOptions) {
       units: getUnits(settings.projectionCode)
     });
     settings.resolutions = mapOptions.resolutions || undefined;
-    settings.tileGrid = maputils.tileGrid(settings.projectionExtent, settings.resolutions, settings.tileSize, settings.bottomLeft);
+    settings.tileGrid = maputils.tileGrid(settings);
   }
 
-  settings.extent = mapOptions.extent || undefined;
-  settings.center = urlParams.center || mapOptions.center;
-  settings.zoom = urlParams.zoom || mapOptions.zoom;
   settings.source = mapOptions.source;
   settings.groups = mapOptions.groups;
   settings.editLayer = mapOptions.editLayer;
