@@ -20,7 +20,7 @@ function init(opt_options) {
   var target = options.target || '#o-toolbar-navigation';
   map = viewer.getMap();
   baseUrl = viewer.getBaseUrl();
-  zoomLevel = options.zoomLevel || undefined;
+  zoomLevel = options.zoomLevel || viewer.getResolutions().length - 3 || 0;
 
   render(target);
 
@@ -109,17 +109,10 @@ function addPosition(current) {
 
   if (enabled === false && geolocation.getTracking()) {
     marker.setPosition(position);
-    if (zoomLevel) {
-      map.getView().animate({
-        center: position,
-        zoom: zoomLevel
-      });
-    } else {
-      map.getView().animate({
-        center: position,
-        resolution: (viewer.getResolutions().length - 3)
-      });
-    }
+    map.getView().animate({
+      center: position,
+      zoom: zoomLevel
+    });
     enabled = true;
   } else if (geolocation.getTracking()) {
     marker.setPosition(position);

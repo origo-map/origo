@@ -18,15 +18,35 @@ var wfs = function wfs(layerOptions) {
   sourceOptions.resolutions = viewer.getResolutions();
   sourceOptions.projectionCode = viewer.getProjectionCode();
 
+  sourceOptions.strategy = layerOptions.strategy ? layerOptions.strategy : sourceOptions.strategy;
+  switch (sourceOptions.strategy) {
+    case 'all':
+      sourceOptions.loadingstrategy = ol.loadingstrategy.all;
+    break;
+    case 'tile':
+    sourceOptions.loadingstrategy = ol.loadingstrategy.tile(ol.tilegrid.createXYZ({
+        maxZoom: sourceOptions.resolutions.length
+      }));
+    break;
+    default:
+    sourceOptions.loadingstrategy = ol.loadingstrategy.bbox;
+    break;
+  }
   var wfsSource = createSource(sourceOptions);
   return vector(wfsOptions, wfsSource);
 
   function createSource(options) {
     var vectorSource = null;
     var serverUrl = options.url;
+    var queryFilter;
 
     //If cql filter then bbox must be used in the filter.
-    var queryFilter = options.filter ? '&CQL_FILTER=' + options.filter + ' AND BBOX(' + options.geometryName + ',' : '&BBOX=';
+    if(options.strategy === 'all'){
+      queryFilter = options.filter ? '&CQL_FILTER=' + options.filter : '';
+    }
+    else{
+      queryFilter = options.filter ? '&CQL_FILTER=' + options.filter + ' AND BBOX(' + options.geometryName + ',' : '&BBOX=';
+    }
     var bboxProjectionCode = options.filter ? "'" + options.projectionCode + "')" : options.projectionCode;
     vectorSource = new ol.source.Vector({
       attributions: options.attribution,
@@ -38,8 +58,8 @@ var wfs = function wfs(layerOptions) {
           '?service=WFS&' +
           'version=1.1.0&request=GetFeature&typeName=' + options.featureType +
           '&outputFormat=application/json' +
-          '&srsname=' + options.projectionCode +
-          queryFilter + extent.join(',') + ',' + bboxProjectionCode;
+          '&srsname=' + options.projectionCode;
+        url += options.strategy === 'all' ? queryFilter : queryFilter + extent.join(',') + ',' + bboxProjectionCode;
         $.ajax({
             url: url,
             cache: false
@@ -48,9 +68,7 @@ var wfs = function wfs(layerOptions) {
             vectorSource.addFeatures(vectorSource.getFormat().readFeatures(response));
           });
       },
-      strategy: ol.loadingstrategy.tile(ol.tilegrid.createXYZ({
-        maxZoom: options.resolutions.length
-      }))
+      strategy: options.loadingstrategy
     });
     return vectorSource;
   }

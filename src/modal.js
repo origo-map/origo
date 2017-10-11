@@ -13,8 +13,8 @@ var modal = function() {
     closeModal: closeModal
   };
 
-  function render(title, content) {
-    modalEl = '<div id="o-modal">' +
+  function render(title, content, cls) {
+    modalEl = '<div id="o-modal" ' + 'class="' + cls + '">' +
       '<div class="o-modal-screen"></div>' +
       '<div class="o-modal">' +
       '<div class="o-close-button"><svg class="o-icon-fa-times"><use xlink:href="#fa-times"></use></svg></div>' +
@@ -39,12 +39,13 @@ var modal = function() {
   function createModal(modalTarget, options) {
     var title = options.title || '';
     var content = options.content || '';
+    var cls = options.cls || '';
     if (options.hasOwnProperty('static')) {
       isStatic = options.static;
     } else {
       isStatic = false;
     }
-    render(title, content);
+    render(title, content, cls);
     $target = $(modalTarget);
 
   }

@@ -183,7 +183,7 @@ function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
               item.content = getAttributes(feature,l)
               result.push(item);
           }
-        }, 
+        },
         {
           hitTolerance: featureInfo.getHitTolerance()
         });

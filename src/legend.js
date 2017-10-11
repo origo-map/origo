@@ -352,7 +352,7 @@ function addLegend(groups) {
                 '</div>';
         item += layer.get('styleName') ? getSymbol(styleSettings[layer.get('styleName')]) : '';
         item += title;
-        $('#o-overlay-list').append(item);
+        $('#o-overlay-list').prepend(item);
       }
     }
 
@@ -425,7 +425,7 @@ function addLegend(groups) {
       var that = this;
       showAbstract($(that));
     });
-
+    evt.stopPropagation();
     evt.preventDefault();
   });
 
@@ -504,7 +504,7 @@ function toggleSubGroupCheck(subgroup, toggleAll) {
       } else {
 
         if (inMapLegend == false && $('#o-legend-' + layername).length == 0) {
-          $('#o-overlay-list').append(createLegendItem('o-legend-' + layername));
+          $('#o-overlay-list').prepend(createLegendItem('o-legend-' + layername));
           onToggleCheck('o-legend-' + layername);
           checkToggleOverlay();
         }
@@ -581,7 +581,7 @@ function toggleCheck(layerid) {
     } else {
 
       if (inMapLegend == false && $('#o-legend-' + layername).length == 0) {
-        $('#o-overlay-list').append(createLegendItem('o-legend-' + layername));
+        $('#o-overlay-list').prepend(createLegendItem('o-legend-' + layername));
         onToggleCheck('o-legend-' + layername);
         checkToggleOverlay();
       }

@@ -5,6 +5,7 @@
     "ol.Map#addLayer",
     "ol.Map#addControl",
     "ol.Map#addOverlay",
+    "ol.Map#dispatchEvent",
     "ol.Map#forEachFeatureAtPixel",
     "ol.Map#forEachLayerAtPixel",
     "ol.Map#getLayers",
@@ -12,9 +13,11 @@
     "ol.Map#getTarget",
     "ol.Map#getOverlays",
     "ol.Map#getView",
+    "ol.Map#removeControl",
     "ol.Map#removeInteraction",
     "ol.Map#removeOverlay",
     "ol.Map#on",
+    "ol.Map#once",
     "ol.Map#un",
     "ol.proj.Projection",
     "ol.proj.Projection#getExtent",
@@ -63,6 +66,8 @@
     "ol.control.Attribution",
     "ol.control.Attribution#setCollapsed",
     "ol.control.Attribution#setCollapsible",
+    "ol.control.MousePosition",
+    "ol.control.MousePosition#setCoordinateFormat",
     "ol.control.Zoom",
     "ol.control.Rotate",
     "ol.control.ScaleLine",
@@ -133,6 +138,7 @@
     "ol.Collection#getLength",
     "ol.Collection#item",
     "ol.Collection#on",
+    "ol.coordinate.createStringXY",
     "ol.format.EsriJSON",
     "ol.format.EsriJSON#readFeatures",
     "ol.format.EsriJSON#writeFeature",
@@ -237,6 +243,7 @@
       "api", "observable"
     ],
     "compilation_level": "ADVANCED",
-    "manage_closure_dependencies": true
+    "manage_closure_dependencies": true,
+    "rewrite_polyfills": false
   }
 }

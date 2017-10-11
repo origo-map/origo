@@ -16,7 +16,6 @@ var wms = function wms(layerOptions) {
   };
   var wmsOptions = $.extend(wmsDefault, layerOptions);
   wmsOptions.name.split(':').pop();
-  wmsOptions.sourceName = wmsOptions.name;
   var sourceOptions = $.extend(sourceDefault, viewer.getMapSource()[layerOptions.source]);
   sourceOptions.attribution = wmsOptions.attribution;
   sourceOptions.projectionCode = viewer.getProjectionCode();
