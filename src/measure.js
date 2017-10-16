@@ -26,12 +26,16 @@ var overlayArray = [];
 var drawStart = false;
 var isActive = false;
 var wgs84Sphere = new ol.Sphere(6378137);
+var lengthTool;
+var areaTool;
 
 function init(opt_options) {
   options = opt_options || {};
-  options.line = options.line === false ? options.line : true;
-  options.area = options.area === false ? options.area : true;
-  if(options.line || options.area){
+  options.measureTools = options.measureTools || ["length", "area"];
+  lengthTool = options.measureTools.indexOf('length') >= 0 ? true : false;
+  areaTool = options.measureTools.indexOf('area') >= 0 ? true : false;
+  options.default = options.default ? options.default : lengthTool ? "length" : "area";
+  if(lengthTool || areaTool){
     var target = options.target || '#o-toolbar-maptools';
     map = Viewer.getMap();
     source = new ol.source.Vector();
@@ -51,19 +55,10 @@ function init(opt_options) {
 
     render(target);
     bindUIActions();
-    if(options.hasOwnProperty('default')){
-      if(options.default == 'area' && options.area) {
-        defaultButton = $('#o-measure-polygon-button button');
-      }
-      else if(options.default == 'line' && options.line) {
-        defaultButton = $('#o-measure-line-button button');
-      }
-      else{
-        defaultButton = options.line ? $('#o-measure-line-button button') : $('#o-measure-polygon-button button');
-      }
-    }
-    else{
-      defaultButton = options.line ? $('#o-measure-line-button button') : $('#o-measure-polygon-button button');
+    if(options.default === 'area') {
+      defaultButton = $('#o-measure-polygon-button button');
+    } else if(options.default === 'length') {
+      defaultButton = $('#o-measure-line-button button');
     }
   }
 }
@@ -71,8 +66,8 @@ function init(opt_options) {
 function onEnableInteraction(e) {
   if(e.interaction === 'measure') {
     $('#o-measure-button button').addClass('o-measure-button-true');
-    if(options.line){$('#o-measure-line-button').removeClass('o-hidden');}
-    if(options.area){$('#o-measure-polygon-button').removeClass('o-hidden');}
+    if(lengthTool){$('#o-measure-line-button').removeClass('o-hidden');}
+    if(areaTool){$('#o-measure-polygon-button').removeClass('o-hidden');}
     $('#o-measure-button').removeClass('tooltip');
     setActive(true);
     defaultButton.trigger('click');
@@ -82,8 +77,8 @@ function onEnableInteraction(e) {
     };
 
     $('#o-measure-button button').removeClass('o-measure-button-true');
-    if(options.line){$('#o-measure-line-button').addClass('o-hidden');}
-    if(options.area){$('#o-measure-polygon-button').addClass('o-hidden');}
+    if(lengthTool){$('#o-measure-line-button').addClass('o-hidden');}
+    if(areaTool){$('#o-measure-polygon-button').addClass('o-hidden');}
     $('#o-measure-button').addClass('tooltip');
 
     map.un('pointermove', pointerMoveHandler);
@@ -108,7 +103,7 @@ function setActive(state) {
 
 function render(target) {
   
-  if(options.line || options.area){
+  if(lengthTool || areaTool){
     var toolbar = utils.createElement('div', '', {
       id: 'o-measure-toolbar',
       cls: 'o-toolbar-horizontal'
@@ -126,7 +121,7 @@ function render(target) {
     $('#' + 'o-measure-toolbar').append(mb);
   }
   
-  if(options.line){
+  if(lengthTool){
     var lb = utils.createButton({
       id: 'o-measure-line-button',
       cls: 'o-measure-type-button',
@@ -139,7 +134,7 @@ function render(target) {
     $('#o-measure-line-button').addClass('o-hidden');
   }
 
-  if(options.area){
+  if(areaTool){
     var pb = utils.createButton({
       id: 'o-measure-polygon-button',
       cls: 'o-measure-type-button',
@@ -154,7 +149,7 @@ function render(target) {
 }
 
 function bindUIActions() {
-  if(options.line || options.area){
+  if(lengthTool || areaTool){
     $('#o-measure-button').on('click', function(e) {
       toggleMeasure();
       $('#o-measure-button button').blur();
@@ -162,7 +157,7 @@ function bindUIActions() {
     });
   }
 
-  if(options.line){
+  if(lengthTool){
     $('#o-measure-line-button').on('click', function(e) {
       type = 'LineString';
       toggleType($('#o-measure-line-button button'));
@@ -171,7 +166,7 @@ function bindUIActions() {
     });
   }
 
-  if(options.area){
+  if(areaTool){
     $('#o-measure-polygon-button').on('click', function(e) {
       type = 'Polygon';
       toggleType($('#o-measure-polygon-button button'));
