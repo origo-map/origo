@@ -48,3 +48,19 @@
 		height: 3rem;
 		width: 3rem;
 }
+.o-button-lg {
+  border-radius: 50%;
+  background-color: $o-btn-bg;
+  border: none;
+  -webkit-box-shadow: 0 2px 5px rgba(0,0,0,0.45);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.45);
+  color: $o-btn-color;
+	cursor: pointer;
+  display: inline-block;
+  height: 2.5rem;
+  position: relative;
+  padding: .5rem;
+  text-align: center;
+  text-decoration: none;
+  width: 2.5rem;
+}

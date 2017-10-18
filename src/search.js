@@ -5,7 +5,7 @@ var $ = require('jquery');
 var Viewer = require('./viewer');
 var wktToFeature = require('./maputils').wktToFeature;
 var Popup = require('./popup');
-var typeahead = require('typeahead.js-browserify');
+var typeahead = require('typeahead.js');
 var getFeature = require('./getfeature');
 var getAttributes = require('./getattributes');
 var featureInfo = require('./featureinfo');
@@ -34,6 +34,9 @@ var srl;
 
 typeahead.loadjQueryPlugin();
 
+var limit;
+var minLength;
+
 function init(options) {
   var el;
   name = options.searchAttribute;
@@ -50,10 +53,12 @@ function init(options) {
   title = options.title || '';
   titleAttribute = options.titleAttribute || undefined;
   contentAttribute = options.contentAttribute || undefined;
-  maxZoomLevel = options.maxZoomLevel || 2;
+  maxZoomLevel = options.maxZoomLevel || Viewer.getResolutions().length - 2 || Viewer.getResolutions();
+  limit = options.limit || 9;
   hintText = options.hintText || 'Sök...';
   hint = options.hasOwnProperty('hint') ? options.hint : true;
   highlight = options.hasOwnProperty('highlight') ? options.highlight : true;
+  minLength = options.minLength || 4;
   projectionCode = Viewer.getProjectionCode();
 
   map = Viewer.getMap();
@@ -83,11 +88,11 @@ function init(options) {
     autoSelect: true,
     hint: hint,
     highlight: highlight,
-    minLength: 4
+    minLength: minLength
   },
   {
     name: 'adress',
-    limit: 9,
+    limit: limit,
     displayKey: name,
     source: function (query, syncResults, asyncResults) {
       var data = {
@@ -114,6 +119,7 @@ function init(options) {
     $('.o-map').append(srl);
     srl.hide();
   }
+
 
   bindUIActions();
 }
@@ -274,17 +280,17 @@ function showOverlay(data, coord) {
   clear();
   popup = Popup('#o-map');
   overlay = new ol.Overlay({
-      element: popup.getEl()
-    });
+    element: popup.getEl()
+  });
 
   map.addOverlay(overlay);
 
   overlay.setPosition(coord);
   content = data[name];
   popup.setContent({
-      content: content,
-      title: title
-    });
+    content: content,
+    title: title
+  });
   popup.setVisibility(true);
   mapUtils.zoomToExent(new ol.geom.Point(coord), maxZoomLevel);
 }
@@ -328,20 +334,20 @@ function selectHandler(evt, data) {
     layer = Viewer.getLayer(data[layerNameAttribute]);
     id = data[idAttribute];
     getFeature(id, layer)
-      .done(function (res) {
-              var featureWkt;
-              var coordWkt;
-              if (res.length > 0) {
-                showFeatureInfo(res, layer.get('title'), getAttributes(res[0], layer));
-              }
+      .done(function(res) {
+        var featureWkt;
+        var coordWkt;
+        if (res.length > 0) {
+          showFeatureInfo(res, layer.get('title'), getAttributes(res[0], layer));
+        }
 
-              // Fallback if no geometry in response
-              else if (geometryAttribute) {
-                featureWkt = wktToFeature(data[geometryAttribute], projectionCode);
-                coordWkt = featureWkt.getGeometry().getCoordinates();
-                showOverlay(data, coordWkt);
-              }
-            });
+        // Fallback if no geometry in response
+        else if (geometryAttribute) {
+          featureWkt = wktToFeature(data[geometryAttribute], projectionCode);
+          coordWkt = featureWkt.getGeometry().getCoordinates();
+          showOverlay(data, coordWkt);
+        }
+      });
   } else if (geometryAttribute && layerName) {
     feature = wktToFeature(data[geometryAttribute], projectionCode);
     layer = Viewer.getLayer(data[layerName]);

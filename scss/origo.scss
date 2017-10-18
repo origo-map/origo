@@ -8,6 +8,7 @@
   position: relative;
   touch-action: manipulation;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
   @import 'reset.scss';
   @import 'helpers.scss';
   @import 'ol.scss';
@@ -23,6 +24,8 @@
   @import 'image.scss';
   @import 'modal.scss';
   @import 'popup.scss';
+  @import 'popover.scss';
+  @import 'dropdown.scss';
   @import 'sidebar.scss';
   @import 'close.scss';
   @import 'icon.scss';
@@ -37,9 +40,11 @@
   @import 'editor-toolbar.scss';
   @import 'fullscreen.scss';
   @import 'share.scss';
+  @import 'position.scss';
   @import 'measure.scss';
   @import 'legend.scss';
   @import 'search.scss';
+  @import 'splash.scss';  
   @import 'downloader.scss';
   @import 'hidden.scss';
 }
