@@ -32,8 +32,6 @@ var projectionCode;
 var overlay;
 var srl;
 
-typeahead.loadjQueryPlugin();
-
 var limit;
 var minLength;
 
