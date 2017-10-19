@@ -17,8 +17,8 @@ function init() {
         cls: 'o-mapmenu-button-true',
         iconCls: 'o-icon-fa-bars',
         src: '#fa-bars',
-        tooltipText: 'Meny',
-        tooltipPlacement: 'west'
+        /*tooltipText: 'Meny',
+        tooltipPlacement: 'west'*/
     });
     $('#o-map').append(el);
     $menuButton = $('#o-mapmenu-button button');
