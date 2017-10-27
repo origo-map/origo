@@ -8,6 +8,7 @@ var style = require('./style')();
 var styleTypes = require('./style/styletypes');
 
 var map;
+var options;
 var activeButton;
 var defaultButton;
 var measure;
@@ -25,37 +26,48 @@ var overlayArray = [];
 var drawStart = false;
 var isActive = false;
 var wgs84Sphere = new ol.Sphere(6378137);
+var lengthTool;
+var areaTool;
 
 function init(opt_options) {
-  var options = opt_options || {};
-  var target = options.target || '#o-toolbar-maptools';
-  map = Viewer.getMap();
-  source = new ol.source.Vector();
-  measureStyleOptions = styleTypes.getStyle('measure');
+  options = opt_options || {};
+  options.measureTools = options.measureTools || ["length", "area"];
+  lengthTool = options.measureTools.indexOf('length') >= 0 ? true : false;
+  areaTool = options.measureTools.indexOf('area') >= 0 ? true : false;
+  options.default = options.default ? options.default : lengthTool ? "length" : "area";
+  if(lengthTool || areaTool){
+    var target = options.target || '#o-toolbar-maptools';
+    map = Viewer.getMap();
+    source = new ol.source.Vector();
+    measureStyleOptions = styleTypes.getStyle('measure');
 
-  //Drawn features
-  vector = new ol.layer.Vector({
-    source: source,
-    name: 'measure',
-    visible: false,
-    zIndex: 6
-  });
+    //Drawn features
+    vector = new ol.layer.Vector({
+      source: source,
+      name: 'measure',
+      visible: false,
+      zIndex: 6
+    });
 
-  map.addLayer(vector);
+    map.addLayer(vector);
 
-  $('.o-map').on('enableInteraction', onEnableInteraction);
+    $('.o-map').on('enableInteraction', onEnableInteraction);
 
-  render(target);
-  bindUIActions();
-
-  defaultButton = $('#o-measure-line-button button');
+    render(target);
+    bindUIActions();
+    if(options.default === 'area') {
+      defaultButton = $('#o-measure-polygon-button button');
+    } else if(options.default === 'length') {
+      defaultButton = $('#o-measure-line-button button');
+    }
+  }
 }
 
 function onEnableInteraction(e) {
   if(e.interaction === 'measure') {
     $('#o-measure-button button').addClass('o-measure-button-true');
-    $('#o-measure-line-button').removeClass('o-hidden');
-    $('#o-measure-polygon-button').removeClass('o-hidden');
+    if(lengthTool){$('#o-measure-line-button').removeClass('o-hidden');}
+    if(areaTool){$('#o-measure-polygon-button').removeClass('o-hidden');}
     $('#o-measure-button').removeClass('tooltip');
     setActive(true);
     defaultButton.trigger('click');
@@ -65,8 +77,8 @@ function onEnableInteraction(e) {
     };
 
     $('#o-measure-button button').removeClass('o-measure-button-true');
-    $('#o-measure-line-button').addClass('o-hidden');
-    $('#o-measure-polygon-button').addClass('o-hidden');
+    if(lengthTool){$('#o-measure-line-button').addClass('o-hidden');}
+    if(areaTool){$('#o-measure-polygon-button').addClass('o-hidden');}
     $('#o-measure-button').addClass('tooltip');
 
     map.un('pointermove', pointerMoveHandler);
@@ -90,68 +102,78 @@ function setActive(state) {
 }
 
 function render(target) {
+  
+  if(lengthTool || areaTool){
+    var toolbar = utils.createElement('div', '', {
+      id: 'o-measure-toolbar',
+      cls: 'o-toolbar-horizontal'
+    });
 
-  var toolbar = utils.createElement('div', '', {
-    id: 'o-measure-toolbar',
-    cls: 'o-toolbar-horizontal'
-  });
+    $(target).append(toolbar);
 
-  $(target).append(toolbar);
+    var mb = utils.createButton({
+      id: 'o-measure-button',
+      cls: 'o-measure-button',
+      iconCls: 'o-icon-steady-measure',
+      src: '#steady-measure',
+      tooltipText: 'Mät i kartan'
+    });
+    $('#' + 'o-measure-toolbar').append(mb);
+  }
+  
+  if(lengthTool){
+    var lb = utils.createButton({
+      id: 'o-measure-line-button',
+      cls: 'o-measure-type-button',
+      iconCls: 'o-icon-minicons-line-vector',
+      src: '#minicons-line-vector',
+      tooltipText: 'Linje',
+      tooltipPlacement: 'north'
+    });
+    $('#' + 'o-measure-toolbar').append(lb);
+    $('#o-measure-line-button').addClass('o-hidden');
+  }
 
-  var mb = utils.createButton({
-    id: 'o-measure-button',
-    cls: 'o-measure-button',
-    iconCls: 'o-icon-steady-measure',
-    src: '#steady-measure',
-    tooltipText: 'Mät i kartan'
-  });
-  $('#' + 'o-measure-toolbar').append(mb);
-
-  var lb = utils.createButton({
-    id: 'o-measure-line-button',
-    cls: 'o-measure-type-button',
-    iconCls: 'o-icon-minicons-line-vector',
-    src: '#minicons-line-vector',
-    tooltipText: 'Linje',
-    tooltipPlacement: 'north'
-  });
-  $('#' + 'o-measure-toolbar').append(lb);
-
-  $('#o-measure-line-button').addClass('o-hidden');
-
-  var pb = utils.createButton({
-    id: 'o-measure-polygon-button',
-    cls: 'o-measure-type-button',
-    iconCls: 'o-icon-minicons-square-vector',
-    src: '#minicons-square-vector',
-    tooltipText: 'Yta',
-    tooltipPlacement: 'north'
-  });
-
-  $('#' + 'o-measure-toolbar').append(pb);
-  $('#o-measure-polygon-button').addClass('o-hidden');
+  if(areaTool){
+    var pb = utils.createButton({
+      id: 'o-measure-polygon-button',
+      cls: 'o-measure-type-button',
+      iconCls: 'o-icon-minicons-square-vector',
+      src: '#minicons-square-vector',
+      tooltipText: 'Yta',
+      tooltipPlacement: 'north'
+    });
+    $('#' + 'o-measure-toolbar').append(pb);
+    $('#o-measure-polygon-button').addClass('o-hidden');
+  }
 }
 
 function bindUIActions() {
-  $('#o-measure-button').on('click', function(e) {
-    toggleMeasure();
-    $('#o-measure-button button').blur();
-    e.preventDefault();
-  });
+  if(lengthTool || areaTool){
+    $('#o-measure-button').on('click', function(e) {
+      toggleMeasure();
+      $('#o-measure-button button').blur();
+      e.preventDefault();
+    });
+  }
 
-  $('#o-measure-line-button').on('click', function(e) {
-    type = 'LineString';
-    toggleType($('#o-measure-line-button button'));
-    $('#o-measure-line-button button').blur();
-    e.preventDefault();
-  });
+  if(lengthTool){
+    $('#o-measure-line-button').on('click', function(e) {
+      type = 'LineString';
+      toggleType($('#o-measure-line-button button'));
+      $('#o-measure-line-button button').blur();
+      e.preventDefault();
+    });
+  }
 
-  $('#o-measure-polygon-button').on('click', function(e) {
-    type = 'Polygon';
-    toggleType($('#o-measure-polygon-button button'));
-    $('#o-measure-polygon-button button').blur();
-    e.preventDefault();
-  });
+  if(areaTool){
+    $('#o-measure-polygon-button').on('click', function(e) {
+      type = 'Polygon';
+      toggleType($('#o-measure-polygon-button button'));
+      $('#o-measure-polygon-button button').blur();
+      e.preventDefault();
+    });
+  }
 
 }
 
@@ -272,10 +294,9 @@ function createMeasureTooltip() {
 };
 
 function formatLength(line) {
-  var length, output;
-  var coordinates = line.getCoordinates();
-  length = coordinates.reduce(getLength,0);
-
+  var projection, length, output;
+  projection = map.getView().getProjection();
+  length = ol.Sphere.getLength(line, {projection: projection});
   if (length > 100) {
     output = (Math.round(length / 1000 * 100) / 100) +
       ' ' + 'km';
@@ -283,27 +304,14 @@ function formatLength(line) {
     output = (Math.round(length * 100) / 100) +
       ' ' + 'm';
   }
+  
   return output;
 };
 
-function getLength(total, value, index, arr){
-  if(index<arr.length-1){
-    var sourceProj = map.getView().getProjection();
-    var c1 = ol.proj.transform(arr[index], sourceProj, 'EPSG:4326');
-    var c2 = ol.proj.transform(arr[index + 1], sourceProj, 'EPSG:4326');
-    total += wgs84Sphere.haversineDistance(c1, c2);
-  }
-  return total;
-}
-
 function formatArea(polygon) {
-  var area;
-  var sourceProj = map.getView().getProjection();
-  var geom = /** @type {ol.geom.Polygon} */(polygon.clone().transform(sourceProj, 'EPSG:4326'));
-  var coordinates = geom.getLinearRing(0).getCoordinates();
-  area = Math.abs(wgs84Sphere.geodesicArea(coordinates));
-  var output;
-
+  var projection, area, output;
+  projection = map.getView().getProjection();
+  area = ol.Sphere.getArea(polygon, {projection: projection});
   if (area > 10000000) {
     output = (Math.round(area / 1000000 * 100) / 100) +
       ' ' + 'km<sup>2</sup>';

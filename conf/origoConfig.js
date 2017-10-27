@@ -22,6 +22,9 @@ module.exports = {
     },
     {
       "name": "attribution"
+    },
+    {
+       "name": "fullscreen"
     }
   ]
 }

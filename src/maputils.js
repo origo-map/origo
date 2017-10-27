@@ -11,13 +11,13 @@ module.exports = {
           extent: extent
       });
   },
-  tileGrid: function(extent, resolutions, tileSize) {
-      var origin = ol.extent.getTopLeft(extent);
+  tileGrid: function(settings) {
+      var origin = settings.alignTopLeft === false ? ol.extent.getBottomLeft(settings.extent) : ol.extent.getTopLeft(settings.extent);
       return new ol.tilegrid.TileGrid({
-          extent: extent,
-          origin: origin,
-          resolutions: resolutions,
-          tileSize: tileSize || [256,256]
+          extent: settings.extent,
+          origin: settings.origin,
+          resolutions: settings.resolutions,
+          tileSize: settings.tileSize || [256,256]
       });
   },
   checkZoomChange: function checkZoomChange(resolution, currentResolution) {

@@ -18,7 +18,7 @@
     {
       "name": "about",
       "options": {
-        "buttontext": "Om Origo",
+        "buttonText": "Om Origo",
         "title": "Om Origo",
         "content": "<p>Origo är ett ramverk för webbkartor. Ramverket bygger på JavaScript-biblioteket OpenLayers 3. Du kan använda Origo för att skapa egna webbaserade kartapplikationer.</p><br><p>Projektet drivs och underhålls av ett antal svenska kommuner. Besök gärna <a href='https://github.com/origo-map/origo' target='_blank'>Origo på GitHub</a> för mer information.</p>"
       }
@@ -32,6 +32,16 @@
     },
     {
       "name": "legend"
+    },
+    {
+      "name": "position",
+      "options": {
+        "title": "Web Mercator",
+        "projections": {
+          "EPSG:4326": "WGS84",
+          "EPSG:3006": "Sweref99 TM"
+        }
+      }
     },
     {
       "name": "measure"
@@ -51,6 +61,12 @@
     -20048966.10,
     20026376.39,
     20048966.10
+  ],
+  "proj4Defs": [
+      {
+        "code": "EPSG:3006",
+        "projection": "+proj=utm +zone=33 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
+      }
   ],
   "extent": [
     -20026376.39,

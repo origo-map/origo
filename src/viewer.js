@@ -53,7 +53,13 @@ function init(el, mapOptions) {
   settings.url = mapOptions.url;
   settings.target = mapOptions.target;
   settings.baseUrl = mapOptions.baseUrl;
-  settings.tileSize = mapOptions.tileSize ? [mapOptions.tileSize,mapOptions.tileSize] : [256,256];
+  settings.extent = mapOptions.extent || undefined;
+  settings.center = urlParams.center || mapOptions.center;
+  settings.zoom = urlParams.zoom || mapOptions.zoom;
+  mapOptions.tileGrid = mapOptions.tileGrid || {};
+  settings.tileSize = mapOptions.tileGrid.tileSize ? [mapOptions.tileGrid.tileSize,mapOptions.tileGrid.tileSize] : [256,256];
+  settings.alignTopLeft = mapOptions.tileGrid.alignTopLeft;
+
   if (mapOptions.hasOwnProperty('proj4Defs') || mapOptions.projectionCode=="EPSG:3857" || mapOptions.projectionCode=="EPSG:4326") {
     // Projection to be used in map
     settings.projectionCode = mapOptions.projectionCode || undefined;
@@ -64,21 +70,20 @@ function init(el, mapOptions) {
       units: getUnits(settings.projectionCode)
     });
     settings.resolutions = mapOptions.resolutions || undefined;
-    settings.tileGrid = maputils.tileGrid(settings.projectionExtent, settings.resolutions, settings.tileSize);
+    settings.tileGrid = maputils.tileGrid(settings);
   }
 
-  settings.extent = mapOptions.extent || undefined;
-  settings.center = urlParams.center || mapOptions.center;
-  settings.zoom = urlParams.zoom || mapOptions.zoom;
   settings.source = mapOptions.source;
   settings.groups = mapOptions.groups;
   settings.editLayer = mapOptions.editLayer;
   settings.styles = mapOptions.styles;
+  settings.clusterOptions = mapOptions.clusterOptions || {};
   style.init();
   settings.layers = createLayers(mapOptions.layers, urlParams.layers);
   settings.controls = mapOptions.controls;
   settings.consoleId = mapOptions.consoleId || 'o-console';
   settings.featureinfoOptions = mapOptions.featureinfoOptions || {};
+  settings.enableRotation = mapOptions.enableRotation === false ? false : true;
 
   //If url arguments, parse this settings
   if (window.location.search) {
@@ -104,6 +109,7 @@ function init(el, mapOptions) {
   }
   featureinfo.init(settings.featureinfoOptions);
 
+  setClusterDistance();
 }
 
 function createLayers(layerlist, savedLayers) {
@@ -133,7 +139,8 @@ function loadMap() {
       projection: settings.projection || undefined,
       center: settings.center,
       resolutions: settings.resolutions || undefined,
-      zoom: settings.zoom
+      zoom: settings.zoom,
+      enableRotation: settings.enableRotation
     })
   });
 }
@@ -205,6 +212,7 @@ function getTileGrid() {
 function getTileSize() {
   return settings.tileSize;
 }
+
 function getUrl() {
   return settings.url;
 }
@@ -351,6 +359,10 @@ function getTarget() {
   return settings.target;
 }
 
+function getClusterOptions(){
+  return settings.clusterOptions;
+}
+
 function checkScale(scale, maxScale, minScale) {
   if (maxScale || minScale) {
 
@@ -475,7 +487,29 @@ function render(el, mapOptions) {
     }
 
     $(el).html(template(footerTemplate));
-  }
+}
+
+function setClusterDistance(){
+  var distance = 60;
+  var maxZoom = getResolutions().length-1;
+  map.getView().on('change:resolution', function(evt){
+    var view = evt.target;
+    this.getLayers().getArray().map(function(layer) {
+      var source = layer.getSource();
+      if (source instanceof ol.source.Cluster) {
+        var mapZoom = parseInt(view.getZoom(),10);
+        var clusterDistance = source.getProperties().clusterDistance || distance;
+        var clusterMaxZoom = source.getProperties().clusterMaxZoom || maxZoom;
+        if (mapZoom > clusterMaxZoom) {
+          source.setDistance(0);
+        }
+        else if (mapZoom <= clusterMaxZoom) {
+          source.setDistance(clusterDistance);
+        }
+      }
+    });
+  }, map);
+}
 
 module.exports.init = init;
 module.exports.createLayers = createLayers;
@@ -498,6 +532,7 @@ module.exports.getMapSource = getMapSource;
 module.exports.getResolutions = getResolutions;
 module.exports.getScale = getScale;
 module.exports.getTarget = getTarget;
+module.exports.getClusterOptions = getClusterOptions;
 module.exports.getTileGrid = getTileGrid;
 module.exports.getTileSize = getTileSize;
 module.exports.autoPan = autoPan;

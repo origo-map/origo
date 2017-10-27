@@ -36,7 +36,8 @@ Not convinced? Or maybe you need some inspiration? Check out these examples of w
  * [Hallstakartan](http://karta.hallstahammar.se)
  * [Karlstadskartan](http://gi.karlstad.se)
  * [Mälardalskartan](http://www.malardalskartan.se)
- * [Sigtunakartan](https://karta.sigtuna.se/)
+ * [Sigtunakartan](https://karta.sigtuna.se)
+ * [Strängnäskartan](https://karta.strangnas.se)
  * [Västerås Stads samlingskarta](http://kartor.vasteras.se/sam)
 
 ## Developing with Origo
@@ -48,7 +49,7 @@ Just follow these three steps and you will be up and running in no time.
 The minimum requirements are:
 
   * [Git](https://git-scm.com/)
-  * [Node.js](https://nodejs.org/) (version 4 or higher is recommended)
+  * [Node.js](https://nodejs.org/) (version 6 or higher is recommended)
 
  1. To get your own local copy of Origo use git to clone the repository with the command below:
 

@@ -112,6 +112,7 @@
     "ol.source.Vector#getFormat",
     "ol.source.Vector#removeFeature",
     "ol.source.VectorTile",
+    "ol.source.Vector#setProperties",
     "ol.source.WMTS",
     "ol.source.XYZ",
     "ol.source.Cluster",
@@ -229,8 +230,8 @@
     "ol.geom.Polygon#getType",
     "ol.geom.Polygon#setCoordinates",
     "ol.Sphere",
-    "ol.Sphere#geodesicArea",
-    "ol.Sphere#haversineDistance",
+    "ol.Sphere.getArea",
+    "ol.Sphere.getLength",
     "ol.loadingstrategy.*"
   ],
   "umd": true,
@@ -256,6 +257,7 @@
       "api", "observable"
     ],
     "compilation_level": "ADVANCED",
-    "manage_closure_dependencies": true
+    "manage_closure_dependencies": true,
+    "rewrite_polyfills": false
   }
 }

@@ -18,7 +18,7 @@ function custom(styleName, params) {
       text: '', fill: fill, stroke: stroke
     }), zIndex: 50});
     var styles = [];
-	
+
     return function(feature, resolution) {
       polygon.setZIndex(1);
       line.setZIndex(10);
@@ -27,17 +27,17 @@ function custom(styleName, params) {
       var geom = feature.getGeometry().getType();
       switch(layer) {
         case 'Layer1':
-          stroke.setColor('rgba(0,0,0,1)'); 
-          stroke.setWidth(1);          
+          stroke.setColor('rgba(0,0,0,1)');
+          stroke.setWidth(1);
           fill.setColor('rgba(0,0,0,1)');
           styles[length++] = strokedPolygon;
           break;
         case 'Layer2':
-          stroke.setColor('rgba(255,0,0,1)'); 
-          stroke.setWidth(1);          
+          stroke.setColor('rgba(255,0,0,1)');
+          stroke.setWidth(1);
           styles[length++] = line;
           break;
-        default: 
+        default:
           text.getText().setText(layer);
           text.getText().setFont('10px sans-serif');
           styles[length++] = text;
