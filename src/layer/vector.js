@@ -37,6 +37,11 @@ module.exports = function vector(options, source) {
       });
       vectorLayer = new ol.layer.Image(options);
       break;
+    case 'vectortile':
+      options.source = source;
+      options.style = style.createStyle(options.style);
+      vectorLayer = new ol.layer.VectorTile(options);
+      break;
   }
   return vectorLayer;
 }
