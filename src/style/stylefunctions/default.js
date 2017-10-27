@@ -1,4 +1,5 @@
 var ol = require('openlayers');
+var getColor = require('../getcolor');
 
 module.exports = function defaultStyle(params) {
   var fill = new ol.style.Fill({
@@ -51,9 +52,9 @@ module.exports = function defaultStyle(params) {
     stroke: dashedStroke,
     zIndex: 12
   });
-  var text = new ol.style.Style({
-    text: new ol.style.Text({
-      text: '',
+  var point = new ol.style.Style({
+    image: new ol.style.Circle({
+      radius: 5,
       fill: fill,
       stroke: stroke
     }),
@@ -65,24 +66,47 @@ module.exports = function defaultStyle(params) {
     polygon.setZIndex(1);
     line.setZIndex(10);
     var length = 0;
-    var layer = feature.get('layer');
     var geom = feature.getGeometry().getType();
-    switch (layer) {
-      case 'Layer1':
-        stroke.setColor('rgba(0,0,0,1)');
+    switch (geom) {
+      case 'Polygon':
+        stroke.setColor(getColor('blue'));
         stroke.setWidth(1);
-        fill.setColor('rgba(0,0,0,1)');
+        fill.setColor(getColor('blue', 0.8));
         styles[length++] = strokedPolygon;
         break;
-      case 'Layer2':
-        stroke.setColor('rgba(255,0,0,1)');
+      case 'MultiPolygon':
+        stroke.setColor(getColor('blue'));
+        stroke.setWidth(1);
+        fill.setColor(getColor('blue', 0.8));
+        styles[length++] = strokedPolygon;
+        break;
+      case 'LineString':
+        stroke.setColor(getColor('red'));
         stroke.setWidth(1);
         styles[length++] = line;
         break;
+      case 'MultiLineString':
+        stroke.setColor(getColor('red'));
+        stroke.setWidth(1);
+        styles[length++] = line;
+        break;
+      case 'Point':
+        stroke.setColor(getColor('yellow'));
+        stroke.setWidth(1);
+        fill.setColor(getColor('yellow', 0.8));
+        styles[length++] = point;
+        break;
+      case 'MultiPoint':
+        stroke.setColor(getColor('yellow'));
+        stroke.setWidth(1);
+        fill.setColor(getColor('yellow', 0.8));
+        styles[length++] = point;
+        break;
       default:
-        text.getText().setText(layer);
-        text.getText().setFont('10px sans-serif');
-        styles[length++] = text;
+        stroke.setColor(getColor('blue'));
+        stroke.setWidth(1);
+        fill.setColor(getColor('blue', 0.8));
+        styles[length++] = strokedPolygon;
         break;
     }
     styles.length = length;
