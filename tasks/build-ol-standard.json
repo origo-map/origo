@@ -104,6 +104,7 @@
     "ol.source.Vector#getFeatures",
     "ol.source.Vector#getFormat",
     "ol.source.Vector#removeFeature",
+    "ol.source.Vector#setProperties",
     "ol.source.WMTS",
     "ol.source.XYZ",
     "ol.source.Cluster",
