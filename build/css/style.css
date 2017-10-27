@@ -26,6 +26,7 @@
   position: relative;
   touch-action: manipulation;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  -webkit-tap-highlight-color: transparent;
   /*! normalize.css v5.0.0 | MIT License | github.com/necolas/normalize.css */
   /* Document
    ========================================================================== */
@@ -1236,7 +1237,7 @@
     position: absolute;
     top: 0;
     width: 100%;
-    z-index: 90; }
+    z-index: 105; }
   .o-map .o-modal {
     background-color: white;
     border-radius: 6px;
@@ -1255,7 +1256,7 @@
     -moz-transform-style: preserve-3d;
     transform-style: preserve-3d;
     width: 300px;
-    z-index: 100; }
+    z-index: 110; }
   .o-map .o-no-csstransforms .o-modal {
     margin-left: -150px;
     margin-top: -50px; }
@@ -1619,7 +1620,7 @@
   .o-map .o-footer .o-footer-left {
     position: relative;
     float: left;
-    padding-left: .5em;
+    padding-left: 5px;
     padding-top: 3px;
     width: 30%; }
   .o-map .o-footer .o-footer-right .o-footer-attribution {
@@ -1794,6 +1795,80 @@
     margin: 0 -8px;
     padding: 5px;
     width: 100%; }
+  .o-map .o-position-find,
+  .o-map .o-position-coords {
+    display: none; }
+  .o-map .o-position {
+    padding-right: 5px;
+    position: relative; }
+    .o-map .o-position .o-active {
+      display: inline-block; }
+  .o-map .o-position-button {
+    background-color: #000;
+    color: #fff;
+    font-size: .625rem;
+    height: 1.25rem;
+    line-height: 1.25rem;
+    padding: 0 15px;
+    position: relative;
+    border-radius: 10px;
+    display: inline-block;
+    font-family: Arial, "Helvetica Neue", sans-serif; }
+  .o-map .o-position-center-button {
+    color: #fff;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.8);
+    display: inline-block;
+    height: 1.25rem;
+    line-height: 1.25rem;
+    margin-right: 3px;
+    padding: 1px;
+    position: relative;
+    vertical-align: middle;
+    z-index: 100; }
+  .o-map .o-position-center-button.o-active {
+    background-color: rgba(255, 255, 255, 0.7);
+    color: #fff; }
+    .o-map .o-position-center-button.o-active .o-icon-position {
+      fill: #000; }
+  .o-map .o-position-marker {
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    cursor: default;
+    padding: .25rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    text-align: center;
+    top: 50%;
+    left: 50%;
+    margin-top: -1rem;
+    margin-left: -1rem;
+    z-index: 10000;
+    position: absolute; }
+  .o-map .o-icon-position {
+    padding: 0;
+    height: 1.125rem;
+    width: 1.125rem;
+    fill: #fff;
+    float: none; }
+  .o-map .o-icon-position-marker {
+    height: 1.5rem;
+    padding: 0;
+    width: 1.5rem;
+    fill: #000; }
+  .o-map .o-position-coords,
+  .o-map .o-position-find {
+    background-color: transparent;
+    border: none;
+    color: #fff;
+    font-family: Arial, "Helvetica Neue", sans-serif;
+    font-size: 0.625rem;
+    height: 1.25rem;
+    line-height: 1.25rem;
+    margin: 0; }
+  .o-map input.o-position-find {
+    padding: 0;
+    width: 95px; }
   .o-map .o-icon-minicons-square-vector {
     padding: .3em;
     height: 1.4em;
@@ -2127,6 +2202,14 @@
     width: .8em; }
   .o-map[class*=o-media-l-m-s-xs] #o-search-wrapper {
     display: none; }
+  .o-map .o-splash .o-modal {
+    width: 400px; }
+  .o-map[class*=o-media-l] .o-splash .o-modal {
+    max-width: 400px;
+    width: 400px; }
+  .o-map[class*=o-media-l-m] .o-splash .o-modal {
+    max-width: 300px;
+    width: 90%; }
   .o-map .o-downloader {
     z-index: 1000; }
     .o-map .o-downloader td {
