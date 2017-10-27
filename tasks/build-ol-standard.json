@@ -54,6 +54,7 @@
     "ol.style.Stroke#setLineDash",
     "ol.style.Stroke#setWidth",
     "ol.style.Text",
+    "ol.style.Text#setFont",
     "ol.style.Text#getText",
     "ol.style.Text#setFill",
     "ol.style.Text#setStroke",
