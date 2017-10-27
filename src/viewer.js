@@ -59,6 +59,7 @@ function init(el, mapOptions) {
   mapOptions.tileGrid = mapOptions.tileGrid || {};
   settings.tileSize = mapOptions.tileGrid.tileSize ? [mapOptions.tileGrid.tileSize,mapOptions.tileGrid.tileSize] : [256,256];
   settings.alignTopLeft = mapOptions.tileGrid.alignTopLeft;
+
   if (mapOptions.hasOwnProperty('proj4Defs') || mapOptions.projectionCode=="EPSG:3857" || mapOptions.projectionCode=="EPSG:4326") {
     // Projection to be used in map
     settings.projectionCode = mapOptions.projectionCode || undefined;
@@ -487,7 +488,7 @@ function render(el, mapOptions) {
 
     $(el).html(template(footerTemplate));
 }
-  
+
 function setClusterDistance(){
   var distance = 60;
   var maxZoom = getResolutions().length-1;
