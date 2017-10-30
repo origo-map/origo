@@ -79,7 +79,6 @@ function init(el, mapOptions) {
   settings.styles = mapOptions.styles;
   settings.clusterOptions = mapOptions.clusterOptions || {};
   style.init();
-  settings.layers = createLayers(mapOptions.layers, urlParams.layers);
   settings.controls = mapOptions.controls;
   settings.consoleId = mapOptions.consoleId || 'o-console';
   settings.featureinfoOptions = mapOptions.featureinfoOptions || {};
@@ -91,6 +90,8 @@ function init(el, mapOptions) {
   }
 
   loadMap();
+  settings.layers = createLayers(mapOptions.layers, urlParams.layers);
+  addLayers(settings.layers);
 
   elQuery(map, {
     breakPoints: mapOptions.breakPoints,
@@ -108,8 +109,12 @@ function init(el, mapOptions) {
     });
   }
   featureinfo.init(settings.featureinfoOptions);
+}
 
-  setClusterDistance();
+function addLayers(layers) {
+  layers.forEach(function(layer) {
+    map.addLayer(layer);
+  });
 }
 
 function createLayers(layerlist, savedLayers) {
@@ -132,7 +137,6 @@ function createLayers(layerlist, savedLayers) {
 function loadMap() {
   map = new ol.Map({
     target: 'o-map',
-    layers: settings.layers,
     controls: [],
     view: new ol.View({
       extent: settings.extent || undefined,
@@ -487,28 +491,6 @@ function render(el, mapOptions) {
     }
 
     $(el).html(template(footerTemplate));
-}
-
-function setClusterDistance(){
-  var distance = 60;
-  var maxZoom = getResolutions().length-1;
-  map.getView().on('change:resolution', function(evt){
-    var view = evt.target;
-    this.getLayers().getArray().map(function(layer) {
-      var source = layer.getSource();
-      if (source instanceof ol.source.Cluster) {
-        var mapZoom = parseInt(view.getZoom(),10);
-        var clusterDistance = source.getProperties().clusterDistance || distance;
-        var clusterMaxZoom = source.getProperties().clusterMaxZoom || maxZoom;
-        if (mapZoom > clusterMaxZoom) {
-          source.setDistance(0);
-        }
-        else if (mapZoom <= clusterMaxZoom) {
-          source.setDistance(clusterDistance);
-        }
-      }
-    });
-  }, map);
 }
 
 module.exports.init = init;
