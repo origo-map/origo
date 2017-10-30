@@ -15,9 +15,13 @@ module.exports = function vector(options, source) {
     case 'cluster':
       options.clusterOptions = options.clusterOptions || {};
       source.clusterOptions = viewer.getMapSource()[options.sourceName].clusterOptions || {};
-      var clusterDistance = options.clusterOptions.clusterDistance || source.clusterOptions.clusterDistance || viewer.getClusterOptions().clusterDistance || 60;
+      var distance = 60;
+      var clusterDistance = options.clusterOptions.clusterDistance || source.clusterOptions.clusterDistance || viewer.getClusterOptions().clusterDistance || distance;
       var clusterMaxZoom = options.clusterOptions.clusterMaxZoom || source.clusterOptions.clusterMaxZoom || viewer.getClusterOptions().clusterMaxZoom || viewer.getResolutions().length-1;
       var clusterInitialDistance = viewer.getSettings().zoom > clusterMaxZoom ? 0 : clusterDistance;
+      var map = viewer.getMap();
+      var view = map.getView();
+      var maxZoom = view.getResolutions().length-1;
       options.source = new ol.source.Cluster({
         attributions: options.attribution,
         source: source,
@@ -29,6 +33,18 @@ module.exports = function vector(options, source) {
       });
       options.style = style.createStyle(options.style, options.clusterStyle);
       vectorLayer = new ol.layer.Vector(options);
+      view.on('change:resolution', onResolutionChange);
+
+      function onResolutionChange(evt) {
+        var mapZoom = parseInt(view.getZoom(), 10);
+        var clusterDistance = options.source.getProperties().clusterDistance || distance;
+        var clusterMaxZoom = options.source.getProperties().clusterMaxZoom || maxZoom;
+        if (mapZoom > clusterMaxZoom) {
+          options.source.setDistance(0);
+        } else if (mapZoom <= clusterMaxZoom) {
+          options.source.setDistance(clusterDistance);
+        }
+      }
       break;
     case 'image':
       options.source = new ol.source.ImageVector({
