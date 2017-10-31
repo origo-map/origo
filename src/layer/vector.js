@@ -14,7 +14,11 @@ module.exports = function vector(options, source) {
       break;
     case 'cluster':
       options.clusterOptions = options.clusterOptions || {};
-      source.clusterOptions = viewer.getMapSource()[options.sourceName].clusterOptions || {};
+      if(options.type === 'WFS' || options.type === 'AGS_FEATURE'){
+        source.clusterOptions = viewer.getMapSource()[options.sourceName].clusterOptions || {};
+      } else {
+        source.clusterOptions = {};
+      }
       var distance = 60;
       var clusterDistance = options.clusterOptions.clusterDistance || source.clusterOptions.clusterDistance || viewer.getClusterOptions().clusterDistance || distance;
       var clusterMaxZoom = options.clusterOptions.clusterMaxZoom || source.clusterOptions.clusterMaxZoom || viewer.getClusterOptions().clusterMaxZoom || viewer.getResolutions().length-1;
