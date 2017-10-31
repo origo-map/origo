@@ -37,17 +37,22 @@ module.exports = function vector(options, source) {
       });
       options.style = style.createStyle(options.style, options.clusterStyle);
       vectorLayer = new ol.layer.Vector(options);
-      view.on('change:resolution', onResolutionChange);
+      map.on('movestart', onMoveStart);
 
-      function onResolutionChange(evt) {
+      function onMoveStart(evt) {
         var mapZoom = parseInt(view.getZoom(), 10);
         var clusterDistance = options.source.getProperties().clusterDistance || distance;
         var clusterMaxZoom = options.source.getProperties().clusterMaxZoom || maxZoom;
-        if (mapZoom > clusterMaxZoom) {
-          options.source.setDistance(0);
-        } else if (mapZoom <= clusterMaxZoom) {
-          options.source.setDistance(clusterDistance);
-        }
+        map.once('moveend', function(evt) {
+          var currentZoom = parseInt(view.getZoom(), 10);
+          if (currentZoom !== mapZoom) {
+            if (mapZoom > clusterMaxZoom) {
+              options.source.setDistance(0);
+            } else if (mapZoom <= clusterMaxZoom) {
+              options.source.setDistance(clusterDistance);
+            }
+          }
+        })
       }
       break;
     case 'image':
