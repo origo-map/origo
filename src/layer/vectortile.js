@@ -4,6 +4,7 @@ var ol = require('openlayers');
 var $ = require('jquery');
 var viewer = require('../viewer');
 var vector = require('./vector');
+var maputils = require('../maputils');
 
 var vectortile = function vectortile(layerOptions) {
   var vectortileDefault = {
@@ -16,7 +17,12 @@ var vectortile = function vectortile(layerOptions) {
   var sourceOptions = $.extend(sourceDefault, viewer.getMapSource()[layerOptions.source]);
   sourceOptions.attributions = vectortileOptions.attribution;
   sourceOptions.projection = viewer.getProjectionCode() || 'EPSG:3857';
-  sourceOptions.tileGrid = viewer.getTileGrid();
+  if(sourceOptions.tileGrid){
+    sourceOptions.tileGrid = maputils.tileGrid(sourceOptions.tileGrid);
+  } else {
+    sourceOptions.tileGrid = viewer.getTileGrid();
+  }
+  
   var vectortileSource = createSource(sourceOptions, vectortileOptions);
   return vector(vectortileOptions, vectortileSource);
 }
