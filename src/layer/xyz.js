@@ -17,17 +17,22 @@ var xyz = function xyz(layerOptions) {
   sourceOptions.attributions = xyzOptions.attribution;
   sourceOptions.projection = viewer.getProjectionCode() || 'EPSG:3857';
   sourceOptions.tileGrid = viewer.getTileGrid();
-
+  if(xyzOptions.layerURL){
+    sourceOptions.url += xyzOptions.layerURL;
+  }
+  else {
+    var format = sourceOptions.sourceName.split('.')[1],
+      url = sourceOptions.sourceName.split('.')[0] + '/{z}/{x}/{y}.';
+    url += format;
+    sourceOptions.url = url;
+  }
   var xyzSource = createSource(sourceOptions);
   return tile(xyzOptions, xyzSource);
+}
 
-  function createSource(options) {
-    var format = options.sourceName.split('.')[1],
-      url = options.sourceName.split('.')[0] + '/{z}/{x}/{y}.';
-    url += format;
-    options.url = format;
-    return new ol.source.XYZ(options);
-  }
+function createSource(options) {
+  options.crossOrigin = 'anonymous';
+  return new ol.source.XYZ(options);
 }
 
 module.exports = xyz;

@@ -36,7 +36,8 @@ Not convinced? Or maybe you need some inspiration? Check out these examples of w
  * [Hallstakartan](http://karta.hallstahammar.se)
  * [Karlstadskartan](http://gi.karlstad.se)
  * [Mälardalskartan](http://www.malardalskartan.se)
- * [Sigtunakartan](https://karta.sigtuna.se/)
+ * [Sigtunakartan](https://karta.sigtuna.se)
+ * [Strängnäskartan](https://karta.strangnas.se)
  * [Västerås Stads samlingskarta](http://kartor.vasteras.se/sam)
 
 ## Developing with Origo

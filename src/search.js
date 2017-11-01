@@ -49,7 +49,7 @@ function init(options) {
   title = options.title || '';
   titleAttribute = options.titleAttribute || undefined;
   contentAttribute = options.contentAttribute || undefined;
-  maxZoomLevel = options.maxZoomLevel || 2;
+  maxZoomLevel = options.maxZoomLevel || Viewer.getResolutions().length - 2 || Viewer.getResolutions();
   limit = options.limit || 9;
   hintText = options.hintText || 'Sök...';
   hint = options.hasOwnProperty('hint') ? options.hint : true;
