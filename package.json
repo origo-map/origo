@@ -30,13 +30,17 @@
     "typeahead.js": "0.11.0"
   },
   "devDependencies": {
+    "babel-eslint": "^8.0.1",
     "browser-sync": "2.9.5",
     "browserify": "11.0.1",
     "browserify-shim": "3.8.10",
     "budo": "^9.0.0",
+    "eslint": "^4.10.0",
+    "eslint-config-airbnb-es5": "^1.2.0",
+    "eslint-plugin-react": "^7.4.0",
     "gulp": "3.9.1",
     "gulp-csso": "3.0.0",
-    "gulp-jshint": "^2.0.4",
+    "gulp-eslint": "^4.0.0",
     "gulp-rename": "1.2.2",
     "gulp-sass": "3.1.0",
     "gulp-sequence": "0.4.6",
@@ -44,7 +48,6 @@
     "gulp-util": "3.0.8",
     "handlebars": "4.0.5",
     "hbsfy": "2.5.1",
-    "jshint": "^2.9.5",
     "node-sass": "^3.13.0",
     "npm-run-all": "^3.1.2",
     "run-sequence": "^2.1.0",
@@ -60,6 +63,16 @@
         "hbsfy"
       ]
     ]
+  },
+  "eslintConfig": {
+    "env": {
+      "browser": true,
+      "node": true
+    },
+    "extends": "eslint-config-airbnb-es5",
+    "rules": {
+      "func-names": "off"
+    }
   },
   "browserify-shim": {}
 }
