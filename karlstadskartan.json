@@ -1,0 +1,4244 @@
+{
+	"controls": [{
+		"name": "home"
+	}, {
+		"name": "geoposition"
+	}, {
+		"name": "mapmenu"
+	}, {
+		"name": "sharemap"
+	}, {
+		"name": "print"
+	}, {
+		"name": "about",
+		"options": {
+      "buttontext": "Om kartan",
+      "title": "Om Karlstadskartan",
+      "content": "<p>Hej! Vad tycker du om Karlstadskartan? Finns det någon mer information som du skulle vilja ha i den? Hur tycker du att den fungerar? Vi vill gärna höra dina synpunkter! Mejla oss på <a href='mailto:kartservice@karlstad.se?Subject=Karlstadskartan' target='_top'>kartservice@karlstad.se</a></p>"
+    }
+	},{
+		"name": "legend"
+	}, {
+		"name": "search",
+		"options": {
+			"searchAttribute": "itssearch",
+			"northing": "y",
+			"easting": "x",
+			"url": "internal/search.php",
+			"title": "Sökresultat"
+		}
+	}, {
+		"name": "measure"
+	}, {
+    "name": "splash",
+    "options": {
+      "content": "<p><h6>Välkommen till Karlstadskartan!</h6> </p> <p>Om du vill kan du välja ett av alla filter för att se var i stan exempelvis skolor, busshållplatser, cykelvägar eller återvinningscentraler ligger.</p>"
+    }
+  },{
+    "name": "position",
+    "options": {
+      "title": "Sweref99 1330",
+      "projections": {
+        "EPSG:4326": "WGS84"
+      }
+    }
+  },
+    {
+      "name": "scaleLine"
+    }],
+  "footer": [{
+    "img": "img/karlstad/karlstadsol.png",
+    "url" : "http://www.karlstad.se",
+    "urlText": "Karlstads kommun"
+  }],
+	"projectionCode": "EPSG:3008",
+  "featureinfoOptions": {
+    "pinning": false,
+    "hitTolerance": 3
+  },
+  "tileGrid": {
+    "tileSize": 512,
+    "alignBottomLeft": true
+  },
+	"projectionExtent": [120000, 6556000, 191000, 6635000],
+	"proj4Defs": [{
+		"code": "EPSG:3008",
+		"alias": "urn:ogc:def:crs:EPSG::3008",
+		"projection": "+proj=tmerc +lat_0=0 +lon_0=13.5 +k=1 +x_0=150000 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
+	}],
+  "extent": [120000,6556000,191000,6635000],
+  "center": [149720, 6584950],
+  "home": [120000, 6556000, 191000, 6635000],
+  "zoom": 4,
+  "resolutions": [128,64,32,16,8,4,2,1,0.5,0.25,0.125],
+	"source": {
+		"geoserver": {
+			"url": "https://gi.karlstad.se/geoserver/ows",
+			"version": "1.1.0"
+		},    
+    "geoserver_tms": {
+      "url": "https://gi.karlstad.se/geoserver/gwc/service/tms/1.0.0/",
+      "tileGrid": {
+        "tileSize": 512,
+        "alignBottomLeft": false
+      }
+    }
+	},
+	"groups": [{
+		"name": "utbildning_barnomsorg",
+		"title": "Utbildning och barnomsorg",
+		"expanded": false,
+		"groups": [{
+			"name": "Busskort",
+			"title": "Busskortsavgränsning"
+			},{
+			"name": "Skolor",
+			"title": "Skolor",
+			"groups": [{
+				"name": "Friskolor",
+				"title": "Friskolor"
+			}]
+			},{
+			"name": "Skolomraden",
+			"title": "Skolområden"
+			}
+		]
+	}, {
+		"name": "uppleva_gora",
+		"title": "Uppleva och göra",
+		"expanded": false,
+		"groups": [{
+			"name": "Kultur",
+			"title": "Kultur"
+			},{
+			"name": "Motionofritid",
+			"title": "Fritid och motion"
+			},{
+			"name": "Sportanlaggningar",
+			"title": "Sportanläggningar"
+			}
+		]
+	}, {
+		"name": "omsorg_hjalp",
+		"title": "Omsorg och hjälp",
+		"expanded": false
+	}, {
+		"name": "bygga_bo",
+		"title": "Bygga och bo",
+		"expanded": false,
+		"groups": [{
+			"name": "Adressfast",
+			"title": "Adresser och fastigheter"
+			},{
+			"name": "Kulprog",
+			"title": "Kulturmiljöprogrammet",
+			"expanded": false,
+			"groups": [{
+				"name": "Byggnadsar",
+				"title": "Byggnadsår",
+				"abstract": "Kartlagret utgör en översiktlig beskrivning av Karlstads framväxt och vilka byggnader som finns kvar från olika tider. Informationen är tyvärr inte helt tillförlitlig då vissa byggnader registrerats på schablonårtal. Några årtal, särskilt 1909 och 1929, kan ibland vara missvisande."
+			}]
+			},{
+			"name": "Samhallsplanering",
+			"title": "Samhällsplanering"
+			}
+		]
+	}, {
+		"name": "miljo_energi",
+		"title": "Miljö och energi",
+		"expanded": false,
+			"groups": [{
+				"name": "livsmedelskontroller",
+				"title": "Livsmedelskollen"
+			}]
+	}, {
+		"name": "trafik_infrastruktur",
+		"title": "Trafik och infrastruktur",
+		"expanded": false,
+		"groups": [{
+			"name": "Kommunikationer",
+			"title": "Kommunikationer",
+			"groups": [{
+				"name": "Biljettstallen",
+				"title": "Biljetter Karlstadsbuss"
+			}, {
+				"name": "Busslinjer",
+				"title": "Busslinjer"
+			}, {
+				"name": "Batbuss",
+				"title": "Båtbuss"
+			}]
+			},{
+			"name": "Trafikogator",
+			"title": "Trafik och gator",
+			"groups": [{
+				"name": "Parkering",
+				"title": "Parkering"
+			}]
+			}
+		]
+	}, {
+		"name": "kommun_politik",
+		"title": "Kommun och politik",
+		"expanded": false
+	}, {
+		"name": "ovrigt",
+		"title": "Historiska kartor",
+		"expanded": false
+	}, {
+		"name": "ortofoton",
+		"title": "Flygbilder",
+		"expanded": false
+	}, {
+		"name": "background",
+		"title": "Bakgrundskartor",
+		"expanded": true
+	}],
+	
+	"layers": [
+		{
+			"name": "webbkartan:webbkarta_mf_buf_busskort_nobel",
+			"title": "Nobelgymnasiet",
+			"source": "geoserver",
+			"group": "Busskort",
+			"style": "busskortsavgransning_nobel",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 3,
+			"attributes": [{
+				"name": "namn",
+				"title": "Skola: "
+			}, {
+				"html": "<i>Är du elev på Nobelgymnasiet och bor inom detta område har du ej rätt till busskort.</i>"
+			}]
+		}, {
+			"name": "webbkartan:webbkarta_mf_buf_busskort_sag",
+			"title": "Sundsta-Älvkullen",
+			"source": "geoserver",
+			"group": "Busskort",
+			"style": "busskortsavgransning_sag",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 3,
+			"attributes": [{
+				"name": "namn",
+				"title": "Skola: "
+			}, {
+				"html": "<i>Är du elev på Sundsta-Älvkullegymnasiet och bor inom detta område har du ej rätt till busskort.</i>"
+			}]
+		}, {
+			"name": "webbkartan:webbkarta_mf_buf_busskort_tingvalla",
+			"title": "Tingvalla",
+			"source": "geoserver",
+			"group": "Busskort",
+			"style": "busskortsavgransning_tingvalla",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 3,
+			"attributes": [{
+				"name": "namn",
+				"title": "Skola: "
+			}, {
+				"html": "<i>Är du elev på Tingvallagymnasiet och bor inom detta område har du ej rätt till busskort.</i>"
+			}]
+		}, {
+			"name": "webbkartan:webbkarta_mf_buf_busskort_tullholmen",
+			"title": "Friskolorna Tullholmen",
+			"source": "geoserver",
+			"group": "Busskort",
+			"style": "busskortsavgransning_tullholmen",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 3,
+			"attributes": [{
+				"name": "namn",
+				"title": "Skola: "
+			}, {
+				"html": "<i>Är du elev på Tullholmsgymnasiet och bor inom detta område har du ej rätt till busskort.</i>"
+			}]
+		}, {
+			"name": "webbkartan:webbkarta_mf_buf_busskort_thoren",
+			"title": "Thorén",
+			"source": "geoserver",
+			"group": "Busskort",
+			"style": "busskortsavgransning_thoren",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 3,
+			"attributes": [{
+				"name": "namn",
+				"title": "Skola: "
+			}, {
+				"html": "<i>Är du elev på Thorén Business School och bor inom detta område har du ej rätt till busskort.</i>"
+			}]
+		}, {
+			"name": "webbkartan:webbkarta_mf_buf_busskort_molkomsfolkhogskola",
+			"title": "Molkoms Folkhögsk.",
+			"source": "geoserver",
+			"group": "Busskort",
+			"style": "busskortsavgransning_molkomsfolkhogskola",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 3,
+			"attributes": [{
+				"name": "namn",
+				"title": "Skola: "
+			}, {
+				"html": "<i>Är du elev på Molkoms Folkhögskola och bor inom detta område har du ej rätt till busskort.</i>"
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_mf_buf_busskort_klara",
+			"title": "Klara Gymnasium",
+			"source": "geoserver",
+			"group": "Busskort",
+			"style": "busskortsavgransning_klara",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 3,
+			"attributes": [{
+				"name": "namn",
+				"title": "Skola: "
+			}, {
+				"html": "<i>Är du elev på Klara Gymnasium och bor inom detta område har du ej rätt till busskort.</i>"
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_mf_buf_forskola",
+			"title": "Förskola",
+			"source": "geoserver",
+			"group": "Skolor",
+			"style": "forskola",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 5,
+			"attributes": [{
+				"name": "namn",
+				"title": "Skola: ",
+				"url": "lank"
+			}, {
+				"name": "adress",
+				"title": "Adress: "
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_mf_buf_skola",
+			"title": "Grundskola",
+			"source": "geoserver",
+			"group": "Skolor",
+			"style": "grundskola",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 5,
+			"attributes": [{
+				"name": "namn",
+				"title": "Skola: ",
+				"url": "lank"
+			}, {
+				"name": "adress",
+				"title": "Adress: "
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_mf_buf_gymnasium",
+			"title": "Gymnasium",
+			"source": "geoserver",
+			"group": "Skolor",
+			"style": "gymnasium",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 5,
+			"attributes": [{
+				"name": "namn",
+				"title": "Skola: ",
+				"url": "lank"
+			}, {
+				"name": "adress",
+				"title": "Adress: "
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_mf_buf_universitet",
+			"title": "Universitet",
+			"source": "geoserver",
+			"group": "Skolor",
+			"style": "universitet",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 5,
+			"attributes": [{
+				"name": "namn",
+				"title": "Skola: ",
+				"url": "lank"
+			}, {
+				"name": "adress",
+				"title": "Adress: "
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_mf_buf_enskforskola",
+			"title": "Friförskola",
+			"source": "geoserver",
+			"group": "Friskolor",
+			"style": "ensk_forskola",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 5,
+			"attributes": [{
+				"name": "namn",
+				"title": "Skola: ",
+				"url": "lank"
+			}, {
+				"name": "typ",
+				"title": "Typ: "
+			}, {
+				"name": "adress",
+				"title": "Adress: "
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_mf_buf_enskskola",
+			"title": "Friskola",
+			"source": "geoserver",
+			"group": "Friskolor",
+			"style": "ensk_skola",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 5,
+			"attributes": [{
+				"name": "namn",
+				"title": "Skola: ",
+				"url": "lank"
+			}, {
+				"name": "typ",
+				"title": "Typ: "
+			}, {
+				"name": "adress",
+				"title": "Adress: "
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_mf_buf_enskgymnasium",
+			"title": "Frigymnasium",
+			"source": "geoserver",
+			"group": "Friskolor",
+			"style": "ensk_gymnasium",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 5,
+			"attributes": [{
+				"name": "namn",
+				"title": "Skola: ",
+				"url": "lank"
+			}, {
+				"name": "typ",
+				"title": "Typ: "
+			}, {
+				"name": "adress",
+				"title": "Adress: "
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_mf_buf_upptagomr_h",
+			"title": "Upptag högstadium",
+			"source": "geoserver",
+			"group": "Skolomraden",
+			"style": "upptag_h",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 3,
+			"attributes": [{
+				"name": "skola",
+				"title": "Skola: "
+			}, {
+				"name": "upptagning",
+				"title": "Upptagningsområde: "
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_mf_buf_upptagomr_ml",
+			"title": "Anvisad låg-/mellanst.",
+			"source": "geoserver",
+			"group": "Skolomraden",
+			"style": "upptag_ml",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 3,
+			"attributes": [{
+				"name": "skola",
+				"title": "Skola: "
+			}, {
+				"name": "upptagning",
+				"title": "Upptagningsområde: "
+			}]
+		},
+		
+		{
+			"name": "webbkartan:vy_webbkarta_kf_bibliotek",
+			"title": "Bibliotek",
+			"source": "geoserver",
+			"group": "Kultur",
+			"style": "bibliotek",
+			"type": "WFS",
+			"featuretype": 5,
+			"visible": false,
+			"attributes": [{
+				"title": "Namn: ",
+				"name": "namn",
+				"url": "lank"
+			}, {
+				"title": "Adress: ",
+				"name": "adress"
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_kf_film",
+			"title": "Film",
+			"source": "geoserver",
+			"group": "Kultur",
+			"style": "film",
+			"type": "WFS",
+			"featuretype": 5,
+			"visible": false,
+			"attributes": [{
+				"title": "Namn: ",
+				"name": "namn",
+				"url": "lank"
+			}, {
+				"title": "Adress: ",
+				"name": "adress"
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_kf_teater",
+			"title": "Teater",
+			"source": "geoserver",
+			"group": "Kultur",
+			"style": "teater",
+			"type": "WFS",
+			"featuretype": 5,
+			"visible": false,
+			"attributes": [{
+				"title": "Namn: ",
+				"name": "namn",
+				"url": "lank"
+			}, {
+				"title": "Adress: ",
+				"name": "adress"
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_kf_konst",
+			"title": "Konst",
+			"source": "geoserver",
+			"group": "Kultur",
+			"style": "konst",
+			"type": "WFS",
+			"featuretype": 5,
+			"visible": false,
+			"attributes": [{
+				"title": "Namn: ",
+				"name": "namn",
+				"url": "lank"
+			}, {
+				"title": "Adress: ",
+				"name": "adress"
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_kf_museer",
+			"title": "Museer",
+			"source": "geoserver",
+			"group": "Kultur",
+			"style": "museer",
+			"type": "WFS",
+			"featuretype": 5,
+			"visible": false,
+			"attributes": [{
+				"title": "Namn: ",
+				"name": "namn",
+				"url": "lank"
+			}, {
+				"title": "Adress: ",
+				"name": "adress"
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_kf_sevardheter",
+			"title": "Sevärdheter",
+			"source": "geoserver",
+			"group": "Kultur",
+			"style": "sevardheter",
+			"type": "WFS",
+			"featuretype": 5,
+			"visible": false,
+			"attributes": [{
+				"title": "Namn: ",
+				"name": "namn",
+				"url": "lank"
+			}, {
+				"title": "Adress: ",
+				"name": "adress"
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_na_np_badplatser",
+			"title": "Badplatser",
+			"source": "geoserver",
+			"group": "Motionofritid",
+			"style": "badplatser",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 5,
+			"attributes": [{
+				"name": "namn",
+				"title": "Namn: "
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_np_golfbana_bangolf",
+			"title": "Bangolf",
+			"source": "geoserver",
+			"group": "Motionofritid",
+			"style": "bangolf",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 5,
+			"attributes": [{
+				"name": "namn",
+				"title": "Namn: ",
+				"url": "lank"
+			}, {
+				"name": "adress",
+				"title": "Adress: "
+			}, {
+				"name": "webben",
+				"title": "Typ: "
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_np_golfbana_golfbana",
+			"title": "Golfbana",
+			"source": "geoserver",
+			"group": "Motionofritid",
+			"style": "golfbana",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 5,
+			"attributes": [{
+				"name": "namn",
+				"title": "Namn: ",
+				"url": "lank"
+			}, {
+				"name": "adress",
+				"title": "Adress: "
+			}, {
+				"name": "webben",
+				"title": "Typ: "
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_na_np_lekplatser",
+			"title": "Lekplatser",
+			"source": "geoserver",
+			"group": "Motionofritid",
+			"style": "lekplatser",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 5,
+			"attributes": [{
+				"name": "namn",
+				"title": "Namn: "
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_kf_skytte",
+			"title": "Skytte",
+			"source": "geoserver",
+			"group": "Motionofritid",
+			"style": "skytte",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 5,
+			"attributes": [{
+				"name": "namn"
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_na_np_smabatshamn",
+			"title": "Småbåtshamn",
+			"source": "geoserver",
+			"group": "Motionofritid",
+			"style": "smabatshamn",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 5,
+			"attributes": [{
+				"name": "namn",
+				"title": "Namn: "
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_kf_klaralvsbanan",
+			"title": "Klarälvsbanan",
+			"source": "geoserver",
+			"group": "Motionofritid",
+			"style": "klaralvsbanan",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 4,
+			"attributes": [{
+				"title": "Namn: ",
+				"name": "namn"
+			}, {
+				"html": "<a href='http://www.klaralvsbanan.se/' target='_blank'>Mer information</a>"
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_na_np_parker",
+			"title": "Parker",
+			"source": "geoserver",
+			"group": "Motionofritid",
+			"style": "park",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 3,
+			"attributes": [{
+				"name": "namn"
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_kf_sportanlaggningar_bandy",
+			"title": "Bandy",
+			"source": "geoserver",
+			"group": "Sportanlaggningar",
+			"style": "sportanlaggningar_bandy",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 5,
+			"attributes": [{
+				"title": "Namn: ",
+				"name": "namn",
+				"url": "lank"
+			}, {
+				"title": "Adress: ",
+				"name": "adress"
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_kf_sportanlaggningar_hastsport",
+			"title": "Hästsport",
+			"source": "geoserver",
+			"group": "Sportanlaggningar",
+			"style": "sportanlaggningar_hastsport",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 5,
+			"attributes": [{
+				"title": "Namn: ",
+				"name": "namn",
+				"url": "lank"
+			}, {
+				"title": "Adress: ",
+				"name": "adress"
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_kf_sportanlaggningar_ishockey",
+			"title": "Ishockey",
+			"source": "geoserver",
+			"group": "Sportanlaggningar",
+			"style": "sportanlaggningar_ishockey",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 5,
+			"attributes": [{
+				"title": "Namn: ",
+				"name": "namn",
+				"url": "lank"
+			}, {
+				"title": "Adress: ",
+				"name": "adress"
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_kf_sportanlaggningar_motorsport",
+			"title": "Motorsport",
+			"source": "geoserver",
+			"group": "Sportanlaggningar",
+			"style": "sportanlaggningar_motorsport",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 5,
+			"attributes": [{
+				"title": "Namn: ",
+				"name": "namn",
+				"url": "lank"
+			}, {
+				"title": "Adress: ",
+				"name": "adress"
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_kf_sportanlaggningar_skidbacke",
+			"title": "Skidbacke",
+			"source": "geoserver",
+			"group": "Sportanlaggningar",
+			"style": "sportanlaggningar_skidbacke",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 5,
+			"attributes": [{
+				"title": "Namn: ",
+				"name": "namn",
+				"url": "lank"
+			}, {
+				"title": "Adress: ",
+				"name": "adress"
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_kf_sportanlaggningar_ovriga",
+			"title": "Övriga",
+			"source": "geoserver",
+			"group": "Sportanlaggningar",
+			"style": "sportanlaggningar_ovriga",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 5,
+			"attributes": [{
+				"title": "Namn: ",
+				"name": "namn",
+				"url": "lank"
+			}, {
+				"title": "Adress: ",
+				"name": "adress"
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_np_motionovandringsymboler",
+			"title": "Friluftsliv",
+			"source": "geoserver",
+			"group": "Motionofritid",
+			"style": "motionovandringsymboler",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 5,
+			"attributes": [{
+				"title": "Typ: ",
+				"name": "klartext"
+			},{
+				"title": "Plats: ",
+				"name": "plats"
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_kf_motionovandring",
+			"title": "Motionsspår",
+			"source": "geoserver",
+			"group": "Motionofritid",
+			"style": "motionovandring",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 4,
+			"attributes": [{
+				"title": "Namn: ",
+				"name": "namn",
+				"url": "lank"
+			}, {
+				"title": "Spårlängd: ",
+				"name": "sparlangd"
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_na_np_naturcykelturer",
+			"title": "Naturcykeltur",
+			"source": "geoserver",
+			"group": "Motionofritid",
+			"style": "cykeltur",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 4,
+			"attributes": [{
+				"title": "Namn: ",
+				"name": "namn"
+			}, {
+				"title": "Startpunkt: ",
+				"name": "startpunkt"
+			}, {
+				"title": "Längd: ",
+				"name": "langd"
+			}, {
+				"html": "<a href='http://karlstad.se/uppleva-och-gora/friluftsliv-och-motion/cykling/cykeltur-/' target='_blank'>Mer information</a>"
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_kd_turistbyra",
+			"title": "Turistbyrå",
+			"source": "geoserver",
+			"group": "uppleva_gora",
+			"style": "turistbyra",
+			"type": "WFS",
+			"featuretype": 5,
+			"visible": false,
+			"attributes": [{
+				"name": "namn",
+				"title": "Namn: ",
+				"url": "lank"
+			}, {
+				"name": "adress",
+				"title": "Adress: "
+			}]
+		}, 
+		
+		{
+			"name": "webbkartan:vy_webbkarta_mi_konsumentomiljorad",
+			"title": "Konsument- och miljöråd",
+			"source": "geoserver",
+			"group": "omsorg_hjalp",
+			"style": "konsumentomiljorad",
+			"type": "WFS",
+			"featuretype": 5,
+			"visible": false,
+			"attributes": [{
+				"name": "namn",
+				"title": "Namn: ",
+				"url": "lank"
+			}, {
+				"name": "adress",
+				"title": "Adress: "
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_kd_polisstation",
+			"title": "Polisstation",
+			"source": "geoserver",
+			"group": "omsorg_hjalp",
+			"style": "polisstation",
+			"type": "WFS",
+			"featuretype": 5,
+			"visible": false,
+			"attributes": [{
+				"name": "namn",
+				"title": "Namn: ",
+				"url": "lank"
+			}, {
+				"name": "adress",
+				"title": "Adress: "
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_kd_brandstation",
+			"title": "Räddningstjänst",
+			"source": "geoserver",
+			"group": "omsorg_hjalp",
+			"style": "brandstation",
+			"type": "WFS",
+			"featuretype": 5,
+			"visible": false,
+			"attributes": [{
+				"name": "namn",
+				"title": "Namn: ",
+				"url": "lank"
+			}, {
+				"name": "adress",
+				"title": "Adress: "
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_kd_sjukhus",
+			"title": "Sjukhus",
+			"source": "geoserver",
+			"group": "omsorg_hjalp",
+			"style": "sjukhus",
+			"type": "WFS",
+			"featuretype": 5,
+			"visible": false,
+			"attributes": [{
+				"name": "namn",
+				"title": "Namn: ",
+				"url": "lank"
+			}, {
+				"name": "adress",
+				"title": "Adress: "
+			}]
+		}, {
+			"name": "webbkartan:vy_asf_vux_verksamheter_externa",
+			"title": "Stödverksamheter",
+			"source": "geoserver",
+			"group": "omsorg_hjalp",
+			"style": "stodverksamheter",
+			"type": "WFS",
+			"featuretype": 5,
+			"visible": false,
+			"attributes": [{
+				"name": "namn",
+				"title": "Namn: ",
+				"url": "lank"
+			}, {
+				"name": "adress",
+				"title": "Adress: "
+			}, {
+				"name": "verksamhet",
+				"title": "Verksamhet: "
+			}, {
+				"name": "omrade",
+				"title": "Område: "
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_kd_trygghetscenter",
+			"title": "Trygghetscenter",
+			"source": "geoserver",
+			"group": "omsorg_hjalp",
+			"style": "trygghetscenter",
+			"type": "WFS",
+			"featuretype": 5,
+			"visible": false,
+			"attributes": [{
+				"name": "namn",
+				"title": "Namn: ",
+				"url": "lank"
+			}, {
+				"name": "adress",
+				"title": "Adress: "
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_vo_vardboende",
+			"title": "Vårdboende",
+			"source": "geoserver",
+			"group": "omsorg_hjalp",
+			"style": "vardboende",
+			"type": "WFS",
+			"featuretype": 5,
+			"visible": false,
+			"attributes": [{
+				"name": "namn",
+				"title": "Namn: ",
+				"url": "lank"
+			}, {
+				"name": "adress",
+				"title": "Adress: "
+			}, {
+				"name": "ort",
+				"title": "Ort: "
+			}]
+		},
+		
+		{
+			"name": "webbkartan:vy_lm_fa_adresser",
+			"title": "Adresser",
+			"source": "geoserver",
+			"group": "Adressfast",
+			"style": "empty",
+			"type": "WMS",
+			"format": "image/png",
+			"maxScale": 5000,
+			"visible": false,
+			"queryable": true,
+			"featuretype": 5,
+			"attributes": [{
+				"name": "itssearch"
+			}]
+		}, {
+			"name": "webbkartan:fastighetsgranser",
+			"title": "Fastighetsgränser",
+			"source": "geoserver",
+			"group": "Adressfast",
+			"style": "fastigheter",
+			"type": "WFS",
+			"maxScale": 10000,
+			"visible": false,
+			"featuretype": 3,
+			"attributes": [{
+				"name": "fastbet",
+				"title": "Fastighetsbeteckning: "
+			}, {
+				"html": "<i>Gränserna är endast illustrativa och inte juridiskt bindande.</i>"
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_ad_adm_stadsdelar",
+			"title": "Stadsdelsgränser",
+			"source": "geoserver",
+			"group": "Adressfast",
+			"style": "stadsdelar",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 3,
+			"attributes": [{
+				"name": "itslabel",
+				"title": "Namn: "
+			}]
+		}, {
+			"name": "webbkartan:vy_mx_mex_kvbostad_tomtkatalog",
+			"title": "Tomter till försäljning",
+			"source": "geoserver",
+			"group": "Adressfast",
+			"style": "tomtmark",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 3,
+			"attributes": [{
+				"name": "extid",
+				"title": "Tomt: "
+			}, {
+				"html": "<a href='http://karlstad.se/bygga-och-bo/bostader/lediga-villatomter/' target='_blank'>Mer information</a>"
+			}]
+		}, {		
+			"name": "1865",														"opacity": 1,
+			"title": "Före 1865",											"group": "Byggnadsar",
+			"timeline": "byggnadsar",													"queryable": true,
+			"source": "data/karlstad/-1864.geojson",			"style": "byggar_1865",
+			"type": "GEOJSON",		     								"featuretype": 3,
+			"visible": false,													"timelineOrder": 1,
+			"attributes": [{"title": "Byggnadsår: ", "name": "ar_nybygg"}, {
+				"html": "<p><br><i>Angivet årtal är inte alltid helt tillförlitligt och bör endast ses som ett riktmärke.</i></p>"
+			}]
+		},{		
+			"name": "1865-1899",											"opacity": 1,
+			"title": "1865-1899",											"group": "Byggnadsar",
+			"timeline": "byggnadsar",													"queryable": true,
+			"source": "data/karlstad/1865-1899.geojson",	"style": "byggar_1865_1899",
+			"type": "GEOJSON",			     	"featuretype": 3,
+			"visible": false,							"timelineOrder": 2,
+			"attributes": [{"title": "Byggnadsår: ", "name": "ar_nybygg"}, {
+				"html": "<p><br><i>Angivet årtal är inte alltid helt tillförlitligt och bör endast ses som ett riktmärke.</i></p>"
+			}]
+		},{		
+			"name": "1900-1919",											"opacity": 1,
+			"title": "1900-1919",											"group": "Byggnadsar",
+			"timeline": "byggnadsar",							"queryable": true,
+			"source": "data/karlstad/1900-1919.geojson",	"style": "byggar_1900_1919",
+			"type": "GEOJSON",						"featuretype": 3,
+			"visible": false,							"timelineOrder": 3,
+			"attributes": [{"title": "Byggnadsår: ", "name": "ar_nybygg"}, {
+				"html": "<p><br><i>Angivet årtal är inte alltid helt tillförlitligt och bör endast ses som ett riktmärke.</i></p>"
+			}]
+		},{		
+			"name": "1920-1929",						"opacity": 1,
+			"title": "1920-1929",						"group": "Byggnadsar",
+			"timeline": "byggnadsar",							"queryable": true,
+			"source": "data/karlstad/1920-1929.geojson",	"style": "byggar_1920_1929",
+			"type": "GEOJSON",						"featuretype": 3,
+			"visible": false,							"timelineOrder": 4,
+			"attributes": [{"title": "Byggnadsår: ", "name": "ar_nybygg"}, {
+				"html": "<p><br><i>Angivet årtal är inte alltid helt tillförlitligt och bör endast ses som ett riktmärke.</i></p>"
+			}]
+		},{		
+			"name": "1930-1939",						"opacity": 1,
+			"title": "1930-1939",						"group": "Byggnadsar",
+			"timeline": "byggnadsar",							"queryable": true,
+			"source": "data/karlstad/1930-1939.geojson",	"style": "byggar_1930_1939",
+			"type": "GEOJSON",						"featuretype": 3,
+			"visible": false,							"timelineOrder": 5,
+			"attributes": [{"title": "Byggnadsår: ", "name": "ar_nybygg"}, {
+				"html": "<p><br><i>Angivet årtal är inte alltid helt tillförlitligt och bör endast ses som ett riktmärke.</i></p>"
+			}]
+		},{		
+			"name": "1940-1949",						"opacity": 1,
+			"title": "1940-1949",						"group": "Byggnadsar",
+			"timeline": "byggnadsar",							"queryable": true,
+			"source": "data/karlstad/1940-1949.geojson",	"style": "byggar_1940_1949",
+			"type": "GEOJSON",						"featuretype": 3,
+			"visible": false,							"timelineOrder": 6,
+			"attributes": [{"title": "Byggnadsår: ", "name": "ar_nybygg"}, {
+				"html": "<p><br><i>Angivet årtal är inte alltid helt tillförlitligt och bör endast ses som ett riktmärke.</i></p>"
+			}]
+		},{		
+			"name": "1950-1959",						"opacity": 1,
+			"title": "1950-1959",						"group": "Byggnadsar",
+			"timeline": "byggnadsar",							"queryable": true,
+			"source": "data/karlstad/1950-1959.geojson",	"style": "byggar_1950_1959",
+			"type": "GEOJSON",						"featuretype": 3,
+			"visible": false,							"timelineOrder": 7,
+			"attributes": [{"title": "Byggnadsår: ", "name": "ar_nybygg"}, {
+				"html": "<p><br><i>Angivet årtal är inte alltid helt tillförlitligt och bör endast ses som ett riktmärke.</i></p>"
+			}]
+		},{		
+			"name": "1960-1969",						"opacity": 1,
+			"title": "1960-1969",						"group": "Byggnadsar",
+			"timeline": "byggnadsar",							"queryable": true,
+			"source": "data/karlstad/1960-1969.geojson",	"style": "byggar_1960_1969",
+			"type": "GEOJSON",						"featuretype": 3,
+			"visible": false,							"timelineOrder": 8,
+			"attributes": [{"title": "Byggnadsår: ", "name": "ar_nybygg"}, {
+				"html": "<p><br><i>Angivet årtal är inte alltid helt tillförlitligt och bör endast ses som ett riktmärke.</i></p>"
+			}]
+		},{		
+			"name": "1970-1979",						"opacity": 1,
+			"title": "1970-1979",						"group": "Byggnadsar",
+			"timeline": "byggnadsar",							"queryable": true,
+			"source": "data/karlstad/1970-1979.geojson",	"style": "byggar_1970_1979",
+			"type": "GEOJSON",						"featuretype": 3,
+			"visible": false,							"timelineOrder": 9,
+			"attributes": [{"title": "Byggnadsår: ", "name": "ar_nybygg"}, {
+				"html": "<p><br><i>Angivet årtal är inte alltid helt tillförlitligt och bör endast ses som ett riktmärke.</i></p>"
+			}]
+		},{		
+			"name": "1980-1989",						"opacity": 1,
+			"title": "1980-1989",						"group": "Byggnadsar",
+			"timeline": "byggnadsar",							"queryable": true,
+			"source": "data/karlstad/1980-1989.geojson",	"style": "byggar_1980_1989",
+			"type": "GEOJSON",						"featuretype": 3,
+			"visible": false,							"timelineOrder": 10,
+			"attributes": [{"title": "Byggnadsår: ", "name": "ar_nybygg"}, {
+				"html": "<p><br><i>Angivet årtal är inte alltid helt tillförlitligt och bör endast ses som ett riktmärke.</i></p>"
+			}]
+		},{		
+			"name": "1990-1999",						"opacity": 1,
+			"title": "1990-1999",						"group": "Byggnadsar",
+			"timeline": "byggnadsar",							"queryable": true,
+			"source": "data/karlstad/1990-1999.geojson",	"style": "byggar_1990_1999",
+			"type": "GEOJSON",						"featuretype": 3,
+			"visible": false,							"timelineOrder": 11,
+			"attributes": [{"title": "Byggnadsår: ", "name": "ar_nybygg"}, {
+				"html": "<p><br><i>Angivet årtal är inte alltid helt tillförlitligt och bör endast ses som ett riktmärke.</i></p>"
+			}]
+		},{		
+			"name": "2000-2015",						"opacity": 1,
+			"title": "2000-2015",						"group": "Byggnadsar",
+			"timeline": "byggnadsar",							"queryable": true,
+			"source": "data/karlstad/2000-2015.geojson",	"style": "byggar_2000_2015",
+			"type": "GEOJSON",						"featuretype": 3,
+			"visible": false,							"timelineOrder": 12,
+			"attributes": [{"title": "Byggnadsår: ", "name": "ar_nybygg"}, {
+				"html": "<p><br><i>Angivet årtal är inte alltid helt tillförlitligt och bör endast ses som ett riktmärke.</i></p>"
+			}]
+		}, {
+			"name": "webbkartan:kulprog_byggnad",
+			"title": "Värdefulla byggnader",
+			"source": "geoserver",
+			"group": "Kulprog",
+			"style": "kulprog_byggnader",
+			"type": "WFS",
+			"featuretype": 3,
+			"visible": false,
+			"attributes": [{
+				"title": "Namn: ",
+				"name": "gammal_fastighet",
+				"urlPrefix": "https://gi.karlstad.se/kulprog/visa.php?typ=byggnad&id=",
+				"url": "id",
+				"runFunction": "showInfo",
+				"functionParam": "url"
+			}]
+		}, {
+			"name": "webbkartan:kulprog_miljo",
+			"title": "Värdefulla miljöer",
+			"source": "geoserver",
+			"group": "Kulprog",
+			"style": "kulprog_miljoer",
+			"type": "WFS",
+			"featuretype": 3,
+			"visible": false,
+			"attributes": [{
+				"title": "Namn: ",
+				"name": "namn",
+				"urlPrefix": "https://gi.karlstad.se/kulprog/visa.php?typ=miljo&id=",
+				"url": "id",
+				"runFunction": "showInfo",
+				"functionParam": "url"
+			}]
+		}, {
+			"name": "webbkartan:pl_plan_pagaendeplaner",
+			"title": "Pågående planer",
+			"source": "geoserver",
+			"group": "Samhallsplanering",
+			"style": "pagaendeplaner",
+			"type": "WFS",
+			"featuretype": 3,
+			"visible": false,
+			"attributes": [{
+				"title": "Område: ",
+				"name": "itstitle",
+				"url": "url"
+			}]
+		}, {
+			"name": "webbkartan:webbkarta_gallande_planer",
+			"title": "Gällande detaljplaner",
+			"source": "geoserver",
+			"group": "Samhallsplanering",
+			"style": "detaljplan",
+			"type": "WFS",
+			"maxScale": 75000,
+			"featuretype": 3,
+			"visible": false,
+			"attributes": [{
+				"name": "akt",
+				"title": "Akt: "
+			}, {
+				"name": "plankarta_text",
+				"url": "pdf_url",
+				"urlPrefix": "http://gi.karlstad.se/plankarta/"
+			}, {
+				"name": "planbesk_text",
+				"url": "pdf_url",
+				"urlPrefix": "http://gi.karlstad.se/planbeskrivning/"
+			}, {
+				"html": "<p><i>Planen gäller för markerat område. <br />Observera att delar av planen kan ha ändrats eller upphävts i andra planer.</i></p>"
+			}]
+		}, {
+			"name": "webbkartan:webbkarta_fop",
+			"title": "Fördj. översiktsplaner",
+			"source": "geoserver",
+			"group": "Samhallsplanering",
+			"style": "fop",
+			"type": "WFS",
+			"featuretype": 3,
+			"visible": false,
+			"attributes": [{
+				"name": "extid",
+				"title": "Område: "
+			}, {
+				"html": "<br><a href='http://karlstad.se/bygga-och-bo/kommunens-planarbete/oversiktsplanering/fordjupade-oversiktsplaner/' target='_blank'>Mer information om fördjupade översiktsplaner</a>"
+			}]
+		}, {
+			"name": "webbkartan:webbkarta_planprogram",
+			"title": "Planprogram",
+			"source": "geoserver",
+			"group": "Samhallsplanering",
+			"style": "program",
+			"type": "WFS",
+			"featuretype": 3,
+			"visible": false,
+			"attributes": [{
+				"name": "extid",
+				"title": "Område: ",
+				"url": "url"
+			}, {
+				"html": "<br><a href='http://karlstad.se/bygga-och-bo/kommunens-planarbete/detaljplaner/godkanda-planprogram/' target='_blank'>Mer information om godkända planer</a>"
+			}]
+		},{
+			"name": "webbkartan:vy_mi_miljo_livsmedelskontroller_mobilanlaggning",
+			"title": "Mobil anläggning",
+			"source": "geoserver",
+			"queryable": false,
+			"group": "none",
+			"style": "livsmedelskontroller_mobilanlaggning",
+			"featuretype": 5,
+			"type": "WFS",
+			"maxScale": 100000,
+			"visible": true,
+			"attributes": [{
+				"name": "namn",
+				"cls": "h6"
+			}, {
+				"name": "datum",
+				"title": "Kontrolldatum: "
+			}, {
+				"name": "uppfoljning_klartext",
+				"title": "Resultat: "
+			}, {
+				"html": "<p><br>Mer information</p>",
+				"runFunction": "showInfo",
+				"functionParam": "url"
+			}]
+		}, 
+		
+		{
+			"name": "webbkartan:vy_mi_miljo_livsmedelskontroller_butikhandel",
+			"title": "Butik/Handel",
+			"source": "geoserver",
+			"group": "livsmedelskontroller",
+			"style": "livsmedelskontroller_butikhandel",
+			"clusterStyle": "livsmedelskontroller_butikhandel_cluster",
+			"layerType": "cluster",
+			"featuretype": 5,
+			"type": "WFS",
+			"maxScale": 100000,
+			"visible": false,
+			"attributes": [{
+				"name": "namn",
+				"cls": "h6"
+			}, {
+				"name": "datum",
+				"title": "Kontrolldatum: "
+			}, {
+				"name": "uppfoljning_klartext",
+				"title": "Resultat: "
+			}, {
+				"html": "<p><br>Mer information</p>",
+				"runFunction": "showInfo",
+				"functionParam": "url"
+			}]
+		}, {
+			"name": "webbkartan:vy_mi_miljo_livsmedelskontroller_restauranger",
+			"title": "Restaurang/Servering",
+			"source": "geoserver",
+			"group": "livsmedelskontroller",
+			"style": "livsmedelskontroller_restauranger",
+			"clusterStyle": "livsmedelskontroller_restauranger_cluster",
+			"layerType": "cluster",
+			"featuretype": 5,
+			"type": "WFS",
+			"maxScale": 100000,
+			"visible": false,
+			"attributes": [{
+				"name": "namn",
+				"cls": "h6"
+			}, {
+				"name": "datum",
+				"title": "Kontrolldatum: "
+			}, {
+				"name": "uppfoljning_klartext",
+				"title": "Resultat: "
+			}, {
+				"html": "<p><br>Mer information</p>",
+				"runFunction": "showInfo",
+				"functionParam": "url"
+			}]
+		}, {
+			"name": "webbkartan:vy_mi_miljo_livsmedelskontroller_skolaomsorg",
+			"title": "Skola/Omsorg",
+			"source": "geoserver",
+			"group": "livsmedelskontroller",
+			"style": "livsmedelskontroller_skolaomsorg",
+			"clusterStyle": "livsmedelskontroller_skolaomsorg_cluster",
+			"layerType": "cluster",
+			"featuretype": 5,
+			"type": "WFS",
+			"maxScale": 100000,
+			"visible": false,
+			"attributes": [{
+				"name": "namn",
+				"cls": "h6"
+			}, {
+				"name": "datum",
+				"title": "Kontrolldatum: "
+			}, {
+				"name": "uppfoljning_klartext",
+				"title": "Resultat: "
+			}, {
+				"html": "<p><br>Mer information</p>",
+				"runFunction": "showInfo",
+				"functionParam": "url"
+			}]
+		}, {
+			"name": "webbkartan:vy_mi_miljo_livsmedelskontroller_ovrigt",
+			"title": "Övriga verksamheter",
+			"source": "geoserver",
+			"group": "livsmedelskontroller",
+			"style": "livsmedelskontroller_ovrigt",
+			"clusterStyle": "livsmedelskontroller_ovrigt_cluster",
+			"layerType": "cluster",
+			"featuretype": 5,
+			"type": "WFS",
+			"maxScale": 100000,
+			"visible": false,
+			"attributes": [{
+				"name": "namn",
+				"cls": "h6"
+			}, {
+				"name": "datum",
+				"title": "Kontrolldatum: "
+			}, {
+				"name": "uppfoljning_klartext",
+				"title": "Resultat: "
+			}, {
+				"html": "<p><br>Mer information</p>",
+				"runFunction": "showInfo",
+				"functionParam": "url"
+			}]
+		}, {
+			"name": "webbkartan:vy_mi_miljo_livsmedelskontroller_okontrollerade",
+			"title": "Ej kontrollerade",
+			"source": "geoserver",
+			"group": "livsmedelskontroller",
+			"style": "livsmedelskontroller_okontrollerade",
+			"clusterStyle": "livsmedelskontroller_okontrollerade_cluster",
+			"layerType": "cluster",
+			"featuretype": 5,
+			"type": "WFS",
+			"maxScale": 100000,
+			"visible": false,
+			"attributes": [{
+				"name": "namn",
+				"cls": "h6"
+			}, {
+				"name": "datum",
+				"title": "Kontrolldatum: "
+			}, {
+				"name": "uppfoljning_klartext",
+				"title": "Resultat: "
+			}, {
+				"html": "<p><br>Mer information</p>",
+				"runFunction": "showInfo",
+				"functionParam": "url"
+			}]
+		},
+		
+		{
+			"name": "webbkartan:vy_webbkarta_tg_vattennivamatare",
+			"title": "Vattennivåmätare",
+			"queryable": true,
+			"source": "geoserver",
+			"group": "miljo_energi",
+			"style": "vattennivamatare",
+			"type": "WFS",
+			"featuretype": 5,
+			"visible": false,
+			"attributes": [{
+				"name": "namn",
+				"title": "Mätstation: ",
+				"url": "lank"
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_mx_atervinning",
+			"title": "Återvinning",
+			"source": "geoserver",
+			"group": "miljo_energi",
+			"style": "atervinning",
+			"type": "WFS",
+			"featuretype": 5,
+			"visible": false,
+			"attributes": [{
+				"name": "namn",
+				"title": "Namn: ",
+				"url": "lank"
+			}, {
+				"name": "webben",
+				"title": "Typ: "
+			}, {
+				"name": "adress",
+				"title": "Adress: "
+			}]
+		}, 
+		
+		{
+			"name": "webbkartan:vy_tg_buss_biljettstallen_kundcenter",
+			"title": "KundCenter",
+			"source": "geoserver",
+			"group": "Biljettstallen",
+			"style": "biljettstallen_kundcenter",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 5,
+			"attributes": [{
+				"name": "namn",
+				"cls": "header1"
+			}, {
+				"name": "adress"
+			}, {
+				"name": "infotext",
+				"title": "<br>"
+			}, {
+				"html": "<br>Information om öppettider etc.",
+				"url": "lank"
+			}, {
+				"html": "<br>E-post: <a href='mailto:karlstadsbuss@karlstad.se' target='_top'>karlstadsbuss@karlstad.se</a>"
+			}]
+		}, {
+			"name": "webbkartan:vy_tg_buss_biljettstallen_ombud",
+			"title": "Ombud",
+			"source": "geoserver",
+			"group": "Biljettstallen",
+			"style": "biljettstallen_ombud",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 5,
+			"attributes": [{
+				"name": "namn",
+				"cls": "header1"
+			}, {
+				"name": "adress"
+			}, {
+				"name": "infotext",
+				"title": "<br>"
+			}, {
+				"html": "<br>Information om öppettider etc.",
+				"url": "lank"
+			}]
+		}, {
+			"name": "webbkartan:vy_tg_buss_biljettstallen_stor",
+			"title": "Stor biljettautomat",
+			"source": "geoserver",
+			"group": "Biljettstallen",
+			"style": "biljettstallen_stor",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 5,
+			"attributes": [{
+				"name": "namn",
+				"cls": "header1"
+			}, {
+				"name": "infotext",
+				"title": "<br>"
+			}, {
+				"html": "<br>Information om öppettider etc.",
+				"url": "lank"
+			}]
+		}, {
+			"name": "webbkartan:vy_tg_buss_biljettstallen_liten",
+			"title": "Liten biljettautomat",
+			"source": "geoserver",
+			"group": "Biljettstallen",
+			"style": "biljettstallen_liten",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 5,
+			"attributes": [{
+				"name": "namn",
+				"cls": "header1"
+			}, {
+				"name": "infotext",
+				"title": "<br>"
+			}, {
+				"html": "<br>Information om öppettider etc.",
+				"url": "lank"
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_tg_buss_hplbusskarta",
+			"title": "Busshållplatser",
+			"source": "geoserver",
+			"group": "Kommunikationer",
+			"style": "buss_hpl",
+			"clusterStyle": "buss_hpl_cluster",
+			"type": "WFS",
+			"visible": false,
+			"layerType": "cluster",
+			"clusterDist": 40,
+			"featuretype": 5,
+			"attributes": [{
+				"title": "Hållplats: ",
+				"name": "itstitle",
+				"url": "hpl_id",
+				"urlPrefix": "http://karlstad.se/karlstadsbuss/live/?place="
+			}, {
+				"html": "<i>Klicka på hållplatsens namn för att se aktuella avgångar.</i>"
+			}]
+		}, {
+			"name": "webbkartan:vy_tg_buss_busslinjeavy_1",
+			"title": "Linje 1",
+			"source": "geoserver",
+			"group": "Busslinjer",
+			"style": "buss_linje_1",
+			"type": "WFS",
+			"featuretype": 4,
+			"visible": false,
+			"attributes": [{
+				"title": "Linje: ",
+				"name": "linjenr"
+			}, {
+				"title": "Rutt: ",
+				"name": "strackning"
+			}, {
+				"html": "<a href='http://karlstad.se/karlstadsbuss/tidtabellerkartor/' target='_blank'>Tidtabeller</a>"
+			}]
+		}, {
+			"name": "webbkartan:vy_tg_buss_busslinjeavy_2",
+			"title": "Linje 2",
+			"source": "geoserver",
+			"group": "Busslinjer",
+			"style": "buss_linje_2",
+			"type": "WFS",
+			"featuretype": 4,
+			"visible": false,
+			"attributes": [{
+				"title": "Linje: ",
+				"name": "linjenr"
+			}, {
+				"title": "Rutt: ",
+				"name": "strackning"
+			}, {
+				"html": "<a href='http://karlstad.se/karlstadsbuss/tidtabellerkartor/' target='_blank'>Tidtabeller</a>"
+			}]
+		}, {
+			"name": "webbkartan:vy_tg_buss_busslinjeavy_3",
+			"title": "Linje 3",
+			"source": "geoserver",
+			"group": "Busslinjer",
+			"style": "buss_linje_3",
+			"type": "WFS",
+			"featuretype": 4,
+			"visible": false,
+			"attributes": [{
+				"title": "Linje: ",
+				"name": "linjenr"
+			}, {
+				"title": "Rutt: ",
+				"name": "strackning"
+			}, {
+				"html": "<a href='http://karlstad.se/karlstadsbuss/tidtabellerkartor/' target='_blank'>Tidtabeller</a>"
+			}]
+		}, {
+			"name": "webbkartan:vy_tg_buss_busslinjeavy_4",
+			"title": "Linje 4",
+			"source": "geoserver",
+			"group": "Busslinjer",
+			"style": "buss_linje_4",
+			"type": "WFS",
+			"featuretype": 4,
+			"visible": false,
+			"attributes": [{
+				"title": "Linje: ",
+				"name": "linjenr"
+			}, {
+				"title": "Rutt: ",
+				"name": "strackning"
+			}, {
+				"html": "<a href='http://karlstad.se/karlstadsbuss/tidtabellerkartor/' target='_blank'>Tidtabeller</a>"
+			}]
+		}, {
+			"name": "webbkartan:vy_tg_buss_busslinjeavy_5",
+			"title": "Linje 5",
+			"source": "geoserver",
+			"group": "Busslinjer",
+			"style": "buss_linje_5",
+			"type": "WFS",
+			"featuretype": 4,
+			"visible": false,
+			"attributes": [{
+				"title": "Linje: ",
+				"name": "linjenr"
+			}, {
+				"title": "Rutt: ",
+				"name": "strackning"
+			}, {
+				"html": "<a href='http://karlstad.se/karlstadsbuss/tidtabellerkartor/' target='_blank'>Tidtabeller</a>"
+			}]
+		}, {
+			"name": "webbkartan:vy_tg_buss_busslinjeavy_6",
+			"title": "Linje 6",
+			"source": "geoserver",
+			"group": "Busslinjer",
+			"style": "buss_linje_6",
+			"type": "WFS",
+			"featuretype": 4,
+			"visible": false,
+			"attributes": [{
+				"title": "Linje: ",
+				"name": "linjenr"
+			}, {
+				"title": "Rutt: ",
+				"name": "strackning"
+			}, {
+				"html": "<a href='http://karlstad.se/karlstadsbuss/tidtabellerkartor/' target='_blank'>Tidtabeller</a>"
+			}]
+		}, {
+			"name": "webbkartan:vy_tg_buss_busslinjeavy_7",
+			"title": "Linje 7",
+			"source": "geoserver",
+			"group": "Busslinjer",
+			"style": "buss_linje_7",
+			"type": "WFS",
+			"featuretype": 4,
+			"visible": false,
+			"attributes": [{
+				"title": "Linje: ",
+				"name": "linjenr"
+			}, {
+				"title": "Rutt: ",
+				"name": "strackning"
+			}, {
+				"html": "<a href='http://karlstad.se/karlstadsbuss/tidtabellerkartor/' target='_blank'>Tidtabeller</a>"
+			}]
+		}, {
+			"name": "webbkartan:vy_tg_buss_busslinjeavy_8",
+			"title": "Linje 8",
+			"source": "geoserver",
+			"group": "Busslinjer",
+			"style": "buss_linje_8",
+			"type": "WFS",
+			"featuretype": 4,
+			"visible": false,
+			"attributes": [{
+				"title": "Linje: ",
+				"name": "linjenr"
+			}, {
+				"title": "Rutt: ",
+				"name": "strackning"
+			}, {
+				"html": "<a href='http://karlstad.se/karlstadsbuss/tidtabellerkartor/' target='_blank'>Tidtabeller</a>"
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_tg_buss_busslinjelag_centrum",
+			"title": "Centrumlinjer",
+			"source": "geoserver",
+			"group": "Busslinjer",
+			"style": "centrumlinjer",
+			"type": "WFS",
+			"featuretype": 4,
+			"visible": false,
+			"attributes": [{
+				"title": "Linje: ",
+				"name": "linjenr"
+			}, {
+				"title": "Rutt: ",
+				"name": "strackning"
+			}, {
+				"html": "<a href='http://karlstad.se/karlstadsbuss/tidtabellerkartor/' target='_blank'>Tidtabeller</a>"
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_tg_buss_busslinjelag_special",
+			"title": "Speciallinjer",
+			"source": "geoserver",
+			"group": "Busslinjer",
+			"style": "speciallinjer",
+			"type": "WFS",
+			"featuretype": 4,
+			"visible": false,
+			"attributes": [{
+				"title": "Linje: ",
+				"name": "linjenr"
+			}, {
+				"title": "Rutt: ",
+				"name": "strackning"
+			}, {
+				"html": "<a href='http://karlstad.se/karlstadsbuss/tidtabellerkartor/' target='_blank'>Tidtabeller</a>"
+			}]
+		}, {
+			"name": "webbkartan:vy_tg_buss_batbusshpl",
+			"title": "Hållplatser",
+			"source": "geoserver",
+			"group": "Batbuss",
+			"style": "batbuss_hpl",
+			"type": "WFS",
+			"visible": false,
+			"featuretype": 5,
+			"attributes": [{
+				"name": "itstitle",
+				"cls": "header1"
+			}]
+		}, {
+			"name": "webbkartan:vy_tg_buss_batbusslinje_91",
+			"title": "Båtbusslinje 91",
+			"source": "geoserver",
+			"group": "Batbuss",
+			"style": "batbuss_linje_91",
+			"type": "WFS",
+			"featuretype": 4,
+			"visible": false,
+			"attributes": [{
+				"html": "<a href='http://karlstad.se/globalassets/karlstadsbuss/tidtabeller/batbuss-2016/linje-91.pdf' target='_blank'>Tidtabell</a>"
+			}]
+		}, {
+			"name": "webbkartan:vy_tg_buss_batbusslinje_92",
+			"title": "Båtbusslinje 92",
+			"source": "geoserver",
+			"group": "Batbuss",
+			"style": "batbuss_linje_92",
+			"type": "WFS",
+			"featuretype": 4,
+			"visible": false,
+			"attributes": [{
+				"html": "<a href='http://karlstad.se/globalassets/karlstadsbuss/tidtabeller/batbuss-2016/linje-92.pdf' target='_blank'>Tidtabell 1-31 juli</a>"
+			}]
+		}, {
+			"name": "webbkartan:vy_tg_buss_batbusslinje_93",
+			"title": "Båtbusslinje 93",
+			"source": "geoserver",
+			"group": "Batbuss",
+			"style": "batbuss_linje_93",
+			"type": "WFS",
+			"featuretype": 4,
+			"visible": false,
+			"attributes": [{
+				"html": "<a href='http://karlstad.se/globalassets/karlstadsbuss/tidtabeller/batbuss-2016/linje-93.pdf' target='_blank'>Tidtabell</a>"
+			}]
+		}, {
+			"name": "webbkartan:vy_tg_buss_batbusslinje_94",
+			"title": "Båtbusslinje 94",
+			"source": "geoserver",
+			"group": "Batbuss",
+			"style": "batbuss_linje_94",
+			"type": "WFS",
+			"featuretype": 4,
+			"visible": false,
+			"attributes": [{
+				"html": "<a href='http://karlstad.se/globalassets/karlstadsbuss/tidtabeller/batbuss-2016/linje-94.pdf' target='_blank'>Tidtabell</a>"
+			}]
+		}, {
+			"name": "webbkartan:vy_tg_buss_batbusslinje_95",
+			"title": "Båtbusslinje 95",
+			"source": "geoserver",
+			"group": "Batbuss",
+			"style": "batbuss_linje_95",
+			"type": "WFS",
+			"featuretype": 4,
+			"visible": false,
+			"attributes": [{
+				"html": "<a href='http://karlstad.se/globalassets/karlstadsbuss/tidtabeller/batbuss-2016/linje-95.pdf' target='_blank'>Tidtabell 27 juni - 7 augusti</a>"
+			}]
+		}, {
+			"name": "webbkartan:vy_tg_buss_batbusslinje_96",
+			"title": "Båtbusslinje 96",
+			"source": "geoserver",
+			"group": "Batbuss",
+			"style": "batbuss_linje_96",
+			"type": "WFS",
+			"featuretype": 4,
+			"visible": false,
+			"attributes": [{
+				"html": "<a href='http://karlstad.se/globalassets/karlstadsbuss/tidtabeller/batbuss-2016/linje-96.pdf' target='_blank'>Tidtabell 16 juli - 6 augusti</a>"
+			}]
+		}, {
+			"name": "webbkartan:vy_tg_buss_batbusslinje_97",
+			"title": "Båtbusslinje 97",
+			"source": "geoserver",
+			"group": "Batbuss",
+			"style": "batbuss_linje_97",
+			"type": "WFS",
+			"featuretype": 4,
+			"visible": false,
+			"attributes": [{
+				"html": "<a href='http://karlstad.se/globalassets/karlstadsbuss/tidtabeller/batbuss-2016/linje_97.pdf' target='_blank'>Tidtabell 9-31 juli</a>"
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_tg_tg_p_gatumark",
+			"title": "Gatuparkering",
+			"queryable": true,
+			"source": "geoserver",
+			"group": "Parkering",
+			"style": "gatuparkering",
+			"type": "WFS",
+			"featuretype": 3,
+			"visible": false,
+			"attributes": [{
+				"name": "typ",
+				"title": "Typ: "
+			}, {
+				"html": "<a href='http://karlstad.se/trafik-och-infrastruktur/trafik-och-gator/parkering-av-fordon/avgifter-och-regler-parkering/' target='_blank'>Avgifter och regler</a>"
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_tg_tg_phus",
+			"title": "Parkeringshus",
+			"queryable": false,
+			"source": "geoserver",
+			"group": "Parkering",
+			"style": "parkering_h",
+			"type": "WFS",
+			"featuretype": 5,
+			"visible": false
+		}, {
+			"name": "webbkartan:vy_webbkarta_tg_parkeringsplats",
+			"title": "Parkeringsplats",
+			"queryable": false,
+			"source": "geoserver",
+			"group": "Parkering",
+			"style": "parkering_p",
+			"type": "WFS",
+			"featuretype": 5,
+			"visible": false
+		}, {
+			"name": "webbkartan:vy_webbkarta_tg_nvdb_cykelvagar",
+			"title": "Cykelvägar",
+			"queryable": false,
+			"source": "geoserver",
+			"group": "Trafikogator",
+			"style": "cykelvagar",
+			"type": "WFS",
+			"featuretype": 3,
+			"visible": false
+		}, {
+			"name": "webbkartan:vy_webbkarta_tg_statlig_vagh",
+			"title": "Statlig väghållare",
+			"queryable": true,
+			"source": "geoserver",
+			"group": "Trafikogator",
+			"style": "statlig_vagh",
+			"type": "WFS",
+			"featuretype": 4,
+			"visible": false,
+			"attributes": [{
+				"name": "namn",
+				"title": "Väghållare: "
+			}, {
+				"name": "huvudnr",
+				"title": "Vägnummer: "
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_tg_kommunikationer_busstn",
+			"title": "Busstation",
+			"source": "geoserver",
+			"group": "Kommunikationer",
+			"style": "kommunikationer_busstn",
+			"type": "WFS",
+			"featuretype": 5,
+			"visible": false,
+			"attributes": [{
+				"name": "namn",
+				"title": "Namn: ",
+				"url": "lank"
+			}, {
+				"name": "adress",
+				"title": "Adress: "
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_tg_kommunikationer_tagstn",
+			"title": "Järnvägsstation",
+			"source": "geoserver",
+			"group": "Kommunikationer",
+			"style": "kommunikationer_tagstn",
+			"type": "WFS",
+			"featuretype": 5,
+			"visible": false,
+			"attributes": [{
+				"name": "namn",
+				"title": "Namn: ",
+				"url": "lank"
+			}, {
+				"name": "adress",
+				"title": "Adress: "
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_tg_kommunikationer_flygplats",
+			"title": "Flygplats",
+			"source": "geoserver",
+			"group": "Kommunikationer",
+			"style": "kommunikationer_flygplats",
+			"type": "WFS",
+			"featuretype": 5,
+			"visible": false,
+			"attributes": [{
+				"name": "namn",
+				"title": "Namn: ",
+				"url": "lank"
+			}, {
+				"name": "adress",
+				"title": "Adress: "
+			}]
+		}, {
+			"name": "webbkartan:vy_webbkarta_tg_kommunikationer_farja",
+			"title": "Färja",
+			"source": "geoserver",
+			"group": "Kommunikationer",
+			"style": "kommunikationer_farja",
+			"type": "WFS",
+			"featuretype": 5,
+			"visible": false,
+			"attributes": [{
+				"name": "namn",
+				"title": "Namn: ",
+				"url": "lank"
+			}, {
+				"name": "adress",
+				"title": "Adress: "
+			}]
+		},
+	
+		{
+			"name": "webbkartan:vy_webbkarta_kl_kontaktcenter",
+			"title": "Kontaktcenter",
+			"source": "geoserver",
+			"group": "kommun_politik",
+			"style": "kontaktcenter",
+			"type": "WFS",
+			"featuretype": 5,
+			"visible": false,
+			"attributes": [{
+				"name": "namn",
+				"title": "Namn: ",
+				"url": "lank"
+			}, {
+				"name": "adress",
+				"title": "Adress: "
+			}]
+		},
+		
+		{
+			"format": "image/jpeg",
+			"group": "ovrigt",
+			"name": "webbkartan:1646",
+			"source": "geoserver",
+			"style": "orto_legend_bw",
+			"opacity": 0.7,
+			"title": "1646",
+			"type": "WMS",
+			"featuretype": 1,
+			"visible": false,
+			"minScale": 1250,
+			"tileSize": 512
+		}, {
+			"format": "image/jpeg",
+			"group": "ovrigt",
+			"name": "webbkartan:1696",
+			"source": "geoserver",
+			"style": "orto_legend_bw",
+			"opacity": 0.7,
+			"title": "1696",
+			"type": "WMS",
+			"featuretype": 1,
+			"visible": false,
+			"minScale": 1250,
+			"tileSize": 512
+		}, {
+			"format": "image/jpeg",
+			"group": "ovrigt",
+			"name": "webbkartan:1713",
+			"source": "geoserver",
+			"style": "orto_legend_bw",
+			"opacity": 0.7,
+			"title": "1713",
+			"type": "WMS",
+			"featuretype": 1,
+			"visible": false,
+			"minScale": 1250,
+			"tileSize": 512
+		}, {
+			"format": "image/jpeg",
+			"group": "ovrigt",
+			"name": "webbkartan:1753",
+			"source": "geoserver",
+			"style": "orto_legend_bw",
+			"opacity": 0.7,
+			"title": "1753",
+			"type": "WMS",
+			"featuretype": 1,
+			"visible": false,
+			"minScale": 1250,
+			"tileSize": 512
+		}, {
+			"format": "image/jpeg",
+			"group": "ovrigt",
+			"name": "webbkartan:1865innan",
+			"source": "geoserver",
+			"style": "orto_legend_bw",
+			"opacity": 0.7,
+			"title": "1865 innan branden",
+			"type": "WMS",
+			"featuretype": 1,
+			"visible": false,
+			"minScale": 1250,
+			"tileSize": 512
+		}, {
+			"format": "image/jpeg",
+			"group": "ovrigt",
+			"name": "webbkartan:1865efter",
+			"source": "geoserver",
+			"style": "orto_legend_bw",
+			"opacity": 0.7,
+			"title": "1865 efter branden",
+			"type": "WMS",
+			"featuretype": 1,
+			"visible": false,
+			"minScale": 1250,
+			"tileSize": 512
+		}, {
+			"format": "image/jpeg",
+			"group": "ovrigt",
+			"name": "webbkartan:1866",
+			"source": "geoserver",
+			"style": "orto_legend_bw",
+			"opacity": 0.7,
+			"title": "1866",
+			"type": "WMS",
+			"featuretype": 1,
+			"visible": false,
+			"minScale": 1250,
+			"tileSize": 512
+		}, {
+			"format": "image/jpeg",
+			"group": "ovrigt",
+			"name": "webbkartan:1882",
+			"source": "geoserver",
+			"style": "orto_legend_bw",
+			"opacity": 0.7,
+			"title": "1882",
+			"type": "WMS",
+			"featuretype": 1,
+			"visible": false,
+			"minScale": 1250,
+			"tileSize": 512
+		}, {
+			"format": "image/jpeg",
+			"group": "ovrigt",
+			"name": "webbkartan:1893",
+			"source": "geoserver",
+			"style": "orto_legend_bw",
+			"opacity": 0.7,
+			"title": "1893",
+			"type": "WMS",
+			"featuretype": 1,
+			"visible": false,
+			"minScale": 1250,
+			"tileSize": 512
+		}, {
+			"format": "image/jpeg",
+			"group": "ovrigt",
+			"name": "webbkartan:1908",
+			"source": "geoserver",
+			"style": "orto_legend_bw",
+			"opacity": 0.7,
+			"title": "1908",
+			"type": "WMS",
+			"featuretype": 1,
+			"visible": false,
+			"minScale": 1250,
+			"tileSize": 512
+		}, {
+			"format": "image/jpeg",
+			"group": "ovrigt",
+			"name": "webbkartan:1923",
+			"source": "geoserver",
+			"style": "orto_legend_bw",
+			"opacity": 0.7,
+			"title": "1923",
+			"type": "WMS",
+			"featuretype": 1,
+			"visible": false,
+			"minScale": 1250,
+			"tileSize": 512
+		}, {
+			"format": "image/jpeg",
+			"group": "ovrigt",
+			"name": "webbkartan:1937",
+			"source": "geoserver",
+			"style": "orto_legend_bw",
+			"opacity": 0.7,
+			"title": "1937",
+			"type": "WMS",
+			"featuretype": 1,
+			"visible": false,
+			"minScale": 1250,
+			"tileSize": 512
+		}, {
+			"format": "image/jpeg",
+			"group": "ovrigt",
+			"name": "webbkartan:1946",
+			"source": "geoserver",
+			"style": "orto_legend_bw",
+			"opacity": 0.7,
+			"title": "1946",
+			"type": "WMS",
+			"featuretype": 1,
+			"visible": false,
+			"minScale": 1250,
+			"tileSize": 512
+		}, {
+			"format": "image/jpeg",
+			"group": "ovrigt",
+			"name": "webbkartan:1948",
+			"source": "geoserver",
+			"style": "orto_legend_bw",
+			"opacity": 0.7,
+			"title": "1948",
+			"type": "WMS",
+			"featuretype": 1,
+			"visible": false,
+			"minScale": 1250,
+			"tileSize": 512
+		}, {
+			"format": "image/jpeg",
+			"group": "ovrigt",
+			"name": "webbkartan:1954",
+			"source": "geoserver",
+			"style": "orto_legend_bw",
+			"opacity": 0.7,
+			"title": "1954",
+			"type": "WMS",
+			"featuretype": 1,
+			"visible": false,
+			"minScale": 1250,
+			"tileSize": 512
+		}, {
+			"format": "image/jpeg",
+			"group": "ovrigt",
+			"name": "webbkartan:1960",
+			"source": "geoserver",
+			"style": "orto_legend_bw",
+			"opacity": 0.7,
+			"title": "1960",
+			"type": "WMS",
+			"featuretype": 1,
+			"visible": false,
+			"minScale": 1250,
+			"tileSize": 512
+		}, {
+			"format": "image/jpeg",
+			"group": "ovrigt",
+			"name": "webbkartan:1966",
+			"source": "geoserver",
+			"style": "orto_legend_bw",
+			"opacity": 0.7,
+			"title": "1966",
+			"type": "WMS",
+			"featuretype": 1,
+			"visible": false,
+			"minScale": 1250,
+			"tileSize": 512
+		}, {
+			"format": "image/jpeg",
+			"group": "ovrigt",
+			"name": "webbkartan:1972",
+			"source": "geoserver",
+			"style": "orto_legend_bw",
+			"opacity": 0.7,
+			"title": "1972",
+			"type": "WMS",
+			"featuretype": 1,
+			"visible": false,
+			"minScale": 1250,
+			"tileSize": 512
+		}, {
+			"format": "image/jpeg",
+			"group": "ovrigt",
+			"name": "webbkartan:1976",
+			"source": "geoserver",
+			"style": "orto_legend_bw",
+			"opacity": 0.7,
+			"title": "1976",
+			"type": "WMS",
+			"featuretype": 1,
+			"visible": false,
+			"minScale": 1250,
+			"tileSize": 512
+		}, {
+			"format": "image/jpeg",
+			"group": "ovrigt",
+			"name": "webbkartan:1988",
+			"source": "geoserver",
+			"style": "orto_legend_bw",
+			"opacity": 0.7,
+			"title": "1988",
+			"type": "WMS",
+			"featuretype": 1,
+			"visible": false,
+			"minScale": 1250,
+			"tileSize": 512
+		}, {
+			"format": "image/jpeg",
+			"group": "ovrigt",
+			"name": "webbkartan:2003",
+			"source": "geoserver",
+			"style": "orto_legend_bw",
+			"opacity": 0.7,
+			"title": "2003",
+			"type": "WMS",
+			"featuretype": 1,
+			"visible": false,
+			"minScale": 1250,
+			"tileSize": 512
+		},
+		
+		{
+			"name": "oversvamning",
+			"opacity": 0,
+			"title": "Översvämningsscenarier",
+			"group": "miljo_energi",
+			"queryable": false,
+			"source": "data/karlstad/empty.json",
+			"style": "oversvamning",
+			"type": "GEOJSON",
+			"featuretype": 0,
+			"visible": false
+		}, {
+			"format": "image/png",
+			"name": "webbkartan:vy_os_oversv_sc5b_2299_4470",
+			"title": "Beräknat högsta flöde i Klarälven",
+			"source": "geoserver",
+			"style": "empty",
+			"opacity": 0.7,
+			"type": "WMS",
+			"timeline": "oversvamning",
+			"timelineOrder": 3,
+			"featuretype": 1,
+			"visible": false,
+			"queryable": true,
+			"tileSize": 512,
+			"attributes": [{
+				"html": "<p>Beräknat högsta flöde i Klarälven normalt vattenstånd i Vänern (dagens förhållanden).</p>"
+			},{
+				"html": "<p><br>Mer information</p>",
+				"runFunction": "showInfo",
+				"functionParam": "http://karlstad.se/globalassets/filer/miljo/sjoar_och_vattendrag/oversvamningsprogram.pdf"
+			}]
+		}, {
+			"format": "image/png",
+			"name": "webbkartan:vy_os_oversv_sc4b_1628_4470",
+			"title": "200-årsflöde i Klarälven",
+			"source": "geoserver",
+			"style": "empty",
+			"opacity": 0.7,
+			"type": "WMS",
+			"timeline": "oversvamning",
+			"timelineOrder": 2,
+			"featuretype": 1,
+			"visible": false,
+			"queryable": true,
+			"tileSize": 512,
+			"attributes": [{
+				"html": "<p>200-årsflöde i Klarälven normalt vattenstånd i Vänern (dagens förhållanden).</p>"
+			},{
+				"html": "<p><br>Mer information</p>",
+				"runFunction": "showInfo",
+				"functionParam": "http://karlstad.se/globalassets/filer/miljo/sjoar_och_vattendrag/oversvamningsprogram.pdf"
+			}]
+		}, {
+			"format": "image/png",
+			"name": "webbkartan:vy_os_oversv_sc2b_1435_4503",
+			"title": "100-årsflöde i Klarälven",
+			"source": "geoserver",
+			"style": "empty",
+			"opacity": 0.7,
+			"type": "WMS",
+			"timeline": "oversvamning",
+			"timelineOrder": 1,
+			"featuretype": 1,
+			"visible": false,
+			"queryable": true,
+			"tileSize": 512,
+			"attributes": [{
+				"html": "<p>100-årsflöde i Klarälven medelhögvatten i Vänern (år 2098).</p>"
+			},{
+				"html": "<p><br>Mer information</p>",
+				"runFunction": "showInfo",
+				"functionParam": "http://karlstad.se/globalassets/filer/miljo/sjoar_och_vattendrag/oversvamningsprogram.pdf"
+			}]
+		},
+		
+		{
+			"name": "Ortofoton:ortofoto1929",
+			"title": "Flygbild 1929",
+			"group": "ortofoton",
+			"timeline": false,
+			"queryable": false,
+			"source": "geoserver",
+			"style": "orto_legend_bw",
+			"type": "WMS",
+			"format": "image/jpeg",
+			"visible": false,
+			"timelineOrder": 1,
+			"tileSize": 512
+		}, {
+			"name": "Ortofoton:ortofoto1960",
+			"title": "Flygbild 1960",
+			"group": "ortofoton",
+			"timeline": false,
+			"queryable": false,
+			"source": "geoserver",
+			"style": "orto_legend_bw",
+			"type": "WMS",
+			"format": "image/jpeg",
+			"visible": false,
+			"timelineOrder": 1,
+			"tileSize": 512
+		}, {
+			"name": "Ortofoton:ortofoto1994",
+			"title": "Flygbild 1994",
+			"group": "ortofoton",
+			"timeline": false,
+			"queryable": false,
+			"source": "geoserver",
+			"style": "orto_legend_bw",
+			"type": "WMS",
+			"format": "image/jpeg",
+			"visible": false,
+			"timelineOrder": 1,
+			"tileSize": 512
+		}, {
+			"name": "Ortofoton:ortofoto2000",
+			"title": "Flygbild 2000",
+			"group": "ortofoton",
+			"timeline": false,
+			"queryable": false,
+			"source": "geoserver",
+			"style": "orto_legend_bw",
+			"type": "WMS",
+			"format": "image/jpeg",
+			"visible": false,
+			"timelineOrder": 1,
+			"tileSize": 512
+		}, {
+			"name": "Ortofoton:ortofoto2003",
+			"title": "Flygbild 2003",
+			"group": "ortofoton",
+			"timeline": false,
+			"queryable": false,
+			"source": "geoserver",
+			"style": "orto_legend",
+			"type": "WMS",
+			"format": "image/jpeg",
+			"visible": false,
+			"timelineOrder": 1,
+			"tileSize": 512
+		}, {
+			"name": "Ortofoton:ortofoton2008",
+			"title": "Flygbild 2008",
+			"group": "ortofoton",
+			"timeline": false,
+			"queryable": false,
+			"source": "geoserver",
+			"style": "orto_legend",
+			"type": "WMS",
+			"format": "image/jpeg",
+			"visible": false,
+			"timelineOrder": 1,
+			"tileSize": 512
+		}, {
+			"name": "Ortofoton:ortofoto2009",
+			"title": "Flygbild 2009",
+			"group": "ortofoton",
+			"timeline": false,
+			"queryable": false,
+			"source": "geoserver",
+			"style": "orto_legend",
+			"type": "WMS",
+			"format": "image/jpeg",
+			"visible": false,
+			"timelineOrder": 1,
+			"tileSize": 512
+		}, {
+			"name": "Ortofoton:ortofoto2010",
+			"title": "Flygbild 2010",
+			"group": "ortofoton",
+			"timeline": false,
+			"queryable": false,
+			"source": "geoserver",
+			"style": "orto_legend",
+			"type": "WMS",
+			"format": "image/jpeg",
+			"visible": false,
+			"timelineOrder": 1,
+			"tileSize": 512
+		}, {
+			"name": "Ortofoton:ortofoto2011",
+			"title": "Flygbild 2011",
+			"group": "ortofoton",
+			"timeline": false,
+			"queryable": false,
+			"source": "geoserver",
+			"style": "orto_legend",
+			"type": "WMS",
+			"format": "image/jpeg",
+			"visible": false,
+			"timelineOrder": 1,
+			"tileSize": 512
+		}, {
+			"name": "Ortofoton:ortofoto2012",
+			"title": "Flygbild 2012",
+			"group": "ortofoton",
+			"timeline": false,
+			"queryable": false,
+			"source": "geoserver",
+			"style": "orto_legend",
+			"type": "WMS",
+			"format": "image/jpeg",
+			"visible": false,
+			"timelineOrder": 1,
+			"tileSize": 512
+		}, {
+			"name": "Ortofoton:ortofoto2013",
+			"title": "Flygbild 2013",
+			"group": "ortofoton",
+			"timeline": false,
+			"queryable": false,
+			"source": "geoserver",
+			"style": "orto_legend",
+			"type": "WMS",
+			"format": "image/jpeg",
+			"visible": false,
+			"timelineOrder": 1,
+			"tileSize": 512
+		}, {
+			"name": "Ortofoton:ortofoto2015",
+			"title": "Flygbild 2015",
+			"group": "ortofoton",
+			"timeline": false,
+			"queryable": false,
+			"source": "geoserver",
+			"style": "orto_legend",
+			"type": "WMS",
+			"format": "image/jpeg",
+			"visible": false,
+			"timelineOrder": 1,
+			"tileSize": 512
+		},
+		
+		{
+			"name": "karlstad",
+			"opacity": 0.25,
+			"title": "Karlstad",
+			"queryable": false,
+			"source": "data/karlstad/mask.geojson",
+			"style": "mask",
+			"type": "GEOJSON",
+			"featuretype": 0,
+			"visible": true,
+      "extent": [-100000,6100000,400000,6900000]
+		}, {
+			"attribution": "&copy Karlstads kommun, &copy Lantmäteriet Geodatasamverkan",
+			"format": "image/png8",
+			"group": "background",
+			"name": "EXTERN:topowebbkartan",
+			"source": "geoserver",
+			"style": "karta_farg",
+			"title": "Topografisk karta",
+			"type": "WMS",
+			"visible": false,
+			"queryable": false,
+			"tileSize": 512
+		}, {
+			"attribution": "&copy Karlstads kommun, &copy Lantmäteriet Geodatasamverkan",
+			"format": "image/png8",
+			"group": "background",
+			"name": "EXTERN:topowebbkartan_nedtonad",
+			"source": "geoserver",
+			"style": "karta_gra",
+			"title": "Topografisk karta, nedtonad",
+			"type": "WMS",
+			"visible": false,
+			"queryable": false,
+			"tileSize": 512
+		}, {
+			"format": "image/png",
+			"name": "Test:gatunamn_aggregated",
+			"title": "Gatunamn",
+			"source": "geoserver",
+			"style": "empty",
+			"legend": false,
+			"opacity": 0.7,
+			"type": "WMS",
+			"featuretype": 6,
+			"visible": true,
+			"queryable": false,
+			"tileSize": 256
+		},{
+			"attribution": "&copy Karlstads kommun, &copy Lantmäteriet Geodatasamverkan",
+			"format": "image/png8",
+			"group": "background",
+			"name": "Test:BGkarta",
+			"source": "geoserver",
+			"style": "karta_farg",
+			"title": "Kommunens baskarta",
+			"type": "WMS",
+			"visible": false,
+			"queryable": false,
+			"tileSize": 512
+		}, {
+			"attribution": "&copy Karlstads kommun",
+			"format": "image/png8",
+			"group": "background",
+			"name": "BGkarta_black",
+			"source": "geoserver",
+			"style": "karta_svart",
+			"title": "Bakgrundskarta mörk",
+			"type": "WMS",
+			"visible": false,
+			"queryable": false,
+			"tileSize": 512
+		}, {
+			"attribution": "&copy Karlstads kommun, &copy Lantmäteriet Geodatasamverkan",
+			"format": "image/jpeg",
+			"group": "background",
+			"name": "EXTERN:lm_visning_orto",
+			"source": "geoserver",
+			"style": "orto",
+			"title": "Flygbild",
+			"type": "WMS",
+			"visible": false,
+			"queryable": false,
+			"tileSize": 512
+		},{
+		"name": "GL_BASEMAP2",
+		"format":"pbf",
+    "layerURL":"GL_BASEMAP2@basemap@pbf/{z}/{x}/{-y}.pbf",
+		"title": "Basemap vector tiles",
+		"group": "background",
+		"source": "geoserver_tms",
+		"style": "basemap",
+		"type": "VECTORTILE",
+		"visible": true,
+		"queryable": true
+    }
+	],
+	
+	"styles": {
+    "basemap": [[{
+      "custom":"polygon",
+      "icon": {
+        "src": "img/png/orto.png",
+        "size": [20,20]
+      }
+    }]],
+    "defaultStyle": [{
+			"title": null,
+			"minScale": null,
+			"maxScale": null,
+			"stroke": {
+				"color": "rgba(0,0,0,1.0)",
+				"lineDash": null,
+				"width": 2
+			},
+			"fill": {
+				"color": "rgba(0,0,0,0.5)"
+			},
+			"icon": {
+				"src": null,
+				"scale": null
+			},
+			"circle": {
+				"stroke": "rgba(0,0,0,1.0)",
+				"fill": "rgba(0,0,0,0.5)",
+				"radius": 10
+			}
+		}],
+		"empty": [
+			[{
+				"stroke": {
+					"color": "rgba(0,0,0,0)"
+				},
+				"fill": {
+					"color": "rgba(0,0,0,0)"
+				}
+			}]
+		],
+		"mask": [
+			[{
+				"stroke": {
+					"color": "rgba(0,0,0,1.0)"
+				},
+				"fill": {
+					"color": "rgba(0,0,0,1.0)"
+				}
+			}]
+		],
+		"editStyle": [
+			[{
+				"stroke": {
+					"color": "rgba(0,0,0,0.8)",
+					"width": 2
+				},
+				"fill": {
+					"color": "rgba(100, 200, 100, 0.8)"
+				},
+				"circle": {
+					"radius": 8,
+					"fill": {
+						"color": "rgba(100, 200, 100, 0.8)"
+					},
+					"stroke": {
+						"color": "rgba(0,0,0,0.8)",
+						"width": 2
+					}
+				}
+			}]
+		],
+		"en_cirkel": [
+			[{
+				"circle": {
+					"radius": 8,
+					"fill": {
+						"color": "rgba(255, 255, 255, 0.4)"
+					},
+					"stroke": {
+						"color": "rgba(0,0,0,0.8)",
+						"width": 2
+					}
+				}
+			}]
+		],
+		"en_cirkel_green": [
+			[{
+				"circle": {
+					"radius": 8,
+					"fill": {
+						"color": "rgba(100, 200, 100, 0.8)"
+					},
+					"stroke": {
+						"color": "rgba(0,0,0,0.8)",
+						"width": 2
+					}
+				}
+			}]
+		],
+		"en_cirkel_blue": [
+			[{
+				"circle": {
+					"radius": 8,
+					"fill": {
+						"color": "rgba(100, 100, 200, 0.8)"
+					},
+					"stroke": {
+						"color": "rgba(0,0,0,0.8)",
+						"width": 2
+					}
+				}
+			}]
+		],
+		"en_cirkel_red": [
+			[{
+				"circle": {
+					"radius": 8,
+					"fill": {
+						"color": "rgba(200, 100, 100, 0.8)"
+					},
+					"stroke": {
+						"color": "rgba(0,0,0,0.8)",
+						"width": 2
+					}
+				},
+				"label": {
+					"label": "linjenr"
+				}
+			}]
+		],
+		"busskortsavgransning_molkomsfolkhogskola": [
+			[{
+				"stroke": {
+					"color": "rgba(168,0,0,1.0)",
+					"width": 1
+				},
+				"fill": {
+					"color": "rgba(255,0,0,0.5)"
+				}
+			}]
+		],
+		"busskortsavgransning_nobel": [
+			[{
+				"stroke": {
+					"color": "rgba(230,152,0,1.0)",
+					"width": 1
+				},
+				"fill": {
+					"color": "rgba(255,255,0,0.5)"
+				}
+			}]
+		],
+		"busskortsavgransning_sag": [
+			[{
+				"stroke": {
+					"color": "rgba(38,115,0,1.0)",
+					"width": 1
+				},
+				"fill": {
+					"color": "rgba(56,168,0,0.5)"
+				}
+			}]
+		],
+		"busskortsavgransning_thoren": [
+			[{
+				"stroke": {
+					"color": "rgba(0,77,168,1.0)",
+					"width": 1
+				},
+				"fill": {
+					"color": "rgba(0,92,230,0.5)"
+				}
+			}]
+		],
+		"busskortsavgransning_tingvalla": [
+			[{
+				"stroke": {
+					"color": "rgba(168,0,132,1.0)",
+					"width": 1
+				},
+				"fill": {
+					"color": "rgba(255,115,223,0.5)"
+				}
+			}]
+		],
+		"busskortsavgransning_tullholmen": [
+			[{
+				"stroke": {
+					"color": "rgba(70,150,240,1.0)",
+					"width": 1
+				},
+				"fill": {
+					"color": "rgba(90,170,255,0.5)"
+				}
+			}]
+		],
+		"busskortsavgransning_klara": [
+			[{
+				"stroke": {
+					"color": "rgba(0,169,230,1.0)",
+					"width": 1
+				},
+				"fill": {
+					"color": "rgba(0,197,255,0.5)"
+				}
+			}]
+		],
+		"forskola": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/utbildning_forskola.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"grundskola": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/utbildning_skola.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"gymnasium": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/utbildning_gymnasium.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"universitet": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/utbildning_universitet.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"friskola": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/utbildning_friskola.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"ensk_forskola": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/utbildning_friforskola.png",
+					"scale": 0.5
+				}
+			}]
+		],
+		"ensk_skola": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/utbildning_friskola.png",
+					"scale": 0.5
+				}
+			}]
+		],
+		"ensk_gymnasium": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/utbildning_frigymnasium.png",
+					"scale": 0.5
+				}
+			}]
+		],
+		"upptag_h": [
+			[{
+				"stroke": {
+					"color": "rgba(150,0,0,1.0)",
+					"width": 1
+				},
+				"fill": {
+					"color": "rgba(153,255,153,0.4)"
+				}
+			}]
+		],
+		"upptag_ml": [
+			[{
+				"stroke": {
+					"color": "rgba(150,0,0,1.0)",
+					"width": 1
+				},
+				"fill": {
+					"color": "rgba(255,255,102,0.4)"
+				}
+			}]
+		],
+		
+		"bibliotek": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/kultur_bibliotek.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"film": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/kultur_film.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"teater": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/kultur_teater.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"konst": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/kultur_konst.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"museer": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/kultur_museum.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"sevardheter": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/kultur_sevardhet.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"badplatser": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/fritid_badplats.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"skytte": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/fritid_skytte.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"smabatshamn": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/fritid_smabatshamn.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"klaralvsbanan": [
+			[{
+				"stroke": {
+					"color": "rgba(153,0,153,0.8)",
+					"width": 3
+				}
+			}]
+		],
+		"park": [
+			[{
+				"stroke": {
+					"color": "rgba(118,204,90,1.0)",
+					"width": 1
+				},
+				"fill": {
+					"color": "rgba(148,255,112,0.6)"
+				}
+			}]
+		],
+		"cykeltur": [
+			[{
+				"stroke": {
+					"color": "rgba(255,71,25,0.8)",
+					"width": 3
+				},
+				"filter": "[namn] == 'Alstern runt'",
+				"legend": "Alstern runt"
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(51,204,51,0.8)",
+					"width": 3
+				},
+				"filter": "[namn] == 'I2-området'",
+				"legend": "I2-området"
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(51,51,255,0.8)",
+					"width": 3
+				},
+				"filter": "[namn] == 'Klarälvsdeltat'",
+				"legend": "Klarälvsdeltat"
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(153,102,51,0.8)",
+					"width": 3
+				},
+				"filter": "[namn] == 'Kroppkärr-Välsviken'",
+				"legend": "Kroppkärr-Välsviken"
+			}]
+		],
+		"golfbana": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/fritid_golfbana.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"bangolf": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/fritid_bangolf.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"lekplatser": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/fritid_lekplats.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"motionovandring": [
+			[{
+				"stroke": {
+					"color": "rgba(255,255,0,0.8)",
+					"width": 3
+				},
+				"filter": "[typ] == 'Elljusspår'",
+				"legend": "Elljusspår"
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(168,112,0,0.8)",
+					"width": 3
+				},
+				"filter": "[typ] == 'Motionsspår'",
+				"legend": "Motionsspår"
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(255,55,55,0.8)",
+					"width": 3
+				},
+				"filter": "[typ] == 'Vandringsled'",
+				"legend": "Vandringsled"
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(169,0,230,0.8)",
+					"width": 3
+				},
+				"filter": "[typ] == 'Rullstolsled'",
+				"legend": "Tillgänglighetsanp.<br>vandringsled"
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(56,168,0,0.8)",
+					"width": 3
+				},
+				"filter": "[typ] == 'Naturstig'",
+				"legend": "Naturstig"
+			}]
+		],
+		"motionovandringsymboler": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/fritid_fageltorn.png",
+          "scale": 0.5
+				},
+				"filter": "[text] == 'Fågeltorn'",
+				"legend": "Fågeltorn"
+			}],
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/fritid_grillplats.png",
+          "scale": 0.5
+				},
+				"filter": "[text] == 'Grillplats'",
+				"legend": "Grillplats"
+			}],
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/fritid_grillplats_handikapp.png",
+          "scale": 0.5
+				},
+				"filter": "[text] == 'Grillplats_handikappanpassad'",
+				"legend": "Hand.anp. grillplats"
+			}],
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/fritid_gomsle.png",
+          "scale": 0.5
+				},
+				"filter": "[text] == 'Gömsle'",
+				"legend": "Gömsle"
+			}],
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/fritid_information.png",
+          "scale": 0.5
+				},
+				"filter": "[text] == 'Informationsskylt'",
+				"legend": "Information"
+			}],
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/fritid_parkering.png",
+          "scale": 0.5
+				},
+				"filter": "[text] == 'Parkering'",
+				"legend": "Parkering"
+			}],
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/fritid_sittplats.png",
+          "scale": 0.5
+				},
+				"filter": "[text] == 'Rastplats'",
+				"legend": "Rastplats"
+			}],
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/fritid_sittplats_handikapp.png",
+          "scale": 0.5
+				},
+				"filter": "[text] == 'Rastplats_handikappanpassad'",
+				"legend": "Hand.anp. rastplats"
+			}],
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/fritid_sittplats.png",
+          "scale": 0.5
+				},
+				"filter": "[text] == 'Sittbänk'",
+				"legend": "Sittbänk"
+			}],
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/fritid_sittplats_handikapp.png",
+          "scale": 0.5
+				},
+				"filter": "[text] == 'Sittbänk_handikappanpassad'",
+				"legend": "Hand.anp. sittbänk"
+			}],
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/fritid_torrdass.png",
+          "scale": 0.5
+				},
+				"filter": "[text] == 'Toalett'",
+				"legend": "Toalett"
+			}],
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/fritid_torrdass_handikapp.png",
+          "scale": 0.5
+				},
+				"filter": "[text] == 'Toalett_handikappanpassad'",
+				"legend": "Hand.anp. toalett"
+			}],
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/fritid_vindskydd.png",
+          "scale": 0.5
+				},
+				"filter": "[text] == 'Vindskydd'",
+				"legend": "Vindskydd"
+			}]
+		],
+		"sportanlaggningar_bandy": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/fritid_ishockeybandy.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"sportanlaggningar_hastsport": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/fritid_hastsport.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"sportanlaggningar_ishockey": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/fritid_ishockeybandy.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"sportanlaggningar_motorsport": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/fritid_motorsport.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"sportanlaggningar_skidbacke": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/fritid_skidbacke.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"sportanlaggningar_ovriga": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/fritid_sportanlaggning.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"turistbyra": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/samhallsinfo_information.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		
+		"konsumentomiljorad": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/samhallsinfo_konsumentrad.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"polisstation": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/samhallsinfo_polisstation.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"brandstation": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/samhallsinfo_raddningstjanst.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"sjukhus": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/samhallsinfo_sjukhus.png",
+          "scale": 0.5
+				}
+			}]
+		],
+    "stodverksamheter": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/samhallsinfo_tom.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"trygghetscenter": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/samhallsinfo_trygghetscenter.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"vardboende": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/samhallsinfo_vardboende.png",
+          "scale": 0.5
+				}
+			}]
+		],
+
+		"fastigheter": [
+			[{
+        "maxScale": 2000,
+				"fill": {
+					"color": "rgba(0,0,0,0)"
+				},
+				"stroke": {
+					"color": "rgba(166,56,0,0.5)",
+					"width": 0.75
+				}
+			}],
+      [{
+        "minScale": 2000,
+        "fill": {
+					"color": "rgba(0,0,0,0)"
+				},
+				"stroke": {
+					"color": "rgba(166,56,0,0.5)",
+					"width": 0.75
+				},
+        "text": {
+					"font": "Bold 9px Segoe UI",
+					"textAlign": "center",
+					"text": ["[trakt]","[blockenhet]"],
+					"fill": {
+						"color": "rgba(80,80,80,1.0)"
+					}
+				}
+      }]
+		],
+		"stadsdelar": [
+			[{
+				"fill": {
+					"color": "rgba(0,0,0,0)"
+				},
+				"stroke": {
+					"color": "rgba(0,122,204,0.8)",
+					"width": 1
+				}
+			}]
+		],
+		"tomtmark": [
+			[{
+				"stroke": {
+					"color": "rgba(255,50,50,1.0)",
+					"width": 2
+				},
+				"fill": {
+					"color": "rgba(255,255,0,0.7)"
+				}
+			}]
+		],
+		"byggar_1865": [
+		[{	"stroke": {"color": "rgba(204,0,0,1.0)", "width": 1},			"fill": {"color": "rgba(255,0,0,1.0)"} }]
+		],
+		"byggar_1865_1899": [
+			[{	"stroke": {"color": "rgba(204, 78, 0, 1.0)", "width": 1},		"fill": {"color": "rgba(255, 98, 0, 1.0)"} }]
+		],
+		"byggar_1900_1919": [
+			[{	"stroke": {"color": "rgba(204, 126, 0, 1.0)","width": 1},		"fill": {"color": "rgba(255, 157, 0, 1.0)"} }]
+		],
+		"byggar_1920_1929": [
+			[{	"stroke": {"color": "rgba(204, 174, 0, 1.0)", "width": 1},	"fill": {"color": "rgba(255, 217, 0, 1.0)"} }]
+		],
+		"byggar_1930_1939": [
+			[{	"stroke": {"color": "rgba(195, 204, 34, 1.0)", "width": 1},	"fill": {"color": "rgba(244, 255, 43, 1.0)"} }]
+		],
+		"byggar_1940_1949": [
+			[{	"stroke": {"color": "rgba(164, 204, 90, 1.0)", "width": 1},	"fill": {"color": "rgba(205, 255, 112, 1.0)"} }]
+		],
+		"byggar_1950_1959": [
+			[{	"stroke": {"color": "rgba(122, 204, 138, 1.0)", "width": 1},	"fill": {"color": "rgba(153, 255, 173, 1.0)"} }]
+		],
+		"byggar_1960_1969": [
+			[{	"stroke": {"color": "rgba(59, 204, 187, 1.0)", "width": 1},	"fill": {"color": "rgba(74, 255, 234, 1.0)"} }]
+		],
+		"byggar_1970_1979": [
+			[{	"stroke": {"color": "rgba(37, 168, 204, 1.0)", "width": 1},	"fill": {"color": "rgba(46, 210, 255, 1.0)"} }]
+		],
+		"byggar_1980_1989": [
+			[{	"stroke": {"color": "rgba(47, 115, 204, 1.0)", "width": 1},	"fill": {"color": "rgba(59, 144, 255, 1.0)"} }]
+		],
+		"byggar_1990_1999": [
+			[{	"stroke": {"color": "rgba(41, 68, 204, 1.0)", "width": 1},	"fill": {"color": "rgba(51, 85, 255, 1.0)"} }]
+		],
+		"byggar_2000_2015": [
+			[{	"stroke": {"color": "rgba(0, 0, 204, 1.0)", "width": 1},		"fill": {"color": "rgba(0, 0, 255, 1.0)"} }]
+		],
+		"kulprog_byggnader": [
+			[{
+				"stroke": {
+					"color": "rgba(255, 71, 25, 1.0)",
+					"width": 1
+				},
+				"fill": {
+					"color": "rgba(255, 0, 0, 0.4)"
+				},
+				"filter": "[klassificering] == 'Byggnad med särskilt värde'",
+				"legend": "Särsk. värdefull byggn."
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(71,25,255,1.0)",
+					"width": 1
+				},
+				"fill": {
+					"color": "rgba(0, 0, 255, 0.4)"
+				},
+				"filter": "[klassificering] == 'Byggnad med visst värde'",
+				"legend": "Byggn. med visst värde"
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(255, 180, 0, 1.0)",
+					"width": 1
+				},
+				"fill": {
+					"color": "rgba(255, 255, 0, 0.4)"
+				},
+				"filter": "[klassificering] == 'Ej utpekad'",
+				"legend": "Ej särskilt utpekad"
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(180, 0, 255, 1.0)",
+					"width": 1
+				},
+				"fill": {
+					"color": "rgba(255, 0, 255, 0.4)"
+				},
+				"filter": "[klassificering] == 'Byggnadsminne'",
+				"legend": "Byggnadsminnen"
+			}]
+
+		],
+		"kulprog_miljoer": [
+			[{
+				"stroke": {
+					"color": "rgba(153, 51, 0, 1.0)",
+					"width": 1
+				},
+				"fill": {
+					"color": "rgba(153, 51, 0, 0.4)"
+				}
+			}]
+
+		],
+		"pagaendeplaner": [
+			[{
+				"stroke": {
+					"color": "rgba(34,34,34,0.8)",
+					"width": 1.5
+				},
+				"fill": {
+					"color": "rgba(0,255,181,0.7)"
+				}
+			}]
+		],
+		"detaljplan": [
+			[{
+				"maxScale": 12500,
+				"minScale": 100000,
+				"fill": {
+					"color": "rgba(66,89,179,0.4)"
+				},
+				"stroke": {
+					"color": "rgba(60,43,0,0.8)",
+					"width": 1.5
+				}
+			}],
+			[{
+				"minScale": 12499,
+				"fill": {
+					"color": "rgba(66,89,179,0.2)"
+				},
+				"stroke": {
+					"color": "rgba(60,43,0,0.8)",
+					"width": 1.5
+				}
+			}]
+		],
+		"fop": [
+			[{
+				"stroke": {
+					"color": "rgba(0,77,168,0.8)",
+					"width": 1.5
+				},
+				"fill": {
+					"color": "rgba(115,178,255,0.7)"
+				}
+			}]
+		],
+		"program": [
+			[{
+				"stroke": {
+					"color": "rgba(230,0,169,0.8)",
+					"width": 1.5
+				},
+				"fill": {
+					"color": "rgba(223,115,255,0.7)"
+				}
+			}]
+		],
+		"livsmedelskontroller_butikhandel": [
+			[{
+				"icon": {
+					"size": [
+						32,32
+					],
+					"src": "img/karlstad/livsmedelskontroller_butikhandel.png"
+				}
+			}]
+		],
+		"livsmedelskontroller_butikhandel_cluster": [
+			[{
+				"circle": {
+					"radius": 16,
+					"fill": {
+						"color": "rgba(126,217,244,0.6)"
+					},
+					"stroke": {
+						"color": "rgba(126,217,244,0.9)",
+						"width": 4
+					}
+				}
+			}, {
+				"text": {
+					"font": "Bold 12px Arial",
+					"textAlign": "center",
+					"text": "size",
+					"fill": {
+						"color": "rgba(0,0,0,1.0)"
+					},
+					"stroke": {
+						"color": "rgba(126,217,244,0.6)",
+						"width": 2
+					}
+				}
+			}]
+		],
+		"livsmedelskontroller_restauranger": [
+			[{
+				"icon": {
+					"size": [
+						32,32
+					],
+					"src": "img/karlstad/livsmedelskontroller_restauranger.png"
+				}
+			}]
+		],
+		"livsmedelskontroller_restauranger_cluster": [
+			[{
+				"circle": {
+					"radius": 16,
+					"fill": {
+						"color": "rgba(83,169,255,0.6)"
+					},
+					"stroke": {
+						"color": "rgba(83,169,255,0.9)",
+						"width": 4
+					}
+				}
+			}, {
+				"text": {
+					"font": "Bold 12px Arial",
+					"textAlign": "center",
+					"text": "size",
+					"fill": {
+						"color": "rgba(0,0,0,1.0)"
+					},
+					"stroke": {
+						"color": "rgba(83,169,255,0.6)",
+						"width": 2
+					}
+				}
+			}]
+		],
+		"livsmedelskontroller_skolaomsorg": [
+			[{
+				"icon": {
+					"size": [
+						32,32
+					],
+					"src": "img/karlstad/livsmedelskontroller_skolaomsorg.png"
+				}
+			}]
+		],
+		"livsmedelskontroller_skolaomsorg_cluster": [
+			[{
+				"circle": {
+					"radius": 16,
+					"fill": {
+						"color": "rgba(153,110,255,0.6)"
+					},
+					"stroke": {
+						"color": "rgba(153,110,255,0.9)",
+						"width": 4
+					}
+				}
+			}, {
+				"text": {
+					"font": "Bold 12px Arial",
+					"textAlign": "center",
+					"text": "size",
+					"fill": {
+						"color": "rgba(0,0,0,1.0)"
+					},
+					"stroke": {
+						"color": "rgba(153,110,255,0.6)",
+						"width": 2
+					}
+				}
+			}]
+		],"livsmedelskontroller_mobilanlaggning": [
+			[{
+				"icon": {
+					"size": [
+						1,1
+					],
+					"src": "img/karlstad/livsmedelskontroller_ovrigt.png"
+				}
+			}]
+		],"livsmedelskontroller_ovrigt": [
+			[{
+				"icon": {
+					"size": [
+						32,32
+					],
+					"src": "img/karlstad/livsmedelskontroller_ovrigt.png"
+				}
+			}]
+		],
+		"livsmedelskontroller_ovrigt_cluster": [
+			[{
+				"circle": {
+					"radius": 16,
+					"fill": {
+						"color": "rgba(255,102,234,0.6)"
+					},
+					"stroke": {
+						"color": "rgba(255,102,234,0.9)",
+						"width": 4
+					}
+				}
+			}, {
+				"text": {
+					"font": "Bold 12px Arial",
+					"textAlign": "center",
+					"text": "size",
+					"fill": {
+						"color": "rgba(0,0,0,1.0)"
+					},
+					"stroke": {
+						"color": "rgba(255,102,234,0.6)",
+						"width": 2
+					}
+				}
+			}]
+		],
+		"livsmedelskontroller_okontrollerade": [
+			[{
+				"icon": {
+					"size": [
+						32,32
+					],
+					"src": "img/karlstad/livsmedelskontroller_butikhandel_gra.png"
+				},
+				"filter": "[kategori] == 'Butik och Handel'",
+				"legend": "Butik/Handel"
+			}],
+			[{
+				"icon": {
+					"size": [
+						32,32
+					],
+					"src": "img/karlstad/livsmedelskontroller_restauranger_gra.png"
+				},
+				"filter": "[kategori] == 'Restauranger och serveringar'",
+				"legend": "Restaurang/Servering"
+			}],
+			[{
+				"icon": {
+					"size": [
+						32,32
+					],
+					"src": "img/karlstad/livsmedelskontroller_skolaomsorg_gra.png"
+				},
+				"filter": "[kategori] == 'Skola och omsorg'",
+				"legend": "Skola/omsorg"
+			}],
+			[{
+				"icon": {
+					"size": [
+						32,32
+					],
+					"src": "img/karlstad/livsmedelskontroller_ovrigt_gra.png"
+				},
+				"filter": "[kategori] == 'Övriga livsmedelsverksamheter, t ex bageri, tillverkning, grossister, kosttillskott.'",
+				"legend": "Övriga verksamheter"
+			}]
+		],
+		"livsmedelskontroller_okontrollerade_cluster": [
+			[{
+				"circle": {
+					"radius": 16,
+					"fill": {
+						"color": "rgba(180,180,180,0.6)"
+					},
+					"stroke": {
+						"color": "rgba(150,150,150,0.9)",
+						"width": 4
+					}
+				}
+			}, {
+				"text": {
+					"font": "Bold 12px Arial",
+					"textAlign": "center",
+					"text": "size",
+					"fill": {
+						"color": "rgba(0,0,0,1.0)"
+					},
+					"stroke": {
+						"color": "rgba(2180,180,180,0.6)",
+						"width": 2
+					}
+				}
+			}]
+		],
+		
+		
+		"vattennivamatare": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/miljoenergi_vattenniva.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"atervinning": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/miljoenergi_atervinningscentral.png",
+          "scale": 0.5
+				},
+				"filter": "[webben] == 'Återvinningscentral'",
+				"legend": "Återvinningscentral"
+			}],
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/miljoenergi_atervinningsstation.png",
+          "scale": 0.5
+				},
+				"filter": "[webben] == 'Återvinningsstation'",
+				"legend": "Återvinningsstation"
+			}]
+		],
+
+		"biljettstallen_kundcenter": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/trafik_busskundcenter.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"biljettstallen_ombud": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/trafik_bussombud.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"biljettstallen_stor": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/trafik_busstor.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"biljettstallen_liten": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/trafik_bussliten.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"buss_hpl": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/trafik_busshpl.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"buss_hpl_cluster": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/trafik_busshpl.png",
+          "scale": 0.5
+				}
+			}, {
+				"text": {
+					"font": "Bold 12px Arial",
+					"textAlign": "center",
+					"text": "size",
+					"fill": {
+						"color": "rgba(255,255,255,1.0)"
+					},
+					"stroke": {
+						"color": "rgba(0,0,0,0.7)'",
+            "width": 5
+					},
+					"offsetX": 11,
+					"offsetY": -11
+				}
+			}]
+		],
+		"buss_linje_1": [
+			[{
+				"stroke": {
+					"color": "rgba(253,226,19,0.9)",
+					"width": 3
+				}
+			}]
+		],
+		"buss_linje_2": [
+			[{
+				"stroke": {
+					"color": "rgba(102,255,0,0.9)",
+					"width": 3
+				}
+			}]
+		],
+		"buss_linje_3": [
+			[{
+				"stroke": {
+					"color": "rgba(191,0,0,0.9)",
+					"width": 3
+				}
+			}]
+		],
+		"buss_linje_4": [
+			[{
+				"stroke": {
+					"color": "rgba(0,152,176,0.9)",
+					"width": 3
+				}
+			}]
+		],
+		"buss_linje_5": [
+			[{
+				"stroke": {
+					"color": "rgba(232,120,0,0.9)",
+					"width": 3
+				}
+			}]
+		],
+		"buss_linje_6": [
+			[{
+				"stroke": {
+					"color": "rgba(0,56,120,0.9)",
+					"width": 3
+				}
+			}]
+		],
+		"buss_linje_7": [
+			[{
+				"stroke": {
+					"color": "rgba(208,0,120,0.9)",
+					"width": 3
+				}
+			}]
+		],
+		"buss_linje_8": [
+			[{
+				"stroke": {
+					"color": "rgba(88,192,240,0.9)",
+					"width": 3
+				}
+			}]
+		],
+		"centrumlinjer": [
+			[{
+				"stroke": {
+					"color": "rgba(128,48,136,0.9)",
+					"width": 3
+				}
+			}]
+		],
+		"speciallinjer": [
+			[{
+				"stroke": {
+					"color": "rgba(0,0,0,0.9)",
+					"width": 3
+				}
+			}]
+		],
+		"batbuss_hpl": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/trafik_batbusshpl.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"batbuss_linje_91": [
+			[{
+				"stroke": {
+					"color": "rgba(254, 184, 17, 0.9)",
+					"width": 3
+				}
+			}]
+		],
+		"batbuss_linje_92": [
+			[{
+				"stroke": {
+					"color": "rgba(113, 191, 68, 0.9)",
+					"width": 3
+				}
+			}]
+		],
+		"batbuss_linje_93": [
+			[{
+				"stroke": {
+					"color": "rgba(192, 37, 45, 0.9)",
+					"width": 3
+				}
+			}]
+		],
+		"batbuss_linje_94": [
+			[{
+				"stroke": {
+					"color": "rgba(0, 171, 188, 0.9)",
+					"width": 3
+				}
+			}]
+		],
+		"batbuss_linje_95": [
+			[{
+				"stroke": {
+					"color": "rgba(245, 130, 33, 0.9)",
+					"width": 3
+				}
+			}]
+		],
+		"batbuss_linje_96": [
+			[{
+				"stroke": {
+					"color": "rgba(1, 64, 129, 0.9)",
+					"width": 3
+				}
+			}]
+		],
+		"batbuss_linje_97": [
+			[{
+				"stroke": {
+					"color": "rgba(215, 12, 140, 0.9)",
+					"width": 3
+				}
+			}]
+		],
+		"cykelvagar": [
+			[{
+				"stroke": {
+					"color": "rgba(255, 51, 153, 1)",
+					"width": 1.5
+				}
+			}]
+		],
+		"cykelstrak_prio": [
+			[{
+				"stroke": {
+					"color": "rgba(1, 95, 157, 1)",
+					"width": 1.8
+				},
+				"filter": "[typ] == 'Plogas, sandas/grusas'",
+				"legend": "Plogas, sandas/grusas"
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(192, 37, 45, 1)",
+					"width": 1.8
+				},
+				"filter": "[typ] == 'Sopsaltas'",
+				"legend": "Sopsaltas"
+			}]
+		],
+		"statlig_vagh": [
+			[{
+				"stroke": {
+					"color": "rgba(255,0,0,0.8)",
+					"width": 2
+				}
+			}]
+		],
+		"parkering_h": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/trafik_phus.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"parkering_p": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/trafik_pplats.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"gatuparkering": [
+			[{
+				"stroke": {
+					"color": "rgba(168,0,0,1.0)",
+					"width": 1
+				},
+				"fill": {
+					"color": "rgba(255,0,0,0.5)"
+				},
+				"filter": "[typ] == 'Parkering röd zon'",
+				"legend": "Parkering röd zon"
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(230,152,0,1.0)",
+					"width": 1
+				},
+				"fill": {
+					"color": "rgba(255,255,0,0.5)"
+				},
+				"filter": "[typ] == 'Parkering gul zon'",
+				"legend": "Parkering gul zon"
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(38,115,0,1.0)",
+					"width": 1
+				},
+				"fill": {
+					"color": "rgba(56,168,0,0.5)"
+				},
+				"filter": "[typ] == 'Parkering grön zon'",
+				"legend": "Parkering grön zon"
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(0,77,168,1.0)",
+					"width": 1
+				},
+				"fill": {
+					"color": "rgba(0,92,230,0.5)"
+				},
+				"filter": "[typ] == 'Parkering blå zon'",
+				"legend": "Parkering blå zon"
+			}],
+			[{
+				"stroke": {
+					"color": "rgba(168,0,132,1.0)",
+					"width": 1
+				},
+				"fill": {
+					"color": "rgba(255,115,223,0.5)"
+				},
+				"filter": "[typ] == 'Handikapparkering'",
+				"legend": "Handikapparkering"
+			}]
+		],
+		"kommunikationer_busstn": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/trafik_busstation.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"kommunikationer_tagstn": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/trafik_jvgstn.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"kommunikationer_flygplats": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/trafik_flygplats.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"kommunikationer_farja": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/trafik_farja.png",
+          "scale": 0.5
+				}
+			}]
+		],		
+		"kontaktcenter": [
+			[{
+				"icon": {
+					"size": [64,64],
+					"src": "img/karlstad/samhallsinfo_kontaktcenter.png",
+          "scale": 0.5
+				}
+			}]
+		],
+		"oversvamning": [
+			[{
+				"stroke": {
+					"color": "rgba(0,42,255,1)",
+					"width": 1
+				},
+				"fill": {
+					"color": "rgba(0,42,255,0.4)"
+				}
+			}]
+		],
+
+		"orto_legend": [
+			[{
+				"icon": {
+					"size": [20, 20],
+					"src": "img/png/orto.png"
+				}
+			}]
+		],
+		"orto_legend_bw": [
+			[{
+				"icon": {
+					"size": [20, 20],
+					"src": "img/karlstad/orto_gra.png"
+				}
+			}]
+		],
+		"karta_svart": [
+			[{
+				"image": {
+					"src": "img/karlstad/svart.png"
+				}
+			}]
+		],
+		"karta_gra": [
+			[{
+				"image": {
+					"src": "img/png/gra.png"
+				}
+			}]
+		],
+		"karta_farg": [
+			[{
+				"image": {
+					"src": "img/png/farg.png"
+				}
+			}]
+		],
+		"orto": [
+			[{
+				"image": {
+					"src": "img/png/orto.png"
+				}
+			}]
+		]
+	}
+}
