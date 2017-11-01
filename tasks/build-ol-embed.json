@@ -58,7 +58,7 @@
     "ol.control.ScaleLine",
     "ol.control.defaults",
     "ol.source.Source",
-    "ol.source.Source#getProperties",    
+    "ol.source.Source#getProperties",
     "ol.source.Source#on",
     "ol.source.Source#once",
     "ol.source.OSM",
