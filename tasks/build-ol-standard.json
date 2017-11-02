@@ -35,6 +35,7 @@
     "ol.View#setZoom",
     "ol.View#fit",
     "ol.View#un",
+    "ol.extent.getBottomLeft",
     "ol.extent.getTopLeft",
     "ol.tilegrid.TileGrid",
     "ol.tilegrid.WMTS",

@@ -303,8 +303,8 @@ function getQueryableLayers() {
 function getSearchableLayers() {
   var searchableLayers = [];
   settings.layers.forEach(function(layer) {
-    if ((layer.get('search') && layer.getVisible()) || layer.get('search') === 'always') {
-      searchableLayers.push(layer.get('id'));
+    if ((layer.get('searchable') && layer.getVisible()) || layer.get('searchable') === 'always') {
+      searchableLayers.push(layer.get('name'));
     }
   });
   return searchableLayers;
