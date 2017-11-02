@@ -19,16 +19,16 @@
 	},{
 		"name": "legend"
 	}, {
+		"name": "measure"
+	}, {
 		"name": "search",
 		"options": {
-			"searchAttribute": "itssearch",
-			"northing": "y",
-			"easting": "x",
-			"url": "internal/search.php",
+			"searchAttribute": "searchfield",
+			"idAttribute": "idfield",
+			"layerNameAttribute": "layer",
+			"url": "data/karlstad/response.json",
 			"title": "Sökresultat"
 		}
-	}, {
-		"name": "measure"
 	}, {
     "name": "splash",
     "options": {
@@ -80,7 +80,9 @@
       "url": "https://gi.karlstad.se/geoserver/gwc/service/tms/1.0.0/",
       "tileGrid": {
         "tileSize": 512,
-        "alignBottomLeft": false
+        "alignBottomLeft": false,
+        "extent": [110000,6540000,200000,6650000],
+        "resolutions": [128,64,32,16,8,4,2,1,0.5,0.25,0.125]
       }
     }
 	},
@@ -204,6 +206,7 @@
 			"style": "busskortsavgransning_nobel",
 			"type": "WFS",
 			"visible": false,
+      "search":true,
 			"featuretype": 3,
 			"attributes": [{
 				"name": "namn",
@@ -219,6 +222,7 @@
 			"style": "busskortsavgransning_sag",
 			"type": "WFS",
 			"visible": false,
+      "search":false,
 			"featuretype": 3,
 			"attributes": [{
 				"name": "namn",
@@ -234,6 +238,7 @@
 			"style": "busskortsavgransning_tingvalla",
 			"type": "WFS",
 			"visible": false,
+      "search":"always",
 			"featuretype": 3,
 			"attributes": [{
 				"name": "namn",
@@ -1179,7 +1184,7 @@
 			"attributes": [{
 				"title": "Namn: ",
 				"name": "gammal_fastighet",
-				"urlPrefix": "https://gi.karlstad.se/kulprog/visa.php?typ=byggnad&id=",
+				"urlPrefix": "http://gi.karlstad.se/kulprog/visa.php?typ=byggnad&id=",
 				"url": "id",
 				"runFunction": "showInfo",
 				"functionParam": "url"
@@ -1196,7 +1201,7 @@
 			"attributes": [{
 				"title": "Namn: ",
 				"name": "namn",
-				"urlPrefix": "https://gi.karlstad.se/kulprog/visa.php?typ=miljo&id=",
+				"urlPrefix": "http://gi.karlstad.se/kulprog/visa.php?typ=miljo&id=",
 				"url": "id",
 				"runFunction": "showInfo",
 				"functionParam": "url"
@@ -2563,7 +2568,7 @@
 			"style": "karta_farg",
 			"title": "Kommunens baskarta",
 			"type": "WMS",
-			"visible": false,
+			"visible": true,
 			"queryable": false,
 			"tileSize": 512
 		}, {
@@ -2599,8 +2604,8 @@
 		"source": "geoserver_tms",
 		"style": "basemap",
 		"type": "VECTORTILE",
-		"visible": true,
-		"queryable": true
+		"visible": false,
+		"queryable": false
     }
 	],
 	
