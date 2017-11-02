@@ -1,7 +1,7 @@
 var browserify = require('browserify');
 var sass = require('gulp-sass');
 var gulp = require('gulp');
-var eslint = require('gulp-eslint');
+// var eslint = require('gulp-eslint');
 var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
 var uglify = require('gulp-uglify');
