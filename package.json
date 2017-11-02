@@ -19,13 +19,14 @@
     "build": "npm run build-origo && npm run build-sass",
     "build-sass": "node-sass --include-path scss scss/origo.scss dist/style.css",
     "build-origo": "browserify origo.js --s origo | uglifyjs --compress --mangle --output dist/origo.min.js",
-    "build-ol": "node node_modules/openlayers/tasks/build.js tasks/build-ol-standard.json node_modules/openlayers/dist/ol.js"
+    "build-ol": "node node_modules/openlayers/tasks/build.js tasks/build-ol-standard.json node_modules/openlayers/dist/ol.js",
+    "build-ol-full": "node node_modules/openlayers/tasks/build.js tasks/build-ol-full.json node_modules/openlayers/dist/ol.js"
   },
   "dependencies": {
     "browserify": "11.0.1",
     "jquery": "2.1.4",
     "localforage": "1.5.0",
-    "openlayers": "4.3.4",
+    "openlayers": "4.4.2",
     "proj4": "2.3.10",
     "typeahead.js": "0.11.0"
   },

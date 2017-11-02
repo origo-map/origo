@@ -1,4 +1,7 @@
 "use strict";
+global.runfunction = require('../src/utils/runfunction');
+
+var $ = require('jquery');
 var featureinfotemplates = require('./featureinfotemplates');
 var replacer = require('../src/utils/replacer');
 var geom = require('./geom');
@@ -32,6 +35,21 @@ module.exports = function(feature, layer) {
                               '</a>';
                         }
                       }
+                      if (attribute['runFunction']) {
+                        var title;
+                        if (feature.get(attribute['functionParam'])) {	
+                          var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['functionParam']));
+                          val = '<a id="colorbox-link" href="#" onclick="runfunction.' + attribute['runFunction'] + '(\'' + url + '\');return false;">' + 
+                                                feature.get(attribute['name']) +
+                                                '</a>';
+                        }
+                        else if (feature.get(attribute['functionParam']) === undefined) {
+                          var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], attribute['functionParam']);
+                          val = '<a id="colorbox-link" href="#" onclick="runfunction.' + attribute['runFunction'] + '(\'' + url + '\');return false;">' + 
+                                                feature.get(attribute['name']) +
+                                                '</a>';
+                        }
+                      }
                   }
                 }
                 else if (attribute['url']) {
@@ -53,10 +71,26 @@ module.exports = function(feature, layer) {
                     }
                 }
                 else if (attribute['html']) {
-                  val = replacer.replace(attribute['html'], feature.getProperties(), {
-                    helper: geom,
-                    helperArg: feature.getGeometry()
-                  });
+                  if (attribute['runFunction'] && attribute['functionParam']) {
+                    var title;
+                    if (feature.get(attribute['functionParam'])) {	
+                          var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], feature.get(attribute['functionParam']));
+                          val = '<a id="colorbox-link" href="#" onclick="runfunction.' + attribute['runFunction'] + '(\'' + url + '\');return false;">' + 
+                                                attribute['html'] +
+                                                '</a>';
+                        }
+                        else if (feature.get(attribute['functionParam']) === undefined) {
+                          var url = createUrl(attribute['urlPrefix'], attribute['urlSuffix'], attribute['functionParam']);
+                          val = '<a id="colorbox-link" href="#" onclick="runfunction.' + attribute['runFunction'] + '(\'' + url + '\');return false;">' + 
+                                                attribute['name'] +
+                                                '</a>';
+                        }
+                  } else {
+                    val = replacer.replace(attribute['html'], feature.getProperties(), {
+                      helper: geom,
+                      helperArg: feature.getGeometry()
+                    });
+                  }
                 }
 
                 var cls = ' class="' + attribute['cls'] + '" ' || '';

@@ -12,12 +12,15 @@ module.exports = {
       });
   },
   tileGrid: function(settings) {
-      var origin = settings.alignTopLeft === false ? ol.extent.getBottomLeft(settings.extent) : ol.extent.getTopLeft(settings.extent);
+      var extent = settings.extent || viewer.getExtent();
+      var origin = settings.alignBottomLeft === false ? ol.extent.getTopLeft(extent) : ol.extent.getBottomLeft(extent);
+      var resolutions = settings.resolutions || viewer.getResolutions();
+      var tileSize = settings.tileSize || viewer.getTileSize();
       return new ol.tilegrid.TileGrid({
-          extent: settings.extent,
-          origin: settings.origin,
-          resolutions: settings.resolutions,
-          tileSize: settings.tileSize || [256,256]
+          extent: extent,
+          origin: origin,
+          resolutions: resolutions,
+          tileSize: tileSize
       });
   },
   checkZoomChange: function checkZoomChange(resolution, currentResolution) {

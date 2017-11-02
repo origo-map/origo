@@ -58,7 +58,7 @@ function init(el, mapOptions) {
   settings.zoom = urlParams.zoom || mapOptions.zoom;
   mapOptions.tileGrid = mapOptions.tileGrid || {};
   settings.tileSize = mapOptions.tileGrid.tileSize ? [mapOptions.tileGrid.tileSize,mapOptions.tileGrid.tileSize] : [256,256];
-  settings.alignTopLeft = mapOptions.tileGrid.alignTopLeft;
+  settings.alignBottomLeft = mapOptions.tileGrid.alignBottomLeft;
 
   if (mapOptions.hasOwnProperty('proj4Defs') || mapOptions.projectionCode=="EPSG:3857" || mapOptions.projectionCode=="EPSG:4326") {
     // Projection to be used in map
@@ -300,6 +300,16 @@ function getQueryableLayers() {
   return queryableLayers;
 }
 
+function getSearchableLayers() {
+  var searchableLayers = [];
+  settings.layers.forEach(function(layer) {
+    if ((layer.get('searchable') && layer.getVisible()) || layer.get('searchable') === 'always') {
+      searchableLayers.push(layer.get('name'));
+    }
+  });
+  return searchableLayers;
+}
+
 function getGroup(group) {
   var group = $.grep(settings.layers, function(obj) {
     return (obj.get('group') == group);
@@ -506,6 +516,7 @@ module.exports.getLayersByProperty = getLayersByProperty;
 module.exports.getLayer = getLayer;
 module.exports.getControlNames = getControlNames;
 module.exports.getQueryableLayers = getQueryableLayers;
+module.exports.getSearchableLayers = getSearchableLayers;
 module.exports.getGroup = getGroup;
 module.exports.getGroups = getGroups;
 module.exports.getProjectionCode = getProjectionCode;
