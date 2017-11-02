@@ -300,6 +300,16 @@ function getQueryableLayers() {
   return queryableLayers;
 }
 
+function getSearchableLayers() {
+  var searchableLayers = [];
+  settings.layers.forEach(function(layer) {
+    if ((layer.get('search') && layer.getVisible()) || layer.get('search') === 'always') {
+      searchableLayers.push(layer.get('id'));
+    }
+  });
+  return searchableLayers;
+}
+
 function getGroup(group) {
   var group = $.grep(settings.layers, function(obj) {
     return (obj.get('group') == group);
@@ -506,6 +516,7 @@ module.exports.getLayersByProperty = getLayersByProperty;
 module.exports.getLayer = getLayer;
 module.exports.getControlNames = getControlNames;
 module.exports.getQueryableLayers = getQueryableLayers;
+module.exports.getSearchableLayers = getSearchableLayers;
 module.exports.getGroup = getGroup;
 module.exports.getGroups = getGroups;
 module.exports.getProjectionCode = getProjectionCode;
