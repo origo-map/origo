@@ -89,7 +89,7 @@ function init(options) {
     limit: limit,
     displayKey: name,
     source: function(query, syncResults, asyncResults) {
-      $.get(url + '?q=' + encodeURI(query), function(data) {
+      $.get(url + '?q=' + encodeURI(query) + '&l=' + Viewer.getSearchableLayers(), function(data) {
         asyncResults(data);
       });
     }
