@@ -45,6 +45,9 @@ module.exports = function createForm(obj) {
       el += '<input id="o-delete-image-button" class="' + imageClass + '" type="button" value="Ta bort bild">';
       el += '</div>';
       break;
+    case 'date':
+      el = '<div><label>' + label + '</label><br><input type="date" id="' + id + '" placeholder="YYYY-MM-DD" value="' + val + '"' + maxLength + '></div>';
+      break;
   }
   return el;
 }
