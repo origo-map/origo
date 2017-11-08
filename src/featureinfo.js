@@ -68,9 +68,9 @@ function getSelectionLayer() {
 function getSelection() {
   var selection = {};
   if(selectionLayer.getFeatures()[0]){
-  selection.geometryType = selectionLayer.getFeatures()[0].getGeometry().getType();
-  selection.coordinates = selectionLayer.getFeatures()[0].getGeometry().getCoordinates();
-  selection.id = selectionLayer.getFeatures()[0].getId();
+    selection.geometryType = selectionLayer.getFeatures()[0].getGeometry().getType();
+    selection.coordinates = selectionLayer.getFeatures()[0].getGeometry().getCoordinates();
+    selection.id = selectionLayer.getFeatures()[0].getId();
   }
   return selection;
 }
