@@ -58,7 +58,7 @@ function init(el, mapOptions) {
   settings.zoom = urlParams.zoom || mapOptions.zoom;
   mapOptions.tileGrid = mapOptions.tileGrid || {};
   settings.tileSize = mapOptions.tileGrid.tileSize ? [mapOptions.tileGrid.tileSize,mapOptions.tileGrid.tileSize] : [256,256];
-  settings.alignTopLeft = mapOptions.tileGrid.alignTopLeft;
+  settings.alignBottomLeft = mapOptions.tileGrid.alignBottomLeft;
 
   if (mapOptions.hasOwnProperty('proj4Defs') || mapOptions.projectionCode=="EPSG:3857" || mapOptions.projectionCode=="EPSG:4326") {
     // Projection to be used in map
