@@ -67,8 +67,11 @@ function getSelectionLayer() {
 
 function getSelection() {
   var selection = {};
+  if(selectionLayer.getFeatures()[0]){
   selection.geometryType = selectionLayer.getFeatures()[0].getGeometry().getType();
   selection.coordinates = selectionLayer.getFeatures()[0].getGeometry().getCoordinates();
+  selection.id = selectionLayer.getFeatures()[0].getId();
+  }
   return selection;
 }
 function getPin() {
@@ -98,7 +101,9 @@ function identify(items, target, coordinate) {
       popup.setVisibility(true);
       var owl = initCarousel('#o-identify-carousel', undefined, function(){
         var currentItem = this.owl.currentItem;
-        selectionLayer.clearAndAdd(items[currentItem].feature.clone(), selectionStyles[items[currentItem].feature.getGeometry().getType()]);
+        var clone = items[currentItem].feature.clone();
+        clone.setId(items[currentItem].feature.getId());
+        selectionLayer.clearAndAdd(clone, selectionStyles[items[currentItem].feature.getGeometry().getType()]);
         popup.setTitle(items[currentItem].title);
       });
       Viewer.autoPan();

@@ -49,6 +49,9 @@ module.exports = {
         arrName: "coordinates"}
       );
   },
+  feature: function(featureId) {
+      return featureId;
+  },
   pin: function(pinStr) {
       return urlparser.strIntify(pinStr);
   },

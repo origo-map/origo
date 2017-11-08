@@ -9,6 +9,8 @@ var isUrl = require('./utils/isurl');
 var elQuery = require('./utils/elquery');
 var featureinfo = require('./featureinfo');
 var maputils = require('./maputils');
+var search = require('./search');
+var getAttributes = require('./getattributes');
 var style = require('./style')();
 var layerCreator = require('./layercreator');
 
@@ -98,6 +100,15 @@ function init(el, mapOptions) {
     breakPointsPrefix: mapOptions.breakPointsPrefix,
   });
 
+  if (urlParams.feature) {
+    var featureId = urlParams.feature;
+    var layer = getLayer(featureId.split(".")[0]);
+    layer.once('render', function(event) {
+      var feature = layer.getSource().getFeatureById(featureId);
+      search.showFeatureInfo([feature], layer.get('title'), getAttributes(feature, layer));
+    });
+  }
+  
   if (urlParams.pin) {
     settings.featureinfoOptions.savedPin = urlParams.pin;
   }

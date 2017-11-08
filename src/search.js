@@ -223,3 +223,4 @@ function selectHandler(evt, data) {
 }
 
 module.exports.init = init;
+module.exports.showFeatureInfo = showFeatureInfo;
