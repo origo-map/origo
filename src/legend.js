@@ -313,6 +313,7 @@ function addLegend(groups) {
     //Check if layer belongs to subgroup
     var inSubgroup = $('#o-group-' + layer.get('group')).closest('ul').parent().closest('ul').hasClass('o-legend-group');
     var title = '<div class="o-legend-item-title o-truncate">' + layer.get('title') + '</div>';
+    var rootGroup;
 
     //Add abstract button
     if(layer.get('abstract')){
@@ -338,8 +339,8 @@ function addLegend(groups) {
 
       //Append layer to group
       item = createLegendItem(name, layerStyle, inSubgroup);
-      if ($('#o-group-' + layer.get('group')).find('li.o-top-item:last').length) {
-        $('#o-group-' + layer.get('group')).find('li.o-top-item:last').after(item);
+      if ($('#o-group-' + layer.get('group')).children('li.o-top-item:last').length) {
+        $('#o-group-' + layer.get('group')).children('li.o-top-item:last').after(item);
       } else {
         $('#o-group-' + layer.get('group') + ' .o-legend-header').after(item);
       }
@@ -373,20 +374,24 @@ function addLegend(groups) {
         $('.' + name + ' .o-checkbox').addClass('o-checkbox-true');
 
         if (inSubgroup) {
-          var parentGroups = $('#' + name).parents('ul [id^=o-group-]');
-          [].forEach.call(parentGroups, function(el) {
-            toggleGroup($(el).find('li:first'));
-          });
+          rootGroup = $('#' + name).parents('ul [id^=o-group-]:last');
+          if (!$(rootGroup).find('.o-icon-expand:first').hasClass('o-icon-expand-true')) {
+            toggleGroup($(rootGroup).find('li.o-legend-header:first'));              
+          }
 
           toggleSubGroupCheck($('#' + name).parents('ul').has('.o-legend-header').first(), false);
         } else {
-          $('#o-group-' + layer.get('group') +' .o-icon-expand').removeClass('o-icon-expand-false');
-          $('#o-group-' + layer.get('group') +' .o-icon-expand').addClass('o-icon-expand-true');
+          $('#o-group-' + layer.get('group') + ' .o-icon-expand:first').removeClass('o-icon-expand-false');
+          $('#o-group-' + layer.get('group') + ' .o-icon-expand:first').addClass('o-icon-expand-true');
           $('#o-group-' + layer.get('group')).removeClass('o-ul-expand-false');
         }
 
       } else {
         $('.' + name + ' .o-checkbox').addClass('o-checkbox-false');
+
+        if (inSubgroup) {
+          toggleSubGroupCheck($('#' + name).parents('ul').has('.o-legend-header').first(), false);
+        }
       }
     }
 
@@ -473,7 +478,7 @@ function toggleGroup(groupheader) {
 function toggleSubGroupCheck(subgroup, toggleAll) {
   var subGroup = $(subgroup);
   var subLayers = subGroup.find('.o-legend-item.o-legend-subitem');
-  var groupList = $('.o-legend-group');
+  var groupList = $('.o-legend-subgroup');
 
   if (toggleAll) {
 
