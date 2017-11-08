@@ -50,7 +50,7 @@ module.exports = {
       );
   },
   feature: function(featureId) {
-      return featureId;
+    return featureId;
   },
   pin: function(pinStr) {
       return urlparser.strIntify(pinStr);
