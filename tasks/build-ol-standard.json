@@ -30,6 +30,7 @@
     "ol.View#getResolution",
     "ol.View#getResolutions",
     "ol.View#getZoom",
+    "ol.View#getZoomForResolution",
     "ol.View#on",
     "ol.View#setCenter",
     "ol.View#setZoom",
