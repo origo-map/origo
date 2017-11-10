@@ -53,6 +53,13 @@ function init(el, mapOptions) {
   settings.url = mapOptions.url;
   settings.target = mapOptions.target;
   settings.baseUrl = mapOptions.baseUrl;
+  settings.extent = mapOptions.extent || undefined;
+  settings.center = urlParams.center || mapOptions.center;
+  settings.zoom = urlParams.zoom || mapOptions.zoom;
+  mapOptions.tileGrid = mapOptions.tileGrid || {};
+  settings.tileSize = mapOptions.tileGrid.tileSize ? [mapOptions.tileGrid.tileSize,mapOptions.tileGrid.tileSize] : [256,256];
+  settings.alignBottomLeft = mapOptions.tileGrid.alignBottomLeft;
+
   if (mapOptions.hasOwnProperty('proj4Defs') || mapOptions.projectionCode=="EPSG:3857" || mapOptions.projectionCode=="EPSG:4326") {
     // Projection to be used in map
     settings.projectionCode = mapOptions.projectionCode || undefined;
@@ -63,21 +70,19 @@ function init(el, mapOptions) {
       units: getUnits(settings.projectionCode)
     });
     settings.resolutions = mapOptions.resolutions || undefined;
-    settings.tileGrid = maputils.tileGrid(settings.projectionExtent, settings.resolutions);
+    settings.tileGrid = maputils.tileGrid(settings);
   }
 
-  settings.extent = mapOptions.extent || undefined;
-  settings.center = urlParams.center || mapOptions.center;
-  settings.zoom = urlParams.zoom || mapOptions.zoom;
   settings.source = mapOptions.source;
   settings.groups = mapOptions.groups;
   settings.editLayer = mapOptions.editLayer;
   settings.styles = mapOptions.styles;
+  settings.clusterOptions = mapOptions.clusterOptions || {};
   style.init();
-  settings.layers = createLayers(mapOptions.layers, urlParams.layers);
   settings.controls = mapOptions.controls;
   settings.consoleId = mapOptions.consoleId || 'o-console';
   settings.featureinfoOptions = mapOptions.featureinfoOptions || {};
+  settings.enableRotation = mapOptions.enableRotation === false ? false : true;
 
   //If url arguments, parse this settings
   if (window.location.search) {
@@ -85,6 +90,8 @@ function init(el, mapOptions) {
   }
 
   loadMap();
+  settings.layers = createLayers(mapOptions.layers, urlParams.layers);
+  addLayers(settings.layers);
 
   elQuery(map, {
     breakPoints: mapOptions.breakPoints,
@@ -102,7 +109,12 @@ function init(el, mapOptions) {
     });
   }
   featureinfo.init(settings.featureinfoOptions);
+}
 
+function addLayers(layers) {
+  layers.forEach(function(layer) {
+    map.addLayer(layer);
+  });
 }
 
 function createLayers(layerlist, savedLayers) {
@@ -126,14 +138,14 @@ function loadMap() {
 
   map = new ol.Map({
     target: 'o-map',
-    layers: settings.layers,
     controls: [],
     view: new ol.View({
       extent: settings.extent || undefined,
       projection: settings.projection || undefined,
       center: settings.center,
       resolutions: settings.resolutions || undefined,
-      zoom: settings.zoom
+      zoom: settings.zoom,
+      enableRotation: settings.enableRotation
     })
   });
 }
@@ -200,6 +212,10 @@ function getMapName() {
 
 function getTileGrid() {
   return settings.tileGrid;
+}
+
+function getTileSize() {
+  return settings.tileSize;
 }
 
 function getUrl() {
@@ -348,6 +364,10 @@ function getTarget() {
   return settings.target;
 }
 
+function getClusterOptions(){
+  return settings.clusterOptions;
+}
+
 function checkScale(scale, maxScale, minScale) {
   if (maxScale || minScale) {
 
@@ -472,7 +492,7 @@ function render(el, mapOptions) {
     }
 
     $(el).html(template(footerTemplate));
-  }
+}
 
 module.exports.init = init;
 module.exports.createLayers = createLayers;
@@ -495,7 +515,9 @@ module.exports.getMapSource = getMapSource;
 module.exports.getResolutions = getResolutions;
 module.exports.getScale = getScale;
 module.exports.getTarget = getTarget;
+module.exports.getClusterOptions = getClusterOptions;
 module.exports.getTileGrid = getTileGrid;
+module.exports.getTileSize = getTileSize;
 module.exports.autoPan = autoPan;
 module.exports.removeOverlays = removeOverlays;
 module.exports.checkScale= checkScale;

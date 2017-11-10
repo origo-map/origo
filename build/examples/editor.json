@@ -7,6 +7,12 @@
       "name": "geoposition"
     },
     {
+      "name": "position",
+      "options": {
+        "title": "Sweref99 16.30"
+      }
+    },
+    {
       "name": "mapmenu"
     },
     {
@@ -18,9 +24,12 @@
     {
       "name": "editor",
       "options": {
-        "editableLayers": ["test_byggnadsytor", "test_punkt"],
         "isActive": true,
-        "autoSave": false
+        "autoSave": false,
+        "defaultLayer": "editor_polygon",
+        "drawTools": {
+          "Polygon": ["box"]
+        }
       }
     },
     {
@@ -51,10 +60,10 @@
     8775797.92
   ],
   "center": [
-    162429,
-    6599905
+    152667,
+    6610405
   ],
-  "zoom": 3,
+  "zoom": 10,
   "resolutions": [
     1146.8799999999999,
     573.4399999999999,
@@ -72,9 +81,9 @@
     0.13999999999999999
   ],
   "source": {
-    "local": {
-      "url": "http://localhost:9090/geoserver/sqlserver/wfs",
-      "workspace": "sqlserver"
+    "mdk": {
+      "url": "https://www.malardalskartan.se/geoserver/origo/wfs",
+      "workspace": "origo"
     },
     "basemap": {
       "url": "https://www.malardalskartan.se/geowebcache/service/wmts"
@@ -82,8 +91,8 @@
   },
   "groups": [
     {
-      "name": "test",
-      "title": "Test",
+      "name": "edit",
+      "title": "Editable layers",
       "expanded": true
     },
     {
@@ -94,91 +103,127 @@
   ],
   "layers": [
     {
-      "name": "test_byggnadsytor",
-      "title": "Byggnadsytor",
-      "group": "test",
-      "geometryName": "ogr_geometry",
+      "name": "editor_polygon",
+      "title": "Polygon",
+      "group": "edit",
+      "geometryName": "geom",
+      "geometryType": "Polygon",
       "queryable": true,
-      "source": "local",
-      "style": "mask",
+      "editable": true,
+      "source": "mdk",
+      "style": "polygon-blue",
       "type": "WFS",
       "visible": true,
       "offline": true,
       "attributes": [
           {
-            "name": "typ",
-            "title": "Typ:",
-            "type": "dropdown",
-            "maxLength": 20,
-            "options": [
-                "Villa",
-                "Radhus",
-                "Lägenhet"
-            ]
-          },
-          {
-            "name": "stomme1",
-            "title": "Stomme:",
-            "type": "dropdown",
-            "maxLength": 20,
-            "constraint": "change:typ:Villa",
-            "options": [
-                "mexitegel",
-                "träpanel",
-                "eternit"
-            ]
-          },
-          {
-            "name": "stomme1",
-            "title": "Stomme:",
-            "type": "dropdown",
-            "maxLength": 20,
-            "constraint": "change:typ:Lägenhet",
-            "options": [
-                "betong",
-                "cement",
-                "puts"
-            ]
-          },
-          {
-            "name": "fastighet",
-            "title": "Fastighet: ",
+            "name": "name",
+            "title": "Name: ",
             "type": "text",
-            "maxLength": 15
+            "maxLength": 50
           },
           {
-            "name": "byggtyp",
-            "title": "Typ:",
+            "name": "type",
+            "title": "Type: ",
+            "type": "dropdown",
+            "maxLength": 30,
+            "options": [
+                "Appartement",
+                "Villa",
+                "Townhouse",
+                "Mansion"
+            ]
+          },
+          {
+            "name": "comments",
+            "title": "Comments: ",
+            "type": "textarea",
+            "textarea": 254
+          },
+          {
+            "name": "highlight",
+            "title": "Highlight: ",
             "type": "checkbox"
           }
       ]
     },
     {
-      "name": "test_punkt",
-      "title": "Byggnadspunkter",
-      "group": "test",
-      "geometryName": "ogr_geometry",
+      "name": "editor_line",
+      "title": "Line",
+      "group": "edit",
+      "geometryName": "geom",
       "queryable": true,
-      "source": "local",
-      "style": "cirkel",
+      "editable": true,
+      "source": "mdk",
+      "style": "line-red",
       "type": "WFS",
-      "extent": [
-          105085,
-          6571627,
-          219773,
-          6628182
-        ],
       "visible": true,
       "attributes": [
           {
-            "name": "typ",
-            "title": "Typ",
+            "name": "name",
+            "title": "Name: ",
+            "type": "text",
+            "maxLength": 50
+          },
+          {
+            "name": "type",
+            "title": "Type: ",
             "type": "dropdown",
+            "maxLength": 30,
             "options": [
-                "Villa",
-                "Radhus",
-                "Lägenhet"
+                "Path",
+                "Road",
+                "Highway",
+                "Bicycle path"
             ]
+          },
+          {
+            "name": "comments",
+            "title": "Comments: ",
+            "type": "textarea",
+            "textarea": 254
+          },
+          {
+            "name": "highlight",
+            "title": "Highlight: ",
+            "type": "checkbox"
+          }
+      ]
+    },
+    {
+      "name": "editor_point",
+      "title": "Punkt",
+      "group": "edit",
+      "geometryName": "geom",
+      "queryable": true,
+      "editable": true,
+      "source": "mdk",
+      "style": "circle-yellow",
+      "type": "WFS",
+      "visible": true,
+      "attributes": [
+          {
+            "name": "name",
+            "title": "Name: ",
+            "type": "text",
+            "maxLength": 50
+          },
+          {
+            "name": "type",
+            "title": "Type: ",
+            "type": "dropdown",
+            "maxLength": 30,
+            "options": [
+                "Restaurant",
+                "Café",
+                "B&B"
+            ]
+          },
+          {
+            "name": "comments",
+            "title": "Comments: ",
+            "type": "textarea",
+            "textarea": 254
           }
       ]
     },
@@ -218,6 +263,28 @@
           }
         ]
       ],
+      "polygon-blue": [
+        [
+          {
+            "stroke": {
+              "color": "rgba(0,122,255,1.0)"
+            },
+            "fill": {
+              "color": "rgba(0,122,255,0.5)"
+            }
+          }
+        ]
+      ],
+      "line-red": [
+        [
+          {
+            "stroke": {
+              "color": "rgba(255,59,48,1.0)",
+              "width": 3
+            }
+          }
+        ]
+      ],
       "cirkel": [
         [
           {
@@ -229,6 +296,22 @@
               },
               "fill": {
                 "color": "rgba(0,0,0,0.5)"
+              }
+            }
+          }
+        ]
+      ],
+      "circle-yellow": [
+        [
+          {
+            "circle": {
+              "radius": 6,
+              "stroke": {
+                "color": "rgba(255,204,0,1)",
+                "width": 2
+              },
+              "fill": {
+                "color": "rgba(255,204,0,0.5)"
               }
             }
           }

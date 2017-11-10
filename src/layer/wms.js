@@ -12,7 +12,8 @@ var wms = function wms(layerOptions) {
   };
   var sourceDefault = {
     version: '1.1.1',
-    gutter: 0
+    gutter: 0,
+    format: 'image/png'
   };
   var wmsOptions = $.extend(wmsDefault, layerOptions);
   wmsOptions.name.split(':').pop();
@@ -20,6 +21,9 @@ var wms = function wms(layerOptions) {
   sourceOptions.attribution = wmsOptions.attribution;
   sourceOptions.projectionCode = viewer.getProjectionCode();
   sourceOptions.id = wmsOptions.id;
+  sourceOptions.tileGrid = viewer.getTileGrid();
+  sourceOptions.format = wmsOptions.format ? wmsOptions.format : sourceOptions.format;
+
   var wmsSource = createSource(sourceOptions);
   return tile(wmsOptions, wmsSource);
   function createSource(options) {
@@ -29,11 +33,12 @@ var wms = function wms(layerOptions) {
       gutter: options.gutter,
       crossOrigin: 'anonymous',
       projection: options.projectionCode,
+      tileGrid: options.tileGrid,
       params: {
         'LAYERS': options.id,
         'TILED': true,
-        VERSION: options.version,
-        'SRS': "EPSG:3857"
+        'VERSION': options.version,
+        'FORMAT': options.format
       }
     }))
   }
