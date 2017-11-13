@@ -302,7 +302,7 @@ function getQueryableLayers() {
 
 function getSearchableLayers() {
   var searchableLayers = [];
-  settings.layers.forEach(function(layer) {
+  map.getLayers().forEach(function(layer) {
     if ((layer.get('searchable') && layer.getVisible()) || layer.get('searchable') === 'always') {
       searchableLayers.push(layer.get('name'));
     }
