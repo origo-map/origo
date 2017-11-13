@@ -22,6 +22,7 @@ var layerNameAttribute;
 var layerName;
 var titleAttribute;
 var contentAttribute;
+var markSearchableLayers;
 var maxZoomLevel;
 var url;
 var title;
@@ -49,6 +50,7 @@ function init(options) {
   title = options.title || '';
   titleAttribute = options.titleAttribute || undefined;
   contentAttribute = options.contentAttribute || undefined;
+  markSearchableLayers = options.hasOwnProperty('markSearchableLayers') ? options.markSearchableLayers : false;
   maxZoomLevel = options.maxZoomLevel || Viewer.getResolutions().length - 2 || Viewer.getResolutions();
   limit = options.limit || 9;
   hintText = options.hintText || 'Sök...';
@@ -89,7 +91,11 @@ function init(options) {
     limit: limit,
     displayKey: name,
     source: function(query, syncResults, asyncResults) {
-      $.get(url + '?q=' + encodeURI(query) + '&l=' + Viewer.getSearchableLayers(), function(data) {
+      var queryUrl = url + '?q=' + encodeURI(query);
+      if(markSearchableLayers){
+        queryUrl += '&l=' + Viewer.getSearchableLayers();
+      }
+      $.get(queryUrl, function(data) {
         asyncResults(data);
       });
     }
