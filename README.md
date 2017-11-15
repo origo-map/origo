@@ -79,4 +79,4 @@ Origo follows the [Airbnb's JavaScript Style Guide](https://github.com/airbnb/ja
 The project is licensed under the BSD 2-clause license. It is specified in the [license file](LICENSE.txt).
 
 ## Contact
-If you want to get in contact with us, please join our chat on slack.com using this invitation: [origo-map.slack.com](https://origo-map.slack.com).
+If you want to get in contact with us, please join our chat on slack.com using this invitation: [origo-map.slack.com](https://join.slack.com/t/origo-map/shared_invite/enQtMjU0OTQ5MzcxMDQ3LTA4ZDBlNjI0Mzc2NzI0NTE1ZjAzMGY2ODIxZjdlNDdiNjRkNjhjZTFiNThjNWM0NmM5ZTIyYjBjNmZkM2Y2NTI).
