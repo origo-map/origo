@@ -501,8 +501,8 @@ function render(el, mapOptions) {
     }
   }
 
-    $(el).html(template(pageTemplate));
-  }
+  $(el).html(template(pageTemplate));
+}
 
 module.exports.init = init;
 module.exports.createLayers = createLayers;
