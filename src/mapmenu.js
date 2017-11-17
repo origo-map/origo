@@ -8,8 +8,12 @@ var $menuButton, $closeButton, $mapMenu;
 
 var symbolSize = 20;
 var styleSettings;
+var options;
+var isActive;
 
-function init() {
+function init(opt_options) {
+    options = opt_options || {};
+    isActive = options.isActive || false;
     styleSettings = viewer.getStyleSettings();
     var el = utils.createButton({
         text: 'Meny',
@@ -45,6 +49,10 @@ function init() {
     $closeButton = $('#o-mapmenu-button-close');
 
     bindUIActions();
+
+    if(isActive && window.innerWidth >= 768) {
+      toggleMenu();
+    }
 }
 function bindUIActions() {
     $menuButton.on('click', function(e) {
