@@ -12,9 +12,15 @@ var options;
 var isActive;
 
 function init(opt_options) {
+    var breakPointSize;
+    var breakPoint;
+
     options = opt_options || {};
     isActive = options.isActive || false;
+    breakPointSize = options.breakPointSize || 'l';
+    breakPoint  = viewer.getBreakPoints(breakPointSize);
     styleSettings = viewer.getStyleSettings();
+
     var el = utils.createButton({
         text: 'Meny',
         id: 'o-mapmenu-button',
@@ -50,7 +56,7 @@ function init(opt_options) {
 
     bindUIActions();
 
-    if(isActive && window.innerWidth >= 768) {
+    if(isActive && $('#o-map').width() >= breakPoint[0]) {
       toggleMenu();
     }
 }
