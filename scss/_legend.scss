@@ -150,8 +150,8 @@ li .o-legend-item-img {
   cursor: pointer;
   display: inline-block;
   float: left;
-  height: 20px;
-  width: 20px;
+  height: 30px;
+  width: 30px;
   border: 1px solid #FFF;
   margin-left: -1px;
 }
@@ -275,7 +275,7 @@ li .o-legend-subitem-title {
     width: inherit;
     display: block;
     border: none;
-    margin: 0;
+    margin-left: 10px;
   }
 }
 

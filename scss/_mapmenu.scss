@@ -47,9 +47,9 @@
 	overflow: hidden;
 	overflow-y: auto;
 	position: absolute;
-	right: -230px;
+	right: -280px;
 	top: 0px;
-	width: 230px;
+	width: 280px;
 	z-index: 100;
 	-ms-transform: translateX(0);
 	-webkit-transform: translateX(0);
@@ -66,9 +66,9 @@
   border-left: 1px solid #C5C5C5;
 }
 #o-mapmenu.o-mapmenu-show {
-	-ms-transform: translateX(-230px);
-	-webkit-transform: translateX(-230px);
-	transform: translateX(-230px);
+	-ms-transform: translateX(-280px);
+	-webkit-transform: translateX(-280px);
+	transform: translateX(-280px);
 }
 .o-no-csstransforms #o-mapmenu.o-mapmenu-show {
   right: 0;
@@ -122,7 +122,7 @@ li .o-menu-button:hover {
 &[class*=#{$media-l-m-s}] {
 #o-sidebar,
 #o-mapmenu {
-  max-width: 230px;
+  max-width: 280px;
   width: 100%;
 }
 }

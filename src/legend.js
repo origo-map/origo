@@ -169,7 +169,7 @@ function getSymbol(style, layer, force) {
           symbol += '</div>';
         }
       } else {
-        inlineStyle += "background-size: 20px";
+        inlineStyle += "background-size: 30px";
         if (layer.getProperties().useLegendGraphics) {
           symbol = '<div class="o-legend-item-img">';
           symbol += '<img class="legend-img" data-layer="' + layer.getProperties().id + '" src="' + src + '"></img>';
