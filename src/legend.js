@@ -376,7 +376,7 @@ function addLegend(groups) {
         if (inSubgroup) {
           rootGroup = $('#' + name).parents('ul [id^=o-group-]:last');
           if (!$(rootGroup).find('.o-icon-expand:first').hasClass('o-icon-expand-true')) {
-            toggleGroup($(rootGroup).find('li.o-legend-header:first'));              
+            toggleGroup($(rootGroup).find('li.o-legend-header:first'));
           }
 
           toggleSubGroupCheck($('#' + name).parents('ul').has('.o-legend-header').first(), false);
@@ -432,6 +432,12 @@ function addLegend(groups) {
   $('#o-legend-overlay .o-toggle-button').on('click', function(evt) {
     toggleOverlay();
     evt.preventDefault();
+  });
+
+  $('#o-map-legend-background li').on("mouseover", function (evt) {
+    var legendId = $(evt.target).closest('li').attr('id');
+    var layer = viewer.getLayer(legendId.split("o-legend-")[1]);
+    $(this).attr('title', layer.get('title'));
   });
 }
 
