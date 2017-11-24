@@ -17,7 +17,9 @@ function init(opt_options) {
     formatConstructors: [
       ol.format.GPX,
       ol.format.GeoJSON,
-      ol.format.KML
+      ol.format.IGC,
+      ol.format.KML,
+      ol.format.TopoJSON
     ]
   });
 
