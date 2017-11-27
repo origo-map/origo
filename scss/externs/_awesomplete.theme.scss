@@ -60,7 +60,7 @@
 	color: #000;
 }
 
-.awesomplete > ul > li[aria-selected="true"] {
+.awesomplete > ul > li[aria-selected="true"] > .suggestion {
 	background-color: $search-hover-backround;
 	color: #000;
 }
