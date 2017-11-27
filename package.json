@@ -22,12 +22,12 @@
     "build-ol": "node node_modules/openlayers/tasks/build.js tasks/build-ol-standard.json node_modules/openlayers/dist/ol.js"
   },
   "dependencies": {
+    "awesomplete": "^1.1.2",
     "browserify": "11.0.1",
     "jquery": "2.1.4",
     "localforage": "1.5.0",
     "openlayers": "4.3.4",
-    "proj4": "2.3.10",
-    "typeahead.js": "0.11.0"
+    "proj4": "2.3.10"
   },
   "devDependencies": {
     "browser-sync": "2.9.5",
