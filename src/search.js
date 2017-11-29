@@ -185,7 +185,7 @@ function groupToList(group) {
   var nr = 0;
   var turn = 0;
   while (nr < limit && types.length) {
-    types.forEach(function(type) {
+    types.slice().forEach(function(type) {
       if (nr < limit) {
         var item = group[type][turn];
         if (type in selection === false) {
@@ -242,7 +242,8 @@ function makeRequest(handler, obj) {
 
 function onClearSearch() {
   $('#o-search-button-close').on('click', function(e) {
-    featureInfo.clear();
+    clearSearchResults();
+    clear();
     $('#o-search').removeClass('o-search-true');
     $('#o-search').addClass('o-search-false');
     $('#o-search .o-search-field').val('');
@@ -254,7 +255,6 @@ function onClearSearch() {
 function showOverlay(data, coord) {
   var popup;
   var content;
-  featureInfo.clear();
   clear();
   popup = Popup('#o-map');
   overlay = new ol.Overlay({
@@ -278,12 +278,21 @@ function showFeatureInfo(features, title, content) {
   obj.feature = features[0];
   obj.title = title;
   obj.content = content;
+  clear();
   featureInfo.identify([obj], 'overlay', getCenter(features[0].getGeometry()));
   mapUtils.zoomToExent(features[0].getGeometry(), maxZoomLevel);
 }
 
 function clear() {
-  Viewer.removeOverlays(overlay);
+  featureInfo.clear();
+  if (overlay) {
+    Viewer.removeOverlays(overlay);
+  }
+}
+
+function clearSearchResults() {
+  awesomplete.list = [];
+  setSearchDb([]);
 }
 
 /** There are several different ways to handle selected search result.
