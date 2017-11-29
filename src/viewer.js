@@ -459,6 +459,23 @@ function autoPan() {
   }
   /*End workaround*/
 }
+function removeLayer(name) {
+  var $ul;
+
+  settings.layers.forEach(function(layer, i, obj) {
+    if (layer.get('name') === name) {
+      obj.splice(i, 1)
+    }
+  });
+
+  $ul = $("#o-mapmenu").find("#" + name).closest('ul');
+  $ul.find('#' + name).remove();
+  if ($ul.children().length === 1) {
+    $ul.remove();
+  }
+
+  $('#o-legend-' + name).remove();
+}
 
 function removeOverlays(overlays) {
   if (overlays) {
@@ -518,6 +535,7 @@ module.exports.getClusterOptions = getClusterOptions;
 module.exports.getTileGrid = getTileGrid;
 module.exports.getTileSize = getTileSize;
 module.exports.autoPan = autoPan;
+module.exports.removeLayer = removeLayer;
 module.exports.removeOverlays = removeOverlays;
 module.exports.checkScale= checkScale;
 module.exports.getMapName = getMapName;

@@ -35,7 +35,8 @@ function init(opt_options) {
       name: event.file.name.split('.')[0].replace(/\s/g,''),
       group: "draganddrop",
       title: event.file.name.split('.')[0],
-      queryable: true
+      queryable: true,
+      removable: true
     });
 
     viewer.getSettings().layers.push(vectorLayer);
@@ -54,8 +55,10 @@ function init(opt_options) {
     vectorLayerName = vectorLayer.get('name');
 
     legend.createLegendItem(vectorLayerName, true);
+    legend.addMapLegendItem(vectorLayer, vectorLayerName)
     legend.addCheckbox(vectorLayer, vectorLayerName);
     legend.addTickListener(vectorLayer);
+    legend.addMapLegendListener(vectorLayer)
   });
 }
 
