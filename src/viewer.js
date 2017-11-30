@@ -475,6 +475,7 @@ function removeLayer(name) {
   }
 
   $('#o-legend-' + name).remove();
+  map.removeLayer(getLayersByProperty("name", name)[0])
 }
 
 function removeOverlays(overlays) {
