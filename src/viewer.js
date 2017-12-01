@@ -31,7 +31,8 @@ var settings = {
   editLayer: null
 };
 var urlParams;
-var footerTemplate = {};
+var pageSettings;
+var pageTemplate = {};
 
 function init(el, mapOptions) {
   render(el, mapOptions);
@@ -480,22 +481,32 @@ function removeOverlays(overlays) {
 }
 
 function render(el, mapOptions) {
-    if (mapOptions.hasOwnProperty('footer')) {
-      if (mapOptions.footer[0].hasOwnProperty('img')) {
-        footerTemplate.img = mapOptions.footer[0].img;
+  pageSettings = mapOptions.pageSettings;
+  pageTemplate.mapClass = "o-map";
+
+  if (pageSettings) {
+    if (pageSettings.footer) {
+      if (pageSettings.footer.hasOwnProperty('img')) {
+        pageTemplate.img = pageSettings.footer.img;
       }
-      if (mapOptions.footer[0].hasOwnProperty('text')) {
-        footerTemplate.text = mapOptions.footer[0].text;
+      if (pageSettings.footer.hasOwnProperty('text')) {
+        pageTemplate.text = pageSettings.footer.text;
       }
-      if (mapOptions.footer[0].hasOwnProperty('url')) {
-        footerTemplate.url = mapOptions.footer[0].url;
+      if (pageSettings.footer.hasOwnProperty('url')) {
+        pageTemplate.url = pageSettings.footer.url;
       }
-      if (mapOptions.footer[0].hasOwnProperty('urlText')) {
-        footerTemplate.urlText = mapOptions.footer[0].urlText;
+      if (pageSettings.footer.hasOwnProperty('urlText')) {
+        pageTemplate.urlText = pageSettings.footer.urlText;
       }
     }
+    if (pageSettings.mapGrid) {
+      if (pageSettings.mapGrid.hasOwnProperty('visible') && pageSettings.mapGrid.visible === true) {
+        pageTemplate.mapClass = "o-map o-map-grid";
+      }
+    }
+  }
 
-    $(el).html(template(footerTemplate));
+  $(el).html(template(pageTemplate));
 }
 
 module.exports.init = init;
