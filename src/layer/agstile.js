@@ -14,7 +14,7 @@ var agsTile = function agsTile(layerOptions) {
   var agsOptions = $.extend(agsDefault, layerOptions);
   var sourceOptions = $.extend(sourceDefault, viewer.getMapSource()[layerOptions.source]);
   sourceOptions.attribution = agsOptions.attribution;
-  sourceOptions.projectionCode = viewer.getProjectionCode();
+  sourceOptions.projection = viewer.getProjection();
   sourceOptions.params = agsOptions.params || {};
   sourceOptions.params.layers = "show:" + agsOptions.id;
 
@@ -24,7 +24,7 @@ var agsTile = function agsTile(layerOptions) {
   function createSource(options) {
     return new ol.source.TileArcGISRest({
       attributions: options.attribution,
-      projection: options.projectionCode,
+      projection: options.projection,
       crossOrigin: 'anonymous',
       params: options.params,
       url: options.url
