@@ -53,6 +53,7 @@ function init(el, mapOptions) {
   settings.url = mapOptions.url;
   settings.target = mapOptions.target;
   settings.baseUrl = mapOptions.baseUrl;
+  settings.breakPoints = mapOptions.breakPoints;
   settings.extent = mapOptions.extent || undefined;
   settings.center = urlParams.center || mapOptions.center;
   settings.zoom = urlParams.zoom || mapOptions.zoom;
@@ -203,6 +204,10 @@ function getExtent() {
 
 function getBaseUrl() {
   return settings.baseUrl;
+}
+
+function getBreakPoints(size) {
+  return size && settings.breakPoints.hasOwnProperty(size) ? settings.breakPoints[size] : settings.breakPoints;
 }
 
 function getMapName() {
@@ -496,6 +501,7 @@ function render(el, mapOptions) {
 module.exports.init = init;
 module.exports.createLayers = createLayers;
 module.exports.getBaseUrl = getBaseUrl;
+module.exports.getBreakPoints = getBreakPoints;
 module.exports.getExtent = getExtent;
 module.exports.getSettings = getSettings;
 module.exports.getStyleSettings = getStyleSettings;

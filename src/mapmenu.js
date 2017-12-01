@@ -8,9 +8,19 @@ var $menuButton, $closeButton, $mapMenu;
 
 var symbolSize = 20;
 var styleSettings;
+var options;
+var isActive;
 
-function init() {
+function init(opt_options) {
+    var breakPointSize;
+    var breakPoint;
+
+    options = opt_options || {};
+    isActive = options.isActive || false;
+    breakPointSize = options.breakPointSize || 'l';
+    breakPoint  = viewer.getBreakPoints(breakPointSize);
     styleSettings = viewer.getStyleSettings();
+
     var el = utils.createButton({
         text: 'Meny',
         id: 'o-mapmenu-button',
@@ -45,6 +55,10 @@ function init() {
     $closeButton = $('#o-mapmenu-button-close');
 
     bindUIActions();
+
+    if(isActive && $('#o-map').width() >= breakPoint[0]) {
+      toggleMenu();
+    }
 }
 function bindUIActions() {
     $menuButton.on('click', function(e) {

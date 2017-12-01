@@ -4,7 +4,10 @@
       "name": "home"
     },
     {
-      "name": "mapmenu"
+      "name": "mapmenu",
+      "options": {
+        "isActive": false
+      }
     },
     {
       "name": "sharemap"
