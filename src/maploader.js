@@ -63,20 +63,23 @@ var mapLoader = function(mapOptions, config) {
       if (isUrl(mapOptions)) {
         urlParams = permalink.parsePermalink(mapOptions);
         var url = mapOptions.split('#')[0];
+        var mapUrl = url;
 
         //remov file name if included in
         url = trimUrl(url);
 
         var baseUrl = config.baseUrl || url;
         var json = urlParams.map + '.json';
-        var mapUrl = url;
         url += json;
       } else {
+        var json = mapOptions;
         if (window.location.hash) {
           urlParams = permalink.parsePermalink(window.location.href);
+          if (urlParams.map) {
+            json = urlParams.map + '.json';
+          }
         }
         var baseUrl = config.baseUrl || '';
-        var json = mapOptions;
         var url = baseUrl + json;
         var mapUrl = getUrl();
       }

@@ -11,7 +11,7 @@ var mapTarget;
 
 function Init(opt_options) {
   var options = opt_options || {};
-  var target = options.target || '#o-toolbar-navigation';
+  var target = options.target || '#o-toolbar-misc';
   mapTarget = viewer.getTarget();
   tooltip = options.tooltipText || 'Visa stor karta';
 
