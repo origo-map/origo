@@ -121,10 +121,8 @@
   }
 }
 &[class*=#{$media-l-m-s-xs}] {
-  .o-tools-left {
-    display: none;
-  }
-  .o-toolbar-misc {
+  .o-toolbar-maptools,
+  .o-toolbar-navigation {
     display: none;
   }
 }
