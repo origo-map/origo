@@ -23,7 +23,7 @@ function render() {
   var el = Utils.createListButton({
     id: 'o-about',
     iconCls: 'o-icon-fa-info-circle',
-    src: 'css/svg/fa-icons.svg#fa-info-circle',
+    src: '#fa-info-circle',
     text: buttonText
   });
   $('#o-menutools').append(el);
