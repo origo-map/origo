@@ -53,8 +53,9 @@
   left: 50%;
   margin-top: -1rem;
   margin-left: -1rem;
-  z-index: 10000;
+  z-index: 1;
   position: absolute;
+  pointer-events: none; 
 }
 .o-icon-position {
   padding: 0;
