@@ -103,6 +103,16 @@ function bindUIActions() {
       $('#o-search').addClass('o-search-false');
     }
   });
+
+  $('.o-search-field').on('blur', function(e) {
+    $('.o-search-wrapper').removeClass('active');
+    window.dispatchEvent(new Event('resize'));
+  });
+  $('.o-search-field').on('focus', function(e) {
+    $('.o-search-wrapper').addClass('active');
+    window.dispatchEvent(new Event('resize'));
+  });
+
 }
 
 /*
