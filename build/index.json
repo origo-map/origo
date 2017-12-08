@@ -4,7 +4,10 @@
       "name": "home"
     },
     {
-      "name": "mapmenu"
+      "name": "mapmenu",
+      "options": {
+        "isActive": false
+      }
     },
     {
       "name": "sharemap"
@@ -50,11 +53,16 @@
       "name": "scaleLine"
     }
   ],
-  "footer": [{
+  "pageSettings": {
+  "footer": {
     "img": "img/png/logo.png",
     "url" : "https://github.com/origo-map/origo",
     "urlText": "Origo"
-  }],
+  },
+  "mapGrid": {
+    "visible": true
+  }
+},
   "projectionCode": "EPSG:3857",
   "projectionExtent": [
     -20026376.39,
