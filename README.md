@@ -16,11 +16,11 @@ Origo is a web mapping framework. It is based on the [OpenLayers library](https:
 
 ## How to get started
 
-The project is still in its early stages. We will be using releases that you can download to get started. We are working hard to get a first version published, although there is currently no timeline for when this will happen. Below you will find a step-by-step guide on how to get started if you wish to try Origo in its current state.
+Download the latest [release](https://github.com/origo-map/origo/releases/) and check out the [api documentation](https://origo-map.github.io/api-documentation/latest/#origo-api). Below you will find some live examples and how to get started devoloping with Origo.
 
 ## Documentation
 
-Documentation is currently being written. Once we have it published, it will be linked from this page.
+Learn more how to use Origo with the [api documentation](https://origo-map.github.io/api-documentation/latest/#origo-api).
 
 ## Want to contribute?
 We happily accept contributions of any kind. Guidelines are available in the [`CONTRIBUTING.md`](https://github.com/origo-map/origo/blob/master/CONTRIBUTING.md) file.
