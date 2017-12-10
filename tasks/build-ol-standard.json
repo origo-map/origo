@@ -98,6 +98,7 @@
     "ol.interaction.Select#getFeatures",
     "ol.interaction.Snap",
     "ol.interaction.Snap#setActive",
+    "ol.interaction.defaults",
     "ol.source.Source",
     "ol.source.Source#on",
     "ol.interaction.Select#on",

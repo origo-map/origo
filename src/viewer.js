@@ -33,6 +33,7 @@ var settings = {
 var urlParams;
 var pageSettings;
 var pageTemplate = {};
+var disableRotation;
 
 function init(el, mapOptions) {
   render(el, mapOptions);
@@ -85,6 +86,19 @@ function init(el, mapOptions) {
   settings.consoleId = mapOptions.consoleId || 'o-console';
   settings.featureinfoOptions = mapOptions.featureinfoOptions || {};
   settings.enableRotation = mapOptions.enableRotation === false ? false : true;
+
+  // Disable rotation if rotation control is not called
+  var getRotate;
+  for (var i = 0; i < mapOptions.controls.length; ++i) {
+    if (mapOptions.controls[i].name == 'rotate') {
+      getRotate = i;
+      break;
+    }
+  }
+  getRotate != undefined ? undefined : disableRotate = new ol.interaction.defaults({ 
+    altShiftDragRotate: false, 
+    pinchRotate: false 
+  });
 
   //If url arguments, parse this settings
   if (window.location.search) {
@@ -140,6 +154,7 @@ function loadMap() {
   map = new ol.Map({
     target: 'o-map',
     controls: [],
+    interactions: disableRotation,
     view: new ol.View({
       extent: settings.extent || undefined,
       projection: settings.projection || undefined,
