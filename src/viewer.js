@@ -90,12 +90,12 @@ function init(el, mapOptions) {
   // Disable rotation if rotation control is not called
   var getRotate;
   for (var i = 0; i < mapOptions.controls.length; ++i) {
-    if (mapOptions.controls[i].name == 'rotate') {
+    if (mapOptions.controls[i].name === 'rotate') {
       getRotate = i;
       break;
     }
   }
-  getRotate != undefined ? undefined : disableRotate = new ol.interaction.defaults({ 
+  getRotate != undefined ? undefined : disableRotation = new ol.interaction.defaults({ 
     altShiftDragRotate: false, 
     pinchRotate: false 
   });
