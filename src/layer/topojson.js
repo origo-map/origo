@@ -20,8 +20,8 @@ var topojson = function topojson(layerOptions) {
   if (isUrl(topojsonOptions.source)) {
     sourceOptions.url = topojsonOptions.source;
   } else {
-    topojsonOptions.sourceName = baseUrl + topojsonOptions.source;
-    sourceOptions.url = topojsonOptions.source;
+    topojsonOptions.sourceName = topojsonOptions.source;
+    sourceOptions.url = baseUrl + topojsonOptions.source;
   }
 
   topojsonSource = createSource(sourceOptions);

@@ -81,6 +81,7 @@ function createStyleOptions(styleParams) {
           var coordinates = feature.getGeometry().getInteriorPoints().getFirstCoordinate();
           return new ol.geom.Point(coordinates);
         }
+        break;
       case 'endPoint':
         styleOptions.geometry = function(feature) {
           var coordinates = feature.getGeometry().getLastCoordinate();
