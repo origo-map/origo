@@ -34,6 +34,7 @@ var layerName;
 var titleAttribute;
 var contentAttribute;
 var markSearchableLayers;
+var searchableDefault;
 var maxZoomLevel;
 var url;
 var title;
@@ -60,6 +61,7 @@ function init(options) {
   titleAttribute = options.titleAttribute || undefined;
   contentAttribute = options.contentAttribute || undefined;
   markSearchableLayers = options.hasOwnProperty('markSearchableLayers') ? options.markSearchableLayers : false;
+  searchableDefault = options.hasOwnProperty('searchableDefault') ? options.searchableDefault : false;
   maxZoomLevel = options.maxZoomLevel || Viewer.getResolutions().length - 2 || Viewer.getResolutions();
   limit = options.limit || 9;
   hintText = options.hintText || 'Sök...';
@@ -247,7 +249,7 @@ function renderList(suggestion, input) {
 function makeRequest(handler, obj) {
   var queryUrl = url + '?q=' + encodeURI(obj.value);
   if(markSearchableLayers){
-    queryUrl += '&l=' + Viewer.getSearchableLayers();
+    queryUrl += '&l=' + Viewer.getSearchableLayers(searchableDefault);
   }
   $.ajax({
     url: queryUrl,

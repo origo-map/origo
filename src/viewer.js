@@ -306,10 +306,13 @@ function getQueryableLayers() {
   return queryableLayers;
 }
 
-function getSearchableLayers() {
+function getSearchableLayers(searchableDefault) {
   var searchableLayers = [];
   map.getLayers().forEach(function(layer) {
-    if ((layer.get('searchable') && layer.getVisible()) || layer.get('searchable') === 'always') {
+    var searchable = layer.get('searchable');
+    var visible = layer.getVisible();
+    searchable = searchable === undefined ? searchableDefault : searchable;
+    if (searchable === 'always' || (searchable && visible)) {
       searchableLayers.push(layer.get('name'));
     }
   });
