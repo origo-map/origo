@@ -103,12 +103,16 @@ function init(el, mapOptions) {
   if (urlParams.feature) {
     var featureId = urlParams.feature;
     var layer = getLayer(featureId.split(".")[0]);
-    layer.once('render', function(event) {
-      var feature = layer.getSource().getFeatureById(featureId);
-      search.showFeatureInfo([feature], layer.get('title'), getAttributes(feature, layer));
-    });
+    if (layer) {
+      layer.once('render', function(event) {
+        var feature = layer.getSource().getFeatureById(featureId);
+        if (feature) {
+          search.showFeatureInfo([feature], layer.get('title'), getAttributes(feature, layer));
+        }
+      });
+    };
   }
-  
+
   if (urlParams.pin) {
     settings.featureinfoOptions.savedPin = urlParams.pin;
   }

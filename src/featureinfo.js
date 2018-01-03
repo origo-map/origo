@@ -113,7 +113,9 @@ function identify(items, target, coordinate) {
       sidebar.setVisibility(true);
       var owl = initCarousel('#o-identify-carousel', undefined, function(){
         var currentItem = this.owl.currentItem;
-        selectionLayer.clearAndAdd(items[currentItem].feature.clone(), selectionStyles[items[currentItem].feature.getGeometry().getType()]);
+        var clone = items[currentItem].feature.clone();
+        clone.setId(items[currentItem].feature.getId());
+        selectionLayer.clearAndAdd(clone, selectionStyles[items[currentItem].feature.getGeometry().getType()]);
         sidebar.setTitle(items[currentItem].title);
       });
       break;
@@ -165,7 +167,7 @@ function clear() {
   selectionLayer.clear();
   sidebar.setVisibility(false);
   if (overlay) {
-    Viewer.removeOverlays(overlay);      
+    Viewer.removeOverlays(overlay);
   }
   console.log("Clearing selection");
 }
