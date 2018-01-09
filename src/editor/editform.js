@@ -10,6 +10,8 @@ module.exports = function createForm(obj) {
   var type = obj.type;
   var maxLength = obj.maxLength ? ' maxlength="' + obj.maxLength + '" ' : '';
   var dropdownOptions = obj.options || [];
+  var today = new Date(); 
+  var isoDate = new Date(today.getTime() - (today.getTimezoneOffset() * 60000)).toISOString();
   var el;
   var checked;
   var firstOption;
@@ -46,7 +48,34 @@ module.exports = function createForm(obj) {
       el += '</div>';
       break;
     case 'date':
-      el = '<div><label>' + label + '</label><br><input type="date" id="' + id + '" placeholder="YYYY-MM-DD" value="' + val + '"' + maxLength + '></div>';
+      if (!val) {
+        if (obj.defaultDate === 'today') {
+          val = isoDate.slice(0, 10);
+        } else if (obj.defaultDate) {
+          val = obj.defaultDate;
+        } else {
+          val = '';
+        }
+      }
+      el = '<div><label>' + label + '</label><br><input type="date" id="' + id + '" placeholder="YYYY-MM-DD" value="' + val + '"></div>';
+      break;
+    case 'datetime':
+      if (!val) {
+        if (obj.defaultDatetime === 'today') {
+          val = isoDate.slice(0, 16);
+        } else if (obj.defaultDatetime) {
+          val = obj.defaultDatetime;
+        } else {
+          val = '';
+        }
+      }
+      el = '<div><label>' + label + '</label><br><input type="datetime-local" id="' + id + '" placeholder="YYYY-MM-DDThh:mm" value="' + val + '"></div>';
+      break;
+    case 'color':
+      if (!val) {
+        val = obj.defaultColor ? obj.defaultColor : '';
+      }
+      el = '<div><label>' + label + '</label><br><input type="color" id="' + id + '" value="' + val + '"></div>';
       break;
   }
   return el;
