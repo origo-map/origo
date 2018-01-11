@@ -479,6 +479,12 @@ function addLegend(groups) {
     toggleOverlay();
     evt.preventDefault();
   });
+
+  $('#o-map-legend-background li').on("mouseover", function (evt) {
+    var legendId = $(evt.target).closest('li').attr('id');
+    var layer = viewer.getLayer(legendId.split("o-legend-")[1]);
+    $(this).attr('title', layer.get('title'));
+  });
 }
 
 function onToggleCheck(layername) {

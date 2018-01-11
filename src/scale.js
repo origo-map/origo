@@ -37,19 +37,27 @@ function render() {
 
 function setActive(state) {
   if (state === true) {
-    map.getView().on('change:resolution', onZoomChange);
+    map.on('movestart', onZoomChange);
     onZoomChange();
     isActive = true;
   } else if (state === false) {
-    map.getView().un('change:resolution', onZoomChange);
+    map.un('movestart', onZoomChange);
     isActive = false;
   }
 }
 
-function onZoomChange(e) {
-  var resolution = e ? e.target.get(e.key) : map.getView().getResolution();
-  var scale = Viewer.getScale(resolution);
-  $('#' + controlId).text(scaleText + numberFormatter(scale));
+function onZoomChange(evt) {
+  map.once('moveend', function(e) {
+    var view = map.getView();
+    var resolution = evt ? evt.frameState.viewState.resolution : view.getResolution();
+    var mapZoom = view.getZoomForResolution(resolution);
+    var currentZoom = parseInt(view.getZoom(), 10);
+    var currentResolution = view.getResolution();
+    if (currentZoom !== mapZoom) {
+      var scale = Viewer.getScale(currentResolution);
+      $('#' + controlId).text(scaleText + numberFormatter(scale));
+    }
+  });
 }
 
 module.exports.init = Init;
