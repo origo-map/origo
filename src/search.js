@@ -33,6 +33,8 @@ var layerNameAttribute;
 var layerName;
 var titleAttribute;
 var contentAttribute;
+var includeSearchableLayers;
+var searchableDefault;
 var maxZoomLevel;
 var url;
 var title;
@@ -58,6 +60,8 @@ function init(options) {
   title = options.title || '';
   titleAttribute = options.titleAttribute || undefined;
   contentAttribute = options.contentAttribute || undefined;
+  includeSearchableLayers = options.hasOwnProperty('includeSearchableLayers') ? options.includeSearchableLayers : false;
+  searchableDefault = options.hasOwnProperty('searchableDefault') ? options.searchableDefault : false;
   maxZoomLevel = options.maxZoomLevel || Viewer.getResolutions().length - 2 || Viewer.getResolutions();
   limit = options.limit || 9;
   hintText = options.hintText || 'Sök...';
@@ -243,8 +247,12 @@ function renderList(suggestion, input) {
 }
 
 function makeRequest(handler, obj) {
+  var queryUrl = url + '?q=' + encodeURI(obj.value);
+  if (includeSearchableLayers) {
+    queryUrl += '&l=' + Viewer.getSearchableLayers(searchableDefault);
+  }
   $.ajax({
-    url: url + '?q=' + encodeURI(obj.value),
+    url: queryUrl,
     type: 'GET',
     dataType: 'json'
   }).then(handler);
