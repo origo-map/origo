@@ -306,6 +306,19 @@ function getQueryableLayers() {
   return queryableLayers;
 }
 
+function getSearchableLayers(searchableDefault) {
+  var searchableLayers = [];
+  map.getLayers().forEach(function(layer) {
+    var searchable = layer.get('searchable');
+    var visible = layer.getVisible();
+    searchable = searchable === undefined ? searchableDefault : searchable;
+    if (searchable === 'always' || (searchable && visible)) {
+      searchableLayers.push(layer.get('name'));
+    }
+  });
+  return searchableLayers;
+}
+
 function getGroup(group) {
   var group = $.grep(settings.layers, function(obj) {
     return (obj.get('group') == group);
@@ -523,6 +536,7 @@ module.exports.getLayersByProperty = getLayersByProperty;
 module.exports.getLayer = getLayer;
 module.exports.getControlNames = getControlNames;
 module.exports.getQueryableLayers = getQueryableLayers;
+module.exports.getSearchableLayers = getSearchableLayers;
 module.exports.getGroup = getGroup;
 module.exports.getGroups = getGroups;
 module.exports.getProjectionCode = getProjectionCode;
