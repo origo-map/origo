@@ -49,7 +49,7 @@ Just follow these three steps and you will be up and running in no time.
 The minimum requirements are:
 
   * [Git](https://git-scm.com/)
-  * [Node.js](https://nodejs.org/) (version 6 or higher is recommended)
+  * [Node.js](https://nodejs.org/) (version 8 or higher is recommended to avoid build problems)
 
  1. To get your own local copy of Origo use git to clone the repository with the command below:
 
