@@ -40,15 +40,15 @@ module.exports = function vector(options, source) {
       map.on('movestart', onMoveStart);
 
       function onMoveStart(evt) {
-        var mapZoom = parseInt(view.getZoom(), 10);
+        var mapZoom = view.getZoomForResolution(evt.frameState.viewState.resolution);
         var clusterDistance = options.source.getProperties().clusterDistance || distance;
         var clusterMaxZoom = options.source.getProperties().clusterMaxZoom || maxZoom;
         map.once('moveend', function(evt) {
           var currentZoom = parseInt(view.getZoom(), 10);
           if (currentZoom !== mapZoom) {
-            if (mapZoom > clusterMaxZoom) {
+            if (currentZoom >= clusterMaxZoom) {
               options.source.setDistance(0);
-            } else if (mapZoom <= clusterMaxZoom) {
+            } else if (currentZoom < clusterMaxZoom) {
               options.source.setDistance(clusterDistance);
             }
           }

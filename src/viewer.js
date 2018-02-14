@@ -31,7 +31,8 @@ var settings = {
   editLayer: null
 };
 var urlParams;
-var footerTemplate = {};
+var pageSettings;
+var pageTemplate = {};
 
 function init(el, mapOptions) {
   render(el, mapOptions);
@@ -53,12 +54,13 @@ function init(el, mapOptions) {
   settings.url = mapOptions.url;
   settings.target = mapOptions.target;
   settings.baseUrl = mapOptions.baseUrl;
+  settings.breakPoints = mapOptions.breakPoints;
   settings.extent = mapOptions.extent || undefined;
   settings.center = urlParams.center || mapOptions.center;
   settings.zoom = urlParams.zoom || mapOptions.zoom;
   mapOptions.tileGrid = mapOptions.tileGrid || {};
   settings.tileSize = mapOptions.tileGrid.tileSize ? [mapOptions.tileGrid.tileSize,mapOptions.tileGrid.tileSize] : [256,256];
-  settings.alignTopLeft = mapOptions.tileGrid.alignTopLeft;
+  settings.alignBottomLeft = mapOptions.tileGrid.alignBottomLeft;
 
   if (mapOptions.hasOwnProperty('proj4Defs') || mapOptions.projectionCode=="EPSG:3857" || mapOptions.projectionCode=="EPSG:4326") {
     // Projection to be used in map
@@ -205,6 +207,10 @@ function getBaseUrl() {
   return settings.baseUrl;
 }
 
+function getBreakPoints(size) {
+  return size && settings.breakPoints.hasOwnProperty(size) ? settings.breakPoints[size] : settings.breakPoints;
+}
+
 function getMapName() {
   return settings.map;
 }
@@ -298,6 +304,19 @@ function getQueryableLayers() {
     }
   });
   return queryableLayers;
+}
+
+function getSearchableLayers(searchableDefault) {
+  var searchableLayers = [];
+  map.getLayers().forEach(function(layer) {
+    var searchable = layer.get('searchable');
+    var visible = layer.getVisible();
+    searchable = searchable === undefined ? searchableDefault : searchable;
+    if (searchable === 'always' || (searchable && visible)) {
+      searchableLayers.push(layer.get('name'));
+    }
+  });
+  return searchableLayers;
 }
 
 function getGroup(group) {
@@ -459,6 +478,24 @@ function autoPan() {
   }
   /*End workaround*/
 }
+function removeLayer(name) {
+  var $ul;
+
+  settings.layers.forEach(function(layer, i, obj) {
+    if (layer.get('name') === name) {
+      obj.splice(i, 1)
+    }
+  });
+
+  $ul = $("#o-mapmenu").find("#" + name).closest('ul');
+  $ul.find('#' + name).remove();
+  if ($ul.children().length === 1) {
+    $ul.remove();
+  }
+
+  $('#o-legend-' + name).remove();
+  map.removeLayer(getLayersByProperty("name", name)[0])
+}
 
 function removeOverlays(overlays) {
   if (overlays) {
@@ -475,27 +512,38 @@ function removeOverlays(overlays) {
 }
 
 function render(el, mapOptions) {
-    if (mapOptions.hasOwnProperty('footer')) {
-      if (mapOptions.footer[0].hasOwnProperty('img')) {
-        footerTemplate.img = mapOptions.footer[0].img;
+  pageSettings = mapOptions.pageSettings;
+  pageTemplate.mapClass = "o-map";
+
+  if (pageSettings) {
+    if (pageSettings.footer) {
+      if (pageSettings.footer.hasOwnProperty('img')) {
+        pageTemplate.img = pageSettings.footer.img;
       }
-      if (mapOptions.footer[0].hasOwnProperty('text')) {
-        footerTemplate.text = mapOptions.footer[0].text;
+      if (pageSettings.footer.hasOwnProperty('text')) {
+        pageTemplate.text = pageSettings.footer.text;
       }
-      if (mapOptions.footer[0].hasOwnProperty('url')) {
-        footerTemplate.url = mapOptions.footer[0].url;
+      if (pageSettings.footer.hasOwnProperty('url')) {
+        pageTemplate.url = pageSettings.footer.url;
       }
-      if (mapOptions.footer[0].hasOwnProperty('urlText')) {
-        footerTemplate.urlText = mapOptions.footer[0].urlText;
+      if (pageSettings.footer.hasOwnProperty('urlText')) {
+        pageTemplate.urlText = pageSettings.footer.urlText;
       }
     }
+    if (pageSettings.mapGrid) {
+      if (pageSettings.mapGrid.hasOwnProperty('visible') && pageSettings.mapGrid.visible === true) {
+        pageTemplate.mapClass = "o-map o-map-grid";
+      }
+    }
+  }
 
-    $(el).html(template(footerTemplate));
+  $(el).html(template(pageTemplate));
 }
 
 module.exports.init = init;
 module.exports.createLayers = createLayers;
 module.exports.getBaseUrl = getBaseUrl;
+module.exports.getBreakPoints = getBreakPoints;
 module.exports.getExtent = getExtent;
 module.exports.getSettings = getSettings;
 module.exports.getStyleSettings = getStyleSettings;
@@ -506,6 +554,7 @@ module.exports.getLayersByProperty = getLayersByProperty;
 module.exports.getLayer = getLayer;
 module.exports.getControlNames = getControlNames;
 module.exports.getQueryableLayers = getQueryableLayers;
+module.exports.getSearchableLayers = getSearchableLayers;
 module.exports.getGroup = getGroup;
 module.exports.getGroups = getGroups;
 module.exports.getProjectionCode = getProjectionCode;
@@ -518,6 +567,7 @@ module.exports.getClusterOptions = getClusterOptions;
 module.exports.getTileGrid = getTileGrid;
 module.exports.getTileSize = getTileSize;
 module.exports.autoPan = autoPan;
+module.exports.removeLayer = removeLayer;
 module.exports.removeOverlays = removeOverlays;
 module.exports.checkScale= checkScale;
 module.exports.getMapName = getMapName;

@@ -22,12 +22,12 @@
     "build-ol": "node node_modules/openlayers/tasks/build.js tasks/build-ol-standard.json node_modules/openlayers/dist/ol.js"
   },
   "dependencies": {
+    "awesomplete": "1.1.2",
     "browserify": "11.0.1",
-    "jquery": "2.1.4",
+    "jquery": "3.3.1",
     "localforage": "1.5.0",
-    "openlayers": "4.3.4",
-    "proj4": "2.3.10",
-    "typeahead.js": "0.11.0"
+    "openlayers": "4.5.0",
+    "proj4": "2.3.10"
   },
   "devDependencies": {
     "babel-eslint": "^8.0.1",
@@ -40,18 +40,18 @@
     "eslint-plugin-react": "^7.4.0",
     "gulp": "3.9.1",
     "gulp-csso": "3.0.0",
-    "gulp-eslint": "^4.0.0",
+    "gulp-eslint": "4.0.0",
     "gulp-rename": "1.2.2",
     "gulp-sass": "3.1.0",
     "gulp-sequence": "0.4.6",
-    "gulp-uglify": "^3.0.0",
+    "gulp-uglify": "3.0.0",
     "gulp-util": "3.0.8",
     "handlebars": "4.0.5",
     "hbsfy": "2.5.1",
-    "node-sass": "^3.13.0",
+    "node-sass": "4.7.2",
     "npm-run-all": "^3.1.2",
     "run-sequence": "^2.1.0",
-    "uglify-js": "2.4.24",
+    "uglify-js": "3.2.0",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "1.1.0",
     "watchify": "3.3.1"
