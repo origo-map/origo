@@ -186,14 +186,22 @@ function displaySearchSuggestions(groups) {
 function getWMSFeatureInfo(spec, callback) {
 
   var mapView = Viewer.getMap().getView();
+  var coord;
+  
+  if (spec.feature.getGeometry() instanceof ol.geom.Polygon) {
+    coord = spec.feature.getGeometry().getInteriorPoint().getCoordinates()
+  } else {
+      coord = spec.feature.getGeometry().getFirstCoordinate()
+  }
 
   var url = spec.layer.getSource().getGetFeatureInfoUrl(
-    spec.feature.getGeometry().getFirstCoordinate(),
-    mapView.getResolution(),
+    coord,
+    2.8,
     mapView.getProjection(),
     {
       'INFO_FORMAT': 'text/html',
-      'feature_count': 1
+      'feature_count': 1,
+      'buffer': 1
     }
   );
 

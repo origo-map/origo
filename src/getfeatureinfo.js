@@ -204,7 +204,8 @@ function getGetFeatureInfoUrl(layer, coordinate) {
         map.getView().getResolution(),
         Viewer.getProjection(),
         {
-            'INFO_FORMAT': infoFormat
+            'INFO_FORMAT': infoFormat,
+            'buffer': '10'
         }
     );
 

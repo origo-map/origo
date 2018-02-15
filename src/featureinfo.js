@@ -91,7 +91,7 @@ function identify(items, target, coordinate) {
       });
       map.addOverlay(overlay);
       if (items[0].feature.getGeometry) {
-        coordinate = items[0].feature.getGeometry().getType() == 'Point' ? geometry.getCoordinates() : coordinate;
+        coordinate = items[0].feature.getGeometry().getType() == 'Point' ? items[0].feature.getGeometry().getCoordinates() : coordinate;
       }
 
       overlay.setPosition(coordinate);
