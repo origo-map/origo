@@ -63,12 +63,12 @@
     "visible": true
   }
 },
-  "projectionCode": "EPSG:3857",
+  "projectionCode": "EPSG:3006",
   "projectionExtent": [
-    -20026376.39,
-    -20048966.10,
-    20026376.39,
-    20048966.10
+    181896.33,
+    6101648.07,
+    864416.00,
+    7689478.31
   ],
   "proj4Defs": [
       {
@@ -77,40 +77,45 @@
       }
   ],
   "extent": [
-    -20026376.39,
-    -20048966.10,
-    20026376.39,
-    20048966.10
+    600000,
+    6830000,
+    620000,
+    6860000
   ],
   "center": [
-    1700000,
-    8275000
+    610000, 6845000 
   ],
-  "zoom": 8,
+  "zoom": 6,
   "resolutions": [
-    156543.03,
-    78271.52,
-    39135.76,
-    19567.88,
-    9783.94,
-    4891.97,
-    2445.98,
-    1222.99,
-    611.50,
-    305.75,
-    152.87,
-    76.437,
-    38.219,
-    19.109,
-    9.5546,
-    4.7773,
-    2.3887,
-    1.1943,
-    0.5972
+    4096,
+    2048,
+    1024,
+    512,
+    256,
+    128,
+    64,
+    32,
+    16,
+    8,
+    4,
+    2,
+    1,
+    0.5,
+    0.25
   ],
   "source": {
     "local": {
       "url": "http://localhost/geoserver/wms"
+    },
+    "lm_topowebb_wms": {
+      "url": "https://gis.hudiksvall.se/wmsproxy",
+      "tileGrid": {
+        "extent": [400000,6500000,680000,7000000],
+        "tileSize": 256
+      }
+    },
+    "HudikAGST": {
+        "url": "https://gis.hudiksvall.se/arcgis/rest/services/Ovrigt/Fornminnen/MapServer"
     }
   },
   "groups": [
@@ -127,37 +132,44 @@
   ],
   "layers": [
     {
-      "name": "origo-cities",
-      "title": "Origokommuner",
-      "group": "test",
-      "source": "data/origo-cities-3857.geojson",
-      "style": "origo-logo",
-      "type": "GEOJSON",
+      "name": "Fornminnen_yta",
+      "id": 2,
+      "title": "Fornminnen (yta)",
+      "format": "image/png",
+      "queryable": true,
+      "visible": true,
+      "type": "AGS_TILE",
+      "group": "fornminnen",
+      "source": "HudikAGST",
+      "style": "cirkel",
+      "tileGrid": {
+        "extent": [400000,6500000,680000,7000000],
+        "tileSize": 256
+      },
       "attributes": [
-          {
-            "name": "name"
-          }
-      ],
-      "visible": true
+        {
+          "name": "Kommun",
+          "title": "Kommun: "
+        },
+        {
+          "name": "Landskap",
+          "title": "Landskap: "
+        },
+        {
+          "name": "Lämningstyp",
+          "title": "Lämningstyp: "
+        }
+      ]
     },
     {
-      "name": "origo-mask",
-      "opacity": 0.25,
-      "title": "origo-mask",
-      "group": "none",
-      "queryable": false,
-      "source": "data/origo-mask-3857.geojson",
-      "style": "mask",
-      "type": "GEOJSON",
-      "visible": true
-    },
-    {
-      "name": "osm",
-      "title": "OpenStreetMap",
+      "name": "topowebb_wms",
+      "id": "topowebbkartan",
       "group": "background",
+      "title": "Topowebbkartan WMS",
+      "source": "lm_topowebb_wms",
       "queryable": false,
       "style": "karta_farg",
-      "type": "OSM",
+      "type": "WMS",
       "visible": true
     }
   ],

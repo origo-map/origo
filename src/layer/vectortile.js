@@ -17,12 +17,15 @@ var vectortile = function vectortile(layerOptions) {
   var sourceOptions = $.extend(sourceDefault, viewer.getMapSource()[layerOptions.source]);
   sourceOptions.attributions = vectortileOptions.attribution;
   sourceOptions.projection = viewer.getProjectionCode() || 'EPSG:3857';
-  if(sourceOptions.tileGrid){
+
+  if (vectortileOptions.tileGrid) {
+    sourceOptions.tileGrid = maputils.tileGrid(vectortileOptions.tileGrid);
+  } else if (sourceOptions.tileGrid) {
     sourceOptions.tileGrid = maputils.tileGrid(sourceOptions.tileGrid);
   } else {
     sourceOptions.tileGrid = viewer.getTileGrid();
   }
-  
+
   var vectortileSource = createSource(sourceOptions, vectortileOptions);
   return vector(vectortileOptions, vectortileSource);
 }
