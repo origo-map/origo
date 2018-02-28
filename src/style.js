@@ -6,6 +6,7 @@ var Viewer = require('./viewer');
 var validateUrl = require('./utils/validateurl');
 var styleFunctions = require('./style/stylefunctions');
 var replacer = require('../src/utils/replacer');
+var mapUtils = require('./mapUtils');
 
 var baseUrl;
 
@@ -78,7 +79,7 @@ function createStyleOptions(styleParams) {
     switch (styleParams.geometry) {
       case 'centerPoint':
         styleOptions.geometry = function(feature) {
-          var coordinates = feature.getGeometry().getInteriorPoints().getFirstCoordinate();
+          var coordinates = mapUtils.getCenter(feature.getGeometry());
           return new ol.geom.Point(coordinates);
         }
         break;
