@@ -16,6 +16,9 @@
       "name": "print"
     },
     {
+      "name": "printmenu"
+    },
+    {
       "name": "about",
       "options": {
         "buttonText": "Om Origo",
@@ -48,20 +51,6 @@
     },
     {
       "name": "scaleLine"
-    },
-    {
-      "name": "search",
-      "options": {
-        "url": "search.aspx",
-        "maxZoomLevel": 14,
-        "layers": "badplats;vagnat;",
-        "idAttribute": "id",
-        "searchAttribute": "NAMN",
-        "northing": "N",
-        "easting": "E",
-        "title": "Adress",
-        "type": "postgis"
-      }
     }
   ],
   "footer": [{
@@ -69,105 +58,78 @@
     "url" : "https://github.com/origo-map/origo",
     "urlText": "Origo"
   }],
-  "proj4Defs": {
-    "EPSG:3006": "+proj=utm +zone=33 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
-  },
-  "projectionCode": "EPSG:3006",
-  "projectionExtent": [
-    -1200000,
-    2994304,
-    4305696,
-    8500000
-  ],
+  "projectionCode": "EPSG:3857",
   "proj4Defs": [
-      {
-        "code": "EPSG:3006",
-        "projection": "+proj=utm +zone=33 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
-      }
+  
   ],
   "extent": [
-    -1200000,
-    2994304,
-    4305696,
-    8500000
+    1485583.7678999987, 8288825.654100002, 1521948.1948999988, 8303845.328100002
   ],
   "center": [
-    414241,
-    6600100
+    1503765.9813999988, 8296335.491100002
   ],
-  "zoom": 8,
-  "resolutions": [4096, 2048, 1024, 512, 256, 128, 64, 32, 16, 8, 4, 2, 1, 0.5],
+  "zoom": 13,
+  "resolutions": [
+    156543.03,
+    78271.52,
+    39135.76,
+    19567.88,
+    9783.94,
+    4891.97,
+    2445.98,
+    1222.99,
+    611.50,
+    305.75,
+    152.87,
+    76.437,
+    38.219,
+    19.109,
+    9.5546,
+    4.7773,
+    2.3887,
+    1.1943,
+    0.5972
+  ],
   "source": {
     "local": {
-      "url": "/geoserver/wms"
-    },
-    "wmts": {
-      "resolutions": [4096, 2048, 1024, 512, 256, 128, 64, 32, 16, 8, 4, 2, 1, 0.5],
-      "matrixIdsPrefix": "",
-      "matrixSet": "3006",
-      "url": "/lmproxy/wmts"
+      "url": "http://localhost:8080/geoserver/wms"
     }
   },
   "groups": [
     {
-      "name": "test",
-      "title": "Test",
-      "expanded": false
+      "name": "superlager",
+      "title": "Super lager",
+      "expanded": true
     },
     {
       "name": "background",
       "title": "Bakgrundskartor",
-      "expanded": false
+      "expanded": true
     }
   ],
   "layers": [
-    {
-      "name": "badplats",
-      "title": "Badplatser",
-      "group": "test",
+     {
+      "name": "forshaga:Lekplats",
+      "title": "Lekplats",
+      "group": "superlager",
+      "source": "local",
+      "type":	"WMS",
+      "format": "image/png",
+      "style": "lekplats",
       "queryable": true,
-      "type": "WMS",
       "visible": true,
-      "source": "local",
-      "style": "orto",
-      "infoFormat": "text/html",
-      "geometryName": "geom",
-      "useLegendGraphics": true,
-      "legendGraphicType": "inline",
-      "legendGraphicSettings": {
-        "format": "image/png",
-        "layer": "badplats",
-        "width": 20,
-        "height": 20
-      }
+      "tileSize":	512,
+      "featuretype": 5
     },
     {
-      "name": "vagnat",
-      "title": "Vägnät",
-      "group": "test",
-      "queryable": true,
-      "type": "WMS",
-      "visible": false,
-      "source": "local",
-      "style": "orto",
-      "geometryName": "geom",
-      "useLegendGraphics": true,
-      "legendGraphicType": "toggleable",
-      "legendGraphicSettings": {
-        "format": "image/png",
-        "layer": "vagnat"
-      }
-    },
-    {
-      "name": "topowebb",
-      "title": "Topowebb",
+      "name": "osm",
+      "title": "OpenStreetMap",
       "group": "background",
       "queryable": false,
-      "style": "karta_farg",
-      "type": "WMTS",
-      "visible": true,
-      "source": "wmts",
-      "legend": false
+      "opacity": 0.9,
+      "style": "karta_gra",
+      "type": "OSM",
+      "visible": true
     }
   ],
   "styles": {
@@ -227,6 +189,13 @@
           }
         ]
       ],
+      "lekplats": [[
+        {
+          "image": {
+            "src": "http://localhost:8080/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=forshaga:Lekplats"
+          }
+        }
+      ]],
       "karta_gra": [
         [
           {

@@ -25,6 +25,16 @@ module.exports = {
                  '</div>';
         return el;
     },
+    createDdOptions: function(options) {
+        return options.map(function (option) { 
+            return '<option>' + option + '</option>'; }).toString().replace(",", "");
+    },
+    createRadioButtons: function(options, group) {
+        return options.map(function (rBtn, i) {
+            return '<input type="radio" name="group'+ group + '" id="o-r' + i +'" value="'+ i + '" />' +
+            '<label for="o-r' + i + '"> ' + rBtn + '</label><br />';
+        }).toString().replace(",", "");
+    },
     createListButton: function(options) {
         var el = '<li>' +
                     '<div id="' + options.id + '-button" class="o-menu-button"' + '>' +
