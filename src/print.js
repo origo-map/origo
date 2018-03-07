@@ -35,9 +35,18 @@ function render() {
 function bindUIActions() {
   $printButton.on('click', function(e) {
     $('#app-wrapper').append('<canvas id="o-print" style="display: none"></canvas>');
-    createImage();
+    toggleMenu();
     e.preventDefault();
   });
+}
+
+function toggleMenu() {
+  if($("#o-printmenu").hasClass('o-printmenu-show')){
+    $("#o-printmenu").removeClass('o-printmenu-show');
+  }
+  else {
+    $("#o-printmenu").addClass('o-printmenu-show');
+  }
 }
 
 function imageToPrint($printCanvas) {

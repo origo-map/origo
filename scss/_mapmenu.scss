@@ -70,6 +70,12 @@
 	-webkit-transform: translateX(-280px);
 	transform: translateX(-280px);
 }
+
+#o-printmenu.o-printmenu-show {
+	-ms-transform: translateX(280px);
+	-webkit-transform: translateX(280px);
+	transform: translateX(280px);
+}
 .o-no-csstransforms #o-mapmenu.o-mapmenu-show {
   right: 0;
 }
