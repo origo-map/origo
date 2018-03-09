@@ -31,6 +31,35 @@
     display: block;
     font-weight: bold;
 }
+#o-printmenu.o-printmenu-show {
+    -ms-transform: translateX(280px);
+    -webkit-transform: translateX(280px);
+    transform: translateX(280px); 
+}
+#o-printmenu {
+    background-color: #fff;
+    border-radius: 1px;
+    /*workaround for box-shadow bug in ios*/
+    -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.45);
+    height: 100%;
+    overflow: hidden;
+    overflow-y: auto;
+    position: absolute;
+    top: 0px;
+    width: 280px;
+    z-index: 100;
+    left: -280px;
+    -ms-transform: translateX(0);
+    -webkit-transform: translateX(0);
+    transform: translateX(0);
+    -ms-transition: .3s ease all;
+    -webkit-transition: .3s ease all;
+    transition: .3s ease all;
+ }
+#o-printmenu-button-close {
+    right: 9px; 
+}
 
 form .o-block {
     margin-left: 10px;

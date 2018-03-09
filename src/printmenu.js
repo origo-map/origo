@@ -4,12 +4,12 @@ var $ = require('jquery');
 var utils = require('./utils');
 var options = require('./../conf/printSettings');
 
-var $printMenu, $printButton;
+var $printMenu, $printButton, $printButtonTool;
 
 function init() {
     var menuEl = '<form type="submit">' + 
                     '<div id="o-printmenu" class="o-printmenu">' +
-                        '<h5 id="o-main-setting-heading">Skriv ut karta</h5>' +
+                        '<h5 id="o-main-setting-heading">Skriv ut karta</h5>' +                         
                         '<div class="o-block">' +
                             '<span class="o-setting-heading">Format</span>' +
                             utils.createRadioButtons(options.formats, 1) +
@@ -62,12 +62,44 @@ function init() {
                   '</form>';
 
     $('#o-map').append(menuEl);
-    $printButton = $('#o-print-create-button')
-    $printMenu = $('o-printmenu');
 
-    $printButton.on('click', function(e) {
-        e.preventDefault();
+    var printButton = utils.createButton({
+        id: 'o-printmenu-button-close',
+        cls: 'o-no-boxshadow',
+        iconCls: 'o-icon-menu-fa-times',
+        src: '#fa-times',
+        tooltipText: 'Stäng meny',
+        tooltipPlacement: 'west'        
     });
+    
+    $('#o-main-setting-heading').append(printButton);  
+
+    var printButtonTool = utils.createButton({
+        id: 'o-print-tool',
+        iconCls: 'o-icon-fa-print',
+        src: '#fa-print'             
+    });    
+
+    $('#o-toolbar-misc').append(printButtonTool); 
+    $printButtonTool = $('#o-print-tool');    
+    $printButton = $('#o-printmenu-button-close');
+    bindUIActions(); 
+
 }
+function bindUIActions() {
+    $printButton.on('click', function(e) {
+      $("#o-printmenu").removeClass('o-printmenu-show');
+      e.preventDefault();
+    });
+    $printButtonTool.on('click', function(e) {
+        if($("#o-printmenu").hasClass('o-printmenu-show')){
+            $("#o-printmenu").removeClass('o-printmenu-show');
+          }
+          else {
+            $("#o-printmenu").addClass('o-printmenu-show');
+          }
+        e.preventDefault();
+      });
+  }
 
 module.exports.init = init;
