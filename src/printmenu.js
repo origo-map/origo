@@ -56,15 +56,13 @@ function init() {
                         '</div>' +
                         '<br />' +
                         '<div class="o-block">' +
-                            '<button class="btn" type="submit">Skapa</button>' +
+                            '<button id="o-print-create-button" class="btn" type="submit">Skapa</button>' +
                         '</div>' +
                     '</div>' +
                   '</form>';
 
-               
-                       
-
     $('#o-map').append(menuEl);
+
     var printButton = utils.createButton({
         id: 'o-printmenu-button-close',
         cls: 'o-no-boxshadow',
@@ -86,7 +84,7 @@ function init() {
     $printButtonTool = $('#o-print-tool');    
     $printButton = $('#o-printmenu-button-close');
     bindUIActions(); 
-   
+
 }
 function bindUIActions() {
     $printButton.on('click', function(e) {
