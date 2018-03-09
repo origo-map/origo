@@ -47,7 +47,6 @@
     "hbsfy": "2.5.1",
     "jshint": "^2.9.5",
     "node-sass": "^3.13.0",
-
     "npm-run-all": "^3.1.2",
     "run-sequence": "^2.1.0",
     "uglify-js": "2.4.24",
