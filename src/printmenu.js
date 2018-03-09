@@ -4,7 +4,7 @@ var $ = require('jquery');
 var utils = require('./utils');
 var options = require('./../conf/printSettings');
 
-var $printMenu, $printButton;
+var $printMenu, $printButton, $printButtonTool;
 
 function init() {
     var menuEl = '<form type="submit">' + 
@@ -74,7 +74,16 @@ function init() {
         tooltipPlacement: 'west'        
     });
     
-    $('#o-main-setting-heading').append(printButton);   
+    $('#o-main-setting-heading').append(printButton);  
+
+    var printButtonTool = utils.createButton({
+        id: 'o-print-tool',
+        iconCls: 'o-icon-fa-print',
+        src: '#fa-print'             
+    });    
+
+    $('#o-toolbar-misc').append(printButtonTool); 
+    $printButtonTool = $('#o-print-tool');    
     $printButton = $('#o-printmenu-button-close');
     bindUIActions(); 
    
@@ -84,6 +93,15 @@ function bindUIActions() {
       $("#o-printmenu").removeClass('o-printmenu-show');
       e.preventDefault();
     });
+    $printButtonTool.on('click', function(e) {
+        if($("#o-printmenu").hasClass('o-printmenu-show')){
+            $("#o-printmenu").removeClass('o-printmenu-show');
+          }
+          else {
+            $("#o-printmenu").addClass('o-printmenu-show');
+          }
+        e.preventDefault();
+      });
   }
 
 module.exports.init = init;
