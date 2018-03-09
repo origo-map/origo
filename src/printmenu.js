@@ -4,7 +4,7 @@ var $ = require('jquery');
 var utils = require('./utils');
 var options = require('./../conf/printSettings');
 
-var $printMenu;
+var $printMenu, $printButton;
 
 function init() {
     var menuEl = '<form type="submit">' + 
@@ -56,13 +56,18 @@ function init() {
                         '</div>' +
                         '<br />' +
                         '<div class="o-block">' +
-                            '<button class="btn" type="submit">Skapa</button>' +
+                            '<button id="o-print-create-button" class="btn" type="submit">Skapa</button>' +
                         '</div>' +
                     '</div>' +
                   '</form>';
 
     $('#o-map').append(menuEl);
+    $printButton = $('#o-print-create-button')
     $printMenu = $('o-printmenu');
+
+    $printButton.on('click', function(e) {
+        e.preventDefault();
+    });
 }
 
 module.exports.init = init;
