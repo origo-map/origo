@@ -24,6 +24,6 @@ Origo uses SASS to enable modular development of CSS. That means changes and add
 
 The classes and IDs of CSS selectors shall have the prefix 'o-'.
 
-Icons shall be in SVG format. New icons are preferably chosen from the Font Awesome library that is available as SVG sprite in Origo. If other libraries are introduced, they shall also be available as SVG sprites.
+Icons shall be in SVG format. New icons are preferably chosen from the Material Icons library or in the second hand the Font Awesome library that are available as SVG sprites in Origo. If other libraries are introduced, they shall also be available as SVG sprites.
 
 Origo has responsive and mobile-friendly deisgn. Development shall follow and work with layouts for existing breakpoints defined in the Origo configuration file. Overall, media queries are not used to define breakpoints since they uses the browser size and not the map size. Instead Origo uses a type to mimic what is usually entitled 'element queries'. Code-wise the breakpoints are defined in a similar way as for media queries but limited to the breakpoints defined in the Origo configuration file.
