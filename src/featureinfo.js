@@ -15,6 +15,7 @@ owlCarousel.loadjQueryPlugin();
 
 var selectionLayer = undefined;
 var savedPin = undefined;
+var clickEvent;
 var options;
 var map;
 var pinning;
@@ -31,6 +32,7 @@ function init(opt_options) {
 
   options = opt_options || {};
 
+  clickEvent = 'clickEvent' in options ? options.clickEvent : 'click';
   pinning = options.hasOwnProperty('pinning') ? options.pinning : true;
   var pinStyleOptions = options.hasOwnProperty('pinStyle') ? options.pinStyle : styleTypes.getStyle('pin');
   pinStyle = style.createStyleRule(pinStyleOptions)[0];
@@ -56,7 +58,7 @@ function init(opt_options) {
 
   hitTolerance = options.hasOwnProperty('hitTolerance') ? options.hitTolerance : 0;
 
-  map.on('click', onClick);
+  map.on(clickEvent, onClick);
   $(document).on('enableInteraction', onEnableInteraction);
 
 }
@@ -160,7 +162,7 @@ function clear() {
   selectionLayer.clear();
   sidebar.setVisibility(false);
   if (overlay) {
-    Viewer.removeOverlays(overlay);      
+    Viewer.removeOverlays(overlay);
   }
   console.log("Clearing selection");
 }
