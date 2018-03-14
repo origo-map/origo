@@ -65,8 +65,9 @@ module.exports = function() {
     createStyleRule: createStyleRule,
     createStyle: createStyle,
     styleFunction: styleFunction,
-    createEditStyle: createEditStyle
-  }
+    createEditStyle: createEditStyle,
+    createGeometryStyle: createGeometryStyle
+  };
 };
 
 function Init() {
@@ -211,13 +212,17 @@ function styleFunction(styleSettings, styleList, clusterStyleSettings, clusterSt
 }
 
 function createEditStyle() {
+  return createGeometryStyle(editStyleOptions);
+}
+
+function createGeometryStyle(geometryStyleOptions) {
   return {
-    'Point': createStyleRule(editStyleOptions['Point']),
-    'MultiPoint': createStyleRule(editStyleOptions['Point']),
-    'LineString': createStyleRule(editStyleOptions['LineString']),
-    'MultiLineString': createStyleRule(editStyleOptions['LineString']),
-    'Polygon': createStyleRule(editStyleOptions['Polygon']),
-    'MultiPolygon': createStyleRule(editStyleOptions['Polygon'])
+    'Point': createStyleRule(geometryStyleOptions.Point),
+    'MultiPoint': createStyleRule(geometryStyleOptions.Point),
+    'LineString': createStyleRule(geometryStyleOptions.LineString),
+    'MultiLineString': createStyleRule(geometryStyleOptions.LineString),
+    'Polygon': createStyleRule(geometryStyleOptions.Polygon),
+    'MultiPolygon': createStyleRule(geometryStyleOptions.Polygon)
   };
 }
 
