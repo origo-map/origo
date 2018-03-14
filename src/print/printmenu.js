@@ -1,10 +1,11 @@
 "use strict";
 
 var $ = require('jquery');
-var utils = require('./utils');
-var options = require('./../conf/printSettings');
+var utils = require('../utils');
+var options = require('./../../conf/printSettings');
+var print = require('./print');
 
-var $printMenu, $printButton, $printButtonTool;
+var $printMenu, $printButton, $printButtonTool, $createPrint;
 
 function init() {
     var menuEl = '<form type="submit">' + 
@@ -100,6 +101,10 @@ function bindUIActions() {
           }
         e.preventDefault();
       });
+    $("#o-print-create-button").on("click", function(e) {
+        print.printMap("hej");
+        e.preventDefault();
+    });
   }
 
 module.exports.init = init;
