@@ -36,7 +36,7 @@ function init(opt_options) {
   pinStyle = style.createStyleRule(pinStyleOptions)[0];
   savedPin = options.savedPin ? maputils.createPointFeature(opt_options.savedPin, pinStyle) : undefined;
 
-  selectionStyles = style.createEditStyle();
+  selectionStyles = 'selectionStyles' in options ? style.createGeometryStyle(options.selectionStyles) : style.createEditStyle();
 
   var savedSelection = options.savedSelection || undefined;
   var savedFeature = savedPin || savedSelection || undefined;
@@ -160,7 +160,7 @@ function clear() {
   selectionLayer.clear();
   sidebar.setVisibility(false);
   if (overlay) {
-    Viewer.removeOverlays(overlay);      
+    Viewer.removeOverlays(overlay);
   }
   console.log("Clearing selection");
 }
