@@ -126,7 +126,7 @@ function bindUIActions() {
             url: "http://localhost:8080/geoserver/wms",
             dpi: $('#o-resolution-dd').val(),
             layers: printLayers,
-            imageFormat: $('input[name=group1]:checked').val(),
+            imageFormat: $('input[name=group1]:checked').parent('label').text().trim(),
             scale: $('#o-scale-dd').val(),
             orientation: $('input[name=group2]:checked').val(),
             size: $('#o-size-dd').val(),

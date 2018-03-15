@@ -60,16 +60,46 @@ function downloadWhenReady(startTime, data) {
     }
 }
 
-function printMap(settings) {
-    var _data = JSON.stringify(spec);
-    var appId = 'json_styling';
-    var format = 'png';
-    var startTime = new Date().getTime();
+/**
+ * Converts values passed from gui to an object accepted by mapfish
+ * @param {values picked up from gui} options 
+ */
+function convertToMapfishOptions(options) {
+    var dpi = parseInt(options.dpi.split(' ')[0]);
+    var scale = parseInt(options.scale.split(/[: ]/).pop());
 
+    var mapfishOptions = {
+        attributes: {
+            map: {
+                center: options.center,
+                dpi: dpi,
+                layers: [],
+                projection: 'EPSG:3857',
+                rotation: 0,
+                scale: scale
+            }
+        },
+        layout: "A4 landscape"
+    }
+
+    mapfishOptions.attributes.map.layers.push({
+        baseURL: 'http://localhost:8080/geoserver/wms/',
+        imageFormat: 'image/png',
+        layers: ['forshaga:lekplats'],
+        opacity: 1,
+        serverType: 'geoserver',
+        type: 'WMS'
+    });
+    return mapfishOptions;
+}
+
+function executeMapfishCall(url, data) {
+    debugger;
+    var startTime = new Date().getTime();
     $.ajax({
         type: 'POST',
-        url: 'http://localhost:8080/print/print/' + appId + '/report.' + format,
-        data: _data,
+        url: url,
+        data: JSON.stringify(data),
         dataType: 'json',
         success: function (data) {
             downloadWhenReady(startTime, $.parseJSON(JSON.stringify(data)));
@@ -78,6 +108,15 @@ function printMap(settings) {
             console.log('Error creating report: ' + data.statusText);
         }
     });
+}
+
+function printMap(settings) {
+    console.log('settings', settings);
+    var appId = 'printwms_archsites_server_type';
+    var format = settings.imageFormat.toLowerCase();
+    
+    var url = 'http://localhost:8080/print/print/' + appId + '/report.' + format;
+    executeMapfishCall(url, convertToMapfishOptions(settings));
 }
 
 module.exports.printMap = printMap;
