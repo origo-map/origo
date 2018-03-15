@@ -151,11 +151,11 @@ function onClick(evt) {
 }
 function setActive(state) {
   if(state === true) {
-    map.on('click', onClick);
+    map.on(clickEvent, onClick);
   }
   else {
     clear();
-    map.un('click', onClick);
+    map.un(clickEvent, onClick);
   }
 }
 function clear() {
