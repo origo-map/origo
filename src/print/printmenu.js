@@ -7,7 +7,8 @@ var print = require('./print');
 var printarea = require('./printarea');
 var Viewer = require('../viewer');
 var ol = require('openlayers');
-var $printButton, $printButtonTool, $printselect, vector;
+var transform = require('./transformprint');
+var $printButton, $printButtonTool, $printselect, vector, $scaleselect;
 
 function init() {
     var menuEl = '<form type="submit">' +
@@ -87,11 +88,12 @@ function init() {
     $printButtonTool = $('#o-print-tool');
     $printButton = $('#o-printmenu-button-close');
     $printselect = $('#o-size-dd');
+    $scaleselect = $('#o-scale-dd');
     bindUIActions();
 }
 
 function bindUIActions() {
-    $printButton.on('click', function (e) {
+    $printButton.on('click', function (e) {           
         $("#o-printmenu").removeClass('o-printmenu-show');
         e.preventDefault();
     });
@@ -100,15 +102,88 @@ function bindUIActions() {
             $("#o-printmenu").removeClass('o-printmenu-show');
         }
         else {
+            printarea.printA1();
             $("#o-printmenu").addClass('o-printmenu-show');
         }
         e.preventDefault();
     });
     $printselect.change(function () {
-        if ($printselect.val() === "A1") {
-            vector = printarea.printA1();
-        }
+        // if ($printselect.val() === "A1") {            
+        //     vector = printarea.printA1();                  
+        // }
+        var map = Viewer.getMap();
+        var paper = getPaperMeasures($printselect.val());
+        var scale = $scaleselect.val();  
+        scale = scale.split(':')[1];     
+        printarea.addPreview(scale, paper);  
+    //     var preScale = undefined;
+
+    // switch(scale){
+    //   case "250":
+    //     preScale = 6;
+    //     break;
+    //   case "500":
+    //     preScale = 6;
+    //     break;
+    //   case "1000":
+    //     preScale = 5;
+    //     break;
+    //   case "2500":
+    //     preScale = 4;
+    //     break;
+    //   case "5000":
+    //     preScale = 3;
+    //     break;
+    //   case "10000":
+    //     preScale = 2;
+    //     break;
+    //   case "25000":
+    //     preScale = 1;
+    //     break;
+    //   case "50000":
+    //     preScale = 1;
+    //     break;
+    //   case "100000":
+    //     preScale = 0;
+    //     break;
+    //   case "250000":
+    //     preScale = 0;
+    //     break;
+    //   default:
+    //     preScale = map.getView().getZoom();
+    //     break;
+    // }
+    // map.getView().setZoom(preScale);      
     });  
+
+
+    function getPaperMeasures(format) {
+        debugger;
+        var orientationLandscape = $('input[name=group2]:checked').val() == 1,
+            width = 0, height = 0;
+
+          switch (format) {
+            case 'A4':
+                width =  orientationLandscape ? 297 : 210;
+                height =  orientationLandscape ? 210 : 297;
+                break;
+            case 'A3':
+              
+                width =  orientationLandscape ? 420 : 297,
+                height = orientationLandscape ? 297 : 420
+                break;
+            case 'A2':              
+                  width =  orientationLandscape ? 594 : 420,
+                  height = orientationLandscape ? 420 : 594
+                  break;
+            }
+    
+        return {
+          width: width,//((width / 25.4)),
+          height:  height//((height / 25.4))
+        };
+      };     
+
 
     $('#o-print-create-button').click(function (event) {
         var map = Viewer.getMap();
@@ -140,6 +215,8 @@ function bindUIActions() {
 
 
 }
+
+
 
 
 
