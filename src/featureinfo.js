@@ -15,6 +15,7 @@ owlCarousel.loadjQueryPlugin();
 
 var selectionLayer = undefined;
 var savedPin = undefined;
+var clickEvent;
 var options;
 var map;
 var pinning;
@@ -31,12 +32,13 @@ function init(opt_options) {
 
   options = opt_options || {};
 
+  clickEvent = 'clickEvent' in options ? options.clickEvent : 'click';
   pinning = options.hasOwnProperty('pinning') ? options.pinning : true;
   var pinStyleOptions = options.hasOwnProperty('pinStyle') ? options.pinStyle : styleTypes.getStyle('pin');
   pinStyle = style.createStyleRule(pinStyleOptions)[0];
   savedPin = options.savedPin ? maputils.createPointFeature(opt_options.savedPin, pinStyle) : undefined;
 
-  selectionStyles = style.createEditStyle();
+  selectionStyles = 'selectionStyles' in options ? style.createGeometryStyle(options.selectionStyles) : style.createEditStyle();
 
   var savedSelection = options.savedSelection || undefined;
   var savedFeature = savedPin || savedSelection || undefined;
@@ -56,7 +58,7 @@ function init(opt_options) {
 
   hitTolerance = options.hasOwnProperty('hitTolerance') ? options.hitTolerance : 0;
 
-  map.on('click', onClick);
+  map.on(clickEvent, onClick);
   $(document).on('enableInteraction', onEnableInteraction);
 
 }
@@ -149,18 +151,18 @@ function onClick(evt) {
 }
 function setActive(state) {
   if(state === true) {
-    map.on('click', onClick);
+    map.on(clickEvent, onClick);
   }
   else {
     clear();
-    map.un('click', onClick);
+    map.un(clickEvent, onClick);
   }
 }
 function clear() {
   selectionLayer.clear();
   sidebar.setVisibility(false);
   if (overlay) {
-    Viewer.removeOverlays(overlay);      
+    Viewer.removeOverlays(overlay);
   }
   console.log("Clearing selection");
 }
