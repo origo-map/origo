@@ -8,7 +8,7 @@ var printarea = require('./printarea');
 var Viewer = require('../viewer');
 var ol = require('openlayers');
 var transform = require('./transformprint');
-var $printButton, $printButtonTool, $printselect, vector, $scaleselect;
+var $printButton, $printButtonTool, $printselect, vector, $scaleselect, $orientationselect;
 
 function init() {
     var menuEl = '<form type="submit">' +
@@ -89,6 +89,7 @@ function init() {
     $printButton = $('#o-printmenu-button-close');
     $printselect = $('#o-size-dd');
     $scaleselect = $('#o-scale-dd');
+    $orientationselect = $("input:radio[name='group2']");
     bindUIActions();
 }
 
@@ -102,63 +103,41 @@ function bindUIActions() {
             $("#o-printmenu").removeClass('o-printmenu-show');
         }
         else {
-            printarea.printA1();
+            
+            printarea.printA1();            
+            var paper = getPaperMeasures('A2');            
+            printarea.addPreview(100000, paper);
+            var map = Viewer.getMap();
+            debugger;
+
             $("#o-printmenu").addClass('o-printmenu-show');
         }
         e.preventDefault();
     });
-    $printselect.change(function () {
-        // if ($printselect.val() === "A1") {            
-        //     vector = printarea.printA1();                  
-        // }
+    $printselect.change(function () {        
+        var map = Viewer.getMap();
+        var paper = getPaperMeasures($printselect.val());
+        var scale = $scaleselect.val();  
+        scale = scale.split(':')[1];     
+        printarea.addPreview(scale, paper);          
+    }); 
+
+    $scaleselect.change(function(){
         var map = Viewer.getMap();
         var paper = getPaperMeasures($printselect.val());
         var scale = $scaleselect.val();  
         scale = scale.split(':')[1];     
         printarea.addPreview(scale, paper);  
-    //     var preScale = undefined;
+    }); 
 
-    // switch(scale){
-    //   case "250":
-    //     preScale = 6;
-    //     break;
-    //   case "500":
-    //     preScale = 6;
-    //     break;
-    //   case "1000":
-    //     preScale = 5;
-    //     break;
-    //   case "2500":
-    //     preScale = 4;
-    //     break;
-    //   case "5000":
-    //     preScale = 3;
-    //     break;
-    //   case "10000":
-    //     preScale = 2;
-    //     break;
-    //   case "25000":
-    //     preScale = 1;
-    //     break;
-    //   case "50000":
-    //     preScale = 1;
-    //     break;
-    //   case "100000":
-    //     preScale = 0;
-    //     break;
-    //   case "250000":
-    //     preScale = 0;
-    //     break;
-    //   default:
-    //     preScale = map.getView().getZoom();
-    //     break;
-    // }
-    // map.getView().setZoom(preScale);      
-    });  
-
-
-    function getPaperMeasures(format) {
-        debugger;
+    $orientationselect.change(function(){
+        var map = Viewer.getMap();
+        var paper = getPaperMeasures($printselect.val());
+        var scale = $scaleselect.val();  
+        scale = scale.split(':')[1];     
+        printarea.addPreview(scale, paper); 
+    });
+    function getPaperMeasures(format) {        
         var orientationLandscape = $('input[name=group2]:checked').val() == 1,
             width = 0, height = 0;
 
