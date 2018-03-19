@@ -94,23 +94,27 @@ function init() {
 }
 
 function bindUIActions() {
+    var polygon = false;
     $printButton.on('click', function (e) {           
         $("#o-printmenu").removeClass('o-printmenu-show');
         e.preventDefault();
     });
-    $printButtonTool.on('click', function (e) {
+    $printButtonTool.on('click', function (e) {                     
         if ($("#o-printmenu").hasClass('o-printmenu-show')) {
             $("#o-printmenu").removeClass('o-printmenu-show');
         }
-        else {
+        else {     
+            if(!vector){
+                vector = printarea.printA1();                
+                polygon = true;
+                var paper = getPaperMeasures('A1');            
+                printarea.addPreview(100000, paper);          
+                $("#o-printmenu").addClass('o-printmenu-show'); 
+            }
+            else{                          
+                $("#o-printmenu").addClass('o-printmenu-show');   
+            } 
             
-            printarea.printA1();            
-            var paper = getPaperMeasures('A1');            
-            printarea.addPreview(100000, paper);
-            var map = Viewer.getMap();
-            debugger;
-
-            $("#o-printmenu").addClass('o-printmenu-show');
         }
         e.preventDefault();
     });
