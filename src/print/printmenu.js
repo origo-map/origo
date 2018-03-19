@@ -105,7 +105,7 @@ function bindUIActions() {
         else {
             
             printarea.printA1();            
-            var paper = getPaperMeasures('A2');            
+            var paper = getPaperMeasures('A1');            
             printarea.addPreview(100000, paper);
             var map = Viewer.getMap();
             debugger;
