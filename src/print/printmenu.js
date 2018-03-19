@@ -142,19 +142,30 @@ function bindUIActions() {
             width = 0, height = 0;
 
           switch (format) {
-            case 'A4':
-                width =  orientationLandscape ? 297 : 210;
-                height =  orientationLandscape ? 210 : 297;
-                break;
-            case 'A3':
-              
-                width =  orientationLandscape ? 420 : 297,
-                height = orientationLandscape ? 297 : 420
+            case 'A1':
+                width =  orientationLandscape ? 841 : 594,
+                height =  orientationLandscape ? 594 : 841
                 break;
             case 'A2':              
                   width =  orientationLandscape ? 594 : 420,
                   height = orientationLandscape ? 420 : 594
                   break;
+            case 'A3':              
+                width =  orientationLandscape ? 420 : 297,
+                height = orientationLandscape ? 297 : 420
+                break; 
+            case 'A4':
+                width =  orientationLandscape ? 297 : 210,
+                height =  orientationLandscape ? 210 : 297
+                break;     
+            case 'A5':
+                width =  orientationLandscape ? 210 : 148,
+                height =  orientationLandscape ? 148 : 210
+                break;            
+            case 'A6':              
+                width =  orientationLandscape ? 148 : 105,
+                height = orientationLandscape ? 105 : 148
+                break;      
             }
     
         return {
