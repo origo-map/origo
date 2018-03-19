@@ -7,7 +7,6 @@ var print = require('./print');
 var printarea = require('./printarea');
 var Viewer = require('../viewer');
 var ol = require('openlayers');
-var transform = require('./transformprint');
 var $printButton, $printButtonTool, $printselect, vector, $scaleselect, $orientationselect;
 
 function init() {
@@ -104,11 +103,10 @@ function bindUIActions() {
         }
         else {
             
-            printarea.printA1();            
+            vector = printarea.printA1();            
             var paper = getPaperMeasures('A2');            
             printarea.addPreview(100000, paper);
             var map = Viewer.getMap();
-            debugger;
 
             $("#o-printmenu").addClass('o-printmenu-show');
         }
@@ -194,10 +192,4 @@ function bindUIActions() {
 
 
 }
-
-
-
-
-
-
 module.exports.init = init;
