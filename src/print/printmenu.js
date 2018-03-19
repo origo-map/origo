@@ -93,22 +93,27 @@ function init() {
 }
 
 function bindUIActions() {
+    var polygon = false;
     $printButton.on('click', function (e) {           
         $("#o-printmenu").removeClass('o-printmenu-show');
         e.preventDefault();
     });
-    $printButtonTool.on('click', function (e) {
+    $printButtonTool.on('click', function (e) {                     
         if ($("#o-printmenu").hasClass('o-printmenu-show')) {
             $("#o-printmenu").removeClass('o-printmenu-show');
         }
-        else {
+        else {     
+            if(!vector){
+                vector = printarea.printA1();                
+                polygon = true;
+                var paper = getPaperMeasures('A1');            
+                printarea.addPreview(100000, paper);          
+                $("#o-printmenu").addClass('o-printmenu-show'); 
+            }
+            else{                          
+                $("#o-printmenu").addClass('o-printmenu-show');   
+            } 
             
-            vector = printarea.printA1();            
-            var paper = getPaperMeasures('A2');            
-            printarea.addPreview(100000, paper);
-            var map = Viewer.getMap();
-
-            $("#o-printmenu").addClass('o-printmenu-show');
         }
         e.preventDefault();
     });
@@ -140,19 +145,30 @@ function bindUIActions() {
             width = 0, height = 0;
 
           switch (format) {
-            case 'A4':
-                width =  orientationLandscape ? 297 : 210;
-                height =  orientationLandscape ? 210 : 297;
-                break;
-            case 'A3':
-              
-                width =  orientationLandscape ? 420 : 297,
-                height = orientationLandscape ? 297 : 420
+            case 'A1':
+                width =  orientationLandscape ? 841 : 594,
+                height =  orientationLandscape ? 594 : 841
                 break;
             case 'A2':              
                   width =  orientationLandscape ? 594 : 420,
                   height = orientationLandscape ? 420 : 594
                   break;
+            case 'A3':              
+                width =  orientationLandscape ? 420 : 297,
+                height = orientationLandscape ? 297 : 420
+                break; 
+            case 'A4':
+                width =  orientationLandscape ? 297 : 210,
+                height =  orientationLandscape ? 210 : 297
+                break;     
+            case 'A5':
+                width =  orientationLandscape ? 210 : 148,
+                height =  orientationLandscape ? 148 : 210
+                break;            
+            case 'A6':              
+                width =  orientationLandscape ? 148 : 105,
+                height = orientationLandscape ? 105 : 148
+                break;      
             }
     
         return {
