@@ -27,5 +27,5 @@ module.exports = {
        "name": "fullscreen"
     }
   ],
-  geoserverPath: 'http://localhost:8080/'
+  geoserverPath: 'http://localhost:8080/geoserver'
 }

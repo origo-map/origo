@@ -95,7 +95,7 @@
       "url": "http://localhost:8080/geoserver/wms"
     },
     "lm": {
-      "url": "https://gi.karlstad.se/geoserver/wms"
+      "url": "http://gi.karlstad.se/geoserver/wms/topowebb"
     }
   },
   "groups": [
@@ -149,6 +149,17 @@
       "visible": true,
       "tileSize":	512,
       "featuretype": 5
+    },
+    {
+      "name": "topowebbkartan",
+      "title": "Topowebb",
+      "group": "background",
+      "queryable": false,
+      "opacity": 0.9,
+      "style": "karta_farg",
+      "type": "WMS",
+      "visible": true,
+      "source": "lm"
     }
   ],
   "styles": {
