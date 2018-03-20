@@ -187,7 +187,7 @@ function bindUIActions() {
         var printLayers = [];        
         for (var i = 0, l = layer.a.length; i < l; i++) {
            if(layer.a[i].S.visible){
-               printLayers.push(layer.a[i].S.title);
+               printLayers.push(layer.a[i]);
            }         
         }  
         var contract = {

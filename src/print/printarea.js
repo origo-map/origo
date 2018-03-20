@@ -12,7 +12,6 @@ var polygonFeature = new ol.Feature(
   new ol.geom.Polygon([[[1499876.032897, 8295720.234419], [1498891.906158, 8295720.234419],
   [1498844.133015, 8296981.445385], [1500363.318953, 8296952.781500]]]));
 
-
 function printA1() {
 
   map = Viewer.getMap();

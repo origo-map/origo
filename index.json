@@ -93,6 +93,9 @@
   "source": {
     "local": {
       "url": "http://localhost:8080/geoserver/wms"
+    },
+    "lm": {
+      "url": "https://gi.karlstad.se/geoserver/wms"
     }
   },
   "groups": [
@@ -109,27 +112,43 @@
   ],
   "layers": [
      {
-      "name": "forshaga:lekplats",
-      "title": "Lekplats",
+      "name": "varmland:al_17",
+      "title": "Vägnät",
       "group": "superlager",
       "source": "local",
       "type":	"WMS",
       "format": "image/png",
-      "style": "lekplats",
+      "style": "",
       "queryable": true,
       "visible": true,
       "tileSize":	512,
       "featuretype": 5
     },
     {
-      "name": "osm",
-      "title": "OpenStreetMap",
-      "group": "background",
-      "queryable": false,
-      "opacity": 0.9,
-      "style": "karta_gra",
-      "type": "OSM",
-      "visible": true
+      "name": "varmland:as_17",
+      "title": "Terräng",
+      "group": "superlager",
+      "source": "local",
+      "type":	"WMS",
+      "format": "image/png",
+      "style": "",
+      "queryable": true,
+      "visible": true,
+      "tileSize":	512,
+      "featuretype": 5
+    },
+    {
+      "name": "varmland:bl_17",
+      "title": "vägnånting",
+      "group": "superlager",
+      "source": "local",
+      "type":	"WMS",
+      "format": "image/png",
+      "style": "",
+      "queryable": true,
+      "visible": true,
+      "tileSize":	512,
+      "featuretype": 5
     }
   ],
   "styles": {
