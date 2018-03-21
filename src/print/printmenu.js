@@ -133,7 +133,7 @@ function bindUIActions() {
 				vector = printarea.printA1();
 				polygon = true;
 				var paper = getPaperMeasures('A1');
-				printarea.addPreview(100000, paper);
+				printarea.addPreview(25000, paper);
 				$("#o-printmenu").addClass('o-printmenu-show');
 			} else {
 				$("#o-printmenu").addClass('o-printmenu-show');
@@ -146,7 +146,7 @@ function bindUIActions() {
 		var map = Viewer.getMap();
 		var paper = getPaperMeasures($printselect.val());
 		var scale = $scaleselect.val();
-		scale = scale.split(':')[1];
+		scale = scale.split('.')[0];
 		printarea.addPreview(scale, paper);
 	});
 
@@ -154,7 +154,7 @@ function bindUIActions() {
 		var map = Viewer.getMap();
 		var paper = getPaperMeasures($printselect.val());
 		var scale = $scaleselect.val();
-		scale = scale.split(':')[1];
+		scale = scale.split('.')[0];
 		printarea.addPreview(scale, paper);
 	});
 
@@ -162,7 +162,7 @@ function bindUIActions() {
 		var map = Viewer.getMap();
 		var paper = getPaperMeasures($printselect.val());
 		var scale = $scaleselect.val();
-		scale = scale.split(':')[1];
+		scale = scale.split('.')[0];
 		printarea.addPreview(scale, paper);
 	});
 
