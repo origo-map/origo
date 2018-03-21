@@ -23,10 +23,9 @@ function downloadWhenReady(startTime, data) {
 
 /**
  * Converts values passed from gui to an object accepted by mapfish
- * @param {values passed from print panel} options 
+ * @param {Object} options 
  */
 function convertToMapfishOptions(options) {
-	console.log("options", options);
 	var dpi = parseInt(options.dpi.split(' ')[0]);
 	var scale = parseInt(options.scale.split(/[: ]/).pop());
 	var layers = options.layers;
@@ -43,7 +42,7 @@ function convertToMapfishOptions(options) {
 			mapTitle: options.title,
 			center: options.center,
 			scale: 25000,
-			dpi: 75,
+			dpi: options.dpi,
 			geodetic: false
 		}],
 		legends:[{
@@ -56,35 +55,80 @@ function convertToMapfishOptions(options) {
 		}]
 	};
 
-	var layerNames = layers.map(function(layer) {
-		return layer.S.name;
-	});
+    //get name of background map
+    var backgroundLayer = layers.filter(function(layer) {
+        return layer.S.group === "background";
+    });
+    console.log('background', backgroundLayer);
 
-	mapfishOptions.layers.push({
-		type: "WMS",
-		baseURL: 'http://gi.karlstad.se/geoserver/wms',
-		format: 'image/png',
-		layers: ["topowebbkartan"]
-	})
-	mapfishOptions.layers.push({
-		type: 'WMS',
-		baseURL: 'http://localhost:8080/geoserver/wms',
-		format: "image/png",
-		layers: ["varmland:al_17", "varmland:as_17", "varmland:bl_17"]//layerNames.filter(function(name) {return typeof name !== "undefined" || name === 'topowebbkartan'})
-	});
-	
+    //assemble object to be pushed to layers. backgroundLayer will always contain 1 element
+    var backgroundLayerObject = {
+      type: backgroundLayer[0].S.type,
+      baseURL: backgroundLayer[0].S.source.R,
+      format: backgroundLayer[0].S.source.f.FORMAT,
+      layers: [backgroundLayer[0].S.name]
+    };
+    //push background to layers array
+    mapfishOptions.layers.push(backgroundLayerObject);
+
+    //filter background map from remaining layers.
+    layers = layers.filter(function(layer) {
+        return layer.S.group !== "background"
+    });
+
+    //return array of Object[] filtered by baseURL and/or type
+    var wmsLayers = buildLayersObjects(layers.filter(function(layer) { return typeof layer.S.name != "undefined" }), "WMS");
+    var wfsLayers = buildLayersObjects(layers.filter(function(layer) { return typeof layer.S.name != "undefined" }), "WFS");
+    console.log('wmsLayers', wmsLayers);
+    console.log('wfsLayers', wfsLayers);
+
+    if (wmsLayers.length !== 0) {
+        wmsLayers.forEach(function(layer) {
+            mapfishOptions.layers.push(layer);
+        });
+    }
+    if (wfsLayers.length !== 0) {
+        wmsLayers.forEach(function(layer) {
+            mapfishOptions.layers.push(wfsLayers);
+        });
+    }
+	console.log('mapfishOptions', mapfishOptions);
 	return mapfishOptions;
 }
 
-//returnera array med objekt per tjänsttyp (wms, wfs)
-function buildObjectTypes(layers) {
+/**
+ * 
+ * @param {(Object[])} layers 
+ */
+function buildLayersObjects(layers, type) {
+    //Filter layers by type
+    var wmsLayers = layers.filter(function (layer) {
+        return layer.S.type === type;
+    });
+	
+	//Build objects from separate sources
+    var printableLayers = [];
+    var printIndex = null;
+    wmsLayers.forEach(function(layer) {
+        printIndex = printableLayers.findIndex(l => l.baseURL === layer.S.source.R);
+        if (printIndex !== -1) {
+            printableLayers[printIndex].layers.push(layer.S.name);
+        } else {
+            printableLayers.push({
+                type: layer.S.type,
+                baseURL: layer.S.source.R,
+                format: layer.S.source.f.FORMAT,
+                layers: [layer.S.name]
+            });
+        }
+    });
 
+    return printableLayers;
 }
 
 function executeMapfishCall(url, data) {
 	var body = JSON.stringify(data);
 	var startTime = new Date().getTime();
-	console.log('data', data);
 	$.ajax({
 		type: 'POST',
 		url: url,

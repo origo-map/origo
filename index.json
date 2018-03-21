@@ -96,6 +96,9 @@
     },
     "lm": {
       "url": "http://gi.karlstad.se/geoserver/wms/topowebb"
+    },
+    "ksdgis": {
+      "url": "http://40.69.3.166:8080/geoserver/wms/"
     }
   },
   "groups": [
@@ -112,8 +115,8 @@
   ],
   "layers": [
      {
-      "name": "varmland:al_17",
-      "title": "Vägnät",
+      "name": "forshaga:al_17",
+      "title": "vägnätellermotsvarande",
       "group": "superlager",
       "source": "local",
       "type":	"WMS",
@@ -125,8 +128,8 @@
       "featuretype": 5
     },
     {
-      "name": "varmland:as_17",
-      "title": "Terräng",
+      "name": "forshaga:bl_17",
+      "title": "terrängkanske",
       "group": "superlager",
       "source": "local",
       "type":	"WMS",
@@ -138,10 +141,10 @@
       "featuretype": 5
     },
     {
-      "name": "varmland:bl_17",
-      "title": "vägnånting",
+      "name": "forshaga:Lekplats",
+      "title": "lekplatser",
       "group": "superlager",
-      "source": "local",
+      "source": "ksdgis",
       "type":	"WMS",
       "format": "image/png",
       "style": "",
@@ -159,6 +162,17 @@
       "style": "karta_farg",
       "type": "WMS",
       "visible": true,
+      "source": "lm"
+    },
+    {
+      "name": "topowebbkartan_nedtonad",
+      "title": "Topowebb nedtonad",
+      "group": "background",
+      "queryable": false,
+      "opacity": 0.9,
+      "style": "karta_gra",
+      "type": "WMS",
+      "visible": false,
       "source": "lm"
     }
   ],
