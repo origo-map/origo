@@ -6,7 +6,7 @@ var Viewer = require('./viewer');
 var validateUrl = require('./utils/validateurl');
 var styleFunctions = require('./style/stylefunctions');
 var replacer = require('../src/utils/replacer');
-var mapUtils = require('./mapUtils');
+var mapUtils = require('./maputils');
 
 var baseUrl;
 

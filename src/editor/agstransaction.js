@@ -8,7 +8,7 @@ var ol = require('openlayers');
 var $ = require('jquery');
 var viewer = require('../viewer');
 var editsStore = require('./editsstore')();
-var dispatcher = require('./editDispatcher');
+var dispatcher = require('./editdispatcher');
 
 var format = new ol.format.EsriJSON();
 var urlSuffix = {
