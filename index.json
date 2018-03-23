@@ -58,15 +58,22 @@
     "url" : "https://github.com/origo-map/origo",
     "urlText": "Origo"
   }],
-  "projectionCode": "EPSG:3857",
+  "projectionCode": "EPSG:3006",
   "proj4Defs": [
-  
+    {
+      "code": "EPSG:3006",
+      "projection": "+proj=utm +zone=33 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
+    }
   ],
   "extent": [
-    1485583.7678999987, 8288825.654100002, 1521948.1948999988, 8303845.328100002
+    -1200000,
+    2994304,
+    4305696,
+    8500000
   ],
   "center": [
-    1503765.9813999988, 8296335.491100002
+    414241,
+    6600100
   ],
   "zoom": 13,
   "resolutions": [
@@ -98,7 +105,10 @@
       "url": "http://gi.karlstad.se/geoserver/wms/topowebb"
     },
     "ksdgis": {
-      "url": "http://40.69.3.166:8080/geoserver/wms/"
+      "url": "http://40.69.3.166:8080/geoserver/wms"
+    },
+    "wfsSource": {
+      "url": "http://localhost:8080/geoserver/wfs"
     }
   },
   "groups": [
@@ -131,10 +141,9 @@
       "name": "forshaga:bl_17",
       "title": "terrängkanske",
       "group": "superlager",
-      "source": "local",
-      "type":	"WMS",
-      "format": "image/png",
-      "style": "",
+      "source": "wfsSource",
+      "type":	"WFS",
+      "style": "mask",
       "queryable": true,
       "visible": true,
       "tileSize":	512,

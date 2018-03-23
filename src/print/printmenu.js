@@ -9,14 +9,10 @@ var Viewer = require('../viewer');
 var ol = require('openlayers');
 var $printButton, $printButtonTool, $printselect, vector, $scaleselect, $orientationselect;
 
-
-
 function init() {
 	$.getJSON('http://localhost:8080/geoserver/pdf/info.json', function(data) {
 		buildPanel(data);
 	});
-
-
 
 	function buildPanel(config) {
 		console.log(config);
@@ -41,14 +37,16 @@ function init() {
 				'<h5 id="o-main-setting-heading">Skriv ut karta</h5>' +
 				'<div class="o-block">' +
 					'<span class="o-setting-heading">Format</span>' +
-					utils.createRadioButtons(outputFormats, 1) +
+					'<select id="o-format-dd" class="o-dd-input">' +
+						utils.createDdOptions(outputFormats) +
+					'</select>' +
 				'</div>' +
-				'<br />' +
 				'<div class="o-block">' +
 					'<span class="o-setting-heading">Orientering</span>' +
-					utils.createRadioButtons(options.orientation, 2) +
+					'<select id="o-orientation-dd" class="o-dd-input">' +
+						utils.createDdOptions(options.orientation) +
+					'</select>' +
 				'</div>' +
-				'</br>' +
 				'<div class="o-block">' +
 					'<span class="o-setting-heading">Storlek</span>' +
 					'<select id="o-size-dd" class="o-dd-input">' +
@@ -91,6 +89,9 @@ function init() {
 			'</form>';
 
 		$('#o-map').append(menuEl);
+		
+		//Set default values for dropdowns
+		$('select option[value="PDF"').attr('selected', 'selected');
 
 		var printButton = utils.createButton({
 			id: 'o-printmenu-button-close',
@@ -114,7 +115,7 @@ function init() {
 		$printButton = $('#o-printmenu-button-close');
 		$printselect = $('#o-size-dd');
 		$scaleselect = $('#o-scale-dd');
-		$orientationselect = $("input:radio[name='group2']");
+		$orientationselect = $('#o-orientation-dd');
 		bindUIActions();
 	}
 }
@@ -167,37 +168,38 @@ function bindUIActions() {
 	});
 
 	function getPaperMeasures(format) {
-		var orientationLandscape = $('input[name=group2]:checked').val() == 1,
+		console.log($('#o-orientation-dd').val());
+		var orientationLandscape = $('#o-orientation-dd').val() == 'Liggande',
 			width = 0,
 			height = 0;
 
 		switch (format) {
 			case 'A1':
 				width = orientationLandscape ? 841 : 594,
-					height = orientationLandscape ? 594 : 841
+                height = orientationLandscape ? 594 : 841
 				break;
 			case 'A2':
 				width = orientationLandscape ? 594 : 420,
-					height = orientationLandscape ? 420 : 594
+                height = orientationLandscape ? 420 : 594
 				break;
 			case 'A3':
 				width = orientationLandscape ? 420 : 297,
-					height = orientationLandscape ? 297 : 420
+                height = orientationLandscape ? 297 : 420
 				break;
 			case 'A4':
-				width = orientationLandscape ? 297 : 210,
-					height = orientationLandscape ? 210 : 297
+				width = orientationLandscape ? 1060.7142857142856 : 750,
+                height = orientationLandscape ? 750 : 1060.7142857142856
 				break;
 			case 'A5':
 				width = orientationLandscape ? 210 : 148,
-					height = orientationLandscape ? 148 : 210
+                height = orientationLandscape ? 148 : 210
 				break;
 			case 'A6':
 				width = orientationLandscape ? 148 : 105,
-					height = orientationLandscape ? 105 : 148
+                height = orientationLandscape ? 105 : 148
 				break;
 		}
-
+		
 		return {
 			width: width, //((width / 25.4)),
 			height: height //((height / 25.4))
@@ -217,13 +219,14 @@ function bindUIActions() {
 				printLayers.push(layer.a[i]);
 			}
 		}
+		console.log($('#o-format-dd').val());
 		var contract = {
 			url: "http://localhost:8080/geoserver/wms",
 			dpi: $('#o-resolution-dd').val(),
 			layers: printLayers,
-			outputFormat: $('input[name=group1]:checked').parent('label').text().trim().toLowerCase(),
+			outputFormat: $('#o-format-dd').val().trim().toLowerCase(),
 			scale: $('#o-scale-dd').val(),
-			orientation: $('input[name=group2]:checked').val(),
+			orientation: $('#o-orientation-dd').val(),
 			size: $('#o-size-dd').val(),
 			title: $('#o-title-input').val(),
 			layout: $('#o-template-dd').val(),

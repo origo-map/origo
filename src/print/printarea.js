@@ -8,13 +8,10 @@ var map;
 var vector;
 var interaction;
 var target = '.o-map';
-var polygonFeature = new ol.Feature(
-  new ol.geom.Polygon([[[1499876.032897, 8295720.234419], [1498891.906158, 8295720.234419],
-  [1498844.133015, 8296981.445385], [1500363.318953, 8296952.781500]]]));
 
 function printA1() {
-
   map = Viewer.getMap();
+  
   var style = new ol.style.Style({
     image: new ol.style.Circle({
       radius: 7,
@@ -31,7 +28,7 @@ function printA1() {
 
   vector = new ol.layer.Vector({
     source: new ol.source.Vector({
-      features: [polygonFeature],
+      features: [],
       name: 'printarea',
       visible: false,
       zIndex: 7
@@ -57,10 +54,21 @@ function getVector() {
 }
 
 function addPreview(scale, paper) {
-  vector = getVector();
-  var extent = vector.getSource().getFeatures()[0].getGeometry().getExtent();
-  var center =  ol.extent.getCenter(extent);
-  var dpi = 300//25.4 / 0.28
+  var center;
+  if(vector.getSource().getFeatures().length > 0) {
+    var extent = vector.getSource().getFeatures()[0].getGeometry().getExtent();
+    center = ol.extent.getCenter(extent);
+  } else {
+    center = map.getView().getCenter();
+  }
+  _updatePreviewFeature(scale, paper, center);
+}
+
+function _createPreviewFeature(scale, paper, center) {
+  console.log('scale', scale);
+  console.log('paper', paper);
+  console.log('center', center);
+  var dpi = 25.4 / 0.28
     , ipu = 39.37
     , sf = 1
     , w = (paper.width / dpi / ipu * scale / 2) * sf
@@ -76,10 +84,13 @@ function addPreview(scale, paper) {
     ]
     , feature = new ol.Feature({
       geometry: new ol.geom.Polygon(coords)
-    })
-    ;
+    });
+    return feature;
+}
 
-  
+function _updatePreviewFeature(scale, paper, center) {
+  vector = getVector();
+  var feature = _createPreviewFeature(scale, paper, center);
   vector.getSource().clear();
   vector.set('polygonFeature', feature);
   vector.getSource().addFeature(feature);
@@ -87,7 +98,6 @@ function addPreview(scale, paper) {
     features: new ol.Collection([feature])
   });
   map.addInteraction(translate);
-
 }
 
 module.exports.printA1 = printA1;
