@@ -30,6 +30,10 @@ var wms = function wms(layerOptions) {
     sourceOptions.tileGrid = maputils.tileGrid(sourceOptions.tileGrid);
   } else {
     sourceOptions.tileGrid = viewer.getTileGrid();
+
+    if (wmsOptions.extent) {
+      sourceOptions.tileGrid.extent = wmsOptions.extent;
+    }
   }
 
   var wmsSource = createSource(sourceOptions);
