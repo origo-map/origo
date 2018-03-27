@@ -7,7 +7,7 @@ var print = require('./print');
 var printarea = require('./printarea');
 var Viewer = require('../viewer');
 var ol = require('openlayers');
-var $printButton, $printButtonTool, $printselect, vector, $scaleselect, $orientationselect;
+var $printButton, $printButtonTool, $printselect, vector, $scaleselect, $orientationselect, $clearButton;
 
 function init() {
 	$.getJSON('http://localhost:8080/geoserver/pdf/info.json', function(data) {
@@ -102,7 +102,8 @@ function init() {
 				'<br />' +
 					'<div class="o-block">' +
 					'<button id="o-print-create-button" class="btn" type="button">Skapa</button>' +
-				'</div>' +
+					'<button id="o-print-clear-button" class="btn" type="button" style="margin:5px">Avbryt</button>' +
+				'</div>' +				
 			'</div>' +
 			'</form>';
 
@@ -134,6 +135,7 @@ function init() {
 		$printselect = $('#o-size-dd');
 		$scaleselect = $('#o-scale-dd');
 		$orientationselect = $('#o-orientation-dd');
+		$clearButton = $('#o-print-clear-button');
 		bindUIActions();
 	}
 }
@@ -148,17 +150,27 @@ function bindUIActions() {
 		if ($("#o-printmenu").hasClass('o-printmenu-show')) {
 			$("#o-printmenu").removeClass('o-printmenu-show');
 		} else {
-			if (!vector) {
+			if (!vector) {				
 				vector = printarea.printA1();
 				polygon = true;
 				var paper = getPaperMeasures('A1');
 				printarea.addPreview(25000, paper);
 				$("#o-printmenu").addClass('o-printmenu-show');
 			} else {
+				vector.setVisible(true);
 				$("#o-printmenu").addClass('o-printmenu-show');
 			}
 
 		}
+		e.preventDefault();
+	});
+	$clearButton.on('click', function (e) {
+		var map = Viewer.getMap();
+		var vector = printarea.getVector();
+		if(vector){
+			vector.setVisible(false);
+			$("#o-printmenu").removeClass('o-printmenu-show');
+		}	
 		e.preventDefault();
 	});
 	$printselect.change(function () {
