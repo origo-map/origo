@@ -19,10 +19,28 @@ function init() {
 		var outputFormats = config.outputFormats.map(function(format) {
 			return format.name.toUpperCase();
 		});
-
-		var layouts = config.layouts.map(function(layout) {
-			return layout.name;
+		
+		var array = [];
+		function filterDuplicates(layout) {
+			var name = layout.name.split('-')[0];
+			if (array.indexOf(name) === -1) {
+				array.push(name);
+				return name;
+			}
+		}
+		var layoutNames = config.layouts.map(function(layout) {
+			return layout.name.split('-')[0];
 		});
+
+		//Populera mall-lista med endast ett entry per "layout" i config.yaml. Enligt kravspec
+		var names = [];
+		function filterDuplicateNames(name) {
+			if(names.indexOf(name) === -1) {
+				names.push(name);
+				return name;
+			}
+		}
+		var layouts = layoutNames.filter(filterDuplicateNames);
 
 		var scales = config.scales.map(function(scale) {
 			return scale.value;
