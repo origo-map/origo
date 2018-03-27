@@ -24,6 +24,10 @@ var vectortile = function vectortile(layerOptions) {
     sourceOptions.tileGrid = maputils.tileGrid(sourceOptions.tileGrid);
   } else {
     sourceOptions.tileGrid = viewer.getTileGrid();
+
+    if (vectortileOptions.extent) {
+      sourceOptions.tileGrid.extent = vectortileOptions.extent;
+    }
   }
 
   var vectortileSource = createSource(sourceOptions, vectortileOptions);

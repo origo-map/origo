@@ -25,6 +25,10 @@ var agsTile = function agsTile(layerOptions) {
     sourceOptions.tileGrid = maputils.tileGrid(sourceOptions.tileGrid);
   } else {
     sourceOptions.tileGrid = viewer.getTileGrid();
+
+    if (agsOptions.extent) {
+      sourceOptions.tileGrid.extent = agsOptions.extent;
+    }
   }
 
   var agsSource = createSource(sourceOptions);

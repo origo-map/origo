@@ -18,12 +18,16 @@ var xyz = function xyz(layerOptions) {
   sourceOptions.attributions = xyzOptions.attribution;
   sourceOptions.projection = viewer.getProjectionCode() || 'EPSG:3857';
 
-  if (wmsOptions.tileGrid) {
-    sourceOptions.tileGrid = maputils.tileGrid(wmsOptions.tileGrid);
+  if (xyzOptions.tileGrid) {
+    sourceOptions.tileGrid = maputils.tileGrid(xyzOptions.tileGrid);
   } else if (sourceOptions.tileGrid) {
     sourceOptions.tileGrid = maputils.tileGrid(sourceOptions.tileGrid);
   } else {
     sourceOptions.tileGrid = viewer.getTileGrid();
+
+    if (xyzOptions.extent) {
+      sourceOptions.tileGrid.extent = xyzOptions.extent;
+    }
   }
 
   if(xyzOptions.layerURL){
