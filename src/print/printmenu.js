@@ -193,34 +193,34 @@ function bindUIActions() {
 
 		switch (format) {
 			case 'A1':
-				width = orientationLandscape ? 841 : 594,
-                height = orientationLandscape ? 594 : 841
+				width = orientationLandscape ? 594 : 420,
+				height = orientationLandscape ? 420 : 594
 				break;
 			case 'A2':
-				width = orientationLandscape ? 594 : 420,
-                height = orientationLandscape ? 420 : 594
+				width = orientationLandscape ? 420 : 297,
+				height = orientationLandscape ? 297 : 420
 				break;
 			case 'A3':
-				width = orientationLandscape ? 420 : 297,
-                height = orientationLandscape ? 297 : 420
+				width = orientationLandscape ? 297 : 210,
+				height = orientationLandscape ? 210 : 297
 				break;
 			case 'A4':
-				width = orientationLandscape ? 1060.7142857142856 : 750,
-                height = orientationLandscape ? 750 : 1060.7142857142856
+				width = orientationLandscape ? 210 : 149,
+                height = orientationLandscape ? 149 : 210
 				break;
 			case 'A5':
-				width = orientationLandscape ? 210 : 148,
-                height = orientationLandscape ? 148 : 210
+				width = orientationLandscape ? 149 : 105,
+                height = orientationLandscape ? 105 : 149
 				break;
 			case 'A6':
-				width = orientationLandscape ? 148 : 105,
-                height = orientationLandscape ? 105 : 148
+				width = orientationLandscape ? 105 : 74,
+                height = orientationLandscape ? 74 : 105
 				break;
 		}
 		
 		return {
-			width: width, //((width / 25.4)),
-			height: height //((height / 25.4))
+			width: width,//((width / 25.4)),
+			height: height//((height / 25.4))
 		};
 	};
 
