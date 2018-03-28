@@ -61,26 +61,47 @@ function convertToMapfishOptions(options) {
     //get name of background map
     var backgroundLayer = layers.filter(function(layer) {
         return layer.get('group') === "background";
-    });
+	})[0];
 
+	
     //assemble object to be pushed to layers. backgroundLayer will always contain 1 element
-    var backgroundLayerObject = {
-      type: backgroundLayer[0].get('type'),
-      baseURL: backgroundLayer[0].S.source.R,
-      format: backgroundLayer[0].S.source.f.FORMAT,
-	  layers: [backgroundLayer[0].S.name]
-    };
+	if(backgroundLayer) {
+	//    console.log("ol.source.TileWMS:", backgroundLayer.getSource() instanceof ol.source.TileWMS)
+	//    console.log("ol.source.ImageWMS:", backgroundLayer.getSource() instanceof ol.source.ImageWMS)
+
+	// 	console.log("urls", backgroundLayer.getSource().getUrls()); //TileWms array
+	// 	//console.log("urls", backgroundLayer.getSource().getUrl()); //TileWms
+	// 	console.log("params", backgroundLayer.getSource().getParams());
+		
+		var url;
+		if (backgroundLayer.getSource() instanceof ol.source.TileWMS) {
+			url = backgroundLayer.getSource().getUrls()[0];
+		} else if (backgroundLayer.getSource() instanceof ol.source.ImageWMS) {
+			url = backgroundLayer.getSource().getUrl(); //String
+		} else {
+			console.log('Bakgrundslager är av okänd bildtyp: ', backgroundLayer.getSource);
+		}
+		var backgroundLayerObject = {
+			type: backgroundLayer.get('type'),
+			baseURL: url,
+			format: backgroundLayer.getSource().getParams().FORMAT,
+			layers: [backgroundLayer.getSource().getParams().LAYERS]
+		};
+		mapfishOptions.layers.push(backgroundLayerObject);
+		console.log('backgroundLayer', backgroundLayerObject);
+	} else {
+		//tom
+	}
     //push background to layers array
-    mapfishOptions.layers.push(backgroundLayerObject);
 
     //filter background map from remaining layers.
     layers = layers.filter(function(layer) {
-        return layer.S.group !== "background"
+        return layer.get('group') !== "background"
     });
 
     //return array of Object[] filtered by baseURL and/or type
-    var wmsLayers = buildLayersObjects(layers.filter(function(layer) { return typeof layer.S.name != "undefined" }), "WMS");
-    var wfsLayers = buildLayersObjects(layers.filter(function(layer) { return typeof layer.S.name != "undefined" }), "WFS");
+    var wmsLayers = buildLayersObjects(layers.filter(function(layer) { return typeof layer.get('name') != "undefined" }), "WMS");
+    var wfsLayers = buildLayersObjects(layers.filter(function(layer) { return typeof layer.get('name') != "undefined" }), "WFS");
 
     if (wmsLayers.length !== 0) {
         wmsLayers.forEach(function(layer) {
@@ -92,7 +113,7 @@ function convertToMapfishOptions(options) {
             mapfishOptions.layers.push(layer);
         });
 	}
-	console.log('mapfishOptions', mapfishOptions);
+	console.log('SKRIVS UT: ', mapfishOptions);
 	return mapfishOptions;
 }
 
@@ -106,22 +127,39 @@ function buildLayersObjects(inLayers, type) {
 		return layer.get("type") === type;
 	});
 
+	
 	var printableLayers = [];
 	var printIndex = null;
-	
 	switch(type) {
-		case 'WMS':		
-			//Build wms objects one per source
+		case 'WMS':
+
+		// var url;
+		// if (backgroundLayer.getSource() instanceof ol.source.TileWMS) {
+		// 	url = backgroundLayer.getSource().getUrls();
+		// } else if (backgroundLayer.getSource() instanceof ol.source.ImageWMS) {
+		// 	url = backgroundLayer.getSource().getUrl();
+		// } else {
+		// 	console.log('Bakgrundslager är av okänd bildtyp: ', backgroundLayer.getSource);
+		// }
+		var url;
+		//Build wms objects one per source
 			layers.forEach(function(layer) {
-				printIndex = printableLayers.findIndex(l => l.baseURL === layer.S.source.R);
+				if (layer.getSource() instanceof ol.source.TileWMS) {
+					url = layer.getSource().getUrls()[0];
+				} else if (layer.getSource() instanceof ol.source.ImageWMS) {
+					url = layer.getSource().getUrl();
+				} else {
+					console.log('Lagertyp stöds ej.');
+				}
+				printIndex = printableLayers.findIndex(l => l.baseURL === url);
 				if (printIndex !== -1) {
 					printableLayers[printIndex].layers.push(layer.S.name);
 				} else {
 					printableLayers.push({
 						type: layer.get('type'),
-						baseURL: layer.S.source.R,
-						format: layer.S.source.f.FORMAT,
-						layers: [layer.S.name]
+						baseURL: url,
+						format: layer.getSource().getParams().FORMAT,
+						layers: [layer.getSource().getParams().LAYERS]
 					});
 				}
 			});
@@ -149,14 +187,12 @@ function buildLayersObjects(inLayers, type) {
 					}),
 					zIndex: 100000
 				  });
-				console.log('style', style);
 
 				features.forEach(function(feature) {
 					feature.setProperties({'_gx_style': 0})
 				});
 
 				var data = geojson.writeFeatures(features, {featureProjection: "EPSG:3006", dataProjection: "EPSG:3006"});
-				console.log('data', JSON.parse(data));
 				printableLayers.push({
 					type: 'vector',
 					geoJson: JSON.parse(data),
@@ -170,17 +206,9 @@ function buildLayersObjects(inLayers, type) {
 					}}
 
 				});
-				// opacity (Defaults to 1.0)
-				// geoJson (Required) the geoJson to render
-				// styleProperty (Defaults to ‘_style’) Name of the property within the features to use as style name. The given property may contain a style object directly.
-				// styles (Optional) dictonary of styles. One style is defined as in OpenLayers.Feature.Vector.style.
-				// name (Defaults to vector) the layer name.
 			});
-			//build wfs objects, one per source
-
 		break;
 	}
-
     return printableLayers;
 }
 

@@ -15,32 +15,21 @@ function init() {
 	});
 
 	function buildPanel(config) {
-		console.log(config);
 		var outputFormats = config.outputFormats.map(function(format) {
 			return format.name.toUpperCase();
 		});
 		
-		var array = [];
-		function filterDuplicates(layout) {
-			var name = layout.name.split('-')[0];
-			if (array.indexOf(name) === -1) {
-				array.push(name);
-				return name;
-			}
-		}
+		
 		var layoutNames = config.layouts.map(function(layout) {
 			return layout.name.split('-')[0];
 		});
-
 		//Populera mall-lista med endast ett entry per "layout" i config.yaml. Enligt kravspec
-		var names = [];
-		function filterDuplicateNames(name) {
-			if(names.indexOf(name) === -1) {
-				names.push(name);
-				return name;
+		var layouts = layoutNames.filter(function (layoutName) {
+			if (!this.has(layoutName)) {
+				this.set(layoutName, true);
+				return true;
 			}
-		}
-		var layouts = layoutNames.filter(filterDuplicateNames);
+		}, new Map);
 
 		var scales = config.scales.map(function(scale) {
 			return scale.value;
@@ -186,7 +175,6 @@ function bindUIActions() {
 	});
 
 	function getPaperMeasures(format) {
-		console.log($('#o-orientation-dd').val());
 		var orientationLandscape = $('#o-orientation-dd').val() == 'Liggande',
 			width = 0,
 			height = 0;
@@ -227,27 +215,24 @@ function bindUIActions() {
 
 	$('#o-print-create-button').click(function (event) {
 		var map = Viewer.getMap();
-		var layer = map.getLayers();
-		var extent = vector.getSource().getFeatures()[0].getGeometry().getExtent();
+		var layers = map.getLayers();
+		var extent = vector.getSource().getFeatures()[0].getGeometry().getExtent(); //TODO :)
+		
 		var centerPoint =  ol.extent.getCenter(extent);
 
-		var printLayers = [];
-		for (var i = 0, l = layer.a.length; i < l; i++) {
-			if (layer.a[i].S.visible) {
-				printLayers.push(layer.a[i]);
-			}
-		}
-		console.log($('#o-format-dd').val());
+		var visibleLayers = layers.getArray().filter(function(layer) {
+			return layer.getVisible();
+		});
+
 		var contract = {
-			url: "http://localhost:8080/geoserver/wms",
 			dpi: $('#o-resolution-dd').val(),
-			layers: printLayers,
+			layers: visibleLayers,
 			outputFormat: $('#o-format-dd').val().trim().toLowerCase(),
 			scale: $('#o-scale-dd').val(),
 			orientation: $('#o-orientation-dd').val(),
 			size: $('#o-size-dd').val(),
 			title: $('#o-title-input').val(),
-			layout: $('#o-template-dd').val(),
+			layout: buildLayoutString($('#o-template-dd').val(), $('#o-size-dd').val(), $('#o-orientation-dd').val()),
 			center: centerPoint
 		};
 		print.printMap(contract);
@@ -255,5 +240,9 @@ function bindUIActions() {
 	});
 
 
+}
+
+function buildLayoutString(name, size, orientation) {
+	return name + '-' + size + '-' + orientation;
 }
 module.exports.init = init;
