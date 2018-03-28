@@ -7,7 +7,7 @@ var print = require('./print');
 var printarea = require('./printarea');
 var Viewer = require('../viewer');
 var ol = require('openlayers');
-var $printButton, $printButtonTool, $printselect, vector, $scaleselect, $orientationselect;
+var $printButton, $printButtonTool, $printselect, vector, $scaleselect, $orientationselect, $clearButton;
 
 function init() {
 	$.getJSON('http://localhost:8080/geoserver/pdf/info.json', function(data) {
@@ -91,7 +91,8 @@ function init() {
 				'<br />' +
 					'<div class="o-block">' +
 					'<button id="o-print-create-button" class="btn" type="button">Skapa</button>' +
-				'</div>' +
+					'<button id="o-print-clear-button" class="btn" type="button" style="margin:5px">Avbryt</button>' +
+				'</div>' +				
 			'</div>' +
 			'</form>';
 
@@ -123,6 +124,7 @@ function init() {
 		$printselect = $('#o-size-dd');
 		$scaleselect = $('#o-scale-dd');
 		$orientationselect = $('#o-orientation-dd');
+		$clearButton = $('#o-print-clear-button');
 		bindUIActions();
 	}
 }
@@ -137,17 +139,27 @@ function bindUIActions() {
 		if ($("#o-printmenu").hasClass('o-printmenu-show')) {
 			$("#o-printmenu").removeClass('o-printmenu-show');
 		} else {
-			if (!vector) {
+			if (!vector) {				
 				vector = printarea.printA1();
 				polygon = true;
 				var paper = getPaperMeasures('A1');
 				printarea.addPreview(25000, paper);
 				$("#o-printmenu").addClass('o-printmenu-show');
 			} else {
+				vector.setVisible(true);
 				$("#o-printmenu").addClass('o-printmenu-show');
 			}
 
 		}
+		e.preventDefault();
+	});
+	$clearButton.on('click', function (e) {
+		var map = Viewer.getMap();
+		var vector = printarea.getVector();
+		if(vector){
+			vector.setVisible(false);
+			$("#o-printmenu").removeClass('o-printmenu-show');
+		}	
 		e.preventDefault();
 	});
 	$printselect.change(function () {
@@ -181,34 +193,34 @@ function bindUIActions() {
 
 		switch (format) {
 			case 'A1':
-				width = orientationLandscape ? 841 : 594,
-                height = orientationLandscape ? 594 : 841
+				width = orientationLandscape ? 594 : 420,
+				height = orientationLandscape ? 420 : 594
 				break;
 			case 'A2':
-				width = orientationLandscape ? 594 : 420,
-                height = orientationLandscape ? 420 : 594
+				width = orientationLandscape ? 420 : 297,
+				height = orientationLandscape ? 297 : 420
 				break;
 			case 'A3':
-				width = orientationLandscape ? 420 : 297,
-                height = orientationLandscape ? 297 : 420
+				width = orientationLandscape ? 297 : 210,
+				height = orientationLandscape ? 210 : 297
 				break;
 			case 'A4':
-				width = orientationLandscape ? 1060.7142857142856 : 750,
-                height = orientationLandscape ? 750 : 1060.7142857142856
+				width = orientationLandscape ? 210 : 149,
+                height = orientationLandscape ? 149 : 210
 				break;
 			case 'A5':
-				width = orientationLandscape ? 210 : 148,
-                height = orientationLandscape ? 148 : 210
+				width = orientationLandscape ? 149 : 105,
+                height = orientationLandscape ? 105 : 149
 				break;
 			case 'A6':
-				width = orientationLandscape ? 148 : 105,
-                height = orientationLandscape ? 105 : 148
+				width = orientationLandscape ? 105 : 74,
+                height = orientationLandscape ? 74 : 105
 				break;
 		}
 		
 		return {
-			width: width, //((width / 25.4)),
-			height: height //((height / 25.4))
+			width: width,//((width / 25.4)),
+			height: height//((height / 25.4))
 		};
 	};
 
