@@ -3,15 +3,18 @@
 var $ = require('jquery');
 var utils = require('../utils');
 var options = require('./../../conf/printSettings');
+var config = require('../../conf/origoConfig');
 var print = require('./print');
 var printarea = require('./printarea');
 var Viewer = require('../viewer');
 var ol = require('openlayers');
+var mapfishConfig;
 var $printButton, $printButtonTool, $printselect, vector, $scaleselect, $orientationselect, $clearButton;
 
 function init() {
-	$.getJSON('http://localhost:8080/geoserver/pdf/info.json', function(data) {
+	$.getJSON(config.printInfo, function(data) {
 		buildPanel(data);
+		mapfishConfig = data;
 	});
 
 	function buildPanel(config) {
@@ -187,40 +190,66 @@ function bindUIActions() {
 	});
 
 	function getPaperMeasures(format) {
+		console.log(mapfishConfig);
 		var orientationLandscape = $('#o-orientation-dd').val() == 'Liggande',
 			width = 0,
 			height = 0;
 
-		switch (format) {
-			case 'A1':
-				width = orientationLandscape ? 594 : 420,
-				height = orientationLandscape ? 420 : 594
-				break;
-			case 'A2':
-				width = orientationLandscape ? 420 : 297,
-				height = orientationLandscape ? 297 : 420
-				break;
-			case 'A3':
-				width = orientationLandscape ? 297 : 210,
-				height = orientationLandscape ? 210 : 297
-				break;
-			case 'A4':
-				width = orientationLandscape ? 210 : 149,
-                height = orientationLandscape ? 149 : 210
-				break;
-			case 'A5':
-				width = orientationLandscape ? 149 : 105,
-                height = orientationLandscape ? 105 : 149
-				break;
-			case 'A6':
-				width = orientationLandscape ? 105 : 74,
-                height = orientationLandscape ? 74 : 105
-				break;
+		// Sätt storlek på polygon till storlek på kartutsnitt
+		// Hämta vald mall
+		var layoutName = buildLayoutString($('#o-template-dd').val(), $('#o-size-dd').val(), $('#o-orientation-dd').val());
+		if (mapfishConfig) {
+			var layoutnames = mapfishConfig.layouts;
+			var getWidth = function (name) {
+				var layout = layoutnames.filter(function (layoutname) {
+					return layoutname.name === name;
+				});
+				return layout[0].map.width ? layout[0].map.width : 0;
+			}
+			var getHeight = function (name) {
+				var layout = layoutnames.filter(function (layoutname) {
+					return layoutname.name === name;
+				});
+				return layout[0].map.height ? layout[0].map.height : 0;
+			}
+			
+			width = getWidth(layoutName);
+			height = getHeight(layoutName);
+			console.log('layoutName', layoutName);
+			console.log('width', width);
+			console.log('height', height);
 		}
+
+		// switch (format) {
+		// 	case 'A1':
+		// 		width = orientationLandscape ? 594 : 420,
+		// 		height = orientationLandscape ? 420 : 594
+		// 		break;
+		// 	case 'A2':
+		// 		width = orientationLandscape ? 420 : 297,
+		// 		height = orientationLandscape ? 297 : 420
+		// 		break;
+		// 	case 'A3':
+		// 		width = orientationLandscape ? 297 : 210,
+		// 		height = orientationLandscape ? 210 : 297
+		// 		break;
+		// 	case 'A4':
+		// 		width = orientationLandscape ? 210 : 400,
+        //         height = orientationLandscape ? 149 : 800
+		// 		break;
+		// 	case 'A5':
+		// 		width = orientationLandscape ? 149 : 105,
+        //         height = orientationLandscape ? 105 : 149
+		// 		break;
+		// 	case 'A6':
+		// 		width = orientationLandscape ? 105 : 74,
+        //         height = orientationLandscape ? 74 : 105
+		// 		break;
+		// }
 		
 		return {
-			width: width,//((width / 25.4)),
-			height: height//((height / 25.4))
+			width: width,	//((width / 25.4)),
+			height: height	//((height / 25.4))
 		};
 	};
 

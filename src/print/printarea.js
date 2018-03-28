@@ -65,9 +65,6 @@ function addPreview(scale, paper) {
 }
 
 function _createPreviewFeature(scale, paper, center) {
-  console.log('scale', scale);
-  console.log('paper', paper);
-  console.log('center', center);
   var dpi = 25.4 / 0.28
     , ipu = 39.37
     , sf = 1

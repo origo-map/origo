@@ -10,7 +10,7 @@ function downloadWhenReady(startTime, data) {
 		console.log(('Gave up waiting after 30 seconds'))
 	} else {
 		setTimeout(function () {
-			$.getJSON(config.geoserverPath + data.statusURL, function (statusData) {
+			$.getJSON(config.geoserverPath + data.statusURL, function (statusData) { //TODO
 				if (!statusData.done) {
 					downloadWhenReady(startTime, data);
 				} else {
@@ -232,7 +232,7 @@ function executeMapfishCall(url, data) {
 }
 
 function printMap(settings) {
-	var url = 'http://localhost:8080/geoserver/pdf/create.json' //TODO
+	var url = config.printCreate;
 	executeMapfishCall(url, convertToMapfishOptions(settings));
 }
 
