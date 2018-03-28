@@ -52,6 +52,12 @@ function init() {
 					'</select>' +
 				'</div>' +
 				'<div class="o-block">' +
+					'<span class="o-setting-heading">Mall</span>' +
+					'<select id="o-template-dd" class="o-dd-input">' +
+					utils.createDdOptions(layouts) +
+					'</select>' +
+				'</div>' +
+				'<div class="o-block">' +
 					'<span class="o-setting-heading">Orientering</span>' +
 					'<select id="o-orientation-dd" class="o-dd-input">' +
 						utils.createDdOptions(options.orientation) +
@@ -61,12 +67,6 @@ function init() {
 					'<span class="o-setting-heading">Storlek</span>' +
 					'<select id="o-size-dd" class="o-dd-input">' +
 					utils.createDdOptions(options.sizes) +
-					'</select>' +
-				'</div>' +
-				'<div class="o-block">' +
-					'<span class="o-setting-heading">Mall</span>' +
-					'<select id="o-template-dd" class="o-dd-input">' +
-					utils.createDdOptions(layouts) +
 					'</select>' +
 				'</div>' +
 				'<div class="o-block">' +
@@ -102,7 +102,9 @@ function init() {
 		$('#o-map').append(menuEl);
 		
 		//Set default values for dropdowns
-		$('select option[value="PDF"').attr('selected', 'selected');
+		$('#o-format-dd option[value="PDF"]').attr('selected', 'selected');
+		$('#o-scale-dd option[value="5000.0"]').attr('selected', 'selected');
+		$('#o-size-dd option[value="A4"]').attr('selected', 'selected');
 
 		var printButton = utils.createButton({
 			id: 'o-printmenu-button-close',
@@ -145,8 +147,8 @@ function bindUIActions() {
 			if (!vector) {				
 				vector = printarea.printA1();
 				polygon = true;
-				var paper = getPaperMeasures('A1');
-				printarea.addPreview(25000, paper);
+				var paper = getPaperMeasures();
+				printarea.addPreview($('#o-scale-dd').val(), paper);
 				$("#o-printmenu").addClass('o-printmenu-show');
 			} else {
 				vector.setVisible(true);
@@ -204,13 +206,13 @@ function bindUIActions() {
 				var layout = layoutnames.filter(function (layoutname) {
 					return layoutname.name === name;
 				});
-				return layout[0].map.width ? layout[0].map.width : 0;
+				return layout[0] ? layout[0].map.width : 0;
 			}
 			var getHeight = function (name) {
 				var layout = layoutnames.filter(function (layoutname) {
 					return layoutname.name === name;
 				});
-				return layout[0].map.height ? layout[0].map.height : 0;
+				return layout[0] ? layout[0].map.height : 0;
 			}
 			
 			width = getWidth(layoutName);
@@ -279,8 +281,6 @@ function bindUIActions() {
 		print.printMap(contract);
 		return false;
 	});
-
-
 }
 
 function buildLayoutString(name, size, orientation) {
