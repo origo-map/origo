@@ -49,24 +49,24 @@ module.exports = function createForm(obj) {
       break;
     case 'date':
       if (!val) {
-        if (obj.defaultDate === 'today') {
-          val = isoDate.slice(0, 10);
+        if (obj.defaultDate === false) {
+          val = '';
         } else if (obj.defaultDate) {
           val = obj.defaultDate;
         } else {
-          val = '';
+          val = isoDate.slice(0, 10);
         }
       }
       el = '<div><label>' + label + '</label><br><input type="date" id="' + id + '" placeholder="YYYY-MM-DD" value="' + val + '"></div>';
       break;
     case 'datetime':
       if (!val) {
-        if (obj.defaultDatetime === 'today') {
-          val = isoDate.slice(0, 16);
+        if (obj.defaultDatetime === false) {
+          val = '';
         } else if (obj.defaultDatetime) {
           val = obj.defaultDatetime;
         } else {
-          val = '';
+          val = isoDate.slice(0, 16);
         }
       }
       el = '<div><label>' + label + '</label><br><input type="datetime-local" id="' + id + '" placeholder="YYYY-MM-DDThh:mm" value="' + val + '"></div>';
