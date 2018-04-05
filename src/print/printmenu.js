@@ -8,8 +8,9 @@ var print = require('./print');
 var printarea = require('./printarea');
 var Viewer = require('../viewer');
 var ol = require('openlayers');
+
 var mapfishConfig;
-var $printButton, $printButtonTool, $printselect, vector, $scaleselect, $orientationselect, $clearButton;
+var $printButton, $printButtonTool, $printselect, vector, $scaleselect, $orientationselect, $clearButton, $layoutselect;
 
 function init() {
 	$.getJSON(config.printInfo, function(data) {
@@ -53,7 +54,7 @@ function init() {
 				'</div>' +
 				'<div class="o-block">' +
 					'<span class="o-setting-heading">Mall</span>' +
-					'<select id="o-template-dd" class="o-dd-input">' +
+					'<select id="o-layout-dd" class="o-dd-input">' +
 					utils.createDdOptions(layouts) +
 					'</select>' +
 				'</div>' +
@@ -130,6 +131,7 @@ function init() {
 		$scaleselect = $('#o-scale-dd');
 		$orientationselect = $('#o-orientation-dd');
 		$clearButton = $('#o-print-clear-button');
+		$layoutselect = $('#o-layout-dd');
 		bindUIActions();
 	}
 }
@@ -175,6 +177,15 @@ function bindUIActions() {
 		printarea.addPreview(scale, paper);
 	});
 
+	$layoutselect.change(function () {
+		console.log('hej');
+		var map = Viewer.getMap();
+		var paper = getPaperMeasures($printselect.val());
+		var scale = $scaleselect.val();
+		scale = scale.split('.')[0];
+		printarea.addPreview(scale, paper);
+	});
+
 	$scaleselect.change(function () {
 		var map = Viewer.getMap();
 		var paper = getPaperMeasures($printselect.val());
@@ -199,7 +210,7 @@ function bindUIActions() {
 
 		// Sätt storlek på polygon till storlek på kartutsnitt
 		// Hämta vald mall
-		var layoutName = buildLayoutString($('#o-template-dd').val(), $('#o-size-dd').val(), $('#o-orientation-dd').val());
+		var layoutName = buildLayoutString($('#o-layout-dd').val(), $('#o-size-dd').val(), $('#o-orientation-dd').val());
 		if (mapfishConfig) {
 			var layoutnames = mapfishConfig.layouts;
 			var getWidth = function (name) {
@@ -259,7 +270,7 @@ function bindUIActions() {
 	$('#o-print-create-button').click(function (event) {
 		var map = Viewer.getMap();
 		var layers = map.getLayers();
-		var extent = vector.getSource().getFeatures()[0].getGeometry().getExtent(); //TODO :)
+		var extent = vector.getSource().getFeatures()[0].getGeometry().getExtent(); //TODO: Finns risk för nullpointer här, även om det alltid endast finns en vector. Borde hanteras bättre
 		
 		var centerPoint =  ol.extent.getCenter(extent);
 
@@ -275,7 +286,7 @@ function bindUIActions() {
 			orientation: $('#o-orientation-dd').val(),
 			size: $('#o-size-dd').val(),
 			title: $('#o-title-input').val(),
-			layout: buildLayoutString($('#o-template-dd').val(), $('#o-size-dd').val(), $('#o-orientation-dd').val()),
+			layout: buildLayoutString($('#o-layout-dd').val(), $('#o-size-dd').val(), $('#o-orientation-dd').val()),
 			center: centerPoint
 		};
 		print.printMap(contract);
