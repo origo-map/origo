@@ -12,19 +12,19 @@ var target = '.o-map';
 function printA1() {
   map = Viewer.getMap();
   
-  var style = new ol.style.Style({
-    image: new ol.style.Circle({
-      radius: 7,
-      fill: new ol.style.Fill({
-        color: [0, 153, 255, 1]
-      }),
-      stroke: new ol.style.Stroke({
-        color: [255, 255, 255, 0.75],
-        width: 1.5
-      })
-    }),
-    zIndex: 100000
-  });
+  // var style = new ol.style.Style({
+  //   image: new ol.style.Circle({
+  //     radius: 7,
+  //     fill: new ol.style.Fill({
+  //       color: [0, 153, 255, 1]
+  //     }),
+  //     stroke: new ol.style.Stroke({
+  //       color: [255, 255, 255, 0.75],
+  //       width: 1.5
+  //     })
+  //   }),
+  //   zIndex: 100000
+  // });
 
   vector = new ol.layer.Vector({
     source: new ol.source.Vector({

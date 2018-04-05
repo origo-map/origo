@@ -92,11 +92,15 @@ function init() {
 					'<input type="checkbox" id="o-legend-input" />' +
 					'<label for="o-legend-input">Teckenförklaring</label>' +
 				'</div>' +
+					
 				'<br />' +
 					'<div class="o-block">' +
 					'<button id="o-print-create-button" class="btn" type="button">Skapa</button>' +
 					'<button id="o-print-clear-button" class="btn" type="button" style="margin:5px">Avbryt</button>' +
-				'</div>' +				
+				'</div>' +
+				'<div class="o-block">' +
+					'<span id="o-dl-progress">Skapar... <img src="../../img/spinner.svg" /></span><a id="o-dl-link" href="#">Ladda ner</a>' +	
+				'</div>' +			
 			'</div>' +
 			'</form>';
 
@@ -178,7 +182,6 @@ function bindUIActions() {
 	});
 
 	$layoutselect.change(function () {
-		console.log('hej');
 		var map = Viewer.getMap();
 		var paper = getPaperMeasures($printselect.val());
 		var scale = $scaleselect.val();
@@ -203,7 +206,6 @@ function bindUIActions() {
 	});
 
 	function getPaperMeasures(format) {
-		console.log(mapfishConfig);
 		var orientationLandscape = $('#o-orientation-dd').val() == 'Liggande',
 			width = 0,
 			height = 0;
@@ -228,9 +230,6 @@ function bindUIActions() {
 			
 			width = getWidth(layoutName);
 			height = getHeight(layoutName);
-			console.log('layoutName', layoutName);
-			console.log('width', width);
-			console.log('height', height);
 		}
 
 		// switch (format) {

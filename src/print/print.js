@@ -5,25 +5,6 @@ var ol = require('openlayers');
 var viewer = require('../viewer');
 var utils = require('./utils/utils');
 
-function downloadWhenReady(startTime, data) {
-	if ((new Date().getTime() - startTime) > 30000) {
-		console.log(('Gave up waiting after 30 seconds'))
-	} else {
-		setTimeout(function () {
-			$.getJSON(config.geoserverPath + data.statusURL, function (statusData) { //TODO: det här funkar inte i dagsläget. Kanske skapa en länk till getURL()
-				if (!statusData.done) {
-					downloadWhenReady(startTime, data);
-				} else {
-					window.location = config.geoserverPath + statusData.downloadURL;
-					console.log(('Downloading: ' + data.ref));
-				}
-			}, function error(data) {
-				console.log(('Error occurred requesting status'));
-			});
-		}, 500);
-	}
-}
-
 /**
  * Converts values passed from gui to an object accepted by mapfish
  * @param {Object} options 
@@ -104,7 +85,6 @@ function convertToMapfishOptions(options) {
             mapfishOptions.layers.push(layer);
         });
 	}
-	console.log('SKRIVS UT: ', mapfishOptions);
 	return mapfishOptions;
 }
 
@@ -175,7 +155,6 @@ function buildLayersObjects(inLayers, type) {
 				var source = layer.getSource();
 				var features = source.getFeatures();
 				var type = layer.get('type');
-
 
 				features.forEach(function(feature) {
 					feature.setProperties({'_gx_style': 0});
@@ -292,14 +271,15 @@ function buildLayersObjects(inLayers, type) {
 		});
 
 	}
-	console.log('fillColor', fillColor);
-	console.log('strokeColor', strokeColor);
     return printableLayers;
 }
 
 function executeMapfishCall(url, data) {
 	var body = JSON.stringify(data);
 	var startTime = new Date().getTime();
+	$('#o-dl-link').hide();
+	$('#o-dl-progress').show();
+	
 	$.ajax({
 		type: 'POST',
 		url: url,
@@ -308,7 +288,8 @@ function executeMapfishCall(url, data) {
 		dataType: 'json',
 		success: function (data) {
 			console.log('SUCCESS', data);
-			downloadWhenReady(startTime, $.parseJSON(JSON.stringify(data)));
+			$('#o-dl-progress').hide();
+			$('#o-dl-link').show().attr('href', data.getURL);
 		},
 		error: function (data) {
 			console.log('Error creating report: ' + data.statusText);
