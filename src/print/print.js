@@ -131,7 +131,8 @@ function buildLayersObjects(inLayers, type) {
 			} else {
 				console.log('Lagertyp stöds ej.');
 			}
-			printIndex = printableLayers.findIndex(l => l.baseURL === url);
+			printIndex = printableLayers.findIndex(function(l) { return l.baseURL === url });
+			console.log('printIndex', printIndex);
 			if (printIndex !== -1) {
 				printableLayers[printIndex].layers.push(layer.S.name);
 			} else {
@@ -191,8 +192,8 @@ function buildLayersObjects(inLayers, type) {
 	
 	function modifyDefaultStyles(styles) {
 		//based on index.json styles being defined as [[]]
-		styles.forEach((s) => {
-			s.forEach((f) => {
+		styles.forEach(function(s) {
+			s.forEach(function(f) {
 				// Set fill properties if fill exists
 				if (f.hasOwnProperty('fill')) {
 					if (f.fill.hasOwnProperty('color')) {
