@@ -132,7 +132,6 @@ function buildLayersObjects(inLayers, type) {
 				console.log('Lagertyp stöds ej.');
 			}
 			printIndex = printableLayers.findIndex(function(l) { return l.baseURL === url });
-			console.log('printIndex', printIndex);
 			if (printIndex !== -1) {
 				printableLayers[printIndex].layers.push(layer.S.name);
 			} else {
