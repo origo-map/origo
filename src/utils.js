@@ -33,7 +33,7 @@ module.exports = {
      */
     createDdOptions: function(options) {
         return options.map(function (option) { 
-            return '<option>' + option + '</option>'; }).toString().replace(new RegExp(',', 'g'), '');
+            return '<option value="'+ option +'">' + option + '</option>'; }).toString().replace(new RegExp(',', 'g'), '');
     },
     /**
      * Creates radiobuttons for every cell of the incoming array of names.
@@ -44,8 +44,7 @@ module.exports = {
      */
     createRadioButtons: function(options, group) {
         return options.map(function (rBtn, i) {
-            return '<input type="radio" name="group'+ group + '" id="o-r' + i +'" value="'+ i + '" />' +
-            '<label for="o-r' + i + '"> ' + rBtn + '</label><br />';
+            return '<label for="o-r' + i + group + '"><input type="radio" name="group'+ group + '" id="o-r' + i + group +'" value="'+ i + '" /> ' + rBtn + '</label><br />';
         }).toString().replace(new RegExp(',', 'g'), '');
     },
     createListButton: function(options) {

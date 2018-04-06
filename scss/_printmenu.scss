@@ -22,7 +22,16 @@
 #o-main-setting-heading {
     margin: 5px 0 5px 5px;
 }
-
+#o-dl-progress {
+    display: none;
+}
+#o-dl-link {
+    text-decoration: none;
+    display: none;
+}
+#o-dl-link:hover {
+    text-decoration: none;
+}
 .o-dd-input {
     width: 75%;
 }

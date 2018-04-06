@@ -1,6 +1,5 @@
 {
-  "controls": [
-    {
+  "controls": [{
       "name": "home"
     },
     {
@@ -55,18 +54,22 @@
   ],
   "footer": [{
     "img": "img/png/logo.png",
-    "url" : "https://github.com/origo-map/origo",
+    "url": "https://github.com/origo-map/origo",
     "urlText": "Origo"
   }],
-  "projectionCode": "EPSG:3857",
-  "proj4Defs": [
-  
-  ],
-  "extent": [
-    1485583.7678999987, 8288825.654100002, 1521948.1948999988, 8303845.328100002
+  "projectionCode": "EPSG:3006",
+  "proj4Defs": [{
+    "code": "EPSG:3006",
+    "projection": "+proj=utm +zone=33 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
+  }],
+  "extent": [-1200000,
+    2994304,
+    4305696,
+    8500000
   ],
   "center": [
-    1503765.9813999988, 8296335.491100002
+    414241,
+    6600100
   ],
   "zoom": 13,
   "resolutions": [
@@ -93,10 +96,21 @@
   "source": {
     "local": {
       "url": "http://localhost:8080/geoserver/wms"
+    },
+    "lm": {
+      "url": "http://gi.karlstad.se/geoserver/wms/topowebb"
+    },
+    "ksdgis": {
+      "url": "http://40.69.3.166:8080/geoserver/wms"
+    },
+    "ksdgis_wfs": {
+      "url": "http://40.69.3.166:8080/geoserver/wfs"
+    },
+    "wfsSource": {
+      "url": "http://localhost:8080/geoserver/wfs"
     }
   },
-  "groups": [
-    {
+  "groups": [{
       "name": "superlager",
       "title": "Super lager",
       "expanded": true
@@ -107,121 +121,168 @@
       "expanded": true
     }
   ],
-  "layers": [
-     {
-      "name": "forshaga:lekplats",
-      "title": "Lekplats",
+  "layers": [{
+      "name": "forshaga:al_17",
+      "title": "vägnätellermotsvarande",
       "group": "superlager",
       "source": "local",
-      "type":	"WMS",
+      "type": "WMS",
       "format": "image/png",
-      "style": "lekplats",
+      "style": "",
       "queryable": true,
       "visible": true,
-      "tileSize":	512,
+      "tileSize": 512,
       "featuretype": 5
     },
     {
-      "name": "osm",
-      "title": "OpenStreetMap",
+      "name": "forshaga:bl_17",
+      "title": "terrängkanske",
+      "group": "superlager",
+      "source": "wfsSource",
+      "type": "WFS",
+      "style": "mask2",
+      "queryable": true,
+      "visible": true,
+      "tileSize": 512,
+      "featuretype": 5
+    },
+    {
+      "name": "forshaga:Lekplats",
+      "title": "lekplatser",
+      "group": "superlager",
+      "source": "ksdgis_wfs",
+      "type": "WFS",
+      "style": "biljettstallen_kundcenter",
+      "queryable": true,
+      "visible": true,
+      "tileSize": 512,
+      "featuretype": 5
+    },
+    {
+      "name": "topowebbkartan",
+      "title": "Topowebb",
+      "group": "background",
+      "queryable": false,
+      "opacity": 0.9,
+      "style": "karta_farg",
+      "type": "WMS",
+      "visible": true,
+      "source": "lm"
+    },
+    {
+      "name": "topowebbkartan_nedtonad",
+      "title": "Topowebb nedtonad",
       "group": "background",
       "queryable": false,
       "opacity": 0.9,
       "style": "karta_gra",
-      "type": "OSM",
-      "visible": true
+      "type": "WMS",
+      "visible": false,
+      "source": "lm"
     }
   ],
   "styles": {
-      "mask": [
-        [
-          {
+    "mask2": [
+      [{
+        "stroke": {
+          "color": "rgba(0,0,255,1.0)",
+          "width": 3,
+          "opacity": 0.5
+        },
+        "fill": {
+          "color": "rgba(0,255,0,1.0)"
+        }
+      }]
+    ],
+    "mask": [
+      [{
+        "stroke": {
+          "color": "rgba(0,0,0,1.0)",
+          "width": 3
+        },
+        "fill": {
+          "color": "rgba(0,0,0,1.0)"
+        }
+      }]
+    ],
+    "origo-logo": [
+      [{
+          "circle": {
+            "radius": 16,
             "stroke": {
-              "color": "rgba(0,0,0,1.0)"
+              "color": "rgba(0,0,0,1)",
+              "width": 5
             },
             "fill": {
-              "color": "rgba(0,0,0,1.0)"
+              "color": "rgba(255,255,255,0.9)"
             }
           }
-        ]
-      ],
-      "origo-logo": [
-        [
-          {
-            "circle": {
-              "radius": 16,
-              "stroke": {
-                "color": "rgba(0,0,0,1)",
-                "width": 5
-              },
-              "fill": {
-                "color": "rgba(255,255,255,0.9)"
-              }
-            }
-          },
-          {
-            "circle": {
-              "radius": 4,
-              "stroke": {
-                "color": "rgba(0,0,0,0)",
-                "width": 1
-              },
-              "fill": {
-                "color": "rgba(37,129,196,1)"
-              }
-            }
-          }
-        ]
-      ],
-      "cirkel": [
-        [
-          {
-            "circle": {
-              "radius": 6,
-              "stroke": {
-                "color": "rgba(0,0,0,1)",
-                "width": 2
-              },
-              "fill": {
-                "color": "rgba(0,0,0,0.5)"
-              }
-            }
-          }
-        ]
-      ],
-      "lekplats": [[
+        },
         {
-          "image": {
-            "src": "http://localhost:8080/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=forshaga:lekplats"
+          "circle": {
+            "radius": 4,
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 1
+            },
+            "fill": {
+              "color": "rgba(37,129,196,1)"
+            }
           }
         }
-      ]],
-      "karta_gra": [
-        [
-          {
-            "image": {
-              "src": "img/png/gra.png"
-            }
-          }
-        ]
-      ],
-      "karta_farg": [
-        [
-          {
-            "image": {
-              "src": "img/png/farg.png"
-            }
-          }
-        ]
-      ],
-      "orto": [
-        [
-          {
-            "image": {
-              "src": "img/png/orto.png"
-            }
-          }
-        ]
       ]
+    ],
+    "cirkel": [
+      [{
+        "circle": {
+          "radius": 4,
+          "stroke": {
+            "color": "rgba(0,0,0,1)",
+            "width": 2
+          },
+          "fill": {
+            "color": "rgba(0,0,0,0.5)"
+          }
+        }
+      }]
+    ],
+    "lekplats": [
+      [{
+        "image": {
+          "src": "http://localhost:8080/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=forshaga:lekplats"
+        }
+      }]
+    ],
+    "karta_gra": [
+      [{
+        "image": {
+          "src": "img/png/gra.png"
+        }
+      }]
+    ],
+    "karta_farg": [
+      [{
+        "image": {
+          "src": "img/png/farg.png"
+        }
+      }]
+    ],
+    "orto": [
+      [{
+        "image": {
+          "src": "img/png/orto.png"
+        }
+      }]
+    ],
+    "biljettstallen_kundcenter": [
+        [{
+            "icon": {
+                "size": [64, 64],
+                "src": "http://localhost:8080/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=forshaga:lekplats",
+                "scale": 0.9,
+                "opacity": 1
+            }
+        }]
+    ]
   }
 }
