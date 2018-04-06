@@ -103,7 +103,8 @@ function buildLayersObjects(inLayers, type) {
 	,   strokeDashstyle = "solid"
 	,   pointRadius = 10
 	,   pointFillColor = "#FC345C"
-	,   pointSrc = ""
+	,   externalGraphic = ""
+	,	graphicOpacity = 1
 	,   labelAlign = "cm"
 	,   labelOutlineColor = "white"
 	,   labelOutlineWidth = 3
@@ -174,7 +175,8 @@ function buildLayersObjects(inLayers, type) {
 						strokeWidth: strokeWidth,
 						pointRadius: pointRadius,
 						pointFillColor: pointFillColor,
-						pointSrc: pointSrc,
+						externalGraphic: externalGraphic,
+						graphicOpacity: graphicOpacity,
 						labelAlign: labelAlign,
 						labelOutlineColor: labelOutlineColor,
 						labelOutlineWidth: labelOutlineWidth,
@@ -218,7 +220,7 @@ function buildLayersObjects(inLayers, type) {
 						strokeDashstyle = f.stroke.dashstyle;
 					}
 				}
-				
+				// Punkt-stilar?? Det verkar så.
 				if (f.hasOwnProperty('circle')) {
 					if (f.circle.hasOwnProperty('stroke')) {
 						if (f.circle.stroke.hasOwnProperty('color')) {
@@ -265,6 +267,14 @@ function buildLayersObjects(inLayers, type) {
 					}
 					if (f.font.hasOwnProperty('backColor')) {
 						fontBackColor = utils.rgbaToHex(f.font.backColor);
+					}
+				}
+				if (f.hasOwnProperty('icon')) {
+					if (f.icon.hasOwnProperty('src')) {
+						externalGraphic = f.icon.src;
+					}
+					if (f.icon.hasOwnProperty('opacity')) {
+						graphicOpacity = f.icon.opacity;
 					}
 				}
 			});

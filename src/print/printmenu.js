@@ -98,6 +98,7 @@ function init() {
 					'<button id="o-print-create-button" class="btn" type="button">Skapa</button>' +
 					'<button id="o-print-clear-button" class="btn" type="button" style="margin:5px">Avbryt</button>' +
 				'</div>' +
+				'<br />' +
 				'<div class="o-block">' +
 					'<span id="o-dl-progress">Skapar... <img src="../../img/spinner.svg" /></span><a id="o-dl-link" href="#">Ladda ner</a>' +	
 				'</div>' +			
