@@ -1,14 +1,14 @@
-"use strict";
+'use strict';
 
 var ol = require('openlayers');
 var $ = require('jquery');
 var viewer = require('../viewer');
 var tile = require('./tile');
+var image = require('./image');
 
 var wms = function wms(layerOptions) {
   var wmsDefault = {
-    layerType: 'tile',
-    featureinfoLayer: undefined
+    featureinfoLayer: null
   };
   var sourceDefault = {
     version: '1.1.1',
@@ -16,6 +16,7 @@ var wms = function wms(layerOptions) {
     format: 'image/png'
   };
   var wmsOptions = $.extend(wmsDefault, layerOptions);
+  var renderMode = wmsOptions.renderMode || 'tile';
   wmsOptions.name.split(':').pop();
   var sourceOptions = $.extend(sourceDefault, viewer.getMapSource()[layerOptions.source]);
   sourceOptions.attribution = wmsOptions.attribution;
@@ -24,10 +25,12 @@ var wms = function wms(layerOptions) {
   sourceOptions.tileGrid = viewer.getTileGrid();
   sourceOptions.format = wmsOptions.format ? wmsOptions.format : sourceOptions.format;
 
-  var wmsSource = createSource(sourceOptions);
-  return tile(wmsOptions, wmsSource);
+  if (renderMode === 'image') {
+    return image(wmsOptions, createImageSource(sourceOptions));
+  }
+  return tile(wmsOptions, createTileSource(sourceOptions));
 
-  function createSource(options) {
+  function createTileSource(options) {
     return new ol.source.TileWMS(({
       attributions: options.attribution,
       url: options.url,
@@ -41,8 +44,22 @@ var wms = function wms(layerOptions) {
         'VERSION': options.version,
         'FORMAT': options.format
       }
-    }))
+    }));
   }
-}
+
+  function createImageSource(options) {
+    return new ol.source.ImageWMS(({
+      attributions: options.attribution,
+      url: options.url,
+      crossOrigin: 'anonymous',
+      projection: options.projectionCode,
+      params: {
+        'LAYERS': options.id,
+        'VERSION': options.version,
+        'FORMAT': options.format
+      }
+    }));
+  }
+};
 
 module.exports = wms;

@@ -105,6 +105,7 @@
     "ol.interaction.Select#on",
     "ol.source.Source#getProperties",
     "ol.source.Source#once",
+    "ol.source.ImageWMS",
     "ol.source.ImageVector",
     "ol.source.OSM",
     "ol.source.Tile",
