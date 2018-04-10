@@ -20,6 +20,7 @@ function convertToMapfishOptions(options) {
 		units: viewer.getProjection().getUnits(), //TODO: Kolla upp om detta stämmer
 		outputFilename: "kartutskrift",
 		outputFormat: options.outputFormat,
+		maptitle: options.title,
 		layers: [],
 		pages: [{
 			comment: "Kommentar",
@@ -57,7 +58,7 @@ function convertToMapfishOptions(options) {
 		}
 		var backgroundLayerObject = {
 			type: backgroundLayer.get('type'),
-			baseURL: url,
+			baseURL: 'https://karta.eskilstuna.se/' + url,
 			format: backgroundLayer.getSource().getParams().FORMAT,
 			layers: [backgroundLayer.getSource().getParams().LAYERS]
 		};
@@ -133,7 +134,7 @@ function buildLayersObjects(inLayers, type) {
 			}
 			printIndex = printableLayers.findIndex(function(l) { return l.baseURL === url });
 			if (printIndex !== -1) {
-				printableLayers[printIndex].layers.push(layer.S.name);
+				printableLayers[printIndex].layers.push(layer.get('name'));
 			} else {
 				printableLayers.push({
 					type: layer.get('type'),
