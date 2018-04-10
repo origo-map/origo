@@ -27,7 +27,7 @@ module.exports = {
        "name": "fullscreen"
     }
   ],
-  geoserverPath: 'http://localhost:8080/geoserver',
-  printInfo: 'http://localhost:8080/geoserver/pdf/info.json',
-  printCreate: 'http://localhost:8080/geoserver/pdf/create.json'
+  geoserverPath: '/geoserver',
+  printInfo: '/geoserver/pdf/info.json',
+  printCreate: '/geoserver/pdf/create.json'
 }
