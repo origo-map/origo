@@ -23,7 +23,7 @@ function convertToMapfishOptions(options) {
 		maptitle: options.title,
 		layers: [],
 		pages: [{
-			comment: "Kommentar",
+			comment: "",
 			mapTitle: options.title,
 			center: options.center,
 			scale: options.scale,
@@ -36,7 +36,7 @@ function convertToMapfishOptions(options) {
 				name: "ikonnamn",
 				iconBeforeName: true
 			}],
-			name: "a class name"
+			name: ""
 		}]
 	};
 
@@ -58,7 +58,7 @@ function convertToMapfishOptions(options) {
 		}
 		var backgroundLayerObject = {
 			type: backgroundLayer.get('type'),
-			baseURL: 'https://karta.eskilstuna.se/' + url,
+			baseURL: url,
 			format: backgroundLayer.getSource().getParams().FORMAT,
 			layers: [backgroundLayer.getSource().getParams().LAYERS]
 		};
@@ -86,6 +86,15 @@ function convertToMapfishOptions(options) {
             mapfishOptions.layers.push(layer);
         });
 	}
+
+	//legend
+	console.log('mapfishoptions', mapfishOptions);
+	wmsLayers.forEach(function(layer) {
+		layer.layers.forEach(function(l) {
+			mapfishOptions.legends.classes.icons.push('http://localhost:8080/geoserver/wms?version=1.3.0&SERVICE=WMS&REQUEST=GetLegendGraphic&LAYER='+ l +'&FORMAT=image/png')
+		});
+	});
+
 	return mapfishOptions;
 }
 
@@ -290,7 +299,7 @@ function executeMapfishCall(url, data) {
 	var startTime = new Date().getTime();
 	$('#o-dl-link').hide();
 	$('#o-dl-progress').show();
-	
+	console.log("skrivs ut:", data);
 	$.ajax({
 		type: 'POST',
 		url: url,

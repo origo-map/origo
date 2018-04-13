@@ -23,10 +23,10 @@ function init() {
 			return format.name.toUpperCase();
 		});
 		
-		
 		var layoutNames = config.layouts.map(function(layout) {
 			return layout.name.split('-')[0];
 		});
+
 		//Populera mall-lista med endast ett entry per "layout" i config.yaml. Enligt kravspec
 		var layouts = layoutNames.filter(function (layoutName) {
 			if (!this.has(layoutName)) {
@@ -67,7 +67,6 @@ function init() {
 				'<div class="o-block">' +
 					'<span class="o-setting-heading">Storlek</span>' +
 					'<select id="o-size-dd" class="o-dd-input">' +
-					utils.createDdOptions(options.sizes) +
 					'</select>' +
 				'</div>' +
 				'<div class="o-block">' +
@@ -110,7 +109,6 @@ function init() {
 		//Set default values for dropdowns
 		$('#o-format-dd option[value="PDF"]').attr('selected', 'selected');
 		$('#o-scale-dd option[value="5000.0"]').attr('selected', 'selected');
-		$('#o-size-dd option[value="A4"]').attr('selected', 'selected');
 
 		var printButton = utils.createButton({
 			id: 'o-printmenu-button-close',
@@ -129,6 +127,7 @@ function init() {
 			src: '#fa-print'
 		});
 
+		
 		$('#o-toolbar-misc').append(printButtonTool);
 		$printButtonTool = $('#o-print-tool');
 		$printButton = $('#o-printmenu-button-close');
@@ -137,7 +136,74 @@ function init() {
 		$orientationselect = $('#o-orientation-dd');
 		$clearButton = $('#o-print-clear-button');
 		$layoutselect = $('#o-layout-dd');
+		
+		// get available sizes for selected option and populate size-dd.
+		var namesAndSizes = getAvailableSizes($layoutselect.find(":selected").text(), config);
+		$.each(namesAndSizes, function(key, value) {
+			$('#o-size-dd').append($('<option></option>').attr('value', key).text(value));
+		});
+		
 		bindUIActions();
+	}
+}
+
+function getAvailableNamesSizes(config) {
+	var configLayouts = config.layouts.map(function(layout, i) {
+		var _name = layout.name.split('-')[0];
+		var _size = layout.name.split('-')[1];
+		return {name: _name, size: _size}
+	});
+	
+	var namesAndSizes = [];
+	// build objects of avaiable sizes for each name
+	configLayouts.forEach(function(a) {
+		var existsAt;
+		
+		if (namesAndSizes.length !== 0) {
+			namesAndSizes.forEach(function(o, i) {
+				if(namesAndSizes[i].name === a.name) {
+					existsAt = i;
+					return;
+				} else {
+					existsAt = -1;
+				}
+			});
+	
+			if (existsAt !== -1) {
+				namesAndSizes[existsAt].sizes.push(a.size);
+			} else {
+				namesAndSizes.push({
+					name: a.name,
+					sizes: [a.size]
+				})
+			}
+		} else {
+			namesAndSizes.push({
+				name: a.name,
+				sizes: [a.size]
+			});
+		}
+	});
+	var noDuplicateSizes = [];
+	namesAndSizes.forEach(function(obj) {
+		$.each(obj.sizes, function(i, el) {
+			if ($.inArray(el, noDuplicateSizes) === -1) noDuplicateSizes.push(el);
+		});
+		obj.sizes = noDuplicateSizes;
+	});
+
+	return namesAndSizes;
+}
+
+function getAvailableSizes(layout, config) {
+	var availableNamesAndSizes = getAvailableNamesSizes(config);
+	var sizesByName = availableNamesAndSizes.filter(function(name) {
+		return name.name === layout;
+	});
+	if (sizesByName[0]) {
+		return sizesByName[0].sizes;
+	} else {
+		return [];
 	}
 }
 
@@ -183,6 +249,10 @@ function bindUIActions() {
 	});
 
 	$layoutselect.change(function () {
+		var namesAndSizes = getAvailableSizes($layoutselect.find(":selected").text(), mapfishConfig);
+		$.each(namesAndSizes, function(key, value) {
+			$('#o-size-dd').replaceWith($('<option></option>').attr('value', key).text(value));
+		});
 		var map = Viewer.getMap();
 		var paper = getPaperMeasures($printselect.val());
 		var scale = $scaleselect.val();
