@@ -43,7 +43,6 @@ function printA1() {
       })
     })
   });
- 
   map.addLayer(vector);
   
   return vector;

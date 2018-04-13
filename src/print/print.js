@@ -88,7 +88,6 @@ function convertToMapfishOptions(options) {
 	}
 
 	//legend
-	console.log('mapfishoptions', mapfishOptions);
 	wmsLayers.forEach(function(layer) {
 		layer.layers.forEach(function(l) {
 			mapfishOptions.legends.classes.icons.push('http://localhost:8080/geoserver/wms?version=1.3.0&SERVICE=WMS&REQUEST=GetLegendGraphic&LAYER='+ l +'&FORMAT=image/png')
@@ -299,7 +298,6 @@ function executeMapfishCall(url, data) {
 	var startTime = new Date().getTime();
 	$('#o-dl-link').hide();
 	$('#o-dl-progress').show();
-	console.log("skrivs ut:", data);
 	$.ajax({
 		type: 'POST',
 		url: url,

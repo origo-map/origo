@@ -142,13 +142,12 @@ function init() {
 		$.each(namesAndSizes, function(key, value) {
 			$('#o-size-dd').append($('<option></option>').attr('value', key).text(value));
 		});
-		
+		var myOpts = document.getElementById('o-size-dd').options;
 		bindUIActions();
 	}
 }
 
 function getAvailableNamesSizes(config) {
-	console.log('config', config);
 	var configLayouts = config.layouts.map(function(layout, i) {
 		var _name = layout.name.split('-')[0];
 		var _size = layout.name.split('-')[1];
@@ -158,7 +157,6 @@ function getAvailableNamesSizes(config) {
 	var namesAndSizes = [];
 	// build objects of avaiable sizes for each name
 	configLayouts.forEach(function(a) {
-		console.log('namesAndSizesArray', namesAndSizes);
 		var existsAt;
 		
 		if (namesAndSizes.length !== 0) {
@@ -188,8 +186,7 @@ function getAvailableNamesSizes(config) {
 	});
 
 	namesAndSizes.forEach(function(obj) {
-		var noDuplicateSizes = [];
-		
+		var noDuplicateSizes = [];		
 		$.each(obj.sizes, function(i, el) {
 			if ($.inArray(el, noDuplicateSizes) === -1) noDuplicateSizes.push(el);
 		});
@@ -212,7 +209,6 @@ function getAvailableSizes(layout, config) {
 }
 
 function bindUIActions() {
-	var polygon = false;
 	$printButton.on('click', function (e) {
 		$("#o-printmenu").removeClass('o-printmenu-show');
 		e.preventDefault();
@@ -221,9 +217,8 @@ function bindUIActions() {
 		if ($("#o-printmenu").hasClass('o-printmenu-show')) {
 			$("#o-printmenu").removeClass('o-printmenu-show');
 		} else {
-			if (!vector) {				
+			if (!vector) {
 				vector = printarea.printA1();
-				polygon = true;
 				var paper = getPaperMeasures();
 				printarea.addPreview($('#o-scale-dd').val(), paper);
 				$("#o-printmenu").addClass('o-printmenu-show');
@@ -289,7 +284,8 @@ function bindUIActions() {
 
 		// Sätt storlek på polygon till storlek på kartutsnitt
 		// Hämta vald mall
-		var layoutName = buildLayoutString($('#o-layout-dd').val(), $('#o-size-dd').val(), $('#o-orientation-dd').val());
+		var size = $('#o-size-dd').find(':selected').text();
+		var layoutName = buildLayoutString($('#o-layout-dd').val(), size, $('#o-orientation-dd').val());
 		if (mapfishConfig) {
 			var layoutnames = mapfishConfig.layouts;
 			var getWidth = function (name) {
@@ -304,7 +300,7 @@ function bindUIActions() {
 				});
 				return layout[0] ? layout[0].map.height : 0;
 			}
-			
+			;
 			width = getWidth(layoutName);
 			height = getHeight(layoutName);
 		}
