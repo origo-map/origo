@@ -148,6 +148,7 @@ function init() {
 }
 
 function getAvailableNamesSizes(config) {
+	console.log('config', config);
 	var configLayouts = config.layouts.map(function(layout, i) {
 		var _name = layout.name.split('-')[0];
 		var _size = layout.name.split('-')[1];
@@ -157,6 +158,7 @@ function getAvailableNamesSizes(config) {
 	var namesAndSizes = [];
 	// build objects of avaiable sizes for each name
 	configLayouts.forEach(function(a) {
+		console.log('namesAndSizesArray', namesAndSizes);
 		var existsAt;
 		
 		if (namesAndSizes.length !== 0) {
@@ -184,8 +186,10 @@ function getAvailableNamesSizes(config) {
 			});
 		}
 	});
-	var noDuplicateSizes = [];
+
 	namesAndSizes.forEach(function(obj) {
+		var noDuplicateSizes = [];
+		
 		$.each(obj.sizes, function(i, el) {
 			if ($.inArray(el, noDuplicateSizes) === -1) noDuplicateSizes.push(el);
 		});
@@ -250,8 +254,10 @@ function bindUIActions() {
 
 	$layoutselect.change(function () {
 		var namesAndSizes = getAvailableSizes($layoutselect.find(":selected").text(), mapfishConfig);
+		var sizeDd = $('#o-size-dd');
+		sizeDd.empty();
 		$.each(namesAndSizes, function(key, value) {
-			$('#o-size-dd').replaceWith($('<option></option>').attr('value', key).text(value));
+			sizeDd.append($('<option></option>').attr('value', key).text(value));
 		});
 		var map = Viewer.getMap();
 		var paper = getPaperMeasures($printselect.val());
