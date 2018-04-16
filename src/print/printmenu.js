@@ -142,7 +142,6 @@ function init() {
 		$.each(namesAndSizes, function(key, value) {
 			$('#o-size-dd').append($('<option></option>').attr('value', key).text(value));
 		});
-		var myOpts = document.getElementById('o-size-dd').options;
 		bindUIActions();
 	}
 }
@@ -349,16 +348,16 @@ function bindUIActions() {
 		var visibleLayers = layers.getArray().filter(function(layer) {
 			return layer.getVisible();
 		});
-
+		console.log('size', $('#o-size-dd').find(':selected').text());
 		var contract = {
 			dpi: $('#o-resolution-dd').val(),
 			layers: visibleLayers,
 			outputFormat: $('#o-format-dd').val().trim().toLowerCase(),
 			scale: $('#o-scale-dd').val(),
 			orientation: $('#o-orientation-dd').val(),
-			size: $('#o-size-dd').val(),
+			size: $('#o-size-dd').find(':selected').text(),
 			title: $('#o-title-input').val(),
-			layout: buildLayoutString($('#o-layout-dd').val(), $('#o-size-dd').val(), $('#o-orientation-dd').val()),
+			layout: buildLayoutString($('#o-layout-dd').val(), $('#o-size-dd').find(':selected').text(), $('#o-orientation-dd').val()),
 			center: centerPoint
 		};
 		print.printMap(contract);
