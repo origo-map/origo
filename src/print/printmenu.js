@@ -9,10 +9,12 @@ var printarea = require('./printarea');
 var Viewer = require('../viewer');
 var ol = require('openlayers');
 
-var mapfishConfig;
+var mapfishConfig, hideLayouts, layoutIfHidden;
 var $printButton, $printButtonTool, $printselect, vector, $scaleselect, $orientationselect, $clearButton, $layoutselect;
 
 function init() {
+	hideLayouts = true;
+
 	$.getJSON(config.printInfo, function(data) {
 		buildPanel(data);
 		mapfishConfig = data;
@@ -35,6 +37,10 @@ function init() {
 			}
 		}, new Map);
 
+		if (layouts.length > 1) {
+			hideLayouts = false;
+		}
+
 		var scales = config.scales.map(function(scale) {
 			return scale.value;
 		});
@@ -52,12 +58,7 @@ function init() {
 						utils.createDdOptions(outputFormats) +
 					'</select>' +
 				'</div>' +
-				'<div class="o-block">' +
-					'<span class="o-setting-heading">Mall</span>' +
-					'<select id="o-layout-dd" class="o-dd-input">' +
-					utils.createDdOptions(layouts) +
-					'</select>' +
-				'</div>' +
+					hideOrShowLayouts(hideLayouts, layouts) +
 				'<div class="o-block">' +
 					'<span class="o-setting-heading">Orientering</span>' +
 					'<select id="o-orientation-dd" class="o-dd-input">' +
@@ -138,12 +139,30 @@ function init() {
 		$layoutselect = $('#o-layout-dd');
 		
 		// get available sizes for selected option and populate size-dd.
-		var namesAndSizes = getAvailableSizes($layoutselect.find(":selected").text(), config);
+		var namesAndSizes;
+		if (hideLayouts) {
+			namesAndSizes = getAvailableSizes(layouts[0], config);
+			layoutIfHidden = layouts;
+			console.log('layoutIfHidden', layoutIfHidden);
+		} else {
+			namesAndSizes = getAvailableSizes($layoutselect.find(":selected").text(), config);
+		}
 		$.each(namesAndSizes, function(key, value) {
 			$('#o-size-dd').append($('<option></option>').attr('value', key).text(value));
 		});
 		bindUIActions();
 	}
+}
+
+// Hides layouts dropdown if there is only one layout in config.yaml
+function hideOrShowLayouts(shouldHide, layouts) {
+	return !shouldHide ? 
+		'<div class="o-block">' +
+			'<span class="o-setting-heading">Mall</span>' +
+			'<select id="o-layout-dd" class="o-dd-input">' +
+				utils.createDdOptions(layouts) +
+			'</select>' +
+		'</div>' : "";
 }
 
 function getAvailableNamesSizes(config) {
@@ -191,7 +210,6 @@ function getAvailableNamesSizes(config) {
 		});
 		obj.sizes = noDuplicateSizes;
 	});
-
 	return namesAndSizes;
 }
 
@@ -284,7 +302,11 @@ function bindUIActions() {
 		// Sätt storlek på polygon till storlek på kartutsnitt
 		// Hämta vald mall
 		var size = $('#o-size-dd').find(':selected').text();
-		var layoutName = buildLayoutString($('#o-layout-dd').val(), size, $('#o-orientation-dd').val());
+		
+		var layoutName = hideLayouts ?
+		buildLayoutString(layoutIfHidden, size, $('#o-orientation-dd').val()) :
+		buildLayoutString($('#o-layout-dd').val(), size, $('#o-orientation-dd').val());
+
 		if (mapfishConfig) {
 			var layoutnames = mapfishConfig.layouts;
 			var getWidth = function (name) {
@@ -342,13 +364,14 @@ function bindUIActions() {
 		var map = Viewer.getMap();
 		var layers = map.getLayers();
 		var extent = vector.getSource().getFeatures()[0].getGeometry().getExtent(); //TODO: Finns risk för nullpointer här, även om det alltid endast finns en vector. Borde hanteras bättre
-		
 		var centerPoint =  ol.extent.getCenter(extent);
-
 		var visibleLayers = layers.getArray().filter(function(layer) {
 			return layer.getVisible();
 		});
-		console.log('size', $('#o-size-dd').find(':selected').text());
+		var layout = hideLayouts ? 
+		buildLayoutString(layoutIfHidden, $('#o-size-dd').find(':selected').text(), $('#o-orientation-dd').val()) : 
+		buildLayoutString($('#o-layout-dd').val(), $('#o-size-dd').find(':selected').text(), $('#o-orientation-dd').val());
+
 		var contract = {
 			dpi: $('#o-resolution-dd').val(),
 			layers: visibleLayers,
@@ -357,7 +380,7 @@ function bindUIActions() {
 			orientation: $('#o-orientation-dd').val(),
 			size: $('#o-size-dd').find(':selected').text(),
 			title: $('#o-title-input').val(),
-			layout: buildLayoutString($('#o-layout-dd').val(), $('#o-size-dd').find(':selected').text(), $('#o-orientation-dd').val()),
+			layout: layout,
 			center: centerPoint
 		};
 		print.printMap(contract);
