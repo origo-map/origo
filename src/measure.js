@@ -34,7 +34,7 @@ function init(opt_options) {
   options.measureTools = options.measureTools || ["length", "area"];
   lengthTool = options.measureTools.indexOf('length') >= 0 ? true : false;
   areaTool = options.measureTools.indexOf('area') >= 0 ? true : false;
-  options.default = options.default ? options.default : lengthTool ? "length" : "area";
+  options.default = !options.default ? "length" : options.default;
   if(lengthTool || areaTool){
     var target = options.target || '#o-toolbar-maptools';
     map = Viewer.getMap();
