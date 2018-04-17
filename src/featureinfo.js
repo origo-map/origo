@@ -150,7 +150,7 @@ function onClick(evt) {
   }
 }
 function setActive(state) {
-  if(state === true) {
+  if(state) {
     map.on(clickEvent, onClick);
   }
   else {
