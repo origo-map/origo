@@ -150,9 +150,10 @@
       "name": "forshaga:Lekplats",
       "title": "lekplatser",
       "group": "superlager",
-      "source": "ksdgis_wfs",
-      "type": "WFS",
-      "style": "biljettstallen_kundcenter",
+      "source": "ksdgis",
+      "type": "WMS",
+      "format": "image/png",
+      "style": "lekplats",
       "queryable": true,
       "visible": true,
       "tileSize": 512,
@@ -249,7 +250,7 @@
     "lekplats": [
       [{
         "image": {
-          "src": "http://localhost:8080/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&LAYER=forshaga:lekplats"
+          "src": "http://40.69.3.166:8080/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=Lekplats"
         }
       }]
     ],

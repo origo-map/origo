@@ -20,7 +20,7 @@ function convertToMapfishOptions(options) {
 		units: viewer.getProjection().getUnits(), //TODO: Kolla upp om detta stämmer
 		outputFilename: "kartutskrift",
 		outputFormat: options.outputFormat,
-		maptitle: options.title,
+		mapTitle: options.title,
 		layers: [],
 		pages: [{
 			comment: "",
@@ -31,12 +31,8 @@ function convertToMapfishOptions(options) {
 			geodetic: false
 		}],
 		legends:[{
-			classes: [{
-				icons: [],
-				name: "ikonnamn",
-				iconBeforeName: true
-			}],
-			name: ""
+			classes: [],
+			name: "Teckenförklaring"
 		}]
 	};
 
@@ -44,7 +40,6 @@ function convertToMapfishOptions(options) {
     var backgroundLayer = layers.filter(function(layer) {
         return layer.get('group') === "background";
 	})[0];
-
 	
     //assemble object to be pushed to layers. backgroundLayer will always contain 1 element
 	if(backgroundLayer) {
@@ -69,10 +64,16 @@ function convertToMapfishOptions(options) {
 
     //filter background map from remaining layers.
     layers = layers.filter(function(layer) {
-        return layer.get('group') !== "background"
-    });
+        return layer.get('group') !== "background" && typeof layer.get('name') !== 'undefined';
+	});
 
-    //return Object[] filtered by baseURL and/or type
+	// build legend objects and add to mapfishconfig
+	var legendArray = buildLegend(layers);
+	legendArray.forEach(function(obj) {
+		mapfishOptions.legends[0].classes.push(obj);
+	});
+	
+	//return Object[] filtered by baseURL and/or type
     var wmsLayers = buildLayersObjects(layers.filter(function(layer) { return typeof layer.get('name') != "undefined" }), "WMS");
     var wfsLayers = buildLayersObjects(layers.filter(function(layer) { return typeof layer.get('name') != "undefined" }), "WFS");
 
@@ -86,15 +87,56 @@ function convertToMapfishOptions(options) {
             mapfishOptions.layers.push(layer);
         });
 	}
-
-	//legend
-	wmsLayers.forEach(function(layer) {
-		layer.layers.forEach(function(l) {
-			mapfishOptions.legends.classes.icons.push('http://localhost:8080/geoserver/wms?version=1.3.0&SERVICE=WMS&REQUEST=GetLegendGraphic&LAYER='+ l +'&FORMAT=image/png')
-		});
-	});
-
 	return mapfishOptions;
+}
+
+function buildLegend(layers) {
+	var legendObjects = layers.map(function(layer) {
+        switch (layer.get('type').toUpperCase()) {
+			case "WMS":
+				var o = [];
+				var url = fetchSourceUrl(layer);
+				var name = layer.get('name');
+				return {
+					name: name,
+					icons: [ url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name ]
+				};
+            break;
+			case "WFS":
+			var o = [];
+				var url = fetchSourceUrl(layer);
+				var name = layer.get('name');
+				return {
+					name: name,
+					icons: [url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name]
+				}
+            break;
+        }
+	});
+	
+    return legendObjects;
+}
+
+// All urls should point to wms service, regardless if layer type is wfs
+function fetchSourceUrl(layer) {
+	switch (layer.get('type').toUpperCase()) {
+		case "WMS":
+			if (layer.getSource() instanceof ol.source.TileWMS) {
+				url = layer.getSource().getUrls()[0];
+			} else if (layer.getSource() instanceof ol.source.ImageWMS) {
+				url = layer.getSource().getUrl();
+			}
+			return url;
+		break;
+		case "WFS":
+			var fullUrl = viewer.getSettings().source[layer.get('sourceName')].url;
+			var parsed = fullUrl.split('/');
+			var result = parsed[0] + '//' + parsed[2];
+			return result + '/geoserver/wms';
+		break;
+	}
+	// return viewer.getSettings().source[sourceName].url;
+	
 }
 
 /**
@@ -124,6 +166,8 @@ function buildLayersObjects(inLayers, type) {
 	//Filter layers by type
 	var layers = inLayers.filter(function (layer) {
 		return layer.get("type") === type;
+		console.error("aj aj nu blev det vajsing i maskineriet... igen");
+		
 	});
 
 	var printableLayers = [];
@@ -295,29 +339,32 @@ function buildLayersObjects(inLayers, type) {
 
 function executeMapfishCall(url, data) {
 	var body = JSON.stringify(data);
-	var startTime = new Date().getTime();
 	$('#o-dl-link').hide();
 	$('#o-dl-progress').show();
-	$.ajax({
+	$('#o-dl-cancel').show();
+	var request = $.ajax({
 		type: 'POST',
 		url: url,
 		data: body,
 		contentType: 'application/json',
 		dataType: 'json',
 		success: function (data) {
-			console.log('SUCCESS', data);
+			console.log('SUCCESS', data.getURL);
 			$('#o-dl-progress').hide();
-			$('#o-dl-link').show().attr('href', data.getURL);
+			$('#o-dl-cancel').hide();
+			//$('#o-dl-link').show().attr('href', data.getURL); // Leaving this in case of changes of mind.
+			window.open(data.getURL);
 		},
 		error: function (data) {
 			console.log('Error creating report: ' + data.statusText);
 		}
 	});
+	return request;
 }
 
 function printMap(settings) {
 	var url = config.printCreate;
-	executeMapfishCall(url, convertToMapfishOptions(settings));
+	return executeMapfishCall(url, convertToMapfishOptions(settings));
 }
 
 module.exports.printMap = printMap;

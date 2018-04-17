@@ -100,8 +100,8 @@ function init() {
 				'</div>' +
 				'<br />' +
 				'<div class="o-block">' +
-					'<span id="o-dl-progress">Skapar... <img src="../../img/spinner.svg" /></span><a id="o-dl-link" href="#">Ladda ner</a>' +	
-				'</div>' +			
+					'<span id="o-dl-progress">Skapar... <img src="../../img/spinner.svg" /></span><a id="o-dl-link" href="#">Ladda ner</a><img id="o-dl-cancel" src="../../img/png/cancel.png"/>' +
+				'</div>' +
 			'</div>' +
 			'</form>';
 
@@ -143,7 +143,6 @@ function init() {
 		if (hideLayouts) {
 			namesAndSizes = getAvailableSizes(layouts[0], config);
 			layoutIfHidden = layouts;
-			console.log('layoutIfHidden', layoutIfHidden);
 		} else {
 			namesAndSizes = getAvailableSizes($layoutselect.find(":selected").text(), config);
 		}
@@ -383,7 +382,15 @@ function bindUIActions() {
 			layout: layout,
 			center: centerPoint
 		};
-		print.printMap(contract);
+		
+		// Abort pending ajax request
+		var request = print.printMap(contract);
+		$('#o-dl-cancel').click(function() {
+			request.abort();
+			$('#o-dl-progress').hide();
+			$('#o-dl-cancel').hide();
+		});
+
 		return false;
 	});
 }
