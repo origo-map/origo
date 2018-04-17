@@ -118,7 +118,7 @@ function render(target) {
       src: '#steady-measure',
       tooltipText: 'Mät i kartan'
     });
-    $('#' + 'o-measure-toolbar').append(mb);
+    $('#o-measure-toolbar').append(mb);
   }
   
   if(lengthTool){
@@ -130,7 +130,7 @@ function render(target) {
       tooltipText: 'Linje',
       tooltipPlacement: 'north'
     });
-    $('#' + 'o-measure-toolbar').append(lb);
+    $('#o-measure-toolbar').append(lb);
     $('#o-measure-line-button').addClass('o-hidden');
   }
 
@@ -143,7 +143,7 @@ function render(target) {
       tooltipText: 'Yta',
       tooltipPlacement: 'north'
     });
-    $('#' + 'o-measure-toolbar').append(pb);
+    $('#o-measure-toolbar').append(pb);
     $('#o-measure-polygon-button').addClass('o-hidden');
   }
 }
