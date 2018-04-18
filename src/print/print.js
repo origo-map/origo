@@ -53,7 +53,7 @@ function convertToMapfishOptions(options) {
 		}
 		var backgroundLayerObject = {
 			type: backgroundLayer.get('type'),
-			baseURL: url,
+			baseURL: 'http://karta.eskilstuna.se' + url,
 			format: backgroundLayer.getSource().getParams().FORMAT,
 			layers: [backgroundLayer.getSource().getParams().LAYERS]
 		};
@@ -166,8 +166,6 @@ function buildLayersObjects(inLayers, type) {
 	//Filter layers by type
 	var layers = inLayers.filter(function (layer) {
 		return layer.get("type") === type;
-		console.error("aj aj nu blev det vajsing i maskineriet... igen");
-		
 	});
 
 	var printableLayers = [];
