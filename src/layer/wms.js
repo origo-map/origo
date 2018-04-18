@@ -4,6 +4,7 @@ var ol = require('openlayers');
 var $ = require('jquery');
 var viewer = require('../viewer');
 var tile = require('./tile');
+var maputils = require('../maputils');
 var image = require('./image');
 
 var wms = function wms(layerOptions) {
@@ -22,8 +23,19 @@ var wms = function wms(layerOptions) {
   sourceOptions.attribution = wmsOptions.attribution;
   sourceOptions.projectionCode = viewer.getProjectionCode();
   sourceOptions.id = wmsOptions.id;
-  sourceOptions.tileGrid = viewer.getTileGrid();
   sourceOptions.format = wmsOptions.format ? wmsOptions.format : sourceOptions.format;
+
+  if (wmsOptions.tileGrid) {
+    sourceOptions.tileGrid = maputils.tileGrid(wmsOptions.tileGrid);
+  } else if (sourceOptions.tileGrid) {
+    sourceOptions.tileGrid = maputils.tileGrid(sourceOptions.tileGrid);
+  } else {
+    sourceOptions.tileGrid = viewer.getTileGrid();
+
+    if (wmsOptions.extent) {
+      sourceOptions.tileGrid.extent = wmsOptions.extent;
+    }
+  }
 
   if (renderMode === 'image') {
     return image(wmsOptions, createImageSource(sourceOptions));
