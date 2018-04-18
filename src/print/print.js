@@ -349,17 +349,23 @@ function executeMapfishCall(url, data) {
 		contentType: 'application/json',
 		dataType: 'json',
 		success: function (data) {
-			console.log('SUCCESS', data.getURL);
+			var url = 'https://karta.eskilstuna.se/' + newUrl(data.getURL);
+			console.log('SUCCESS', url);
 			$('#o-dl-progress').hide();
 			$('#o-dl-cancel').hide();
 			//$('#o-dl-link').show().attr('href', data.getURL); // Leaving this in case of changes of mind.
-			window.open(data.getURL);
+			window.open(url);
 		},
 		error: function (data) {
 			console.log('Error creating report: ' + data.statusText);
 		}
 	});
 	return request;
+}
+
+// because mapfish can't return a dang url which isnt localhost
+function newUrl(url) {
+	return url.substr(url.indexOf('/', 7) + 1)
 }
 
 function printMap(settings) {

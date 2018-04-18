@@ -27,7 +27,7 @@ module.exports = {
        "name": "fullscreen"
     }
   ],
-  geoserverPath: '/geoserver',
-  printInfo: '/geoserver/pdf/info.json',
-  printCreate: '/geoserver/pdf/create.json'
+  geoserverPath: 'https://karta.eskilstuna.se/geoserver',
+  printInfo: 'https://karta.eskilstuna.se/geoserver/pdf/info.json',
+  printCreate: 'https://karta.eskilstuna.se/geoserver/pdf/create.json'
 }
