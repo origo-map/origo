@@ -29,9 +29,19 @@
     text-decoration: none;
     display: none;
 }
+
+.o-map #o-dl-cancel {
+    height: 20px;
+    width: 20px;
+    margin-right: 10px;
+    float: right;
+    display: none; 
+}
+
 #o-dl-link:hover {
     text-decoration: none;
 }
+
 .o-dd-input {
     width: 75%;
 }
