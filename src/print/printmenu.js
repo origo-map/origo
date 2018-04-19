@@ -239,7 +239,11 @@ function bindUIActions() {
 				printarea.addPreview($('#o-scale-dd').val(), paper);
 				$("#o-printmenu").addClass('o-printmenu-show');
 			} else {
-				vector.setVisible(true);
+				//vector.setVisible(true);
+				Viewer.getMap().removeLayer(vector);
+				vector = printarea.printA1();
+				var paper = getPaperMeasures();
+				printarea.addPreview($('#o-scale-dd').val(), paper);
 				$("#o-printmenu").addClass('o-printmenu-show');
 			}
 
