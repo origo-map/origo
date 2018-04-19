@@ -99,7 +99,7 @@ function buildLegend(layers) {
 				var name = layer.get('name');
 				return {
 					name: name,
-					icons: [ url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name ]
+					icons: [ 'http://karta.eskilstuna.se' + url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name ]
 				};
             break;
 			case "WFS":
@@ -108,7 +108,7 @@ function buildLegend(layers) {
 				var name = layer.get('name');
 				return {
 					name: name,
-					icons: [url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name]
+					icons: [ 'http://karta.eskilstuna.se' + url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name ]
 				}
             break;
         }
@@ -188,7 +188,7 @@ function buildLayersObjects(inLayers, type) {
 			} else {
 				printableLayers.push({
 					type: layer.get('type'),
-					baseURL: url,
+					baseURL: 'http://karta.eskilstuna.se' + url,
 					format: layer.getSource().getParams().FORMAT,
 					layers: [layer.getSource().getParams().LAYERS]
 				});
