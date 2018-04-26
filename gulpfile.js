@@ -1,11 +1,11 @@
 var browserify = require('browserify');
 var sass = require('gulp-sass');
 var gulp = require('gulp');
-var jshint = require('gulp-jshint');
+// var eslint = require('gulp-eslint');
 var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
 var uglify = require('gulp-uglify');
-var rename = require("gulp-rename");
+var rename = require('gulp-rename');
 var minifyCSS = require('gulp-csso');
 var runSequence = require('run-sequence');
 
@@ -19,8 +19,10 @@ gulp.task('origo-debug', function () {
   return b.bundle()
     .pipe(source('origo.js'))
     .pipe(buffer())
-    .pipe(jshint())
-    .pipe(jshint.reporter('default'))
+
+    // TODO reactivate eslint when number of errors are less
+    // .pipe(eslint())
+    // .pipe(eslint.format())
     .pipe(gulp.dest('./dist/'));
 });
 
@@ -41,64 +43,64 @@ gulp.task('origo-min', function () {
 
 gulp.task('origo-js', [ 'origo-debug', 'origo-min']);
 
-gulp.task('css-debug', function(){
+gulp.task('css-debug', function () {
   return gulp.src('scss/origo.scss')
     .pipe(sass())
     .pipe(rename('style.css'))
-    .pipe(gulp.dest('dist'))
+    .pipe(gulp.dest('dist'));
 });
 
-gulp.task('css-min', function(){
+gulp.task('css-min', function () {
   return gulp.src('scss/origo.scss')
     .pipe(sass())
     .pipe(minifyCSS())
     .pipe(rename('style.min.css'))
-    .pipe(gulp.dest('dist'))
+    .pipe(gulp.dest('dist'));
 });
 
 gulp.task('origo-css', [ 'css-debug', 'css-min']);
 
-gulp.task('css', function(){
+gulp.task('css', function () {
   return gulp.src(['dist/style.css', 'dist/style.min.css', 'css/print.css'])
-    .pipe(gulp.dest('build/css'))
+    .pipe(gulp.dest('build/css'));
 });
 
-gulp.task('svg', function(){
+gulp.task('svg', function () {
   return gulp.src('css/svg/*.svg')
-    .pipe(gulp.dest('build/css/svg'))
+    .pipe(gulp.dest('build/css/svg'));
 });
-gulp.task('png', function(){
+gulp.task('png', function () {
   return gulp.src('css/png/*.png')
-    .pipe(gulp.dest('build/css/png'))
+    .pipe(gulp.dest('build/css/png'));
 });
 
-gulp.task('img', function(){
+gulp.task('img', function () {
   return gulp.src('img/**')
-    .pipe(gulp.dest('build/img'))
+    .pipe(gulp.dest('build/img'));
 });
 
-gulp.task('js', function(){
+gulp.task('js', function () {
   return gulp.src('dist/*.js')
-    .pipe(gulp.dest('build/js'))
+    .pipe(gulp.dest('build/js'));
 });
 
-gulp.task('examples', function(){
+gulp.task('examples', function () {
   return gulp.src('examples/**')
-    .pipe(gulp.dest('build/examples'))
+    .pipe(gulp.dest('build/examples'));
 });
 
-gulp.task('data', function(){
+gulp.task('data', function () {
   return gulp.src('data/*.*')
-    .pipe(gulp.dest('build/data'))
+    .pipe(gulp.dest('build/data'));
 });
 
-gulp.task('root', function(){
+gulp.task('root', function () {
   return gulp.src(['index.html', 'index.json'])
-    .pipe(gulp.dest('build'))
+    .pipe(gulp.dest('build'));
 });
 
 gulp.task('pack', ['css', 'svg', 'png', 'img', 'js', 'examples', 'data', 'root']);
 
-gulp.task('default', function(cb) {
+gulp.task('default', function () {
   runSequence('origo-js', 'origo-css', 'pack');
 });
