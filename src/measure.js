@@ -28,13 +28,14 @@ var isActive = false;
 var wgs84Sphere = new ol.Sphere(6378137);
 var lengthTool;
 var areaTool;
+var defaultTool;
 
 function init(opt_options) {
   options = opt_options || {};
   options.measureTools = options.measureTools || ["length", "area"];
-  lengthTool = options.measureTools.indexOf('length') >= 0 ? true : false;
-  areaTool = options.measureTools.indexOf('area') >= 0 ? true : false;
-  options.default = options.default ? options.default : lengthTool ? "length" : "area";
+  lengthTool = options.measureTools.indexOf('length') >= 0;
+  areaTool = options.measureTools.indexOf('area') >= 0;
+  defaultTool = options.default ? options.default : "length";
   if(lengthTool || areaTool){
     var target = options.target || '#o-toolbar-maptools';
     map = Viewer.getMap();
@@ -55,9 +56,9 @@ function init(opt_options) {
 
     render(target);
     bindUIActions();
-    if(options.default === 'area') {
+    if(defaultTool === 'area') {
       defaultButton = $('#o-measure-polygon-button button');
-    } else if(options.default === 'length') {
+    } else if(defaultTool === 'length') {
       defaultButton = $('#o-measure-line-button button');
     }
   }
@@ -92,12 +93,7 @@ function onEnableInteraction(e) {
 
 }
 
-function setActive(state) {
-  if(state === true) {
-    isActive = true;
-  } else {
-    isActive = false;
-  }
+isActive = state ? true : false;
 
 }
 
@@ -118,7 +114,7 @@ function render(target) {
       src: '#steady-measure',
       tooltipText: 'Mät i kartan'
     });
-    $('#' + 'o-measure-toolbar').append(mb);
+    $('#o-measure-toolbar').append(mb);
   }
   
   if(lengthTool){
@@ -130,7 +126,7 @@ function render(target) {
       tooltipText: 'Linje',
       tooltipPlacement: 'north'
     });
-    $('#' + 'o-measure-toolbar').append(lb);
+    $('#o-measure-toolbar').append(lb);
     $('#o-measure-line-button').addClass('o-hidden');
   }
 
@@ -143,7 +139,7 @@ function render(target) {
       tooltipText: 'Yta',
       tooltipPlacement: 'north'
     });
-    $('#' + 'o-measure-toolbar').append(pb);
+    $('#o-measure-toolbar').append(pb);
     $('#o-measure-polygon-button').addClass('o-hidden');
   }
 }
