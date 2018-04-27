@@ -60,6 +60,7 @@ var wfs = function wfs(layerOptions) {
           '&outputFormat=application/json' +
           '&srsname=' + options.projectionCode;
         url += options.strategy === 'all' ? queryFilter : queryFilter + extent.join(',') + ',' + bboxProjectionCode;
+        url = encodeURI(url);
         $.ajax({
             url: url,
             cache: false
