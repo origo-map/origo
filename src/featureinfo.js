@@ -1,17 +1,16 @@
-"use strict";
+import 'owl.carousel';
+import Overlay from 'ol/overlay';
+import $ from 'jquery';
+import viewer from './viewer';
+import Popup from './popup';
+import sidebar from './sidebar';
+import maputils from './maputils';
+import featurelayer from './featurelayer';
+import Style from './style';
+import styleTypes from './style/styletypes';
+import getFeatureInfo from './getfeatureinfo';
 
-var ol = require('openlayers');
-var $ = require('jquery');
-var Viewer = require('./viewer');
-var Popup = require('./popup');
-var sidebar = require('./sidebar');
-var maputils = require('./maputils');
-var featurelayer = require('./featurelayer');
-var style = require('./style')();
-var styleTypes = require('./style/styletypes');
-var getFeatureInfo = require('./getfeatureinfo');
-var owlCarousel = require('../externs/owlcarousel-browserify');
-owlCarousel.loadjQueryPlugin();
+const style = Style();
 
 var selectionLayer = undefined;
 var savedPin = undefined;
@@ -28,7 +27,7 @@ var overlay;
 var hitTolerance;
 
 function init(opt_options) {
-  map = Viewer.getMap();
+  map = viewer.getMap();
 
   options = opt_options || {};
 
@@ -46,10 +45,9 @@ function init(opt_options) {
 
   showOverlay = options.hasOwnProperty('overlay') ? options.overlay : true;
 
-  if(showOverlay) {
+  if (showOverlay) {
     identifyTarget = 'overlay';
-  }
-  else {
+  } else {
     sidebar.init();
     identifyTarget = 'sidebar';
   }
@@ -73,22 +71,25 @@ function getSelection() {
   selection.coordinates = selectionLayer.getFeatures()[0].getGeometry().getCoordinates();
   return selection;
 }
+
 function getPin() {
   return savedPin;
 }
+
 function getHitTolerance() {
   return hitTolerance;
 }
+
 function identify(items, target, coordinate) {
   clear();
-  var content = items.map(function(i){
+  var content = items.map(function(i) {
     return i.content;
   }).join('');
   content = '<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme">' + content + '</div></div>';
   switch (target) {
     case 'overlay':
       var popup = Popup('#o-map');
-      overlay = new ol.Overlay({
+      overlay = new Overlay({
         element: popup.getEl()
       });
       map.addOverlay(overlay);
@@ -96,19 +97,25 @@ function identify(items, target, coordinate) {
       var coord;
       geometry.getType() == 'Point' ? coord = geometry.getCoordinates() : coord = coordinate;
       overlay.setPosition(coord);
-      popup.setContent({content: content, title: items[0].title});
+      popup.setContent({
+        content: content,
+        title: items[0].title
+      });
       popup.setVisibility(true);
-      var owl = initCarousel('#o-identify-carousel', undefined, function(){
+      var owl = initCarousel('#o-identify-carousel', undefined, function() {
         var currentItem = this.owl.currentItem;
         selectionLayer.clearAndAdd(items[currentItem].feature.clone(), selectionStyles[items[currentItem].feature.getGeometry().getType()]);
         popup.setTitle(items[currentItem].title);
       });
-      Viewer.autoPan();
+      viewer.autoPan();
       break;
     case 'sidebar':
-      sidebar.setContent({content: content, title: items[0].title});
+      sidebar.setContent({
+        content: content,
+        title: items[0].title
+      });
       sidebar.setVisibility(true);
-      var owl = initCarousel('#o-identify-carousel', undefined, function(){
+      var owl = initCarousel('#o-identify-carousel', undefined, function() {
         var currentItem = this.owl.currentItem;
         selectionLayer.clearAndAdd(items[currentItem].feature.clone(), selectionStyles[items[currentItem].feature.getGeometry().getType()]);
         sidebar.setTitle(items[currentItem].title);
@@ -116,12 +123,13 @@ function identify(items, target, coordinate) {
       break;
   }
 }
+
 function onClick(evt) {
   savedPin = undefined;
   //Featurinfo in two steps. Concat serverside and clientside when serverside is finished
   var clientResult = getFeatureInfo.getFeaturesAtPixel(evt, clusterFeatureinfoLevel);
   //Abort if clientResult is false
-  if(clientResult !== false) {
+  if (clientResult !== false) {
     getFeatureInfo.getFeaturesFromRemote(evt)
       .done(function(data) {
         var serverResult = data || [];
@@ -129,68 +137,67 @@ function onClick(evt) {
         if (result.length > 0) {
           selectionLayer.clear();
           identify(result, identifyTarget, evt.coordinate)
-        }
-        else if(selectionLayer.getFeatures().length > 0) {
+        } else if (selectionLayer.getFeatures().length > 0) {
           clear();
-        }
-        else if(pinning){
+        } else if (pinning) {
           sidebar.setVisibility(false);
           var resolution = map.getView().getResolution();
           setTimeout(function() {
-            if(!maputils.checkZoomChange(resolution, map.getView().getResolution())) {
+            if (!maputils.checkZoomChange(resolution, map.getView().getResolution())) {
               savedPin = maputils.createPointFeature(evt.coordinate, pinStyle);
               selectionLayer.addFeature(savedPin);
             }
           }, 250);
         }
-        else {
-          console.log('No features identified');
-        }
       });
   }
 }
+
 function setActive(state) {
-  if(state) {
+  if (state) {
     map.on(clickEvent, onClick);
-  }
-  else {
+  } else {
     clear();
     map.un(clickEvent, onClick);
   }
 }
+
 function clear() {
   selectionLayer.clear();
   sidebar.setVisibility(false);
   if (overlay) {
-    Viewer.removeOverlays(overlay);
+    viewer.removeOverlays(overlay);
   }
   console.log("Clearing selection");
 }
+
 function onEnableInteraction(e) {
-  if(e.interaction === 'featureInfo') {
+  if (e.interaction === 'featureInfo') {
     setActive(true);
-  }
-  else {
+  } else {
     setActive(false);
   }
 }
+
 function initCarousel(id, options, cb) {
   var carouselOptions = options || {
-    navigation : true, // Show next and prev buttons
-    slideSpeed : 300,
-    paginationSpeed : 400,
-    singleItem:true,
-    rewindSpeed:200,
+    navigation: true, // Show next and prev buttons
+    slideSpeed: 300,
+    paginationSpeed: 400,
+    singleItem: true,
+    rewindSpeed: 200,
     navigationText: ['<svg class="o-icon-fa-chevron-left"><use xlink:href="#fa-chevron-left"></use></svg>', '<svg class="o-icon-fa-chevron-right"><use xlink:href="#fa-chevron-right"></use></svg>'],
     afterAction: cb
   };
   return $(id).owlCarousel(carouselOptions);
 }
 
-module.exports.init = init;
-module.exports.clear = clear;
-module.exports.getSelectionLayer = getSelectionLayer;
-module.exports.getSelection = getSelection;
-module.exports.getPin = getPin;
-module.exports.getHitTolerance = getHitTolerance;
-module.exports.identify = identify;
+export default {
+  init,
+  clear,
+  getSelectionLayer,
+  getSelection,
+  getPin,
+  getHitTolerance,
+  identify
+};

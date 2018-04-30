@@ -1,54 +1,58 @@
-"use strict";
+import viewer from '../viewer';
+import featureinfo from '../featureinfo';
+import urlparser from '../utils/urlparser';
 
-var viewer = require('../viewer');
-var selection = require('../featureinfo')['getSelection'];
-var getPin = require('../featureinfo')['getPin'];
-var urlparser =require('../utils/urlparser');
-
+var selection = featureinfo.getSelection;
+var getPin = featureinfo.getPin;
 var permalinkStore = {};
 var state;
 var url;
 
 permalinkStore.getState = function getState() {
-    state = {};
-    var view = viewer.getMap().getView();
-    var layers = viewer.getLayers();
-    state.layers = getSaveLayers(layers);
-    state.center = view.getCenter().map(function(coord) {
-        return Math.round(coord);
+  state = {};
+  var view = viewer.getMap().getView();
+  var layers = viewer.getLayers();
+  state.layers = getSaveLayers(layers);
+  state.center = view.getCenter().map(function(coord) {
+    return Math.round(coord);
+  }).join();
+  state.zoom = view.getZoom().toString();
+  // state.selection = getSaveSelection(selection());
+  if (getPin()) {
+    state.pin = getPin().getGeometry().getCoordinates().map(function(coord) {
+      return Math.round(coord);
     }).join();
-    state.zoom = view.getZoom().toString();
-    // state.selection = getSaveSelection(selection());
-    if (getPin()) {
-        state.pin = getPin().getGeometry().getCoordinates().map(function(coord) {
-          return Math.round(coord);
-        }).join();
-    }
-    if (viewer.getMapName()) {
-        state.map = viewer.getMapName().split('.')[0];
-    }
-    return state;
+  }
+  if (viewer.getMapName()) {
+    state.map = viewer.getMapName().split('.')[0];
+  }
+  return state;
 }
 permalinkStore.getUrl = function() {
-    url = viewer.getUrl();
-    return url;
+  url = viewer.getUrl();
+  return url;
 }
 
 function getSaveLayers(layers) {
-    var saveLayers = [];
-    layers.forEach(function(layer) {
-        var saveLayer = {};
-        saveLayer.v = layer.getVisible() === true ? 1 : 0;
-        saveLayer.s = layer.get('legend') === true ? 1 : 0;
-        if (saveLayer.s || saveLayer.v) {
-            saveLayer.name = layer.get('name');
-            saveLayers.push(urlparser.stringify(saveLayer, {topmost: 'name'}));
-        }
-    });
-    return saveLayers;
-}
-function getSaveSelection(selection) {
-    return urlparser.arrStringify(selection.coordinates, {topmost: selection.geometryType});
+  var saveLayers = [];
+  layers.forEach(function(layer) {
+    var saveLayer = {};
+    saveLayer.v = layer.getVisible() === true ? 1 : 0;
+    saveLayer.s = layer.get('legend') === true ? 1 : 0;
+    if (saveLayer.s || saveLayer.v) {
+      saveLayer.name = layer.get('name');
+      saveLayers.push(urlparser.stringify(saveLayer, {
+        topmost: 'name'
+      }));
+    }
+  });
+  return saveLayers;
 }
 
-module.exports = permalinkStore;
+function getSaveSelection(selection) {
+  return urlparser.arrStringify(selection.coordinates, {
+    topmost: selection.geometryType
+  });
+}
+
+export default permalinkStore;

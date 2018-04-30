@@ -1,59 +1,62 @@
-var ol = require('openlayers');
-var getColor = require('../getcolor');
+import Circle from 'ol/style/circle';
+import Fill from 'ol/style/fill';
+import Stroke from 'ol/style/stroke';
+import Style from 'ol/style/style';
+import getColor from '../getcolor';
 
-module.exports = function defaultStyle(params) {
-  var fill = new ol.style.Fill({
+export default function defaultStyle(params) {
+  var fill = new Fill({
     color: ''
   });
-  var stroke = new ol.style.Stroke({
+  var stroke = new Stroke({
     color: '',
     width: 0.1,
     lineCap: 'square',
     lineJoin: 'round'
   });
-  var noStroke = new ol.style.Stroke({
+  var noStroke = new Stroke({
     color: '',
     width: 0.0
   });
-  var overlayedStroke = new ol.style.Stroke({
+  var overlayedStroke = new Stroke({
     color: '',
     width: 0.1,
     lineCap: 'square',
     lineJoin: 'round'
   });
-  var dashedStroke = new ol.style.Stroke({
+  var dashedStroke = new Stroke({
     color: '',
     width: 1,
     lineDash: [1, 2]
   });
-  var polygon = new ol.style.Style({
+  var polygon = new Style({
     fill: fill,
     zIndex: 1
   });
-  var strokedPolygon = new ol.style.Style({
+  var strokedPolygon = new Style({
     fill: fill,
     stroke: stroke,
     zIndex: 2
   });
-  var dashedPolygon = new ol.style.Style({
+  var dashedPolygon = new Style({
     fill: fill,
     stroke: dashedStroke,
     zIndex: 2
   });
-  var line = new ol.style.Style({
+  var line = new Style({
     stroke: stroke,
     zIndex: 10
   });
-  var overlayedLine = new ol.style.Style({
+  var overlayedLine = new Style({
     stroke: overlayedStroke,
     zIndex: 11
   });
-  var dashedLine = new ol.style.Style({
+  var dashedLine = new Style({
     stroke: dashedStroke,
     zIndex: 12
   });
-  var point = new ol.style.Style({
-    image: new ol.style.Circle({
+  var point = new Style({
+    image: new Circle({
       radius: 5,
       fill: fill,
       stroke: stroke
@@ -112,4 +115,4 @@ module.exports = function defaultStyle(params) {
     styles.length = length;
     return styles;
   };
-};
+}

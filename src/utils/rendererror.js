@@ -1,8 +1,7 @@
-"use strict";
-var $ = require('jquery');
-var utils = require('../utils');
+import $ from 'jquery';
+import utils from '../utils';
 
-module.exports = function renderError(type, el) {
+export default function renderError(type, el) {
   if (type === 'browser') {
     renderBrowserError(el);
   }

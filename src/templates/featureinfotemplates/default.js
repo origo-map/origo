@@ -1,7 +1,5 @@
-"use strict";
+import defaultTemplate from './default.handlebars';
 
-var defaultTemplate = require("./default.handlebars");
-
-module.exports = function(attributes) {
+export default function (attributes) {
   return defaultTemplate(attributes);
 }

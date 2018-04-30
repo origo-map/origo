@@ -1,12 +1,16 @@
-"use strict";
-
-var ol = require('openlayers');
-var $ = require('jquery');
-var Viewer = require('./viewer');
-var validateUrl = require('./utils/validateurl');
-var styleFunctions = require('./style/stylefunctions');
-var replacer = require('../src/utils/replacer');
-var mapUtils = require('./maputils');
+import Point from 'ol/geom/point';
+import Circle from 'ol/style/circle';
+import Fill from 'ol/style/fill';
+import Icon from 'ol/style/icon';
+import Stroke from 'ol/style/stroke';
+import Style from 'ol/style/style';
+import Text from 'ol/style/text';
+import $ from 'jquery';
+import viewer from './viewer';
+import validateUrl from './utils/validateurl';
+import styleFunctions from './style/stylefunctions';
+import replacer from '../src/utils/replacer';
+import mapUtils from './maputils';
 
 var baseUrl;
 
@@ -56,7 +60,7 @@ var editStyleOptions = {
   ]
 };
 
-module.exports = function() {
+export default function () {
 
   return {
     init: Init,
@@ -71,7 +75,7 @@ module.exports = function() {
 };
 
 function Init() {
-  baseUrl = Viewer.getBaseUrl();
+  baseUrl = viewer.getBaseUrl();
 }
 
 function createStyleOptions(styleParams) {
@@ -81,13 +85,13 @@ function createStyleOptions(styleParams) {
       case 'centerPoint':
         styleOptions.geometry = function(feature) {
           var coordinates = mapUtils.getCenter(feature.getGeometry());
-          return new ol.geom.Point(coordinates);
+          return new Point(coordinates);
         }
         break;
       case 'endPoint':
         styleOptions.geometry = function(feature) {
           var coordinates = feature.getGeometry().getLastCoordinate();
-          return new ol.geom.Point(coordinates);
+          return new Point(coordinates);
         }
         break;
     }
@@ -96,31 +100,31 @@ function createStyleOptions(styleParams) {
     styleOptions.zIndex = styleParams.zIndex;
   }
   if (styleParams.hasOwnProperty('fill')) {
-    styleOptions.fill = new ol.style.Fill(styleParams.fill);
+    styleOptions.fill = new Fill(styleParams.fill);
   }
   if (styleParams.hasOwnProperty('stroke')) {
-    styleOptions.stroke = new ol.style.Stroke(styleParams.stroke);
+    styleOptions.stroke = new Stroke(styleParams.stroke);
   }
   if (styleParams.hasOwnProperty('text')) {
-    styleOptions.text = new ol.style.Text(styleParams.text);
+    styleOptions.text = new Text(styleParams.text);
     if (styleParams.text.hasOwnProperty('fill')) {
-      styleOptions.text.setFill(new ol.style.Fill(styleParams.text.fill));
+      styleOptions.text.setFill(new Fill(styleParams.text.fill));
     }
     if (styleParams.text.hasOwnProperty('stroke')) {
-      styleOptions.text.setStroke(new ol.style.Stroke(styleParams.text.stroke));
+      styleOptions.text.setStroke(new Stroke(styleParams.text.stroke));
     }
   }
   if (styleParams.hasOwnProperty('icon')) {
     if (styleParams.icon.hasOwnProperty('src')) {
       styleParams.icon.src = validateUrl(styleParams.icon.src, baseUrl);
     }
-    styleOptions.image = new ol.style.Icon(styleParams.icon);
+    styleOptions.image = new Icon(styleParams.icon);
   }
   if (styleParams.hasOwnProperty('circle')) {
-    styleOptions.image = new ol.style.Circle({
+    styleOptions.image = new Circle({
       radius: styleParams.circle.radius,
-      fill: new ol.style.Fill(styleParams.circle.fill) || undefined,
-      stroke: new ol.style.Stroke(styleParams.circle.stroke) || undefined
+      fill: new Fill(styleParams.circle.fill) || undefined,
+      stroke: new Stroke(styleParams.circle.stroke) || undefined
     });
   }
   return styleOptions;
@@ -136,13 +140,13 @@ function createStyleList(styleOptions) {
     if (styleOptions[i].constructor === Array) {
       for (var j = 0; j < styleOptions[i].length; j++) {
         styleOption = createStyleOptions(styleOptions[i][j]);
-        styleRule.push(new ol.style.Style(styleOption));
+        styleRule.push(new Style(styleOption));
       }
     }
     //If single style for rule
     else {
       styleOption = createStyleOptions(styleOptions[i]);
-      styleRule = [new ol.style.Style(styleOption)];
+      styleRule = [new Style(styleOption)];
     }
 
     styleList.push(styleRule);
@@ -151,7 +155,7 @@ function createStyleList(styleOptions) {
 }
 
 function createStyle(styleName, clusterStyleName) {
-  var styleSettings = Viewer.getStyleSettings()[styleName];
+  var styleSettings = viewer.getStyleSettings()[styleName];
   if ($.isEmptyObject(styleSettings)) {
     alert('Style ' + styleName + ' is not defined');
   }
@@ -159,7 +163,7 @@ function createStyle(styleName, clusterStyleName) {
     var style = styleFunctions(styleSettings[0][0].custom, styleSettings[0][0].params);
     return style;
   } else {
-    var clusterStyleSettings = Viewer.getStyleSettings()[clusterStyleName];
+    var clusterStyleSettings = viewer.getStyleSettings()[clusterStyleName];
     var style = (function() {
       //Create style for each rule
       var styleList = createStyleList(styleSettings);
@@ -181,22 +185,22 @@ function createStyleRule(options) {
   if (options.constructor === Array) {
     for (var i = 0; i < options.length; i++) {
       var styleOption = createStyleOptions(options[i]);
-      styleRule.push(new ol.style.Style(styleOption));
+      styleRule.push(new Style(styleOption));
     }
   }
   //If single style for rule
   else {
     styleOption = createStyleOptions(options);
-    styleRule = [new ol.style.Style(styleOption)];
+    styleRule = [new Style(styleOption)];
   }
   return styleRule;
 }
 
 function styleFunction(styleSettings, styleList, clusterStyleSettings, clusterStyleList) {
   var s = styleSettings;
-  var resolutions = Viewer.getResolutions();
+  var resolutions = viewer.getResolutions();
   var fn = function(feature, resolution) {
-    var scale = Viewer.getScale(resolution);
+    var scale = viewer.getScale(resolution);
     var styleL;
     //If size is larger than, it is a cluster
     var size = clusterStyleList ? feature.get('features').length : 1;
@@ -230,7 +234,7 @@ function checkOptions(feature, scale, styleSettings, styleList, size) {
   var s = styleSettings;
   for (var j = 0; j < s.length; j++) {
     var styleL;
-    if (Viewer.checkScale(scale, s[j][0].maxScale, s[j][0].minScale)) {
+    if (viewer.checkScale(scale, s[j][0].maxScale, s[j][0].minScale)) {
       s[j].some(function(element, index, array) {
         if (element.hasOwnProperty('text') && size) {
           styleList[j][index].getText().setText(size);

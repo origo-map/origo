@@ -1,22 +1,18 @@
-"use strict";
-var $ = require('jquery');
-var supports = require('./utils/supports');
-var permalink = require('./permalink/permalink');
-var getUrl = require('./utils/geturl');
-var isUrl = require('./utils/isurl');
-var trimUrl = require('./utils/trimurl');
+import $ from 'jquery';
+import supports from './utils/supports';
+import permalink from './permalink/permalink';
+import getUrl from './utils/geturl';
+import isUrl from './utils/isurl';
+import trimUrl from './utils/trimurl';
 
-var mapLoader = function(mapOptions, config) {
-
-  var map = {};
-  var mapEl = config.target;
-  var format = 'json';
-  var cors = config.crossOrigin;
-
-  var urlParams = undefined;
+const mapLoader = function mapLoader(mapOptions, config) {
+  const map = {};
+  let mapEl = config.target;
+  const format = 'json';
+  let urlParams;
 
   if (mapEl.substring(0, 1) !== '#') {
-    mapEl = '#' + mapEl;
+    mapEl = `#${mapEl}`;
   }
   map.el = mapEl;
 
@@ -28,14 +24,11 @@ var mapLoader = function(mapOptions, config) {
   // Check if authorization is required before map options is loaded
   if (config.authorizationUrl) {
     return $.ajax({
-        url: config.authorizationUrl
-      })
-      .then(function(data) {
-        return loadMapOptions();
-      });
-  } else {
-    return loadMapOptions();
+      url: config.authorizationUrl
+    })
+      .then(() => loadMapOptions());
   }
+  return loadMapOptions();
 
   function loadMapOptions() {
     if (typeof(mapOptions) === 'object') {
@@ -114,13 +107,13 @@ function loadSvgSprites(baseUrl, config) {
   var svgPromises = [];
   svgSprites.forEach(function(sprite) {
     var promise = $.get(baseUrl + svgPath + sprite, function(data) {
-        var div = document.createElement("div");
-        div.innerHTML = new XMLSerializer().serializeToString(data.documentElement);
-        document.body.insertBefore(div, document.body.childNodes[0]);
-      });
+      var div = document.createElement("div");
+      div.innerHTML = new XMLSerializer().serializeToString(data.documentElement);
+      document.body.insertBefore(div, document.body.childNodes[0]);
+    });
     svgPromises.push(promise);
     return svgPromises;
   });
 }
 
-module.exports = mapLoader;
+export default mapLoader;
