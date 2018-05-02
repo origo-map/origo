@@ -224,13 +224,7 @@ function getLayers() {
 }
 
 function getLayersByProperty(key, val, byName) {
-  const layers = map.getLayers().getArray().filter((layer) => {
-    if (layer.get(key)) {
-      if (layer.get(key) === val) {
-        return layer;
-      }
-    }
-  });
+  const layers = map.getLayers().getArray().filter(layer => layer.get(key) && layer.get(key) === val);
 
   if (byName) {
     return layers.map(layer => layer.get('name'));
