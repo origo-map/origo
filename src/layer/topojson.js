@@ -5,6 +5,16 @@ import viewer from '../viewer';
 import vector from './vector';
 import isUrl from '../utils/isurl';
 
+function createSource(options) {
+  return new VectorSource({
+    attributions: options.attribution,
+    url: options.url,
+    format: new TopoJSONFormat({
+      defaultDataProjection: options.projectionCode
+    })
+  });
+}
+
 const topojson = function topojson(layerOptions) {
   const baseUrl = viewer.getBaseUrl();
   const topojsonDefault = {
@@ -12,6 +22,7 @@ const topojson = function topojson(layerOptions) {
   };
   const topojsonOptions = $.extend(topojsonDefault, layerOptions);
   const sourceOptions = {};
+
   sourceOptions.attribution = topojsonOptions.attribution;
   sourceOptions.projectionCode = viewer.getProjectionCode();
   sourceOptions.sourceName = layerOptions.source;
@@ -24,16 +35,6 @@ const topojson = function topojson(layerOptions) {
 
   const topojsonSource = createSource(sourceOptions);
   return vector(topojsonOptions, topojsonSource);
-
-  function createSource(options) {
-    return new VectorSource({
-      attributions: options.attribution,
-      url: options.url,
-      format: new TopoJSONFormat({
-        defaultDataProjection: options.projectionCode
-      })
-    });
-  }
 };
 
-module.exports = topojson;
+export default topojson;
