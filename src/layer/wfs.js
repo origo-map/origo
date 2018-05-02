@@ -54,11 +54,9 @@ export default function wfs(layerOptions) {
         geometryName: options.geometryName
       }),
       loader(extent, resolution, projection) {
-        let url = `${serverUrl
-        }?service=WFS&` +
-          `version=1.1.0&request=GetFeature&typeName=${options.featureType
-          }&outputFormat=application/json` +
-          `&srsname=${options.projectionCode}`;
+        let url = [`${serverUrl}?service=WFS`,
+          `&version=1.1.0&request=GetFeature&typeName=${options.featureType}&outputFormat=application/json`,
+          `&srsname=${options.projectionCode}`].join('');
         url += options.strategy === 'all' ? queryFilter : `${queryFilter + extent.join(',')},${bboxProjectionCode}`;
         url = encodeURI(url);
         $.ajax({
