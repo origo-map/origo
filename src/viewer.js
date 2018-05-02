@@ -3,7 +3,7 @@ import View from 'ol/View';
 import Collection from 'ol/Collection';
 import Projection from 'ol/proj/Projection';
 import Feature from 'ol/Feature';
-import geom from 'ol/geom.*';
+import geom from 'ol/geom/geometry';
 import $ from 'jquery';
 import template from './templates/viewer.handlebars';
 import elQuery from './utils/elquery';
