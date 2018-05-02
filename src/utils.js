@@ -11,27 +11,27 @@ export default {
     if (options.tooltipText) {
       tooltip = `<span data-tooltip="${options.tooltipText}" data-placement="${placement}"></span>`;
     }
-    const el = `<div id="${options.id}" class="o-button-container o-tooltip">` +
-      `<button class="o-button ${cls}">${text}` +
-      `<svg class="${iconCls}">` +
-      `<use xlink:href="${options.src}"></use>` +
-      '</svg>' +
-      '</button>' +
-      `${tooltip}` +
-      '</div>';
+    const el = `<div id="${options.id}" class="o-button-container o-tooltip">
+      <button class="o-button ${cls}">${text}
+      <svg class="${iconCls}">
+      <use xlink:href="${options.src}"></use>
+      </svg>
+      </button>
+      ${tooltip}
+      </div>`;
     return el;
   },
   createListButton(options) {
-    const el = '<li>' +
-      `<div id="${options.id}-button" class="o-menu-button">` +
-      '<div class="o-button-icon">' +
-      `<svg class="${options.iconCls}">` +
-      `<use xlink:href="${options.src}"></use>` +
-      '</svg>' +
-      '</div>' +
-      `${options.text}` +
-      '</div>' +
-      '</li>';
+    const el = `<li>
+      <div id="${options.id}-button" class="o-menu-button">
+      <div class="o-button-icon">
+      <svg class="${options.iconCls}">
+      <use xlink:href="${options.src}"></use>
+      </svg>
+      </div>
+      ${options.text}
+      </div>
+      </li>`;
     return el;
   },
   createElement(el, val, attributes) {
