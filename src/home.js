@@ -1,18 +1,14 @@
-"use strict";
+import $ from 'jquery';
+import viewer from './viewer';
+import utils from './utils';
 
-var ol = require('openlayers');
-var $ = require('jquery');
-var Viewer = require('./viewer');
-var utils = require('./utils');
+const map = viewer.getMap();
+let tooltip;
+let extent;
 
-var map;
-var tooltip;
-var extent;
-
-function Init(opt_options) {
-  var options = opt_options || {};
-  var target = options.target || '#o-toolbar-navigation';
-  map = Viewer.getMap();
+function init(opt_options) {
+  const options = opt_options || {};
+  const target = options.target || '#o-toolbar-navigation';
   tooltip = options.tooltipText || 'Zooma till hela kartan';
   extent = options.extent || map.getView().calculateExtent(map.getSize());
   render(target);
@@ -20,7 +16,7 @@ function Init(opt_options) {
 }
 
 function render(target) {
-  var el = utils.createButton({
+  const el = utils.createButton({
     id: 'o-home-button',
     iconCls: 'o-icon-fa-home',
     src: '#fa-home',
@@ -30,11 +26,11 @@ function render(target) {
 }
 
 function bindUIActions() {
-  $('#o-home-button').on('click', function(e) {
+  $('#o-home-button').on('click', (e) => {
     map.getView().fit(extent);
     $('#o-home-button button').blur();
     e.preventDefault();
   });
 }
 
-module.exports.init = Init;
+export default init;
