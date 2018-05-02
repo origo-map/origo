@@ -1,14 +1,14 @@
-import wfs from './wfs.js';
-import ags_feature from './agsfeature.js';
-import topojson from './topojson.js';
-import geojson from './geojson.js';
-import wms from './wms.js';
-import wmts from './wmts.js';
-import ags_tile from './ags_tile.js';
-import xyz from './xyz.js';
-import osm from './osm.js';
-import vectortile from './vectortile.js';
-import feature from './featurelayer.js';
+import wfs from './wfs';
+import ags_feature from './agsfeature';
+import topojson from './topojson';
+import geojson from './geojson';
+import wms from './wms';
+import wmts from './wmts';
+import ags_tile from './agstile';
+import xyz from './xyz';
+import osm from './osm';
+import vectortile from './vectortile';
+import feature from './featurelayer';
 
 const type = {};
 

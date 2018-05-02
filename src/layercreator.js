@@ -1,8 +1,8 @@
 import $ from 'jquery';
-import viewer from './viewer.js';
-import mapUtils from './maputils.js';
-import group from './layer/group.js';
-import type from './layer/layertype.js';
+import viewer from './viewer';
+import mapUtils from './maputils';
+import group from './layer/group';
+import type from './layer/layertype';
 
 type.GROUP = groupLayer;
 
