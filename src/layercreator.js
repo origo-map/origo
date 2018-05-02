@@ -1,26 +1,13 @@
-"use strict";
+import $ from 'jquery';
+import viewer from './viewer';
+import mapUtils from './maputils';
+import group from './layer/group';
+import type from './layer/layertype';
 
-var $ = require('jquery');
-var viewer = require('./viewer');
-var mapUtils = require('./maputils');
-var group = require('./layer/group');
-var type = {};
-var layerCreator;
-type.WFS = require('./layer/wfs');
-type.AGS_FEATURE = require('./layer/agsfeature');
-type.TOPOJSON = require('./layer/topojson');
-type.GEOJSON = require('./layer/geojson');
-type.WMS = require('./layer/wms');
-type.WMTS = require('./layer/wmts');
-type.AGS_TILE = require('./layer/agstile');
-type.XYZ = require('./layer/xyz');
-type.OSM = require('./layer/osm');
-type.VECTORTILE = require('./layer/vectortile');
-type.FEATURE = require('./layer/featurelayer');
 type.GROUP = groupLayer;
 
-layerCreator = function layerCreator(opt_options) {
-  var defaultOptions = {
+const layerCreator = function layerCreator(opt_options) {
+  const defaultOptions = {
     name: undefined,
     id: undefined,
     title: undefined,
@@ -44,10 +31,10 @@ layerCreator = function layerCreator(opt_options) {
     attributes: undefined,
     tileSize: viewer.getTileSize()
   };
-  var projection = viewer.getProjection();
-  var options = opt_options || {};
-  var layerOptions = $.extend(defaultOptions, options);
-  var name = layerOptions.name;
+  const projection = viewer.getProjection();
+  const options = opt_options || {};
+  const layerOptions = $.extend(defaultOptions, options);
+  const name = layerOptions.name;
   layerOptions.minResolution = layerOptions.hasOwnProperty('minScale') ? mapUtils.scaleToResolution(layerOptions.minScale, projection): undefined;
   layerOptions.maxResolution = layerOptions.hasOwnProperty('maxScale') ? mapUtils.scaleToResolution(layerOptions.maxScale, projection): undefined;
   layerOptions.extent = layerOptions.extent || viewer.getExtent();
@@ -68,14 +55,12 @@ layerCreator = function layerCreator(opt_options) {
 }
 
 function groupLayer(options) {
-  var layers;
-  var layerOptions;
   if (options.hasOwnProperty('layers')) {
-    layers = options.layers.map(function(layer) {
+    const layers = options.layers.map(function(layer) {
       return layerCreator(layer);
     });
 
-    layerOptions = {};
+    const layerOptions = {};
     layerOptions.layers = layers;
     return group($.extend(options, layerOptions));
   } else {
@@ -83,4 +68,4 @@ function groupLayer(options) {
   }
 }
 
-module.exports = layerCreator;
+export default layerCreator;
