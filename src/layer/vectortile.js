@@ -1,20 +1,21 @@
-"use strict";
+import $ from 'jquery';
+import TopoJSONFormat from 'ol/format/TopoJSON';
+import GeoJSONFormat from 'ol/format/GeoJSON';
+import MVTFormat from 'ol/format/MVT';
+import VectorTileSource from 'ol/source/VectorTile';
+import viewer from '../viewer';
+import vector from './vector';
+import maputils from '../maputils';
 
-var ol = require('openlayers');
-var $ = require('jquery');
-var viewer = require('../viewer');
-var vector = require('./vector');
-var maputils = require('../maputils');
-
-var vectortile = function vectortile(layerOptions) {
-  var vectortileDefault = {
+const vectortile = function vectortile(layerOptions) {
+  const vectortileDefault = {
     layerType: 'vectortile',
     featureinfoLayer: undefined
   };
-  var sourceDefault = {};
-  var vectortileOptions = $.extend(vectortileDefault, layerOptions);
+  const sourceDefault = {};
+  const vectortileOptions = $.extend(vectortileDefault, layerOptions);
   vectortileOptions.sourceName = vectortileOptions.name;
-  var sourceOptions = $.extend(sourceDefault, viewer.getMapSource()[layerOptions.source]);
+  const sourceOptions = $.extend(sourceDefault, viewer.getMapSource()[layerOptions.source]);
   sourceOptions.attributions = vectortileOptions.attribution;
   sourceOptions.projection = viewer.getProjectionCode() || 'EPSG:3857';
 
@@ -30,31 +31,33 @@ var vectortile = function vectortile(layerOptions) {
     }
   }
 
-  var vectortileSource = createSource(sourceOptions, vectortileOptions);
+  const vectortileSource = createSource(sourceOptions, vectortileOptions);
   return vector(vectortileOptions, vectortileSource);
-}
+};
 
-function createSource(options, vectortileOptions) {
-  var format;
-  switch(vectortileOptions.format) {
+function createSource(opt, vectortileOptions) {
+  const options = opt;
+  let format;
+  switch (vectortileOptions.format) {
     case 'topojson':
-    format = new ol.format.TopoJSON();
-    break;
+      format = new TopoJSONFormat();
+      break;
     case 'geojson':
-    format = new ol.format.GeoJSON();
-    break;
+      format = new GeoJSONFormat();
+      break;
     case 'pbf':
-    format = new ol.format.MVT();
-    break;
+      format = new MVTFormat();
+      break;
+    default:
+      break;
   }
-  if(vectortileOptions.layerURL){
+  if (vectortileOptions.layerURL) {
     options.url += vectortileOptions.layerURL;
-  }
-  else {
-    options.url += vectortileOptions.layerName + '@'  + vectortileOptions.gridset + '@' + vectortileOptions.format + '/{z}/{x}/{-y}.'+ vectortileOptions.format;
+  } else {
+    options.url += `${vectortileOptions.layerName}@${vectortileOptions.gridset}@${vectortileOptions.format}/{z}/{x}/{-y}.${vectortileOptions.format}`;
   }
   options.format = format;
-  return new ol.source.VectorTile(options);
+  return new VectorTileSource(options);
 }
 
 module.exports = vectortile;
