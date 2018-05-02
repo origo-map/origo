@@ -1,5 +1,5 @@
-import LoadingStrategy from 'ol/LoadingStrategy';
-import TileGrid from 'ol/TileGrid';
+import LoadingStrategy from 'ol/loadingstrategy';
+import TileGrid from 'ol/tilegrid';
 import VectorSource from 'ol/source/Vector';
 import GeoJSONFormat from 'ol/format/GeoJSON';
 import $ from 'jquery';
