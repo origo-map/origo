@@ -1,4 +1,3 @@
-"use strict";
 import $ from 'jquery';
 import viewer from './viewer.js';
 import mapUtils from './maputils.js';
