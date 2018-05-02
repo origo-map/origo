@@ -12,38 +12,33 @@ import getFeatureInfo from './getfeatureinfo';
 
 const style = Style();
 
-var selectionLayer = undefined;
-var savedPin = undefined;
-var clickEvent;
-var options;
-var map;
-var pinning;
-var pinStyle;
-var selectionStyles;
-var showOverlay;
-var identifyTarget;
-var clusterFeatureinfoLevel;
-var overlay;
-var hitTolerance;
+let selectionLayer;
+let savedPin;
+let clickEvent;
+let options;
+let map;
+let pinning;
+let pinStyle;
+let selectionStyles;
+let showOverlay;
+let identifyTarget;
+let clusterFeatureinfoLevel;
+let overlay;
+let hitTolerance;
 
 function init(opt_options) {
   map = viewer.getMap();
-
   options = opt_options || {};
-
+  const pinStyleOptions = Object.prototype.hasOwnProperty.call(options, 'pinStyle') ? options.pinStyle : styleTypes.getStyle('pin');
+  const savedSelection = options.savedSelection || undefined;
   clickEvent = 'clickEvent' in options ? options.clickEvent : 'click';
-  pinning = options.hasOwnProperty('pinning') ? options.pinning : true;
-  var pinStyleOptions = options.hasOwnProperty('pinStyle') ? options.pinStyle : styleTypes.getStyle('pin');
+  pinning = Object.prototype.hasOwnProperty.call(options, 'pinning') ? options.pinning : true;
   pinStyle = style.createStyleRule(pinStyleOptions)[0];
   savedPin = options.savedPin ? maputils.createPointFeature(opt_options.savedPin, pinStyle) : undefined;
-
   selectionStyles = 'selectionStyles' in options ? style.createGeometryStyle(options.selectionStyles) : style.createEditStyle();
-
-  var savedSelection = options.savedSelection || undefined;
-  var savedFeature = savedPin || savedSelection || undefined;
+  const savedFeature = savedPin || savedSelection || undefined;
   selectionLayer = featurelayer(savedFeature, map);
-
-  showOverlay = options.hasOwnProperty('overlay') ? options.overlay : true;
+  showOverlay = Object.prototype.hasOwnProperty.call(options, 'overlay') ? options.overlay : true;
 
   if (showOverlay) {
     identifyTarget = 'overlay';
@@ -52,13 +47,11 @@ function init(opt_options) {
     identifyTarget = 'sidebar';
   }
 
-  clusterFeatureinfoLevel = options.hasOwnProperty('clusterFeatureinfoLevel') ? options.clusterFeatureinfoLevel : 1;
-
-  hitTolerance = options.hasOwnProperty('hitTolerance') ? options.hitTolerance : 0;
+  clusterFeatureinfoLevel = Object.prototype.hasOwnProperty.call(options, 'clusterFeatureinfoLevel') ? options.clusterFeatureinfoLevel : 1;
+  hitTolerance = Object.prototype.hasOwnProperty.call(options, 'hitTolerance') ? options.hitTolerance : 0;
 
   map.on(clickEvent, onClick);
   $(document).on('enableInteraction', onEnableInteraction);
-
 }
 
 function getSelectionLayer() {
@@ -66,7 +59,7 @@ function getSelectionLayer() {
 }
 
 function getSelection() {
-  var selection = {};
+  const selection = {};
   selection.geometryType = selectionLayer.getFeatures()[0].getGeometry().getType();
   selection.coordinates = selectionLayer.getFeatures()[0].getGeometry().getCoordinates();
   return selection;
@@ -82,67 +75,72 @@ function getHitTolerance() {
 
 function identify(items, target, coordinate) {
   clear();
-  var content = items.map(function(i) {
-    return i.content;
-  }).join('');
-  content = '<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme">' + content + '</div></div>';
+  let content = items.map(i => i.content).join('');
+  content = `<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme">${content}</div></div>`;
   switch (target) {
     case 'overlay':
-      var popup = Popup('#o-map');
+    {
+      const popup = Popup('#o-map');
       overlay = new Overlay({
         element: popup.getEl()
       });
       map.addOverlay(overlay);
-      var geometry = items[0].feature.getGeometry();
-      var coord;
-      geometry.getType() == 'Point' ? coord = geometry.getCoordinates() : coord = coordinate;
+      const geometry = items[0].feature.getGeometry();
+      const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
       overlay.setPosition(coord);
       popup.setContent({
-        content: content,
+        content,
         title: items[0].title
       });
       popup.setVisibility(true);
-      var owl = initCarousel('#o-identify-carousel', undefined, function() {
-        var currentItem = this.owl.currentItem;
+      initCarousel('#o-identify-carousel', undefined, function callback() {
+        const currentItem = this.owl.currentItem;
         selectionLayer.clearAndAdd(items[currentItem].feature.clone(), selectionStyles[items[currentItem].feature.getGeometry().getType()]);
         popup.setTitle(items[currentItem].title);
       });
       viewer.autoPan();
       break;
+    }
     case 'sidebar':
+    {
       sidebar.setContent({
-        content: content,
+        content,
         title: items[0].title
       });
       sidebar.setVisibility(true);
-      var owl = initCarousel('#o-identify-carousel', undefined, function() {
-        var currentItem = this.owl.currentItem;
+      initCarousel('#o-identify-carousel', undefined, function callback() {
+        const currentItem = this.owl.currentItem;
         selectionLayer.clearAndAdd(items[currentItem].feature.clone(), selectionStyles[items[currentItem].feature.getGeometry().getType()]);
         sidebar.setTitle(items[currentItem].title);
       });
       break;
+    }
+    default:
+    {
+      break;
+    }
   }
 }
 
 function onClick(evt) {
   savedPin = undefined;
-  //Featurinfo in two steps. Concat serverside and clientside when serverside is finished
-  var clientResult = getFeatureInfo.getFeaturesAtPixel(evt, clusterFeatureinfoLevel);
-  //Abort if clientResult is false
+  // Featurinfo in two steps. Concat serverside and clientside when serverside is finished
+  const clientResult = getFeatureInfo.getFeaturesAtPixel(evt, clusterFeatureinfoLevel);
+  // Abort if clientResult is false
   if (clientResult !== false) {
     getFeatureInfo.getFeaturesFromRemote(evt)
-      .done(function(data) {
-        var serverResult = data || [];
-        var result = serverResult.concat(clientResult);
+      .done((data) => {
+        const serverResult = data || [];
+        const result = serverResult.concat(clientResult);
         if (result.length > 0) {
           selectionLayer.clear();
-          identify(result, identifyTarget, evt.coordinate)
+          identify(result, identifyTarget, evt.coordinate);
         } else if (selectionLayer.getFeatures().length > 0) {
           clear();
         } else if (pinning) {
+          const resolution = map.getView().getResolution();
           sidebar.setVisibility(false);
-          var resolution = map.getView().getResolution();
-          setTimeout(function() {
+          setTimeout(() => {
             if (!maputils.checkZoomChange(resolution, map.getView().getResolution())) {
               savedPin = maputils.createPointFeature(evt.coordinate, pinStyle);
               selectionLayer.addFeature(savedPin);
@@ -168,7 +166,7 @@ function clear() {
   if (overlay) {
     viewer.removeOverlays(overlay);
   }
-  console.log("Clearing selection");
+  console.log('Clearing selection');
 }
 
 function onEnableInteraction(e) {
@@ -180,7 +178,7 @@ function onEnableInteraction(e) {
 }
 
 function initCarousel(id, options, cb) {
-  var carouselOptions = options || {
+  const carouselOptions = options || {
     navigation: true, // Show next and prev buttons
     slideSpeed: 300,
     paginationSpeed: 400,
