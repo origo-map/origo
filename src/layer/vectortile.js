@@ -7,6 +7,31 @@ import viewer from '../viewer';
 import vector from './vector';
 import maputils from '../maputils';
 
+function createSource(opt, vectortileOptions) {
+  const options = opt;
+  let format;
+  switch (vectortileOptions.format) {
+    case 'topojson':
+      format = new TopoJSONFormat();
+      break;
+    case 'geojson':
+      format = new GeoJSONFormat();
+      break;
+    case 'pbf':
+      format = new MVTFormat();
+      break;
+    default:
+      break;
+  }
+  if (vectortileOptions.layerURL) {
+    options.url += vectortileOptions.layerURL;
+  } else {
+    options.url += `${vectortileOptions.layerName}@${vectortileOptions.gridset}@${vectortileOptions.format}/{z}/{x}/{-y}.${vectortileOptions.format}`;
+  }
+  options.format = format;
+  return new VectorTileSource(options);
+}
+
 const vectortile = function vectortile(layerOptions) {
   const vectortileDefault = {
     layerType: 'vectortile',
@@ -35,29 +60,4 @@ const vectortile = function vectortile(layerOptions) {
   return vector(vectortileOptions, vectortileSource);
 };
 
-function createSource(opt, vectortileOptions) {
-  const options = opt;
-  let format;
-  switch (vectortileOptions.format) {
-    case 'topojson':
-      format = new TopoJSONFormat();
-      break;
-    case 'geojson':
-      format = new GeoJSONFormat();
-      break;
-    case 'pbf':
-      format = new MVTFormat();
-      break;
-    default:
-      break;
-  }
-  if (vectortileOptions.layerURL) {
-    options.url += vectortileOptions.layerURL;
-  } else {
-    options.url += `${vectortileOptions.layerName}@${vectortileOptions.gridset}@${vectortileOptions.format}/{z}/{x}/{-y}.${vectortileOptions.format}`;
-  }
-  options.format = format;
-  return new VectorTileSource(options);
-}
-
-module.exports = vectortile;
+export default vectortile;
