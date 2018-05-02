@@ -1,16 +1,14 @@
-"use strict";
+import $ from 'jquery';
+import utils from './utils';
+import modal from './modal';
 
-var $ = require('jquery');
-var Utils = require('./utils');
-var Modal = require('./modal');
+let $aboutButton;
+let buttonText;
+let title;
+let content;
 
-var $aboutButton;
-var buttonText;
-var title;
-var content;
-
-function init(opt_options) {
-  var options = opt_options || {};
+function init(opt) {
+  const options = opt || {};
   buttonText = options.buttonText || 'Om kartan';
   title = options.title || 'Om kartan';
   content = options.content || '<p></p>';
@@ -20,7 +18,7 @@ function init(opt_options) {
 }
 
 function render() {
-  var el = Utils.createListButton({
+  const el = utils.createListButton({
     id: 'o-about',
     iconCls: 'o-icon-fa-info-circle',
     src: '#fa-info-circle',
@@ -31,15 +29,15 @@ function render() {
 }
 
 function bindUIActions() {
-  $aboutButton.on('click', function(e) {
-    Modal.createModal('#o-map', {
-      title: title,
-      content: content
+  $aboutButton.on('click', (e) => {
+    modal.createModal('#o-map', {
+      title,
+      content
     });
 
-    Modal.showModal();
+    modal.showModal();
     e.preventDefault();
   });
 }
 
-module.exports.init = init;
+export default init;
