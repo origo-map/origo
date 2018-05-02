@@ -1,3 +1,4 @@
+import proj4 from 'proj4';
 import Map from 'ol/Map';
 import View from 'ol/View';
 import Collection from 'ol/Collection';

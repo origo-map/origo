@@ -5,8 +5,6 @@ import controlInitialiser from './src/controlinitialiser';
 import origoConfig from './conf/origoConfig';
 import controls from './conf/origoControls';
 
-window.proj4 = require('proj4');
-
 const origo = {};
 origo.map = {};
 origo.config = origoConfig;
