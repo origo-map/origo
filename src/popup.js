@@ -1,41 +1,41 @@
 import $ from 'jquery';
 
-export default function(target) {
+export default function (target) {
   render(target);
   bindUIActions();
   return {
-    getEl: getEl,
-    setVisibility: setVisibility,
-    setTitle: setTitle,
-    setContent: setContent,
-    closePopup: closePopup
-  }
+    getEl,
+    setVisibility,
+    setTitle,
+    setContent,
+    closePopup
+  };
 }
 
 function render(target) {
-  var pop = '<div id="o-popup">' +
-    '<div class="o-popup o-card">' +
-    '<div class="o-close-button"><svg class="o-icon-fa-times"><use xlink:href="#fa-times"></use></svg></div>' +
-    '<div class="o-card-title"></div>' +
-    '<div class="o-card-content"></div>' +
-    '</div>' +
-    '</div>';
+  const pop = `<div id="o-popup">
+  <div class="o-popup o-card">
+    <div class="o-close-button"><svg class="o-icon-fa-times"><use xlink:href="#fa-times"></use></svg></div>
+    <div class="o-card-title"></div>
+    <div class="o-card-content"></div>
+  </div>
+</div>`;
   $(target).append(pop);
 }
 
 function bindUIActions() {
-  $('#o-popup .o-popup .o-close-button').on('click', function(evt) {
+  $('#o-popup .o-popup .o-close-button').on('click', (evt) => {
     closePopup();
     evt.preventDefault();
   });
 }
 
 function getEl() {
-  return $("#o-popup").get(0);
+  return $('#o-popup').get(0);
 }
 
 function setVisibility(visible) {
-  visible == true ? $('#o-popup .o-popup').css('display', 'block') : $('#o-popup .o-popup').css('display', 'none');
+  visible === true ? $('#o-popup .o-popup').css('display', 'block') : $('#o-popup .o-popup').css('display', 'none');
 }
 
 function setTitle(title) {
