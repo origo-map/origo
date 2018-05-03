@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import dispatcher from './editdispatcher';
 
-export default function editStore() {
+export default function editsStore() {
   const edits = {};
 
   $(document).on('changeFeature', featureChange);
