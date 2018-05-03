@@ -1,26 +1,19 @@
-"use strict";
+import $ from 'jquery';
+import utils from './utils';
+import permalink from './permalink/permalink';
+import isEmbedded from './utils/isembedded';
+import viewer from './viewer';
 
-var $ = require('jquery');
-var utils = require('./utils');
-var permalink = require('./permalink/permalink');
-var isEmbedded = require('./utils/isembedded');
-var viewer = require('./viewer');
+let tooltip;
+let mapTarget;
 
-var tooltip;
-var mapTarget;
-
-function Init(opt_options) {
-  var options = opt_options || {};
-  var target = options.target || '#o-toolbar-misc';
-  mapTarget = viewer.getTarget();
-  tooltip = options.tooltipText || 'Visa stor karta';
-
-  render(target);
-  bindUIActions();
+function goFullScreen() {
+  const url = permalink.getPermalink();
+  window.open(url);
 }
 
 function render(target) {
-  var el = utils.createButton({
+  const el = utils.createButton({
     id: 'o-fullscreen-button',
     cls: 'o-fullscreen-button',
     iconCls: 'o-icon-fa-expand',
@@ -34,16 +27,21 @@ function render(target) {
 }
 
 function bindUIActions() {
-  $('#o-fullscreen-button button').click(function(e) {
+  $('#o-fullscreen-button button').click((e) => {
     goFullScreen();
     $('#o-fullscreen-button button').blur();
     e.preventDefault();
-  })
+  });
 }
 
-function goFullScreen() {
-  var url = permalink.getPermalink();
-  window.open(url);
+function Init(optOptions) {
+  const options = optOptions || {};
+  const target = options.target || '#o-toolbar-misc';
+  mapTarget = viewer.getTarget();
+  tooltip = options.tooltipText || 'Visa stor karta';
+
+  render(target);
+  bindUIActions();
 }
 
-module.exports.init = Init;
+export default Init;
