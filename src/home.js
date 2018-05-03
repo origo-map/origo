@@ -2,13 +2,14 @@ import $ from 'jquery';
 import viewer from './viewer';
 import utils from './utils';
 
-const map = viewer.getMap();
+let map;
 let tooltip;
 let extent;
 
 function init(opt_options) {
   const options = opt_options || {};
   const target = options.target || '#o-toolbar-navigation';
+  map = viewer.getMap();
   tooltip = options.tooltipText || 'Zooma till hela kartan';
   extent = options.extent || map.getView().calculateExtent(map.getSize());
   render(target);

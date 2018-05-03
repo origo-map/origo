@@ -20,4 +20,4 @@ function init() {
   map.addControl(rotateControl);
 }
 
-export default init;
+export default { init };
