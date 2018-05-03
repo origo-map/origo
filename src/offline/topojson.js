@@ -1,28 +1,27 @@
-"use strict";
-var ol = require('openlayers');
-var $ = require('jquery');
-var verifyFeatureIds = require('./verifyfeatureids');
+import $ from 'jquery';
+import TopoJSONFormat from 'ol/format/TopoJSON';
+import verifyFeatureIds from './verifyfeatureids';
 
-var topoJson = {};
+const topoJson = {};
 topoJson.request = function request(layer) {
-  var source = layer.get('sourceName');
-  var request = createRequest(source);
-  return request;
+  const source = layer.get('sourceName');
+  const req = createRequest(source);
+  return req;
 
   function createRequest(source) {
-    var format = new ol.format.TopoJSON();
-    var url = source;
+    const format = new TopoJSONFormat();
+    const url = source;
 
     return $.ajax({
-        url: url,
-        cache: false
-      })
-      .then(function(response) {
-        var features = format.readFeatures(response);
+      url,
+      cache: false
+    })
+      .then((response) => {
+        let features = format.readFeatures(response);
         features = verifyFeatureIds(features);
         return features;
       });
   }
-}
+};
 
-module.exports = topoJson;
+export default topoJson;

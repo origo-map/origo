@@ -1,19 +1,17 @@
-"use strict";
+import $ from 'jquery';
+import viewer from '../viewer';
+import template from './downloader.template.handlebars';
+import spinner from '../components/spinner.handlebars';
+import utils from '../utils';
+import dispatcher from './offlinedispatcher';
 
-var $ = require('jquery');
-var Viewer = require('../viewer');
-var template = require("./downloader.template.handlebars");
-var spinner = require("../components/spinner.handlebars");
-var utils = require('../utils');
-var dispatcher = require('./offlinedispatcher');
+const toolbarPrefix = 'o-downloader-td-toolbar-';
 
-var toolbarPrefix = 'o-downloader-td-toolbar-';
-
-var Downloader = function Downloader(layersObj) {
+const Downloader = function Downloader(layersObj) {
   render(layersObj);
   addListeners();
 
-  function render(layersObj) {
+  function render() {
     $('#o-map').prepend(template);
     renderRows(layersObj);
 
@@ -26,46 +24,45 @@ var Downloader = function Downloader(layersObj) {
   }
 
   function onChangeOfflineStart(e) {
-    renderButtons('#' + toolbarPrefix + e.layerName, 'pending', e.layerName);
+    renderButtons(`#${toolbarPrefix}${e.layerName}`, 'pending', e.layerName);
   }
 
   function onChangeOfflineEnd(e) {
-    renderButtons('#' + toolbarPrefix + e.layerName, e.state, e.layerName);
+    renderButtons(`#${toolbarPrefix}${e.layerName}`, e.state, e.layerName);
   }
 
   function bindUIActions() {
-    $('.o-downloader .o-close-button').on('click', function(evt) {
-        closeDownloader();
-        evt.preventDefault();
+    $('.o-downloader .o-close-button').on('click', (evt) => {
+      closeDownloader();
+      evt.preventDefault();
     });
   }
 
-  function renderRows(layersObj) {
-    var layerNames = Object.getOwnPropertyNames(layersObj);
-    layerNames.forEach(function(layerName) {
+  function renderRows() {
+    const layerNames = Object.getOwnPropertyNames(layersObj);
+    layerNames.forEach((layerName) => {
       renderRow(layerName, layersObj);
     });
   }
 
-  function renderRow(layerName, layersObj) {
-    var layer = Viewer.getLayer(layerName);
-    var tdTitle = utils.createElement('td', layer.get('title'),{});
-    var toolbarId = toolbarPrefix + layerName;
-    var toolbar = utils.createElement('div', '', {
+  function renderRow(layerName) {
+    const layer = viewer.getLayer(layerName);
+    const tdTitle = utils.createElement('td', layer.get('title'), {});
+    const toolbarId = toolbarPrefix + layerName;
+    const toolbar = utils.createElement('div', '', {
       cls: 'o-toolbar-horizontal',
       style: 'text-align: right; float: right;',
       id: toolbarId
     });
-    var tdToolbar = utils.createElement('td', toolbar, {});
-    var row = tdTitle + tdToolbar;
-    var cls = 'o-downloader-tr-' + layerName;
-    var tr = utils.createElement('tr', row, {
-      cls: cls
+    const tdToolbar = utils.createElement('td', toolbar, {});
+    const row = tdTitle + tdToolbar;
+    const cls = `o-downloader-tr-${layerName}`;
+    const tr = utils.createElement('tr', row, {
+      cls
     });
-    var state;
     $('.o-downloader .o-table').append(tr);
-    state =  layersObj[layerName].downloaded === true ? 'offline' : 'download';
-    renderButtons('#' + toolbarId, state, layerName);
+    const state = layersObj[layerName].downloaded === true ? 'offline' : 'download';
+    renderButtons(`#${toolbarId}`, state, layerName);
   }
 
   function renderButtons(target, state, layerName) {
@@ -81,40 +78,40 @@ var Downloader = function Downloader(layersObj) {
   }
 
   function renderSync(target, layerName) {
-    var id = 'o-downloader-refresh-' + layerName;
-    var refresh = createButton({
+    const id = 'o-downloader-refresh-' + layerName;
+    const refresh = createButton({
       href: '#fa-refresh',
       cls: 'o-icon-fa-refresh',
-      id: id
+      id
     });
     $(target).append(refresh);
-    bindAction('#' + id, layerName, 'sync');
+    bindAction(`#${id}`, layerName, 'sync');
   }
 
   function renderRemove(target, layerName) {
-    var id = 'o-downloader-trash-' + layerName;
-    var trash = createButton({
+    const id = `o-downloader-trash-${layerName}`;
+    const trash = createButton({
       href: '#fa-trash',
       cls: 'o-icon-fa-trash',
-      id: id
+      id
     });
     $(target).append(trash);
-    bindAction('#' + id, layerName, 'remove');
+    bindAction(`#${id}`, layerName, 'remove');
   }
 
   function renderDownload(target, layerName) {
-    var id = 'o-downloader-download-' + layerName;
-    var download = createButton({
+    const id = `o-downloader-download-${layerName}`;
+    const download = createButton({
       href: '#fa-download',
       cls: 'o-icon-fa-download',
-      id: id
+      id
     });
     $(target).append(download);
-    bindAction('#' + id, layerName, 'download');
+    bindAction(`#${id}`, layerName, 'download');
   }
 
   function renderPending(target) {
-    var spinnerButton = utils.createElement('button', '', {
+    const spinnerButton = utils.createElement('button', '', {
       cls: 'o-spinner'
     });
     $(target).append(spinnerButton);
@@ -122,7 +119,7 @@ var Downloader = function Downloader(layersObj) {
   }
 
   function createButton(obj) {
-    var icon = utils.createSvg({
+    const icon = utils.createSvg({
       href: obj.href,
       cls: obj.cls
     });
@@ -136,13 +133,12 @@ var Downloader = function Downloader(layersObj) {
   }
 
   function bindAction(target, layerName, type) {
-    $(target).on('click', function(evt) {
+    $(target).on('click', (evt) => {
       dispatcher.emitChangeDownload(layerName, type);
       evt.preventDefault();
       evt.stopPropagation();
     });
   }
+};
 
-}
-
-module.exports = Downloader;
+export default Downloader;

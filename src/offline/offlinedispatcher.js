@@ -1,19 +1,10 @@
-"use strict";
-
-var $ = require('jquery');
-
-module.exports = {
-  emitChangeOffline: emitChangeOffline,
-  emitChangeDownload: emitChangeDownload,
-  emitChangeOfflineStart: emitChangeOfflineStart,
-  emitChangeOfflineEnd: emitChangeOfflineEnd
-}
+import $ from 'jquery';
 
 function emitChangeOffline(layerName, action, ids) {
   $.event.trigger({
     type: 'changeOffline',
-    layerName: layerName,
-    action: action,
+    layerName,
+    action,
     ids: ids || undefined
   });
 }
@@ -21,22 +12,29 @@ function emitChangeOffline(layerName, action, ids) {
 function emitChangeDownload(layerName, action) {
   $.event.trigger({
     type: 'changeDownload',
-    layerName: layerName,
-    action: action
+    layerName,
+    action
   });
 }
 
 function emitChangeOfflineStart(layerName) {
   $.event.trigger({
     type: 'changeOfflineStart',
-    layerName: layerName
+    layerName
   });
 }
 
 function emitChangeOfflineEnd(layerName, state) {
   $.event.trigger({
     type: 'changeOfflineEnd',
-    layerName: layerName,
-    state: state
+    layerName,
+    state
   });
 }
+
+export default {
+  emitChangeOffline,
+  emitChangeDownload,
+  emitChangeOfflineStart,
+  emitChangeOfflineEnd
+};

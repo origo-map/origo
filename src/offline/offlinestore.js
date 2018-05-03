@@ -1,35 +1,26 @@
-var $ = require('jquery');
-var ol = require('openlayers');
-var viewer = require('../viewer');
-var localforage = require('localforage');
-var offlineLayer = require('./offlinelayer')();
-var dispatcher = require('./offlinedispatcher');
-var editorDispatcher = require('../editor/editdispatcher');
-var format = new ol.format.GeoJSON();
-var storage = {};
-var editsStorage = {};
-var offlineLayers = {};
-var storageName;
-var editsStorageName;
-var map;
+import $ from 'jquery';
+import GeoJSONFormat from 'ol/format/GeoJSON';
+import localforage from 'localforage';
+import viewer from '../viewer';
+import dispatcher from './offlinedispatcher';
+import editorDispatcher from '../editor/editdispatcher';
+import OfflineLayer from './offlinelayer';
+
+const offlineLayer = OfflineLayer();
+
+const format = new GeoJSONFormat();
+const storage = {};
+const editsStorage = {};
+const offlineLayers = {};
+let storageName;
+let editsStorageName;
 
 function offlineStore() {
-
-  return {
-    getOfflineLayers: getOfflineLayers,
-    getOfflineLayer: getOfflineLayer,
-    getOfflineEdits: getOfflineEdits,
-    getEditsItems: getEditsItems,
-    init: Init
-  };
-
-  function Init(opt_options) {
-    var options = opt_options || {};
-    var layerNames;
-    map = viewer.getMap();
+  function init(optOptions) {
+    const options = optOptions || {};
+    const layerNames = viewer.getLayersByProperty('offline', true, true);
     storageName = options.name || 'origo-layers';
     editsStorageName = options.editsName || 'origo-layers-edits';
-    layerNames = viewer.getLayersByProperty('offline', true, true);
     setOfflineLayers(layerNames);
     storage = createInstances(layerNames, storageName);
     editsStorage = createInstances(layerNames, editsStorageName);
@@ -40,10 +31,10 @@ function offlineStore() {
   }
 
   function createInstances(layerNames, name) {
-    var instances = {};
-    layerNames.forEach(function(layerName) {
+    const instances = {};
+    layerNames.forEach((layerName) => {
       instances[layerName] = localforage.createInstance({
-        name: name,
+        name,
         storeName: layerName
       });
     });
@@ -62,14 +53,14 @@ function offlineStore() {
   function getOfflineEdits(layerName) {
     if (offlineLayers[layerName].edits) {
       return getEditsItems(layerName);
-    } else {
-      return undefined;
     }
+
+    return undefined;
   }
 
   function setOfflineLayers(layerNames) {
-    layerNames.forEach(function(layerName) {
-      var layer = viewer.getLayer(layerName);
+    layerNames.forEach((layerName) => {
+      const layer = viewer.getLayer(layerName);
       layer.set('onlineType', layer.get('type'));
       offlineLayers[layerName] = createOfflineObj();
       offlineLayer.setOfflineSource(layerName, []);
@@ -89,9 +80,7 @@ function offlineStore() {
 
   function onChangeOfflineEdits(e) {
     e.stopImmediatePropagation();
-    if (editsStorage[e.layerName]) {
-
-    } else {
+    if (editsStorage[e.layerName] === undefined) {
       editsStorage[e.layerName] = localforage.createInstance({
         name: editsStorageName,
         storeName: e.layerName
@@ -111,7 +100,7 @@ function offlineStore() {
   function onDownload(layerName) {
     if (offlineLayers[layerName].downloaded) {
       storage[layerName].clear()
-        .then(function() {
+        .then(() => {
           saveFeaturesToStorage(layerName);
         });
     } else {
@@ -120,17 +109,13 @@ function offlineStore() {
   }
 
   function ondEdits(layerName, ids) {
-    var promises = ids.map(function(id) {
-      return removeFromEditsStorage(id, layerName);
-    });
-    return Promise.all(promises).then(function() {
-      return true;
-    });
+    const promises = ids.map(id => removeFromEditsStorage(id, layerName));
+    return Promise.all(promises).then(() => true);
   }
 
   function onRemove(layerName) {
     if (offlineLayers[layerName].edits) {
-      var proceed = confirm('Du har fortfarande offline-ändringar som inte är sparade. Om du fortsätter kommer dessa att försvinna.');
+      const proceed = confirm('Du har fortfarande offline-ändringar som inte är sparade. Om du fortsätter kommer dessa att försvinna.');
       if (proceed) {
         removeDownloaded(layerName);
       }
@@ -142,7 +127,7 @@ function offlineStore() {
   function removeDownloaded(layerName) {
     if (offlineLayers[layerName]) {
       return storage[layerName].clear()
-        .then(function() {
+        .then(() => {
           setLayerOnline(layerName);
           dispatcher.emitChangeOfflineEnd(layerName, 'download');
         });
@@ -153,7 +138,7 @@ function offlineStore() {
     return {
       downloaded: false,
       edits: false
-    }
+    };
   }
 
   function setDownloaded(layerName, downloaded) {
@@ -173,67 +158,59 @@ function offlineStore() {
   }
 
   function saveFeaturesToStorage(layerName) {
-    var features;
     if (storage[layerName]) {
-      features = viewer.getLayer(layerName).getSource().getFeatures();
+      const features = viewer.getLayer(layerName).getSource().getFeatures();
       setItems(layerName, features);
     } else {
-      console.log(layerName + ' is missing in storage');
+      console.log(`${layerName} is missing in storage`);
     }
   }
 
   function setItems(layerName, features) {
-    var promises = features.map(function(feature) {
-      var id = feature.getId();
-      var obj = format.writeFeatureObject(feature);
+    const promises = features.map((feature) => {
+      const id = feature.getId();
+      const obj = format.writeFeatureObject(feature);
       return storage[layerName].setItem(id, obj);
     });
-    Promise.all(promises).then(function(results) {
+    Promise.all(promises).then(() => {
       setLayerOffline(layerName, features);
       dispatcher.emitChangeOfflineEnd(layerName, 'offline');
     });
   }
 
   function getItems(layerName) {
-    var layer = viewer.getLayer(layerName);
-    var geometryName = layer.get('geometryName');
-    var features = [];
-    return storage[layerName].iterate(function(value, key, index) {
-        var storedFeature = format.readFeature(value);
-        var feature = restoreGeometryName(storedFeature, geometryName);
-        features.push(feature);
-      })
-      .then(function() {
-        return features;
-      });
+    const layer = viewer.getLayer(layerName);
+    const geometryName = layer.get('geometryName');
+    const features = [];
+    return storage[layerName].iterate((value, key, index) => {
+      const storedFeature = format.readFeature(value);
+      const feature = restoreGeometryName(storedFeature, geometryName);
+      features.push(feature);
+    })
+      .then(() => features);
   }
 
   function getEditsItems(layerName) {
-    var layer = viewer.getLayer(layerName);
-    var items = [];
-    return editsStorage[layerName].iterate(function(value, key, index) {
-        var obj = {};
-        obj[key] = value;
-        items.push(obj);
-      })
-      .then(function() {
-        return items;
-      });
+    const items = [];
+    return editsStorage[layerName].iterate((value, key, index) => {
+      const obj = {};
+      obj[key] = value;
+      items.push(obj);
+    })
+      .then(() => items);
   }
 
   function initLayers() {
-    var layerNames = Object.getOwnPropertyNames(storage);
-    layerNames.forEach(function(layerName) {
-      getItems(layerName).then(function(features) {
-        var layer;
+    const layerNames = Object.getOwnPropertyNames(storage);
+    layerNames.forEach((layerName) => {
+      getItems(layerName).then((features) => {
         if (features.length) {
           setLayerOffline(layerName, features);
         } else {
           setLayerOnline(layerName, features);
         }
       });
-      getEditsItems(layerName).then(function(items) {
-        var layer;
+      getEditsItems(layerName).then((items) => {
         if (items.length) {
           setEdits(layerName, true);
         } else {
@@ -254,11 +231,11 @@ function offlineStore() {
   }
 
   function saveUpdate(updates, layerName) {
-    updates.forEach(function(feature) {
-      var id = feature.getId();
-      var action = 'update';
+    updates.forEach((feature) => {
+      const id = feature.getId();
+      const action = 'update';
       editsStorage[layerName].getItem(id)
-        .then(function(result) {
+        .then((result) => {
           if (result === null) {
             saveToEditsStorage(feature, layerName, action);
           } else {
@@ -269,23 +246,23 @@ function offlineStore() {
   }
 
   function saveInsert(inserts, layerName) {
-    inserts.forEach(function(feature) {
-      var action = 'insert';
+    inserts.forEach((feature) => {
+      const action = 'insert';
       saveToEditsStorage(feature, layerName, action);
     });
   }
 
   function saveDelete(deletes, layerName) {
-    deletes.forEach(function(feature) {
-      var id = feature.getId();
-      var action = 'delete';
+    deletes.forEach((feature) => {
+      const id = feature.getId();
+      const action = 'delete';
       editsStorage[layerName].getItem(id)
-        .then(function(result) {
+        .then((result) => {
           if (result === null) {
             saveToEditsStorage(feature, layerName, action);
           } else if (result === 'insert') {
             removeFromEditsStorage(feature.getId(), layerName)
-              .then(function() {
+              .then(() => {
                 emitChangeFeature(feature, layerName, action);
               });
           } else {
@@ -296,9 +273,9 @@ function offlineStore() {
   }
 
   function saveToEditsStorage(feature, layerName, action) {
-    var id = feature.getId();
+    const id = feature.getId();
     editsStorage[layerName].setItem(id, action)
-      .then(function() {
+      .then(() => {
         setEdits(layerName, true);
         saveFeatureToStorage(feature, layerName, action);
       });
@@ -306,9 +283,9 @@ function offlineStore() {
 
   function removeFromEditsStorage(id, layerName) {
     return editsStorage[layerName].removeItem(id)
-      .then(function() {
+      .then(() => {
         editsStorage[layerName].length()
-          .then(function(nr) {
+          .then((nr) => {
             if (nr > 0) {
               setEdits(layerName, true);
             } else {
@@ -319,9 +296,9 @@ function offlineStore() {
   }
 
   function saveFeatureToStorage(feature, layerName, action) {
-    var id = feature.getId();
+    const id = feature.getId();
     storage[layerName].setItem(id, format.writeFeatureObject(feature))
-      .then(function() {
+      .then(() => {
         emitChangeFeature(feature, layerName, action);
       });
   }
@@ -329,20 +306,27 @@ function offlineStore() {
   function emitChangeFeature(feature, layerName, action) {
     editorDispatcher.emitChangeFeature({
       feature: [feature],
-      layerName: layerName,
+      layerName,
       status: 'finished',
-      action: action
+      action
     });
   }
 
   function restoreGeometryName(feature, geometryName) {
-    var geometry = feature.getGeometry();
+    const geometry = feature.getGeometry();
     feature.unset(feature.getGeometryName());
     feature.setGeometryName(geometryName);
     feature.setGeometry(geometry);
     return feature;
   }
 
+  return {
+    getOfflineLayers,
+    getOfflineLayer,
+    getOfflineEdits,
+    getEditsItems,
+    init
+  };
 }
 
-module.exports = offlineStore;
+export default offlineStore;
