@@ -4,8 +4,11 @@ const controlInitialiser = (controls) => {
   controls.forEach((control) => {
     controlName = control.name;
     controlOptions = control.options || undefined;
-    if (origo.controls.hasOwnProperty(controlName)) {
-      controlOptions ? origo.controls[controlName].init(controlOptions) : origo.controls[controlName].init();
+    if (controlName in origo.controls) {
+      if (controlOptions) {
+        origo.controls[controlName].init(controlOptions);
+      }
+      origo.controls[controlName].init();
     }
   });
 };
