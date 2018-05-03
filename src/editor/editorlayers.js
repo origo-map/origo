@@ -1,31 +1,31 @@
-"use strict";
+import $ from 'jquery';
+import viewer from '../viewer';
+import dropDown from '../dropdown';
+import dispatcher from './editdispatcher';
+import utils from '../utils';
 
-var $ = require('jquery');
-var viewer = require('../viewer');
-var dropDown = require('../dropdown');
-var dispatcher = require('./editdispatcher');
-var createElement = require('../utils').createElement;
+const createElement = utils.createElement;
 
-module.exports = function editorLayers(editableLayers, opt_options) {
-  var active = false;
-  var activeCls = 'o-active';
-  var target = 'editor-toolbar-layers-dropdown';
-  var defaultOptions = {
-    target: target,
+export default function editorLayers(editableLayers, optOptions = {}) {
+  let active = false;
+  const activeCls = 'o-active';
+  const target = 'editor-toolbar-layers-dropdown';
+  const defaultOptions = {
+    target,
     selectOptions: selectionModel(editableLayers),
     activeLayer: editableLayers[0]
   };
-  var renderOptions = $.extend(defaultOptions, opt_options);
+  const renderOptions = $.extend(defaultOptions, optOptions);
 
   render(renderOptions);
   addListener(target);
 
   function render(options) {
-    var popover = createElement('div', '', {
+    const popover = createElement('div', '', {
       id: options.target,
       cls: 'o-popover'
     });
-    $('#' + 'o-editor-layers').after(popover);
+    $('#o-editor-layers').after(popover);
     dropDown(options.target, options.selectOptions, {
       dataAttribute: 'layer',
       active: options.activeLayer
@@ -33,7 +33,7 @@ module.exports = function editorLayers(editableLayers, opt_options) {
   }
 
   function addListener() {
-    $('#' + target).on('changeDropdown', function(e) {
+    $(`#${target}`).on('changeDropdown', (e) => {
       e.stopImmediatePropagation(e);
       setActive(false);
       dispatcher.emitToggleEdit('edit', {
@@ -65,10 +65,10 @@ module.exports = function editorLayers(editableLayers, opt_options) {
   function setActive(state) {
     if (state) {
       active = true;
-      $('#' + target).addClass(activeCls);
+      $(`#${target}`).addClass(activeCls);
     } else {
       active = false;
-      $('#' + target).removeClass(activeCls);
+      $(`#${target}`).removeClass(activeCls);
     }
     dispatcher.emitChangeEdit('layers', active);
   }
@@ -80,8 +80,8 @@ module.exports = function editorLayers(editableLayers, opt_options) {
   }
 
   function selectionModel(layerNames) {
-    var selectOptions = layerNames.map(function(layerName) {
-      var obj = {};
+    const selectOptions = layerNames.map((layerName) => {
+      const obj = {};
       obj.name = viewer.getLayer(layerName).get('title');
       obj.value = layerName;
       return obj;
