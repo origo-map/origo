@@ -325,7 +325,7 @@ function createGroup(group, parentGroup, prepend) {
     parentGroup.append(legendGroup);
   } else {
     legendGroup = `<li>
-                    <ul id="o-group-'}${group.name}" class="o-legend-group">
+                    <ul id="o-group-${group.name}" class="o-legend-group">
                       <li class="o-legend-header"><div class="o-legend-item">
                         ${group.title}
                       <div class="o-icon-expand">

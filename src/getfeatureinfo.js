@@ -141,7 +141,7 @@ function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
   let cluster = false;
   map.forEachFeatureAtPixel(evt.pixel, (feature, layer) => {
     const l = layer;
-    const queryable = false;
+    let queryable = false;
     if (layer) {
       queryable = layer.get('queryable');
     }
