@@ -1,9 +1,9 @@
 export default function trimUrl(url) {
-  var trimmed;
+  let trimmed;
   if (url.substring(url.lastIndexOf('/')).indexOf('.htm') !== -1) {
     trimmed = url.substring(0, url.lastIndexOf('/') + 1);
   } else if (url.substr(url.length - 1) !== '/') {
-    trimmed = url + '/';
+    trimmed = `${url}/`;
   } else {
     trimmed = url;
   }
