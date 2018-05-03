@@ -1,10 +1,13 @@
 import $ from 'jquery';
 
-const modal = function() {
-
+const modal = function modal() {
   let isStatic;
   let $target;
   let modalEl;
+
+  function closeModal() {
+    $('#o-modal').remove();
+  }
 
   function render(title, content, cls) {
     modalEl = `<div id="o-modal" class=${cls}">
@@ -19,11 +22,11 @@ const modal = function() {
 
   function bindUIActions() {
     if (isStatic === false) {
-      $('.o-modal-screen, .o-close-button').click(function () {
+      $('.o-modal-screen, .o-close-button').click(() => {
         closeModal();
       });
     } else {
-      $('.o-close-button').click(function() {
+      $('.o-close-button').click(() => {
         closeModal();
       });
     }
@@ -33,7 +36,7 @@ const modal = function() {
     const title = options.title || '';
     const content = options.content || '';
     const cls = options.cls || '';
-    if (options.hasOwnProperty('static')) {
+    if (Object.prototype.hasOwnProperty.call(options, 'static')) {
       isStatic = options.static;
     } else {
       isStatic = false;
@@ -48,10 +51,6 @@ const modal = function() {
     bindUIActions();
   }
 
-  function closeModal() {
-    $('#o-modal').remove();
-  }
-
   return {
     createModal,
     showModal,
@@ -59,4 +58,4 @@ const modal = function() {
   };
 };
 
-module.exports = modal();
+export default modal;

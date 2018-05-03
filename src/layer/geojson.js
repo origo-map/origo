@@ -6,10 +6,10 @@ import vector from './vector';
 import isUrl from '../utils/isurl';
 
 function createSource(options) {
-  return VectorSource({
+  return new VectorSource({
     attributions: options.attribution,
     url: options.url,
-    format: GeoJSON()
+    format: new GeoJSON()
   });
 }
 

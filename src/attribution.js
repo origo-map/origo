@@ -1,18 +1,15 @@
-"use strict";
+import Attribution from 'ol/control/Attribution';
+import $ from 'jquery';
+import viewer from './viewer';
 
-var ol = require('openlayers');
-var $ = require('jquery');
-var Viewer = require('./viewer');
+let map;
 
-var map;
+function init(opt) {
+  const options = opt || {};
+  const breakPoint = options.breakPoint || [768, 500];
+  map = viewer.getMap();
 
-function Init(opt_options) {
-  var options = opt_options || {};
-  var breakPoint = options.breakPoint || [768, 500];
-  var attribution;
-  map = Viewer.getMap();
-
-  attribution = new ol.control.Attribution({
+  const attribution = new Attribution({
     collapsible: false
   });
 
@@ -22,11 +19,11 @@ function Init(opt_options) {
   checkSize();
 
   function checkSize() {
-    var mapSize = map.getSize();
-    var collapsed = (mapSize[0] <= breakPoint[0] || mapSize[1] <= breakPoint[1]);
+    const mapSize = map.getSize();
+    const collapsed = (mapSize[0] <= breakPoint[0] || mapSize[1] <= breakPoint[1]);
     attribution.setCollapsible(collapsed);
     attribution.setCollapsed(collapsed);
   }
 }
 
-module.exports.init = Init;
+export default init;

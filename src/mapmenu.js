@@ -1,89 +1,84 @@
-"use strict";
+import $ from 'jquery';
+import utils from './utils';
+import viewer from './viewer';
 
-var $ = require('jquery');
-var viewer = require('./viewer');
-var utils = require('./utils');
+let $closeButton;
+let $mapMenu;
+let $menuButton;
 
-var $menuButton, $closeButton, $mapMenu;
+let options;
+let isActive;
 
-var symbolSize = 20;
-var styleSettings;
-var options;
-var isActive;
+function init(opt) {
+  options = opt || {};
+  isActive = options.isActive || false;
+  const breakPointSize = options.breakPointSize || 'l';
+  const breakPoint = viewer.getBreakPoints(breakPointSize);
 
-function init(opt_options) {
-    var breakPointSize;
-    var breakPoint;
+  const el = utils.createButton({
+    text: 'Meny',
+    id: 'o-mapmenu-button',
+    cls: 'o-mapmenu-button-true',
+    iconCls: 'o-icon-fa-bars',
+    src: '#fa-bars',
+    tooltipText: 'Meny',
+    tooltipPlacement: 'west'
+  });
+  $('#o-map').append(el);
+  $menuButton = $('#o-mapmenu-button button');
 
-    options = opt_options || {};
-    isActive = options.isActive || false;
-    breakPointSize = options.breakPointSize || 'l';
-    breakPoint  = viewer.getBreakPoints(breakPointSize);
-    styleSettings = viewer.getStyleSettings();
+  const menuEl = `<div id="o-mapmenu" class="o-mapmenu">
+  <div class="o-block">
+    <ul id="o-menutools">
+      <li></li>
+    </ul>
+  </div>
+</div>`;
+  $('#o-map').append(menuEl);
+  $mapMenu = $('#o-mapmenu');
 
-    var el = utils.createButton({
-        text: 'Meny',
-        id: 'o-mapmenu-button',
-        cls: 'o-mapmenu-button-true',
-        iconCls: 'o-icon-fa-bars',
-        src: '#fa-bars',
-        tooltipText: 'Meny',
-        tooltipPlacement: 'west'
-    });
-    $('#o-map').append(el);
-    $menuButton = $('#o-mapmenu-button button');
+  const closeButton = utils.createButton({
+    id: 'o-mapmenu-button-close',
+    cls: 'o-no-boxshadow',
+    iconCls: 'o-icon-menu-fa-times',
+    src: '#fa-times',
+    tooltipText: 'Stäng meny',
+    tooltipPlacement: 'west'
+  });
+  $('#o-menutools').append(closeButton);
+  $closeButton = $('#o-mapmenu-button-close');
 
-    var menuEl = '<div id="o-mapmenu" class="o-mapmenu">' +
-                    '<div class="o-block">' +
-                      '<ul id="o-menutools">' +
-                        '<li></li>' +
-                      '</ul>'
-                    '</div>' +
-                  '</div>';
-    $('#o-map').append(menuEl);
-    $mapMenu = $('#o-mapmenu');
+  bindUIActions();
 
-    var closeButton = utils.createButton({
-        id: 'o-mapmenu-button-close',
-        cls: 'o-no-boxshadow',
-        iconCls: 'o-icon-menu-fa-times',
-        src: '#fa-times',
-        tooltipText: 'Stäng meny',
-        tooltipPlacement: 'west'
-    });
-    $('#o-menutools').append(closeButton);
-    $closeButton = $('#o-mapmenu-button-close');
-
-    bindUIActions();
-
-    if(isActive && $('#o-map').width() >= breakPoint[0]) {
-      toggleMenu();
-    }
+  if (isActive && $('#o-map').width() >= breakPoint[0]) {
+    toggleMenu();
+  }
 }
 function bindUIActions() {
-    $menuButton.on('click', function(e) {
-      	toggleMenu();
-        $menuButton.blur();
-        e.preventDefault();
-    });
-    $closeButton.on('click', function(e) {
-      	toggleMenu();
-        $closeButton.blur();
-        e.preventDefault();
-    });
+  $menuButton.on('click', (e) => {
+    toggleMenu();
+    $menuButton.blur();
+    e.preventDefault();
+  });
+  $closeButton.on('click', (e) => {
+    toggleMenu();
+    $closeButton.blur();
+    e.preventDefault();
+  });
 }
 function toggleMenu() {
-    if($mapMenu.hasClass('o-mapmenu-show')){
-      $mapMenu.removeClass('o-mapmenu-show');
-    }
-    else {
-      $mapMenu.addClass('o-mapmenu-show');
-    }
+  if ($mapMenu.hasClass('o-mapmenu-show')) {
+    $mapMenu.removeClass('o-mapmenu-show');
+  } else {
+    $mapMenu.addClass('o-mapmenu-show');
+  }
 }
 function getTarget() {
-    return $mapMenu;
+  return $mapMenu;
 }
 
-module.exports.init = init;
-module.exports.toggleMenu = toggleMenu;
-module.exports.getTarget = getTarget;
+export default {
+  init,
+  toggleMenu,
+  getTarget
+};

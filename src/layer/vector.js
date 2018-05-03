@@ -1,72 +1,85 @@
-"use strict";
+import ImageLayer from 'ol/layer/Image';
+import VectorLayer from 'ol/layer/Vector';
+import VectorTileLayer from 'ol/layer/Vectortile';
+import ClusterSource from 'ol/source/Cluster';
+import ImageVectorSource from 'ol/source/ImageVector';
 
-var ol = require('openlayers');
-var style = require('../style')();
-var viewer = require('../viewer');
+import style from '../style';
+import viewer from '../viewer';
 
-module.exports = function vector(options, source) {
-  var vectorLayer;
+export default function vector(opt, src) {
+  const options = opt;
+  const source = src;
+  const map = viewer.getMap();
+  const view = map.getView();
+  const distance = 60;
+  const maxZoom = view.getResolutions().length - 1;
+  let vectorLayer;
   switch (options.layerType) {
-    case 'vector':
+    case 'vector': {
       options.source = source;
       options.style = style.createStyle(options.style);
-      vectorLayer = new ol.layer.Vector(options);
+      vectorLayer = new VectorLayer(options);
       break;
-    case 'cluster':
+    }
+    case 'cluster': {
       options.clusterOptions = options.clusterOptions || {};
-      if(options.type === 'WFS' || options.type === 'AGS_FEATURE'){
+      if (options.type === 'WFS' || options.type === 'AGS_FEATURE') {
         source.clusterOptions = viewer.getMapSource()[options.sourceName].clusterOptions || {};
       } else {
         source.clusterOptions = {};
       }
-      var distance = 60;
-      var clusterDistance = options.clusterOptions.clusterDistance || source.clusterOptions.clusterDistance || viewer.getClusterOptions().clusterDistance || distance;
-      var clusterMaxZoom = options.clusterOptions.clusterMaxZoom || source.clusterOptions.clusterMaxZoom || viewer.getClusterOptions().clusterMaxZoom || viewer.getResolutions().length-1;
-      var clusterInitialDistance = viewer.getSettings().zoom > clusterMaxZoom ? 0 : clusterDistance;
-      var map = viewer.getMap();
-      var view = map.getView();
-      var maxZoom = view.getResolutions().length-1;
-      options.source = new ol.source.Cluster({
+      const clusterDistance = options.clusterOptions.clusterDistance || source.clusterOptions.clusterDistance || viewer.getClusterOptions().clusterDistance || distance;
+      const clusterMaxZoom = options.clusterOptions.clusterMaxZoom || source.clusterOptions.clusterMaxZoom || viewer.getClusterOptions().clusterMaxZoom || viewer.getResolutions().length - 1;
+      const clusterInitialDistance = viewer.getSettings().zoom > clusterMaxZoom ? 0 : clusterDistance;
+      options.source = new ClusterSource({
         attributions: options.attribution,
-        source: source,
+        source,
         distance: clusterInitialDistance
       });
       options.source.setProperties({
-        clusterDistance : clusterDistance,
-        clusterMaxZoom : clusterMaxZoom
+        clusterDistance,
+        clusterMaxZoom
       });
       options.style = style.createStyle(options.style, options.clusterStyle);
-      vectorLayer = new ol.layer.Vector(options);
+      vectorLayer = new VectorLayer(options);
       map.on('movestart', onMoveStart);
 
-      function onMoveStart(evt) {
-        var mapZoom = view.getZoomForResolution(evt.frameState.viewState.resolution);
-        var clusterDistance = options.source.getProperties().clusterDistance || distance;
-        var clusterMaxZoom = options.source.getProperties().clusterMaxZoom || maxZoom;
-        map.once('moveend', function(evt) {
-          var currentZoom = parseInt(view.getZoom(), 10);
-          if (currentZoom !== mapZoom) {
-            if (currentZoom >= clusterMaxZoom) {
-              options.source.setDistance(0);
-            } else if (currentZoom < clusterMaxZoom) {
-              options.source.setDistance(clusterDistance);
-            }
-          }
-        })
-      }
+
       break;
-    case 'image':
-      options.source = new ol.source.ImageVector({
-        source: source,
+    }
+    case 'image': {
+      options.source = new ImageVectorSource({
+        source,
         style: style.createStyle(options.style)
       });
-      vectorLayer = new ol.layer.Image(options);
+      vectorLayer = new ImageLayer(options);
       break;
-    case 'vectortile':
+    }
+    case 'vectortile': {
       options.source = source;
       options.style = style.createStyle(options.style);
-      vectorLayer = new ol.layer.VectorTile(options);
+      vectorLayer = new VectorTileLayer(options);
       break;
+    }
+    default: {
+      break;
+    }
+  }
+  function onMoveStart(evt) {
+    const mapZoom = view.getZoomForResolution(evt.frameState.viewState.resolution);
+    const clusterDistance = options.source.getProperties().clusterDistance || distance;
+    const clusterMaxZoom = options.source.getProperties().clusterMaxZoom || maxZoom;
+    map.once('moveend', (evt) => {
+      const currentZoom = parseInt(view.getZoom(), 10);
+      if (currentZoom !== mapZoom) {
+        if (currentZoom >= clusterMaxZoom) {
+          options.source.setDistance(0);
+        } else if (currentZoom < clusterMaxZoom) {
+          options.source.setDistance(clusterDistance);
+        }
+      }
+    });
   }
   return vectorLayer;
 }
