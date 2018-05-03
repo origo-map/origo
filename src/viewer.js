@@ -3,6 +3,7 @@ import Map from 'ol/Map';
 import View from 'ol/View';
 import Collection from 'ol/Collection';
 import Projection from 'ol/proj/Projection';
+import project from 'ol/proj';
 import Feature from 'ol/Feature';
 import geom from 'ol/geom/geometry';
 import $ from 'jquery';
@@ -38,7 +39,8 @@ function init(el, mapOptions) {
   render(el, mapOptions);
 
   // Read and set projection
-  if ('proj4Defs' in mapOptions && window.proj4) {
+  if ('proj4Defs' in mapOptions && proj4) {
+    project.setProj4(proj4);
     const proj = mapOptions.proj4Defs;
 
     // Register proj4 projection definitions
