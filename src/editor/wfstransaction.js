@@ -1,49 +1,46 @@
-"use strict";
+import WFSFormat from 'ol/format/WFS';
+import $ from 'jquery';
+import viewer from '../viewer';
+import dispatcher from './editdispatcher';
 
-var ol = require('openlayers');
-var $ = require('jquery');
-var viewer = require('../viewer');
-var editsStore = require('./editsstore')();
-var dispatcher = require('./editdispatcher');
+const format = new WFSFormat();
+const serializer = new XMLSerializer();
 
-var format = new ol.format.WFS();
-var serializer = new XMLSerializer();
-
-module.exports = function(transObj, layerName) {
+export default function (transObj, layerName) {
   return wfsTransaction(transObj, layerName);
 }
 
 function writeWfsTransaction(transObj, options) {
-  var node = format.writeTransaction(transObj.insert, transObj.update, transObj.delete, options);
+  const node = format.writeTransaction(transObj.insert, transObj.update, transObj.delete, options);
   return node;
 }
 
 function wfsTransaction(transObj, layerName) {
-  var srsName = viewer.getProjectionCode();
-  var layer = viewer.getLayer(layerName);
-  var featureType = layer.get('featureType');
-  var source = viewer.getMapSource()[layer.get('sourceName')];
-  var options = {
+  const srsName = viewer.getProjectionCode();
+  const layer = viewer.getLayer(layerName);
+  const featureType = layer.get('featureType');
+  const source = viewer.getMapSource()[layer.get('sourceName')];
+  const options = {
     gmlOptions: {
-      srsName: srsName
+      srsName
     },
     featureNS: source.workspace,
     featurePrefix: source.prefix || source.workspace,
-    featureType: featureType
+    featureType
   };
-  var node = writeWfsTransaction(transObj, options);
+  const node = writeWfsTransaction(transObj, options);
   return $.ajax({
-    type: "POST",
+    type: 'POST',
     url: source.url,
     data: serializer.serializeToString(node),
     contentType: 'text/xml',
-    success: success,
-    error: error,
+    success,
+    error,
     context: this
   })
-    .then(function(data) {
-      var result = readResponse(data);
-      var nr = 0;
+    .then((data) => {
+      const result = readResponse(data);
+      let nr = 0;
       if (result) {
         nr += result.transactionSummary.totalUpdated;
         nr += result.transactionSummary.totalDeleted;
@@ -53,13 +50,13 @@ function wfsTransaction(transObj, layerName) {
     });
 
   function success(data) {
-    var result = readResponse(data);
-    var feature;
+    const result = readResponse(data);
+    let feature;
     if (result) {
       if (result.transactionSummary.totalUpdated > 0) {
         dispatcher.emitChangeFeature({
           feature: transObj.update,
-          layerName: layerName,
+          layerName,
           status: 'finished',
           action: 'update'
         });
@@ -68,7 +65,7 @@ function wfsTransaction(transObj, layerName) {
       if (result.transactionSummary.totalDeleted > 0) {
         dispatcher.emitChangeFeature({
           feature: transObj.delete,
-          layerName: layerName,
+          layerName,
           status: 'finished',
           action: 'delete'
         });
@@ -78,14 +75,12 @@ function wfsTransaction(transObj, layerName) {
         feature = transObj.insert;
         dispatcher.emitChangeFeature({
           feature: transObj.insert,
-          layerName: layerName,
+          layerName,
           status: 'finished',
           action: 'insert'
         });
-        var insertIds = result.insertIds;
-        insertIds.forEach(function(insertId, index) {
-          feature[index].setId(insertId);
-        });
+        const insertIds = result.insertIds;
+        insertIds.forEach((insertId, index) => feature[index].setId(insertId));
       }
     } else {
       error();
@@ -93,14 +88,14 @@ function wfsTransaction(transObj, layerName) {
   }
 
   function error(e) {
-    var errorMsg = e ? (e.status + ' ' + e.statusText) : "";
-    alert('Det inträffade ett fel när ändringarna skulle sparas till servern...\n' +
-      errorMsg);
+    const errorMsg = e ? (`${e.status} ${e.statusText}`) : '';
+    alert(`Det inträffade ett fel när ändringarna skulle sparas till servern...
+      ${errorMsg}`);
   }
 }
 
 function readResponse(data) {
-  var result;
+  let result;
   if (window.Document && data instanceof Document && data.documentElement &&
     data.documentElement.localName === 'ExceptionReport') {
     alert(data.getElementsByTagNameNS(
