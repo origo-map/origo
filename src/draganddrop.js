@@ -9,8 +9,6 @@ import VectorLayer from 'ol/layer/Vector';
 import viewer from './viewer';
 import legend from './legend';
 
-// var ol = require('openlayers');
-
 function init(opt_options) {
   const options = opt_options || {};
   const map = viewer.getMap();
@@ -69,4 +67,4 @@ function init(opt_options) {
   });
 }
 
-export default init;
+export default { init };
