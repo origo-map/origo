@@ -2,7 +2,7 @@ import Zoom from 'ol/control/Zoom';
 import $ from 'jquery';
 import viewer from './viewer';
 
-export default function Init(opt_options) {
+export default function init(opt_options) {
   const options = opt_options || {};
   const target = options.target || 'o-toolbar-navigation';
   const map = viewer.getMap();
