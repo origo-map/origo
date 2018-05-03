@@ -34,7 +34,7 @@ function bindUIActions() {
   });
 }
 
-function Init(optOptions) {
+function init(optOptions) {
   const options = optOptions || {};
   const target = options.target || '#o-toolbar-misc';
   mapTarget = viewer.getTarget();
@@ -44,4 +44,4 @@ function Init(optOptions) {
   bindUIActions();
 }
 
-export default Init;
+export default { init };

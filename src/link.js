@@ -32,4 +32,4 @@ function init(optOptions) {
   bindUIActions();
 }
 
-export default init;
+export default { init };

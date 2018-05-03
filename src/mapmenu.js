@@ -54,6 +54,7 @@ function init(opt) {
     toggleMenu();
   }
 }
+
 function bindUIActions() {
   $menuButton.on('click', (e) => {
     toggleMenu();
@@ -66,6 +67,7 @@ function bindUIActions() {
     e.preventDefault();
   });
 }
+
 function toggleMenu() {
   if ($mapMenu.hasClass('o-mapmenu-show')) {
     $mapMenu.removeClass('o-mapmenu-show');
@@ -73,6 +75,7 @@ function toggleMenu() {
     $mapMenu.addClass('o-mapmenu-show');
   }
 }
+
 function getTarget() {
   return $mapMenu;
 }
