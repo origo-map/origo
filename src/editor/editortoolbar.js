@@ -1,31 +1,27 @@
-"use strict";
 
-var ol = require('openlayers');
-var $ = require('jquery');
-var viewer = require('../viewer');
-var editortemplate = require("../templates/editortoolbar.template.handlebars");
-var dispatcher = require('./editdispatcher');
-var editHandler = require('./edithandler');
-var editorLayers = require('./editorlayers');
-var drawTools = require('./drawtools');
+import $ from 'jquery';
+import editortemplate from '../templates/editortoolbar.template.handlebars';
+import dispatcher from './editdispatcher';
+import editHandler from './edithandler';
+import editorLayers from './editorlayers';
+import drawTools from './drawtools';
 
-var activeClass = 'o-control-active';
-var disableClass = 'o-disabled';
-var currentLayer = undefined;
-var editableLayers = undefined;
-var $editAttribute = undefined;
-var $editDraw = undefined;
-var $editDelete = undefined;
-var $editLayers = undefined;
-var $editSave = undefined;
-var $editClose = undefined;
+const activeClass = 'o-control-active';
+const disableClass = 'o-disabled';
+let currentLayer;
+let editableLayers;
+let $editAttribute;
+let $editDraw;
+let $editDelete;
+let $editLayers;
+let $editSave;
+let $editClose;
 
-module.exports = function() {
-
+export default (function () {
   return {
     init: Init
   };
-}()
+}());
 
 function Init(options) {
   currentLayer = options.currentLayer;
@@ -60,34 +56,33 @@ function render() {
 }
 
 function bindUIActions() {
-  var self = this;
-  $editDraw.on('click', function(e) {
+  $editDraw.on('click', (e) => {
     dispatcher.emitToggleEdit('draw');
     $editDraw.blur();
     e.preventDefault();
     return false;
   });
-  $editAttribute.on('click', function(e) {
+  $editAttribute.on('click', (e) => {
     dispatcher.emitToggleEdit('attribute');
     $editAttribute.blur();
     e.preventDefault();
   });
-  $editDelete.on('click', function(e) {
+  $editDelete.on('click', (e) => {
     dispatcher.emitToggleEdit('delete');
     $editDelete.blur();
     e.preventDefault();
   });
-  $editLayers.on('click', function(e) {
+  $editLayers.on('click', (e) => {
     dispatcher.emitToggleEdit('layers');
     $editLayers.blur();
     e.preventDefault();
   });
-  $editSave.on('click', function(e) {
+  $editSave.on('click', (e) => {
     dispatcher.emitToggleEdit('save');
     $editSave.blur();
     e.preventDefault();
   });
-  $editClose.on('click', function(e) {
+  $editClose.on('click', (e) => {
     $('.o-map').first().trigger({
       type: 'enableInteraction',
       interaction: 'featureInfo'
@@ -103,7 +98,7 @@ function onEnableInteraction(e) {
   if (e.interaction === 'editor') {
     setActive(true);
     dispatcher.emitToggleEdit('edit', {
-      currentLayer: currentLayer
+      currentLayer
     });
   } else {
     setActive(false);
