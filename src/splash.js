@@ -1,23 +1,20 @@
-"use strict";
+import $ from 'jquery';
+import modal from './modal';
+import viewer from './viewer';
 
-var $ = require('jquery');
-var Modal = require('./modal');
-var viewer = require('./viewer');
-
-var defaultTitle = 'Om kartan';
-var defaultContent = '<p></p>';
-var cls = 'o-splash';
-var title;
-var content;
+const defaultTitle = 'Om kartan';
+const defaultContent = '<p></p>';
+const cls = 'o-splash';
+let title;
+let content;
 
 function init(opt_options) {
-  var options = opt_options || {};
-  var url;
+  const options = opt_options || {};
   title = options.title || defaultTitle;
   if (options.url) {
-    url = viewer.getBaseUrl() + options.url;
+    const url = viewer.getBaseUrl() + options.url;
     getContent(url)
-      .done(function(data) {
+      .done((data) => {
         content = data;
         openModal();
       });
@@ -32,12 +29,12 @@ function getContent(url) {
 }
 
 function openModal() {
-  Modal.createModal('#o-map', {
-    title: title,
-    content: content,
-    cls: cls
+  modal.createModal('#o-map', {
+    title,
+    content,
+    cls
   });
-  Modal.showModal();
+  modal.showModal();
 }
 
-module.exports.init = init;
+export default { init };

@@ -1,19 +1,17 @@
-"use strict";
+import ScaleLine from 'ol/control/ScaleLine';
+import viewer from './viewer';
 
-var ol = require('openlayers');
-var Viewer = require('./viewer');
+let map;
 
-var map;
+function init(optOptions) {
+  const options = optOptions || {};
+  const target = options.target || 'o-tools-bottom';
+  map = viewer.getMap();
 
-function Init(opt_options) {
-  var options = opt_options || {};
-  var target = options.target || 'o-tools-bottom';
-  map = Viewer.getMap();
-
-  var scaleLine = new ol.control.ScaleLine({
-    target: target
+  const scaleLine = new ScaleLine({
+    target
   });
   map.addControl(scaleLine);
 }
 
-module.exports.init = Init;
+export default { init };
