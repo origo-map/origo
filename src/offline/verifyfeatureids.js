@@ -1,14 +1,15 @@
-"use strict";
-var generateUUID = require('../utils/generateuuid');
+import generateUUID from '../utils/generateuuid';
 
-module.exports = function verifyFeatureIds(features) {
+function verifyFeatureIds(features) {
   if (features[0]) {
     if (features[0].getId() === undefined) {
-      features.forEach(function(feature) {
+      features.forEach((feature) => {
         feature.setId(generateUUID());
-      })
+      });
     }
   }
 
   return features;
 }
+
+export default verifyFeatureIds;

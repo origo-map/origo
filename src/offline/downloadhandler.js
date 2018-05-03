@@ -1,19 +1,20 @@
-"use strict";
+import $ from 'jquery';
+import Feature from 'ol/Feature';
+import viewer from '../viewer';
+import layerCreator from '../layercreator';
+import downloadSources from './downloadsources';
+import dispatcher from './offlinedispatcher';
+import OfflineLayer from './offlinelayer';
+import OfflineStore from './offlinestore';
 
-var ol = require('openlayers');
-var $ = require('jquery');
-var viewer = require('../viewer');
-var layerCreator = require('../layercreator');
-var offlineLayer = require('./offlinelayer')();
-var downloadSources = require('./downloadsources');
-var dispatcher = require('./offlinedispatcher');
-var offlineStore = require('./offlinestore')();
+const offlineLayer = OfflineLayer();
+const offlineStore = OfflineStore();
 
-var downloadErrorMsg = 'Det inträffade ett fel när lagret skulle hämtas. Är du ansluten till internet?'
-var saveErrorMsg = 'Det inträffade ett fel när förändringarna skulle sparas. Försök igen senare.';
-var invalidFormatMsg = 'Invalid format: ';
+const downloadErrorMsg = 'Det inträffade ett fel när lagret skulle hämtas. Är du ansluten till internet?';
+const saveErrorMsg = 'Det inträffade ett fel när förändringarna skulle sparas. Försök igen senare.';
+const invalidFormatMsg = 'Invalid format: ';
 
-var downloadHandler = function downloadHandler() {
+const downloadHandler = function downloadHandler() {
   $(document).on('changeDownload', onChangeDownload);
   offlineStore.init();
 
@@ -29,29 +30,28 @@ var downloadHandler = function downloadHandler() {
   }
 
   function removeDownloaded(layerName) {
-    var layer = viewer.getLayer(layerName);
-    var props = layer.getProperties();
-    var source;
+    const layer = viewer.getLayer(layerName);
+    const props = layer.getProperties();
     dispatcher.emitChangeOfflineStart(layerName);
     props.style = props.styleName;
     props.source = props.sourceName;
     props.type = props.onlineType;
-    source = layerCreator(props).getSource();
+    const source = layerCreator(props).getSource();
     layer.setSource(source);
     dispatcher.emitChangeOffline(layer.get('name'), 'remove');
   }
 
   function sync(layerName) {
-    var offlineEdits = offlineStore.getOfflineEdits(layerName);
+    const offlineEdits = offlineStore.getOfflineEdits(layerName);
     dispatcher.emitChangeOfflineStart(layerName);
     if (offlineEdits) {
       offlineEdits
-        .then(function(editItems) {
+        .then((editItems) => {
           saveToRemote(editItems, layerName)
-            .then(function() {
+            .then(() => {
               download(layerName);
             })
-            .fail(function(err) {
+            .fail(() => {
               abort(layerName, saveErrorMsg, 'alert');
             });
         });
@@ -61,22 +61,21 @@ var downloadHandler = function downloadHandler() {
   }
 
   function saveToRemote(editItems, layerName) {
-    var layer = viewer.getLayer(layerName);
-    var transObj = {
+    const layer = viewer.getLayer(layerName);
+    const transObj = {
       delete: [],
       insert: [],
       update: []
     };
-    var ids = [];
-    editItems.forEach(function(item) {
-      var id = Object.getOwnPropertyNames(item)[0];
-      var feature = layer.getSource().getFeatureById(id);
-      var dummy;
+    const ids = [];
+    editItems.forEach((item) => {
+      const id = Object.getOwnPropertyNames(item)[0];
+      const feature = layer.getSource().getFeatureById(id);
       if (feature) {
         transObj[item[id]].push(feature);
         ids.push(id);
       } else if (item[id] === 'delete') {
-        dummy = new ol.Feature();
+        const dummy = new Feature();
         dummy.setId(id);
         transObj[item[id]].push(dummy);
         ids.push(id);
@@ -84,7 +83,7 @@ var downloadHandler = function downloadHandler() {
     });
 
     return downloadSources[layer.get('onlineType')].transaction(transObj, layerName)
-      .then(function(result) {
+      .then((result) => {
         if (result > 0) {
           dispatcher.emitChangeOffline(layer.get('name'), 'edits', ids);
         }
@@ -92,26 +91,25 @@ var downloadHandler = function downloadHandler() {
   }
 
   function download(layerName) {
-    var layer = viewer.getLayer(layerName);
-    var type = layer.get('onlineType');
+    const layer = viewer.getLayer(layerName);
+    const type = layer.get('onlineType');
     dispatcher.emitChangeOfflineStart(layerName);
-    if (downloadSources.hasOwnProperty(type)) {
+    if (Object.prototype.hasOwnProperty.call(downloadSources, type)) {
       downloadSources[type].request(layer)
-        .then(function(result) {
+        .then((result) => {
           offlineLayer.setOfflineSource(layerName, result);
           dispatcher.emitChangeOffline(layer.get('name'), 'download');
         })
-        .fail(function(error) {
+        .fail(() => {
           abort(layerName, downloadErrorMsg, 'alert');
         });
     } else {
-      error = 'Sorry, ' + type + ' is not available as on offline format';
       abort(layerName, invalidFormatMsg + type);
     }
   }
 
   function abort(layerName, error, isAlert) {
-    var action;
+    let action;
     if (offlineStore.getOfflineLayer(layerName).downloaded) {
       action = 'offline';
     } else {
@@ -126,6 +124,6 @@ var downloadHandler = function downloadHandler() {
 
     dispatcher.emitChangeOfflineEnd(layerName, action);
   }
-}
+};
 
-module.exports = downloadHandler;
+export default downloadHandler;

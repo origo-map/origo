@@ -1,28 +1,27 @@
-"use strict";
-var ol = require('openlayers');
-var $ = require('jquery');
-var verifyFeatureIds = require('./verifyfeatureids');
+import $ from 'jquery';
+import GeoJSONFormat from 'ol/format/GeoJSON';
+import verifyFeatureIds from './verifyfeatureids';
 
-var geojson = {};
+const geojson = {};
 geojson.request = function request(layer) {
-  var source = layer.get('sourceName');
-  var request = createRequest(source);
-  return request;
+  const source = layer.get('sourceName');
+  const req = createRequest(source);
+  return req;
 
   function createRequest(source) {
-    var format = new ol.format.GeoJSON();
-    var url = source;
+    const format = new GeoJSONFormat();
+    const url = source;
 
     return $.ajax({
-        url: url,
-        cache: false
-      })
-      .then(function(response) {
-        var features = format.readFeatures(response);
+      url,
+      cache: false
+    })
+      .then((response) => {
+        let features = format.readFeatures(response);
         features = verifyFeatureIds(features);
         return features;
       });
   }
-}
+};
 
-module.exports = geojson;
+export default geojson;
