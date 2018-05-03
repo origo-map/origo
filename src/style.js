@@ -33,34 +33,34 @@ const editStyleOptions = {
     }
   }],
   LineString: [{
-    stroke: {
-      color: white,
-      width: width + 2
+      stroke: {
+        color: white,
+        width: width + 2
+      }
+    },
+    {
+      stroke: {
+        color: blue,
+        width
+      }
     }
-  },
-  {
-    stroke: {
-      color: blue,
-      width
-    }
-  }
   ],
   Polygon: [{
-    stroke: {
-      color: white,
-      width: width + 2
+      stroke: {
+        color: white,
+        width: width + 2
+      }
+    },
+    {
+      stroke: {
+        color: blue,
+        width
+      }
     }
-  },
-  {
-    stroke: {
-      color: blue,
-      width
-    }
-  }
   ]
 };
 
-export default function () {
+export default function() {
   return {
     init: Init,
     createStyleOptions,
@@ -82,20 +82,21 @@ function createStyleOptions(styleParams) {
   if (Object.prototype.hasOwnProperty.call(styleParams, 'geometry')) {
     switch (styleParams.geometry) {
       case 'centerPoint':
-        styleOptions.geometry = function (feature) {
+        styleOptions.geometry = function(feature) {
           const coordinates = maputils.getCenter(feature.getGeometry());
           return new Point(coordinates);
         };
         break;
       case 'endPoint':
-        styleOptions.geometry = function (feature) {
+        styleOptions.geometry = function(feature) {
           const coordinates = feature.getGeometry().getLastCoordinate();
           return new Point(coordinates);
         };
         break;
-      default: {
-        break;
-      }
+      default:
+        {
+          break;
+        }
     }
   }
   if (Object.prototype.hasOwnProperty.call(styleParams, 'zIndex')) {
@@ -165,7 +166,7 @@ function createStyle(styleName, clusterStyleName) {
     return style;
   }
   const clusterStyleSettings = viewer.getStyleSettings()[clusterStyleName];
-  const style = (function () {
+  const style = (function() {
     // Create style for each rule
     const styleList = createStyleList(styleSettings);
     if (clusterStyleSettings) {

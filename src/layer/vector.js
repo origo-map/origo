@@ -18,7 +18,7 @@ export default function vector(opt, src) {
   switch (options.layerType) {
     case 'vector': {
       options.source = source;
-      options.style = style.createStyle(options.style);
+      options.style = style().createStyle(options.style);
       vectorLayer = new VectorLayer(options);
       break;
     }
@@ -41,7 +41,7 @@ export default function vector(opt, src) {
         clusterDistance,
         clusterMaxZoom
       });
-      options.style = style.createStyle(options.style, options.clusterStyle);
+      options.style = style().createStyle(options.style, options.clusterStyle);
       vectorLayer = new VectorLayer(options);
       map.on('movestart', onMoveStart);
 
@@ -51,14 +51,14 @@ export default function vector(opt, src) {
     case 'image': {
       options.source = new ImageVectorSource({
         source,
-        style: style.createStyle(options.style)
+        style: style().createStyle(options.style)
       });
       vectorLayer = new ImageLayer(options);
       break;
     }
     case 'vectortile': {
       options.source = source;
-      options.style = style.createStyle(options.style);
+      options.style = style().createStyle(options.style);
       vectorLayer = new VectorTileLayer(options);
       break;
     }
