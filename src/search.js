@@ -1,19 +1,18 @@
-'use strict';
+import Overlay from 'ol/Overlay';
+import Point from 'ol/geom/Point';
+import Awesomplete from 'awesomplete';
+import $ from 'jquery';
+import featureInfo from './featureinfo';
+import generateUUID from './utils/generateuuid';
+import getAttributes from './getattributes';
+import getCenter from './geometry/getcenter';
+import getFeature from './getfeature';
+import mapUtils from './maputils';
+import popup from './popup';
+import viewer from './viewer';
+import utils from './utils';
 
-var ol = require('openlayers');
-var $ = require('jquery');
-var Viewer = require('./viewer');
-var wktToFeature = require('./maputils').wktToFeature;
-var Popup = require('./popup');
-var Awesomplete = require('awesomplete');
-var getFeature = require('./getfeature');
-var getAttributes = require('./getattributes');
-var featureInfo = require('./featureinfo');
-var mapUtils = require('./maputils');
-var getCenter = require('./geometry/getcenter');
-var utils = require('./utils');
-var generateUUID = require('./utils/generateuuid');
-var keyCodes = {
+const keyCodes = {
   9: 'tab',
   27: 'esc',
   37: 'left',
@@ -22,28 +21,28 @@ var keyCodes = {
   38: 'up',
   40: 'down'
 };
-var searchDb = {};
-var map;
-var name;
-var northing;
-var easting;
-var geometryAttribute;
-var idAttribute;
-var layerNameAttribute;
-var layerName;
-var titleAttribute;
-var contentAttribute;
-var includeSearchableLayers;
-var searchableDefault;
-var maxZoomLevel;
-var url;
-var title;
-var hintText;
-var projectionCode;
-var overlay;
-var limit;
-var minLength;
-var awesomplete;
+let searchDb = {};
+let map;
+let name;
+let northing;
+let easting;
+let geometryAttribute;
+let idAttribute;
+let layerNameAttribute;
+let layerName;
+let titleAttribute;
+let contentAttribute;
+let includeSearchableLayers;
+let searchableDefault;
+let maxZoomLevel;
+let url;
+let title;
+let hintText;
+let projectionCode;
+let overlay;
+let limit;
+let minLength;
+let awesomplete;
 
 function init(options) {
   name = options.searchAttribute;
@@ -60,15 +59,15 @@ function init(options) {
   title = options.title || '';
   titleAttribute = options.titleAttribute || undefined;
   contentAttribute = options.contentAttribute || undefined;
-  includeSearchableLayers = options.hasOwnProperty('includeSearchableLayers') ? options.includeSearchableLayers : false;
-  searchableDefault = options.hasOwnProperty('searchableDefault') ? options.searchableDefault : false;
-  maxZoomLevel = options.maxZoomLevel || Viewer.getResolutions().length - 2 || Viewer.getResolutions();
+  includeSearchableLayers = Object.prototype.hasOwnProperty.call(options, 'includeSearchableLayers') ? options.includeSearchableLayers : false;
+  searchableDefault = Object.prototype.hasOwnProperty.call(options, 'searchableDefault') ? options.searchableDefault : false;
+  maxZoomLevel = options.maxZoomLevel || viewer.getResolutions().length - 2 || viewer.getResolutions();
   limit = options.limit || 9;
   hintText = options.hintText || 'Sök...';
   minLength = options.minLength || 4;
-  projectionCode = Viewer.getProjectionCode();
+  projectionCode = viewer.getProjectionCode();
 
-  map = Viewer.getMap();
+  map = viewer.getMap();
 
   render();
   initAutocomplete();
@@ -76,28 +75,28 @@ function init(options) {
 }
 
 function render() {
-  var el = '<div id="o-search-wrapper" class="o-search-wrapper">' +
-    '<div id="o-search" class="o-search o-search-false">' +
-    '<input id="hjl" class="o-search-field form-control" type="text" placeholder="' + hintText + '">' +
-    '<button id="o-search-button">' +
-    '<svg class="o-icon-fa-search">' +
-    '<use xlink:href="#fa-search"></use>' +
-    '</svg>' +
-    '</button>' +
-    '<button id="o-search-button-close">' +
-    '<svg class="o-icon-search-fa-times">' +
-    '<use xlink:href="#fa-times"></use>' +
-    '</svg>' +
-    '</button>' +
-    '</div>' +
-    '</div>';
+  const el = `<div id="o-search-wrapper" class="o-search-wrapper">
+    <div id="o-search" class="o-search o-search-false">
+    <input id="hjl" class="o-search-field form-control" type="text" placeholder="${hintText}">
+    <button id="o-search-button">
+    <svg class="o-icon-fa-search">
+    <use xlink:href="#fa-search"></use>
+    </svg>
+    </button>
+    <button id="o-search-button-close">
+    <svg class="o-icon-search-fa-times">
+    <use xlink:href="#fa-times"></use>
+    </svg>
+    </button>
+    </div>
+    </div>`;
   $('#o-map').append(el);
 }
 
 function bindUIActions() {
-  document.getElementById('hjl').addEventListener("awesomplete-selectcomplete", selectHandler);
+  document.getElementById('hjl').addEventListener('awesomplete-selectcomplete', selectHandler);
 
-  $('#o-search .o-search-field').on('input', function() {
+  $('#o-search .o-search-field').on('input', () => {
     if ($('#o-search .o-search-field').val() && $('#o-search').hasClass('o-search-false')) {
       $('#o-search').removeClass('o-search-false');
       $('#o-search').addClass('o-search-true');
@@ -108,15 +107,14 @@ function bindUIActions() {
     }
   });
 
-  $('.o-search-field').on('blur', function(e) {
+  $('.o-search-field').on('blur', (e) => {
     $('.o-search-wrapper').removeClass('active');
     window.dispatchEvent(new Event('resize'));
   });
-  $('.o-search-field').on('focus', function(e) {
+  $('.o-search-field').on('focus', (e) => {
     $('.o-search-wrapper').addClass('active');
     window.dispatchEvent(new Event('resize'));
   });
-
 }
 
 /*
@@ -127,23 +125,23 @@ for a limit in Awesomplete that can only store data in the fields label and text
 The data-catogry attribute is used to make a layer division in the sugguestion list.
 */
 function initAutocomplete() {
-  var list;
+  let list;
 
   $.support.cors = true;
 
-  var input = $("#o-search .o-search-field");
+  const input = $('#o-search .o-search-field');
   awesomplete = new Awesomplete('#o-search .o-search-field', {
     minChars: minLength,
     autoFirst: false,
     sort: false,
     maxItems: limit,
     item: renderList,
-    filter: function(suggestion, input) {
+    filter(suggestion, input) {
       return suggestion.value;
     }
   });
 
-  var handler = function(data) {
+  const handler = function func(data) {
     list = [];
     searchDb = {};
     if (data.length) {
@@ -158,11 +156,11 @@ function initAutocomplete() {
     }
   };
 
-  $(input).on("keyup", function(e) {
-    var keyCode = e.keyCode;
+  $(input).on('keyup', function func(e) {
+    const keyCode = e.keyCode;
     if (this.value.length >= minLength) {
       if (keyCode in keyCodes) {
-        return;
+        // empty
       } else {
         makeRequest(handler, this);
       }
@@ -171,22 +169,19 @@ function initAutocomplete() {
 }
 
 function dbToList() {
-  var items = Object.keys(searchDb);
-  return items.map(function(item) {
-    return searchDb[item];
-  });
+  const items = Object.keys(searchDb);
+  return items.map(item => searchDb[item]);
 }
 
 function groupDb(data) {
-  var group = {};
-  var ids = Object.keys(data);
-  ids.forEach(function(id) {
-    var item = data[id];
-    var type = item[layerNameAttribute];
-    var header = false;
+  const group = {};
+  const ids = Object.keys(data);
+  ids.forEach((id) => {
+    const item = data[id];
+    const type = item[layerNameAttribute];
     if (type in group === false) {
       group[type] = [];
-      item.header = Viewer.getLayer(type).get('title');
+      item.header = viewer.getLayer(type).get('title');
     }
     group[type].push(item);
   });
@@ -194,15 +189,15 @@ function groupDb(data) {
 }
 
 function groupToList(group) {
-  var types = Object.keys(group);
-  var list = [];
-  var selection = {};
-  var nr = 0;
-  var turn = 0;
+  const types = Object.keys(group);
+  let list = [];
+  const selection = {};
+  let nr = 0;
+  let turn = 0;
   while (nr < limit && types.length) {
-    types.slice().forEach(function(type) {
+    types.slice().forEach((type) => {
       if (nr < limit) {
-        var item = group[type][turn];
+        const item = group[type][turn];
         if (type in selection === false) {
           selection[type] = [];
         }
@@ -215,27 +210,26 @@ function groupToList(group) {
     });
     turn++;
   }
-  list = Object.keys(selection).reduce(function(previous, group) {
-    return previous.concat(selection[group]);
-  }, []);
+  list = Object.keys(selection).reduce((previous, group) => previous.concat(selection[group]), []);
   return list;
 }
 
 function setSearchDb(data) {
-  data.forEach(function(item) {
-    var id = generateUUID();
-    item.label = id;
-    item.value = item[name];
-    searchDb[id] = item;
+  data.forEach((item) => {
+    const dataItem = item;
+    const id = generateUUID();
+    dataItem.label = id;
+    dataItem.value = item[name];
+    searchDb[id] = dataItem;
   });
 }
 
 function renderList(suggestion, input) {
-  var item = searchDb[suggestion.label] || {};
-  var header = 'header' in item ? '<div class="heading">' + item.header + '</div>' : '';
-  var options = {};
-  var html = input === '' ? suggestion.value : suggestion.value.replace(RegExp(Awesomplete.$.regExpEscape(input), "gi"), "<mark>$&</mark>");
-  html = header + '<div class="suggestion">' + html + '</div>';
+  const item = searchDb[suggestion.label] || {};
+  const header = 'header' in item ? `<div class="heading">${item.header}</div>` : '';
+  let options = {};
+  let html = input === '' ? suggestion.value : suggestion.value.replace(RegExp(Awesomplete.$.regExpEscape(input), 'gi'), '<mark>$&</mark>');
+  html = `${header}<div class="suggestion">${html}</div>`;
   options = {
     innerHTML: html,
     'aria-selected': 'false'
@@ -244,13 +238,13 @@ function renderList(suggestion, input) {
     options.className = 'header';
   }
 
-  return Awesomplete.$.create("li", options);
+  return Awesomplete.$.create('li', options);
 }
 
 function makeRequest(handler, obj) {
-  var queryUrl = url + '?q=' + encodeURI(obj.value);
+  let queryUrl = `${url}?q=${encodeURI(obj.value)}`;
   if (includeSearchableLayers) {
-    queryUrl += '&l=' + Viewer.getSearchableLayers(searchableDefault);
+    queryUrl += `&l=${viewer.getSearchableLayers(searchableDefault)}`;
   }
   $.ajax({
     url: queryUrl,
@@ -260,7 +254,7 @@ function makeRequest(handler, obj) {
 }
 
 function onClearSearch() {
-  $('#o-search-button-close').on('click', function(e) {
+  $('#o-search-button-close').on('click', (e) => {
     clearSearchResults();
     clear();
     $('#o-search').removeClass('o-search-true');
@@ -272,30 +266,28 @@ function onClearSearch() {
 }
 
 function showOverlay(data, coord) {
-  var popup;
-  var content;
   clear();
-  popup = Popup('#o-map');
-  overlay = new ol.Overlay({
-    element: popup.getEl()
+  const newPopup = popup('#o-map');
+  overlay = new Overlay({
+    element: newPopup.getEl()
   });
 
   map.addOverlay(overlay);
 
   overlay.setPosition(coord);
-  content = data[name];
-  popup.setContent({
-    content: content,
-    title: title
+  const content = data[name];
+  newPopup.setContent({
+    content,
+    title
   });
-  popup.setVisibility(true);
-  mapUtils.zoomToExent(new ol.geom.Point(coord), maxZoomLevel);
+  newPopup.setVisibility(true);
+  mapUtils.zoomToExent(new Point(coord), maxZoomLevel);
 }
 
-function showFeatureInfo(features, title, content) {
-  var obj = {};
+function showFeatureInfo(features, objTitle, content) {
+  const obj = {};
   obj.feature = features[0];
-  obj.title = title;
+  obj.title = objTitle;
   obj.content = content;
   clear();
   featureInfo.identify([obj], 'overlay', getCenter(features[0].getGeometry()));
@@ -305,7 +297,7 @@ function showFeatureInfo(features, title, content) {
 function clear() {
   featureInfo.clear();
   if (overlay) {
-    Viewer.removeOverlays(overlay);
+    viewer.removeOverlays(overlay);
   }
 }
 
@@ -331,43 +323,40 @@ function clearSearchResults() {
  * must be defined. */
 
 function selectHandler(evt) {
-  var id = evt.text.label;
-  var data = searchDb[id];
-  var layer;
-  var id;
-  var feature;
-  var content;
-  var coord;
+  let id = evt.text.label;
+  const data = searchDb[id];
+  let layer;
+  let feature;
+  let content;
+  let coord;
   if (layerNameAttribute && idAttribute) {
-    layer = Viewer.getLayer(data[layerNameAttribute]);
+    layer = viewer.getLayer(data[layerNameAttribute]);
     id = data[idAttribute];
     getFeature(id, layer)
-      .done(function(res) {
-        var featureWkt;
-        var coordWkt;
+      .done((res) => {
+        let featureWkt;
+        let coordWkt;
         if (res.length > 0) {
           showFeatureInfo(res, layer.get('title'), getAttributes(res[0], layer));
-        }
-
-        // Fallback if no geometry in response
-        else if (geometryAttribute) {
-          featureWkt = wktToFeature(data[geometryAttribute], projectionCode);
+        } else if (geometryAttribute) {
+          // Fallback if no geometry in response
+          featureWkt = mapUtils.wktToFeature(data[geometryAttribute], projectionCode);
           coordWkt = featureWkt.getGeometry().getCoordinates();
           showOverlay(data, coordWkt);
         }
       });
   } else if (geometryAttribute && layerName) {
-    feature = wktToFeature(data[geometryAttribute], projectionCode);
-    layer = Viewer.getLayer(data[layerName]);
+    feature = mapUtils.wktToFeature(data[geometryAttribute], projectionCode);
+    layer = viewer.getLayer(data[layerName]);
     showFeatureInfo([feature], layer.get('title'), getAttributes(feature, layer));
   } else if (titleAttribute && contentAttribute && geometryAttribute) {
-    feature = wktToFeature(data[geometryAttribute], projectionCode);
+    feature = mapUtils.wktToFeature(data[geometryAttribute], projectionCode);
 
     // Make sure the response is wrapped in a html element
     content = utils.createElement('div', data[contentAttribute]);
     showFeatureInfo([feature], data[titleAttribute], content);
   } else if (geometryAttribute && title) {
-    feature = wktToFeature(data[geometryAttribute], projectionCode);
+    feature = mapUtils.wktToFeature(data[geometryAttribute], projectionCode);
     content = utils.createElement('div', data[name]);
     showFeatureInfo([feature], title, content);
   } else if (easting && northing && title) {
@@ -378,4 +367,4 @@ function selectHandler(evt) {
   }
 }
 
-module.exports.init = init;
+export default { init };
