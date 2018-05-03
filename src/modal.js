@@ -10,7 +10,7 @@ const modal = function modal() {
   }
 
   function render(title, content, cls) {
-    modalEl = `<div id="o-modal" class=${cls}">
+    modalEl = `<div id="o-modal" class="${cls}">
                 <div class="o-modal-screen"></div>
                 <div class="o-modal">
                   <div class="o-close-button"><svg class="o-icon-fa-times"><use xlink:href="#fa-times"></use></svg></div>
