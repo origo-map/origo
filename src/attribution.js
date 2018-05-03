@@ -26,4 +26,4 @@ function init(opt) {
   }
 }
 
-export default init;
+export default { init };

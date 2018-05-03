@@ -1,27 +1,23 @@
-"use strict";
+import Rotate from 'ol/control/Rotate';
+import $ from 'jquery';
+import viewer from './viewer';
+import utils from './utils';
 
-var ol = require('openlayers');
-var $ = require('jquery');
-var Viewer = require('./viewer');
-var utils = require('./utils');
+let map;
 
-var map;
-
-function Init(opt_options) {
-  var options = opt_options || {};
-  var rotateControl;
-  var icon = utils.createSvg({
+function init() {
+  const icon = utils.createSvg({
     href: '#origo-compass',
     cls: 'o-icon-compass'
   });
-  map = Viewer.getMap();
+  map = viewer.getMap();
 
-  rotateControl = new ol.control.Rotate({
-    label: $.parseHTML('<span>' + icon + '</span>')[0],
+  const rotateControl = new Rotate({
+    label: $.parseHTML(`<span>${icon}</span>`)[0],
     tipLabel: ' ',
     target: 'o-toolbar-misc'
   });
   map.addControl(rotateControl);
 }
 
-module.exports.init = Init;
+export default init;

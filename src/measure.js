@@ -1,49 +1,53 @@
-"use strict";
+import $ from 'jquery';
+import Sphere from 'ol/Sphere';
+import VectorSource from 'ol/source/Vector';
+import VectorLayer from 'ol/layer/Vector';
+import DrawInteraction from 'ol/interaction/Draw';
+import Overlay from 'ol/Overlay';
+import Polygon from 'ol/geom/Polygon';
+import LineString from 'ol/geom/LineString';
+import viewer from './viewer';
+import utils from './utils';
+import Style from './style';
+import styleTypes from './style/styletypes';
 
-var ol = require('openlayers');
-var $ = require('jquery');
-var Viewer = require('./viewer');
-var utils = require('./utils');
-var style = require('./style')();
-var styleTypes = require('./style/styletypes');
+const style = Style();
 
-var map;
-var options;
-var activeButton;
-var defaultButton;
-var measure;
-var type;
-var sketch;
-var measureTooltip;
-var measureTooltipElement;
-var measureStyleOptions;
-var helpTooltip;
-var helpTooltipElement;
-var vector;
-var source;
-var label;
-var overlayArray = [];
-var drawStart = false;
-var isActive = false;
-var wgs84Sphere = new ol.Sphere(6378137);
-var lengthTool;
-var areaTool;
+let map;
+let options;
+let activeButton;
+let defaultButton;
+let measure;
+let type;
+let sketch;
+let measureTooltip;
+let measureTooltipElement;
+let measureStyleOptions;
+let helpTooltip;
+let helpTooltipElement;
+let vector;
+let source;
+let label;
+let lengthTool;
+let areaTool;
+let isActive = false;
+const overlayArray = [];
 
-function init(opt_options) {
-  options = opt_options || {};
-  options.measureTools = options.measureTools || ["length", "area"];
-  lengthTool = options.measureTools.indexOf('length') >= 0 ? true : false;
-  areaTool = options.measureTools.indexOf('area') >= 0 ? true : false;
-  options.default = options.default ? options.default : lengthTool ? "length" : "area";
-  if(lengthTool || areaTool){
-    var target = options.target || '#o-toolbar-maptools';
-    map = Viewer.getMap();
-    source = new ol.source.Vector();
+function init(optOptions) {
+  options = optOptions || {};
+  options.measureTools = options.measureTools || ['length', 'area'];
+  lengthTool = options.measureTools.indexOf('length') >= 0;
+  areaTool = options.measureTools.indexOf('area') >= 0;
+  options.default = options.default ? options.default : lengthTool ? 'length' : 'area';
+  if (lengthTool || areaTool) {
+    const target = options.target || '#o-toolbar-maptools';
+    map = viewer.getMap();
+    source = new VectorSource();
     measureStyleOptions = styleTypes.getStyle('measure');
 
-    //Drawn features
-    vector = new ol.layer.Vector({
-      source: source,
+    // Drawn features
+    vector = new VectorLayer({
+      source,
       name: 'measure',
       visible: false,
       zIndex: 6
@@ -55,74 +59,79 @@ function init(opt_options) {
 
     render(target);
     bindUIActions();
-    if(options.default === 'area') {
+    if (options.default === 'area') {
       defaultButton = $('#o-measure-polygon-button button');
-    } else if(options.default === 'length') {
+    } else if (options.default === 'length') {
       defaultButton = $('#o-measure-line-button button');
     }
   }
 }
 
 function onEnableInteraction(e) {
-  if(e.interaction === 'measure') {
+  if (e.interaction === 'measure') {
     $('#o-measure-button button').addClass('o-measure-button-true');
-    if(lengthTool){$('#o-measure-line-button').removeClass('o-hidden');}
-    if(areaTool){$('#o-measure-polygon-button').removeClass('o-hidden');}
+    if (lengthTool) {
+      $('#o-measure-line-button').removeClass('o-hidden');
+    }
+    if (areaTool) {
+      $('#o-measure-polygon-button').removeClass('o-hidden');
+    }
     $('#o-measure-button').removeClass('tooltip');
     setActive(true);
     defaultButton.trigger('click');
   } else {
     if (activeButton) {
       activeButton.removeClass('o-measure-button-true');
-    };
+    }
 
     $('#o-measure-button button').removeClass('o-measure-button-true');
-    if(lengthTool){$('#o-measure-line-button').addClass('o-hidden');}
-    if(areaTool){$('#o-measure-polygon-button').addClass('o-hidden');}
+    if (lengthTool) {
+      $('#o-measure-line-button').addClass('o-hidden');
+    }
+    if (areaTool) {
+      $('#o-measure-polygon-button').addClass('o-hidden');
+    }
     $('#o-measure-button').addClass('tooltip');
 
     map.un('pointermove', pointerMoveHandler);
     map.un('click', pointerMoveHandler);
     map.removeInteraction(measure);
     vector.setVisible(false);
-    Viewer.removeOverlays(overlayArray);
+    viewer.removeOverlays(overlayArray);
     vector.getSource().clear();
     setActive(false);
   }
-
 }
 
 function setActive(state) {
-  if(state === true) {
+  if (state === true) {
     isActive = true;
   } else {
     isActive = false;
   }
-
 }
 
 function render(target) {
-  
-  if(lengthTool || areaTool){
-    var toolbar = utils.createElement('div', '', {
+  if (lengthTool || areaTool) {
+    const toolbar = utils.createElement('div', '', {
       id: 'o-measure-toolbar',
       cls: 'o-toolbar-horizontal'
     });
 
     $(target).append(toolbar);
 
-    var mb = utils.createButton({
+    const mb = utils.createButton({
       id: 'o-measure-button',
       cls: 'o-measure-button',
       iconCls: 'o-icon-steady-measure',
       src: '#steady-measure',
       tooltipText: 'Mät i kartan'
     });
-    $('#' + 'o-measure-toolbar').append(mb);
+    $('#o-measure-toolbar').append(mb);
   }
-  
-  if(lengthTool){
-    var lb = utils.createButton({
+
+  if (lengthTool) {
+    const lb = utils.createButton({
       id: 'o-measure-line-button',
       cls: 'o-measure-type-button',
       iconCls: 'o-icon-minicons-line-vector',
@@ -130,12 +139,12 @@ function render(target) {
       tooltipText: 'Linje',
       tooltipPlacement: 'north'
     });
-    $('#' + 'o-measure-toolbar').append(lb);
+    $('#o-measure-toolbar').append(lb);
     $('#o-measure-line-button').addClass('o-hidden');
   }
 
-  if(areaTool){
-    var pb = utils.createButton({
+  if (areaTool) {
+    const pb = utils.createButton({
       id: 'o-measure-polygon-button',
       cls: 'o-measure-type-button',
       iconCls: 'o-icon-minicons-square-vector',
@@ -143,22 +152,22 @@ function render(target) {
       tooltipText: 'Yta',
       tooltipPlacement: 'north'
     });
-    $('#' + 'o-measure-toolbar').append(pb);
+    $('#o-measure-toolbar').append(pb);
     $('#o-measure-polygon-button').addClass('o-hidden');
   }
 }
 
 function bindUIActions() {
-  if(lengthTool || areaTool){
-    $('#o-measure-button').on('click', function(e) {
+  if (lengthTool || areaTool) {
+    $('#o-measure-button').on('click', (e) => {
       toggleMeasure();
       $('#o-measure-button button').blur();
       e.preventDefault();
     });
   }
 
-  if(lengthTool){
-    $('#o-measure-line-button').on('click', function(e) {
+  if (lengthTool) {
+    $('#o-measure-line-button').on('click', (e) => {
       type = 'LineString';
       toggleType($('#o-measure-line-button button'));
       $('#o-measure-line-button button').blur();
@@ -166,42 +175,41 @@ function bindUIActions() {
     });
   }
 
-  if(areaTool){
-    $('#o-measure-polygon-button').on('click', function(e) {
+  if (areaTool) {
+    $('#o-measure-polygon-button').on('click', (e) => {
       type = 'Polygon';
       toggleType($('#o-measure-polygon-button button'));
       $('#o-measure-polygon-button button').blur();
       e.preventDefault();
     });
   }
-
 }
 
-function createStyle(feature, labelText) {
-  var featureType = feature.getGeometry().getType();
-  var measureStyle = featureType == 'LineString' ? style.createStyleRule(measureStyleOptions.linestring) : style.createStyleRule(measureStyleOptions.polygon);
+function createStyle(feature) {
+  const featureType = feature.getGeometry().getType();
+  const measureStyle = featureType === 'LineString' ? style.createStyleRule(measureStyleOptions.linestring) : style.createStyleRule(measureStyleOptions.polygon);
 
   return measureStyle;
 }
 
-//Display and move tooltips with pointer
+// Display and move tooltips with pointer
 function pointerMoveHandler(evt) {
   if (evt.dragging) {
     return;
   }
 
-  var helpMsg = 'Klicka för att börja mäta';
-  var tooltipCoord = evt.coordinate;
+  const helpMsg = 'Klicka för att börja mäta';
+  let tooltipCoord = evt.coordinate;
 
   if (sketch) {
-    var output;
-    var geom = (sketch.getGeometry());
+    const geom = (sketch.getGeometry());
+    let output;
 
-    if (geom instanceof ol.geom.Polygon) {
-      output = formatArea(/** @type {ol.geom.Polygon} */ (geom));
+    if (geom instanceof Polygon) {
+      output = formatArea((geom));
       tooltipCoord = geom.getInteriorPoint().getCoordinates();
-    } else if (geom instanceof ol.geom.LineString) {
-      output = formatLength( /** @type {ol.geom.LineString} */ (geom));
+    } else if (geom instanceof LineString) {
+      output = formatLength((geom));
       tooltipCoord = geom.getLastCoordinate();
     }
 
@@ -210,19 +218,18 @@ function pointerMoveHandler(evt) {
     measureTooltip.setPosition(tooltipCoord);
   }
 
-  if (evt.type == 'pointermove') {
+  if (evt.type === 'pointermove') {
     helpTooltipElement.innerHTML = helpMsg;
     helpTooltip.setPosition(evt.coordinate);
   }
-
-};
+}
 
 function addInteraction() {
   vector.setVisible(true);
 
-  measure = new ol.interaction.Draw({
-    source: source,
-    type: type,
+  measure = new DrawInteraction({
+    source,
+    type,
     style: style.createStyleRule(measureStyleOptions.interaction)
   });
 
@@ -234,15 +241,14 @@ function addInteraction() {
   map.on('pointermove', pointerMoveHandler);
   map.on('click', pointerMoveHandler);
 
-  measure.on('drawstart', function(evt) {
+  measure.on('drawstart', (evt) => {
     // set sketch
-    drawStart = true;
     sketch = evt.feature;
     $(helpTooltipElement).addClass('o-hidden');
   }, this);
 
-  measure.on('drawend', function(evt) {
-    var feature = evt.feature;
+  measure.on('drawend', (evt) => {
+    const feature = evt.feature;
     feature.setStyle(createStyle(feature));
     feature.getStyle()[0].getText().setText(label);
     $(measureTooltipElement).remove();
@@ -253,8 +259,7 @@ function addInteraction() {
     createMeasureTooltip();
     $(helpTooltipElement).removeClass('o-hidden');
   }, this);
-
-};
+}
 
 function createHelpTooltip() {
   if (helpTooltipElement) {
@@ -264,15 +269,15 @@ function createHelpTooltip() {
   helpTooltipElement = document.createElement('div');
   helpTooltipElement.className = 'o-tooltip o-tooltip-measure';
 
-  helpTooltip = new ol.Overlay({
+  helpTooltip = new Overlay({
     element: helpTooltipElement,
     offset: [15, 0],
-    positioning: 'center-left',
+    positioning: 'center-left'
   });
 
   overlayArray.push(helpTooltip);
   map.addOverlay(helpTooltip);
-};
+}
 
 function createMeasureTooltip() {
   if (measureTooltipElement) {
@@ -282,7 +287,7 @@ function createMeasureTooltip() {
   measureTooltipElement = document.createElement('div');
   measureTooltipElement.className = 'o-tooltip o-tooltip-measure';
 
-  measureTooltip = new ol.Overlay({
+  measureTooltip = new Overlay({
     element: measureTooltipElement,
     offset: [0, -15],
     positioning: 'bottom-center',
@@ -291,51 +296,52 @@ function createMeasureTooltip() {
 
   overlayArray.push(measureTooltip);
   map.addOverlay(measureTooltip);
-};
+}
 
 function formatLength(line) {
-  var projection, length, output;
-  projection = map.getView().getProjection();
-  length = ol.Sphere.getLength(line, {projection: projection});
+  const projection = map.getView().getProjection();
+  const length = Sphere.getLength(line, {
+    projection
+  });
+  let output;
+
   if (length > 100) {
-    output = (Math.round(length / 1000 * 100) / 100) +
-      ' ' + 'km';
+    output = `${Math.round((length / 1000) * 100) / 100} km`;
   } else {
-    output = (Math.round(length * 100) / 100) +
-      ' ' + 'm';
+    output = `${Math.round(length * 100) / 100} m`;
   }
-  
+
   return output;
-};
+}
 
 function formatArea(polygon) {
-  var projection, area, output;
-  projection = map.getView().getProjection();
-  area = ol.Sphere.getArea(polygon, {projection: projection});
+  const projection = map.getView().getProjection();
+  const area = Sphere.getArea(polygon, {
+    projection
+  });
+  let output;
+
   if (area > 10000000) {
-    output = (Math.round(area / 1000000 * 100) / 100) +
-      ' ' + 'km<sup>2</sup>';
+    output = `${Math.round((area / 1000000) * 100) / 100} km<sup>2</sup>`;
   } else if (area > 10000) {
-    output = (Math.round(area / 10000 * 100) / 100) +
-      ' ' + 'ha';
+    output = `${Math.round((area / 10000) * 100) / 100} ha`;
   } else {
-    output = (Math.round(area * 100) / 100) +
-      ' ' + 'm<sup>2</sup>';
+    output = `${Math.round(area * 100) / 100} m<sup>2</sup>`;
   }
 
-  var htmlElem = document.createElement('span');
+  const htmlElem = document.createElement('span');
   htmlElem.innerHTML = output;
 
-  [].forEach.call(htmlElem.children, function(element) {
+  [].forEach.call(htmlElem.children, (element) => {
     if (element.tagName === 'SUP') {
       element.textContent = String.fromCharCode(element.textContent.charCodeAt(0) + 128);
     }
-  })
+  });
 
   return htmlElem.textContent;
-};
+}
 
-function toggleMeasure () {
+function toggleMeasure() {
   if (isActive) {
     $('.o-map').trigger({
       type: 'enableInteraction',
@@ -347,8 +353,7 @@ function toggleMeasure () {
       interaction: 'measure'
     });
   }
-
-};
+}
 
 function toggleType(button) {
   if (activeButton) {
@@ -359,6 +364,6 @@ function toggleType(button) {
   activeButton = button;
   map.removeInteraction(measure);
   addInteraction();
-};
+}
 
-module.exports.init = init;
+export default { init };

@@ -1,23 +1,12 @@
-"use strict";
+import $ from 'jquery';
+import utils from './utils';
 
-var $ = require('jquery');
-var utils = require('./utils');
-
-var url;
-var title;
-var $linkButton;
-
-function init(opt_options) {
-  var options = opt_options || {};
-  url = options.url;
-  title = options.title;
-
-  render();
-  bindUIActions();
-}
+let url;
+let title;
+let $linkButton;
 
 function render() {
-  var el = utils.createListButton({
+  const el = utils.createListButton({
     id: 'o-link',
     iconCls: 'o-icon-fa-external-link',
     src: '#fa-external-link',
@@ -29,9 +18,18 @@ function render() {
 }
 
 function bindUIActions() {
-  $linkButton.on('click', function() {
+  $linkButton.on('click', () => {
     window.open(url);
   });
 }
 
-module.exports.init = init;
+function init(optOptions) {
+  const options = optOptions || {};
+  url = options.url;
+  title = options.title;
+
+  render();
+  bindUIActions();
+}
+
+export default init;
