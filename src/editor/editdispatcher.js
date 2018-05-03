@@ -1,21 +1,9 @@
-"use strict";
-
-var $ = require('jquery');
-
-module.exports = {
-  emitChangeEdit: emitChangeEdit,
-  emitChangeFeature: emitChangeFeature,
-  emitToggleEdit: emitToggleEdit,
-  emitEnableInteraction: emitEnableInteraction,
-  emitEditsChange: emitEditsChange,
-  emitChangeEditorShapes: emitChangeEditorShapes,
-  emitChangeOfflineEdits: emitChangeOfflineEdits
-}
+import $ from 'jquery';
 
 function emitChangeEdit(tool, state) {
   $.event.trigger({
     type: 'changeEdit',
-    tool: tool,
+    tool,
     active: state
   });
 }
@@ -30,11 +18,11 @@ function emitChangeFeature(change) {
   });
 }
 
-function emitToggleEdit(tool, opt_options) {
-  var options = opt_options || {};
-  var e = {
+function emitToggleEdit(tool, optOptions) {
+  const options = optOptions || {};
+  const e = {
     type: 'toggleEdit',
-    tool: tool
+    tool
   };
   $.extend(e, options);
   $.event.trigger(e);
@@ -50,21 +38,32 @@ function emitEnableInteraction() {
 function emitEditsChange(edits) {
   $.event.trigger({
     type: 'editsChange',
-    edits: edits
+    edits
   });
 }
 
 function emitChangeEditorShapes(shape) {
   $.event.trigger({
     type: 'editorShapes',
-    shape: shape
+    shape
   });
 }
 
 function emitChangeOfflineEdits(edits, layerName) {
   $.event.trigger({
     type: 'changeOfflineEdits',
-    edits: edits,
-    layerName: layerName
+    edits,
+    layerName
   });
 }
+
+
+export default {
+  emitChangeEdit,
+  emitChangeFeature,
+  emitToggleEdit,
+  emitEnableInteraction,
+  emitEditsChange,
+  emitChangeEditorShapes,
+  emitChangeOfflineEdits
+};

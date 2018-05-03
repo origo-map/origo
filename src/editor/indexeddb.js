@@ -1,5 +1,3 @@
-var dispatcher = require('./editdispatcher');
+import dispatcher from './editdispatcher';
 
-module.exports = function(transObj, layerName) {
-  dispatcher.emitChangeOfflineEdits(transObj, layerName);
-}
+export default (transObj, layerName) => dispatcher.emitChangeOfflineEdits(transObj, layerName);

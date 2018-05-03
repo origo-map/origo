@@ -1,34 +1,35 @@
-"use strict";
+import MousePosition from 'ol/control/MousePosition';
+import Feature from 'ol/feature';
+import Point from 'ol/geom/point';
+import coordinate from 'ol/coordinate';
+import $ from 'jquery';
+import viewer from './viewer';
+import utils from './utils';
 
-var ol = require('openlayers');
-var $ = require('jquery');
-var viewer = require('./viewer');
-var utils = require('./utils');
+const controlId = 'o-position';
+const markerId = 'o-position-marker';
+const toggleProjId = 'o-position-toggle-proj';
+const coordsId = 'o-position-coords';
+const coordsFindId = 'o-position-find';
+const togglePositionId = 'o-toggle-position';
+const characterError = 'Ogiltigt tecken för koordinat, vänligen försök igen.';
+const extentError = 'Angivna koordinater ligger inte inom kartans utsträckning, vänligen försök igen.';
+let map;
+let view;
+let consoleId;
+let suffix;
+let currentProjection;
+let projections;
+let projectionCodes;
+let projection;
+let mapProjection;
+let precision;
+let mousePositionActive;
+let mousePositionControl;
 
-var controlId = 'o-position';
-var markerId = 'o-position-marker';
-var toggleProjId = 'o-position-toggle-proj';
-var coordsId = 'o-position-coords';
-var coordsFindId = 'o-position-find';
-var togglePositionId = 'o-toggle-position';
-var characterError = 'Ogiltigt tecken för koordinat, vänligen försök igen.';
-var extentError = 'Angivna koordinater ligger inte inom kartans utsträckning, vänligen försök igen.';
-var map = undefined;
-var view = undefined;
-var consoleId = undefined;
-var suffix = undefined;
-var currentProjection = undefined;
-var projections = undefined;
-var projectionCodes = undefined;
-var projection = undefined;
-var mapProjection = undefined;
-var precision = undefined;
-var mousePositionActive = false;
-var mousePositionControl;
-
-function Init(opt_options) {
-  var options = opt_options || {};
-  var title = options.title || undefined;
+function init(opt_options) {
+  const options = opt_options || {};
+  const title = options.title || undefined;
   suffix = options.suffix || '';
   map = viewer.getMap();
   view = map.getView();
@@ -46,20 +47,19 @@ function Init(opt_options) {
   } else {
     alert('No title or projection is set for position');
   }
-  setPrecision();
 
+  setPrecision();
   render();
   bindUIActions();
-
   addMousePosition();
 }
 
 function render() {
-  var icon = utils.createSvg({
+  const icon = utils.createSvg({
     href: '#o_centerposition_24px',
     cls: 'o-icon-position'
   });
-  var toggleButtons = utils.createElement('button', icon, {
+  let toggleButtons = utils.createElement('button', icon, {
     cls: 'o-position-center-button',
     id: togglePositionId
   });
@@ -68,73 +68,73 @@ function render() {
     cls: 'o-position-button',
     value: currentProjection
   });
-  var coordsDiv = utils.createElement('div', '', {
+  const coordsDiv = utils.createElement('div', '', {
     id: coordsId,
     cls: coordsId,
     style: 'padding-left: 5px;'
   });
-  var coordsFind = utils.createElement('input', '', {
+  const coordsFind = utils.createElement('input', '', {
     id: coordsFindId,
     cls: coordsFindId,
     type: 'text',
     name: coordsFindId,
     style: 'padding-left: 5px;'
   });
-  var controlContainer = utils.createElement('div', toggleButtons + coordsDiv + coordsFind, {
+  const controlContainer = utils.createElement('div', toggleButtons + coordsDiv + coordsFind, {
     id: controlId,
     cls: controlId,
     style: 'display: inline-block;'
   });
-  $('#' + consoleId).append(controlContainer);
+  $(`#${consoleId}`).append(controlContainer);
 }
 
 function bindUIActions() {
-  $('#' + toggleProjId).on('click', onToggleProjection);
-  $('#' + togglePositionId).on('click', onTogglePosition);
+  $(`#${toggleProjId}`).on('click', onToggleProjection);
+  $(`#${togglePositionId}`).on('click', onTogglePosition);
 }
 
 function addMousePosition() {
-  mousePositionControl = new ol.control.MousePosition({
-    coordinateFormat: ol.coordinate.createStringXY(precision),
+  mousePositionControl = new MousePosition({
+    coordinateFormat: coordinate.createStringXY(precision),
     projection: currentProjection,
     target: document.getElementById(coordsId),
     undefinedHTML: '&nbsp;'
   });
   map.addControl(mousePositionControl);
   mousePositionActive = true;
-  $('#' + coordsId).addClass('o-active');
+  $(`#${coordsId}`).addClass('o-active');
 }
 
 function removeMousePosition() {
   map.removeControl(mousePositionControl);
-  $('#' + coordsId).removeClass('o-active');
+  $(`#${coordsId}`).removeClass('o-active');
   mousePositionActive = false;
 }
 
 function addCenterPosition() {
   renderMarker();
-  $('#' + togglePositionId).addClass('o-active');
-  $('#' + coordsFindId).addClass('o-active');
+  $(`#${togglePositionId}`).addClass('o-active');
+  $(`#${coordsFindId}`).addClass('o-active');
   updateCoords(view.getCenter());
   view.on('change:center', onChangeCenter);
-  $('#' + coordsFindId).on('keypress', onFind);
+  $(`#${coordsFindId}`).on('keypress', onFind);
 }
 
 function removeCenterPosition() {
   view.un('change:center', onChangeCenter);
   clear();
-  $('#' + coordsFindId).off('keypress', onFind);
-  $('#' + markerId).remove();
-  $('#' + togglePositionId).removeClass('o-active');
-  $('#' + coordsFindId).removeClass('o-active');
+  $(`#${coordsFindId}`).off('keypress', onFind);
+  $(`#${markerId}`).remove();
+  $(`#${togglePositionId}`).removeClass('o-active');
+  $(`#${coordsFindId}`).removeClass('o-active');
 }
 
 function renderMarker() {
-  var icon = utils.createSvg({
+  const icon = utils.createSvg({
     href: '#o_centerposition_24px',
     cls: 'o-icon-position-marker'
   });
-  var marker = utils.createElement('div', icon, {
+  const marker = utils.createElement('div', icon, {
     id: markerId,
     cls: markerId
   });
@@ -142,8 +142,8 @@ function renderMarker() {
 }
 
 function findCoordinate() {
-  var coords = $('#' + coordsFindId).val();
-  var validated = validateCoordinate(coords);
+  const coords = $(`#${coordsFindId}`).val();
+  const validated = validateCoordinate(coords);
   if (validated.length === 2) {
     map.getView().animate({
       center: validated,
@@ -153,15 +153,13 @@ function findCoordinate() {
 }
 
 function validateCoordinate(strCoords) {
-  var extent = viewer.getExtent() || view.getProjection().getExtent();
-  var inExtent;
+  const extent = viewer.getExtent() || view.getProjection().getExtent();
+  let inExtent;
 
-  //validate numbers
-  var coords = strCoords.split(',').map(function(coord) {
-      return parseFloat(coord);
-    })
-    .filter(function(coord) {
-      if (coord !== NaN) {
+  // validate numbers
+  const coords = strCoords.split(',').map(coord => parseFloat(coord))
+    .filter((coord) => {
+      if (Number.isNaN(coord)) {
         return coord;
       }
     });
@@ -180,16 +178,14 @@ function validateCoordinate(strCoords) {
   inExtent = inExtent && (coords[0] <= extent[2]) && (coords[1] <= extent[3]);
   if (inExtent) {
     return coords;
-  } else {
-    alert(extentError);
-    return [];
   }
+  alert(extentError);
+  return [];
 }
 
 function toggleProjectionVal(val) {
-  var index;
-  var proj = undefined;
-  index = projectionCodes.indexOf(val);
+  let proj;
+  const index = projectionCodes.indexOf(val);
   if (index === projectionCodes.length - 1) {
     proj = projectionCodes[0];
   } else if (index < projectionCodes.length - 1) {
@@ -207,7 +203,7 @@ function onTogglePosition() {
     removeMousePosition();
     addCenterPosition();
   } else {
-    addMousePosition();    
+    addMousePosition();
     removeCenterPosition();
   }
 }
@@ -240,14 +236,9 @@ function onFind(e) {
 
 function round(coords) {
   if (precision) {
-    return coords.map(function(coord) {
-      return coord.toFixed(precision);
-    });
-  } else {
-    return coords.map(function(coord) {
-      return Math.round(coord);
-    });
+    return coords.map(coord => coord.toFixed(precision));
   }
+  return coords.map(coord => Math.round(coord));
 }
 
 function setPrecision() {
@@ -259,30 +250,29 @@ function setPrecision() {
 }
 
 function writeProjection() {
-  $('#' + toggleProjId).val(currentProjection);
-  $('#' + toggleProjId).text(projections[currentProjection]);
+  $(`#${toggleProjId}`).val(currentProjection);
+  $(`#${toggleProjId}`).text(projections[currentProjection]);
 }
 
 function transformCoords(coords, source, destination) {
-  var geometry = new ol.Feature({
-    geometry: new ol.geom.Point(coords)
+  const geometry = new Feature({
+    geometry: new Point(coords)
   }).getGeometry();
   return geometry.transform(source, destination).getCoordinates();
 }
 
 function updateCoords(sourceCoords) {
-  var coords = sourceCoords;
-  var center;
+  let coords = sourceCoords;
   if (currentProjection !== mapProjection) {
     coords = transformCoords(coords, projection, currentProjection);
   }
   coords = round(coords);
-  center = coords.join(', ') + suffix;
+  const center = coords.join(', ') + suffix;
   writeCoords(center);
 }
 
 function writeCoords(coords) {
-  $('#' + coordsFindId).val(coords);
+  $(`#${coordsFindId}`).val(coords);
 }
 
-module.exports.init = Init;
+export default { init };

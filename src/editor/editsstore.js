@@ -1,16 +1,14 @@
-var $ = require('jquery');
-var ol = require('openlayers');
-var viewer = require('../viewer');
-var dispatcher = require('./editdispatcher');
+import $ from 'jquery';
+import dispatcher from './editdispatcher';
 
-var editsStore = function featureStore() {
-  var edits = {};
+export default function editsStore() {
+  const edits = {};
 
   $(document).on('changeFeature', featureChange);
 
   return {
-    getEdits: getEdits,
-    hasFeature: hasFeature
+    getEdits,
+    hasFeature
   };
 
   function addEdit(e) {
@@ -35,9 +33,7 @@ var editsStore = function featureStore() {
 
   function removeEdit(e) {
     if (e.feature.length) {
-      e.feature.forEach(function(feature) {
-        removeFeature(e.action, feature, e.layerName)
-      });
+      e.feature.forEach(feature => removeFeature(e.action, feature, e.layerName));
     }
     if (hasEdits() === false) {
       dispatcher.emitEditsChange(0);
@@ -57,7 +53,7 @@ var editsStore = function featureStore() {
   }
 
   function hasFeature(type, feature, layerName) {
-    if (edits.hasOwnProperty(layerName)) {
+    if (Object.prototype.hasOwnProperty.call(edits, layerName)) {
       if (edits[layerName][type].indexOf(feature.getId()) > -1) {
         return true;
       }
@@ -66,7 +62,7 @@ var editsStore = function featureStore() {
   }
 
   function addFeature(type, feature, layerName) {
-    if (edits.hasOwnProperty(layerName) === false) {
+    if (Object.prototype.hasOwnProperty.call(edits, layerName) === false) {
       edits[layerName] = createEditsObj();
     }
     if (hasFeature(type, feature, layerName) === false) {
@@ -75,7 +71,7 @@ var editsStore = function featureStore() {
   }
 
   function removeFeature(type, feature, layerName) {
-    var index = 0;
+    let index = 0;
     if (edits.hasOwnProperty(layerName)) {
       index = edits[layerName][type].indexOf(feature.getId());
       if (index > -1) {
@@ -88,11 +84,10 @@ var editsStore = function featureStore() {
   }
 
   function isFinished(layerName) {
-    var editTypes;
-    var finished = true;
+    let finished = true;
     if (edits.hasOwnProperty(layerName)) {
-      editTypes = Object.getOwnPropertyNames(edits[layerName]);
-      editTypes.forEach(function(editType) {
+      const editTypes = Object.getOwnPropertyNames(edits[layerName]);
+      editTypes.forEach((editType) => {
         if (edits[layerName][editType].length) {
           finished = false;
           return finished;
@@ -112,16 +107,13 @@ var editsStore = function featureStore() {
       update: [],
       insert: [],
       delete: []
-    }
+    };
   }
 
   function hasEdits() {
     if (Object.getOwnPropertyNames(edits).length) {
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 }
-
-module.exports = editsStore;

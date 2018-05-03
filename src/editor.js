@@ -1,36 +1,12 @@
- "use strict";
+import $ from 'jquery';
+import viewer from './viewer';
+import utils from './utils';
+import editorToolbar from './editor/editortoolbar';
 
-var $ = require('jquery');
-var viewer = require('./viewer');
-var utils = require('./utils');
-var editorToolbar = require('./editor/editortoolbar');
-
-var $editorButton;
-
-module.exports = function() {
-
-  return {
-    init: Init
-  };
-}();
-
-function Init(opt_options) {
-  var options = opt_options || {};
-  var editableLayers = viewer.getLayersByProperty('editable', true, true);
-  if (editableLayers.length) {
-    options.editableLayers = editableLayers;
-  }  
-  options.autoSave = options.hasOwnProperty('autoSave') ? options.autoSave : true;
-  options.autoForm = options.hasOwnProperty('autoForm') ? options.autoForm : false;
-  options.currentLayer = options.defaultLayer || options.editableLayers[0];
-  editorToolbar.init(options);
-  render();
-  $editorButton = $('#o-editor-button');
-  bindUIActions();
-}
+let $editorButton;
 
 function bindUIActions() {
-  $editorButton.on('click', function(e) {
+  $editorButton.on('click', (e) => {
     $('.o-map').first().trigger({
       type: 'enableInteraction',
       interaction: 'editor'
@@ -42,7 +18,7 @@ function bindUIActions() {
 }
 
 function render() {
-  var el = utils.createListButton({
+  const el = utils.createListButton({
     id: 'o-editor',
     iconCls: 'o-icon-fa-pencil',
     src: '#fa-pencil',
@@ -50,3 +26,20 @@ function render() {
   });
   $('#o-menutools').append(el);
 }
+
+function init(optOptions) {
+  const options = optOptions || {};
+  const editableLayers = viewer.getLayersByProperty('editable', true, true);
+  if (editableLayers.length) {
+    options.editableLayers = editableLayers;
+  }
+  options.autoSave = 'autoSave' in options ? options.autoSave : true;
+  options.autoForm = 'autoForm' in options ? options.autoForm : false;
+  options.currentLayer = options.defaultLayer || options.editableLayers[0];
+  editorToolbar.init(options);
+  render();
+  $editorButton = $('#o-editor-button');
+  bindUIActions();
+}
+
+export default { init };

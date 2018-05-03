@@ -40,4 +40,4 @@ function createLink() {
   $('.o-share-link input').val(url).select();
 }
 
-export default init;
+export default { init };

@@ -1,18 +1,15 @@
-"use strict";
+import Draw from 'ol/interaction/Draw';
 
-var ol = require('openlayers');
-
-module.exports = function(drawType) {
-  var types = {
+export default (drawType) => {
+  const types = {
     box: {
       type: 'Circle',
-      geometryFunction: ol.interaction.Draw.createBox()
+      geometryFunction: Draw.createBox()
     }
   };
 
-  if (types.hasOwnProperty(drawType)) {
+  if (Object.prototype.hasOwnProperty.call(types, drawType)) {
     return types[drawType];
-  } else {
-    return {};
   }
-}
+  return {};
+};
