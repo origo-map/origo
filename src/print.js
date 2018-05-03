@@ -5,13 +5,11 @@ import template from './templates/print.handlebars';
 
 let $printButton;
 let attribution;
-let map;
 let baseUrl;
 
 function init(opt) {
   const options = opt || {};
   attribution = options.attribution || '© Lantmäteriet Geodatasamverkan';
-  map = viewer.getMap();
   baseUrl = viewer.getBaseUrl();
 
   render();
@@ -105,4 +103,4 @@ function createImage() {
   }
 }
 
-export default init;
+export default { init };
