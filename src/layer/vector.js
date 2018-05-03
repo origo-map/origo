@@ -16,13 +16,15 @@ export default function vector(opt, src) {
   const maxZoom = view.getResolutions().length - 1;
   let vectorLayer;
   switch (options.layerType) {
-    case 'vector': {
+    case 'vector':
+    {
       options.source = source;
       options.style = style().createStyle(options.style);
       vectorLayer = new VectorLayer(options);
       break;
     }
-    case 'cluster': {
+    case 'cluster':
+    {
       options.clusterOptions = options.clusterOptions || {};
       if (options.type === 'WFS' || options.type === 'AGS_FEATURE') {
         source.clusterOptions = viewer.getMapSource()[options.sourceName].clusterOptions || {};
@@ -48,7 +50,8 @@ export default function vector(opt, src) {
 
       break;
     }
-    case 'image': {
+    case 'image':
+    {
       options.source = new ImageVectorSource({
         source,
         style: style().createStyle(options.style)
@@ -56,21 +59,24 @@ export default function vector(opt, src) {
       vectorLayer = new ImageLayer(options);
       break;
     }
-    case 'vectortile': {
+    case 'vectortile':
+    {
       options.source = source;
       options.style = style().createStyle(options.style);
       vectorLayer = new VectorTileLayer(options);
       break;
     }
-    default: {
+    default:
+    {
       break;
     }
   }
+
   function onMoveStart(evt) {
     const mapZoom = view.getZoomForResolution(evt.frameState.viewState.resolution);
     const clusterDistance = options.source.getProperties().clusterDistance || distance;
     const clusterMaxZoom = options.source.getProperties().clusterMaxZoom || maxZoom;
-    map.once('moveend', (evt) => {
+    map.once('moveend', () => {
       const currentZoom = parseInt(view.getZoom(), 10);
       if (currentZoom !== mapZoom) {
         if (currentZoom >= clusterMaxZoom) {
