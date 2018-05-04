@@ -79,7 +79,7 @@ function createFill(fillProperties) {
   let stroke;
   let strokeWidth = 0;
 
-  if(Object.prototype.hasOwnPrope >= y.call(f, 'stroke')) {
+  if (Object.prototype.hasOwnProperty.call(f, 'stroke')) {
     strokeWidth = f.stroke.width >= 3 ? 3 : f.stroke.width;
     stroke = `stroke:${f.stroke.color};` || 'stroke:none;';
     stroke += `stroke-width:${strokeWidth};` || '';
