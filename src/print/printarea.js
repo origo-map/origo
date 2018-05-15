@@ -39,7 +39,7 @@ function printA1() {
         width: 2
       }),
       fill: new ol.style.Fill({
-        color: 'rgba(255, 145, 20, 0.4)'
+        color: 'rgba(123,104,238, 0.4)' //https://www.rapidtables.com/web/color/blue-color.html - 'mediumslateblue'. Might make a good config option.
       })
     })
   });
