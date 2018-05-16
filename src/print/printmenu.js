@@ -97,7 +97,7 @@ function init() {
 				'</div>' +
 				'<br />' +
 				'<div class="o-block">' +
-					'<span id="o-dl-progress">Skapar... <img src="../../img/spinner.svg" /></span><a id="o-dl-link" href="#">Ladda ner</a><img id="o-dl-cancel" src="../../img/png/cancel.png"/>' +
+					'<span id="o-dl-progress">Skapar... <img src="img/spinner.svg" /></span><a id="o-dl-link" href="#">Ladda ner</a><img id="o-dl-cancel" src="img/png/cancel.png"/>' +
 				'</div>' +
 			'</div>' +
 			'</form>';
