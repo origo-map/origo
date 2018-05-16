@@ -41,9 +41,6 @@ function init() {
 			hideLayouts = false;
 		}
 
-		var scales = config.scales.map(function(scale) {
-			return scale.value;
-		});
 
 		var dpis = config.dpis.map(function(dpi) {
 			return dpi.value;
@@ -73,7 +70,7 @@ function init() {
 				'<div class="o-block">' +
 					'<span class="o-setting-heading">Skala</span>' +
 					'<select id="o-scale-dd" class="o-dd-input">' +
-					utils.createDdOptions(scales) +
+
 					'</select>' +
 				'</div>' +
 				'<div class="o-block">' +
@@ -106,6 +103,10 @@ function init() {
 			'</form>';
 
 		$('#o-map').append(menuEl);
+        
+        $.each(config.scales, function (key, entry) {
+            $('#o-scale-dd').append($('<option></option>').attr('value', entry.value).text(entry.name));
+        });
 		
 		//Set default values for dropdowns
 		$('#o-format-dd option[value="PDF"]').attr('selected', 'selected');
