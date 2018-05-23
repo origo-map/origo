@@ -15,6 +15,12 @@ export default function (id, layer) {
   return sourceType[type](id, layer, serverUrl);
 }
 
+function fail(response) {
+  if (response.error) {
+    console.log(`${response.error.message}
+      ${response.error.details.join('\n')}`);
+  }
+}
 
 sourceType.AGS_FEATURE = function agsFeature(id, layer, serverUrl) {
   const esriSrs = projectionCode.split(':').pop();
@@ -49,7 +55,7 @@ sourceType.AGS_FEATURE = function agsFeature(id, layer, serverUrl) {
     }, fail);
 };
 
-sourceType.WFS = function(id, layer, serverUrl) {
+sourceType.WFS = function wfsSourceType(id, layer, serverUrl) {
   const geometryName = layer.get('geometryName');
   const format = new GeoJSONFormat({
     geometryName
@@ -67,13 +73,6 @@ sourceType.WFS = function(id, layer, serverUrl) {
     data,
     type: 'POST',
     dataType: 'json'
- })
+  })
     .then(response => format.readFeatures(response));
 };
-
-function fail(response) {
-  if (response.error) {
-    console.log(`${response.error.message}
-      ${response.error.details.join('\n')}`);
-  }
-}
