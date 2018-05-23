@@ -1,7 +1,7 @@
 import getcenter from './geometry/getcenter';
 import getarea from './geometry/getarea';
 
-var geom = {};
+const geom = {};
 geom.center = getcenter;
 geom.area = getarea;
 
