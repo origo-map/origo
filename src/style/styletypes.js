@@ -1,7 +1,7 @@
 import pin from './pin';
 import measure from './measure';
 
-export default function styletypes() {
+export default function () {
   const styleTypes = {};
 
   styleTypes.pin = pin;

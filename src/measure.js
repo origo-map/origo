@@ -9,9 +9,10 @@ import LineString from 'ol/geom/LineString';
 import viewer from './viewer';
 import utils from './utils';
 import Style from './style';
-import styleTypes from './style/styletypes';
+import StyleTypes from './style/styletypes';
 
 const style = Style();
+const styleTypes = StyleTypes();
 
 let map;
 let options;

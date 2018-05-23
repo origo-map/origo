@@ -7,10 +7,11 @@ import sidebar from './sidebar';
 import maputils from './maputils';
 import featurelayer from './featurelayer';
 import Style from './style';
-import styleTypes from './style/styletypes';
+import StyleTypes from './style/styletypes';
 import getFeatureInfo from './getfeatureinfo';
 
 const style = Style();
+const styleTypes = StyleTypes();
 
 let selectionLayer;
 let savedPin;
