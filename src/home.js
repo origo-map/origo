@@ -6,16 +6,6 @@ let map;
 let tooltip;
 let extent;
 
-function init(opt_options) {
-  const options = opt_options || {};
-  const target = options.target || '#o-toolbar-navigation';
-  map = viewer.getMap();
-  tooltip = options.tooltipText || 'Zooma till hela kartan';
-  extent = options.extent || map.getView().calculateExtent(map.getSize());
-  render(target);
-  bindUIActions();
-}
-
 function render(target) {
   const el = utils.createButton({
     id: 'o-home-button',
@@ -32,6 +22,16 @@ function bindUIActions() {
     $('#o-home-button button').blur();
     e.preventDefault();
   });
+}
+
+function init(optOptions) {
+  const options = optOptions || {};
+  const target = options.target || '#o-toolbar-navigation';
+  map = viewer.getMap();
+  tooltip = options.tooltipText || 'Zooma till hela kartan';
+  extent = options.extent || map.getView().calculateExtent(map.getSize());
+  render(target);
+  bindUIActions();
 }
 
 export default {

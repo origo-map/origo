@@ -7,25 +7,6 @@ import featureInfo from './featureinfo';
 
 let map;
 
-function isTainted(pixel, layerFilter) {
-  try {
-    if (layerFilter) {
-      map.forEachLayerAtPixel(pixel, layer => layerFilter === layer);
-    } else {
-      map.forEachLayerAtPixel(pixel, () => ({}));
-    }
-    return false;
-  } catch (e) {
-    console.log(e);
-    return true;
-  }
-}
-
-
-function layerAtPixel(pixel, matchLayer) {
-  map.forEachLayerAtPixel(pixel, layer => matchLayer === layer);
-}
-
 function getGetFeatureInfoUrl(layer, coordinate) {
   const resolution = map.getView().getResolution();
   const projection = viewer.getProjection();
@@ -52,10 +33,10 @@ function getAGSIdentifyUrl(layer, coordinate) {
   const serverUrl = source.url;
   const esrijsonFormat = new EsriJSON();
   const size = map.getSize();
-  const tolerance = 'tolerance' in source ? source.tolerance.toString() : 5;
+  const tolerance = Object.prototype.hasOwnProperty.call(source, 'tolerance') ? source.tolerance.toString() : 5;
   const extent = map.getView().calculateExtent(size);
 
-  const url = [serverUrl,
+  const url = [`${serverUrl}`,
     '/identify?f=json',
     '&returnGeometry=true',
     '&geometryType=esriGeometryPoint',
@@ -64,7 +45,7 @@ function getAGSIdentifyUrl(layer, coordinate) {
     '&outFields=*',
     '&geometryPrecision=2',
     `&tolerance=${tolerance}`,
-    `&layers=all: ${layerId}`,
+    `&layers=all:${layerId}`,
     `&mapExtent=${extent}`,
     `&imageDisplay=${size},96`].join('');
 
@@ -83,6 +64,23 @@ function getAGSIdentifyUrl(layer, coordinate) {
       });
       return features[0];
     });
+}
+
+function isTainted(pixel, layerFilter) {
+  try {
+    if (layerFilter) {
+      map.forEachLayerAtPixel(pixel, layer => layerFilter === layer);
+    }
+
+    return false;
+  } catch (e) {
+    console.log(e);
+    return true;
+  }
+}
+
+function layerAtPixel(pixel, matchLayer) {
+  map.forEachLayerAtPixel(pixel, layer => matchLayer === layer);
 }
 
 function getGetFeatureInfoRequest(layer, coordinate) {
@@ -118,13 +116,14 @@ function getGetFeatureInfoRequest(layer, coordinate) {
     default:
       return null;
   }
+
   return null;
 }
 
 function getFeatureInfoRequests(evt) {
   const requests = [];
   // Check for support of crossOrigin in image, absent in IE 8 and 9
-  if ('crossOrigin' in new Image()) {
+  if ('crossOrigin' in new (Image)()) {
     map.forEachLayerAtPixel(evt.pixel, (layer) => {
       if (layer.get('queryable')) {
         const item = getGetFeatureInfoRequest(layer, evt.coordinate);
@@ -133,7 +132,7 @@ function getFeatureInfoRequests(evt) {
         }
       }
     });
-  } else if (isTainted(evt.pixel)) {
+  } else if (isTainted(evt.pixel)) { // If canvas is tainted
     const layers = viewer.getQueryableLayers();
     layers.forEach((layer) => {
       if (layer.get('queryable')) {
@@ -143,7 +142,7 @@ function getFeatureInfoRequests(evt) {
           if (item) {
             requests.push(item);
           }
-        } else if (layerAtPixel(evt.pixel, layer)) {
+        } else if (layerAtPixel(evt.pixel, layer)) { // If layer is not tainted, test if layer hit at pixel
           const item = getGetFeatureInfoRequest(layer, evt.coordinate);
           if (item) {
             requests.push(item);
@@ -151,7 +150,7 @@ function getFeatureInfoRequests(evt) {
         }
       }
     });
-  } else {
+  } else { // If crossOrigin is not supported and canvas not tainted
     map.forEachLayerAtPixel(evt.pixel, (layer) => {
       if (layer.get('queryable') === true) {
         const item = getGetFeatureInfoRequest(layer, evt.coordinate);
@@ -162,6 +161,25 @@ function getFeatureInfoRequests(evt) {
     });
   }
   return requests;
+}
+
+function getFeaturesFromRemote(evt) {
+  map = viewer.getMap();
+  const requestResult = [];
+  const requestPromises = getFeatureInfoRequests(evt).map(request => request.fn.then((feature) => {
+    const layer = viewer.getLayer(request.layer);
+    if (feature) {
+      requestResult.push({
+        title: layer.get('title'),
+        feature,
+        content: getAttributes(feature, layer)
+      });
+      return requestResult;
+    }
+
+    return false;
+  }));
+  return $.when(requestPromises).then(() => requestResult);
 }
 
 function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
@@ -207,6 +225,8 @@ function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
       item.content = getAttributes(feature, l);
       result.push(item);
     }
+
+    return false;
   }, {
     hitTolerance: featureInfo.getHitTolerance()
   });
@@ -215,27 +235,6 @@ function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
     return false;
   }
   return result;
-}
-
-function getFeaturesFromRemote(evt) {
-  map = viewer.getMap();
-  const requestResult = [];
-  const requestPromises = getFeatureInfoRequests(evt).map((request) => {
-    return request.fn.then((feature) => {
-      const layer = viewer.getLayer(request.layer);
-      if (feature) {
-        requestResult.push({
-          title: layer.get('title'),
-          feature,
-          content: getAttributes(feature, layer)
-        });
-        return requestResult;
-      }
-    });
-  });
-  return $.when.apply($, requestPromises).then((data) => {
-    return requestResult;
-  });
 }
 
 export default {
