@@ -7,16 +7,6 @@ let buttonText;
 let title;
 let content;
 
-function init(opt) {
-  const options = opt || {};
-  buttonText = options.buttonText || 'Om kartan';
-  title = options.title || 'Om kartan';
-  content = options.content || '<p></p>';
-
-  render();
-  bindUIActions();
-}
-
 function render() {
   const el = utils.createListButton({
     id: 'o-about',
@@ -38,6 +28,16 @@ function bindUIActions() {
     modal.showModal();
     e.preventDefault();
   });
+}
+
+function init(opt) {
+  const options = opt || {};
+  buttonText = options.buttonText || 'Om kartan';
+  title = options.title || 'Om kartan';
+  content = options.content || '<p></p>';
+
+  render();
+  bindUIActions();
 }
 
 export default { init };
