@@ -13,8 +13,6 @@ export default function dropDown(target, items, options) {
     href: '#ic_check_24px',
     cls: 'o-icon-24'
   });
-  render();
-  addListener();
 
   function render() {
     items.forEach((item, index) => {
@@ -36,6 +34,11 @@ export default function dropDown(target, items, options) {
     $target.append(ul);
   }
 
+  function toggleActive($active) {
+    $target.find('li').removeClass(activeCls);
+    $active.addClass(activeCls);
+  }
+
   function addListener() {
     $target.on('click', 'ul', (e) => {
       const $active = $(e.target);
@@ -47,8 +50,6 @@ export default function dropDown(target, items, options) {
     });
   }
 
-  function toggleActive($active) {
-    $target.find('li').removeClass(activeCls);
-    $active.addClass(activeCls);
-  }
+  render();
+  addListener();
 }
