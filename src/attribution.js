@@ -1,4 +1,4 @@
-import Attribution from 'ol/control/Attribution';
+import Attribution from 'ol/control/attribution';
 import $ from 'jquery';
 import viewer from './viewer';
 

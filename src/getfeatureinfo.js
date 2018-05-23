@@ -1,4 +1,4 @@
-import EsriJSON from 'ol/format/EsriJSON';
+import EsriJSON from 'ol/format/esrijson';
 import $ from 'jquery';
 import viewer from './viewer';
 import maputils from './maputils';
@@ -7,75 +7,82 @@ import featureInfo from './featureinfo';
 
 let map;
 
-function getFeaturesFromRemote(evt) {
-  map = viewer.getMap();
-  const requestResult = [];
-  const requestPromises = getFeatureInfoRequests(evt).map((request) => {
-    return request.fn.then((feature) => {
-      const layer = viewer.getLayer(request.layer);
-      if (feature) {
-        requestResult.push({
-          title: layer.get('title'),
-          feature,
-          content: getAttributes(feature, layer)
-        });
-        return requestResult;
-      }
-    });
-  });
-  return $.when.apply($, requestPromises).then((data) => {
-    return requestResult;
-  });
+function isTainted(pixel, layerFilter) {
+  try {
+    if (layerFilter) {
+      map.forEachLayerAtPixel(pixel, layer => layerFilter === layer);
+    } else {
+      map.forEachLayerAtPixel(pixel, () => ({}));
+    }
+    return false;
+  } catch (e) {
+    console.log(e);
+    return true;
+  }
 }
 
-function getFeatureInfoRequests(evt) {
-  const requests = [];
-  // Check for support of crossOrigin in image, absent in IE 8 and 9
-  if ('crossOrigin' in new(Image)) {
-    map.forEachLayerAtPixel(evt.pixel, (layer) => {
-      if (layer.get('queryable')) {
-        const item = getGetFeatureInfoRequest(layer, evt.coordinate);
-        if (item) {
-          requests.push(item)
-        }
-      }
-    });
-  }
-  // If canvas is tainted
-  else if (isTainted(evt.pixel)) {
-    const layers = viewer.getQueryableLayers();
-    layers.forEach((layer) => {
-      if (layer.get('queryable')) {
-        // If layer is tainted, then create request for layer
-        if (isTainted(evt.pixel, layer)) {
-          const item = getGetFeatureInfoRequest(layer, evt.coordinate);
-          if (item) {
-            requests.push(item)
-          }
-        }
 
-        // If layer is not tainted, test if layer hit at pixel
-        else if (layerAtPixel(evt.pixel, layer)) {
-          const item = getGetFeatureInfoRequest(layer, evt.coordinate);
-          if (item) {
-            requests.push(item)
-          }
-        }
+function layerAtPixel(pixel, matchLayer) {
+  map.forEachLayerAtPixel(pixel, layer => matchLayer === layer);
+}
+
+function getGetFeatureInfoUrl(layer, coordinate) {
+  const resolution = map.getView().getResolution();
+  const projection = viewer.getProjection();
+  const url = layer.getSource().getGetFeatureInfoUrl(coordinate, resolution, projection, {
+    INFO_FORMAT: 'application/json'
+  });
+
+  return $.ajax(url, {
+    type: 'post'
+  })
+    .then((response) => {
+      if (response.error) {
+        return [];
       }
+      return maputils.geojsonToFeature(response);
     });
-  }
-  // If crossOrigin is not supported and canvas not tainted
-  else {
-    map.forEachLayerAtPixel(evt.pixel, (layer) => {
-      if (layer.get('queryable') === true) {
-        const item = getGetFeatureInfoRequest(layer, evt.coordinate);
-        if (item) {
-          requests.push(item)
-        }
+}
+
+function getAGSIdentifyUrl(layer, coordinate) {
+  const projectionCode = viewer.getProjectionCode();
+  const esriSrs = projectionCode.split(':').pop();
+  const layerId = layer.get('id');
+  const source = viewer.getMapSource()[layer.get('sourceName')];
+  const serverUrl = source.url;
+  const esrijsonFormat = new EsriJSON();
+  const size = map.getSize();
+  const tolerance = 'tolerance' in source ? source.tolerance.toString() : 5;
+  const extent = map.getView().calculateExtent(size);
+
+  const url = [serverUrl,
+    '/identify?f=json',
+    '&returnGeometry=true',
+    '&geometryType=esriGeometryPoint',
+    `&sr=${esriSrs}`,
+    `&geometry=${coordinate}`,
+    '&outFields=*',
+    '&geometryPrecision=2',
+    `&tolerance=${tolerance}`,
+    `&layers=all: ${layerId}`,
+    `&mapExtent=${extent}`,
+    `&imageDisplay=${size},96`].join('');
+
+  return $.ajax({
+    url,
+    dataType: 'jsonp'
+  })
+    .then((response) => {
+      if (response.error) {
+        return [];
       }
+      const obj = {};
+      obj.features = response.results;
+      const features = esrijsonFormat.readFeatures(obj, {
+        featureProjection: viewer.getProjection()
+      });
+      return features[0];
     });
-  }
-  return requests;
 }
 
 function getGetFeatureInfoRequest(layer, coordinate) {
@@ -109,30 +116,52 @@ function getGetFeatureInfoRequest(layer, coordinate) {
       obj.fn = getAGSIdentifyUrl(layer, coordinate);
       return obj;
     default:
-      return undefined;
+      return null;
   }
+  return null;
 }
 
-function isTainted(pixel, layerFilter) {
-  try {
-    if (layerFilter) {
-      map.forEachLayerAtPixel(pixel, (layer) => {
-        return layerFilter === layer;
-      });
-    } else {
-      map.forEachLayerAtPixel(pixel, (layer) => {});
-    }
-    return false;
-  } catch (e) {
-    console.log(e);
-    return true;
+function getFeatureInfoRequests(evt) {
+  const requests = [];
+  // Check for support of crossOrigin in image, absent in IE 8 and 9
+  if ('crossOrigin' in new Image()) {
+    map.forEachLayerAtPixel(evt.pixel, (layer) => {
+      if (layer.get('queryable')) {
+        const item = getGetFeatureInfoRequest(layer, evt.coordinate);
+        if (item) {
+          requests.push(item);
+        }
+      }
+    });
+  } else if (isTainted(evt.pixel)) {
+    const layers = viewer.getQueryableLayers();
+    layers.forEach((layer) => {
+      if (layer.get('queryable')) {
+        // If layer is tainted, then create request for layer
+        if (isTainted(evt.pixel, layer)) {
+          const item = getGetFeatureInfoRequest(layer, evt.coordinate);
+          if (item) {
+            requests.push(item);
+          }
+        } else if (layerAtPixel(evt.pixel, layer)) {
+          const item = getGetFeatureInfoRequest(layer, evt.coordinate);
+          if (item) {
+            requests.push(item);
+          }
+        }
+      }
+    });
+  } else {
+    map.forEachLayerAtPixel(evt.pixel, (layer) => {
+      if (layer.get('queryable') === true) {
+        const item = getGetFeatureInfoRequest(layer, evt.coordinate);
+        if (item) {
+          requests.push(item);
+        }
+      }
+    });
   }
-}
-
-function layerAtPixel(pixel, matchLayer) {
-  map.forEachLayerAtPixel(pixel, (layer) => {
-    return matchLayer === layer;
-  })
+  return requests;
 }
 
 function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
@@ -188,63 +217,25 @@ function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
   return result;
 }
 
-function getGetFeatureInfoUrl(layer, coordinate) {
-  const resolution = map.getView().getResolution();
-  const projection = viewer.getProjection();
-  const url = layer.getSource().getGetFeatureInfoUrl(coordinate, resolution, projection, {
-    INFO_FORMAT: 'application/json'
+function getFeaturesFromRemote(evt) {
+  map = viewer.getMap();
+  const requestResult = [];
+  const requestPromises = getFeatureInfoRequests(evt).map((request) => {
+    return request.fn.then((feature) => {
+      const layer = viewer.getLayer(request.layer);
+      if (feature) {
+        requestResult.push({
+          title: layer.get('title'),
+          feature,
+          content: getAttributes(feature, layer)
+        });
+        return requestResult;
+      }
+    });
   });
-
-  return $.ajax(url, {
-    type: 'post'
-  })
-    .then((response) => {
-      if (response.error) {
-        return [];
-      }
-      return maputils.geojsonToFeature(response);
-    });
-}
-
-function getAGSIdentifyUrl(layer, coordinate) {
-  const projectionCode = viewer.getProjectionCode();
-  const esriSrs = projectionCode.split(':').pop();
-  const layerId = layer.get('id');
-  const source = viewer.getMapSource()[layer.get('sourceName')];
-  const serverUrl = source.url;
-  const esrijsonFormat = new EsriJSON();
-  const size = map.getSize();
-  const tolerance = source.hasOwnProperty('tolerance') ? source.tolerance.toString() : 5;
-  const extent = map.getView().calculateExtent(size);
-
-  const url = serverUrl +
-    '/identify?f=json&' +
-    'returnGeometry=true' +
-    '&geometryType=esriGeometryPoint' +
-    '&sr=' + esriSrs +
-    '&geometry=' + coordinate +
-    '&outFields=*' +
-    '&geometryPrecision=2' +
-    '&tolerance=' + tolerance +
-    '&layers=all:' + layerId +
-    '&mapExtent=' + extent +
-    '&imageDisplay=' + size + ',' + '96';
-
-  return $.ajax({
-    url,
-    dataType: 'jsonp'
-  })
-    .then((response) => {
-      if (response.error) {
-        return [];
-      }
-      const obj = {};
-      obj.features = response.results;
-      const features = esrijsonFormat.readFeatures(obj, {
-        featureProjection: viewer.getProjection()
-      });
-      return features[0];
-    });
+  return $.when.apply($, requestPromises).then((data) => {
+    return requestResult;
+  });
 }
 
 export default {
