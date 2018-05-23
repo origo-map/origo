@@ -175,7 +175,7 @@ function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
       const item = {};
       item.title = l.get('title');
       item.feature = feature;
-      item.content = getAttributes(feature, l)
+      item.content = getAttributes(feature, l);
       result.push(item);
     }
   }, {

@@ -18,7 +18,7 @@ function createUrl(prefix, suffix, url) {
   return p + url + s;
 }
 
-function getAttributes(feature, layer) {
+export default function(feature, layer) {
   let content = '<div><ul>';
   let attribute;
   let li = '';
@@ -87,5 +87,3 @@ function getAttributes(feature, layer) {
   content += `${li}</ul></div>`;
   return content;
 }
-
-export default { getAttributes };
