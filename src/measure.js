@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import Sphere from 'ol/Sphere';
+import Sphere from 'ol/sphere';
 import VectorSource from 'ol/source/vector';
 import VectorLayer from 'ol/layer/vector';
 import DrawInteraction from 'ol/interaction/draw';

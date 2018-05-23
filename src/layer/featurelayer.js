@@ -1,4 +1,4 @@
-import VectorSource from 'ol/source/Vector';
+import VectorSource from 'ol/source/vector';
 import vector from './vector';
 
 function createSource(options) {
