@@ -5,7 +5,11 @@ const controlInitialiser = (controls) => {
     controlName = control.name;
     controlOptions = control.options || undefined;
     if (Object.prototype.hasOwnProperty.call(origo.controls, controlName)) {
-      controlOptions ? origo.controls[controlName].init(controlOptions) : origo.controls[controlName].init();
+      if (controlOptions) {
+        origo.controls[controlName].init(controlOptions);
+      } else {
+        origo.controls[controlName].init();
+      }
     }
   });
 };
