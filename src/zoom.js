@@ -1,9 +1,9 @@
-import Zoom from 'ol/control/Zoom';
+import Zoom from 'ol/control/zoom';
 import $ from 'jquery';
 import viewer from './viewer';
 
-const init = function init(opt_options) {
-  const options = opt_options || {};
+const init = function init(optOptions) {
+  const options = optOptions || {};
   const target = options.target || 'o-toolbar-navigation';
   const map = viewer.getMap();
 
@@ -15,6 +15,6 @@ const init = function init(opt_options) {
     target
   });
   map.addControl(zoomControl);
-}
+};
 
 export default { init };

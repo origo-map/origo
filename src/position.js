@@ -1,4 +1,4 @@
-import MousePosition from 'ol/control/MousePosition';
+import MousePosition from 'ol/control/mouseposition';
 import Feature from 'ol/feature';
 import Point from 'ol/geom/point';
 import coordinate from 'ol/coordinate';
