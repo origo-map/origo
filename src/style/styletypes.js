@@ -1,9 +1,8 @@
 import pin from './pin';
 import measure from './measure';
 
-export default (function() {
-
-  var styleTypes = {};
+export default function styletypes() {
+  const styleTypes = {};
 
   styleTypes.pin = pin;
   styleTypes.measure = measure;
@@ -12,9 +11,9 @@ export default (function() {
     getStyle: function getStyle(type) {
       if (type) {
         return styleTypes[type];
-      } else {
-        console.log(type + ' is not a default style');
       }
+      console.log(`${type} is not a default style`)
+      return false;
     }
-  }
-})();
+  };
+}

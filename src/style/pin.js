@@ -1,5 +1,5 @@
-var pin = [{
-  'icon': {
+const pin = [{
+  icon: {
     anchor: [0.5, 32],
     anchorXUnits: 'fraction',
     anchorYUnits: 'pixels',
