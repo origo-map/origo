@@ -9,8 +9,8 @@ import VectorLayer from 'ol/layer/Vector';
 import viewer from './viewer';
 import legend from './legend';
 
-function init(opt_options) {
-  const options = opt_options || {};
+function init(optOptions) {
+  const options = optOptions || {};
   const map = viewer.getMap();
   const groupTitle = options.groupTitle || 'Egna lager';
   let vectorSource;
