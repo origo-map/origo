@@ -1,7 +1,7 @@
 import round from '../utils/round';
 
-var getArea = function getArea(geometry_in, decimals) {
-  var area = geometry_in.getArea ? geometry_in.getArea() : 0;
+export default function getArea(geometryIn, decimals) {
+  let area = geometryIn.getArea ? geometryIn.getArea() : 0;
   if (decimals) {
     area = round(area, decimals);
   } else {
@@ -9,5 +9,3 @@ var getArea = function getArea(geometry_in, decimals) {
   }
   return area;
 }
-
-export default getArea;

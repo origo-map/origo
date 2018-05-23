@@ -1,36 +1,39 @@
 import viewer from '../viewer';
 
-var getCenter = function getCenter(geometry_in, destination, axisOrientation) {
-  var geometry = geometry_in.clone();
+export default function getCenter(geometryIn, destination, axisOrientation) {
+  const geometry = geometryIn.clone();
 
   if (destination) {
     geometry.transform(viewer.getMap().getView().getProjection(), destination);
   }
 
-  var type = geometry.getType();
-  var center;
+
+  const type = geometry.getType();
+  let center;
   switch (type) {
-    case "Polygon":
+    case 'Polygon':
       center = geometry.getInteriorPoint().getCoordinates();
       break;
-    case "MultiPolygon":
+    case 'MultiPolygon':
       center = geometry.getInteriorPoints().getCoordinates()[0];
       break;
-    case "Point":
+    case 'Point':
       center = geometry.getCoordinates();
       break;
-    case "MultiPoint":
+    case 'MultiPoint':
       center = geometry[0].getCoordinates();
       break;
-    case "LineString":
+    case 'LineString':
       center = geometry.getCoordinateAt(0.5);
       break;
-    case "MultiLineString":
+    case 'MultiLineString':
       center = geometry.getLineStrings()[0].getCoordinateAt(0.5);
       break;
-    case "Circle":
+    case 'Circle':
       center = geometry.getCenter();
       break;
+    default:
+      center = undefined;
   }
 
   if (axisOrientation) {
@@ -40,6 +43,4 @@ var getCenter = function getCenter(geometry_in, destination, axisOrientation) {
   }
 
   return center;
-};
-
-export default getCenter;
+}
