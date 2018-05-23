@@ -33,6 +33,7 @@ For all bugs and feature requests please use ["Issues"](https://github.com/origo
 ## Live examples
 Not convinced? Or maybe you need some inspiration? Check out these examples of web maps that have been developed using the Origo framework:
  * [Enakartan](http://karta.enkoping.se)
+ * [Eskilstunakartan](https://karta.eskilstuna.se)
  * [Hallstakartan](http://karta.hallstahammar.se)
  * [Karlstadskartan](http://gi.karlstad.se)
  * [Mälardalskartan](http://www.malardalskartan.se)
