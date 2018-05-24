@@ -1,9 +1,9 @@
-import Draw from 'ol/interaction/Draw';
-import Select from 'ol/interaction/Select';
-import Modify from 'ol/interaction/Modify';
-import Snap from 'ol/interaction/Snap';
-import Collection from 'ol/Collection';
-import Feature from 'ol/Feature';
+import Draw from 'ol/interaction/draw';
+import Select from 'ol/interaction/select';
+import Modify from 'ol/interaction/modify';
+import Snap from 'ol/interaction/snap';
+import Collection from 'ol/collection';
+import Feature from 'ol/feature';
 import $ from 'jquery';
 import viewer from '../viewer';
 import modal from '../modal';
@@ -35,9 +35,157 @@ let select;
 let modify;
 let snap;
 
-function setEditLayer(layerName) {
-  currentLayer = layerName;
-  setInteractions();
+function isActive() {
+  if (modify === undefined || select === undefined) {
+    return false;
+  }
+  return true;
+}
+
+function setActive(editType) {
+  switch (editType) {
+    case 'modify':
+      draw.setActive(false);
+      modify.setActive(true);
+      select.setActive(true);
+      break;
+    case 'draw':
+      draw.setActive(true);
+      modify.setActive(true);
+      select.setActive(false);
+      break;
+    default:
+      draw.setActive(false);
+      hasDraw = false;
+      modify.setActive(true);
+      select.setActive(true);
+      break;
+  }
+}
+
+function getFeaturesByIds(type, layer, ids) {
+  const source = layer.getSource();
+  const features = [];
+  if (type === 'delete') {
+    ids.forEach((id) => {
+      const dummy = new Feature();
+      dummy.setId(id);
+      features.push(dummy);
+    });
+  } else {
+    ids.forEach((id) => {
+      let feature;
+      if (source.getFeatureById(id)) {
+        feature = source.getFeatureById(id);
+        feature.unset('bbox');
+        features.push(feature);
+      }
+    });
+  }
+
+  return features;
+}
+
+function getDefaultValues(attrs) {
+  return attrs.filter(attribute => attribute.name && attribute.defaultValue)
+    .reduce((prev, curr) => {
+      const previous = prev;
+      previous[curr.name] = curr.defaultValue;
+      return previous;
+    }, {});
+}
+
+function getSnapSources(layers) {
+  return layers.map(layer => viewer.getLayer(layer).getSource());
+}
+
+function saveFeatures() {
+  const edits = editsStore.getEdits();
+  const layerNames = Object.getOwnPropertyNames(edits);
+  layerNames.forEach((layerName) => {
+    const transaction = {
+      insert: null,
+      delete: null,
+      update: null
+    };
+    const editTypes = Object.getOwnPropertyNames(edits[layerName]);
+    editTypes.forEach((editType) => {
+      const layer = viewer.getLayer(layerName);
+      const ids = edits[layerName][editType];
+      const features = getFeaturesByIds(editType, layer, ids);
+      if (features.length) {
+        transaction[editType] = features;
+      }
+    });
+
+    transactionHandler(transaction, layerName);
+  });
+}
+
+function saveFeature(change) {
+  dispatcher.emitChangeFeature(change);
+  if (autoSave) {
+    saveFeatures(change);
+  }
+}
+
+function onModifyEnd(evt) {
+  const feature = evt.features.item(0);
+  saveFeature({
+    feature,
+    layerName: currentLayer,
+    action: 'update'
+  });
+}
+
+function onDrawEnd(evt) {
+  const feature = evt.feature;
+  const layer = viewer.getLayer(currentLayer);
+  const defaultAttributes = getDefaultValues(layer.get('attributes'));
+  feature.setProperties(defaultAttributes);
+  feature.setId(generateUUID());
+  editSource.addFeature(feature);
+  setActive();
+  hasDraw = false;
+  saveFeature({
+    feature,
+    layerName: currentLayer,
+    action: 'insert'
+  });
+  dispatcher.emitChangeEdit('draw', false);
+  if (autoForm) {
+    editAttributes(feature);
+  }
+}
+
+function addSnapInteraction(sources) {
+  const snapInteractions = [];
+  sources.forEach((source) => {
+    const interaction = new Snap({
+      source
+    });
+    snapInteractions.push(interaction);
+    map.addInteraction(interaction);
+  });
+  return snapInteractions;
+}
+
+function removeInteractions() {
+  if (isActive()) {
+    map.removeInteraction(modify);
+    map.removeInteraction(select);
+    map.removeInteraction(draw);
+    if (snap) {
+      snap.forEach((snapInteraction) => {
+        map.removeInteraction(snapInteraction);
+      });
+    }
+
+    modify = null;
+    select = null;
+    draw = null;
+    snap = null;
+  }
 }
 
 function setInteractions(drawType) {
@@ -80,10 +228,9 @@ function setInteractions(drawType) {
   }
 }
 
-function verifyLayer(layerName) {
-  if (!(editLayers[layerName].get('geometryType'))) {
-    addFeatureAddListener(layerName);
-  }
+function setEditLayer(layerName) {
+  currentLayer = layerName;
+  setInteractions();
 }
 
 function setGeometryProps(layer) {
@@ -101,25 +248,25 @@ function addFeatureAddListener(layerName) {
   });
 }
 
+function verifyLayer(layerName) {
+  if (!(editLayers[layerName].get('geometryType'))) {
+    addFeatureAddListener(layerName);
+  }
+}
+
 function setEditProps(options) {
   const initialValue = {};
   const result = editableLayers.reduce((layerProps, layerName) => {
     const layer = viewer.getLayer(layerName);
-    snap = 'snap' in options ? options.snap : true;
+    const layerProperties = layerProps;
     const snapLayers = options.snapLayers || editableLayers;
+    snap = 'snap' in options ? options.snap : true;
     layer.set('snap', snap);
     layer.set('snapLayers', snapLayers);
-    layerProps[layerName] = layer;
+    layerProperties[layerName] = layer;
     return layerProps;
   }, initialValue);
   return result;
-}
-
-function isActive() {
-  if (modify === undefined || select === undefined) {
-    return false;
-  }
-  return true;
 }
 
 function onDeleteSelected() {
@@ -142,32 +289,11 @@ function onDeleteSelected() {
   }
 }
 
-function onModifyEnd(evt) {
-  const feature = evt.features.item(0);
-  saveFeature({
-    feature,
-    layerName: currentLayer,
-    action: 'update'
-  });
-}
-
-function onDrawEnd(evt) {
-  const feature = evt.feature;
-  const layer = viewer.getLayer(currentLayer);
-  attributes = getDefaultValues(layer.get('attributes'));
-  feature.setProperties(attributes);
-  feature.setId(generateUUID());
-  editSource.addFeature(feature);
-  setActive();
-  hasDraw = false;
-  saveFeature({
-    feature: feature,
-    layerName: currentLayer,
-    action: 'insert'
-  });
-  dispatcher.emitChangeEdit('draw', false);
-  if (autoForm) {
-    editAttributes(feature);
+function startDraw() {
+  if (hasDraw !== true && isActive()) {
+    setActive('draw');
+    hasDraw = true;
+    dispatcher.emitChangeEdit('draw', true);
   }
 }
 
@@ -187,7 +313,21 @@ function cancelAttribute() {
   dispatcher.emitChangeEdit('attribute', false);
 }
 
-function onAttributesSave(feature, attributes) {
+function attributesSaveHandler(feature, formEl) {
+  // get DOM values and set attribute values to feature
+  attributes.forEach((attribute) => {
+    if (Object.prototype.hasOwnProperty.call(formEl, attribute.name)) {
+      feature.set(attribute.name, formEl[attribute.name]);
+    }
+  });
+  saveFeature({
+    feature,
+    layerName: currentLayer,
+    action: 'update'
+  });
+}
+
+function onAttributesSave(feature, attrs) {
   $('#o-save-button').on('click', (e) => {
     const editEl = {};
     let fileReader;
@@ -195,7 +335,7 @@ function onAttributesSave(feature, attributes) {
     let file;
 
     // Read values from form
-    attributes.forEach((attribute) => {
+    attrs.forEach((attribute) => {
       // Get the input container class
       const containerClass = `.${attribute.elId.slice(1)}`;
 
@@ -204,9 +344,7 @@ function onAttributesSave(feature, attributes) {
         // Check if checkbox. If checkbox read state.
         if ($(attribute.elId).attr('type') === 'checkbox') {
           editEl[attribute.name] = $(attribute.elId).is(':checked') ? 1 : 0;
-        }
-        // Read value from input text, textarea or select
-        else {
+        } else { // Read value from input text, textarea or select
           editEl[attribute.name] = $(attribute.elId).val();
         }
       }
@@ -245,46 +383,6 @@ function onAttributesSave(feature, attributes) {
     $('#o-save-button').blur();
     e.preventDefault();
   });
-}
-
-function attributesSaveHandler(feature, formEl) {
-  // get DOM values and set attribute values to feature
-  attributes.forEach((attribute) => {
-    if (formEl.hasOwnProperty(attribute.name)) {
-      feature.set(attribute.name, formEl[attribute.name]);
-    }
-  });
-  saveFeature({
-    feature,
-    layerName: currentLayer,
-    action: 'update'
-  });
-}
-
-function removeInteractions() {
-  if (isActive()) {
-    map.removeInteraction(modify);
-    map.removeInteraction(select);
-    map.removeInteraction(draw);
-    if (snap) {
-      snap.forEach((snapInteraction) => {
-        map.removeInteraction(snapInteraction);
-      });
-    }
-
-    modify = null;
-    select = null;
-    draw = null;
-    snap = null;
-  }
-}
-
-function startDraw() {
-  if (hasDraw !== true && isActive()) {
-    setActive('draw');
-    hasDraw = true;
-    dispatcher.emitChangeEdit('draw', true);
-  }
 }
 
 function addListener() {
@@ -329,6 +427,73 @@ function addImageListener() {
   return fn;
 }
 
+function editAttributes(feat) {
+  let feature = feat;
+  let attributeObjects;
+  let features;
+
+  // Get attributes from the created, or the selected, feature and fill DOM elements with the values
+  if (feature) {
+    features = new Collection();
+    features.push(feature);
+  } else {
+    features = select.getFeatures();
+  }
+  if (features.getLength() === 1) {
+    dispatcher.emitChangeEdit('attribute', true);
+    feature = features.item(0);
+    if (attributes.length > 0) {
+      // Create an array of defined attributes and corresponding values from selected feature
+      attributeObjects = attributes.map((attributeObject) => {
+        const obj = {};
+        $.extend(obj, attributeObject);
+        obj.val = feature.get(obj.name) || '';
+        if ('constraint' in obj) {
+          const constraintProps = obj.constraint.split(':');
+          if (constraintProps.length === 3) {
+            obj.eventType = constraintProps[0];
+            obj.dependencyVal = feature.get(constraintProps[1]);
+            obj.requiredVal = constraintProps[2];
+            obj.isVisible = obj.dependencyVal === obj.requiredVal;
+            obj.addListener = addListener();
+            obj.elId = `#input-${obj.name}-${obj.requiredVal}`;
+            obj.elDependencyId = `#input-${constraintProps[1]}`;
+          } else {
+            alert('Villkor verkar inte vara rätt formulerat. Villkor formuleras enligt principen change:attribute:value');
+          }
+        } else if (obj.type === 'image') {
+          obj.isVisible = true;
+          obj.elId = `#input-${obj.name}`;
+          obj.addListener = addImageListener();
+        } else {
+          obj.isVisible = true;
+          obj.elId = `#input-${obj.name}`;
+        }
+
+        obj.formElement = editForm(obj);
+        return obj;
+      });
+    }
+
+    const formElement = attributeObjects.reduce((prev, next) => prev + next.formElement, '');
+    const form = `<form>${formElement}<br><div class="o-form-save"><input id="o-save-button" type="button" value="Ok"></input></div></form>`;
+    modal.createModal('#o-map', {
+      title,
+      content: form,
+      static: true
+    });
+    modal.showModal();
+
+    attributeObjects.forEach((obj) => {
+      if ('addListener' in obj) {
+        obj.addListener(obj);
+      }
+    });
+
+    onAttributesSave(feature, attributeObjects);
+  }
+}
+
 function onToggleEdit(e) {
   e.stopPropagation();
   if (e.tool === 'draw') {
@@ -359,173 +524,6 @@ function onChangeEdit(e) {
   if (e.tool !== 'draw' && e.active) {
     cancelDraw();
   }
-}
-
-function getSnapSources(layers) {
-  return layers.map(layer => viewer.getLayer(layer).getSource());
-}
-
-function addSnapInteraction(sources) {
-  const snapInteractions = [];
-  sources.forEach((source) => {
-    const interaction = new Snap({
-      source
-    });
-    snapInteractions.push(interaction);
-    map.addInteraction(interaction);
-  });
-  return snapInteractions;
-}
-
-function setActive(editType) {
-  switch (editType) {
-    case 'modify':
-      draw.setActive(false);
-      modify.setActive(true);
-      select.setActive(true);
-      break;
-    case 'draw':
-      draw.setActive(true);
-      modify.setActive(true);
-      select.setActive(false);
-      break;
-    default:
-      draw.setActive(false);
-      hasDraw = false;
-      modify.setActive(true);
-      select.setActive(true);
-      break;
-  }
-}
-
-function editAttributes(feature) {
-  let attributeObjects;
-  let features;
-
-  // Get attributes from the created, or the selected, feature and fill DOM elements with the values
-  if (feature) {
-    features = new Collection();
-    features.push(feature);
-  } else {
-    features = select.getFeatures();
-  }
-  if (features.getLength() === 1) {
-    dispatcher.emitChangeEdit('attribute', true);
-    feature = features.item(0);
-    if (attributes.length > 0) {
-
-      // Create an array of defined attributes and corresponding values from selected feature
-      attributeObjects = attributes.map((attributeObject) => {
-        const obj = {};
-        $.extend(obj, attributeObject);
-        obj.val = feature.get(obj.name) || '';
-        if ('constraint' in obj) {
-          const constraintProps = obj.constraint.split(':');
-          if (constraintProps.length === 3) {
-            obj.eventType = constraintProps[0];
-            obj.dependencyVal = feature.get(constraintProps[1]);
-            obj.requiredVal = constraintProps[2];
-            obj.dependencyVal === obj.requiredVal ? obj.isVisible = true : obj.isVisible = false;
-            obj.addListener = addListener();
-            obj.elId = `#input-${obj.name}-${obj.requiredVal}`;
-            obj.elDependencyId = `#input-${constraintProps[1]}`;
-          } else {
-            alert('Villkor verkar inte vara rätt formulerat. Villkor formuleras enligt principen change:attribute:value');
-          }
-        } else if (obj.type === 'image') {
-          obj.isVisible = true;
-          obj.elId = `#input-${obj.name}`;
-          obj.addListener = addImageListener();
-        } else {
-          obj.isVisible = true;
-          obj.elId = `#input-${obj.name}`;
-        }
-
-        obj.formElement = editForm(obj);
-        return obj;
-      });
-
-    }
-    const formElement = attributeObjects.reduce((prev, next) => {
-      return prev + next.formElement;
-    }, '');
-    const form = `<form>${formElement}<br><div class="o-form-save"><input id="o-save-button" type="button" value="Ok"></input></div></form>`;
-    modal.createModal('#o-map', {
-      title,
-      content: form,
-      static: true
-    });
-    modal.showModal();
-
-    attributeObjects.forEach((obj) => {
-      if ('addListener' in obj) {
-        obj.addListener(obj);
-      }
-    });
-
-    onAttributesSave(feature, attributeObjects);
-  }
-}
-
-function saveFeature(change) {
-  dispatcher.emitChangeFeature(change);
-  if (autoSave) {
-    saveFeatures(change);
-  }
-}
-
-function saveFeatures() {
-  const edits = editsStore.getEdits();
-  const layerNames = Object.getOwnPropertyNames(edits);
-  layerNames.forEach((layerName) => {
-    const transaction = {
-      insert: null,
-      delete: null,
-      update: null
-    };
-    const editTypes = Object.getOwnPropertyNames(edits[layerName]);
-    editTypes.forEach((editType) => {
-      const layer = viewer.getLayer(layerName);
-      const ids = edits[layerName][editType];
-      const features = getFeaturesByIds(editType, layer, ids);
-      if (features.length) {
-        transaction[editType] = features;
-      }
-    });
-
-    transactionHandler(transaction, layerName);
-  });
-}
-
-function getFeaturesByIds(type, layer, ids) {
-  const source = layer.getSource();
-  const features = [];
-  if (type === 'delete') {
-    ids.forEach((id) => {
-      const dummy = new Feature();
-      dummy.setId(id);
-      features.push(dummy);
-    });
-  } else {
-    ids.forEach((id) => {
-      let feature;
-      if (source.getFeatureById(id)) {
-        feature = source.getFeatureById(id);
-        feature.unset('bbox');
-        features.push(feature);
-      }
-    });
-  }
-
-  return features;
-}
-
-function getDefaultValues(attributes) {
-  return attributes.filter(attribute => attribute.name && attribute.defaultValue)
-    .reduce((prev, curr) => {
-      prev[curr.name] = curr.defaultValue
-      return prev;
-    }, {});
 }
 
 export default function editHandler(options) {
