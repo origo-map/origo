@@ -8,6 +8,37 @@ let consoleId;
 let map;
 let scaleText;
 
+function render() {
+  const container = utils.createElement('div', '', {
+    id: controlId,
+    style: 'display: inline-block;'
+  });
+  $(`#${consoleId}`).append(container);
+}
+
+function onZoomChange(evt) {
+  map.once('moveend', () => {
+    const view = map.getView();
+    const resolution = evt ? evt.frameState.viewState.resolution : view.getResolution();
+    const mapZoom = view.getZoomForResolution(resolution);
+    const currentZoom = parseInt(view.getZoom(), 10);
+    const currentResolution = view.getResolution();
+    if (currentZoom !== mapZoom) {
+      const scale = viewer.getScale(currentResolution);
+      $(`#${controlId}`).text(scaleText + numberFormatter(scale));
+    }
+  });
+}
+
+function setActive(state) {
+  if (state === true) {
+    map.on('movestart', onZoomChange);
+    onZoomChange();
+  } else if (state === false) {
+    map.un('movestart', onZoomChange);
+  }
+}
+
 function init(opt) {
   const options = opt || {};
   map = viewer.getMap();
@@ -21,37 +52,6 @@ function init(opt) {
   return {
     setActive
   };
-}
-
-function render() {
-  const container = utils.createElement('div', '', {
-    id: controlId,
-    style: 'display: inline-block;'
-  });
-  $(`#${consoleId}`).append(container);
-}
-
-function setActive(state) {
-  if (state === true) {
-    map.on('movestart', onZoomChange);
-    onZoomChange();
-  } else if (state === false) {
-    map.un('movestart', onZoomChange);
-  }
-}
-
-function onZoomChange(evt) {
-  map.once('moveend', (e) => {
-    const view = map.getView();
-    const resolution = evt ? evt.frameState.viewState.resolution : view.getResolution();
-    const mapZoom = view.getZoomForResolution(resolution);
-    const currentZoom = parseInt(view.getZoom(), 10);
-    const currentResolution = view.getResolution();
-    if (currentZoom !== mapZoom) {
-      const scale = viewer.getScale(currentResolution);
-      $(`#${controlId}`).text(scaleText + numberFormatter(scale));
-    }
-  });
 }
 
 export default { init };
