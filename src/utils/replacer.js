@@ -5,15 +5,12 @@ const replacer = function replacer() {
   let helperNS;
   let helperArg;
 
-  function replace(name, obj, options) {
-    start = options.start || '{{';
-    end = options.end || '}}';
-    helper = options.helper || {};
-    helperNS = options.helperNS || '@';
-    helperArg = [options.helperArg] || [];
-
-    const result = searchAndReplace(name, obj);
-    return result;
+  function getArgs(str) {
+    const args = str.match(/\((.*?)\)/);
+    if (args) {
+      return [args[1].split(','), str.substring(0, args.index)];
+    }
+    return ['', str];
   }
 
   function searchAndReplace(name, obj) {
@@ -35,12 +32,15 @@ const replacer = function replacer() {
     return name;
   }
 
-  function getArgs(str) {
-    const args = str.match(/\((.*?)\)/);
-    if (args) {
-      return [args[1].split(','), str.substring(0, args.index)];
-    }
-    return ['', str];
+  function replace(name, obj, options) {
+    start = options.start || '{{';
+    end = options.end || '}}';
+    helper = options.helper || {};
+    helperNS = options.helperNS || '@';
+    helperArg = [options.helperArg] || [];
+
+    const result = searchAndReplace(name, obj);
+    return result;
   }
 
   return {
