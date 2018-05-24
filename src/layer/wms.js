@@ -1,12 +1,44 @@
 import $ from 'jquery';
-import TileWMSSource from 'ol/source/TileWMS';
-import ImageWMSSource from 'ol/source/ImageWMS';
+import TileWMSSource from 'ol/source/tilewms';
+import ImageWMSSource from 'ol/source/imagewms';
 import viewer from '../viewer';
 import tile from './tile';
 import maputils from '../maputils';
 import image from './image';
 
-export default function wms(layerOptions) {
+function createTileSource(options) {
+  return new TileWMSSource(({
+    attributions: options.attribution,
+    url: options.url,
+    gutter: options.gutter,
+    crossOrigin: 'anonymous',
+    projection: options.projectionCode,
+    tileGrid: options.tileGrid,
+    params: {
+      LAYERS: options.id,
+      TILED: true,
+      VERSION: options.version,
+      FORMAT: options.format
+    }
+  }));
+}
+
+function createImageSource(options) {
+  return new ImageWMSSource(({
+    attributions: options.attribution,
+    url: options.url,
+    crossOrigin: 'anonymous',
+    projection: options.projectionCode,
+    params: {
+      LAYERS: options.id,
+      VERSION: options.version,
+      FORMAT: options.format
+    }
+  }));
+}
+
+
+const wms = function wms(layerOptions) {
   const wmsDefault = {
     featureinfoLayer: null
   };
@@ -40,35 +72,6 @@ export default function wms(layerOptions) {
     return image(wmsOptions, createImageSource(sourceOptions));
   }
   return tile(wmsOptions, createTileSource(sourceOptions));
+};
 
-  function createTileSource(options) {
-    return new TileWMSSource(({
-      attributions: options.attribution,
-      url: options.url,
-      gutter: options.gutter,
-      crossOrigin: 'anonymous',
-      projection: options.projectionCode,
-      tileGrid: options.tileGrid,
-      params: {
-        LAYERS: options.id,
-        TILED: true,
-        VERSION: options.version,
-        FORMAT: options.format
-      }
-    }));
-  }
-
-  function createImageSource(options) {
-    return new ImageWMSSource(({
-      attributions: options.attribution,
-      url: options.url,
-      crossOrigin: 'anonymous',
-      projection: options.projectionCode,
-      params: {
-        LAYERS: options.id,
-        VERSION: options.version,
-        FORMAT: options.format
-      }
-    }));
-  }
-}
+export default wms;
