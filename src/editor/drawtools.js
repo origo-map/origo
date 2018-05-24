@@ -39,7 +39,6 @@ const drawToolsSelector = function drawToolsSelector(tools, defaultLayer) {
     };
   }
 
-
   function close() {
     if (active) {
       setActive(false);

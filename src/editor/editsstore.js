@@ -4,12 +4,74 @@ import dispatcher from './editdispatcher';
 export default function editsStore() {
   const edits = {};
 
-  $(document).on('changeFeature', featureChange);
+  function createEditsObj() {
+    return {
+      update: [],
+      insert: [],
+      delete: []
+    };
+  }
 
-  return {
-    getEdits,
-    hasFeature
-  };
+  function isFinished(layerName) {
+    let finished = true;
+    if (Object.prototype.hasOwnProperty.call(edits, layerName)) {
+      const editTypes = Object.getOwnPropertyNames(edits[layerName]);
+      editTypes.forEach((editType) => {
+        if (edits[layerName][editType].length) {
+          finished = false;
+          return finished;
+        }
+
+        return false;
+      });
+      if (finished) {
+        delete edits[layerName];
+        return finished;
+      }
+
+      return false;
+    }
+
+    return finished;
+  }
+
+  function hasFeature(type, feature, layerName) {
+    if (Object.prototype.hasOwnProperty.call(edits, layerName)) {
+      if (edits[layerName][type].indexOf(feature.getId()) > -1) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function addFeature(type, feature, layerName) {
+    if (Object.prototype.hasOwnProperty.call(edits, layerName) === false) {
+      edits[layerName] = createEditsObj();
+    }
+    if (hasFeature(type, feature, layerName) === false) {
+      edits[layerName][type].push(feature.getId());
+    }
+  }
+
+  function removeFeature(type, feature, layerName) {
+    let index = 0;
+    if (Object.prototype.hasOwnProperty.call(edits, layerName)) {
+      index = edits[layerName][type].indexOf(feature.getId());
+      if (index > -1) {
+        edits[layerName][type].splice(index, 1);
+        isFinished(layerName);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function hasEdits() {
+    if (Object.getOwnPropertyNames(edits).length) {
+      return true;
+    }
+    return false;
+  }
 
   function addEdit(e) {
     if (e.action === 'insert') {
@@ -52,68 +114,10 @@ export default function editsStore() {
     }
   }
 
-  function hasFeature(type, feature, layerName) {
-    if (Object.prototype.hasOwnProperty.call(edits, layerName)) {
-      if (edits[layerName][type].indexOf(feature.getId()) > -1) {
-        return true;
-      }
-    }
-    return false;
-  }
+  $(document).on('changeFeature', featureChange);
 
-  function addFeature(type, feature, layerName) {
-    if (Object.prototype.hasOwnProperty.call(edits, layerName) === false) {
-      edits[layerName] = createEditsObj();
-    }
-    if (hasFeature(type, feature, layerName) === false) {
-      edits[layerName][type].push(feature.getId());
-    }
-  }
-
-  function removeFeature(type, feature, layerName) {
-    let index = 0;
-    if (edits.hasOwnProperty(layerName)) {
-      index = edits[layerName][type].indexOf(feature.getId());
-      if (index > -1) {
-        edits[layerName][type].splice(index, 1);
-        isFinished(layerName);
-        return true;
-      }
-    }
-    return false;
-  }
-
-  function isFinished(layerName) {
-    let finished = true;
-    if (edits.hasOwnProperty(layerName)) {
-      const editTypes = Object.getOwnPropertyNames(edits[layerName]);
-      editTypes.forEach((editType) => {
-        if (edits[layerName][editType].length) {
-          finished = false;
-          return finished;
-        }
-      });
-      if (finished) {
-        delete edits[layerName];
-        return finished;
-      }
-    } else {
-      return finished;
-    }
-  }
-
-  function createEditsObj() {
-    return {
-      update: [],
-      insert: [],
-      delete: []
-    };
-  }
-
-  function hasEdits() {
-    if (Object.getOwnPropertyNames(edits).length) {
-      return true;
-    }
-    return false;
-  }
+  return {
+    getEdits,
+    hasFeature
+  };
 }

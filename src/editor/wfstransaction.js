@@ -1,4 +1,4 @@
-import WFSFormat from 'ol/format/WFS';
+import WFSFormat from 'ol/format/wfs';
 import $ from 'jquery';
 import viewer from '../viewer';
 import dispatcher from './editdispatcher';
@@ -6,8 +6,16 @@ import dispatcher from './editdispatcher';
 const format = new WFSFormat();
 const serializer = new XMLSerializer();
 
-export default function (transObj, layerName) {
-  return wfsTransaction(transObj, layerName);
+function readResponse(data) {
+  let result;
+  if (window.Document && data instanceof Document && data.documentElement &&
+    data.documentElement.localName === 'ExceptionReport') {
+    alert(data.getElementsByTagNameNS('http://www.opengis.net/ows', 'ExceptionText').item(0).textContent);
+  } else {
+    result = format.readTransactionResponse(data);
+  }
+
+  return result;
 }
 
 function writeWfsTransaction(transObj, options) {
@@ -29,25 +37,12 @@ function wfsTransaction(transObj, layerName) {
     featureType
   };
   const node = writeWfsTransaction(transObj, options);
-  return $.ajax({
-    type: 'POST',
-    url: source.url,
-    data: serializer.serializeToString(node),
-    contentType: 'text/xml',
-    success,
-    error,
-    context: this
-  })
-    .then((data) => {
-      const result = readResponse(data);
-      let nr = 0;
-      if (result) {
-        nr += result.transactionSummary.totalUpdated;
-        nr += result.transactionSummary.totalDeleted;
-        nr += result.transactionSummary.totalInserted;
-      }
-      return nr;
-    });
+
+  function error(e) {
+    const errorMsg = e ? (`${e.status} ${e.statusText}`) : '';
+    alert(`Det inträffade ett fel när ändringarna skulle sparas till servern...
+      ${errorMsg}`);
+  }
 
   function success(data) {
     const result = readResponse(data);
@@ -87,22 +82,27 @@ function wfsTransaction(transObj, layerName) {
     }
   }
 
-  function error(e) {
-    const errorMsg = e ? (`${e.status} ${e.statusText}`) : '';
-    alert(`Det inträffade ett fel när ändringarna skulle sparas till servern...
-      ${errorMsg}`);
-  }
+  return $.ajax({
+    type: 'POST',
+    url: source.url,
+    data: serializer.serializeToString(node),
+    contentType: 'text/xml',
+    success,
+    error,
+    context: this
+  })
+    .then((data) => {
+      const result = readResponse(data);
+      let nr = 0;
+      if (result) {
+        nr += result.transactionSummary.totalUpdated;
+        nr += result.transactionSummary.totalDeleted;
+        nr += result.transactionSummary.totalInserted;
+      }
+      return nr;
+    });
 }
 
-function readResponse(data) {
-  let result;
-  if (window.Document && data instanceof Document && data.documentElement &&
-    data.documentElement.localName === 'ExceptionReport') {
-    alert(data.getElementsByTagNameNS(
-      'http://www.opengis.net/ows', 'ExceptionText').item(0).textContent);
-  } else {
-    result = format.readTransactionResponse(data);
-  }
-
-  return result;
+export default function (transObj, layerName) {
+  return wfsTransaction(transObj, layerName);
 }

@@ -1,4 +1,4 @@
-import EsriJSON from 'ol/format/EsriJSON';
+import EsriJSON from 'ol/format/esrijson';
 import $ from 'jquery';
 import viewer from '../viewer';
 import dispatcher from './editdispatcher';
@@ -42,28 +42,6 @@ function agsTransaction(transObj, layerName) {
   const id = layer.get('id');
   const source = viewer.getMapSource()[layer.get('sourceName')];
   const types = Object.getOwnPropertyNames(transObj);
-  const cb = {
-    update: updateSuccess,
-    insert: insertSuccess,
-    delete: deleteSuccess
-  };
-  types.forEach((type) => {
-    if (transObj[type]) {
-      const url = `${source.url}/${id}/${urlSuffix[type]}`;
-      const data = writeAgsTransaction(transObj[type], {
-        projection,
-        type
-      });
-      $.ajax({
-        type: 'POST',
-        url,
-        data,
-        success: cb[type],
-        error,
-        context: this
-      });
-    }
-  });
 
   function updateSuccess(data) {
     const feature = transObj.update;
@@ -135,6 +113,29 @@ function agsTransaction(transObj, layerName) {
       error();
     }
   }
+
+  const cb = {
+    update: updateSuccess,
+    insert: insertSuccess,
+    delete: deleteSuccess
+  };
+  types.forEach((type) => {
+    if (transObj[type]) {
+      const url = `${source.url}/${id}/${urlSuffix[type]}`;
+      const data = writeAgsTransaction(transObj[type], {
+        projection,
+        type
+      });
+      $.ajax({
+        type: 'POST',
+        url,
+        data,
+        success: cb[type],
+        error,
+        context: this
+      });
+    }
+  });
 }
 
 export default function (transObj, layerName) {
