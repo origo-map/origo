@@ -58,7 +58,7 @@ const mapLoader = function mapLoader(mapOptions, config) {
       map.options.params = urlParams;
       map.options.baseUrl = baseUrl;
 
-      return $.when(...loadSvgSprites(baseUrl, config))
+      return $.when.apply($, loadSvgSprites(baseUrl, config))
         .then(() => map);
     } else if (typeof (mapOptions) === 'string') {
       if (isUrl(mapOptions)) {
@@ -86,7 +86,7 @@ const mapLoader = function mapLoader(mapOptions, config) {
         mapUrl = getUrl();
       }
 
-      return $.when(...loadSvgSprites(baseUrl, config))
+      return $.when.apply($, loadSvgSprites(baseUrl, config))
         .then(() => $.ajax({
           url,
           dataType: format
