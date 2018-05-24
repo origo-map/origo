@@ -68,7 +68,7 @@ function createImage() {
         $printCanvas[0].height = printWidth;
       }
 
-      ctxCanvas.drawImage(image, (sourceWidth / 2 - $printCanvas[0].width / 2), 0, $printCanvas[0].width, $printCanvas[0].height, 0, 0, $printCanvas[0].width, $printCanvas[0].height);
+      ctxCanvas.drawImage(image, ((sourceWidth / 2) - ($printCanvas[0].width / 2)), 0, $printCanvas[0].width, $printCanvas[0].height, 0, 0, $printCanvas[0].width, $printCanvas[0].height);
       imageToPrint($printCanvas);
     };
     image.src = imageUrl;
