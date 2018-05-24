@@ -1,6 +1,6 @@
 
 import $ from 'jquery';
-import editortemplate from '../templates/editortoolbar.template.handlebars';
+import editortemplate from './editortemplate';
 import dispatcher from './editdispatcher';
 import editHandler from './edithandler';
 import editorLayers from './editorlayers';
@@ -18,7 +18,7 @@ let $editSave;
 let $editClose;
 
 function render() {
-  $('#o-tools-bottom').append(editortemplate());
+  $('#o-tools-bottom').append(editortemplate);
   $editAttribute = $('#o-editor-attribute');
   $editDraw = $('#o-editor-draw');
   $editDelete = $('#o-editor-delete');
