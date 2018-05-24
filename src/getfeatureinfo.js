@@ -179,7 +179,7 @@ function getFeaturesFromRemote(evt) {
 
     return false;
   }));
-  return $.when(requestPromises).then(() => requestResult);
+  return $.when(...requestPromises).then(() => requestResult);
 }
 
 function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
