@@ -27,33 +27,6 @@ let precision;
 let mousePositionActive;
 let mousePositionControl;
 
-function init(opt_options) {
-  const options = opt_options || {};
-  const title = options.title || undefined;
-  suffix = options.suffix || '';
-  map = viewer.getMap();
-  view = map.getView();
-  projection = view.getProjection();
-  mapProjection = viewer.getProjectionCode();
-  consoleId = viewer.getConsoleId();
-  projections = options.projections || {};
-  projectionCodes = Object.getOwnPropertyNames(projections);
-  if (title) {
-    currentProjection = mapProjection;
-    projections[currentProjection] = title;
-    projectionCodes.unshift(mapProjection);
-  } else if (projectionCodes.length) {
-    currentProjection = projectionCodes[0];
-  } else {
-    alert('No title or projection is set for position');
-  }
-
-  setPrecision();
-  render();
-  bindUIActions();
-  addMousePosition();
-}
-
 function render() {
   const icon = utils.createSvg({
     href: '#o_centerposition_24px',
@@ -88,11 +61,6 @@ function render() {
   $(`#${consoleId}`).append(controlContainer);
 }
 
-function bindUIActions() {
-  $(`#${toggleProjId}`).on('click', onToggleProjection);
-  $(`#${togglePositionId}`).on('click', onTogglePosition);
-}
-
 function addMousePosition() {
   mousePositionControl = new MousePosition({
     coordinateFormat: coordinate.createStringXY(precision),
@@ -111,24 +79,6 @@ function removeMousePosition() {
   mousePositionActive = false;
 }
 
-function addCenterPosition() {
-  renderMarker();
-  $(`#${togglePositionId}`).addClass('o-active');
-  $(`#${coordsFindId}`).addClass('o-active');
-  updateCoords(view.getCenter());
-  view.on('change:center', onChangeCenter);
-  $(`#${coordsFindId}`).on('keypress', onFind);
-}
-
-function removeCenterPosition() {
-  view.un('change:center', onChangeCenter);
-  clear();
-  $(`#${coordsFindId}`).off('keypress', onFind);
-  $(`#${markerId}`).remove();
-  $(`#${togglePositionId}`).removeClass('o-active');
-  $(`#${coordsFindId}`).removeClass('o-active');
-}
-
 function renderMarker() {
   const icon = utils.createSvg({
     href: '#o_centerposition_24px',
@@ -141,15 +91,36 @@ function renderMarker() {
   $('#o-map').append(marker);
 }
 
-function findCoordinate() {
-  const coords = $(`#${coordsFindId}`).val();
-  const validated = validateCoordinate(coords);
-  if (validated.length === 2) {
-    map.getView().animate({
-      center: validated,
-      zoom: (viewer.getResolutions().length - 3)
-    });
+function writeCoords(coords) {
+  $(`#${coordsFindId}`).val(coords);
+}
+
+function transformCoords(coords, source, destination) {
+  const geometry = new Feature({
+    geometry: new Point(coords)
+  }).getGeometry();
+  return geometry.transform(source, destination).getCoordinates();
+}
+
+function round(coords) {
+  if (precision) {
+    return coords.map(coord => coord.toFixed(precision));
   }
+  return coords.map(coord => Math.round(coord));
+}
+
+function updateCoords(sourceCoords) {
+  let coords = sourceCoords;
+  if (currentProjection !== mapProjection) {
+    coords = transformCoords(coords, projection, currentProjection);
+  }
+  coords = round(coords);
+  const center = coords.join(', ') + suffix;
+  writeCoords(center);
+}
+
+function onChangeCenter() {
+  updateCoords(view.getCenter());
 }
 
 function validateCoordinate(strCoords) {
@@ -157,11 +128,12 @@ function validateCoordinate(strCoords) {
   let inExtent;
 
   // validate numbers
-  const coords = strCoords.split(',').map(coord => parseFloat(coord))
+  let coords = strCoords.split(',').map(coord => parseFloat(coord))
     .filter((coord) => {
       if (Number.isNaN(coord)) {
         return coord;
       }
+      return null;
     });
   if (coords.length !== 2) {
     alert(characterError);
@@ -183,19 +155,43 @@ function validateCoordinate(strCoords) {
   return [];
 }
 
-function toggleProjectionVal(val) {
-  let proj;
-  const index = projectionCodes.indexOf(val);
-  if (index === projectionCodes.length - 1) {
-    proj = projectionCodes[0];
-  } else if (index < projectionCodes.length - 1) {
-    proj = projectionCodes[index + 1];
+function findCoordinate() {
+  const coords = $(`#${coordsFindId}`).val();
+  const validated = validateCoordinate(coords);
+  if (validated.length === 2) {
+    map.getView().animate({
+      center: validated,
+      zoom: (viewer.getResolutions().length - 3)
+    });
   }
-  return proj;
 }
+
+function onFind(e) {
+  if (e.which === 13) {
+    findCoordinate();
+  }
+}
+function addCenterPosition() {
+  renderMarker();
+  $(`#${togglePositionId}`).addClass('o-active');
+  $(`#${coordsFindId}`).addClass('o-active');
+  updateCoords(view.getCenter());
+  view.on('change:center', onChangeCenter);
+  $(`#${coordsFindId}`).on('keypress', onFind);
+}
+
 
 function clear() {
   writeCoords('');
+}
+
+function removeCenterPosition() {
+  view.un('change:center', onChangeCenter);
+  clear();
+  $(`#${coordsFindId}`).off('keypress', onFind);
+  $(`#${markerId}`).remove();
+  $(`#${togglePositionId}`).removeClass('o-active');
+  $(`#${coordsFindId}`).removeClass('o-active');
 }
 
 function onTogglePosition() {
@@ -208,37 +204,15 @@ function onTogglePosition() {
   }
 }
 
-function onToggleProjection(e) {
-  return function(event) {
-    currentProjection = toggleProjectionVal(this.value);
-    setPrecision();
-    writeProjection(currentProjection);
-    if (mousePositionActive) {
-      removeMousePosition();
-      addMousePosition();
-    } else {
-      updateCoords(view.getCenter());
-    }
-    this.blur();
-    event.preventDefault();
-  }.bind(this)(e);
-}
-
-function onChangeCenter() {
-  updateCoords(view.getCenter());
-}
-
-function onFind(e) {
-  if (e.which === 13) {
-    findCoordinate();
+function toggleProjectionVal(val) {
+  let proj;
+  const index = projectionCodes.indexOf(val);
+  if (index === projectionCodes.length - 1) {
+    proj = projectionCodes[0];
+  } else if (index < projectionCodes.length - 1) {
+    proj = projectionCodes[index + 1];
   }
-}
-
-function round(coords) {
-  if (precision) {
-    return coords.map(coord => coord.toFixed(precision));
-  }
-  return coords.map(coord => Math.round(coord));
+  return proj;
 }
 
 function setPrecision() {
@@ -254,25 +228,52 @@ function writeProjection() {
   $(`#${toggleProjId}`).text(projections[currentProjection]);
 }
 
-function transformCoords(coords, source, destination) {
-  const geometry = new Feature({
-    geometry: new Point(coords)
-  }).getGeometry();
-  return geometry.transform(source, destination).getCoordinates();
+function onToggleProjection(e) {
+  return function toggleProjection(event) {
+    currentProjection = toggleProjectionVal(this.value);
+    setPrecision();
+    writeProjection(currentProjection);
+    if (mousePositionActive) {
+      removeMousePosition();
+      addMousePosition();
+    } else {
+      updateCoords(view.getCenter());
+    }
+    this.blur();
+    event.preventDefault();
+  }.bind(this)(e);
 }
 
-function updateCoords(sourceCoords) {
-  let coords = sourceCoords;
-  if (currentProjection !== mapProjection) {
-    coords = transformCoords(coords, projection, currentProjection);
+function bindUIActions() {
+  $(`#${toggleProjId}`).on('click', onToggleProjection);
+  $(`#${togglePositionId}`).on('click', onTogglePosition);
+}
+
+function init(optOptions) {
+  const options = optOptions || {};
+  const title = options.title || undefined;
+  suffix = options.suffix || '';
+  map = viewer.getMap();
+  view = map.getView();
+  projection = view.getProjection();
+  mapProjection = viewer.getProjectionCode();
+  consoleId = viewer.getConsoleId();
+  projections = options.projections || {};
+  projectionCodes = Object.getOwnPropertyNames(projections);
+  if (title) {
+    currentProjection = mapProjection;
+    projections[currentProjection] = title;
+    projectionCodes.unshift(mapProjection);
+  } else if (projectionCodes.length) {
+    currentProjection = projectionCodes[0];
+  } else {
+    alert('No title or projection is set for position');
   }
-  coords = round(coords);
-  const center = coords.join(', ') + suffix;
-  writeCoords(center);
-}
 
-function writeCoords(coords) {
-  $(`#${coordsFindId}`).val(coords);
+  setPrecision();
+  render();
+  bindUIActions();
+  addMousePosition();
 }
 
 export default { init };
