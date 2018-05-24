@@ -136,11 +136,7 @@ function toggleMeasure() {
 }
 
 function setActive(state) {
-  if (state === true) {
-    isActive = true;
-  } else {
-    isActive = false;
-  }
+  isActive = state;
 }
 
 // Display and move tooltips with pointer
