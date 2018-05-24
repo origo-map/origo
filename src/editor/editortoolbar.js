@@ -17,36 +17,8 @@ let $editLayers;
 let $editSave;
 let $editClose;
 
-export default (function () {
-  return {
-    init: Init
-  };
-}());
-
-function Init(options) {
-  currentLayer = options.currentLayer;
-  editableLayers = options.editableLayers;
-
-  editHandler(options);
-  render();
-  editorLayers(editableLayers, {
-    activeLayer: currentLayer
-  });
-  drawTools(options.drawTools, currentLayer);
-
-  $(document).on('enableInteraction', onEnableInteraction);
-  $(document).on('changeEdit', onChangeEdit);
-  $(document).on('editsChange', toggleSave);
-
-  bindUIActions();
-
-  if (options.isActive) {
-    setActive(true);
-  }
-}
-
 function render() {
-  $("#o-tools-bottom").append(editortemplate());
+  $('#o-tools-bottom').append(editortemplate());
   $editAttribute = $('#o-editor-attribute');
   $editDraw = $('#o-editor-draw');
   $editDelete = $('#o-editor-delete');
@@ -93,6 +65,14 @@ function bindUIActions() {
   });
 }
 
+function setActive(state) {
+  if (state === true) {
+    $('#o-editor-toolbar').removeClass('o-hidden');
+  } else {
+    $('#o-editor-toolbar').addClass('o-hidden');
+  }
+}
+
 function onEnableInteraction(e) {
   e.stopPropagation();
   if (e.interaction === 'editor') {
@@ -103,14 +83,6 @@ function onEnableInteraction(e) {
   } else {
     setActive(false);
     dispatcher.emitToggleEdit('cancel');
-  }
-}
-
-function setActive(state) {
-  if (state === true) {
-    $('#o-editor-toolbar').removeClass('o-hidden');
-  } else {
-    $('#o-editor-toolbar').addClass('o-hidden');
   }
 }
 
@@ -142,3 +114,31 @@ function toggleSave(e) {
     $editSave.addClass(disableClass);
   }
 }
+
+function init(options) {
+  currentLayer = options.currentLayer;
+  editableLayers = options.editableLayers;
+
+  editHandler(options);
+  render();
+  editorLayers(editableLayers, {
+    activeLayer: currentLayer
+  });
+  drawTools(options.drawTools, currentLayer);
+
+  $(document).on('enableInteraction', onEnableInteraction);
+  $(document).on('changeEdit', onChangeEdit);
+  $(document).on('editsChange', toggleSave);
+
+  bindUIActions();
+
+  if (options.isActive) {
+    setActive(true);
+  }
+}
+
+export default (function exportInit() {
+  return {
+    init
+  };
+}());

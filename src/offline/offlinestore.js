@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import GeoJSONFormat from 'ol/format/GeoJSON';
+import GeoJSONFormat from 'ol/format/geojson';
 import localforage from 'localforage';
 import viewer from '../viewer';
 import dispatcher from './offlinedispatcher';

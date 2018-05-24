@@ -26,6 +26,8 @@ let identifyTarget;
 let clusterFeatureinfoLevel;
 let overlay;
 let hitTolerance;
+let items;
+let popup;
 
 function clear() {
   selectionLayer.clear();
@@ -33,7 +35,32 @@ function clear() {
   if (overlay) {
     viewer.removeOverlays(overlay);
   }
-  console.log('Clearing selection');
+}
+
+function callback(evt) {
+  const currentItem = evt.item.index;
+  if (currentItem !== null) {
+    selectionLayer.clearAndAdd(
+      items[currentItem].feature.clone(),
+      selectionStyles[items[currentItem].feature.getGeometry().getType()]
+    );
+    if (identifyTarget === 'overlay') {
+      popup.setTitle(items[currentItem].title);
+    } else {
+      sidebar.setTitle(items[currentItem].title);
+    }
+  }
+}
+
+function initCarousel(id, opt) {
+  const carouselOptions = opt || {
+    onChanged: callback,
+    items: 1,
+    nav: true,
+    navText: ['<svg class="o-icon-fa-chevron-left"><use xlink:href="#fa-chevron-left"></use></svg>',
+      '<svg class="o-icon-fa-chevron-right"><use xlink:href="#fa-chevron-right"></use></svg>']
+  };
+  return $(id).owlCarousel(carouselOptions);
 }
 
 function getSelectionLayer() {
@@ -55,14 +82,15 @@ function getHitTolerance() {
   return hitTolerance;
 }
 
-function identify(items, target, coordinate) {
+function identify(identifyItems, target, coordinate) {
+  items = identifyItems;
   clear();
   let content = items.map(i => i.content).join('');
   content = `<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme">${content}</div></div>`;
   switch (target) {
     case 'overlay':
     {
-      const popup = Popup('#o-map');
+      popup = Popup('#o-map');
       overlay = new Overlay({
         element: popup.getEl()
       });
@@ -75,11 +103,7 @@ function identify(items, target, coordinate) {
         title: items[0].title
       });
       popup.setVisibility(true);
-      initCarousel('#o-identify-carousel', undefined, function callback() {
-        const currentItem = this.owl.currentItem;
-        selectionLayer.clearAndAdd(items[currentItem].feature.clone(), selectionStyles[items[currentItem].feature.getGeometry().getType()]);
-        popup.setTitle(items[currentItem].title);
-      });
+      initCarousel('#o-identify-carousel');
       viewer.autoPan();
       break;
     }
@@ -90,11 +114,7 @@ function identify(items, target, coordinate) {
         title: items[0].title
       });
       sidebar.setVisibility(true);
-      initCarousel('#o-identify-carousel', undefined, function callback() {
-        const currentItem = this.owl.currentItem;
-        selectionLayer.clearAndAdd(items[currentItem].feature.clone(), selectionStyles[items[currentItem].feature.getGeometry().getType()]);
-        sidebar.setTitle(items[currentItem].title);
-      });
+      initCarousel('#o-identify-carousel');
       break;
     }
     default:
@@ -150,19 +170,6 @@ function onEnableInteraction(e) {
   }
 }
 
-function initCarousel(id, options, cb) {
-  const carouselOptions = options || {
-    navigation: true, // Show next and prev buttons
-    slideSpeed: 300,
-    paginationSpeed: 400,
-    singleItem: true,
-    rewindSpeed: 200,
-    navigationText: ['<svg class="o-icon-fa-chevron-left"><use xlink:href="#fa-chevron-left"></use></svg>', '<svg class="o-icon-fa-chevron-right"><use xlink:href="#fa-chevron-right"></use></svg>'],
-    afterAction: cb
-  };
-  return $(id).owlCarousel(carouselOptions);
-}
-
 function init(optOptions) {
   map = viewer.getMap();
   options = optOptions || {};
@@ -171,7 +178,7 @@ function init(optOptions) {
   clickEvent = 'clickEvent' in options ? options.clickEvent : 'click';
   pinning = Object.prototype.hasOwnProperty.call(options, 'pinning') ? options.pinning : true;
   pinStyle = style.createStyleRule(pinStyleOptions)[0];
-  savedPin = options.savedPin ? maputils.createPointFeature(opt_options.savedPin, pinStyle) : undefined;
+  savedPin = options.savedPin ? maputils.createPointFeature(options.savedPin, pinStyle) : undefined;
   selectionStyles = 'selectionStyles' in options ? style.createGeometryStyle(options.selectionStyles) : style.createEditStyle();
   const savedFeature = savedPin || savedSelection || undefined;
   selectionLayer = featurelayer(savedFeature, map);

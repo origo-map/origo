@@ -7,6 +7,16 @@ import utils from '../utils';
 const createElement = utils.createElement;
 
 export default function editorLayers(editableLayers, optOptions = {}) {
+  function selectionModel(layerNames) {
+    const selectOptions = layerNames.map((layerName) => {
+      const obj = {};
+      obj.name = viewer.getLayer(layerName).get('title');
+      obj.value = layerName;
+      return obj;
+    });
+    return selectOptions;
+  }
+
   let active = false;
   const activeCls = 'o-active';
   const target = 'editor-toolbar-layers-dropdown';
@@ -16,9 +26,6 @@ export default function editorLayers(editableLayers, optOptions = {}) {
     activeLayer: editableLayers[0]
   };
   const renderOptions = $.extend(defaultOptions, optOptions);
-
-  render(renderOptions);
-  addListener(target);
 
   function render(options) {
     const popover = createElement('div', '', {
@@ -32,16 +39,15 @@ export default function editorLayers(editableLayers, optOptions = {}) {
     });
   }
 
-  function addListener() {
-    $(`#${target}`).on('changeDropdown', (e) => {
-      e.stopImmediatePropagation(e);
-      setActive(false);
-      dispatcher.emitToggleEdit('edit', {
-        currentLayer: e.dataAttribute
-      });
-    });
-    $(document).on('toggleEdit', onToggleEdit);
-    $(document).on('changeEdit', onChangeEdit);
+  function setActive(state) {
+    if (state) {
+      active = true;
+      $(`#${target}`).addClass(activeCls);
+    } else {
+      active = false;
+      $(`#${target}`).removeClass(activeCls);
+    }
+    dispatcher.emitChangeEdit('layers', active);
   }
 
   function onToggleEdit(e) {
@@ -62,30 +68,18 @@ export default function editorLayers(editableLayers, optOptions = {}) {
     e.stopPropagation();
   }
 
-  function setActive(state) {
-    if (state) {
-      active = true;
-      $(`#${target}`).addClass(activeCls);
-    } else {
-      active = false;
-      $(`#${target}`).removeClass(activeCls);
-    }
-    dispatcher.emitChangeEdit('layers', active);
-  }
-
-  function close() {
-    if (active) {
+  function addListener() {
+    $(`#${target}`).on('changeDropdown', (e) => {
+      e.stopImmediatePropagation(e);
       setActive(false);
-    }
+      dispatcher.emitToggleEdit('edit', {
+        currentLayer: e.dataAttribute
+      });
+    });
+    $(document).on('toggleEdit', onToggleEdit);
+    $(document).on('changeEdit', onChangeEdit);
   }
 
-  function selectionModel(layerNames) {
-    const selectOptions = layerNames.map((layerName) => {
-      const obj = {};
-      obj.name = viewer.getLayer(layerName).get('title');
-      obj.value = layerName;
-      return obj;
-    });
-    return selectOptions;
-  }
+  render(renderOptions);
+  addListener(target);
 }

@@ -18,7 +18,7 @@ const createForm = function createForm(obj) {
       el = `<div><label>${label}</label><br><input type="text" id="${id}" value="${val}" ${maxLength}></div>`;
       break;
     case 'textarea':
-      el = `<div><label>${label}</label><br><textarea id="${id}" ${maxLength} rows="3">' + ${val}</textarea></div>`;
+      el = `<div><label>${label}</label><br><textarea id="${id}" ${maxLength} rows="3">${val}</textarea></div>`;
       break;
     case 'checkbox':
       checked = val ? ' checked' : '';
@@ -30,7 +30,7 @@ const createForm = function createForm(obj) {
       } else {
         firstOption = '<option value="" selected>Välj</option>';
       }
-      el = `<div class="${cls}"><label>${label} label><br><select id=${id}>${firstOption}`;
+      el = `<div class="${cls}"><label>${label}</label><br><select id=${id}>${firstOption}`;
       for (let i = 0; i < dropdownOptions.length; i += 1) {
         el += `<option value="${dropdownOptions[i]}">${dropdownOptions[i]}</option>`;
       }
