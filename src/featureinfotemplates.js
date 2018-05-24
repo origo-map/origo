@@ -1,4 +1,4 @@
-import defaultTemplate from './templates/featureinfotemplates/default';
+import defaultTemplate from './templates/featureinfotemplate';
 
 const templates = {};
 templates.default = defaultTemplate;

@@ -7,7 +7,7 @@ import project from 'ol/proj';
 import Feature from 'ol/feature';
 import geom from 'ol/geom/geometry';
 import $ from 'jquery';
-import template from './templates/viewer.handlebars';
+import template from './templates/viewertemplate';
 import elQuery from './utils/elquery';
 import featureinfo from './featureinfo';
 import maputils from './maputils';
