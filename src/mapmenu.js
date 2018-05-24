@@ -9,6 +9,31 @@ let $menuButton;
 let options;
 let isActive;
 
+function toggleMenu() {
+  if ($mapMenu.hasClass('o-mapmenu-show')) {
+    $mapMenu.removeClass('o-mapmenu-show');
+  } else {
+    $mapMenu.addClass('o-mapmenu-show');
+  }
+}
+
+function getTarget() {
+  return $mapMenu;
+}
+
+function bindUIActions() {
+  $menuButton.on('click', (e) => {
+    toggleMenu();
+    $menuButton.blur();
+    e.preventDefault();
+  });
+  $closeButton.on('click', (e) => {
+    toggleMenu();
+    $closeButton.blur();
+    e.preventDefault();
+  });
+}
+
 function init(opt) {
   options = opt || {};
   isActive = options.isActive || false;
@@ -53,31 +78,6 @@ function init(opt) {
   if (isActive && $('#o-map').width() >= breakPoint[0]) {
     toggleMenu();
   }
-}
-
-function bindUIActions() {
-  $menuButton.on('click', (e) => {
-    toggleMenu();
-    $menuButton.blur();
-    e.preventDefault();
-  });
-  $closeButton.on('click', (e) => {
-    toggleMenu();
-    $closeButton.blur();
-    e.preventDefault();
-  });
-}
-
-function toggleMenu() {
-  if ($mapMenu.hasClass('o-mapmenu-show')) {
-    $mapMenu.removeClass('o-mapmenu-show');
-  } else {
-    $mapMenu.addClass('o-mapmenu-show');
-  }
-}
-
-function getTarget() {
-  return $mapMenu;
 }
 
 export default {
