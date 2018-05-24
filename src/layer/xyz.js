@@ -4,6 +4,10 @@ import viewer from '../viewer';
 import tile from './tile';
 import maputils from '../maputils';
 
+function createSource(options) {
+  return new XYZSource(options);
+}
+
 const xyz = function xyz(layerOptions) {
   const xyzDefault = {
     layerType: 'tile',
@@ -40,9 +44,5 @@ const xyz = function xyz(layerOptions) {
   const xyzSource = createSource(sourceOptions);
   return tile(xyzOptions, xyzSource);
 };
-
-function createSource(options) {
-  return new XYZSource(options);
-}
 
 export default xyz;
