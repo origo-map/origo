@@ -35,6 +35,89 @@ let urlParams;
 let pageSettings;
 const pageTemplate = {};
 
+function render(el, mapOptions) {
+  pageSettings = mapOptions.pageSettings;
+  pageTemplate.mapClass = 'o-map';
+
+  if (pageSettings) {
+    if (pageSettings.footer) {
+      if ('img' in pageSettings.footer) {
+        pageTemplate.img = pageSettings.footer.img;
+      }
+      if ('text' in pageSettings.footer) {
+        pageTemplate.text = pageSettings.footer.text;
+      }
+      if ('url' in pageSettings.footer) {
+        pageTemplate.url = pageSettings.footer.url;
+      }
+      if ('urlText' in pageSettings.footer) {
+        pageTemplate.urlText = pageSettings.footer.urlText;
+      }
+    }
+    if (pageSettings.mapGrid) {
+      if ('visible' in pageSettings.mapGrid && pageSettings.mapGrid.visible === true) {
+        pageTemplate.mapClass = 'o-map o-map-grid';
+      }
+    }
+  }
+
+  $(el).html(template(pageTemplate));
+}
+
+function getUnits(proj) {
+  let units;
+  switch (proj) {
+    case 'EPSG:3857':
+      units = 'm';
+      break;
+    case 'EPSG:4326':
+      units = 'degrees';
+      break;
+    default:
+      units = proj4.defs(proj) ? proj4.defs(proj).units : undefined;
+  }
+  return units;
+}
+
+function loadMap() {
+  map = new Map({
+    target: 'o-map',
+    controls: [],
+    view: new View({
+      extent: settings.extent || undefined,
+      projection: settings.projection || undefined,
+      center: settings.center,
+      resolutions: settings.resolutions || undefined,
+      zoom: settings.zoom,
+      enableRotation: settings.enableRotation
+    })
+  });
+}
+
+function createLayers(layerlist, savedLayers) {
+  const layers = [];
+  for (let i = layerlist.length - 1; i >= 0; i -= 1) {
+    let savedLayer = {};
+    if (savedLayers) {
+      savedLayer = savedLayers[layerlist[i].name.split(':').pop()] || {
+        visible: false,
+        legend: false
+      };
+      savedLayer.name = layerlist[i].name;
+    }
+    const layer = $.extend(layerlist[i], savedLayer);
+    layers.push(layerCreator(layer));
+  }
+  return layers;
+}
+
+
+function addLayers(layers) {
+  layers.forEach((layer) => {
+    map.addLayer(layer);
+  });
+}
+
 function init(el, mapOptions) {
   render(el, mapOptions);
 
@@ -44,9 +127,9 @@ function init(el, mapOptions) {
     const proj = mapOptions.proj4Defs;
 
     // Register proj4 projection definitions
-    for (let i = 0; i < proj.length; i++) {
+    for (let i = 0; i < proj.length; i += 1) {
       proj4.defs(proj[i].code, proj[i].projection);
-      if (proj[i].hasOwnProperty('alias')) {
+      if (Object.prototype.hasOwnProperty.call(proj[i], 'alias')) {
         proj4.defs(proj[i].alias, proj4.defs(proj[i].code));
       }
     }
@@ -61,9 +144,9 @@ function init(el, mapOptions) {
   settings.extent = mapOptions.extent || undefined;
   settings.center = urlParams.center || mapOptions.center;
   settings.zoom = urlParams.zoom || mapOptions.zoom;
-  mapOptions.tileGrid = mapOptions.tileGrid || {};
-  settings.tileSize = mapOptions.tileGrid.tileSize ? [mapOptions.tileGrid.tileSize,mapOptions.tileGrid.tileSize] : [256,256];
-  settings.alignBottomLeft = mapOptions.tileGrid.alignBottomLeft;
+  settings.tileGrid = mapOptions.tileGrid || {};
+  settings.tileSize = settings.tileGrid.tileSize ? [settings.tileGrid.tileSize, settings.tileGrid.tileSize] : [256, 256];
+  settings.alignBottomLeft = settings.tileGrid.alignBottomLeft;
 
   if ('proj4Defs' in mapOptions || mapOptions.projectionCode === 'EPSG:3857' || mapOptions.projectionCode === 'EPSG:4326') {
     // Projection to be used in map
@@ -87,7 +170,7 @@ function init(el, mapOptions) {
   settings.controls = mapOptions.controls;
   settings.consoleId = mapOptions.consoleId || 'o-console';
   settings.featureinfoOptions = mapOptions.featureinfoOptions || {};
-  settings.enableRotation = mapOptions.enableRotation === false ? false : true;
+  settings.enableRotation = mapOptions.enableRotation !== false;
 
   loadMap();
   settings.layers = createLayers(mapOptions.layers, urlParams.layers);
@@ -95,58 +178,18 @@ function init(el, mapOptions) {
 
   elQuery(map, {
     breakPoints: mapOptions.breakPoints,
-    breakPointsPrefix: mapOptions.breakPointsPrefix,
+    breakPointsPrefix: mapOptions.breakPointsPrefix
   });
 
   if (urlParams.pin) {
     settings.featureinfoOptions.savedPin = urlParams.pin;
-  }
-
-  // This needs further development for proper handling in permalink
-  else if (urlParams.selection) {
+  } else if (urlParams.selection) {
+    // This needs further development for proper handling in permalink
     settings.featureinfoOptions.savedSelection = new Feature({
       geometry: new geom[urlParams.selection.geometryType](urlParams.selection.coordinates)
     });
   }
   featureinfo.init(settings.featureinfoOptions);
-}
-
-function addLayers(layers) {
-  layers.forEach((layer) => {
-    map.addLayer(layer);
-  });
-}
-
-function createLayers(layerlist, savedLayers) {
-  const layers = [];
-  for (let i = layerlist.length - 1; i >= 0; i--) {
-    let savedLayer = {};
-    if (savedLayers) {
-      savedLayer = savedLayers[layerlist[i].name.split(':').pop()] || {
-        visible: false,
-        legend: false
-      };
-      savedLayer.name = layerlist[i].name;
-    }
-    const layer = $.extend(layerlist[i], savedLayer);
-    layers.push(layerCreator(layer));
-  }
-  return layers;
-}
-
-function loadMap() {
-  map = new Map({
-    target: 'o-map',
-    controls: [],
-    view: new View({
-      extent: settings.extent || undefined,
-      projection: settings.projection || undefined,
-      center: settings.center,
-      resolutions: settings.resolutions || undefined,
-      zoom: settings.zoom,
-      enableRotation: settings.enableRotation
-    })
-  });
 }
 
 function getSettings() {
@@ -197,12 +240,12 @@ function getMapUrl() {
   if (window.location.search) {
     url = window.location.href.replace(window.location.search, '?');
   } else {
-    url = window.location.href + '?';
+    url = `${window.location.href}?`;
   }
   const mapView = map.getView();
   const center = mapView.getCenter();
-  for (let i = 0; i < 2; i++) {
-    center[i] = parseInt(center[i]); // coordinates in integers
+  for (let i = 0; i < 2; i += 1) {
+    center[i] = parseInt(center[i], 10); // coordinates in integers
   }
   const zoom = mapView.getZoom();
   const layers = map.getLayers();
@@ -262,15 +305,6 @@ function getGroup(group) {
   return settings.layers.filter(obj => obj.get('group') === group);
 }
 
-function getGroups(opt) {
-  if (opt === 'top') {
-    return settings.groups;
-  } else if (opt === 'sub') {
-    return getSubgroups();
-  }
-  return settings.groups.concat(getSubgroups());
-}
-
 function getSubgroups() {
   const subgroups = [];
 
@@ -292,6 +326,15 @@ function getSubgroups() {
 
   findSubgroups(settings.groups, 0);
   return subgroups;
+}
+
+function getGroups(opt) {
+  if (opt === 'top') {
+    return settings.groups;
+  } else if (opt === 'sub') {
+    return getSubgroups();
+  }
+  return settings.groups.concat(getSubgroups());
 }
 
 function getProjectionCode() {
@@ -325,27 +368,22 @@ function checkScale(scale, maxScale, minScale) {
       if ((scale > maxScale) && (scale < minScale)) {
         return true;
       }
-    }
-
-    // Alter 2: only maxscale
-    else if (maxScale) {
+    } else if (maxScale) {
+      // Alter 2: only maxscale
       if (scale > maxScale) {
         return true;
       }
-    }
-
-    // Alter 3: only minscale
-    else if (minScale) {
+    } else if (minScale) {
+      // Alter 3: only minscale
       if (scale < minScale) {
         return true;
       }
     }
-  }
-
-  // Alter 4: no scale limit
-  else {
+  } else {
+    // Alter 4: no scale limit
     return true;
   }
+  return false;
 }
 
 function getConsoleId() {
@@ -360,21 +398,6 @@ function getScale(resolution) {
   return scale;
 }
 
-function getUnits(proj) {
-  let units;
-  switch (proj) {
-    case 'EPSG:3857':
-      units = 'm';
-      break;
-    case 'EPSG:4326':
-      units = 'degrees';
-      break;
-    default:
-      units = proj4.defs(proj) ? proj4.defs(proj).units : undefined;
-  }
-  return units;
-}
-
 function autoPan() {
   /* Workaround to remove when autopan implemented for overlays */
   const el = $('.o-popup');
@@ -386,7 +409,7 @@ function autoPan() {
   const offsetX = (mapOffset.left + mapSize[0]) - (popupOffset.left + $(el).outerWidth(true));
 
   // Check if mapmenu widget is used and opened
-  const menuSize = 0;
+  let menuSize = 0;
   if ('mapmenu' in settings.controls) {
     menuSize = settings.controls.mapmenu.getTarget().offset().left > 0 ? mapSize[0] - settings.controls.mapmenu.getTarget().offset().left : menuSize = 0;
   }
@@ -438,35 +461,6 @@ function removeOverlays(overlays) {
   } else {
     map.getOverlays().clear();
   }
-}
-
-function render(el, mapOptions) {
-  pageSettings = mapOptions.pageSettings;
-  pageTemplate.mapClass = 'o-map';
-
-  if (pageSettings) {
-    if (pageSettings.footer) {
-      if ('img' in pageSettings.footer) {
-        pageTemplate.img = pageSettings.footer.img;
-      }
-      if ('text' in pageSettings.footer) {
-        pageTemplate.text = pageSettings.footer.text;
-      }
-      if ('url' in pageSettings.footer) {
-        pageTemplate.url = pageSettings.footer.url;
-      }
-      if ('urlText' in pageSettings.footer) {
-        pageTemplate.urlText = pageSettings.footer.urlText;
-      }
-    }
-    if (pageSettings.mapGrid) {
-      if ('visible' in pageSettings.mapGrid && pageSettings.mapGrid.visible === true) {
-        pageTemplate.mapClass = 'o-map o-map-grid';
-      }
-    }
-  }
-
-  $(el).html(template(pageTemplate));
 }
 
 export default {
