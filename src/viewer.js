@@ -398,40 +398,6 @@ function getScale(resolution) {
   return scale;
 }
 
-function autoPan() {
-  /* Workaround to remove when autopan implemented for overlays */
-  const el = $('.o-popup');
-  const center = map.getView().getCenter();
-  const popupOffset = $(el).offset();
-  const mapOffset = $(`#${map.getTarget()}`).offset();
-  const offsetY = popupOffset.top - mapOffset.top;
-  const mapSize = map.getSize();
-  const offsetX = (mapOffset.left + mapSize[0]) - (popupOffset.left + $(el).outerWidth(true));
-
-  // Check if mapmenu widget is used and opened
-  let menuSize = 0;
-  if ('mapmenu' in settings.controls) {
-    menuSize = settings.controls.mapmenu.getTarget().offset().left > 0 ? mapSize[0] - settings.controls.mapmenu.getTarget().offset().left : menuSize = 0;
-  }
-  if (offsetY < 0 || offsetX < 0 + menuSize || offsetX > (mapSize[0] - $(el).outerWidth(true))) {
-    let dx = 0;
-    let dy = 0;
-    if (offsetX < 0 + menuSize) {
-      dx = (-offsetX + menuSize) * map.getView().getResolution();
-    }
-    if (offsetX > (mapSize[0] - $(el).outerWidth(true))) {
-      dx = -($(el).outerWidth(true) - (mapSize[0] - offsetX)) * map.getView().getResolution();
-    }
-    if (offsetY < 0) {
-      dy = (-offsetY) * map.getView().getResolution();
-    }
-    map.getView().animate({
-      center: ([center[0] + dx, center[1] + dy]),
-      duration: 300
-    });
-  }
-  /* End workaround */
-}
 function removeLayer(name) {
   settings.layers.forEach((layer, i, obj) => {
     if (layer.get('name') === name) {
@@ -490,7 +456,6 @@ export default {
   getClusterOptions,
   getTileGrid,
   getTileSize,
-  autoPan,
   removeLayer,
   removeOverlays,
   checkScale,

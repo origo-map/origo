@@ -5,16 +5,16 @@ import utils from './utils';
 import permalink from './permalink/permalink';
 
 let shareButton;
-function init() {
-  const el = utils.createListButton({
-    id: 'o-share',
-    iconCls: 'o-icon-fa-share-square-o',
-    src: '#fa-share-square-o',
-    text: 'Dela karta'
-  });
-  $('#o-menutools').append(el);
-  shareButton = $('#o-share-button');
-  bindUIActions();
+
+
+function createContent() {
+  return '<div class="o-share-link"><input type="text"></div>' +
+    '<i>Kopiera och klistra in länken för att dela kartan.</i>';
+}
+
+function createLink() {
+  const url = permalink.getPermalink();
+  $('.o-share-link input').val(url).select();
 }
 
 function bindUIActions() {
@@ -30,14 +30,16 @@ function bindUIActions() {
   });
 }
 
-function createContent() {
-  return '<div class="o-share-link"><input type="text"></div>' +
-    '<i>Kopiera och klistra in länken för att dela kartan.</i>';
-}
-
-function createLink() {
-  const url = permalink.getPermalink();
-  $('.o-share-link input').val(url).select();
+function init() {
+  const el = utils.createListButton({
+    id: 'o-share',
+    iconCls: 'o-icon-fa-share-square-o',
+    src: '#fa-share-square-o',
+    text: 'Dela karta'
+  });
+  $('#o-menutools').append(el);
+  shareButton = $('#o-share-button');
+  bindUIActions();
 }
 
 export default { init };

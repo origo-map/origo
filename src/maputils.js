@@ -30,9 +30,9 @@ export default {
   checkZoomChange: function checkZoomChange(resolution, currentResolution) {
     if (resolution !== currentResolution) {
       return true;
-    } else {
-      return false;
     }
+
+    return false;
   },
   createPointFeature: function createPointFeature(coordinate, style) {
     const feature = new Feature({
@@ -65,9 +65,8 @@ export default {
         maxZoom
       });
       return extent;
-    } else {
-      return undefined;
     }
+    return false;
   },
   getCenter: function getCenter(geometry) {
     const type = geometry.getType();

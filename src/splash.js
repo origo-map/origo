@@ -8,21 +8,6 @@ const cls = 'o-splash';
 let title;
 let content;
 
-function init(opt_options) {
-  const options = opt_options || {};
-  title = options.title || defaultTitle;
-  if (options.url) {
-    const url = viewer.getBaseUrl() + options.url;
-    getContent(url)
-      .done((data) => {
-        content = data;
-        openModal();
-      });
-  } else {
-    content = options.content || defaultContent;
-    openModal();
-  }
-}
 
 function getContent(url) {
   return $.get(url);
@@ -35,6 +20,22 @@ function openModal() {
     cls
   });
   modal.showModal();
+}
+
+function init(optOptions) {
+  const options = optOptions || {};
+  title = options.title || defaultTitle;
+  if (options.url) {
+    const url = viewer.getBaseUrl() + options.url;
+    getContent(url)
+      .done((data) => {
+        content = data;
+        openModal();
+      });
+  } else {
+    content = options.content || defaultContent;
+    openModal();
+  }
 }
 
 export default { init };
