@@ -1,17 +1,5 @@
 import $ from 'jquery';
 
-export default function (target) {
-  render(target);
-  bindUIActions();
-  return {
-    getEl,
-    setVisibility,
-    setTitle,
-    setContent,
-    closePopup
-  };
-}
-
 function render(target) {
   const pop = `<div id="o-popup">
   <div class="o-popup o-card">
@@ -23,19 +11,16 @@ function render(target) {
   $(target).append(pop);
 }
 
-function bindUIActions() {
-  $('#o-popup .o-popup .o-close-button').on('click', (evt) => {
-    closePopup();
-    evt.preventDefault();
-  });
-}
-
 function getEl() {
   return $('#o-popup').get(0);
 }
 
 function setVisibility(visible) {
-  visible === true ? $('#o-popup .o-popup').css('display', 'block') : $('#o-popup .o-popup').css('display', 'none');
+  if (visible) {
+    $('#o-popup .o-popup').css('display', 'block');
+  } else {
+    $('#o-popup .o-popup').css('display', 'none');
+  }
 }
 
 function setTitle(title) {
@@ -43,10 +28,39 @@ function setTitle(title) {
 }
 
 function setContent(config) {
-  config.title ? $('#o-popup .o-popup .o-card-title').html(config.title) : $('#o-popup .o-popup .o-card-title').html('');
-  config.content ? $('#o-popup .o-popup .o-card-content').html(config.content) : $('#o-popup .o-popup .o-card-content').html('');
+  if (config.title) {
+    $('#o-popup .o-popup .o-card-title').html(config.title);
+  } else {
+    $('#o-popup .o-popup .o-card-title').html('');
+  }
+  if (config.content) {
+    $('#o-popup .o-popup .o-card-content').html(config.content);
+  } else {
+    $('#o-popup .o-popup .o-card-content').html('');
+  }
+  const popupHeight = $('.o-popup').outerHeight() + 20;
+  $('#o-popup').height(popupHeight);
 }
 
 function closePopup() {
   setVisibility(false);
+}
+
+function bindUIActions() {
+  $('#o-popup .o-popup .o-close-button').on('click', (evt) => {
+    closePopup();
+    evt.preventDefault();
+  });
+}
+
+export default function (target) {
+  render(target);
+  bindUIActions();
+  return {
+    getEl,
+    setVisibility,
+    setTitle,
+    setContent,
+    closePopup
+  };
 }

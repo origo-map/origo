@@ -1,39 +1,11 @@
 import $ from 'jquery';
 import viewer from './viewer';
 import utils from './utils';
-import template from './templates/print.handlebars';
+import template from './print/printtemplate';
 
 let $printButton;
 let attribution;
 let baseUrl;
-
-function init(opt) {
-  const options = opt || {};
-  attribution = options.attribution || '© Lantmäteriet Geodatasamverkan';
-  baseUrl = viewer.getBaseUrl();
-
-  render();
-  bindUIActions();
-}
-
-function render() {
-  const el = utils.createListButton({
-    id: 'o-print',
-    iconCls: 'o-icon-fa-print',
-    src: '#fa-print',
-    text: 'Skriv ut'
-  });
-  $('#o-menutools').append(el);
-  $printButton = $('#o-print-button');
-}
-
-function bindUIActions() {
-  $printButton.on('click', (e) => {
-    $('#app-wrapper').append('<canvas id="o-print" style="display: none"></canvas>');
-    createImage();
-    e.preventDefault();
-  });
-}
 
 function imageToPrint($printCanvas) {
   const imageCrop = new Image();
@@ -96,11 +68,39 @@ function createImage() {
         $printCanvas[0].height = printWidth;
       }
 
-      ctxCanvas.drawImage(image, (sourceWidth / 2 - $printCanvas[0].width / 2), 0, $printCanvas[0].width, $printCanvas[0].height, 0, 0, $printCanvas[0].width, $printCanvas[0].height);
+      ctxCanvas.drawImage(image, ((sourceWidth / 2) - ($printCanvas[0].width / 2)), 0, $printCanvas[0].width, $printCanvas[0].height, 0, 0, $printCanvas[0].width, $printCanvas[0].height);
       imageToPrint($printCanvas);
     };
     image.src = imageUrl;
   }
+}
+
+function render() {
+  const el = utils.createListButton({
+    id: 'o-print',
+    iconCls: 'o-icon-fa-print',
+    src: '#fa-print',
+    text: 'Skriv ut'
+  });
+  $('#o-menutools').append(el);
+  $printButton = $('#o-print-button');
+}
+
+function bindUIActions() {
+  $printButton.on('click', (e) => {
+    $('#app-wrapper').append('<canvas id="o-print" style="display: none"></canvas>');
+    createImage();
+    e.preventDefault();
+  });
+}
+
+function init(opt) {
+  const options = opt || {};
+  attribution = options.attribution || '© Lantmäteriet Geodatasamverkan';
+  baseUrl = viewer.getBaseUrl();
+
+  render();
+  bindUIActions();
 }
 
 export default { init };

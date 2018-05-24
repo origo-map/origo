@@ -91,20 +91,26 @@ function identify(identifyItems, target, coordinate) {
     case 'overlay':
     {
       popup = Popup('#o-map');
-      overlay = new Overlay({
-        element: popup.getEl()
-      });
-      map.addOverlay(overlay);
-      const geometry = items[0].feature.getGeometry();
-      const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
-      overlay.setPosition(coord);
       popup.setContent({
         content,
         title: items[0].title
       });
       popup.setVisibility(true);
+      overlay = new Overlay({
+        element: popup.getEl(),
+        autoPan: true,
+        autoPanAnimation: {
+          duration: 500
+        },
+        autoPanMargin: 40,
+        positioning: 'bottom-center',
+        insertFirst: false
+      });
+      const geometry = items[0].feature.getGeometry();
+      const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
+      map.addOverlay(overlay);
+      overlay.setPosition(coord);
       initCarousel('#o-identify-carousel');
-      viewer.autoPan();
       break;
     }
     case 'sidebar':

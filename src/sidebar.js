@@ -1,19 +1,15 @@
 import $ from 'jquery';
 
-let sidebar;
+function setVisibility(visible) {
+  if (visible) {
+    $('#o-sidebar').addClass('o-sidebar-show');
+  } else {
+    $('#o-sidebar').removeClass('o-sidebar-show');
+  }
+}
 
-function init() {
-  const el = `<div id="o-sidebar">
-    <div class="o-sidebar o-card">
-    <div class="o-close-button"><svg class="o-icon-fa-times"><use xlink:href="#fa-times"></use></svg></div>
-    <div class="o-card-title"></div>
-    <div class="o-card-content"></div>
-    </div>
-    </div>`;
-  $('#o-map').append(el);
-  sidebar = $('#o-sidebar');
-
-  bindUIActions();
+function closeSidebar() {
+  setVisibility(false);
 }
 
 function bindUIActions() {
@@ -21,14 +17,6 @@ function bindUIActions() {
     closeSidebar();
     evt.preventDefault();
   });
-}
-
-function setVisibility(visible) {
-  if (visible) {
-    $('#o-sidebar').addClass('o-sidebar-show');
-  } else {
-    $('#o-sidebar').removeClass('o-sidebar-show');
-  }
 }
 
 function setTitle(title) {
@@ -48,8 +36,17 @@ function setContent(config) {
   }
 }
 
-function closeSidebar() {
-  setVisibility(false);
+function init() {
+  const el = `<div id="o-sidebar">
+    <div class="o-sidebar o-card">
+    <div class="o-close-button"><svg class="o-icon-fa-times"><use xlink:href="#fa-times"></use></svg></div>
+    <div class="o-card-title"></div>
+    <div class="o-card-content"></div>
+    </div>
+    </div>`;
+  $('#o-map').append(el);
+
+  bindUIActions();
 }
 
 export default {

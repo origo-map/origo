@@ -1,4 +1,4 @@
-<div id="o-editor-toolbar" class="o-editor-toolbar o-toolbar o-toolbar-horizontal o-padding-horizontal-8 o-rounded-top o-hidden">
+export default `<div id="o-editor-toolbar" class="o-editor-toolbar o-toolbar o-toolbar-horizontal o-padding-horizontal-8 o-rounded-top o-hidden">
     <div id="o-editor-toolbar-drawtools" class="o-toolbar-horizontal">
       <div class="o-popover-container">
         <button id="o-editor-draw" class="o-button-lg" type="button" name="button">
@@ -35,4 +35,4 @@
             <use xlink:href="#ic_close_24px"></use>
         </svg>
     </button>
-</div>
+</div>`;
