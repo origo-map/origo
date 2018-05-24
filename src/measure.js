@@ -93,12 +93,7 @@ function onEnableInteraction(e) {
 }
 
 function setActive(state) {
-  if(state === true) {
-    isActive = true;
-  } else {
-    isActive = false;
-  }
-
+  isActive = state ? true : false; 
 }
 
 function render(target) {
