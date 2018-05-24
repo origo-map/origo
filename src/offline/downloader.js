@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import viewer from '../viewer';
-import template from './downloader.template.handlebars';
-import spinner from '../components/spinner.handlebars';
+import template from './downloadtemplate';
+import spinner from '../components/spinnertemplate';
 import utils from '../utils';
 import dispatcher from './offlinedispatcher';
 

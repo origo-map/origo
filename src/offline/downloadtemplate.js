@@ -1,4 +1,4 @@
-<div class="o-container-fluid o-downloader">
+export default `<div class="o-container-fluid o-downloader">
   <div class="o-card">
     <div class="o-card-header o-text-center">
       <h6 class="o-card-heading">Nedladdningar</h6>
@@ -12,4 +12,4 @@
       </table>
     </div>
   </div>
-</div>
+</div>`;
