@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import TopoJSONFormat from 'ol/format/TopoJSON';
+import TopoJSONFormat from 'ol/format/topojson';
 import verifyFeatureIds from './verifyfeatureids';
 
 const topoJson = {};
