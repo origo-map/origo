@@ -7,14 +7,6 @@ import OfflineStore from './offline/offlinestore';
 const offlineStore = OfflineStore();
 let $offlineButton;
 
-function init(optOptions) {
-  const options = optOptions || {};
-
-  downloadHandler();
-  render();
-  bindUIActions();
-}
-
 function render() {
   const el = utils.createListButton({
     id: 'o-offline',
@@ -31,6 +23,12 @@ function bindUIActions() {
     downloader(offlineStore.getOfflineLayers());
     e.preventDefault();
   });
+}
+
+function init() {
+  downloadHandler();
+  render();
+  bindUIActions();
 }
 
 export default { init };
