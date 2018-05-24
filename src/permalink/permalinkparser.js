@@ -35,10 +35,10 @@ export default {
     return layerObjects;
   },
   zoom(zoomStr) {
-    return parseInt(zoomStr);
+    return parseInt(zoomStr, 10);
   },
   center(centerStr) {
-    const center = centerStr.split(',').map(coord => parseInt(coord));
+    const center = centerStr.split(',').map(coord => parseInt(coord, 10));
     return center;
   },
   selection(selectionStr) {

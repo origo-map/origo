@@ -2,7 +2,6 @@ import viewer from '../viewer';
 import featureinfo from '../featureinfo';
 import urlparser from '../utils/urlparser';
 
-const selection = featureinfo.getSelection;
 const getPin = featureinfo.getPin;
 const permalinkStore = {};
 
@@ -29,13 +28,16 @@ permalinkStore.getState = function getState() {
   state.layers = getSaveLayers(layers);
   state.center = view.getCenter().map(coord => Math.round(coord)).join();
   state.zoom = view.getZoom().toString();
-  // state.selection = getSaveSelection(selection());
+
   if (getPin()) {
-    state.pin = getPin().getGeometry().getCoordinates().map(coord => Math.round(coord)).join();
+    state.pin = getPin().getGeometry().getCoordinates().map(coord => Math.round(coord))
+      .join();
   }
+
   if (viewer.getMapName()) {
     state.map = viewer.getMapName().split('.')[0];
   }
+
   return state;
 };
 
@@ -43,11 +45,5 @@ permalinkStore.getUrl = function getUrl() {
   const url = viewer.getUrl();
   return url;
 };
-
-function getSaveSelection(selection) {
-  return urlparser.arrStringify(selection.coordinates, {
-    topmost: selection.geometryType
-  });
-}
 
 export default permalinkStore;
