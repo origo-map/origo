@@ -33,70 +33,53 @@ const editStyleOptions = {
     }
   }],
   LineString: [{
-      stroke: {
-        color: white,
-        width: width + 2
-      }
-    },
-    {
-      stroke: {
-        color: blue,
-        width
-      }
+    stroke: {
+      color: white,
+      width: width + 2
     }
+  },
+  {
+    stroke: {
+      color: blue,
+      width
+    }
+  }
   ],
   Polygon: [{
-      stroke: {
-        color: white,
-        width: width + 2
-      }
-    },
-    {
-      stroke: {
-        color: blue,
-        width
-      }
+    stroke: {
+      color: white,
+      width: width + 2
     }
+  },
+  {
+    stroke: {
+      color: blue,
+      width
+    }
+  }
   ]
 };
-
-export default function() {
-  return {
-    init: Init,
-    createStyleOptions,
-    createStyleList,
-    createStyleRule,
-    createStyle,
-    styleFunction,
-    createEditStyle,
-    createGeometryStyle
-  };
-}
-
-function Init() {
-  baseUrl = viewer.getBaseUrl();
-}
 
 function createStyleOptions(styleParams) {
   const styleOptions = {};
   if (Object.prototype.hasOwnProperty.call(styleParams, 'geometry')) {
     switch (styleParams.geometry) {
       case 'centerPoint':
-        styleOptions.geometry = function(feature) {
+        styleOptions.geometry = function centerPoint(feature) {
           const coordinates = maputils.getCenter(feature.getGeometry());
           return new Point(coordinates);
         };
         break;
       case 'endPoint':
-        styleOptions.geometry = function(feature) {
+        styleOptions.geometry = function endPoint(feature) {
           const coordinates = feature.getGeometry().getLastCoordinate();
           return new Point(coordinates);
         };
         break;
       default:
-        {
-          break;
-        }
+      {
+        break;
+      }
     }
   }
   if (Object.prototype.hasOwnProperty.call(styleParams, 'zIndex')) {
@@ -156,6 +139,64 @@ function createStyleList(styleOptions) {
   return styleList;
 }
 
+function checkOptions(feature, scale, styleSettings, styleList, size) {
+  const s = styleSettings;
+  for (let j = 0; j < s.length; j += 1) {
+    let styleL;
+    if (viewer.checkScale(scale, s[j][0].maxScale, s[j][0].minScale)) {
+      s[j].some((element, index) => {
+        if (Object.prototype.hasOwnProperty.call(element, 'text') && size) {
+          styleList[j][index].getText().setText(size);
+        } else if (Object.prototype.hasOwnProperty.call(element, 'text')) {
+          styleList[j][index].getText().setText(replacer.replace(element.text.text, feature.getProperties()));
+        }
+        return null;
+      });
+      if (Object.prototype.hasOwnProperty.call(s[j][0], 'filter')) {
+        let expr;
+        // find attribute vale between [] defined in styles
+        const matches = s[j][0].filter.match(/\[(.*?)\]/);
+        if (matches) {
+          let first = feature;
+          if (feature.get('features')) {
+            first = feature.get('features')[0];
+          }
+          const featAttr = matches[1];
+          expr = s[j][0].filter.split(']')[1];
+          const featMatch = first.get(featAttr);
+          expr = typeof featMatch === 'number' ? featMatch + expr : `"${featMatch}"${expr}`;
+        }
+        if (eval(expr)) {
+          styleL = styleList[j];
+          return styleL;
+        }
+      } else {
+        styleL = styleList[j];
+        return styleL;
+      }
+    }
+  }
+  return null;
+}
+
+function styleFunction(styleSettings, styleList, clusterStyleSettings, clusterStyleList) {
+  const resolutions = viewer.getResolutions();
+  const fn = function fn(feature, resolution) {
+    const scale = viewer.getScale(resolution);
+    let styleL;
+    // If size is larger than, it is a cluster
+    const size = clusterStyleList ? feature.get('features').length : 1;
+    if (size > 1 && resolution !== resolutions[resolutions.length + 1]) {
+      styleL = checkOptions(feature, scale, clusterStyleSettings, clusterStyleList, size.toString());
+      // clusterStyleList[0].setText(size);
+    } else {
+      styleL = checkOptions(feature, scale, styleSettings, styleList);
+    }
+    return styleL;
+  };
+  return fn;
+}
+
 function createStyle(styleName, clusterStyleName) {
   const styleSettings = viewer.getStyleSettings()[styleName];
   if ($.isEmptyObject(styleSettings)) {
@@ -166,7 +207,7 @@ function createStyle(styleName, clusterStyleName) {
     return style;
   }
   const clusterStyleSettings = viewer.getStyleSettings()[clusterStyleName];
-  const style = (function() {
+  const style = (function style() {
     // Create style for each rule
     const styleList = createStyleList(styleSettings);
     if (clusterStyleSettings) {
@@ -193,28 +234,6 @@ function createStyleRule(options) {
   return styleRule;
 }
 
-function styleFunction(styleSettings, styleList, clusterStyleSettings, clusterStyleList) {
-  const resolutions = viewer.getResolutions();
-  const fn = function fn(feature, resolution) {
-    const scale = viewer.getScale(resolution);
-    let styleL;
-    // If size is larger than, it is a cluster
-    const size = clusterStyleList ? feature.get('features').length : 1;
-    if (size > 1 && resolution !== resolutions[resolutions.length + 1]) {
-      styleL = checkOptions(feature, scale, clusterStyleSettings, clusterStyleList, size.toString());
-      // clusterStyleList[0].setText(size);
-    } else {
-      styleL = checkOptions(feature, scale, styleSettings, styleList);
-    }
-    return styleL;
-  };
-  return fn;
-}
-
-function createEditStyle() {
-  return createGeometryStyle(editStyleOptions);
-}
-
 function createGeometryStyle(geometryStyleOptions) {
   return {
     Point: createStyleRule(geometryStyleOptions.Point),
@@ -226,40 +245,23 @@ function createGeometryStyle(geometryStyleOptions) {
   };
 }
 
-function checkOptions(feature, scale, styleSettings, styleList, size) {
-  const s = styleSettings;
-  for (let j = 0; j < s.length; j += 1) {
-    let styleL;
-    if (viewer.checkScale(scale, s[j][0].maxScale, s[j][0].minScale)) {
-      s[j].some((element, index) => {
-        if (Object.prototype.hasOwnProperty.call(element, 'text') && size) {
-          styleList[j][index].getText().setText(size);
-        } else if (Object.prototype.hasOwnProperty.call(element, 'text')) {
-          styleList[j][index].getText().setText(replacer.replace(element.text.text, feature.getProperties()));
-        }
-      });
-      if (Object.prototype.hasOwnProperty.call(s[j][0], 'filter')) {
-        let expr;
-        // find attribute vale between [] defined in styles
-        const matches = s[j][0].filter.match(/\[(.*?)\]/);
-        if (matches) {
-          let first = feature;
-          if (feature.get('features')) {
-            first = feature.get('features')[0];
-          }
-          const featAttr = matches[1];
-          expr = s[j][0].filter.split(']')[1];
-          const featMatch = first.get(featAttr);
-          expr = typeof featMatch === 'number' ? featMatch + expr : `"${featMatch}"${expr}`;
-        }
-        if (eval(expr)) {
-          styleL = styleList[j];
-          return styleL;
-        }
-      } else {
-        styleL = styleList[j];
-        return styleL;
-      }
-    }
-  }
+function createEditStyle() {
+  return createGeometryStyle(editStyleOptions);
+}
+
+function Init() {
+  baseUrl = viewer.getBaseUrl();
+}
+
+export default function () {
+  return {
+    init: Init,
+    createStyleOptions,
+    createStyleList,
+    createStyleRule,
+    createStyle,
+    styleFunction,
+    createEditStyle,
+    createGeometryStyle
+  };
 }
