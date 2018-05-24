@@ -38,8 +38,6 @@ function setContent(config) {
   } else {
     $('#o-popup .o-popup .o-card-content').html('');
   }
-  const popupHeight = $('.o-popup').outerHeight() + 20;
-  $('#o-popup').height(popupHeight);
 }
 
 function closePopup() {

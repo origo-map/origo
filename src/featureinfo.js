@@ -60,6 +60,10 @@ function initCarousel(id, opt) {
     navText: ['<svg class="o-icon-fa-chevron-left"><use xlink:href="#fa-chevron-left"></use></svg>',
       '<svg class="o-icon-fa-chevron-right"><use xlink:href="#fa-chevron-right"></use></svg>']
   };
+  if (identifyTarget === 'overlay') {
+    const popupHeight = $('.o-popup').outerHeight() + 20;
+    $('#o-popup').height(popupHeight);
+  }
   return $(id).owlCarousel(carouselOptions);
 }
 
@@ -96,6 +100,9 @@ function identify(identifyItems, target, coordinate) {
         title: items[0].title
       });
       popup.setVisibility(true);
+      initCarousel('#o-identify-carousel');
+      const popupHeight = $('.o-popup').outerHeight() + 20;
+      $('#o-popup').height(popupHeight);
       overlay = new Overlay({
         element: popup.getEl(),
         autoPan: true,
@@ -103,14 +110,12 @@ function identify(identifyItems, target, coordinate) {
           duration: 500
         },
         autoPanMargin: 40,
-        positioning: 'bottom-center',
-        insertFirst: false
+        positioning: 'bottom-center'
       });
       const geometry = items[0].feature.getGeometry();
       const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
       map.addOverlay(overlay);
       overlay.setPosition(coord);
-      initCarousel('#o-identify-carousel');
       break;
     }
     case 'sidebar':
