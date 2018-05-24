@@ -5,6 +5,25 @@ import $ from 'jquery';
 import viewer from '../viewer';
 import tile from './tile';
 
+function createSource(options) {
+  return new WMTSSource({
+    crossOrigin: 'anonymous',
+    attributions: options.attribution,
+    url: options.url,
+    projection: options.projectionCode,
+    layer: options.id,
+    matrixSet: options.matrixSet,
+    format: options.format,
+    tileGrid: new Tilegrid({
+      origin: options.origin || Extent.getTopLeft(options.projectionExtent),
+      resolutions: options.resolutions,
+      matrixIds: options.matrixIds,
+      tileSize: options.tileSize
+    }),
+    style: 'default'
+  });
+}
+
 const wmts = function wmts(layerOptions) {
   const wmtsDefault = {
     layerType: 'tile',
@@ -35,25 +54,6 @@ const wmts = function wmts(layerOptions) {
 
   const wmtsSource = createSource(sourceOptions);
   return tile(wmtsOptions, wmtsSource);
-
-  function createSource(options) {
-    return new WMTSSource({
-      crossOrigin: 'anonymous',
-      attributions: options.attribution,
-      url: options.url,
-      projection: options.projectionCode,
-      layer: options.id,
-      matrixSet: options.matrixSet,
-      format: options.format,
-      tileGrid: new Tilegrid({
-        origin: options.origin || Extent.getTopLeft(options.projectionExtent),
-        resolutions: options.resolutions,
-        matrixIds: options.matrixIds,
-        tileSize: options.tileSize
-      }),
-      style: 'default'
-    });
-  }
 };
 
 export default wmts;

@@ -1,6 +1,8 @@
 export default function getUrl() {
-  return location.protocol + '//' +
-    location.hostname +
-    (location.port ? ":" + location.port : "") +
-    location.pathname;
+  return [
+    `${window.location.protocol}//`,
+    `${window.location.hostname}`,
+    (window.location.port ? `:${window.location.port}` : ''),
+    `${window.location.pathname}`
+  ].join('');
 }
