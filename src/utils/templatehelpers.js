@@ -1,11 +1,12 @@
 const templateHelpers = {
   if: (condition, thenTemplate, elseTemplate = '') => (condition ? thenTemplate : elseTemplate),
-  each: (obj) => {
+  each: (obj, templateFn) => {
     const props = Object.keys(obj);
-    return props.map(prop => ({
+    const items = props.map(prop => ({
       prop,
       value: obj[prop]
     }));
+    return items.map(item => templateFn(item)).join('');
   }
 };
 
