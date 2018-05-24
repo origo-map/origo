@@ -51,4 +51,4 @@ const replacer = function replacer() {
   };
 };
 
-export default replacer;
+export default replacer();

@@ -48,16 +48,10 @@ let awesomplete;
 function render() {
   const el = `<div id="o-search-wrapper" class="o-search-wrapper">
     <div id="o-search" class="o-search o-search-false">
-    <input id="hjl" class="o-search-field form-control" type="text" placeholder="${hintText}">
-    <button id="o-search-button">
-    <svg class="o-icon-fa-search">
-    <use xlink:href="#fa-search"></use>
-    </svg>
-    </button>
-    <button id="o-search-button-close">
-    <svg class="o-icon-search-fa-times">
-    <use xlink:href="#fa-times"></use>
-    </svg>
+    <input id="hjl" class="o-search-field form-control" type="text" placeholder="${hintText}"><button id="o-search-button">
+    <svg class="o-icon-fa-search"><use xlink:href="#fa-search"></use></svg>
+    </button><button id="o-search-button-close">
+    <svg class="o-icon-search-fa-times"><use xlink:href="#fa-times"></use></svg>
     </button>
     </div>
     </div>`;
