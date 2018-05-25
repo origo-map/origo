@@ -10,27 +10,11 @@ module.exports = {
         test: /\.(js)$/,
         exclude: /node_modules/,
         use: ['babel-loader']
-      },
-      {
-        test: /\.handlebars$/,
-        loader: 'handlebars-loader'
       }
     ]
   },
   resolve: {
     extensions: ['*', '.js']
-  },
-  output: {
-    path: `${__dirname}/js`,
-    publicPath: '/js',
-    filename: 'origo.js',
-    libraryTarget: 'var',
-    libraryExport: 'default',
-    library: 'origo'
-  },
-  devServer: {
-    contentBase: './',
-    port: 9966
   },
   plugins: [
     new webpack.ProvidePlugin({

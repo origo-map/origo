@@ -12,14 +12,15 @@
   "main": "origo.js",
   "scripts": {
     "start": "npm run prebuild-sass | run-p start-origo watch-sass",
-    "start-origo": "webpack-dev-server --config ./webpack.config.js --mode development",
+    "start-origo": "webpack-dev-server --config ./webpack.dev.js --mode development",
     "watch": "watchify origo.js --s origo --d --outfile js/origo.js",
     "watch-sass": "node-sass -w --include-path scss scss/origo.scss css/style.css",
     "prebuild-sass": "node-sass --include-path scss scss/origo.scss css/style.css",
     "build": "npm run build-origo && npm run build-sass",
     "build-sass": "node-sass --include-path scss scss/origo.scss dist/style.css",
-    "build-origo": "browserify origo.js --s origo | uglifyjs --compress --mangle --output dist/origo.min.js"
+    "build-js": "webpack --config webpack.prod.js"
   },
+  "sideEffects": false,
   "dependencies": {
     "awesomplete": "1.1.2",
     "jquery": "3.3.1",
@@ -48,10 +49,12 @@
     "npm-run-all": "^3.1.2",
     "run-sequence": "^2.1.0",
     "uglify-js": "3.2.0",
+    "uglifyjs-webpack-plugin": "^1.2.5",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "1.1.0",
     "webpack": "^4.5.0",
     "webpack-cli": "^2.0.14",
-    "webpack-dev-server": "^3.1.3"
+    "webpack-dev-server": "^3.1.3",
+    "webpack-merge": "^4.1.2"
   }
 }
