@@ -1,6 +1,6 @@
 import $ from 'jquery';
-import utils from './utils';
-import viewer from './viewer';
+import utils from '../src/utils';
+import viewer from '../src/viewer';
 
 let $closeButton;
 let $mapMenu;

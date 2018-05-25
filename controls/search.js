@@ -2,15 +2,15 @@ import Overlay from 'ol/overlay';
 import Point from 'ol/geom/point';
 import Awesomplete from 'awesomplete';
 import $ from 'jquery';
-import featureInfo from './featureinfo';
-import generateUUID from './utils/generateuuid';
-import getAttributes from './getattributes';
-import getCenter from './geometry/getcenter';
-import getFeature from './getfeature';
-import mapUtils from './maputils';
-import popup from './popup';
-import viewer from './viewer';
-import utils from './utils';
+import featureInfo from '../src/featureinfo';
+import generateUUID from '../src/utils/generateuuid';
+import getAttributes from '../src/getattributes';
+import getCenter from '../src/geometry/getcenter';
+import getFeature from '../src/getfeature';
+import mapUtils from '../src/maputils';
+import popup from '../src/popup';
+import viewer from '../src/viewer';
+import utils from '../src/utils';
 
 const keyCodes = {
   9: 'tab',

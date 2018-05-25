@@ -1,6 +1,6 @@
 import $ from 'jquery';
-import utils from './utils';
-import modal from './modal';
+import utils from '../src/utils';
+import modal from '../src/modal';
 
 let $aboutButton;
 let buttonText;

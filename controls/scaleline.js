@@ -1,5 +1,5 @@
 import ScaleLine from 'ol/control/scaleline';
-import viewer from './viewer';
+import viewer from '../src/viewer';
 
 let map;
 

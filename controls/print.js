@@ -1,7 +1,7 @@
 import $ from 'jquery';
-import viewer from './viewer';
-import utils from './utils';
-import template from './print/printtemplate';
+import viewer from '../src/viewer';
+import utils from '../src/utils';
+import template from '../src/print/printtemplate';
 
 let $printButton;
 let attribution;

@@ -1,6 +1,6 @@
 import Attribution from 'ol/control/attribution';
 import $ from 'jquery';
-import viewer from './viewer';
+import viewer from '../src/viewer';
 
 let map;
 

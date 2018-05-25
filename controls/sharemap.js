@@ -1,8 +1,8 @@
 import $ from 'jquery';
-import modal from './modal';
+import modal from '../src/modal';
 import mapmenu from './mapmenu';
-import utils from './utils';
-import permalink from './permalink/permalink';
+import utils from '../src/utils';
+import permalink from '../src/permalink/permalink';
 
 let shareButton;
 
