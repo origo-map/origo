@@ -3,17 +3,37 @@ import VectorLayer from 'ol/layer/vector';
 import VectorTileLayer from 'ol/layer/vectortile';
 import ClusterSource from 'ol/source/cluster';
 import ImageVectorSource from 'ol/source/imagevector';
-
 import style from '../style';
 import viewer from '../viewer';
 
+const distance = 60;
+let map;
+let view;
+let maxZoom;
+let options;
+
+function onMoveStart(evt) {
+  const mapZoom = view.getZoomForResolution(evt.frameState.viewState.resolution);
+  const clusterDistance = options.source.getProperties().clusterDistance || distance;
+  const clusterMaxZoom = options.source.getProperties().clusterMaxZoom || maxZoom;
+  map.once('moveend', () => {
+    const currentZoom = parseInt(view.getZoom(), 10);
+    if (currentZoom !== mapZoom) {
+      if (currentZoom >= clusterMaxZoom) {
+        options.source.setDistance(0);
+      } else if (currentZoom < clusterMaxZoom) {
+        options.source.setDistance(clusterDistance);
+      }
+    }
+  });
+}
+
 export default function vector(opt, src) {
-  const options = opt;
+  map = viewer.getMap();
+  view = map.getView();
+  maxZoom = view.getResolutions().length - 1;
+  options = opt;
   const source = src;
-  const map = viewer.getMap();
-  const view = map.getView();
-  const distance = 60;
-  const maxZoom = view.getResolutions().length - 1;
   let vectorLayer;
   switch (options.layerType) {
     case 'vector':
@@ -46,8 +66,6 @@ export default function vector(opt, src) {
       options.style = style().createStyle(options.style, options.clusterStyle);
       vectorLayer = new VectorLayer(options);
       map.on('movestart', onMoveStart);
-
-
       break;
     }
     case 'image':
@@ -72,20 +90,5 @@ export default function vector(opt, src) {
     }
   }
 
-  function onMoveStart(evt) {
-    const mapZoom = view.getZoomForResolution(evt.frameState.viewState.resolution);
-    const clusterDistance = options.source.getProperties().clusterDistance || distance;
-    const clusterMaxZoom = options.source.getProperties().clusterMaxZoom || maxZoom;
-    map.once('moveend', () => {
-      const currentZoom = parseInt(view.getZoom(), 10);
-      if (currentZoom !== mapZoom) {
-        if (currentZoom >= clusterMaxZoom) {
-          options.source.setDistance(0);
-        } else if (currentZoom < clusterMaxZoom) {
-          options.source.setDistance(clusterDistance);
-        }
-      }
-    });
-  }
   return vectorLayer;
 }

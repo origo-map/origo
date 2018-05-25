@@ -4,6 +4,17 @@ import viewer from '../viewer';
 import tile from './tile';
 import maputils from '../maputils';
 
+function createSource(options) {
+  return new TileArcGISRest({
+    attributions: options.attribution,
+    projection: options.projection,
+    crossOrigin: 'anonymous',
+    params: options.params,
+    url: options.url,
+    tileGrid: options.tileGrid
+  });
+}
+
 const agsTile = function agsTile(layerOptions) {
   const agsDefault = {
     layerType: 'tile',
@@ -31,17 +42,6 @@ const agsTile = function agsTile(layerOptions) {
 
   const agsSource = createSource(sourceOptions);
   return tile(agsOptions, agsSource);
-
-  function createSource(options) {
-    return new TileArcGISRest({
-      attributions: options.attribution,
-      projection: options.projection,
-      crossOrigin: 'anonymous',
-      params: options.params,
-      url: options.url,
-      tileGrid: options.tileGrid
-    });
-  }
 };
 
 export default agsTile;
