@@ -118,80 +118,6 @@ function addLayers(layers) {
   });
 }
 
-function init(el, mapOptions) {
-  render(el, mapOptions);
-
-  // Read and set projection
-  if ('proj4Defs' in mapOptions && proj4) {
-    project.setProj4(proj4);
-    const proj = mapOptions.proj4Defs;
-
-    // Register proj4 projection definitions
-    for (let i = 0; i < proj.length; i += 1) {
-      proj4.defs(proj[i].code, proj[i].projection);
-      if (Object.prototype.hasOwnProperty.call(proj[i], 'alias')) {
-        proj4.defs(proj[i].alias, proj4.defs(proj[i].code));
-      }
-    }
-  }
-  urlParams = mapOptions.params || {};
-  settings.params = urlParams;
-  settings.map = mapOptions.map;
-  settings.url = mapOptions.url;
-  settings.target = mapOptions.target;
-  settings.baseUrl = mapOptions.baseUrl;
-  settings.breakPoints = mapOptions.breakPoints;
-  settings.extent = mapOptions.extent || undefined;
-  settings.center = urlParams.center || mapOptions.center;
-  settings.zoom = urlParams.zoom || mapOptions.zoom;
-  settings.tileGrid = mapOptions.tileGrid || {};
-  settings.tileSize = settings.tileGrid.tileSize ? [settings.tileGrid.tileSize, settings.tileGrid.tileSize] : [256, 256];
-  settings.alignBottomLeft = settings.tileGrid.alignBottomLeft;
-
-  if ('proj4Defs' in mapOptions || mapOptions.projectionCode === 'EPSG:3857' || mapOptions.projectionCode === 'EPSG:4326') {
-    // Projection to be used in map
-    settings.projectionCode = mapOptions.projectionCode || undefined;
-    settings.projectionExtent = mapOptions.projectionExtent;
-    settings.projection = new Projection({
-      code: settings.projectionCode,
-      extent: settings.projectionExtent,
-      units: getUnits(settings.projectionCode)
-    });
-    settings.resolutions = mapOptions.resolutions || undefined;
-    settings.tileGrid = maputils.tileGrid(settings);
-  }
-
-  settings.source = mapOptions.source;
-  settings.groups = mapOptions.groups;
-  settings.editLayer = mapOptions.editLayer;
-  settings.styles = mapOptions.styles;
-  settings.clusterOptions = mapOptions.clusterOptions || {};
-  style().init();
-  settings.controls = mapOptions.controls;
-  settings.consoleId = mapOptions.consoleId || 'o-console';
-  settings.featureinfoOptions = mapOptions.featureinfoOptions || {};
-  settings.enableRotation = mapOptions.enableRotation !== false;
-
-  loadMap();
-  settings.layers = createLayers(mapOptions.layers, urlParams.layers);
-  addLayers(settings.layers);
-
-  elQuery(map, {
-    breakPoints: mapOptions.breakPoints,
-    breakPointsPrefix: mapOptions.breakPointsPrefix
-  });
-
-  if (urlParams.pin) {
-    settings.featureinfoOptions.savedPin = urlParams.pin;
-  } else if (urlParams.selection) {
-    // This needs further development for proper handling in permalink
-    settings.featureinfoOptions.savedSelection = new Feature({
-      geometry: new geom[urlParams.selection.geometryType](urlParams.selection.coordinates)
-    });
-  }
-  featureinfo.init(settings.featureinfoOptions);
-}
-
 function getSettings() {
   return settings;
 }
@@ -427,6 +353,80 @@ function removeOverlays(overlays) {
   } else {
     map.getOverlays().clear();
   }
+}
+
+function init(el, mapOptions) {
+  render(el, mapOptions);
+
+  // Read and set projection
+  if ('proj4Defs' in mapOptions && proj4) {
+    project.setProj4(proj4);
+    const proj = mapOptions.proj4Defs;
+
+    // Register proj4 projection definitions
+    for (let i = 0; i < proj.length; i += 1) {
+      proj4.defs(proj[i].code, proj[i].projection);
+      if (Object.prototype.hasOwnProperty.call(proj[i], 'alias')) {
+        proj4.defs(proj[i].alias, proj4.defs(proj[i].code));
+      }
+    }
+  }
+  urlParams = mapOptions.params || {};
+  settings.params = urlParams;
+  settings.map = mapOptions.map;
+  settings.url = mapOptions.url;
+  settings.target = mapOptions.target;
+  settings.baseUrl = mapOptions.baseUrl;
+  settings.breakPoints = mapOptions.breakPoints;
+  settings.extent = mapOptions.extent || undefined;
+  settings.center = urlParams.center || mapOptions.center;
+  settings.zoom = urlParams.zoom || mapOptions.zoom;
+  settings.tileGrid = mapOptions.tileGrid || {};
+  settings.tileSize = settings.tileGrid.tileSize ? [settings.tileGrid.tileSize, settings.tileGrid.tileSize] : [256, 256];
+  settings.alignBottomLeft = settings.tileGrid.alignBottomLeft;
+
+  if ('proj4Defs' in mapOptions || mapOptions.projectionCode === 'EPSG:3857' || mapOptions.projectionCode === 'EPSG:4326') {
+    // Projection to be used in map
+    settings.projectionCode = mapOptions.projectionCode || undefined;
+    settings.projectionExtent = mapOptions.projectionExtent;
+    settings.projection = new Projection({
+      code: settings.projectionCode,
+      extent: settings.projectionExtent,
+      units: getUnits(settings.projectionCode)
+    });
+    settings.resolutions = mapOptions.resolutions || undefined;
+    settings.tileGrid = maputils.tileGrid(settings);
+  }
+
+  settings.source = mapOptions.source;
+  settings.groups = mapOptions.groups;
+  settings.editLayer = mapOptions.editLayer;
+  settings.styles = mapOptions.styles;
+  settings.clusterOptions = mapOptions.clusterOptions || {};
+  style().init();
+  settings.controls = mapOptions.controls;
+  settings.consoleId = mapOptions.consoleId || 'o-console';
+  settings.featureinfoOptions = mapOptions.featureinfoOptions || {};
+  settings.enableRotation = mapOptions.enableRotation !== false;
+
+  loadMap();
+  settings.layers = createLayers(mapOptions.layers, urlParams.layers);
+  addLayers(settings.layers);
+
+  elQuery(map, {
+    breakPoints: mapOptions.breakPoints,
+    breakPointsPrefix: mapOptions.breakPointsPrefix
+  });
+
+  if (urlParams.pin) {
+    settings.featureinfoOptions.savedPin = urlParams.pin;
+  } else if (urlParams.selection) {
+    // This needs further development for proper handling in permalink
+    settings.featureinfoOptions.savedSelection = new Feature({
+      geometry: new geom[urlParams.selection.geometryType](urlParams.selection.coordinates)
+    });
+  }
+  featureinfo.init(settings.featureinfoOptions);
 }
 
 export default {
