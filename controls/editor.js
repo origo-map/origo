@@ -1,7 +1,7 @@
 import $ from 'jquery';
-import viewer from './viewer';
-import utils from './utils';
-import editorToolbar from './editor/editortoolbar';
+import viewer from '../src/viewer';
+import utils from '../src/utils';
+import editorToolbar from '../src/editor/editortoolbar';
 
 let $editorButton;
 

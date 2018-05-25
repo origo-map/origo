@@ -1,8 +1,8 @@
 import $ from 'jquery';
-import utils from './utils';
-import downloader from './offline/downloader';
-import downloadHandler from './offline/downloadhandler';
-import OfflineStore from './offline/offlinestore';
+import utils from '../src/utils';
+import downloader from '../src/offline/downloader';
+import downloadHandler from '../src/offline/downloadhandler';
+import OfflineStore from '../src/offline/offlinestore';
 
 const offlineStore = OfflineStore();
 let $offlineButton;

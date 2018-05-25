@@ -1,7 +1,7 @@
 import Rotate from 'ol/control/rotate';
 import $ from 'jquery';
-import viewer from './viewer';
-import utils from './utils';
+import viewer from '../src/viewer';
+import utils from '../src/utils';
 
 let map;
 

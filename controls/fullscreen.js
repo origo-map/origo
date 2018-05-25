@@ -1,8 +1,8 @@
 import $ from 'jquery';
-import utils from './utils';
-import permalink from './permalink/permalink';
-import isEmbedded from './utils/isembedded';
-import viewer from './viewer';
+import utils from '../src/utils';
+import permalink from '../src/permalink/permalink';
+import isEmbedded from '../src/utils/isembedded';
+import viewer from '../src/viewer';
 
 let tooltip;
 let mapTarget;

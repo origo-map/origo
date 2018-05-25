@@ -3,8 +3,8 @@ import Feature from 'ol/feature';
 import Point from 'ol/geom/point';
 import coordinate from 'ol/coordinate';
 import $ from 'jquery';
-import viewer from './viewer';
-import utils from './utils';
+import viewer from '../src/viewer';
+import utils from '../src/utils';
 
 const controlId = 'o-position';
 const markerId = 'o-position-marker';

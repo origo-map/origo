@@ -1,7 +1,7 @@
 import $ from 'jquery';
-import viewer from './viewer';
-import utils from './utils';
-import numberFormatter from './utils/numberformatter';
+import viewer from '../src/viewer';
+import utils from '../src/utils';
+import numberFormatter from '../src/utils/numberformatter';
 
 const controlId = 'o-scale';
 let consoleId;

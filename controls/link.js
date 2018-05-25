@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import utils from './utils';
+import utils from '../src/utils';
 
 let url;
 let title;

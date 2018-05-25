@@ -1,6 +1,6 @@
 import $ from 'jquery';
-import modal from './modal';
-import viewer from './viewer';
+import modal from '../src/modal';
+import viewer from '../src/viewer';
 
 const defaultTitle = 'Om kartan';
 const defaultContent = '<p></p>';

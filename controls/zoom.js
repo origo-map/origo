@@ -1,6 +1,6 @@
 import Zoom from 'ol/control/zoom';
 import $ from 'jquery';
-import viewer from './viewer';
+import viewer from '../src/viewer';
 
 const init = function init(optOptions) {
   const options = optOptions || {};

@@ -6,7 +6,7 @@ import KMLFormat from 'ol/format/kml';
 import TopoJSONFormat from 'ol/format/topojson';
 import VectorSource from 'ol/source/vector';
 import VectorLayer from 'ol/layer/vector';
-import viewer from './viewer';
+import viewer from '../src/viewer';
 import legend from './legend';
 
 function init(optOptions) {

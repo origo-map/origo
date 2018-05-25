@@ -1,8 +1,8 @@
 import $ from 'jquery';
 import Geolocation from 'ol/geolocation';
 import Overlay from 'ol/overlay';
-import viewer from './viewer';
-import utils from './utils';
+import viewer from '../src/viewer';
+import utils from '../src/utils';
 
 let $geolocateButtonId;
 let $geolocateButton;

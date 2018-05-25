@@ -6,10 +6,10 @@ import DrawInteraction from 'ol/interaction/draw';
 import Overlay from 'ol/overlay';
 import Polygon from 'ol/geom/polygon';
 import LineString from 'ol/geom/linestring';
-import viewer from './viewer';
-import utils from './utils';
-import Style from './style';
-import StyleTypes from './style/styletypes';
+import viewer from '../src/viewer';
+import utils from '../src/utils';
+import Style from '../src/style';
+import StyleTypes from '../src/style/styletypes';
 
 const style = Style();
 const styleTypes = StyleTypes();

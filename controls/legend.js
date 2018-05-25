@@ -1,7 +1,7 @@
 import $ from 'jquery';
-import viewer from './viewer';
-import modal from './modal';
-import validateUrl from './utils/validateurl';
+import viewer from '../src/viewer';
+import modal from '../src/modal';
+import validateUrl from '../src/utils/validateurl';
 
 const symbolSize = 20;
 let styleSettings;
