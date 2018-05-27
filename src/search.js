@@ -136,6 +136,7 @@ function initAutocomplete() {
     minChars: minLength,
     autoFirst: false,
     sort: false,
+    maxItems: limit,
     item: renderList,
     filter: function(suggestion, input) {
       return suggestion.value;

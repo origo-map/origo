@@ -21,7 +21,7 @@ Please use the [GitHub issue tracker](https://github.com/origo-map/origo/issues)
 
 ## Contributing code
 
-With Origo we strive for modularity and flexibility. If you are interested in developing with Origo, take a look at [`README.md`](https://github.com/origo-map/origo/blob/master/README.md) to get going.
+With Origo we strive for modularity and flexibility. If you are interested in developing with Origo, take a look at [`README.md`](https://github.com/origo-map/origo/blob/master/README.md) to get an overview and [`DEVELOPING.md`](https://github.com/origo-map/origo/blob/master/DEVELOPING.md) for the developing guidelines.
 
 Read through the guidelines below before you start coding.
 

@@ -73,7 +73,7 @@ module.exports = {
               center = geometry.getInteriorPoint().getCoordinates();
               break;
           case "MultiPolygon":
-              center = geometry.getInteriorPoints()[0].getCoordinates();
+              center = geometry.getInteriorPoints().getFirstCoordinate();
               break;
           case "Point":
               center = geometry.getCoordinates();

@@ -6,6 +6,7 @@ var Viewer = require('./viewer');
 var validateUrl = require('./utils/validateurl');
 var styleFunctions = require('./style/stylefunctions');
 var replacer = require('../src/utils/replacer');
+var mapUtils = require('./maputils');
 
 var baseUrl;
 
@@ -64,8 +65,9 @@ module.exports = function() {
     createStyleRule: createStyleRule,
     createStyle: createStyle,
     styleFunction: styleFunction,
-    createEditStyle: createEditStyle
-  }
+    createEditStyle: createEditStyle,
+    createGeometryStyle: createGeometryStyle
+  };
 };
 
 function Init() {
@@ -78,7 +80,7 @@ function createStyleOptions(styleParams) {
     switch (styleParams.geometry) {
       case 'centerPoint':
         styleOptions.geometry = function(feature) {
-          var coordinates = feature.getGeometry().getInteriorPoints().getFirstCoordinate();
+          var coordinates = mapUtils.getCenter(feature.getGeometry());
           return new ol.geom.Point(coordinates);
         }
         break;
@@ -210,13 +212,17 @@ function styleFunction(styleSettings, styleList, clusterStyleSettings, clusterSt
 }
 
 function createEditStyle() {
+  return createGeometryStyle(editStyleOptions);
+}
+
+function createGeometryStyle(geometryStyleOptions) {
   return {
-    'Point': createStyleRule(editStyleOptions['Point']),
-    'MultiPoint': createStyleRule(editStyleOptions['Point']),
-    'LineString': createStyleRule(editStyleOptions['LineString']),
-    'MultiLineString': createStyleRule(editStyleOptions['LineString']),
-    'Polygon': createStyleRule(editStyleOptions['Polygon']),
-    'MultiPolygon': createStyleRule(editStyleOptions['Polygon'])
+    'Point': createStyleRule(geometryStyleOptions.Point),
+    'MultiPoint': createStyleRule(geometryStyleOptions.Point),
+    'LineString': createStyleRule(geometryStyleOptions.LineString),
+    'MultiLineString': createStyleRule(geometryStyleOptions.LineString),
+    'Polygon': createStyleRule(geometryStyleOptions.Polygon),
+    'MultiPolygon': createStyleRule(geometryStyleOptions.Polygon)
   };
 }
 
