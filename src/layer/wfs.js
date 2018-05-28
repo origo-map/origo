@@ -65,8 +65,23 @@ var wfs = function wfs(layerOptions) {
             url: url,
             cache: false
           })
+          .fail(function(e) {
+            if(e.status === 404) {
+              alert('Invalid url, page not found!');
+            } else {
+              alert(e.status);
+            }
+          })
           .done(function(response) {
-            vectorSource.addFeatures(vectorSource.getFormat().readFeatures(response));
+            if(response.features) {
+              vectorSource.addFeatures(vectorSource.getFormat().readFeatures(response));
+            } else {
+              var str = new XMLSerializer().serializeToString(response);
+              var parser = new DOMParser();
+              var xml = parser.parseFromString(str, 'text/xml');
+              var error = xml.getElementsByTagName("ows:ExceptionText")[0].innerHTML;
+              console.error(JSON.stringify(response), options, error);
+            }
           });
       },
       strategy: options.loadingstrategy
