@@ -37,7 +37,7 @@ const downloadHandler = function downloadHandler() {
     const type = layer.get('onlineType');
     dispatcher.emitChangeOfflineStart(layerName);
     if (Object.prototype.hasOwnProperty.call(downloadSources, type)) {
-      downloadSources[type].request(layer)
+      downloadSources[type].default.request(layer)
         .then((result) => {
           offlineLayer.setOfflineSource(layerName, result);
           dispatcher.emitChangeOffline(layer.get('name'), 'download');
@@ -62,6 +62,35 @@ const downloadHandler = function downloadHandler() {
     dispatcher.emitChangeOffline(layer.get('name'), 'remove');
   }
 
+  function saveToRemote(editItems, layerName) {
+    const layer = viewer.getLayer(layerName);
+    const transObj = {
+      delete: [],
+      insert: [],
+      update: []
+    };
+    const ids = [];
+    editItems.forEach((item) => {
+      const id = Object.getOwnPropertyNames(item)[0];
+      const feature = layer.getSource().getFeatureById(id);
+      if (feature) {
+        transObj[item[id]].push(feature);
+        ids.push(id);
+      } else if (item[id] === 'delete') {
+        const dummy = new Feature();
+        dummy.setId(id);
+        transObj[item[id]].push(dummy);
+        ids.push(id);
+      }
+    });
+
+    return downloadSources[layer.get('onlineType')].transaction(transObj, layerName)
+      .then((result) => {
+        if (result > 0) {
+          dispatcher.emitChangeOffline(layer.get('name'), 'edits', ids);
+        }
+      });
+  }
   function sync(layerName) {
     const offlineEdits = offlineStore.getOfflineEdits(layerName);
     dispatcher.emitChangeOfflineStart(layerName);
@@ -92,38 +121,8 @@ const downloadHandler = function downloadHandler() {
     }
   }
 
-  function saveToRemote(editItems, layerName) {
-    const layer = viewer.getLayer(layerName);
-    const transObj = {
-      delete: [],
-      insert: [],
-      update: []
-    };
-    const ids = [];
-    editItems.forEach((item) => {
-      const id = Object.getOwnPropertyNames(item)[0];
-      const feature = layer.getSource().getFeatureById(id);
-      if (feature) {
-        transObj[item[id]].push(feature);
-        ids.push(id);
-      } else if (item[id] === 'delete') {
-        const dummy = new Feature();
-        dummy.setId(id);
-        transObj[item[id]].push(dummy);
-        ids.push(id);
-      }
-    });
-
-    $(document).on('changeDownload', onChangeDownload);
-    offlineStore.init();
-
-    return downloadSources[layer.get('onlineType')].transaction(transObj, layerName)
-      .then((result) => {
-        if (result > 0) {
-          dispatcher.emitChangeOffline(layer.get('name'), 'edits', ids);
-        }
-      });
-  }
+  $(document).on('changeDownload', onChangeDownload);
+  offlineStore.init();
 };
 
 export default downloadHandler;

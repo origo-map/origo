@@ -9,8 +9,8 @@ import OfflineLayer from './offlinelayer';
 const offlineLayer = OfflineLayer();
 
 const format = new GeoJSONFormat();
-const storage = {};
-const editsStorage = {};
+let storage = {};
+let editsStorage = {};
 const offlineLayers = {};
 let storageName;
 let editsStorageName;
