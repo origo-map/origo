@@ -47,41 +47,48 @@ export default function defaultStyle() {
         stroke.setColor(getColor('blue'));
         stroke.setWidth(1);
         fill.setColor(getColor('blue', 0.8));
-        styles[length += 1] = strokedPolygon;
+        styles[length] = strokedPolygon;
+        length += 1;
         break;
       case 'MultiPolygon':
         stroke.setColor(getColor('blue'));
         stroke.setWidth(1);
         fill.setColor(getColor('blue', 0.8));
-        styles[length += 1] = strokedPolygon;
+        styles[length] = strokedPolygon;
+        length += 1;
         break;
       case 'LineString':
         stroke.setColor(getColor('red'));
         stroke.setWidth(1);
-        styles[length += 1] = line;
+        styles[length] = line;
+        length += 1;
         break;
       case 'MultiLineString':
         stroke.setColor(getColor('red'));
         stroke.setWidth(1);
-        styles[length += 1] = line;
+        styles[length] = line;
+        length += 1;
         break;
       case 'Point':
         stroke.setColor(getColor('yellow'));
         stroke.setWidth(1);
         fill.setColor(getColor('yellow', 0.8));
-        styles[length += 1] = point;
+        styles[length] = point;
+        length += 1;
         break;
       case 'MultiPoint':
         stroke.setColor(getColor('yellow'));
         stroke.setWidth(1);
         fill.setColor(getColor('yellow', 0.8));
-        styles[length += 1] = point;
+        styles[length] = point;
+        length += 1;
         break;
       default:
         stroke.setColor(getColor('blue'));
         stroke.setWidth(1);
         fill.setColor(getColor('blue', 0.8));
-        styles[length += 1] = strokedPolygon;
+        styles[length] = strokedPolygon;
+        length += 1;
         break;
     }
     styles.length = length;
