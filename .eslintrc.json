@@ -8,6 +8,12 @@
     "import/no-unresolved": "off",
     "new-cap": "off",
     "prefer-destructuring": "off",
-    "max-len": "off"
+    "max-len": "off",
+    "import/no-extraneous-dependencies": ["error", {
+      "devDependencies": [
+        "tasks/**"
+      ],
+      "optionalDependencie": false
+    }]
   }
 }

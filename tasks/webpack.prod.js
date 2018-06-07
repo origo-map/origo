@@ -1,24 +1,31 @@
 const webpack = require('webpack');
 const merge = require('webpack-merge');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
-
 const common = require('./webpack.common.js');
 
 module.exports = merge(common, {
+  optimization: {
+    nodeEnv: 'production',
+    minimize: true
+  },
+  performance: { hints: false },
   output: {
-    path: `${__dirname}/dist`,
+    path: `${__dirname}/../dist`,
     filename: 'origo.min.js',
     libraryTarget: 'var',
     libraryExport: 'default',
     library: 'origo'
   },
-  devtool: 'source-map',
+  devtool: false,
+  mode: 'production',
   plugins: [
     new UglifyJSPlugin({
-      sourceMap: true
+      uglifyOptions: {
+        output: {
+          beautify: false
+        }
+      }
     }),
-    new webpack.DefinePlugin({
-      'process.env.NODE_ENV': '"production"'
-    })
+    new webpack.optimize.AggressiveMergingPlugin()
   ]
 });

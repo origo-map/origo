@@ -9,7 +9,18 @@ module.exports = {
       {
         test: /\.(js)$/,
         exclude: /node_modules/,
-        use: ['babel-loader']
+        loader: 'babel-loader',
+        query: {
+          cacheDirectory: false,
+          presets: [
+            ['env', {
+              targets: {
+                browsers: ['ie >= 11']
+              },
+              modules: false
+            }]
+          ]
+        }
       }
     ]
   },
