@@ -11,6 +11,7 @@ var map;
 var options;
 var activeButton;
 var defaultButton;
+var defaultTool;
 var measure;
 var type;
 var sketch;
@@ -34,7 +35,7 @@ function init(opt_options) {
   options.measureTools = options.measureTools || ["length", "area"];
   lengthTool = options.measureTools.indexOf('length') >= 0 ? true : false;
   areaTool = options.measureTools.indexOf('area') >= 0 ? true : false;
-  options.default = options.default ? options.default : lengthTool ? "length" : "area";
+  defaultTool = options.default ? options.default : "length";
   if(lengthTool || areaTool){
     var target = options.target || '#o-toolbar-maptools';
     map = Viewer.getMap();
@@ -55,9 +56,9 @@ function init(opt_options) {
 
     render(target);
     bindUIActions();
-    if(options.default === 'area') {
+    if(defaultTool === 'area') {
       defaultButton = $('#o-measure-polygon-button button');
-    } else if(options.default === 'length') {
+    } else if(defaultTool === 'length') {
       defaultButton = $('#o-measure-line-button button');
     }
   }
