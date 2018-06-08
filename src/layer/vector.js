@@ -6,34 +6,13 @@ import ImageVectorSource from 'ol/source/imagevector';
 import style from '../style';
 import viewer from '../viewer';
 
-const distance = 60;
-let map;
-let view;
-let maxZoom;
-let options;
-
-function onMoveStart(evt) {
-  const mapZoom = view.getZoomForResolution(evt.frameState.viewState.resolution);
-  const clusterDistance = options.source.getProperties().clusterDistance || distance;
-  const clusterMaxZoom = options.source.getProperties().clusterMaxZoom || maxZoom;
-  map.once('moveend', () => {
-    const currentZoom = parseInt(view.getZoom(), 10);
-    if (currentZoom !== mapZoom) {
-      if (currentZoom >= clusterMaxZoom) {
-        options.source.setDistance(0);
-      } else if (currentZoom < clusterMaxZoom) {
-        options.source.setDistance(clusterDistance);
-      }
-    }
-  });
-}
-
 export default function vector(opt, src) {
-  map = viewer.getMap();
-  view = map.getView();
-  maxZoom = view.getResolutions().length - 1;
-  options = opt;
+  const options = opt;
   const source = src;
+  const distance = 60;
+  const map = viewer.getMap();
+  const view = map.getView();
+  const maxZoom = view.getResolutions().length - 1;
   let vectorLayer;
   switch (options.layerType) {
     case 'vector':
@@ -65,7 +44,19 @@ export default function vector(opt, src) {
       });
       options.style = style().createStyle(options.style, options.clusterStyle);
       vectorLayer = new VectorLayer(options);
-      map.on('movestart', onMoveStart);
+      map.on('movestart', (evt) => {
+        const mapZoom = view.getZoomForResolution(evt.frameState.viewState.resolution);
+        map.once('moveend', () => {
+          const currentZoom = parseInt(view.getZoom(), 10);
+          if (currentZoom !== mapZoom) {
+            if (currentZoom >= clusterMaxZoom) {
+              options.source.setDistance(0);
+            } else if (currentZoom < clusterMaxZoom) {
+              options.source.setDistance(clusterDistance);
+            }
+          }
+        });
+      });
       break;
     }
     case 'image':
@@ -89,6 +80,5 @@ export default function vector(opt, src) {
       break;
     }
   }
-
   return vectorLayer;
 }
