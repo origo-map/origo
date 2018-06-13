@@ -9,12 +9,12 @@
   position: absolute;
   top: 0;
   width: 100%;
-  z-index: 105;
+  z-index: 1015;
 }
 .o-modal {
   background-color: white;
   border-radius: 6px;
-	bottom: auto;
+  bottom: auto;
   -webkit-box-shadow: 0 2px 8px 1px rgba(0,0,0,0.45);
   box-shadow: 0 2px 8px 1px rgba(0,0,0,0.45);
   font-family: Arial,sans-serif;
@@ -23,13 +23,35 @@
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
   position: absolute;
-	right: auto;
-	top: 50%;
-	-webkit-transform-style: preserve-3d;
+  right: auto;
+  top: 50%;
+  -webkit-transform-style: preserve-3d;
   -moz-transform-style: preserve-3d;
   transform-style: preserve-3d;
   width: 300px;
-  z-index: 110;
+  z-index: 1020;
+}
+.o-modal-full {
+  background-color: white;
+  border-radius: 6px;
+  bottom: auto;
+  -webkit-box-shadow: 0 2px 8px 1px rgba(0,0,0,0.45);
+  box-shadow: 0 2px 8px 1px rgba(0,0,0,0.45);
+  font-family: Arial,sans-serif;
+  left: 49%;
+  -ms-transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  position: absolute;
+  right: auto;
+  top: 49%;
+  -webkit-transform-style: preserve-3d;
+  -moz-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  z-index: 1020;
+  height: 98%;
+  width: 98%;
+  margin:1%;
 }
 .o-no-csstransforms .o-modal {
   margin-left: -150px;
@@ -46,9 +68,14 @@
 .o-modal-content {
   font-size: 0.9em;
   line-height: 1.1em;
-	max-height: calc(100vh - 100px);
+  max-height: calc(100vh - 100px);
   padding: 10px 15px;
-	overflow-y: auto;
+  overflow-y: auto;
+}
+.o-modal-content-full {
+  height: calc(100vh - 65px);
+  width:100%;
+  border:0;
 }
 .o-modal-content .o-share-link {
   padding: 10px 5px;
@@ -75,4 +102,12 @@
   max-width: 300px;
   width: 90%;
 }
+}
+.o-external-link-button {
+  height: 2.429em;
+  float: right;
+  width: 2.429em;
+}
+.o-external-link-button:hover {
+  cursor: pointer;
 }

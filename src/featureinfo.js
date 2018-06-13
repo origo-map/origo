@@ -10,6 +10,7 @@ var featurelayer = require('./featurelayer');
 var style = require('./style')();
 var styleTypes = require('./style/styletypes');
 var getFeatureInfo = require('./getfeatureinfo');
+var Modal = require('./modal');
 var owlCarousel = require('../externs/owlcarousel-browserify');
 owlCarousel.loadjQueryPlugin();
 
@@ -98,6 +99,7 @@ function identify(items, target, coordinate) {
       overlay.setPosition(coord);
       popup.setContent({content: content, title: items[0].title});
       popup.setVisibility(true);
+      bindUIActions();
       var owl = initCarousel('#o-identify-carousel', undefined, function(){
         var currentItem = this.owl.currentItem;
         selectionLayer.clearAndAdd(items[currentItem].feature.clone(), selectionStyles[items[currentItem].feature.getGeometry().getType()]);
@@ -185,6 +187,18 @@ function initCarousel(id, options, cb) {
     afterAction: cb
   };
   return $(id).owlCarousel(carouselOptions);
+}
+function bindUIActions() {
+  $('.o-modal-link-iframe').on('click', function(e) {
+    Modal.createModal('#o-map', {
+      title: $(this).text(),
+      content: $(this).attr('href'),
+      target: 'iframe'
+    });
+
+    Modal.showModal();
+    e.preventDefault();
+  });
 }
 
 module.exports.init = init;

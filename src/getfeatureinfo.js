@@ -9,24 +9,25 @@ var featureInfo = require('./featureinfo');
 var map;
 
 function getFeaturesFromRemote(evt) {
-        map = Viewer.getMap();
-        var requestResult = [];
-        var requestPromises = getFeatureInfoRequests(evt).map(function(request) {
-            return request.fn.then(function(feature) {
-                var layer = Viewer.getLayer(request.layer);
-                if(feature) {
-                    requestResult.push({
-                        title: layer.get('title'),
-                        feature: feature,
-                        content: getAttributes(feature, layer)
-                    });
-                    return requestResult;
-                }
-            });
+  map = Viewer.getMap();
+  var requestResult = [];
+  var requestPromises = getFeatureInfoRequests(evt).map(function(request) {
+    return request.fn.then(function(feature) {
+      var layer = Viewer.getLayer(request.layer);
+      if(feature) {
+        requestResult.push({
+          title: layer.get('title'),
+          name: layer.get('name'),
+          feature: feature,
+          content: getAttributes(feature, layer)
         });
-        return $.when.apply($, requestPromises).then(function(data) {
-            return requestResult;
-        });
+        return requestResult;
+      }
+    });
+  });
+  return $.when.apply($, requestPromises).then(function(data) {
+    return requestResult;
+  });
 }
 function getFeatureInfoRequests(evt) {
     var requests = [];
@@ -136,64 +137,63 @@ function layerAtPixel(pixel, matchLayer) {
     })
 }
 function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
-    map = Viewer.getMap();
-    var result = [],
-    cluster = false;
-    map.forEachFeatureAtPixel(evt.pixel,
-        function(feature, layer) {
-          var l = layer;
-          var queryable = false;
-          if(layer) {
-              queryable = layer.get('queryable');
-          }
-          if(feature.get('features')) {
-              //If cluster
-              var collection = feature.get('features');
-              if (collection.length > 1) {
-                var zoom = map.getView().getZoom();
-                var zoomLimit = clusterFeatureinfoLevel === -1 ? Viewer.getResolutions().length : zoom + clusterFeatureinfoLevel;
-                if(zoomLimit < Viewer.getResolutions().length) {
-                    map.getView().setCenter(evt.coordinate);
-                    map.getView().setZoom(zoom + 1);
-                    cluster = true;
-                    return true;
-                }
-                else {
-                    collection.forEach(function(f) {
-                          var item = {};
-                          item.title = l.get('title');
-                          item.feature = f;
-                          item.content =  getAttributes(f,l);
-                          result.push(item);
-                    });
-                }
-              }
-              else if(collection.length == 1 && queryable) {
-                  var item = {};
-                  item.title = l.get('title');
-                  item.feature = collection[0];
-                  item.content = getAttributes(collection[0],l);
-                  result.push(item);
-              }
-          }
-          else if(queryable) {
-              var item = {};
-              item.title = l.get('title');
-              item.feature = feature;
-              item.content = getAttributes(feature,l)
-              result.push(item);
-          }
-        },
-        {
-          hitTolerance: featureInfo.getHitTolerance()
-        });
+  map = Viewer.getMap();
+  var result = [],
+  cluster = false;
+  map.forEachFeatureAtPixel(evt.pixel,
+    function(feature, layer) {
+    var l = layer;
+    var queryable = false;
+    if(layer) {
+      queryable = layer.get('queryable');
+    }
+    if(feature.get('features')) {
+      //If cluster
+      var collection = feature.get('features');
+      if (collection.length > 1) {
+        var zoom = map.getView().getZoom();
+        var zoomLimit = clusterFeatureinfoLevel === -1 ? Viewer.getResolutions().length : zoom + clusterFeatureinfoLevel;
+        if(zoomLimit < Viewer.getResolutions().length) {
+          map.getView().setCenter(evt.coordinate);
+          map.getView().setZoom(zoom + 1);
+          cluster = true;
+          return true;
+        } else {
+          collection.forEach(function(f) {
+            var item = {};
+            item.title = l.get('title');
+            item.name = l.get('name');
+            item.feature = f;
+            item.content =  getAttributes(f,l);
+            result.push(item);
+          });
+        }
+      } else if(collection.length == 1 && queryable) {
+        var item = {};
+        item.title = l.get('title');
+        item.name = l.get('name');
+        item.feature = collection[0];
+        item.content = getAttributes(collection[0],l);
+        result.push(item);
+      }
+    } else if(queryable) {
+      var item = {};
+      item.title = l.get('title');
+      item.name = l.get('name');
+      item.feature = feature;
+      item.content = getAttributes(feature,l)
+      result.push(item);
+    }
+  },
+  {
+    hitTolerance: featureInfo.getHitTolerance()
+  });
 
-    if(cluster) {
-        return false;
-    }
-    else {
-        return result;
-    }
+  if(cluster) {
+    return false;
+  } else {
+    return result;
+  }
 }
 function getGetFeatureInfoUrl(layer, coordinate) {
     var url = layer.getSource().getGetFeatureInfoUrl(
