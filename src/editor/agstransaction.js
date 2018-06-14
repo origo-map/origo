@@ -54,7 +54,9 @@ function agsTransaction(transObj, layerName) {
   };
   types.forEach(function(type) {
     if (transObj[type]) {
-      var url = source.url  + '/' + id + '/' + urlSuffix[type];
+      var u = source.url.slice(-1) === '/' ? source.url : source.url  + '/';
+      var i = id.slice(-1) === '/' ? id : id + '/';
+      var url = u + i + urlSuffix[type];
       var datat = writeAgsTransaction(transObj[type], {
         projection: projection,
         type: type
