@@ -1,22 +1,19 @@
-"use strict";
+import pin from './pin';
+import measure from './measure';
 
-var pin = require('./pin');
-var measure = require('./measure');
-
-module.exports = function() {
-
-  var styleTypes = {};
+export default function () {
+  const styleTypes = {};
 
   styleTypes.pin = pin;
   styleTypes.measure = measure;
 
   return {
     getStyle: function getStyle(type) {
-      if(type) {
+      if (type) {
         return styleTypes[type];
-      } else {
-        console.log(type + ' is not a default style');
       }
+      console.log(`${type} is not a default style`)
+      return false;
     }
-  }
-}();
+  };
+}

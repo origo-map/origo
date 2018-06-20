@@ -1,24 +1,21 @@
-"use strict";
+import VectorSource from 'ol/source/vector';
+import vector from './vector';
 
-var ol = require('openlayers');
-var vector = require('./vector');
+function createSource(options) {
+  return new VectorSource({
+    attributions: options.attribution,
+    features: options.features
+  });
+}
 
-var featureLayer = function featureLayer(layerOptions) {
-  var options = layerOptions;
-  var sourceOptions = {};
-  var vectorSource;
+const featureLayer = function featureLayer(layerOptions) {
+  const options = layerOptions;
+  const sourceOptions = {};
   sourceOptions.attribution = layerOptions.attribution;
   sourceOptions.features = layerOptions.features;
 
-  vectorSource = createSource(sourceOptions);
+  const vectorSource = createSource(sourceOptions);
   return vector(options, vectorSource);
+};
 
-  function createSource(options) {
-    return new ol.source.Vector({
-      attributions: options.attribution,
-      features: options.features
-    });
-  }
-}
-
-module.exports = featureLayer;
+export default featureLayer;

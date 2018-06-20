@@ -1,102 +1,107 @@
-"use strict";
+import Projection from 'ol/proj/projection';
+import TileGrid from 'ol/tilegrid/tilegrid';
+import Feature from 'ol/feature';
+import Point from 'ol/geom/point';
+import Vector from 'ol/source/vector';
+import GeoJSON from 'ol/format/geojson';
+import Extent from 'ol/extent';
+import WKT from 'ol/format/wkt';
+import viewer from './viewer';
 
-var ol = require('openlayers');
-var $ = require('jquery');
-var viewer = require('./viewer');
-
-module.exports = {
-  customProjection: function(projectionCode, extent) {
-      return new ol.proj.Projection({
-          code: projectionCode,
-          extent: extent
-      });
+export default {
+  customProjection: function customProjection(projectionCode, extent) {
+    return new Projection({
+      code: projectionCode,
+      extent
+    });
   },
-  tileGrid: function(settings) {
-    var extent = settings.extent || viewer.getExtent();
-    var origin = settings.alignBottomLeft === false ? ol.extent.getTopLeft(extent) : ol.extent.getBottomLeft(extent);
-    var resolutions = settings.resolutions || viewer.getResolutions();
-    var tileSize = settings.tileSize || viewer.getTileSize();
-    return new ol.tilegrid.TileGrid({
-        extent: extent,
-        origin: origin,
-        resolutions: resolutions,
-        tileSize: tileSize
+  tileGrid: function tileGrid(settings) {
+    const extent = settings.extent || viewer.getExtent();
+    const origin = settings.alignBottomLeft === false ? Extent.getTopLeft(extent) : Extent.getBottomLeft(extent);
+    const resolutions = settings.resolutions || viewer.getResolutions();
+    const tileSize = settings.tileSize || viewer.getTileSize();
+    return new TileGrid({
+      extent,
+      origin,
+      resolutions,
+      tileSize
     });
   },
   checkZoomChange: function checkZoomChange(resolution, currentResolution) {
-      if(resolution !== currentResolution) {
-        return true;
-      }
-      else {
-        return false;
-      }
+    if (resolution !== currentResolution) {
+      return true;
+    }
+
+    return false;
   },
   createPointFeature: function createPointFeature(coordinate, style) {
-      var feature = new ol.Feature({
-          geometry: new ol.geom.Point(coordinate)
-      });
-      feature.setStyle(style);
-      return feature;
+    const feature = new Feature({
+      geometry: new Point(coordinate)
+    });
+    feature.setStyle(style);
+    return feature;
   },
   geojsonToFeature: function geojsonToFeature(obj) {
-      var vectorSource = new ol.source.Vector({
-        features: (new ol.format.GeoJSON()).readFeatures(obj)
-      });
-      return vectorSource.getFeatures()[0];
+    const vectorSource = new Vector({
+      features: (new GeoJSON()).readFeatures(obj)
+    });
+    return vectorSource.getFeatures()[0];
   },
   wktToFeature: function wktToFeature(wkt, srsName) {
-      var format = new ol.format.WKT();
-      var feature = format.readFeature(wkt, {
-        dataProjection: srsName,
-        featureProjection: srsName
-      });
-      return feature;
+    const format = new WKT();
+    const feature = format.readFeature(wkt, {
+      dataProjection: srsName,
+      featureProjection: srsName
+    });
+    return feature;
   },
   zoomToExent: function zoomToExent(geometry, level) {
-      var map = viewer.getMap();
-      var view = map.getView();
-      var maxZoom = level;
-      var extent = geometry.getExtent();
-      if(extent) {
-          view.fit(extent, {maxZoom: maxZoom});
-          return extent;
-      }
-      else {
-        return undefined;
-      }
+    const map = viewer.getMap();
+    const view = map.getView();
+    const maxZoom = level;
+    const extent = geometry.getExtent();
+    if (extent) {
+      view.fit(extent, {
+        maxZoom
+      });
+      return extent;
+    }
+    return false;
   },
   getCenter: function getCenter(geometry) {
-      var type = geometry.getType();
-      var center;
-      switch (type) {
-          case "Polygon":
-              center = geometry.getInteriorPoint().getCoordinates();
-              break;
-          case "MultiPolygon":
-              center = geometry.getInteriorPoints().getFirstCoordinate();
-              break;
-          case "Point":
-              center = geometry.getCoordinates();
-              break;
-          case "MultiPoint":
-              center = geometry[0].getCoordinates();
-              break;
-          case "LineString":
-              center = geometry.getCoordinateAt(0.5);
-              break;
-          case "MultiLineString":
-              center = geometry.getLineStrings()[0].getCoordinateAt(0.5);
-              break;
-          case "Circle":
-              center = geometry.getCenter();
-              break;
-      }
-      return center;
+    const type = geometry.getType();
+    let center;
+    switch (type) {
+      case 'Polygon':
+        center = geometry.getInteriorPoint().getCoordinates();
+        break;
+      case 'MultiPolygon':
+        center = geometry.getInteriorPoints().getFirstCoordinate();
+        break;
+      case 'Point':
+        center = geometry.getCoordinates();
+        break;
+      case 'MultiPoint':
+        center = geometry[0].getCoordinates();
+        break;
+      case 'LineString':
+        center = geometry.getCoordinateAt(0.5);
+        break;
+      case 'MultiLineString':
+        center = geometry.getLineStrings()[0].getCoordinateAt(0.5);
+        break;
+      case 'Circle':
+        center = geometry.getCenter();
+        break;
+      default:
+        break;
+    }
+    return center;
   },
   scaleToResolution: function scaleToResolution(scale, projection) {
-    var dpi = 25.4 / 0.28;
-    var mpu = projection.getMetersPerUnit();
-    var resolution = scale / (mpu * 39.37 * dpi);
+    const dpi = 25.4 / 0.28;
+    const mpu = projection.getMetersPerUnit();
+    const resolution = scale / (mpu * 39.37 * dpi);
     return resolution;
   }
-}
+};
