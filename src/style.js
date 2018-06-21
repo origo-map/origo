@@ -7,6 +7,7 @@ var validateUrl = require('./utils/validateurl');
 var styleFunctions = require('./style/stylefunctions');
 var replacer = require('../src/utils/replacer');
 var mapUtils = require('./maputils');
+var geom = require('./geom');
 
 var baseUrl;
 
@@ -238,7 +239,8 @@ function checkOptions(feature, scale, styleSettings, styleList, size) {
           styleList[j][index].getText().setText(replacer.replace(element.text.text, feature.getProperties()));
         } else if ('icon' in element) {
           if ('rotation' in element.icon) {
-            var rotation = Number(replacer.replace(element.icon.rotation, feature.getProperties()));
+            var radians = Number(replacer.replace(element.icon.rotation, feature.getProperties()));
+            var rotation = geom.deg2rad(radians);
             styleList[j][index].getImage().setRotation(rotation);
           }
         }
