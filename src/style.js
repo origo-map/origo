@@ -236,6 +236,11 @@ function checkOptions(feature, scale, styleSettings, styleList, size) {
           styleList[j][index].getText().setText(size);
         } else if (element.hasOwnProperty('text')) {
           styleList[j][index].getText().setText(replacer.replace(element.text.text, feature.getProperties()));
+        } else if ('icon' in element) {
+          if ('rotation' in element.icon) {
+            var rotation = Number(replacer.replace(element.icon.rotation, feature.getProperties()));
+            styleList[j][index].getImage().setRotation(rotation);
+          }
         }
       });
       if (s[j][0].hasOwnProperty('filter')) {
