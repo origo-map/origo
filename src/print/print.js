@@ -68,7 +68,7 @@ function convertToMapfishOptions(options) {
 	});
 
 	// build legend objects and add to mapfishconfig
-	var legendArray = buildLegend(layers);
+	var legendArray = buildLegend(layers.filter(function(layer) {return !layer.get('name').includes('_bk_') } )); //TODO: Make it more user configurable
 	legendArray.forEach(function(obj) {
 		mapfishOptions.legends[0].classes.push(obj);
 	});
