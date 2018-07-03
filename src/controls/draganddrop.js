@@ -37,7 +37,7 @@ function init(optOptions) {
 
     vectorLayer = new VectorLayer({
       source: vectorSource,
-      name: event.file.name.split('.')[0].replace(/[^a-z0-9]/gi, ''),
+      name: event.file.name.split('.')[0].replace(/\W/g,''),
       group: 'draganddrop',
       title: event.file.name.split('.')[0],
       queryable: true,
