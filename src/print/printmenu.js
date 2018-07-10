@@ -41,7 +41,6 @@ function init() {
 			hideLayouts = false;
 		}
 
-
 		var dpis = config.dpis.map(function(dpi) {
 			return dpi.value;
 		});
@@ -59,7 +58,6 @@ function init() {
 				'<div class="o-block">' +
 					'<span class="o-setting-heading">Orientering</span>' +
 					'<select id="o-orientation-dd" class="o-dd-input">' +
-						utils.createDdOptions(options.orientation) +
 					'</select>' +
 				'</div>' +
 				'<div class="o-block">' +
@@ -104,13 +102,16 @@ function init() {
 
 		$('#o-map').append(menuEl);
         
-        $.each(config.scales, function (key, entry) {
-            $('#o-scale-dd').append($('<option></option>').attr('value', entry.value).text(entry.name));
+        //Populate additional dropdowns, orientations with the help of printSettings, scales from mapfish   
+        $('#o-orientation-dd').append($('<option></option>').attr('value', 'Portrait').text(options.orientation[0]));
+        $('#o-orientation-dd').append($('<option></option>').attr('value', 'Landscape').text(options.orientation[1]));
+        
+        $.each(config.scales, function (scaleNr, scale) {
+            $('#o-scale-dd').append($('<option></option>').attr('value', scale.value).text(scale.name));
         });
 		
 		//Set default values for dropdowns
 		$('#o-format-dd option[value="PDF"]').attr('selected', 'selected');
-		//$('#o-scale-dd option[value="5000.0"]').attr('selected', 'selected');
 
 		var printButton = utils.createButton({
 			id: 'o-printmenu-button-close',
@@ -129,7 +130,6 @@ function init() {
 			src: '#fa-print'
 		});
 
-		
 		$('#o-toolbar-misc').append(printButtonTool);
 		$printButtonTool = $('#o-print-tool');
 		$printButton = $('#o-printmenu-button-close');
@@ -319,7 +319,7 @@ function bindUIActions() {
 	});
 
 	function getPaperMeasures(format) {
-		var orientationLandscape = $('#o-orientation-dd').val() == 'Liggande',
+		var orientationLandscape = $('#o-orientation-dd').val() == 'Landscape',
 			width = 0,
 			height = 0;
 
@@ -327,10 +327,7 @@ function bindUIActions() {
 		// Hämta vald mall
 		var size = $('#o-size-dd').find(':selected').text();
 		
-		var layoutName = hideLayouts ?
-		buildLayoutString(layoutIfHidden, size, $('#o-orientation-dd').val()) :
-		buildLayoutString($('#o-layout-dd').val(), size, $('#o-orientation-dd').val());
-
+		var layoutName = buildLayoutString.apply(null,buildLayoutObjectsArray());
 		if (mapfishConfig) {
 			var layoutnames = mapfishConfig.layouts;
 			var getWidth = function (name) {
@@ -346,7 +343,7 @@ function bindUIActions() {
 				return layout[0] ? layout[0].map.height : 0;
 			}
 			;
-			width = getWidth(layoutName);
+			width = getWidth(layoutName); 
 			height = getHeight(layoutName);
 		}
 
@@ -392,9 +389,6 @@ function bindUIActions() {
 		var visibleLayers = layers.getArray().filter(function(layer) {
 			return layer.getVisible();
 		});
-		var layout = hideLayouts ? 
-		buildLayoutString(layoutIfHidden, $('#o-size-dd').find(':selected').text(), $('#o-orientation-dd').val()) : 
-		buildLayoutString($('#o-layout-dd').val(), $('#o-size-dd').find(':selected').text(), $('#o-orientation-dd').val());
 
 		var contract = {
 			dpi: $('#o-resolution-dd').val(),
@@ -404,7 +398,7 @@ function bindUIActions() {
 			orientation: $('#o-orientation-dd').val(),
 			size: $('#o-size-dd').find(':selected').text(),
 			title: $('#o-title-input').val(),
-			layout: layout,
+			layout: buildLayoutString.apply(null,buildLayoutObjectsArray()),
 			center: centerPoint
 		};
 		
@@ -419,8 +413,30 @@ function bindUIActions() {
 		return false;
 	});
 }
-
-function buildLayoutString(name, size, orientation) {
-	return name + '-' + size + '-' + orientation;
+function buildLayoutObjectsArray() {
+    var layoutObjectsArray = [];
+    hideLayouts ? layoutObjectsArray = [layoutIfHidden, $('#o-size-dd').find(':selected').text(), $('#o-orientation-dd').val()]: layoutObjectsArray = [$('#o-layout-dd').val(), $('#o-size-dd').find(':selected').text(), $('#o-orientation-dd').val()];
+    
+    if ($('#o-title-input').val()!="") {
+            layoutObjectsArray.push("Title");
+    }
+    if ($('#o-legend-input').is(":checked")) {
+            layoutObjectsArray.push("Legend");
+    }
+    return layoutObjectsArray;
+}
+//Three to five arguments expected
+//Title and Legend are optional, layoutName and paperSize and orientation are not
+function buildLayoutString() {
+    if (arguments.length == 3) {
+        return arguments[0] + '-' + arguments[1] + '-' + arguments[2];
+    }
+    else if (arguments.length == 4) { 
+        return arguments[0] + '-' + arguments[1] + '-' + arguments[2] + '-' + arguments[3];
+        
+    }
+    else if (arguments.length == 5) {
+        return arguments[0] + '-' + arguments[1] + '-' + arguments[2] + '-' + arguments[3] + '-' + arguments[4];
+    }
 }
 module.exports.init = init;
