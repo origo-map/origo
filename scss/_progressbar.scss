@@ -1,0 +1,9 @@
+#o-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 0.4em;
+    background: rgba(228, 18, 11, 0.7);
+    width: 0;
+    transition: width 1ms;
+}

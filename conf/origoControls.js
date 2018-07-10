@@ -12,6 +12,7 @@ import measure from '../src/controls/measure';
 import offline from '../src/controls/offline';
 import position from '../src/controls/position';
 import print from '../src/controls/print';
+import progressbar from '../src/controls/progressbar';
 import rotate from '../src/controls/rotate';
 import scale from '../src/controls/scale';
 import scaleline from '../src/controls/scaleline';
@@ -35,6 +36,7 @@ const controls = {
   offline,
   position,
   print,
+  progressbar,
   rotate,
   scale,
   scaleline,
