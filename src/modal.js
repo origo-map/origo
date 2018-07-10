@@ -1,53 +1,49 @@
-"use strict";
-var $ = require('jquery');
+import $ from 'jquery';
 
-var modal = function() {
+const modal = function modal() {
+  let isStatic;
+  let $target;
+  let modalEl;
 
-  var isStatic = undefined;
-  var $target = undefined;
-  var modalEl = undefined;
-
-  return {
-    createModal: createModal,
-    showModal: showModal,
-    closeModal: closeModal
-  };
+  function closeModal() {
+    $('#o-modal').remove();
+  }
 
   function render(title, content, cls) {
-    modalEl = '<div id="o-modal" ' + 'class="' + cls + '">' +
-      '<div class="o-modal-screen"></div>' +
-      '<div class="o-modal">' +
-      '<div class="o-close-button"><svg class="o-icon-fa-times"><use xlink:href="#fa-times"></use></svg></div>' +
-      '<div class="o-modal-title">' + title + '</div>' +
-      '<div class="o-modal-content">' + content + '</div>' +
-      '</div>' +
-      '</div>';
+    modalEl = `<div id="o-modal" class="${cls}">
+                <div class="o-modal-screen"></div>
+                <div class="o-modal">
+                  <div class="o-close-button"><svg class="o-icon-fa-times"><use xlink:href="#fa-times"></use></svg></div>
+                  <div class="o-modal-title">${title}</div>
+                  <div class="o-modal-content">${content}</div>
+                </div>
+              </div>`;
   }
 
   function bindUIActions() {
     if (isStatic === false) {
-      $('.o-modal-screen, .o-close-button').click(function() {
+      $('.o-modal-screen, .o-close-button').click(() => {
         closeModal();
       });
     } else {
-      $('.o-close-button').click(function() {
+      $('.o-close-button').click(() => {
         closeModal();
       });
     }
   }
 
   function createModal(modalTarget, options) {
-    var title = options.title || '';
-    var content = options.content || '';
-    var cls = options.cls || '';
-    if (options.hasOwnProperty('static')) {
+    const title = options.title || '';
+    const content = options.content || '';
+    const cls = options.cls || '';
+    if (Object.prototype.hasOwnProperty.call(options, 'static')) {
       isStatic = options.static;
     } else {
       isStatic = false;
     }
+
     render(title, content, cls);
     $target = $(modalTarget);
-
   }
 
   function showModal() {
@@ -55,9 +51,11 @@ var modal = function() {
     bindUIActions();
   }
 
-  function closeModal() {
-    $('#o-modal').remove();
-  }
-}
+  return {
+    createModal,
+    showModal,
+    closeModal
+  };
+};
 
-module.exports = modal();
+export default modal();

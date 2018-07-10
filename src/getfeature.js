@@ -1,79 +1,78 @@
-var ol = require('openlayers');
-var $ = require('jquery');
-var viewer = require('./viewer');
+import EsriJSONFormat from 'ol/format/esrijson';
+import GeoJSONFormat from 'ol/format/geojson';
+import $ from 'jquery';
+import viewer from './viewer';
 
-var sourceType = {};
-var projectionCode;
-var source;
+let projectionCode;
+const sourceType = {};
 
-module.exports = function(id, layer) {
-    projectionCode = viewer.getProjectionCode();
-    source = viewer.getMapSource();
-    var serverUrl = source[layer.get('sourceName')].url;
-    var type = layer.get('type');
-    //returns a promise with features as result
-    return sourceType[type](id, layer, serverUrl);
-}
-
-sourceType.AGS_FEATURE = function agsFeature(id, layer, serverUrl) {
-  var esriSrs = projectionCode.split(':').pop();
-  var layerId = layer.get('id');
-  var esrijsonFormat = new ol.format.EsriJSON();
-
-  var url = serverUrl + '/' + layerId +
-      '/query?f=json&' +
-      'returnGeometry=true' +
-      '&objectIds=' + id +
-      '&geometryType=esriGeometryEnvelope'+
-      '&inSR=' + esriSrs +
-      '&outFields=*' +
-      '&returnIdsOnly=false' +
-      '&returnCountOnly=false' +
-      '&geometryPrecision=2' +
-      '&outSR=' + esriSrs;
-
-  return $.ajax({
-        url: url,
-        dataType: 'jsonp'
-  })
-    .then(function(response) {
-        if(response.error) {
-            fail(response);
-            return [];
-        }
-        else {
-            var features = esrijsonFormat.readFeatures(response, {
-                    featureProjection: viewer.getProjection()
-            });
-            return features;
-        }
-    }, fail
-    );
-}
-
-sourceType.WFS = function(id, layer, serverUrl) {
-  var geometryName = layer.get('geometryName');
-  var format = new ol.format.GeoJSON({geometryName: geometryName});
-  var url = serverUrl +'?';
-  var data = 'service=WFS' +
-      '&version=1.0.0' +
-      '&request=GetFeature&typeName=' + layer.get('name') +
-      '&outputFormat=json' +
-      '&featureId=' + id;
-  return $.ajax({
-    url: url,
-    data: data,
-    type: 'POST',
-    dataType: 'json'
-  })
-    .then(function(response) {
-        return format.readFeatures(response);
-    });
+export default function (id, layer) {
+  projectionCode = viewer.getProjectionCode();
+  const source = viewer.getMapSource();
+  const serverUrl = source[layer.get('sourceName')].url;
+  const type = layer.get('type');
+  // returns a promise with features as result
+  return sourceType[type](id, layer, serverUrl);
 }
 
 function fail(response) {
-    if(response.error) {
-        console.log(response.error.message + '\n' +
-            response.error.details.join('\n'));
-    }
+  if (response.error) {
+    console.log(`${response.error.message}
+      ${response.error.details.join('\n')}`);
+  }
 }
+
+sourceType.AGS_FEATURE = function agsFeature(id, layer, serverUrl) {
+  const esriSrs = projectionCode.split(':').pop();
+  const layerId = layer.get('id');
+  const esrijsonFormat = new EsriJSONFormat();
+
+  const url = [`${serverUrl}/${layerId}/query?f=json`,
+    '&returnGeometry=true',
+    `&objectIds=${id}`,
+    '&geometryType=esriGeometryEnvelope',
+    `&inSR=${esriSrs}`,
+    '&outFields=*',
+    '&returnIdsOnly=false',
+    '&returnCountOnly=false',
+    '&geometryPrecision=2',
+    `&outSR=${esriSrs}`
+  ].join('');
+
+  return $.ajax({
+    url,
+    dataType: 'jsonp'
+  })
+    .then((response) => {
+      if (response.error) {
+        fail(response);
+        return [];
+      }
+      const features = esrijsonFormat.readFeatures(response, {
+        featureProjection: viewer.getProjection()
+      });
+      return features;
+    }, fail);
+};
+
+sourceType.WFS = function wfsSourceType(id, layer, serverUrl) {
+  const geometryName = layer.get('geometryName');
+  const format = new GeoJSONFormat({
+    geometryName
+  });
+  const url = `${serverUrl}?`;
+  const data = ['service=WFS',
+    '&version=1.0.0',
+    `&request=GetFeature&typeName=${layer.get('name')}`,
+    '&outputFormat=json',
+    `&featureId=${id}`
+  ].join('');
+
+  return $.ajax({
+    url,
+    data,
+    type: 'POST',
+    dataType: 'json'
+  })
+    .then(response => format.readFeatures(response));
+};

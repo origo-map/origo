@@ -1,37 +1,33 @@
-"use strict";
+import $ from 'jquery';
+import viewer from './src/viewer';
+import mapLoader from './src/maploader';
+import controlInitialiser from './src/controlinitialiser';
+import origoConfig from './conf/origoConfig';
+import controls from './conf/origoControls';
 
-window.proj4 = require('proj4');
-global.jQuery = require("jquery");
-
-var $ = require('jquery');
-var Viewer = require('./src/viewer');
-var mapLoader = require('./src/maploader');
-var controlInitialiser = require('./src/controlinitialiser');
-
-var origo = {};
+const origo = {};
 origo.map = {};
-origo.config = require('./conf/origoConfig');
-origo.controls = require('./conf/origoControls');
-
-origo.map.init = function(options, opt_config) {
-  var config = opt_config ? $.extend(origo.config, opt_config) : origo.config;
-
-  var map = mapLoader(options, config);
-  if (map) {
-    map.then(function(config) {
-      init(config);
-    })
-    return Viewer;
-  } else {
-    return undefined;
-  }
-}
+origo.config = origoConfig;
+origo.controls = controls;
 
 function init(config) {
-  Viewer.init(config.el, config.options);
+  viewer.init(config.el, config.options);
 
-  //Init controls
+  // Init controls
   controlInitialiser(config.options.controls);
 }
 
-module.exports = origo;
+origo.map.init = function initMap(options, defaultOptions) {
+  const config = defaultOptions ? $.extend(origo.config, defaultOptions) : origo.config;
+
+  const map = mapLoader(options, config);
+  if (map) {
+    map.then((mapConfig) => {
+      init(mapConfig);
+    });
+    return viewer;
+  }
+  return null;
+};
+
+export default origo;

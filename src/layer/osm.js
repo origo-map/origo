@@ -1,19 +1,15 @@
-"use strict";
+import OSMSource from 'ol/source/osm';
+import $ from 'jquery';
+import tile from './tile';
 
-var ol = require('openlayers');
-var $ = require('jquery');
-var tile = require('./tile');
-
-var osm = function osm(layerOptions) {
-  var osmDefault = {};
-  var osmOptions = $.extend(osmDefault, layerOptions);
-
-  var osmSource = createSource();
-  return tile(osmOptions, osmSource);
+export default function osm(layerOptions) {
+  const osmDefault = {};
+  const osmOptions = $.extend(osmDefault, layerOptions);
 
   function createSource() {
-    return new ol.source.OSM()
+    return new OSMSource();
   }
-}
 
-module.exports = osm;
+  const osmSource = createSource();
+  return tile(osmOptions, osmSource);
+}

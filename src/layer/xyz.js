@@ -1,20 +1,22 @@
-"use strict";
+import XYZSource from 'ol/source/xyz';
+import $ from 'jquery';
+import viewer from '../viewer';
+import tile from './tile';
+import maputils from '../maputils';
 
-var ol = require('openlayers');
-var $ = require('jquery');
-var viewer = require('../viewer');
-var tile = require('./tile');
-var maputils = require('../maputils');
+function createSource(options) {
+  return new XYZSource(options);
+}
 
-var xyz = function xyz(layerOptions) {
-  var xyzDefault = {
+const xyz = function xyz(layerOptions) {
+  const xyzDefault = {
     layerType: 'tile',
     featureinfoLayer: undefined
   };
-  var sourceDefault = {};
-  var xyzOptions = $.extend(xyzDefault, layerOptions);
+  const sourceDefault = {};
+  const xyzOptions = $.extend(xyzDefault, layerOptions);
   xyzOptions.sourceName = xyzOptions.id;
-  var sourceOptions = $.extend(sourceDefault, viewer.getMapSource()[layerOptions.source]);
+  const sourceOptions = $.extend(sourceDefault, viewer.getMapSource()[layerOptions.source]);
   sourceOptions.attributions = xyzOptions.attribution;
   sourceOptions.projection = viewer.getProjectionCode() || 'EPSG:3857';
 
@@ -30,22 +32,17 @@ var xyz = function xyz(layerOptions) {
     }
   }
 
-  if(xyzOptions.layerURL){
+  if (xyzOptions.layerURL) {
     sourceOptions.url += xyzOptions.layerURL;
-  }
-  else {
-    var format = sourceOptions.sourceName.split('.')[1],
-      url = sourceOptions.sourceName.split('.')[0] + '/{z}/{x}/{y}.';
+  } else {
+    const format = sourceOptions.sourceName.split('.')[1];
+    let url = `${sourceOptions.sourceName.split('.')[0]}/{z}/{x}/{y}.`;
     url += format;
     sourceOptions.url = url;
   }
-  var xyzSource = createSource(sourceOptions);
+  sourceOptions.crossOrigin = 'anonymous';
+  const xyzSource = createSource(sourceOptions);
   return tile(xyzOptions, xyzSource);
-}
+};
 
-function createSource(options) {
-  options.crossOrigin = 'anonymous';
-  return new ol.source.XYZ(options);
-}
-
-module.exports = xyz;
+export default xyz;
