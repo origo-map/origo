@@ -1,6 +1,9 @@
 {
   "controls": [
     {
+      "name": "progressbar"
+    },
+    {
       "name": "home"
     },
     {

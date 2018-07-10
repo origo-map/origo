@@ -19,5 +19,5 @@ controls.attribution = require('../src/attribution');
 controls.position = require('../src/position');
 controls.fullscreen = require('../src/fullscreen');
 controls.splash = require('../src/splash');
-
+controls.progressbar = require('../src/progressBar');
 module.exports = controls;
