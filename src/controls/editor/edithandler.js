@@ -1,3 +1,4 @@
+import Awesomplete from 'awesomplete';
 import Draw from 'ol/interaction/draw';
 import Select from 'ol/interaction/select';
 import Modify from 'ol/interaction/modify';
@@ -34,6 +35,8 @@ let hasSnap;
 let select;
 let modify;
 let snap;
+
+let awesome;
 
 function isActive() {
   if (modify === undefined || select === undefined) {
@@ -494,6 +497,108 @@ function editAttributes(feat) {
   }
 }
 
+function awesomeImage(src, value) {
+  const div = document.createElement('div');
+  const img = document.createElement('img');
+  img.style = 'width: 28px; float: left; margin-right: 14px;';
+  img.setAttribute('src', src);
+  const p = document.createElement('p');
+  p.innerHTML = value;
+  div.appendChild(img);
+  div.appendChild(p);
+  return div;
+}
+function getList(item) {
+  const dir = item.location;
+  const ext = item.extension;
+  let src;
+  let val;
+  return $.ajax({
+    url: dir,
+    success: (data) => {
+      const results = [];
+      const el = document.createElement('html');
+      el.innerHTML = data;
+      const links = el.querySelectorAll('a');
+      links.forEach((link) => {
+        const candidate = link.href.split('/').pop();
+        const array = candidate.split('.');
+        if (array.length === 2 && array[1] === ext) {
+          src = array.join('.');
+          val = array[0].split('_').join('');
+          const o = {
+            src: `${dir}/${src}`,
+            value: val
+          };
+          results.push(o);
+          console.log(o)
+        }
+      });
+      return results;
+    }
+  });
+}
+function awesomeParser(list) {
+  const hasLocation = list.reduce(o => Object.keys(o).includes('location'));
+  if (hasLocation) {
+    // console.log(list, hasLocation);
+    // list contains path 
+    // re-create list
+    list.forEach((item) => {
+      getList(item);
+    });
+  } else {
+    return list.map((item) => {
+      if (item.src && item.value) {
+        return {
+          label: awesomeImage(item.src, item.value).outerHTML,
+          value: item.value
+        };
+      }
+      return item.value;
+    });
+  }
+  
+  /* return list.map((item) => {
+    // console.log('Item: ', item);
+    if (item.location && item.extension) {
+      // TODO :: create list with item and src.
+    
+      
+      const dir = item.location; 
+      const ext = item.extension;
+      let src; 
+      let val;
+      $.ajax({
+        url: dir,
+        success: (data) => {
+          const el = document.createElement('html');
+          el.innerHTML = data;
+          const links = el.querySelectorAll('a');
+          links.forEach((link) => {
+            const candidate = link.href.split('/').pop();
+            const array = candidate.split('.');
+            if (array.length === 2 && array[1] === ext) {
+              src = array.join('.');
+              val = array[0].split('_').join("");
+            }
+            //console.log(src, val)
+            //console.log(awesomeImage(src, val))
+          });
+        }
+      });
+      return 'test';
+    } else if (item.src && item.value) {
+      return {
+        label: awesomeImage(item.src, item.value).outerHTML,
+        value: item.value
+      };
+    } else if (item.value) {
+      return item.value;
+    }
+  }); */
+}
+
 function onToggleEdit(e) {
   e.stopPropagation();
   if (e.tool === 'draw') {
@@ -506,6 +611,54 @@ function onToggleEdit(e) {
   } else if (e.tool === 'attribute') {
     if (hasAttribute === false) {
       editAttributes();
+
+      const list = [];
+      // Check if awesomplete SearchList has awesomplete?
+      const searchLists = document.querySelectorAll('#searchList');
+      searchLists.forEach((searchList) => {
+        if (searchList.querySelectorAll('div').length === 0) {
+          const input = searchList.querySelector('input');
+          let olist = JSON.parse(input.getAttribute('o-list'));
+          olist = awesomeParser(olist);
+          const options = JSON.parse(input.getAttribute('o-config'));
+          let config = {
+            list: olist
+          };
+          if (options.images) {
+            config.item = text =>
+              Awesomplete.$.create('li', {
+                innerHTML: text,
+                'area-selected': false
+              });
+          }
+          config = options ? $.extend({}, config, options) : config;
+
+          awesome = new Awesomplete(input, config);
+          list.push(awesome);
+          const btn = searchList.querySelector('button');
+
+          Awesomplete.$(btn).addEventListener('click', () => {
+            const hasList = list.map(a => btn.classList.contains(a.input.id));
+            const index = hasList.indexOf(true);
+            awesome = list[index];
+
+            if (awesome.ul.childNodes.length === 0) {
+              awesome.minChars = 0;
+              awesome.evaluate();
+            } else if (awesome.ul.hasAttribute('hidden')) {
+              awesome.open();
+            } else {
+              awesome.close();
+            }
+            list.map((a) => {
+              if (!btn.classList.contains(a.input.id)) {
+                a.close();
+              }
+              return a;
+            });
+          });
+        }
+      });
     } else {
       cancelAttribute();
     }

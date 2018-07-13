@@ -1,122 +1,92 @@
 {
-  "controls": [
-    {
+  "controls": [{
       "name": "home"
-    },
-    {
-      "name": "mapmenu",
-      "options": {
-        "isActive": false
-      }
-    },
-    {
-      "name": "sharemap"
     },
     {
       "name": "geoposition"
     },
     {
+      "name": "position",
+      "options": {
+        "title": "Sweref99 16.30"
+      }
+    },
+    {
+      "name": "mapmenu"
+    },
+    {
+      "name": "sharemap"
+    },
+    {
       "name": "print"
     },
     {
-      "name": "about",
+      "name": "editor",
       "options": {
-        "buttonText": "Om Origo",
-        "title": "Om Origo",
-        "content": "<p>Origo är ett ramverk för webbkartor. Ramverket bygger på JavaScript-biblioteket OpenLayers 3. Du kan använda Origo för att skapa egna webbaserade kartapplikationer.</p><br><p>Projektet drivs och underhålls av ett antal svenska kommuner. Besök gärna <a href='https://github.com/origo-map/origo' target='_blank'>Origo på GitHub</a> för mer information.</p>"
-      }
-    },
-    {
-      "name": "link",
-      "options": {
-        "title": "Origo",
-        "url": "https://github.com/origo-map/origo"
-      }
-    },
-    {
-      "name": "legend"
-    },
-    {
-      "name": "position",
-      "options": {
-        "title": "Web Mercator",
-        "projections": {
-          "EPSG:4326": "WGS84",
-          "EPSG:3006": "Sweref99 TM"
+        "isActive": true,
+        "autoSave": false,
+        "defaultLayer": "editor_point",
+        "drawTools": {
+          "Polygon": ["box"]
         }
       }
     },
     {
-      "name": "measure"
-    },
-    {
-      "name": "scaleLine"
+      "name": "legend",
+      "options": {
+        "hasMapLegend": false
+      }
     }
   ],
-  "pageSettings": {
-  "footer": {
-    "img": "img/png/logo.png",
-    "url" : "https://github.com/origo-map/origo",
-    "urlText": "Origo"
-  },
-  "mapGrid": {
-    "visible": true
-  }
-},
-  "projectionCode": "EPSG:3857",
-  "projectionExtent": [
-    -20026376.39,
-    -20048966.10,
-    20026376.39,
-    20048966.10
+  "projectionCode": "EPSG:3010",
+  "projectionExtent": [-1678505.1838360203,
+    4665380,
+    2431912.7361639794,
+    8775797.92
   ],
-  "proj4Defs": [
-      {
-        "code": "EPSG:3006",
-        "projection": "+proj=utm +zone=33 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
-      }
-  ],
-  "extent": [
-    -20026376.39,
-    -20048966.10,
-    20026376.39,
-    20048966.10
+  "proj4Defs": [{
+    "code": "3010",
+    "alias": "urn:ogc:def:crs:EPSG::3010",
+    "projection": "+proj=tmerc +lat_0=0 +lon_0=16.5 +k=1 +x_0=150000 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
+  }],
+  "extent": [-1678505.1838360203,
+    4665380,
+    2431912.7361639794,
+    8775797.92
   ],
   "center": [
-    1700000,
-    8275000
+    152667,
+    6610405
   ],
-  "zoom": 8,
+  "zoom": 10,
   "resolutions": [
-    156543.03,
-    78271.52,
-    39135.76,
-    19567.88,
-    9783.94,
-    4891.97,
-    2445.98,
-    1222.99,
-    611.50,
-    305.75,
-    152.87,
-    76.437,
-    38.219,
-    19.109,
-    9.5546,
-    4.7773,
-    2.3887,
-    1.1943,
-    0.5972
+    1146.8799999999999,
+    573.4399999999999,
+    286.71999999999997,
+    143.35999999999999,
+    71.67999999999999,
+    35.839999999999996,
+    17.919999999999998,
+    8.959999999999999,
+    4.4799999999999995,
+    2.2399999999999998,
+    1.1199999999999999,
+    0.5599999999999999,
+    0.27999999999999997,
+    0.13999999999999999
   ],
   "source": {
-    "local": {
-      "url": "http://localhost/geoserver/wms"
+    "mdk": {
+      "url": "https://www.malardalskartan.se/geoserver/origo/wfs",
+      "workspace": "origo"
+    },
+    "basemap": {
+      "url": "https://www.malardalskartan.se/geowebcache/service/wmts"
     }
   },
-  "groups": [
-    {
-      "name": "test",
-      "title": "Test",
+  "groups": [{
+      "name": "edit",
+      "title": "Editable layers",
       "expanded": true
     },
     {
@@ -125,125 +95,306 @@
       "expanded": true
     }
   ],
-  "layers": [
+  "layers": [{
+      "name": "editor_polygon",
+      "title": "Polygon",
+      "group": "edit",
+      "geometryName": "geom",
+      "geometryType": "Polygon",
+      "queryable": true,
+      "editable": true,
+      "source": "mdk",
+      "style": "polygon-blue",
+      "type": "WFS",
+      "visible": true,
+      "offline": true,
+      "attributes": [{
+          "name": "name",
+          "title": "Name: ",
+          "type": "text",
+          "maxLength": 50
+        },
+        {
+          "name": "type",
+          "title": "Type: ",
+          "type": "dropdown",
+          "maxLength": 30,
+          "options": [
+            "Appartement",
+            "Villa",
+            "Townhouse",
+            "Mansion"
+          ]
+        },
+        {
+          "name": "comments",
+          "title": "Comments: ",
+          "type": "textarea",
+          "textarea": 254
+        },
+        {
+          "name": "highlight",
+          "title": "Highlight: ",
+          "type": "checkbox"
+        }
+      ]
+    },
     {
-      "name": "origo-cities",
-      "title": "Origokommuner",
-      "group": "test",
-      "source": "data/origo-cities-3857.geojson",
-      "style": "origo-logo",
-      "type": "GEOJSON",
+      "name": "editor_line",
+      "title": "Line",
+      "group": "edit",
+      "geometryName": "geom",
+      "queryable": true,
+      "editable": true,
+      "source": "mdk",
+      "style": "line-red",
+      "type": "WFS",
+      "visible": true,
+      "attributes": [{
+          "name": "name",
+          "title": "Name: ",
+          "type": "text",
+          "maxLength": 50
+        },
+        {
+          "name": "type",
+          "title": "Type: ",
+          "type": "dropdown",
+          "maxLength": 30,
+          "options": [
+            "Path",
+            "Road",
+            "Highway",
+            "Bicycle path"
+          ]
+        },
+        {
+          "name": "comments",
+          "title": "Comments: ",
+          "type": "textarea",
+          "textarea": 254
+        },
+        {
+          "name": "highlight",
+          "title": "Highlight: ",
+          "type": "checkbox"
+        }
+      ]
+    },
+    {
+      "name": "editor_point",
+      "title": "Punkt",
+      "group": "edit",
+      "geometryName": "geom",
+      "queryable": true,
+      "editable": true,
+      "source": "mdk",
+      "style": "circle-yellow",
+      "type": "WFS",
+      "visible": true,
       "attributes": [
-          {
-            "name": "name"
+        {
+          "name": "sprak",
+          "title": "Språk: ",
+          "type": "searchList",
+          "list": [
+            {
+              "value": "Java"
+            },
+            {
+              "value": "JavaScript"
+            },
+            {
+              "value": "Python"
+            },
+            {
+              "value": "Ada"
+            },
+            {
+              "value": "English"
+            },
+            {
+              "value": "French"
+            },
+            {
+              "value": "Swedish"
+            }
+          ],
+          "config": {
+            "minChars": 2,
+            "maxItems": 15
           }
-      ],
-      "visible": true
+        },
+        {
+          "name": "icons",
+          "title": "Ikoner: ",
+          "type": "searchList",
+          "list": [
+            {
+              "src": "img/kompass.svg",
+              "value": "kompass",
+              "comment": "Bildens namn får inte vara samma sak som value."
+            },
+            {
+              "src": "img/kompass.svg",
+              "value": "vädersträck"
+            },
+            {
+              "src": "img/kompass.svg",
+              "value": "Gråand"
+            }
+          ],
+          "config": {
+            "minChars": 0,
+            "maxItems": 10,
+            "images": true
+          }
+        },
+        {
+          "name": "icon-lib",
+          "title": "Bibliotek: ",
+          "type": "searchList",
+          "list": [
+            {
+              "location": "img/png",
+              "extension": "png"
+            },
+            {
+              "location": "img/png",
+              "extension": "png"
+            }
+          ],
+          "config": {
+            "minChars": 0,
+            "maxItems": 15,
+            "images": true
+          }
+        },
+        {
+          "name": "name",
+          "title": "Name: ",
+          "type": "text",
+          "maxLength": 50
+        },
+        {
+          "name": "type",
+          "title": "Type: ",
+          "type": "dropdown",
+          "maxLength": 30,
+          "options": [
+            "Restaurant",
+            "Café",
+            "B&B"
+          ]
+        },
+        {
+          "name": "comments",
+          "title": "Comments: ",
+          "type": "textarea",
+          "textarea": 254
+        }
+      ]
     },
     {
-      "name": "origo-mask",
-      "opacity": 0.25,
-      "title": "origo-mask",
-      "group": "none",
-      "queryable": false,
-      "source": "data/origo-mask-3857.geojson",
-      "style": "mask",
-      "type": "GEOJSON",
-      "visible": true
-    },
-    {
-      "name": "osm",
-      "title": "OpenStreetMap",
+      "attribution": "&copy Lantmäteriet Geodatasamverkan",
+      "format": "image/png",
       "group": "background",
-      "queryable": false,
-      "style": "karta_farg",
-      "type": "OSM",
+      "name": "topowebbkartan_nedtonad",
+      "source": "basemap",
+      "title": "Karta, grå",
+      "type": "WMTS",
+      "style": "karta_gra",
       "visible": true
+    },
+    {
+      "attribution": "&copy Lantmäteriet Geodatasamverkan",
+      "format": "image/png",
+      "group": "background",
+      "name": "topowebbkartan",
+      "source": "basemap",
+      "title": "Karta, färg",
+      "type": "WMTS",
+      "style": "karta_farg",
+      "visible": false
     }
   ],
   "styles": {
-      "mask": [
-        [
-          {
-            "stroke": {
-              "color": "rgba(0,0,0,1.0)"
-            },
-            "fill": {
-              "color": "rgba(0,0,0,1.0)"
-            }
-          }
-        ]
-      ],
-      "origo-logo": [
-        [
-          {
-            "circle": {
-              "radius": 16,
-              "stroke": {
-                "color": "rgba(0,0,0,1)",
-                "width": 5
-              },
-              "fill": {
-                "color": "rgba(255,255,255,0.9)"
-              }
-            }
+    "mask": [
+      [{
+        "stroke": {
+          "color": "rgba(0,0,0,1.0)"
+        },
+        "fill": {
+          "color": "rgba(0,0,0,1.0)"
+        }
+      }]
+    ],
+    "polygon-blue": [
+      [{
+        "stroke": {
+          "color": "rgba(0,122,255,1.0)"
+        },
+        "fill": {
+          "color": "rgba(0,122,255,0.5)"
+        }
+      }]
+    ],
+    "line-red": [
+      [{
+        "stroke": {
+          "color": "rgba(255,59,48,1.0)",
+          "width": 3
+        }
+      }]
+    ],
+    "cirkel": [
+      [{
+        "circle": {
+          "radius": 6,
+          "stroke": {
+            "color": "rgba(0,0,0,1)",
+            "width": 2
           },
-          {
-            "circle": {
-              "radius": 4,
-              "stroke": {
-                "color": "rgba(0,0,0,0)",
-                "width": 1
-              },
-              "fill": {
-                "color": "rgba(37,129,196,1)"
-              }
-            }
+          "fill": {
+            "color": "rgba(0,0,0,0.5)"
           }
-        ]
-      ],
-      "cirkel": [
-        [
-          {
-            "circle": {
-              "radius": 6,
-              "stroke": {
-                "color": "rgba(0,0,0,1)",
-                "width": 2
-              },
-              "fill": {
-                "color": "rgba(0,0,0,0.5)"
-              }
-            }
+        }
+      }]
+    ],
+    "circle-yellow": [
+      [{
+        "circle": {
+          "radius": 6,
+          "stroke": {
+            "color": "rgba(255,204,0,1)",
+            "width": 2
+          },
+          "fill": {
+            "color": "rgba(255,204,0,0.5)"
           }
-        ]
-      ],
-      "karta_gra": [
-        [
-          {
-            "image": {
-              "src": "img/png/gra.png"
-            }
-          }
-        ]
-      ],
-      "karta_farg": [
-        [
-          {
-            "image": {
-              "src": "img/png/farg.png"
-            }
-          }
-        ]
-      ],
-      "orto": [
-        [
-          {
-            "image": {
-              "src": "img/png/orto.png"
-            }
-          }
-        ]
-      ]
+        }
+      }]
+    ],
+    "karta_gra": [
+      [{
+        "image": {
+          "src": "img/png/gra.png"
+        }
+      }]
+    ],
+    "karta_farg": [
+      [{
+        "image": {
+          "src": "img/png/farg.png"
+        }
+      }]
+    ],
+    "orto": [
+      [{
+        "image": {
+          "src": "img/png/orto.png"
+        }
+      }]
+    ]
   }
 }

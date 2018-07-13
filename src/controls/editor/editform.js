@@ -10,6 +10,13 @@ const createForm = function createForm(obj) {
   const dropdownOptions = obj.options || [];
   const today = new Date();
   const isoDate = new Date(today.getTime() - (today.getTimezoneOffset() * 60000)).toISOString();
+
+  const elDiv = document.createElement('div');
+  const elLabel = document.createElement('label');
+  const elInput = document.createElement('input');
+  const elButton = document.createElement('button');
+  const elSpan = document.createElement('span');
+
   let el;
   let checked;
   let firstOption;
@@ -35,6 +42,28 @@ const createForm = function createForm(obj) {
         el += `<option value="${dropdownOptions[i]}">${dropdownOptions[i]}</option>`;
       }
       el += '</select></div>';
+      break;
+    case 'searchList':
+      elDiv.id = obj.type;
+      elLabel.innerHTML = label;
+      elLabel.appendChild(document.createElement('br'));
+
+      elInput.setAttribute('id', id);
+      elInput.setAttribute('class', 'awesomplete');
+      elInput.setAttribute('o-list', `${JSON.stringify(obj.list)}`);
+      elInput.setAttribute('o-config', `${JSON.stringify(obj.config || {} )}`);
+      elInput.setAttribute('maxlength', 50);
+
+      elButton.setAttribute('class', `dropdown-btn ${id}`);
+      elButton.setAttribute('type', 'button');
+      elSpan.setAttribute('class', 'caret');
+      elButton.insertAdjacentElement('afterbegin', elSpan);
+
+      elDiv.insertAdjacentElement('afterbegin', elLabel);
+      elLabel.insertAdjacentElement('afterend', elInput);
+
+      elDiv.querySelector('.awesomplete').insertAdjacentElement('afterend', elButton);
+      el = elDiv.outerHTML;
       break;
     case 'image': {
       const imageClass = val ? '' : 'o-hidden';
@@ -78,6 +107,7 @@ const createForm = function createForm(obj) {
     default:
       break;
   }
+
   return el;
 };
 

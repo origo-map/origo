@@ -1,0 +1,53 @@
+#searchList .awesomplete{
+    width: 80%;
+}
+#searchList .awesomplete > input {
+    width: 100%;
+    height: 100%;
+}
+
+#searchList .button {
+    padding: 1em 5em;
+    border-radius: 0.3em;
+    background: linear-gradient(hsl(40, 70%, 80%), hsl(40, 70%, 70%));
+    border: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+#searchList .dropdown-btn {
+    vertical-align: top;
+    height: 2.11em;
+    border-top-left-radius: 0;
+    border-top-right-radius: 5px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 5px;
+    border: 1px solid #ccc;
+    float: right;
+    width: 20%;
+}
+
+#searchList .caret {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-left: 2px;
+    vertical-align: middle;
+    border-top: 4px solid;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+}
+
+#searchList .awesomplete > ul {
+    min-width: 100%;
+    background-color: white;
+}
+#searchList .awesomplete > ul > li {
+    position: relative;
+    padding: .4em 1em;
+    left: 1em;
+    border-bottom: none;
+    font-size: .875em;
+    line-height: 1.5rem;
+}
+#searchList .awesomplete mark {
+    background: hsl(65, 100%, 50%);
+}
