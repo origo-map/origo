@@ -75,7 +75,7 @@ function init(opt) {
 
   bindUIActions();
 
-  if (isActive && $('#o-map').width() >= breakPoint[0]) {
+  if (isActive && $('#o-map').width() >= breakPoint[breakPointSize][0]) {
     toggleMenu();
   }
 }
