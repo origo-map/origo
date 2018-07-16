@@ -36,11 +36,6 @@ function bindUIActions() {
   });
   $editAttribute.on('click', (e) => {
     dispatcher.emitToggleEdit('attribute');
-    
-    /* if (document.querySelector('#searchList .awesomplete')) {
-      console.log('attributes show');
-
-    } */
     $editAttribute.blur();
     e.preventDefault();
   });
