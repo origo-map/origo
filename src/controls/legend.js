@@ -63,9 +63,15 @@ function createStroke(strokeProperties) {
   return stroke;
 }
 
+function getAll(arr, name) {
+  return arr.filter(o => ({}).hasOwnProperty.call(o, name));
+}
+
 function getSymbol(style) {
   let symbol = '';
   const s = style[0];
+  const circles = getAll(s, 'circle');
+  
   if (Object.prototype.hasOwnProperty.call(s[0], 'icon')) {
     const src = validateUrl(s[0].icon.src, baseUrl);
     // var scale = style.icon.scale || undefined;
@@ -93,10 +99,10 @@ function getSymbol(style) {
     symbol += `<div class="o-legend-item-img"><svg height="${symbolSize}" width="${symbolSize}">
     ${stroke}
     </svg></div>`;
-  } else if (Object.prototype.hasOwnProperty.call(s[0], 'circle')) {
+  } else if (circles.length > 0) {
     let circle = '';
-    for (let i = 0; i < s.length; i += 1) {
-      circle += createCircle(s[i]);
+    for (let i = 0; i < circles.length; i += 1) {
+      circle += createCircle(circles[i]);
     }
     symbol += `<div class="o-legend-item-img"><svg height="${symbolSize}" width="${symbolSize}">
     ${circle}
