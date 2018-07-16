@@ -508,15 +508,16 @@ function awesomeImage(src, value) {
   div.appendChild(p);
   return div;
 }
-function getList(item) {
-  const dir = item.location;
-  const ext = item.extension;
+function fetchImg(callback, options) {
+  const dir = options.location;
+  const ext = options.extension;
   let src;
   let val;
-  return $.ajax({
+  $.ajax({
     url: dir,
+    type: 'GET',
     success: (data) => {
-      const results = [];
+      const images = [];
       const el = document.createElement('html');
       el.innerHTML = data;
       const links = el.querySelectorAll('a');
@@ -526,77 +527,27 @@ function getList(item) {
         if (array.length === 2 && array[1] === ext) {
           src = array.join('.');
           val = array[0].split('_').join('');
-          const o = {
+          images.push({
             src: `${dir}/${src}`,
             value: val
-          };
-          results.push(o);
-          console.log(o)
-        }
-      });
-      return results;
-    }
-  });
-}
-function awesomeParser(list) {
-  const hasLocation = list.reduce(o => Object.keys(o).includes('location'));
-  if (hasLocation) {
-    // console.log(list, hasLocation);
-    // list contains path 
-    // re-create list
-    list.forEach((item) => {
-      getList(item);
-    });
-  } else {
-    return list.map((item) => {
-      if (item.src && item.value) {
-        return {
-          label: awesomeImage(item.src, item.value).outerHTML,
-          value: item.value
-        };
-      }
-      return item.value;
-    });
-  }
-  
-  /* return list.map((item) => {
-    // console.log('Item: ', item);
-    if (item.location && item.extension) {
-      // TODO :: create list with item and src.
-    
-      
-      const dir = item.location; 
-      const ext = item.extension;
-      let src; 
-      let val;
-      $.ajax({
-        url: dir,
-        success: (data) => {
-          const el = document.createElement('html');
-          el.innerHTML = data;
-          const links = el.querySelectorAll('a');
-          links.forEach((link) => {
-            const candidate = link.href.split('/').pop();
-            const array = candidate.split('.');
-            if (array.length === 2 && array[1] === ext) {
-              src = array.join('.');
-              val = array[0].split('_').join("");
-            }
-            //console.log(src, val)
-            //console.log(awesomeImage(src, val))
           });
         }
       });
-      return 'test';
-    } else if (item.src && item.value) {
+      callback(images);
+    }
+  });
+}
+
+function awesomeParser(list) {
+  return list.map((item) => {
+    if (item.src && item.value) {
       return {
         label: awesomeImage(item.src, item.value).outerHTML,
         value: item.value
       };
-    } else if (item.value) {
-      return item.value;
     }
-  }); */
+    return item.value;
+  });
 }
 
 function onToggleEdit(e) {
@@ -611,20 +562,36 @@ function onToggleEdit(e) {
   } else if (e.tool === 'attribute') {
     if (hasAttribute === false) {
       editAttributes();
-
       const list = [];
-      // Check if awesomplete SearchList has awesomplete?
       const searchLists = document.querySelectorAll('#searchList');
       searchLists.forEach((searchList) => {
         if (searchList.querySelectorAll('div').length === 0) {
           const input = searchList.querySelector('input');
           let olist = JSON.parse(input.getAttribute('o-list'));
-          olist = awesomeParser(olist);
+          const hasLocation = olist.reduce(o => Object.keys(o).includes('location'));
+          let hasImages = olist.filter(o => Object.keys(o).includes('src')).length > 0;
+          if (hasLocation) {
+            olist.forEach((oItem) => {
+              fetchImg((images) => {
+                images.map((item) => {
+                  olist.push({
+                    label: awesomeImage(item.src, item.value).outerHTML,
+                    value: item.value
+                  });
+                  return true;
+                });
+              }, oItem);
+            });
+            olist = olist.filter(obj => obj.src);
+            hasImages = true;
+          } else {
+            olist = awesomeParser(olist);
+          }
           const options = JSON.parse(input.getAttribute('o-config'));
           let config = {
             list: olist
           };
-          if (options.images) {
+          if (hasImages) {
             config.item = text =>
               Awesomplete.$.create('li', {
                 innerHTML: text,

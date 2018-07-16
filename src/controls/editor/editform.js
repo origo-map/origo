@@ -51,8 +51,8 @@ const createForm = function createForm(obj) {
       elInput.setAttribute('id', id);
       elInput.setAttribute('class', 'awesomplete');
       elInput.setAttribute('o-list', `${JSON.stringify(obj.list)}`);
-      elInput.setAttribute('o-config', `${JSON.stringify(obj.config || {} )}`);
-      elInput.setAttribute('maxlength', 50);
+      elInput.setAttribute('o-config', `${JSON.stringify(obj.config || {})}`);
+      elInput.setAttribute('maxlength', maxLength || 50);
 
       elButton.setAttribute('class', `dropdown-btn ${id}`);
       elButton.setAttribute('type', 'button');

@@ -232,22 +232,20 @@
           "list": [
             {
               "src": "img/kompass.svg",
-              "value": "kompass",
-              "comment": "Bildens namn får inte vara samma sak som value."
+              "value": "Riktning"
             },
             {
-              "src": "img/kompass.svg",
-              "value": "vädersträck"
+              "src": "img/geolocation_marker.png",
+              "value": "Markör"
             },
             {
-              "src": "img/kompass.svg",
-              "value": "Gråand"
+              "src": "img/geolocation_marker_heading.png",
+              "value": "Rubrik"
             }
           ],
           "config": {
             "minChars": 0,
-            "maxItems": 10,
-            "images": true
+            "maxItems": 5
           }
         },
         {
@@ -266,8 +264,7 @@
           ],
           "config": {
             "minChars": 0,
-            "maxItems": 15,
-            "images": true
+            "maxItems": 5
           }
         },
         {
