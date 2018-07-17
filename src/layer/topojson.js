@@ -10,7 +10,7 @@ function createSource(options) {
     attributions: options.attribution,
     url: options.url,
     format: new TopoJSONFormat({
-      defaultDataProjection: options.projectionCode
+      dataProjection: options.projectionCode
     })
   });
 }

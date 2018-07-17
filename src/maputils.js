@@ -4,7 +4,7 @@ import Feature from 'ol/feature';
 import Point from 'ol/geom/point';
 import Vector from 'ol/source/vector';
 import GeoJSON from 'ol/format/geojson';
-import Extent from 'ol/extent';
+import {getTopLeft, getBottomLeft} from 'ol/extent';
 import WKT from 'ol/format/wkt';
 import viewer from './viewer';
 
@@ -17,7 +17,7 @@ export default {
   },
   tileGrid: function tileGrid(settings) {
     const extent = settings.extent || viewer.getExtent();
-    const origin = settings.alignBottomLeft === false ? Extent.getTopLeft(extent) : Extent.getBottomLeft(extent);
+    const origin = settings.alignBottomLeft === false ? getTopLeft(extent) : getBottomLeft(extent);
     const resolutions = settings.resolutions || viewer.getResolutions();
     const tileSize = settings.tileSize || viewer.getTileSize();
     return new TileGrid({

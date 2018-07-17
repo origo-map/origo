@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import Sphere from 'ol/sphere';
+import {getArea, getLength} from 'ol/sphere';
 import VectorSource from 'ol/source/vector';
 import VectorLayer from 'ol/layer/vector';
 import DrawInteraction from 'ol/interaction/draw';
@@ -79,8 +79,8 @@ function createMeasureTooltip() {
 }
 
 function formatLength(line) {
-  const projection = map.getView().getProjection();
-  const length = Sphere.getLength(line, {
+  const projection = map.getView().getProjection().code;
+  const length = getLength(line, {
     projection
   });
   let output;
@@ -95,8 +95,8 @@ function formatLength(line) {
 }
 
 function formatArea(polygon) {
-  const projection = map.getView().getProjection();
-  const area = Sphere.getArea(polygon, {
+  const projection = map.getView().getProjection().code;
+  const area = getArea(polygon, {
     projection
   });
   let output;
@@ -151,11 +151,11 @@ function pointerMoveHandler(evt) {
   if (sketch) {
     const geom = (sketch.getGeometry());
     let output;
-
-    if (geom instanceof Polygon) {
+    
+    if (geom.constructor.name === 'Polygon') {
       output = formatArea((geom));
       tooltipCoord = geom.getInteriorPoint().getCoordinates();
-    } else if (geom instanceof LineString) {
+    } else if (geom.constructor.name === 'LineString') {
       output = formatLength((geom));
       tooltipCoord = geom.getLastCoordinate();
     }

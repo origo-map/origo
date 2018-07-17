@@ -2,8 +2,8 @@ import proj4 from 'proj4';
 import Map from 'ol/map';
 import View from 'ol/view';
 import Collection from 'ol/collection';
-import Projection from 'ol/proj/projection';
-import project from 'ol/proj';
+import Projection from 'ol/proj/Projection';
+import {register} from 'ol/proj/proj4';
 import Feature from 'ol/feature';
 import geom from 'ol/geom/geometry';
 import $ from 'jquery';
@@ -360,7 +360,6 @@ function init(el, mapOptions) {
 
   // Read and set projection
   if ('proj4Defs' in mapOptions && proj4) {
-    project.setProj4(proj4);
     const proj = mapOptions.proj4Defs;
 
     // Register proj4 projection definitions
@@ -371,6 +370,7 @@ function init(el, mapOptions) {
       }
     }
   }
+  register(proj4);
   urlParams = mapOptions.params || {};
   settings.params = urlParams;
   settings.map = mapOptions.map;
