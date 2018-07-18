@@ -131,7 +131,7 @@ function getBaseUrl() {
 }
 
 function getBreakPoints(size) {
-  return size && 'size' in settings.breakPoints ? settings.breakPoints[size] : settings.breakPoints;
+  return size && size in settings.breakPoints ? settings.breakPoints[size] : settings.breakPoints;
 }
 
 function getMapName() {
