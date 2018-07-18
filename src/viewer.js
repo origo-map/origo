@@ -13,6 +13,9 @@ import featureinfo from './featureinfo';
 import maputils from './maputils';
 import style from './style';
 import layerCreator from './layercreator';
+import Observable from 'ol/observable';
+import search from './controls/search';
+import getAttributes from './getattributes';
 
 let map;
 const settings = {
@@ -424,6 +427,45 @@ function init(el, mapOptions) {
     // This needs further development for proper handling in permalink
     settings.featureinfoOptions.savedSelection = new Feature({
       geometry: new geom[urlParams.selection.geometryType](urlParams.selection.coordinates)
+    });
+  } else if (urlParams.select) {
+    const query = urlParams.select;
+    let cache = []; 
+    map.getLayers().forEach((l) => {
+      if (l.get('name') === query.layer) {
+        const source = l.getSource();
+        const listnerKey = source.on('change', () => {
+          if (source.getState() === 'ready') {
+            const features = source.getFeatures();
+            features.forEach((feature) => {
+              query.attributes.map((attribute) => {
+                const key = Object.keys(attribute)[0];
+                const value = Object.values(attribute)[0];
+                if (feature.get(key).toString() === value) {
+                  // console.log(feature.get(key).toString() === value, feature.get(key).toString(), value);
+                  cache.push(feature);
+                }
+              });
+            });
+            settings.featureinfoOptions.savedSelection = cache[0];
+            featureinfo.init(settings.featureinfoOptions);
+            
+            if (cache[0]) {
+              map.getView().animate({
+                center: cache[0].getGeometry().getCoordinates(),
+                zoom: 14
+              }, (completed) => {
+                if (completed) {
+                  search.showFeatureInfo(cache, l.get('title'), getAttributes(cache[0], l));
+                }
+              });  
+            } else {
+              console.log('Feature not found: ' + query);
+            }
+            Observable.unByKey(listnerKey);
+          }
+        });
+      }
     });
   }
   featureinfo.init(settings.featureinfoOptions);
