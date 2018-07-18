@@ -1,3 +1,9 @@
+#o-tools-left {
+  pointer-events: none;
+}
+#o-tools-left button {
+  pointer-events: auto;
+}
 .o-tools-left {
   display: block;
   display: flex;
