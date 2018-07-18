@@ -152,10 +152,10 @@ function pointerMoveHandler(evt) {
     const geom = (sketch.getGeometry());
     let output;
     
-    if (geom.constructor.name === 'Polygon') {
+    if (geom.getType() === 'Polygon') {
       output = formatArea((geom));
       tooltipCoord = geom.getInteriorPoint().getCoordinates();
-    } else if (geom.constructor.name === 'LineString') {
+    } else if (geom.getType() === 'LineString') {
       output = formatLength((geom));
       tooltipCoord = geom.getLastCoordinate();
     }
