@@ -17,9 +17,9 @@ function getEl() {
 
 function setVisibility(visible) {
   if (visible) {
-    $('#o-popup .o-popup').css('display', 'block');
+    $('#o-popup').css('display', 'block');
   } else {
-    $('#o-popup .o-popup').css('display', 'none');
+    $('#o-popup').css('display', 'none');
   }
 }
 
