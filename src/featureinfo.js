@@ -44,10 +44,23 @@ function callback(evt) {
       items[currentItem].feature.clone(),
       selectionStyles[items[currentItem].feature.getGeometry().getType()]
     );
-    if (identifyTarget === 'overlay') {
-      popup.setTitle(items[currentItem].title);
+    const layer = viewer.getLayersByProperty('name', items[currentItem].name)[0];
+    const titleAttribute = layer.getProperties().titleAttribute;
+    let title;
+    if (titleAttribute) {
+      const featureProps = items[currentItem].feature.getProperties();
+      if (titleAttribute in featureProps) {
+        title = featureProps[titleAttribute];
+      } else {
+        title = items[currentItem].title;
+      }
     } else {
-      sidebar.setTitle(items[currentItem].title);
+      title = items[currentItem].title;
+    }
+    if (identifyTarget === 'overlay') {
+      popup.setTitle(title);
+    } else {
+      sidebar.setTitle(title);
     }
   }
 }

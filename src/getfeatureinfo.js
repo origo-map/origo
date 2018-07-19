@@ -172,7 +172,8 @@ function getFeaturesFromRemote(evt) {
       requestResult.push({
         title: layer.get('title'),
         feature,
-        content: getAttributes(feature, layer)
+        content: getAttributes(feature, layer),
+        layer: layer.get('name')
       });
       return requestResult;
     }
@@ -209,6 +210,7 @@ function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
           item.title = l.get('title');
           item.feature = f;
           item.content = getAttributes(f, l);
+          item.name = l.get('name');
           result.push(item);
         });
       } else if (collection.length === 1 && queryable) {
@@ -216,6 +218,7 @@ function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
         item.title = l.get('title');
         item.feature = collection[0];
         item.content = getAttributes(collection[0], l);
+        item.name = l.get('name');
         result.push(item);
       }
     } else if (queryable) {
@@ -223,6 +226,7 @@ function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
       item.title = l.get('title');
       item.feature = feature;
       item.content = getAttributes(feature, l);
+      item.name = l.get('name');
       result.push(item);
     }
 
