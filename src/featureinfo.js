@@ -9,6 +9,7 @@ import featurelayer from './featurelayer';
 import Style from './style';
 import StyleTypes from './style/styletypes';
 import getFeatureInfo from './getfeatureinfo';
+import Modal from './modal';
 
 const style = Style();
 const styleTypes = StyleTypes();
@@ -86,6 +87,19 @@ function getHitTolerance() {
   return hitTolerance;
 }
 
+function bindUIActions() {
+  $('.o-modal-link-iframe').on('click', function create(e) {
+    Modal.createModal('#o-map', {
+      title: $(this).text(),
+      content: $(this).attr('href'),
+      target: 'iframe'
+    });
+
+    Modal.showModal();
+    e.preventDefault();
+  });
+}
+
 function identify(identifyItems, target, coordinate) {
   items = identifyItems;
   clear();
@@ -100,6 +114,7 @@ function identify(identifyItems, target, coordinate) {
         title: items[0].title
       });
       popup.setVisibility(true);
+      bindUIActions();
       initCarousel('#o-identify-carousel');
       const popupHeight = $('.o-popup').outerHeight() + 20;
       $('#o-popup').height(popupHeight);

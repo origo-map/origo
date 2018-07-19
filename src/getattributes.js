@@ -17,6 +17,7 @@ export default function (feature, layer) {
   let li = '';
   let title;
   let val;
+  let aCls;
   // If layer is configured with attributes
   if (layer.get('attributes')) {
     // If attributes is string then use template named with the string
@@ -28,6 +29,7 @@ export default function (feature, layer) {
         attribute = layer.get('attributes')[i];
         title = '';
         val = '';
+        aCls = attribute.target === 'iframe' ? 'o-modal-link-iframe' : '';
         if (attribute.name) {
           if (feature.get(attribute.name)) {
             val = feature.get(attribute.name);
@@ -37,7 +39,7 @@ export default function (feature, layer) {
             if (attribute.url) {
               if (feature.get(attribute.url)) {
                 const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.url), feature.getProperties()));
-                val = `<a href="${url}" target="_blank">
+                val = `<a href="${url}" target="_blank" class="${aCls}">
                   ${feature.get(attribute.name)}
                   </a>`;
               }
@@ -47,7 +49,7 @@ export default function (feature, layer) {
           if (feature.get(attribute.url)) {
             const text = attribute.html || attribute.url;
             const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.url), attributes));
-            val = `<a href="${url}" target="_blank">
+            val = `<a href="${url}" target="_blank" class="${aCls}">
               ${text}
               </a>`;
           }
