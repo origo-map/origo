@@ -28,6 +28,7 @@ let overlay;
 let hitTolerance;
 let items;
 let popup;
+let sidebarPan;
 
 function clear() {
   selectionLayer.clear();
@@ -126,6 +127,20 @@ function identify(identifyItems, target, coordinate) {
       });
       sidebar.setVisibility(true);
       initCarousel('#o-identify-carousel');
+      if (sidebarPan) {
+        const view = map.getView();
+        const resolution = view.getResolution();
+        const margin = 40;
+        const mapWidth = map.getSize()[0];
+        const viewCenter = view.getCenter();
+        const pixelClickX = map.getPixelFromCoordinate(coordinate)[0];
+        const sidebarWidth = document.getElementById('o-sidebar').offsetWidth;
+        const panPixel = pixelClickX - (mapWidth - sidebarWidth - margin);
+        if (panPixel > 0) {
+          const panToCoord = [viewCenter[0] + (panPixel * resolution), viewCenter[1]];
+          view.animate({ center: panToCoord, duration: 500 });
+        }
+      }
       break;
     }
     default:
@@ -184,26 +199,27 @@ function onEnableInteraction(e) {
 function init(optOptions) {
   map = viewer.getMap();
   options = optOptions || {};
-  const pinStyleOptions = Object.prototype.hasOwnProperty.call(options, 'pinStyle') ? options.pinStyle : styleTypes.getStyle('pin');
+  const pinStyleOptions = 'pinStyle' in options ? options.pinStyle : styleTypes.getStyle('pin');
   const savedSelection = options.savedSelection || undefined;
   clickEvent = 'clickEvent' in options ? options.clickEvent : 'click';
-  pinning = Object.prototype.hasOwnProperty.call(options, 'pinning') ? options.pinning : true;
+  pinning = 'pinning' in options ? options.pinning : true;
   pinStyle = style.createStyleRule(pinStyleOptions)[0];
   savedPin = options.savedPin ? maputils.createPointFeature(options.savedPin, pinStyle) : undefined;
   selectionStyles = 'selectionStyles' in options ? style.createGeometryStyle(options.selectionStyles) : style.createEditStyle();
   const savedFeature = savedPin || savedSelection || undefined;
   selectionLayer = featurelayer(savedFeature, map);
-  showOverlay = Object.prototype.hasOwnProperty.call(options, 'overlay') ? options.overlay : true;
+  showOverlay = 'overlay' in options ? options.overlay : true;
 
   if (showOverlay) {
     identifyTarget = 'overlay';
   } else {
     sidebar.init();
     identifyTarget = 'sidebar';
+    sidebarPan = options.sidebarPan;
   }
 
-  clusterFeatureinfoLevel = Object.prototype.hasOwnProperty.call(options, 'clusterFeatureinfoLevel') ? options.clusterFeatureinfoLevel : 1;
-  hitTolerance = Object.prototype.hasOwnProperty.call(options, 'hitTolerance') ? options.hitTolerance : 0;
+  clusterFeatureinfoLevel = 'clusterFeatureinfoLevel' in options ? options.clusterFeatureinfoLevel : 1;
+  hitTolerance = 'hitTolerance' in options ? options.hitTolerance : 0;
 
   map.on(clickEvent, onClick);
   $(document).on('enableInteraction', onEnableInteraction);
