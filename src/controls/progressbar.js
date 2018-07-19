@@ -1,94 +1,104 @@
 import v from '../viewer';
-/**
- * Renders a progress bar.
- * @param {Element} el The target element.
- * @constructor
- */
-function Progress(el) {
-    this.el = el;
-    this.loading = 0;
-    this.loaded = 0;
+import u from '../utils';
+
+let firstChild;
+let progressBar;
+
+function addLoading() {
+  if (this.loading === 0) {
+    this.show();
+  }
+  this.loading += 1;
+  this.update();
 }
 
-
-/**
- * Increment the count of loading tiles.
- */
-Progress.prototype.addLoading = function () {
-    if (this.loading === 0) {
-        this.show();
-    }
-    ++this.loading;
+function addLoaded() {
+  setTimeout(() => {
+    this.loaded += 1;
     this.update();
-};
+  }, 100);
+}
 
+function update() {
+  const atZero = 100;
+  const percent = ((this.loaded / this.loading) * 100).toFixed(1);
+  let width = `${percent}%`;
+  if (parseFloat(percent) === 0) {
+    width = `${atZero}%`;
+  }
+  this.el.style.width = width;
+  if (this.loading === this.loaded) {
+    this.loading = 0;
+    this.loaded = 0;
+    const thiss = this;
+    setTimeout(() => {
+      thiss.hide();
+    }, 500);
+  }
+}
 
-/**
- * Increment the count of loaded tiles.
- */
-Progress.prototype.addLoaded = function () {
-    const this_ = this;
-    setTimeout(function () {
-        ++this_.loaded;
-        this_.update();
-    }, 100);
-};
+function show() {
+  this.el.style.visibility = 'visible';
+  this.el.style.background = 'red';
+  this.el.style.opacity = 1;
+}
 
+function hide() {
+  if (this.loading === this.loaded) {
+    this.el.style.visibility = 'hidden';
+    this.el.style.width = '100%';
+    this.el.style.background = 'red';
+    this.el.style.opacity = 0;
+    this.el.style.transition = 'visibility 0s 1s, opacity 1s linear';
+  }
+}
 
-/**
- * Update the progress bar.
- */
-Progress.prototype.update = function () {
-    const width = (this.loaded / this.loading * 100).toFixed(1) + '%';
-    this.el.style.width = width;
-    if (this.loading === this.loaded) {
-        this.loading = 0;
-        this.loaded = 0;
-        const this_ = this;
-        setTimeout(function () {
-            this_.hide();
-        }, 500);
-    }
-};
+function render(target) {
+  const el = u.createElement('div', '', { id: target });
+  const otb = document.querySelector('#o-tools-bottom');
+  const div = document.createElement('div');
+  div.innerHTML = el;
+  firstChild = div.firstChild;
+  otb.insertAdjacentElement('afterbegin', firstChild);
+}
 
+function bindUIActions() {
+  const m = v.getMap();
+  const ls = m.getLayers();
+  ls.forEach((l) => {
+    const so = l.getSource();
+    so.on('change', () => {
+      progressBar.addLoading();
+      if (so.getState() === 'ready') {
+        progressBar.addLoaded();
+      }
+    });
+    so.on('tileloadstart', () => {
+      progressBar.addLoading();
+    });
+    so.on('tileloadend', () => {
+      progressBar.addLoaded();
+    });
+    so.on('tileloaderror', () => {
+      progressBar.addLoaded();
+    });
+  });
+}
 
-/**
- * Show the progress bar.
- */
-Progress.prototype.show = function () {
-    this.el.style.visibility = 'visible';
-};
-
-
-/**
- * Hide the progress bar.
- */
-Progress.prototype.hide = function () {
-    if (this.loading === this.loaded) {
-        this.el.style.visibility = 'hidden';
-        this.el.style.width = 0;
-    }
-};
-function init() {
-     const otb = document.querySelector('#o-tools-bottom');
-     console.log(otb);
-     const div = document.createElement('div');
-     div.id = "o-progress";
-     otb.insertAdjacentElement('afterbegin', div);
-     const p = new Progress(document.getElementById('o-progress'));
-     const m = v.getMap();
-     const ls = m.getLayers()
-     ls.forEach(function (l) {
-         let so = l.getSource();
-         so.on('tileloadstart', function () {
-             p.addLoading();
-         });
-         so.on('tileloadend', function () {
-             p.addLoaded();
-         });
-         so.on('tileloaderror', function () {
-             p.addLoaded();
-         });
-     });
+function init(optOptions) {
+  const options = optOptions || {};
+  const target = options.target || 'o-progress';
+  render(target);
+  progressBar = {
+    el: firstChild,
+    loading: 0,
+    loaded: 0,
+    addLoaded,
+    addLoading,
+    update,
+    show,
+    hide
+  };
+  bindUIActions();
 }
 export default { init };
