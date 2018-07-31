@@ -324,6 +324,13 @@ function getScale(resolution) {
   return scale;
 }
 
+function scaleToResolution(scale) {
+  var dpi = 25.4 / 0.28;
+  var mpu = settings.projection.getMetersPerUnit();
+  var resolution = scale / (mpu * 39.37 * dpi);
+  return resolution;
+}
+
 function removeLayer(name) {
   settings.layers.forEach((layer, i, obj) => {
     if (layer.get('name') === name) {
@@ -452,6 +459,7 @@ export default {
   getMapSource,
   getResolutions,
   getScale,
+  scaleToResolution,
   getTarget,
   getClusterOptions,
   getTileGrid,

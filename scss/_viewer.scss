@@ -1,11 +1,23 @@
+.o-tools-top {
+  display: block;
+  display: flex;
+  flex-flow: column;
+  z-index:100;
+}
+.o-tools-top {
+  left: 0;
+  top: 0;
+}
+
 .o-tools-left {
   display: block;
   display: flex;
   flex-flow: column;
+  z-index:10;
 }
 .o-tools-left {
   left: 0;
-  top: 0;
+  top: 40px;
 }
 .o-toolbar-maptools {
   margin-top: .5rem;

@@ -51,6 +51,9 @@
     },
     {
       "name": "scaleLine"
+    },
+    {
+      "name": "scaledropdown"
     }
   ],
   "pageSettings": {

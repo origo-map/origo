@@ -1,0 +1,74 @@
+#o-scale-dropdown {
+    background: #FFF;
+    margin-bottom:5px;
+    top: 0.5em;
+    left: 0.5em;
+    bottom: 0px;
+    position: absolute;/* top: 0.5em;*/
+    z-index: 100;
+    border-radius: 4px;
+    -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.45);
+    padding: 5px 5px 5px 5px;
+    width: 100px;
+    height: 24px;
+}
+
+#o-scale-dropdown-input {
+    background: #FFF;
+    width: 100px;
+    height: 24px;
+    border: none;
+    cursor: pointer;
+    color:#999;
+    margin-bottom: 0rem; 
+    padding: 0rem; 
+
+}
+.o-scale-dropdown-caret {
+    height: 1rem;
+    width: 1rem;
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding: 0.6rem 0.5rem 0 0; 
+}
+.o-input-dropdown-list {
+    font-size: 0.8em;
+    /*padding-top: 0.4em;*/
+    margin-top: 0.6em;
+    /*background: #F00;*/
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.45);
+    border-radius: 5px;
+    width: 110px;
+    -ms-transform: translate(-5px); /* IE 9 */
+    -webkit-transform: translate(-5px); /* Safari */
+    transform: translate(-5px);
+}
+.o-input-dropdown-list li {
+    padding-top: 2px 0;
+    padding-bottom: 2px;    
+    background-color:#fff;
+    color:#999;
+}
+.o-input-dropdown-list li:hover {
+    background: #999;
+    cursor: pointer;
+}
+.o-input-dropdown-list ul {
+    background: #ffffff;
+    padding: 5px;
+    border-radius: 5px;
+}
+.o-svg-container {
+    position: absolute;
+    background: #FFF;
+    height: 2.1em;;
+    top: 0;
+    width: 2em;
+    right: 0;
+    border-radius: 0 4px 4px  0 ;
+    -webkit-box-shadow:  -1px 0 5px rgba(128, 128, 128, 0.45);
+    box-shadow:  -1px 0 5px rgba(128, 128, 128, 0.45);
+    cursor: pointer;
+}
