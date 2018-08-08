@@ -67,15 +67,20 @@ function getSymbol(style) {
   let symbol = '';
   const s = style[0];
   if (Object.prototype.hasOwnProperty.call(s[0], 'icon')) {
-    const src = validateUrl(s[0].icon.src, baseUrl);
-    // var scale = style.icon.scale || undefined;
-    const format = s[0].format || 'png';
-    if (format === 'png') {
-      symbol = `<div class="o-legend-item-img"><img style="width: auto; height: 20px;" src="${src}"></div>`;
-    } else if (format === 'svg') {
-      const o = `<object type="image/svg+xml" data="${src}" style="width: 20px;"></object>`;
-      // var inlineStyle = `background: url(${src}) no-repeat;width: 20px; height: 20px;background-size: 20px;`;
-      symbol = `<div class="o-legend-item-img">${o}</div>`;
+    if(s[0].legendIsMultiRow){
+      symbol = '<svg class="o-legend-item-img o-legend-multiRowLegend"><use xlink:href="#fa-list-ul"></use></svg>';
+    }
+    else{
+      const src = validateUrl(s[0].icon.src, baseUrl);
+      // var scale = style.icon.scale || undefined;
+      const format = s[0].format || 'png';
+      if (format === 'png') {
+        symbol = `<div class="o-legend-item-img"><img style="width: auto; height: 20px;" src="${src}"></div>`;
+      } else if (format === 'svg') {
+        const o = `<object type="image/svg+xml" data="${src}" style="width: 20px;"></object>`;
+        // var inlineStyle = `background: url(${src}) no-repeat;width: 20px; height: 20px;background-size: 20px;`;
+        symbol = `<div class="o-legend-item-img">${o}</div>`;
+      }
     }
   } else if (Object.prototype.hasOwnProperty.call(s[0], 'fill')) {
     let fill = '';
@@ -106,6 +111,7 @@ function getSymbol(style) {
     const inlineStyle = `background: url(${src}) no-repeat;width: 30px; height: 30px;background-size: 30px;`;
     symbol = `<div class="o-legend-item-img" style="${inlineStyle}"></div>`;
   }
+
 
   return symbol;
 }
@@ -292,6 +298,7 @@ function toggleSubGroupCheck(subgroup, toggleAll) {
           offToggleCheck(`o-legend-${layername}`);
           $(`#o-legend-${layername}`).remove();
           layer.set('legend', false);
+          removeExtendedLegend(`o-legend-${layername}`);  
           checkToggleOverlay();
         }
 
@@ -299,6 +306,7 @@ function toggleSubGroupCheck(subgroup, toggleAll) {
       } else {
         if (inMapLegend === false && $(`#o-legend-${layername}`).length === 0) {
           $('#o-overlay-list').prepend(createLegendItem(`o-legend-${layername}`));
+          addExtendedLegend('o-legend-' + layername);
           onToggleCheck(`o-legend-${layername}`);
           checkToggleOverlay();
         }
@@ -371,6 +379,7 @@ function toggleCheck(layerid) {
 
       if (inMapLegend === false) {
         offToggleCheck(`o-legend-${layername}`);
+        removeExtendedLegend(`o-legend-${layername}`);  
         $(`#o-legend-${layername}`).remove();
         layer.set('legend', false);
         checkToggleOverlay();
@@ -381,6 +390,7 @@ function toggleCheck(layerid) {
       if (inMapLegend === false && $(`#o-legend-${layername}`).length === 0) {
         $('#o-overlay-list').prepend(createLegendItem(`o-legend-${layername}`));
         onToggleCheck(`o-legend-${layername}`);
+        addExtendedLegend(`o-legend-${layername}`);
         checkToggleOverlay();
       }
 
@@ -583,7 +593,15 @@ function addLegend(groups) {
     const mapLegend = `<div id="o-map-legend"><ul id="o-legend-overlay"><li class="o-legend o-hidden"><div class ="o-toggle-button o-toggle-button-max">
                         <svg class="o-icon-fa-angle-double-down"><use xlink:href="#fa-angle-double-down"></use></svg>
                         <svg class="o-icon-fa-angle-double-up"><use xlink:href="#fa-angle-double-up"></use></svg>
-                    </div></li><li><ul id="o-overlay-list"></li></ul></ul><ul id="o-map-legend-background"></ul></div>`;
+                    </div></li><li><ul id="o-overlay-list"></li></ul></ul><ul id="o-map-legend-background"></ul><div id="o-map-legendExtendedLegend">
+                    <div class="o-icon-expand">
+                                                    <svg class="o-icon-fa-chevron-right">
+                                                        <use xlink:href="#fa-chevron-right"></use>  
+                                                    </svg>
+                                                    <svg class="o-icon-fa-chevron-left">
+                                                        <use xlink:href="#fa-chevron-left"></use>
+                                                    </svg>
+                                                </div></div></div>`;
     $('#o-map').append(mapLegend);
 
     // Add divider to map legend if not only background
@@ -630,8 +648,11 @@ function addLegend(groups) {
 
       if (layer.get('legend') === true || layer.getVisible(true)) {
         addMapLegendItem(layer, name, title);
+        addExtendedLegend('o-legend-' + name);
       }
     }
+
+    
 
     // Check map legend to make sure minimize button appears
     checkToggleOverlay();
@@ -666,6 +687,50 @@ function addLegend(groups) {
     const layer = viewer.getLayer(legendId.split('o-legend-')[1]);
     $(this).attr('title', layer.get('title'));
   });
+  $('#o-map-legendExtendedLegend').on('click', function(evt) {
+    if($('#o-map-legendExtendedLegend').hasClass("extended")){
+      $('#o-map-legendExtendedLegend').removeClass("extended");
+    }
+    else{
+      $('#o-map-legendExtendedLegend').addClass("extended");
+      $('#o-map-legendExtendedLegend').addClass("hasBeenExtended");
+    }
+  });
+}
+
+function addExtendedLegend(layerId){
+  var layername = layerId.split('o-legend-').pop();
+  var layer = viewer.getLayer(layername);
+  var style = layer.get('styleName') ? styleSettings[layer.get('styleName')][0]: false;
+  if (style[0].hasOwnProperty('icon') && style[0].legendIsMultiRow){
+      // this fadeIn and fadeOut works only in mobile mode.    
+      $("#o-mobile-alert").fadeIn(100).fadeTo(3000, 1).fadeOut(1000);
+      var extendenLegend = '<div class="o-map-legendExtendedLegend-item" id="o-map-legendExtendedLegend_' + layername + '"><p>' + layer.get('title') + '</p>' +
+      '<img src="' + style[0].icon.src + '" /></div>';
+      var legend = $('#o-map-legendExtendedLegend');
+      legend.append(extendenLegend);
+      if(!legend.hasClass('hasBeenExtended')){
+        if(!legend.hasClass('advertice')){
+          legend.addClass('advertice');
+        }
+        else{
+          /* Workaround to get animation to replay if user still has not open the hasBeenExtended */
+          var clone = legend.clone(true);
+          legend.before(clone);
+          legend.remove();
+          delete legend.element;
+        }
+      }
+  }
+}
+
+function removeExtendedLegend(layerId){
+  var layername = layerId.split('o-legend-').pop();
+  var layer = viewer.getLayer(layername);
+  $('#o-map-legendExtendedLegend_' + layername).remove();
+  if($(".o-map-legendExtendedLegend-item") === null){
+      $('#o-map-legendExtendedLegend').removeClass('extended');
+  }
 }
 
 function render() {
