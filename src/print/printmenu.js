@@ -278,9 +278,7 @@ function bindUIActions() {
 		var map = Viewer.getMap();
 		var paper = getPaperMeasures($printselect.val());
 		var scale = $scaleselect.val();
-        if (scale.indexOf('E') > -1) { //If Mapfish reports very small scales as exponential numbers then convert to decimal
-            scale = parseFloat(scale).toString();
-        }
+        scale = detectAndFixE(scale);
 		scale = scale.split('.')[0];
 		printarea.addPreview(scale, paper);
 	});
@@ -295,6 +293,7 @@ function bindUIActions() {
 		var map = Viewer.getMap();
 		var paper = getPaperMeasures($printselect.val());
 		var scale = $scaleselect.val();
+        scale = detectAndFixE(scale);
 		scale = scale.split('.')[0];
 		printarea.addPreview(scale, paper);
 	});
@@ -303,9 +302,7 @@ function bindUIActions() {
 		var map = Viewer.getMap();
 		var paper = getPaperMeasures($printselect.val());
 		var scale = $scaleselect.val();
-        if (scale.indexOf('E') > -1) { //If Mapfish reports very small scales as exponential numbers then convert to decimal
-            scale = parseFloat(scale).toString();
-        }
+        scale = detectAndFixE(scale);
 		scale = scale.split('.')[0];
 		printarea.addPreview(scale, paper);
 	});
@@ -314,6 +311,7 @@ function bindUIActions() {
 		var map = Viewer.getMap();
 		var paper = getPaperMeasures($printselect.val());
 		var scale = $scaleselect.val();
+        scale = detectAndFixE(scale);
 		scale = scale.split('.')[0];
 		printarea.addPreview(scale, paper);
 	});
@@ -413,6 +411,14 @@ function bindUIActions() {
 		return false;
 	});
 }
+//If Mapfish reports very small scales as exponential numbers then convert to decimal
+function detectAndFixE(scale) {
+   if (scale.indexOf('E') > -1) {              
+       scale = parseFloat(scale).toString();
+    }
+    return scale;
+}
+
 function buildLayoutObjectsArray() {
     var layoutObjectsArray = [];
     hideLayouts ? layoutObjectsArray = [layoutIfHidden, $('#o-size-dd').find(':selected').text(), $('#o-orientation-dd').val()]: layoutObjectsArray = [$('#o-layout-dd').val(), $('#o-size-dd').find(':selected').text(), $('#o-orientation-dd').val()];
