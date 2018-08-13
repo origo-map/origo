@@ -445,11 +445,6 @@ function addCheckbox(layer, name, inSubgroup) {
   } else if (layer.getVisible() === true) {
     $(`.${name} .o-checkbox`).addClass('o-checkbox-true');
     if (inSubgroup) {
-      const parentGroups = $(`#${name}`).parents('ul [id^=o-group-]');
-      [].forEach.call(parentGroups, (el) => {
-        toggleGroup($(el).find('li:first'));
-      });
-
       toggleSubGroupCheck($(`#${name}`).parents('ul').has('.o-legend-header').first(), false);
     } else {
       $(`#o-group-${layer.get('group')} .o-icon-expand`).removeClass('o-icon-expand-false');
