@@ -32,7 +32,7 @@ function convertToMapfishOptions(options) {
 		}],
 		legends:[{
 			classes: [],
-			name: "Teckenförklaring"
+			name: ""
 		}]
 	};
 
@@ -99,8 +99,8 @@ function buildLegend(layers) {
 				var url = fetchSourceUrl(layer);
 				var name = layer.get('name');
 				return {
-					name: name,
-					icons: [ 'http://karta.eskilstuna.se' + url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name ]
+					name: layer.get('title'),
+					icons: [ 'http://karta.eskilstuna.se' + url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&SCALE=1&legend_options=dpi:400']
 				};
             break;
 			case "WFS":
@@ -108,8 +108,8 @@ function buildLegend(layers) {
 				var url = fetchSourceUrl(layer);
 				var name = layer.get('name');
 				return {
-					name: name,
-					icons: [ 'http://karta.eskilstuna.se' + url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name ]
+					name: layer.get('title'),
+					icons: [ 'http://karta.eskilstuna.se' + url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&SCALE=1&legend_options=dpi:400']
 				}
             break;
         }
