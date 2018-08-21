@@ -69,6 +69,9 @@ function convertToMapfishOptions(options) {
 
 	// build legend objects and add to mapfishconfig
 	var legendArray = buildLegend(layers.filter(function(layer) {return !layer.get('name').includes('_bk_') } )); //TODO: Make it more user configurable
+	//Sets layer limit to 12 in legend
+	legendArray = legendArray.filter(function(legend, index){return index < 12})
+
 	legendArray.forEach(function(obj) {
 		if(obj) mapfishOptions.legends[0].classes.push(obj);
 	});
