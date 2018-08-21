@@ -70,7 +70,7 @@ function convertToMapfishOptions(options) {
 	// build legend objects and add to mapfishconfig
 	var legendArray = buildLegend(layers.filter(function(layer) {return !layer.get('name').includes('_bk_') } )); //TODO: Make it more user configurable
 	legendArray.forEach(function(obj) {
-		mapfishOptions.legends[0].classes.push(obj);
+		if(obj) mapfishOptions.legends[0].classes.push(obj);
 	});
 	
 	//return Object[] filtered by baseURL and/or type
@@ -92,7 +92,8 @@ function convertToMapfishOptions(options) {
 
 function buildLegend(layers) {
 	var legendObjects = layers.map(function(layer) {
-        switch (layer.get('type').toUpperCase()) {
+		var type = layer.get('type') || "";
+        switch (type.toUpperCase()) {
 			case "WMS":
 				var o = [];
 				var url = fetchSourceUrl(layer);
