@@ -6,26 +6,43 @@ import Vector from 'ol/source/vector';
 import GeoJSON from 'ol/format/geojson';
 import Extent from 'ol/extent';
 import WKT from 'ol/format/wkt';
-import viewer from './viewer';
 
 export default {
+  isWithinVisibleScales: function isWithinVisibleScales(scale, maxScale, minScale) {
+    if (maxScale || minScale) {
+      // Alter 1: maxscale and minscale
+      if (maxScale && minScale) {
+        if ((scale > maxScale) && (scale < minScale)) {
+          return true;
+        }
+      } else if (maxScale) {
+        // Alter 2: only maxscale
+        if (scale > maxScale) {
+          return true;
+        }
+      } else if (minScale) {
+        // Alter 3: only minscale
+        if (scale < minScale) {
+          return true;
+        }
+      }
+    } else {
+      // Alter 4: no scale limit
+      return true;
+    }
+    return false;
+  },
   customProjection: function customProjection(projectionCode, extent) {
     return new Projection({
       code: projectionCode,
       extent
     });
   },
-  tileGrid: function tileGrid(settings) {
-    const extent = settings.extent || viewer.getExtent();
-    const origin = settings.alignBottomLeft === false ? Extent.getTopLeft(extent) : Extent.getBottomLeft(extent);
-    const resolutions = settings.resolutions || viewer.getResolutions();
-    const tileSize = settings.tileSize || viewer.getTileSize();
-    return new TileGrid({
-      extent,
-      origin,
-      resolutions,
-      tileSize
-    });
+  tileGrid: function tileGrid(settings, defaultSettings = {}) {
+    const tileGridSettings = Object.assign({}, defaultSettings, settings);
+    const extent = tileGridSettings.extent;
+    tileGridSettings.origin = tileGridSettings.alignBottomLeft === false ? Extent.getTopLeft(extent) : Extent.getBottomLeft(extent);
+    return new TileGrid(tileGridSettings);
   },
   checkZoomChange: function checkZoomChange(resolution, currentResolution) {
     if (resolution !== currentResolution) {
@@ -54,19 +71,6 @@ export default {
       featureProjection: srsName
     });
     return feature;
-  },
-  zoomToExent: function zoomToExent(geometry, level) {
-    const map = viewer.getMap();
-    const view = map.getView();
-    const maxZoom = level;
-    const extent = geometry.getExtent();
-    if (extent) {
-      view.fit(extent, {
-        maxZoom
-      });
-      return extent;
-    }
-    return false;
   },
   getCenter: function getCenter(geometry) {
     const type = geometry.getType();
@@ -98,7 +102,14 @@ export default {
     }
     return center;
   },
-  scaleToResolution: function scaleToResolution(scale, projection) {
+  resolutionToScale: function resolutionToScale(resolution, projection) {
+    const dpi = 25.4 / 0.28;
+    const mpu = projection.getMetersPerUnit();
+    let scale = resolution * mpu * 39.37 * dpi;
+    scale = Math.round(scale);
+    return scale;
+  },
+  scaletoResolution: function scaleToResolution(scale, projection) {
     const dpi = 25.4 / 0.28;
     const mpu = projection.getMetersPerUnit();
     const resolution = scale / (mpu * 39.37 * dpi);

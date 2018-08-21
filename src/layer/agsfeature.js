@@ -2,7 +2,6 @@ import $ from 'jquery';
 import EsriJSON from 'ol/format/esrijson';
 import VectorSource from 'ol/source/vector';
 import loadingstrategy from 'ol/loadingstrategy';
-import viewer from '../viewer';
 import vector from './vector';
 
 function createSource(options) {
@@ -48,7 +47,7 @@ function createSource(options) {
   return vectorSource;
 }
 
-const agsFeature = function agsFeature(layerOptions) {
+const agsFeature = function agsFeature(layerOptions, viewer) {
   const agsDefault = {
     layerType: 'vector'
   };
@@ -62,7 +61,7 @@ const agsFeature = function agsFeature(layerOptions) {
   sourceOptions.id = agsOptions.id;
 
   const agsSource = createSource(sourceOptions);
-  return vector(agsOptions, agsSource);
+  return vector(agsOptions, agsSource, viewer);
 };
 
 export default agsFeature;

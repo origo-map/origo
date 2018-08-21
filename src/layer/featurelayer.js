@@ -8,14 +8,14 @@ function createSource(options) {
   });
 }
 
-const featureLayer = function featureLayer(layerOptions) {
+const featureLayer = function featureLayer(layerOptions, viewer) {
   const options = layerOptions;
   const sourceOptions = {};
   sourceOptions.attribution = layerOptions.attribution;
   sourceOptions.features = layerOptions.features;
 
   const vectorSource = createSource(sourceOptions);
-  return vector(options, vectorSource);
+  return vector(options, vectorSource, viewer);
 };
 
 export default featureLayer;

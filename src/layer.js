@@ -1,10 +1,8 @@
-import $ from 'jquery';
-import viewer from './viewer';
 import mapUtils from './maputils';
 import group from './layer/group';
 import type from './layer/layertype';
 
-const layerCreator = function layerCreator(optOptions) {
+const Layer = function Layer(optOptions, viewer) {
   const defaultOptions = {
     name: undefined,
     id: undefined,
@@ -31,10 +29,10 @@ const layerCreator = function layerCreator(optOptions) {
   };
   const projection = viewer.getProjection();
   const options = optOptions || {};
-  const layerOptions = $.extend(defaultOptions, options);
+  const layerOptions = Object.assign({}, defaultOptions, options);
   const name = layerOptions.name;
-  layerOptions.minResolution = Object.prototype.hasOwnProperty.call(layerOptions, 'minScale') ? mapUtils.scaleToResolution(layerOptions.minScale, projection) : undefined;
-  layerOptions.maxResolution = Object.prototype.hasOwnProperty.call(layerOptions, 'maxScale') ? mapUtils.scaleToResolution(layerOptions.maxScale, projection) : undefined;
+  layerOptions.minResolution = 'minScale' in layerOptions ? mapUtils.scaleToResolution(layerOptions.minScale, projection) : undefined;
+  layerOptions.maxResolution = 'maxScale' in layerOptions ? mapUtils.scaleToResolution(layerOptions.maxScale, projection) : undefined;
   layerOptions.extent = layerOptions.extent || viewer.getExtent();
   layerOptions.sourceName = layerOptions.source;
   layerOptions.styleName = layerOptions.style;
@@ -44,29 +42,25 @@ const layerCreator = function layerCreator(optOptions) {
 
   layerOptions.name = name.split(':').pop();
 
-  if (Object.prototype.hasOwnProperty.call(type, layerOptions.type)) {
-    return type[layerOptions.type](layerOptions, layerCreator);
+  if ('type' in layerOptions) {
+    return type[layerOptions.type](layerOptions, viewer);
   }
 
-  console.log('Layer type is missing or layer type is not correct. Check your layer definition: ');
-  console.log(layerOptions);
-
-  return false;
+  throw new Error(`Layer type is missing or layer type is not correct. Check your layer definition: ${layerOptions}`);
 };
 
-function groupLayer(options) {
-  if (Object.prototype.hasOwnProperty.call(options, 'layers')) {
-    const layers = options.layers.map(layer => layerCreator(layer));
+function groupLayer(options, viewer) {
+  if ('layers' in options) {
+    const layers = options.layers.map(layer => Layer(layer, viewer));
 
     const layerOptions = {};
     layerOptions.layers = layers;
-    return group($.extend(options, layerOptions));
+    return group(Object.assign({}, options, layerOptions));
   }
 
-  console.log('Group layer has no layers');
-  return false;
+  throw new Error('Group layer has no layers');
 }
 
 type.GROUP = groupLayer;
 
-export default layerCreator;
+export default Layer;

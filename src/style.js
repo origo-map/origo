@@ -5,8 +5,6 @@ import Icon from 'ol/style/icon';
 import Stroke from 'ol/style/stroke';
 import Style from 'ol/style/style';
 import Text from 'ol/style/text';
-import $ from 'jquery';
-import viewer from './viewer';
 import validateurl from './utils/validateurl';
 import stylefunctions from './style/stylefunctions';
 import replacer from '../src/utils/replacer';
@@ -33,30 +31,30 @@ const editStyleOptions = {
     }
   }],
   LineString: [{
-    stroke: {
-      color: white,
-      width: width + 2
+      stroke: {
+        color: white,
+        width: width + 2
+      }
+    },
+    {
+      stroke: {
+        color: blue,
+        width
+      }
     }
-  },
-  {
-    stroke: {
-      color: blue,
-      width
-    }
-  }
   ],
   Polygon: [{
-    stroke: {
-      color: white,
-      width: width + 2
+      stroke: {
+        color: white,
+        width: width + 2
+      }
+    },
+    {
+      stroke: {
+        color: blue,
+        width
+      }
     }
-  },
-  {
-    stroke: {
-      color: blue,
-      width
-    }
-  }
   ]
 };
 
@@ -77,37 +75,37 @@ function createStyleOptions(styleParams) {
         };
         break;
       default:
-      {
-        break;
-      }
+        {
+          break;
+        }
     }
   }
-  if (Object.prototype.hasOwnProperty.call(styleParams, 'zIndex')) {
+  if ('zIndex' in styleParams) {
     styleOptions.zIndex = styleParams.zIndex;
   }
-  if (Object.prototype.hasOwnProperty.call(styleParams, 'fill')) {
+  if ('fill' in styleParams) {
     styleOptions.fill = new Fill(styleParams.fill);
   }
-  if (Object.prototype.hasOwnProperty.call(styleParams, 'stroke')) {
+  if ('stroke' in styleParams) {
     styleOptions.stroke = new Stroke(styleParams.stroke);
   }
-  if (Object.prototype.hasOwnProperty.call(styleParams, 'text')) {
+  if ('text' in styleParams) {
     styleOptions.text = new Text(styleParams.text);
-    if (Object.prototype.hasOwnProperty.call(styleParams.text, 'fill')) {
+    if ('fill' in styleParams.text) {
       styleOptions.text.setFill(new Fill(styleParams.text.fill));
     }
-    if (Object.prototype.hasOwnProperty.call(styleParams.text, 'stroke')) {
+    if ('stroke' in styleParams.text) {
       styleOptions.text.setStroke(new Stroke(styleParams.text.stroke));
     }
   }
-  if (Object.prototype.hasOwnProperty.call(styleParams, 'icon')) {
+  if ('icon' in styleParams) {
     const styleIcon = styleParams.icon;
-    if (Object.prototype.hasOwnProperty.call(styleIcon, 'src')) {
+    if ('src' in styleIcon) {
       styleIcon.src = validateurl(styleIcon.src, baseUrl);
     }
     styleOptions.image = new Icon(styleIcon);
   }
-  if (Object.prototype.hasOwnProperty.call(styleParams, 'circle')) {
+  if ('circle' in styleParams) {
     styleOptions.image = new Circle({
       radius: styleParams.circle.radius,
       fill: new Fill(styleParams.circle.fill) || undefined,
@@ -143,7 +141,7 @@ function checkOptions(feature, scale, styleSettings, styleList, size) {
   const s = styleSettings;
   for (let j = 0; j < s.length; j += 1) {
     let styleL;
-    if (viewer.checkScale(scale, s[j][0].maxScale, s[j][0].minScale)) {
+    if (maputils.isWithinVisibleScales(scale, s[j][0].maxScale, s[j][0].minScale)) {
       s[j].some((element, index) => {
         if (Object.prototype.hasOwnProperty.call(element, 'text') && size) {
           styleList[j][index].getText().setText(size);
@@ -179,10 +177,16 @@ function checkOptions(feature, scale, styleSettings, styleList, size) {
   return null;
 }
 
-function styleFunction(styleSettings, styleList, clusterStyleSettings, clusterStyleList) {
-  const resolutions = viewer.getResolutions();
+function styleFunction({
+  styleSettings,
+  styleList,
+  clusterStyleSettings,
+  clusterStyleList,
+  projection,
+  resolutions
+} = {}) {
   const fn = function fn(feature, resolution) {
-    const scale = viewer.getScale(resolution);
+    const scale = maputils.resolutionToScale(resolution, projection);
     let styleL;
     // If size is larger than, it is a cluster
     const size = clusterStyleList ? feature.get('features').length : 1;
@@ -197,12 +201,18 @@ function styleFunction(styleSettings, styleList, clusterStyleSettings, clusterSt
   return fn;
 }
 
-function createStyle(styleName, clusterStyleName) {
+function createStyle({
+  style: styleName,
+  clusterStyleName,
+  viewer
+} = {}) {
+  const resolutions = viewer.getResolutions();
+  const projection = viewer.getProjection();
   const styleSettings = viewer.getStyleSettings()[styleName];
-  if ($.isEmptyObject(styleSettings)) {
-    alert(`Style ${styleName} is not defined`);
+  if (Object.keys(styleSettings).length === 0 || !styleSettings) {
+    throw new Error(`Style ${styleName} is not defined`);
   }
-  if (Object.prototype.hasOwnProperty.call(styleSettings[0][0], 'custom')) {
+  if ('custom' in styleSettings[0][0]) {
     const style = stylefunctions(styleSettings[0][0].custom, styleSettings[0][0].params);
     return style;
   }
@@ -212,9 +222,21 @@ function createStyle(styleName, clusterStyleName) {
     const styleList = createStyleList(styleSettings);
     if (clusterStyleSettings) {
       const clusterStyleList = createStyleList(clusterStyleSettings);
-      return styleFunction(styleSettings, styleList, clusterStyleSettings, clusterStyleList);
+      return styleFunction({
+        styleSettings,
+        styleList,
+        clusterStyleSettings,
+        clusterStyleList,
+        projection,
+        resolutions
+      });
     }
-    return styleFunction(styleSettings, styleList);
+    return styleFunction({
+      styleSettings,
+      styleList,
+      projection,
+      resolutions
+    });
   }());
   return style;
 }
@@ -249,19 +271,12 @@ function createEditStyle() {
   return createGeometryStyle(editStyleOptions);
 }
 
-function Init() {
-  baseUrl = viewer.getBaseUrl();
-}
-
-export default function () {
-  return {
-    init: Init,
-    createStyleOptions,
-    createStyleList,
-    createStyleRule,
-    createStyle,
-    styleFunction,
-    createEditStyle,
-    createGeometryStyle
-  };
-}
+export default {
+  createStyleOptions,
+  createStyleList,
+  createStyleRule,
+  createStyle,
+  styleFunction,
+  createEditStyle,
+  createGeometryStyle
+};

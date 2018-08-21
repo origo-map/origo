@@ -1,20 +1,22 @@
 import $ from 'jquery';
-import viewer from './src/viewer';
+import Viewer from './src/viewer';
 import mapLoader from './src/maploader';
-import controlInitialiser from './src/controlinitialiser';
+// import controlInitialiser from './src/controlinitialiser';
 import origoConfig from './conf/origoConfig';
-import controls from './conf/origoControls';
+// import controls from './conf/origoControls';
 
 const origo = {};
 origo.map = {};
 origo.config = origoConfig;
-origo.controls = controls;
+// origo.controls = controls;
 
 function init(config) {
-  viewer.init(config.el, config.options);
+  const viewer = Viewer(config.el, config.options);
 
   // Init controls
-  controlInitialiser(config.options.controls);
+  // controlInitialiser(config.options.controls);
+
+  return viewer;
 }
 
 origo.map.init = function initMap(options, defaultOptions) {
@@ -25,7 +27,6 @@ origo.map.init = function initMap(options, defaultOptions) {
     map.then((mapConfig) => {
       init(mapConfig);
     });
-    return viewer;
   }
   return null;
 };

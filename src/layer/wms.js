@@ -1,7 +1,6 @@
 import $ from 'jquery';
 import TileWMSSource from 'ol/source/tilewms';
 import ImageWMSSource from 'ol/source/imagewms';
-import viewer from '../viewer';
 import tile from './tile';
 import maputils from '../maputils';
 import image from './image';
@@ -38,7 +37,7 @@ function createImageSource(options) {
 }
 
 
-const wms = function wms(layerOptions) {
+const wms = function wms(layerOptions, viewer) {
   const wmsDefault = {
     featureinfoLayer: null
   };

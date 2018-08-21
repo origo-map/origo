@@ -30,10 +30,6 @@ const mapLoader = function mapLoader(mapOptions, config) {
   let baseUrl;
   let json;
 
-
-  if (mapEl.substring(0, 1) !== '#') {
-    mapEl = `#${mapEl}`;
-  }
   map.el = mapEl;
 
   // Check browser support

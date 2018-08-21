@@ -1,5 +1,5 @@
 import viewer from '../../viewer';
-import layerCreator from '../../layercreator';
+import layerCreator from '../../layer';
 
 const offlineLayer = function offlineLayer() {
   function setOfflineSource(layerName, features) {
