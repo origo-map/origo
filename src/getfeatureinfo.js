@@ -152,7 +152,7 @@ function getFeatureInfoRequests(evt) {
     });
   } else { // If crossOrigin is not supported and canvas not tainted
     map.forEachLayerAtPixel(evt.pixel, (layer) => {
-      if (layer.get('queryable') === true) {
+      if (layer.get('queryable')) {
         const item = getGetFeatureInfoRequest(layer, evt.coordinate);
         if (item) {
           requests.push(item);
