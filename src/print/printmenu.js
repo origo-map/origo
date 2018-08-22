@@ -235,17 +235,14 @@ function bindUIActions() {
 			$("#o-printmenu").removeClass('o-printmenu-show');
 		} else {
             var currScale = Viewer.getScale(Viewer.getMap().getView().getResolution()); //Calculate current map scale,  
-            
-            if (currScale >= 1000) { //If map scale >= 1:1000 then round
-                var factor = Math.pow(10, currScale.toString().length) / 10000;
-                currScale = Math.round(currScale/factor) * factor;
-                if (currScale>=10000000) { //If map scale >= 1:ten million then convert to exponential nr of form which rhymes with Mapfish
-                    currScale = currScale.toExponential().toString().toUpperCase().replace('+',''); 
-                } else { 
-                    currScale = currScale + ".0"; 
-                }    
-            }   
-            
+            var factor = Math.pow(10, currScale.toString().length) / 10000;
+            currScale = Math.round(currScale/factor) * factor;
+            if (currScale>=10000000) { //If map scale >= 1:ten million then convert to exponential nr of form which rhymes with Mapfish
+                currScale = currScale.toExponential().toString().toUpperCase().replace('+',''); 
+            } else { 
+                currScale = currScale + ".0"; 
+            }    
+                    
             $('#o-scale-dd option').filter(function () { return $(this).val() == currScale; }).prop('selected', true); //Set scale dd to current map scale
             
 			if (!vector) {
