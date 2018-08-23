@@ -1,64 +1,70 @@
-"use strict";
+import 'owl.carousel';
+import Overlay from 'ol/overlay';
+import $ from 'jquery';
+import viewer from './viewer';
+import Popup from './popup';
+import sidebar from './sidebar';
+import maputils from './maputils';
+import featurelayer from './featurelayer';
+import Style from './style';
+import StyleTypes from './style/styletypes';
+import getFeatureInfo from './getfeatureinfo';
 
-var ol = require('openlayers');
-var $ = require('jquery');
-var Viewer = require('./viewer');
-var Popup = require('./popup');
-var sidebar = require('./sidebar');
-var maputils = require('./maputils');
-var featurelayer = require('./featurelayer');
-var style = require('./style')();
-var styleTypes = require('./style/styletypes');
-var getFeatureInfo = require('./getfeatureinfo');
-var owlCarousel = require('../externs/owlcarousel-browserify');
-owlCarousel.loadjQueryPlugin();
+const style = Style();
+const styleTypes = StyleTypes();
 
-var selectionLayer = undefined;
-var savedPin = undefined;
-var options;
-var map;
-var pinning;
-var pinStyle;
-var selectionStyles;
-var showOverlay;
-var identifyTarget;
-var clusterFeatureinfoLevel;
-var overlay;
-var hitTolerance;
+let selectionLayer;
+let savedPin;
+let clickEvent;
+let options;
+let map;
+let pinning;
+let pinStyle;
+let selectionStyles;
+let showOverlay;
+let identifyTarget;
+let clusterFeatureinfoLevel;
+let overlay;
+let hitTolerance;
+let items;
+let popup;
 
-function init(opt_options) {
-  map = Viewer.getMap();
-
-  options = opt_options || {};
-
-  pinning = options.hasOwnProperty('pinning') ? options.pinning : true;
-  var pinStyleOptions = options.hasOwnProperty('pinStyle') ? options.pinStyle : styleTypes.getStyle('pin');
-  pinStyle = style.createStyleRule(pinStyleOptions)[0];
-  savedPin = options.savedPin ? maputils.createPointFeature(opt_options.savedPin, pinStyle) : undefined;
-
-  selectionStyles = style.createEditStyle();
-
-  var savedSelection = options.savedSelection || undefined;
-  var savedFeature = savedPin || savedSelection || undefined;
-  selectionLayer = featurelayer(savedFeature, map);
-
-  showOverlay = options.hasOwnProperty('overlay') ? options.overlay : true;
-
-  if(showOverlay) {
-    identifyTarget = 'overlay';
+function clear() {
+  selectionLayer.clear();
+  sidebar.setVisibility(false);
+  if (overlay) {
+    viewer.removeOverlays(overlay);
   }
-  else {
-    sidebar.init();
-    identifyTarget = 'sidebar';
+}
+
+function callback(evt) {
+  const currentItem = evt.item.index;
+  if (currentItem !== null) {
+    selectionLayer.clearAndAdd(
+      items[currentItem].feature.clone(),
+      selectionStyles[items[currentItem].feature.getGeometry().getType()]
+    );
+    if (identifyTarget === 'overlay') {
+      popup.setTitle(items[currentItem].title);
+    } else {
+      sidebar.setTitle(items[currentItem].title);
+    }
   }
+}
 
-  clusterFeatureinfoLevel = options.hasOwnProperty('clusterFeatureinfoLevel') ? options.clusterFeatureinfoLevel : 1;
-
-  hitTolerance = options.hasOwnProperty('hitTolerance') ? options.hitTolerance : 0;
-
-  map.on('click', onClick);
-  $(document).on('enableInteraction', onEnableInteraction);
-
+function initCarousel(id, opt) {
+  const carouselOptions = opt || {
+    onChanged: callback,
+    items: 1,
+    nav: true,
+    navText: ['<svg class="o-icon-fa-chevron-left"><use xlink:href="#fa-chevron-left"></use></svg>',
+      '<svg class="o-icon-fa-chevron-right"><use xlink:href="#fa-chevron-right"></use></svg>']
+  };
+  if (identifyTarget === 'overlay') {
+    const popupHeight = $('.o-popup').outerHeight() + 20;
+    $('#o-popup').height(popupHeight);
+  }
+  return $(id).owlCarousel(carouselOptions);
 }
 
 function getSelectionLayer() {
@@ -66,136 +72,160 @@ function getSelectionLayer() {
 }
 
 function getSelection() {
-  var selection = {};
-  if(selectionLayer.getFeatures()[0]){
+  const selection = {};
+  if (selectionLayer.getFeatures()[0]) {
     selection.geometryType = selectionLayer.getFeatures()[0].getGeometry().getType();
     selection.coordinates = selectionLayer.getFeatures()[0].getGeometry().getCoordinates();
     selection.id = selectionLayer.getFeatures()[0].getId();
   }
   return selection;
 }
+
 function getPin() {
   return savedPin;
 }
+
 function getHitTolerance() {
   return hitTolerance;
 }
-function identify(items, target, coordinate) {
+
+function identify(identifyItems, target, coordinate) {
+  items = identifyItems;
   clear();
-  var content = items.map(function(i){
-    return i.content;
-  }).join('');
-  content = '<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme">' + content + '</div></div>';
+  let content = items.map(i => i.content).join('');
+  content = `<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme">${content}</div></div>`;
   switch (target) {
     case 'overlay':
-      var popup = Popup('#o-map');
-      overlay = new ol.Overlay({
-        element: popup.getEl()
+    {
+      popup = Popup('#o-map');
+      popup.setContent({
+        content,
+        title: items[0].title
       });
-      map.addOverlay(overlay);
-      var geometry = items[0].feature.getGeometry();
-      var coord;
-      geometry.getType() == 'Point' ? coord = geometry.getCoordinates() : coord = coordinate;
-      overlay.setPosition(coord);
-      popup.setContent({content: content, title: items[0].title});
       popup.setVisibility(true);
-      var owl = initCarousel('#o-identify-carousel', undefined, function(){
-        var currentItem = this.owl.currentItem;
-        var clone = items[currentItem].feature.clone();
-        clone.setId(items[currentItem].feature.getId());
-        selectionLayer.clearAndAdd(clone, selectionStyles[items[currentItem].feature.getGeometry().getType()]);
-        popup.setTitle(items[currentItem].title);
+
+      initCarousel('#o-identify-carousel');
+      const popupHeight = $('.o-popup').outerHeight() + 20;
+      $('#o-popup').height(popupHeight);
+      overlay = new Overlay({
+        element: popup.getEl(),
+        autoPan: true,
+        autoPanAnimation: {
+          duration: 500
+        },
+        autoPanMargin: 40,
+        positioning: 'bottom-center'
       });
-      Viewer.autoPan();
+
+      const clone = items[0].feature.clone();
+      clone.setId(items[0].feature.getId());
+      selectionLayer.clearAndAdd(clone, selectionStyles[items[0].feature.getGeometry().getType()]);
+      const geometry = items[0].feature.getGeometry();
+      const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
+      map.addOverlay(overlay);
+      overlay.setPosition(coord);
       break;
+    }
     case 'sidebar':
-      sidebar.setContent({content: content, title: items[0].title});
-      sidebar.setVisibility(true);
-      var owl = initCarousel('#o-identify-carousel', undefined, function(){
-        var currentItem = this.owl.currentItem;
-        var clone = items[currentItem].feature.clone();
-        clone.setId(items[currentItem].feature.getId());
-        selectionLayer.clearAndAdd(clone, selectionStyles[items[currentItem].feature.getGeometry().getType()]);
-        sidebar.setTitle(items[currentItem].title);
+    {
+      sidebar.setContent({
+        content,
+        title: items[0].title
       });
+      const clone = items[0].feature.clone();
+      clone.setId(items[0].feature.getId());
+      selectionLayer.clearAndAdd(clone, selectionStyles[items[0].feature.getGeometry().getType()]);
+      sidebar.setVisibility(true);
+      initCarousel('#o-identify-carousel');
       break;
+    }
+    default:
+    {
+      break;
+    }
   }
 }
+
 function onClick(evt) {
   savedPin = undefined;
-  //Featurinfo in two steps. Concat serverside and clientside when serverside is finished
-  var clientResult = getFeatureInfo.getFeaturesAtPixel(evt, clusterFeatureinfoLevel);
-  //Abort if clientResult is false
-  if(clientResult !== false) {
+  // Featurinfo in two steps. Concat serverside and clientside when serverside is finished
+  const clientResult = getFeatureInfo.getFeaturesAtPixel(evt, clusterFeatureinfoLevel);
+  // Abort if clientResult is false
+  if (clientResult !== false) {
     getFeatureInfo.getFeaturesFromRemote(evt)
-      .done(function(data) {
-        var serverResult = data || [];
-        var result = serverResult.concat(clientResult);
+      .done((data) => {
+        const serverResult = data || [];
+        const result = serverResult.concat(clientResult);
         if (result.length > 0) {
           selectionLayer.clear();
-          identify(result, identifyTarget, evt.coordinate)
-        }
-        else if(selectionLayer.getFeatures().length > 0) {
+          identify(result, identifyTarget, evt.coordinate);
+        } else if (selectionLayer.getFeatures().length > 0) {
           clear();
-        }
-        else if(pinning){
+        } else if (pinning) {
+          const resolution = map.getView().getResolution();
           sidebar.setVisibility(false);
-          var resolution = map.getView().getResolution();
-          setTimeout(function() {
-            if(!maputils.checkZoomChange(resolution, map.getView().getResolution())) {
+          setTimeout(() => {
+            if (!maputils.checkZoomChange(resolution, map.getView().getResolution())) {
               savedPin = maputils.createPointFeature(evt.coordinate, pinStyle);
               selectionLayer.addFeature(savedPin);
             }
           }, 250);
         }
-        else {
-          console.log('No features identified');
-        }
       });
   }
 }
+
 function setActive(state) {
-  if(state === true) {
-    map.on('click', onClick);
-  }
-  else {
+  if (state) {
+    map.on(clickEvent, onClick);
+  } else {
     clear();
-    map.un('click', onClick);
+    map.un(clickEvent, onClick);
   }
 }
-function clear() {
-  selectionLayer.clear();
-  sidebar.setVisibility(false);
-  if (overlay) {
-    Viewer.removeOverlays(overlay);
-  }
-  console.log("Clearing selection");
-}
+
 function onEnableInteraction(e) {
-  if(e.interaction === 'featureInfo') {
+  if (e.interaction === 'featureInfo') {
     setActive(true);
-  }
-  else {
+  } else {
     setActive(false);
   }
 }
-function initCarousel(id, options, cb) {
-  var carouselOptions = options || {
-    navigation : true, // Show next and prev buttons
-    slideSpeed : 300,
-    paginationSpeed : 400,
-    singleItem:true,
-    rewindSpeed:200,
-    navigationText: ['<svg class="o-icon-fa-chevron-left"><use xlink:href="#fa-chevron-left"></use></svg>', '<svg class="o-icon-fa-chevron-right"><use xlink:href="#fa-chevron-right"></use></svg>'],
-    afterAction: cb
-  };
-  return $(id).owlCarousel(carouselOptions);
+
+function init(optOptions) {
+  map = viewer.getMap();
+  options = optOptions || {};
+  const pinStyleOptions = Object.prototype.hasOwnProperty.call(options, 'pinStyle') ? options.pinStyle : styleTypes.getStyle('pin');
+  const savedSelection = options.savedSelection || undefined;
+  clickEvent = 'clickEvent' in options ? options.clickEvent : 'click';
+  pinning = Object.prototype.hasOwnProperty.call(options, 'pinning') ? options.pinning : true;
+  pinStyle = style.createStyleRule(pinStyleOptions)[0];
+  savedPin = options.savedPin ? maputils.createPointFeature(options.savedPin, pinStyle) : undefined;
+  selectionStyles = 'selectionStyles' in options ? style.createGeometryStyle(options.selectionStyles) : style.createEditStyle();
+  const savedFeature = savedPin || savedSelection || undefined;
+  selectionLayer = featurelayer(savedFeature, map);
+  showOverlay = Object.prototype.hasOwnProperty.call(options, 'overlay') ? options.overlay : true;
+
+  if (showOverlay) {
+    identifyTarget = 'overlay';
+  } else {
+    sidebar.init();
+    identifyTarget = 'sidebar';
+  }
+
+  clusterFeatureinfoLevel = Object.prototype.hasOwnProperty.call(options, 'clusterFeatureinfoLevel') ? options.clusterFeatureinfoLevel : 1;
+  hitTolerance = Object.prototype.hasOwnProperty.call(options, 'hitTolerance') ? options.hitTolerance : 0;
+
+  map.on(clickEvent, onClick);
+  $(document).on('enableInteraction', onEnableInteraction);
 }
 
-module.exports.init = init;
-module.exports.clear = clear;
-module.exports.getSelectionLayer = getSelectionLayer;
-module.exports.getSelection = getSelection;
-module.exports.getPin = getPin;
-module.exports.getHitTolerance = getHitTolerance;
-module.exports.identify = identify;
+export default {
+  init,
+  clear,
+  getSelectionLayer,
+  getSelection,
+  getPin,
+  getHitTolerance,
+  identify
+};

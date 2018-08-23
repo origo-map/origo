@@ -1,61 +1,58 @@
-"use strict";
-var urlparser = require('../utils/urlparser');
+import urlparser from '../utils/urlparser';
 
-var layerModel = {
-    v: {
-      name: "visible",
-      dataType: "boolean"
-    },
-    s: {
-      name: "legend",
-      dataType: "boolean"
-    },
-}
+const layerModel = {
+  v: {
+    name: 'visible',
+    dataType: 'boolean'
+  },
+  s: {
+    name: 'legend',
+    dataType: 'boolean'
+  }
+};
 
-module.exports = {
-  layers: function(layersStr) {
-      var layers = layersStr.split(',');
-      var layerObjects = {};
-      layers.forEach(function(layer) {
-          var obj = {};
-          var layerObject = urlparser.objectify(layer,{topmost: "name"});
-          Object.getOwnPropertyNames(layerObject).forEach(function(prop) {
-              var val = layerObject[prop];
-              if(layerModel.hasOwnProperty(prop)) {
-                  var attribute = layerModel[prop];
-                  obj[attribute.name] = urlparser.strBoolean(val);
-              }
-              else {
-                  obj[prop] = val;
-              }
-          });
-          layerObjects[obj.name] = obj;
-
+export default {
+  layers(layersStr) {
+    const layers = layersStr.split(',');
+    const layerObjects = {};
+    layers.forEach((layer) => {
+      const obj = {};
+      const layerObject = urlparser.objectify(layer, {
+        topmost: 'name'
       });
-      return layerObjects;
-  },
-  zoom: function(zoomStr) {
-      return parseInt(zoomStr);
-  },
-  center: function(centerStr) {
-      var center = centerStr.split(",").map(function(coord) {
-          return parseInt(coord);
+      Object.getOwnPropertyNames(layerObject).forEach((prop) => {
+        const val = layerObject[prop];
+        if (Object.prototype.hasOwnProperty.call(layerModel, prop)) {
+          const attribute = layerModel[prop];
+          obj[attribute.name] = urlparser.strBoolean(val);
+        } else {
+          obj[prop] = val;
+        }
       });
-      return center;
+      layerObjects[obj.name] = obj;
+    });
+    return layerObjects;
   },
-  selection: function(selectionStr) {
-      return urlparser.strArrayify(selectionStr, {
-        topmostName: "geometryType",
-        arrName: "coordinates"}
-      );
+  zoom(zoomStr) {
+    return parseInt(zoomStr, 10);
   },
-  feature: function(featureId) {
+  center(centerStr) {
+    const center = centerStr.split(',').map(coord => parseInt(coord, 10));
+    return center;
+  },
+  selection(selectionStr) {
+    return urlparser.strArrayify(selectionStr, {
+      topmostName: 'geometryType',
+      arrName: 'coordinates'
+    });
+  },
+  feature(featureId) {
     return featureId;
   },
-  pin: function(pinStr) {
-      return urlparser.strIntify(pinStr);
+  pin(pinStr) {
+    return urlparser.strIntify(pinStr);
   },
-  map: function(mapStr) {
-      return mapStr;
+  map(mapStr) {
+    return mapStr;
   }
-}
+};

@@ -1,71 +1,68 @@
-"use strict";
+import $ from 'jquery';
+import EsriJSON from 'ol/format/esrijson';
+import VectorSource from 'ol/source/vector';
+import loadingstrategy from 'ol/loadingstrategy';
+import viewer from '../viewer';
+import vector from './vector';
 
-var ol = require('openlayers');
-var $ = require('jquery');
-var viewer = require('../viewer');
-var vector = require('./vector');
+function createSource(options) {
+  const esriSrs = options.projectionCode.split(':').pop();
+  const queryFilter = options.filter ? `&where=${options.filter}` : '';
+  const esrijsonFormat = new EsriJSON();
+  const vectorSource = new VectorSource({
+    attributions: options.attribution,
+    loader(extent, resolution, projection) {
+      const that = this;
+      const url = options.url + options.id +
+        encodeURI(['/query?f=json&',
+          'returnGeometry=true',
+          '&spatialRel=esriSpatialRelIntersects',
+          `&geometry={"xmin":${extent[0]},"ymin":`,
+          `${extent[1]},"xmax":${extent[2]},"ymax":${extent[3]}`,
+          `,"spatialReference":{"wkid":${esriSrs}}`,
+          '&geometryType=esriGeometryEnvelope',
+          `&inSR=${esriSrs}&outFields=*`,
+          '&returnIdsOnly=false&returnCountOnly=false',
+          '&geometryPrecision=2',
+          `&outSR=${esriSrs}${queryFilter}`].join(''));
+      $.ajax({
+        url,
+        dataType: 'jsonp',
+        success: (response) => {
+          if (response.error) {
+            alert(`${response.error.message}\n${response.error.details.join('\n')}`);
+          } else {
+            // dataProjection will be read from document
+            const features = esrijsonFormat.readFeatures(response, {
+              featureProjection: projection
+            });
+            if (features.length > 0) {
+              that.addFeatures(features);
+            }
+          }
+        }
+      });
+    },
+    strategy: loadingstrategy.bbox
+  });
+  return vectorSource;
+}
 
-var agsFeature = function agsFeature(layerOptions) {
-  var agsDefault = {
+const agsFeature = function agsFeature(layerOptions) {
+  const agsDefault = {
     layerType: 'vector'
   };
-  var sourceDefault = {};
-  var agsOptions = $.extend(agsDefault, layerOptions);
-  var sourceOptions = $.extend(sourceDefault, viewer.getMapSource()[layerOptions.sourceName]);
+  const sourceDefault = {};
+  const agsOptions = $.extend(agsDefault, layerOptions);
+  const sourceOptions = $.extend(sourceDefault, viewer.getMapSource()[layerOptions.sourceName]);
   sourceOptions.geometryName = agsOptions.geometryName;
   sourceOptions.filter = agsOptions.filter;
   sourceOptions.attribution = agsOptions.attribution;
   sourceOptions.projectionCode = viewer.getProjectionCode();
   sourceOptions.id = agsOptions.id;
 
-  var agsSource = createSource(sourceOptions);
+  const agsSource = createSource(sourceOptions);
   return vector(agsOptions, agsSource);
+};
 
-  function createSource(options) {
-    var vectorSource = null;
-    var esriSrs = options.projectionCode.split(':').pop();
-    var queryFilter = options.filter ? '&where=' + options.filter : '';
-    var esrijsonFormat = new ol.format.EsriJSON();
-    vectorSource = new ol.source.Vector({
-      attributions: options.attribution,
-      loader: function(extent, resolution, projection) {
-        var that = this;
-        var url = options.url + options.id +
-          encodeURI('/query?f=json&' +
-            'returnGeometry=true' +
-            '&spatialRel=esriSpatialRelIntersects' +
-            '&geometry=' + '{"xmin":' + extent[0] + ',"ymin":' +
-              extent[1] + ',"xmax":' + extent[2] + ',"ymax":' + extent[3] +
-              ',"spatialReference":{"wkid":' + esriSrs + '}}' +
-            '&geometryType=esriGeometryEnvelope' +
-            '&inSR=' + esriSrs + '&outFields=*' + '' +
-            '&returnIdsOnly=false&returnCountOnly=false' +
-            '&geometryPrecision=2' +
-            '&outSR=' + esriSrs + queryFilter);
-        $.ajax({
-          url: url,
-          dataType: 'jsonp',
-          success: function(response) {
-            if (response.error) {
-              alert(response.error.message + '\n' +
-                response.error.details.join('\n'));
-            } else {
-
-              // dataProjection will be read from document
-              var features = esrijsonFormat.readFeatures(response, {
-                featureProjection: projection
-              });
-              if (features.length > 0) {
-                that.addFeatures(features);
-              }
-            }
-          }
-        });
-      },
-      strategy: ol.loadingstrategy.bbox
-    });
-    return vectorSource;
-  }
-}
-
-module.exports = agsFeature;
+export default agsFeature;
