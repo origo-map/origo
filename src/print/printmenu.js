@@ -10,7 +10,7 @@ var Viewer = require('../viewer');
 var ol = require('openlayers');
 
 var mapfishConfig, hideLayouts, layoutIfHidden;
-var $printButton, $printButtonTool, $printselect, vector, $scaleselect, $orientationselect, $clearButton, $layoutselect;
+var $printButton, $printButtonTool, $printselect, vector, $scaleselect, $orientationselect, $clearButton, $layoutselect, $defaultPrintButton;
 
 function init() {
 	hideLayouts = true;
@@ -19,6 +19,8 @@ function init() {
 		buildPanel(data);
 		mapfishConfig = data;
 	});
+
+	addDefaultPrintButton();
 
 	function buildPanel(config) {
 		var outputFormats = config.outputFormats.map(function(format) {
@@ -138,6 +140,7 @@ function init() {
 		$orientationselect = $('#o-orientation-dd');
 		$clearButton = $('#o-print-clear-button');
 		$layoutselect = $('#o-layout-dd');
+		$defaultPrintButton = $('#o-print-button');
 		
 		// get available sizes for selected option and populate size-dd.
 		var namesAndSizes;
@@ -226,23 +229,21 @@ function getAvailableSizes(layout, config) {
 }
 
 function bindUIActions() {
-	$printButton.on('click', function (e) {
-		$("#o-printmenu").removeClass('o-printmenu-show');
-		e.preventDefault();
-	});
-	$printButtonTool.on('click', function (e) {
+	function togglePrintMenu(e) {
 		if ($("#o-printmenu").hasClass('o-printmenu-show')) {
 			$("#o-printmenu").removeClass('o-printmenu-show');
 		} else {
             var currScale = Viewer.getScale(Viewer.getMap().getView().getResolution()); //Calculate current map scale,  
-            var factor = Math.pow(10, currScale.toString().length) / 10000;
-            currScale = Math.round(currScale/factor) * factor;
-            if (currScale>=10000000) { //If map scale >= 1:ten million then convert to exponential nr of form which rhymes with Mapfish
-                currScale = currScale.toExponential().toString().toUpperCase().replace('+',''); 
-            } else { 
-                currScale = currScale + ".0"; 
-            }    
-                    
+                      
+                var factor = Math.pow(10, currScale.toString().length) / 10000;
+                currScale = Math.round(currScale/factor) * factor;
+                if (currScale>=10000000) { //If map scale >= 1:ten million then convert to exponential nr of form which rhymes with Mapfish
+                    currScale = currScale.toExponential().toString().toUpperCase().replace('+',''); 
+                } else { 
+                    currScale = currScale + ".0"; 
+                }    
+               
+            
             $('#o-scale-dd option').filter(function () { return $(this).val() == currScale; }).prop('selected', true); //Set scale dd to current map scale
             
 			if (!vector) {
@@ -261,7 +262,17 @@ function bindUIActions() {
 
 		}
 		e.preventDefault();
+	}
+
+	$printButton.on('click', function (e) {
+		$("#o-printmenu").removeClass('o-printmenu-show');
+		e.preventDefault();
 	});
+
+	$printButtonTool.on('click', togglePrintMenu);
+
+	$defaultPrintButton.on('click', togglePrintMenu);
+
 	$clearButton.on('click', function (e) {
 		var map = Viewer.getMap();
 		var vector = printarea.getVector();
@@ -442,4 +453,15 @@ function buildLayoutString() {
         return arguments[0] + '-' + arguments[1] + '-' + arguments[2] + '-' + arguments[3] + '-' + arguments[4];
     }
 }
+
+function addDefaultPrintButton(){
+ var skrivUtKnapp = utils.createListButton({
+  id: 'o-print',
+  iconCls: 'o-icon-fa-print',
+  src: '#fa-print',
+  text: 'Skriv ut'
+ });
+ $('#o-menutools').append(skrivUtKnapp);
+}
+
 module.exports.init = init;

@@ -1,7 +1,7 @@
 var controls = {};
 controls.geoposition = require('../src/geoposition');
 controls.mapmenu = require('../src/mapmenu');
-controls.print = require('../src/print');
+//controls.print = require('../src/print');
 controls.printmenu = require('../src/print/printmenu');
 controls.sharemap = require('../src/sharemap');
 controls.legend = require('../src/legend');
