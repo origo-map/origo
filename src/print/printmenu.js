@@ -291,6 +291,7 @@ function bindUIActions() {
         scale = detectAndFixE(scale);
 		scale = scale.split('.')[0];
 		printarea.addPreview(scale, paper);
+		checkPrintability();
 	});
 
 	$printDpi.change(checkPrintability);
