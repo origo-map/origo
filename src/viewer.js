@@ -10,8 +10,8 @@ import $ from 'jquery';
 import template from './templates/viewertemplate';
 import elQuery from './utils/elquery';
 import featureinfo from './featureinfo';
+import getcenter from './geometry/getcenter';
 import maputils from './maputils';
-import search from './controls/search';
 import getattributes from './getattributes';
 import style from './style';
 import layerCreator from './layercreator';
@@ -425,9 +425,28 @@ function init(el, mapOptions) {
     const layer = getLayer(featureId.split('.')[0]);
     if (layer) {
       layer.once('render', () => {
-        const feature = layer.getSource().getFeatureById(featureId);
+        let feature;
+        const type = layer.get('type');
+        if (type === 'WFS') {
+          feature = layer.getSource().getFeatureById(featureId);
+        } else {
+          feature = layer.getSource().getFeatureById(featureId.split('.')[1]);
+        }
+
         if (feature) {
-          search.showFeatureInfo([feature], layer.get('title'), getattributes(feature, layer));
+          const obj = {};
+          obj.feature = feature;
+          obj.title = layer.get('title');
+          obj.content = getattributes(feature, layer);
+
+          const showOverlay = Object.prototype.hasOwnProperty.call(settings.featureinfoOptions, 'overlay') ? settings.featureinfoOptions.overlay : true;
+
+          if (showOverlay) {
+            featureinfo.identify([obj], 'overlay', getcenter(feature.getGeometry()));
+          } else {
+            featureinfo.identify([obj], 'sidebar', getcenter(feature.getGeometry()));
+          }
+          maputils.zoomToExent(feature.getGeometry(), getResolutions().length - 2);
         }
       });
     }

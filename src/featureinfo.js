@@ -40,10 +40,13 @@ function clear() {
 function callback(evt) {
   const currentItem = evt.item.index;
   if (currentItem !== null) {
+    const clone = items[currentItem].feature.clone();
+    clone.setId(items[currentItem].feature.getId());
     selectionLayer.clearAndAdd(
-      items[currentItem].feature.clone(),
+      clone,
       selectionStyles[items[currentItem].feature.getGeometry().getType()]
     );
+    selectionLayer.setSourceLayer(items[currentItem].layer);
     if (identifyTarget === 'overlay') {
       popup.setTitle(items[currentItem].title);
     } else {
@@ -64,6 +67,7 @@ function initCarousel(id, opt) {
     const popupHeight = $('.o-popup').outerHeight() + 20;
     $('#o-popup').height(popupHeight);
   }
+
   return $(id).owlCarousel(carouselOptions);
 }
 
@@ -77,6 +81,13 @@ function getSelection() {
     selection.geometryType = selectionLayer.getFeatures()[0].getGeometry().getType();
     selection.coordinates = selectionLayer.getFeatures()[0].getGeometry().getCoordinates();
     selection.id = selectionLayer.getFeatures()[0].getId();
+    selection.type = selectionLayer.getSourceLayer().get('type');
+
+    if (selection.type === 'WFS') {
+      selection.id = selectionLayer.getFeatures()[0].getId();
+    } else {
+      selection.id = `${selectionLayer.getSourceLayer().get('name')}.${selectionLayer.getFeatures()[0].getId()}`;
+    }
   }
   return selection;
 }
@@ -116,10 +127,6 @@ function identify(identifyItems, target, coordinate) {
         autoPanMargin: 40,
         positioning: 'bottom-center'
       });
-
-      const clone = items[0].feature.clone();
-      clone.setId(items[0].feature.getId());
-      selectionLayer.clearAndAdd(clone, selectionStyles[items[0].feature.getGeometry().getType()]);
       const geometry = items[0].feature.getGeometry();
       const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
       map.addOverlay(overlay);
@@ -132,9 +139,6 @@ function identify(identifyItems, target, coordinate) {
         content,
         title: items[0].title
       });
-      const clone = items[0].feature.clone();
-      clone.setId(items[0].feature.getId());
-      selectionLayer.clearAndAdd(clone, selectionStyles[items[0].feature.getGeometry().getType()]);
       sidebar.setVisibility(true);
       initCarousel('#o-identify-carousel');
       break;
