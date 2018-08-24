@@ -150,8 +150,9 @@ function init() {
 		} else {
 			namesAndSizes = getAvailableSizes($layoutselect.find(":selected").text(), config);
 		}
-		$.each(namesAndSizes, function(key, value) {
-			$('#o-size-dd').append($('<option></option>').attr('value', key).text(value));
+		$.each(namesAndSizes.reverse(), function(key, value) {
+			var index = (namesAndSizes.length-1)-key;
+			$printselect.append($('<option></option>').attr('value', index).text(value));
 		});
 		bindUIActions();
 	}
