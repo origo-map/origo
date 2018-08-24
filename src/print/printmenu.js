@@ -10,7 +10,7 @@ var Viewer = require('../viewer');
 var ol = require('openlayers');
 
 var mapfishConfig, hideLayouts, layoutIfHidden;
-var $printButton, $printButtonTool, $printselect, vector, $scaleselect, $orientationselect, $clearButton, $layoutselect, $defaultPrintButton;
+var $printButton, $printButtonTool, $printselect, vector, $scaleselect, $orientationselect, $clearButton, $layoutselect, $defaultPrintButton, $printDpi;
 
 function init() {
 	hideLayouts = true;
@@ -141,6 +141,7 @@ function init() {
 		$clearButton = $('#o-print-clear-button');
 		$layoutselect = $('#o-layout-dd');
 		$defaultPrintButton = $('#o-print-button');
+		$printDpi = $('#o-resolution-dd');
 		
 		// get available sizes for selected option and populate size-dd.
 		var namesAndSizes;
@@ -291,6 +292,8 @@ function bindUIActions() {
 		scale = scale.split('.')[0];
 		printarea.addPreview(scale, paper);
 	});
+
+	$printDpi.change(checkPrintability);
 
 	$layoutselect.change(function () {
 		var namesAndSizes = getAvailableSizes($layoutselect.find(":selected").text(), mapfishConfig);
@@ -463,6 +466,23 @@ function addDefaultPrintButton(){
   text: 'Skriv ut'
  });
  $('#o-menutools').append(skrivUtKnapp);
+}
+
+function checkPrintability(){
+	if($printselect.val() == '0'){
+		$printDpi.children('[value=300]').prop('disabled', true);
+		$printDpi.children('[value=300]').attr('title', '300 dpi är inte tillgänglig för A0');
+	}
+	else if( $printDpi.val() == '300' ){
+		$printselect.children('[value=0]').prop('disabled', true);
+		$printselect.children('[value=0]').attr('title', 'A0 är inte tillgänglig i 300 dpi');
+	}
+	else{
+		$printDpi.children('[value=300]').prop('disabled', false);
+		$printselect.children('[value=0]').prop('disabled', false);
+		$printDpi.children('[value=300]').attr('title', '');
+		$printselect.children('[value=0]').attr('title', '');
+	}
 }
 
 module.exports.init = init;
