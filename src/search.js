@@ -189,10 +189,12 @@ function getWMSFeatureInfo(spec, callback) {
   var coord;
   
   if (spec.feature.getGeometry() instanceof ol.geom.Polygon) {
-    coord = spec.feature.getGeometry().getInteriorPoint().getCoordinates()
-  } else {
-      coord = spec.feature.getGeometry().getFirstCoordinate()
-  }
+        coord = spec.feature.getGeometry().getInteriorPoint().getCoordinates();
+  } else if (spec.feature.getGeometry() instanceof ol.geom.MultiPolygon) {
+        coord = spec.feature.getGeometry().getInteriorPoints().getPoint(0).getCoordinates();
+    } else {
+        coord = spec.feature.getGeometry().getFirstCoordinate();
+      }
 
   var url = spec.layer.getSource().getGetFeatureInfoUrl(
     coord,
