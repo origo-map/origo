@@ -198,7 +198,7 @@ function getWMSFeatureInfo(spec, callback) {
 
   var url = spec.layer.getSource().getGetFeatureInfoUrl(
     coord,
-    2.8,
+    0.28,
     mapView.getProjection(),
     {
       'INFO_FORMAT': 'text/html',
