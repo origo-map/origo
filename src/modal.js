@@ -23,7 +23,7 @@ const modal = function modal() {
     }
     modalEl += `<div class="o-modal-title">${title}</div>`;
     if (target === 'iframe') {
-      modalEl += `<iframe src="${content}" class="o-modal-content-full"></iframe>`;
+      modalEl += `<div class="o-modal-content-full"><iframe src="${content}" class="o-modal-content-iframe"></iframe></div>`;
     } else {
       modalEl += `<div class="o-modal-content">${content}</div>`;
     }
