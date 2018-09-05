@@ -31,7 +31,6 @@ export default {
       });
       layerObjects[obj.name] = obj;
     });
-
     return layerObjects;
   },
   zoom(zoomStr) {
@@ -46,6 +45,9 @@ export default {
       topmostName: 'geometryType',
       arrName: 'coordinates'
     });
+  },
+  feature(featureId) {
+    return featureId;
   },
   pin(pinStr) {
     return urlparser.strIntify(pinStr);

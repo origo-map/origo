@@ -12,7 +12,7 @@ export default function (feature, layer) {
   const attributes = feature.getProperties();
   const geometryName = feature.getGeometryName();
   delete attributes[geometryName];
-  let content = '<div><ul>';
+  let content = '<div class="o-identify-content"><ul>';
   let attribute;
   let li = '';
   let title;
