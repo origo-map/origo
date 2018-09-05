@@ -438,6 +438,7 @@ function init(el, mapOptions) {
           obj.feature = feature;
           obj.title = layer.get('title');
           obj.content = getattributes(feature, layer);
+          obj.layer = layer;
 
           const showOverlay = Object.prototype.hasOwnProperty.call(settings.featureinfoOptions, 'overlay') ? settings.featureinfoOptions.overlay : true;
 
