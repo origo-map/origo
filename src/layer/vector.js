@@ -1,5 +1,5 @@
 import VectorLayer from 'ol/layer/Vector';
-import VectorTileLayer from 'ol/layer/vectortile';
+import VectorTileLayer from 'ol/layer/VectorTile';
 import ClusterSource from 'ol/source/Cluster';
 import style from '../style';
 import viewer from '../viewer';
@@ -10,7 +10,6 @@ export default function vector(opt, src) {
   const distance = 60;
   const map = viewer.getMap();
   const view = map.getView();
-  const maxZoom = view.getResolutions().length - 1;
   let vectorLayer;
   switch (options.layerType) {
     case 'vector':
