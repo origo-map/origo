@@ -1,4 +1,4 @@
-import Zoom from 'ol/control/zoom';
+import Zoom from 'ol/control/Zoom';
 import $ from 'jquery';
 import viewer from '../viewer';
 

@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import VectorSource from 'ol/source/vector';
+import VectorSource from 'ol/source/Vector';
 import TopoJSONFormat from 'ol/format/topojson';
 import viewer from '../viewer';
 import vector from './vector';

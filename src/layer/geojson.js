@@ -1,4 +1,4 @@
-import VectorSource from 'ol/source/vector';
+import VectorSource from 'ol/source/Vector';
 import GeoJSON from 'ol/format/geojson';
 import $ from 'jquery';
 import viewer from '../viewer';

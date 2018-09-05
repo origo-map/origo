@@ -1,5 +1,5 @@
-import VectorSource from 'ol/source/vector';
-import VectorLayer from 'ol/layer/vector';
+import VectorSource from 'ol/source/Vector';
+import VectorLayer from 'ol/layer/Vector';
 
 // create unmanaged layer
 export default function (features, map) {

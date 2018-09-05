@@ -1,5 +1,5 @@
 import WMTSSource from 'ol/source/wmts';
-import Tilegrid from 'ol/tilegrid/wmts';
+import Tilegrid from 'ol/tilegrid/WMTS';
 import {getTopLeft} from 'ol/extent';
 import $ from 'jquery';
 import viewer from '../viewer';

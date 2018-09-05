@@ -1,11 +1,11 @@
-import DragAndDrop from 'ol/interaction/draganddrop';
+import DragAndDrop from 'ol/interaction/DragAndDrop';
 import GPXFormat from 'ol/format/gpx';
 import GeoJSONFormat from 'ol/format/geojson';
 import IGCFormat from 'ol/format/igc';
 import KMLFormat from 'ol/format/kml';
 import TopoJSONFormat from 'ol/format/topojson';
-import VectorSource from 'ol/source/vector';
-import VectorLayer from 'ol/layer/vector';
+import VectorSource from 'ol/source/Vector';
+import VectorLayer from 'ol/layer/Vector';
 import viewer from '../viewer';
 import legend from './legend';
 

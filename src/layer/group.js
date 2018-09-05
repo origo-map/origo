@@ -1,4 +1,4 @@
-import layerGroup from 'ol/layer/group';
+import layerGroup from 'ol/layer/Group';
 import $ from 'jquery';
 
 const group = function group(layerOptions) {

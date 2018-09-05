@@ -1,8 +1,8 @@
-import Projection from 'ol/proj/projection';
-import TileGrid from 'ol/tilegrid/tilegrid';
-import Feature from 'ol/feature';
-import Point from 'ol/geom/point';
-import Vector from 'ol/source/vector';
+import Projection from 'ol/proj/Projection';
+import TileGrid from 'ol/tilegrid/TileGrid';
+import Feature from 'ol/Feature';
+import Point from 'ol/geom/Point';
+import Vector from 'ol/source/Vector';
 import GeoJSON from 'ol/format/geojson';
 import {getTopLeft, getBottomLeft} from 'ol/extent';
 import WKT from 'ol/format/wkt';

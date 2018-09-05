@@ -1,6 +1,6 @@
 import * as LoadingStrategy from 'ol/loadingstrategy';
 import {createXYZ} from 'ol/tilegrid';
-import VectorSource from 'ol/source/vector';
+import VectorSource from 'ol/source/Vector';
 import GeoJSONFormat from 'ol/format/geojson';
 import $ from 'jquery';
 import viewer from '../viewer';

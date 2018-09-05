@@ -1,11 +1,11 @@
 import $ from 'jquery';
 import {getArea, getLength} from 'ol/sphere';
-import VectorSource from 'ol/source/vector';
-import VectorLayer from 'ol/layer/vector';
-import DrawInteraction from 'ol/interaction/draw';
+import VectorSource from 'ol/source/Vector';
+import VectorLayer from 'ol/layer/Vector';
+import DrawInteraction from 'ol/interaction/Draw';
 import Overlay from 'ol/overlay';
-import Polygon from 'ol/geom/polygon';
-import LineString from 'ol/geom/linestring';
+import Polygon from 'ol/geom/Polygon';
+import LineString from 'ol/geom/LineString';
 import viewer from '../viewer';
 import utils from '../utils';
 import Style from '../style';

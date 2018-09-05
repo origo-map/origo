@@ -1,6 +1,6 @@
-import VectorLayer from 'ol/layer/vector';
+import VectorLayer from 'ol/layer/Vector';
 import VectorTileLayer from 'ol/layer/vectortile';
-import ClusterSource from 'ol/source/cluster';
+import ClusterSource from 'ol/source/Cluster';
 import style from '../style';
 import viewer from '../viewer';
 
