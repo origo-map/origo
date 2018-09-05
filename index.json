@@ -83,10 +83,10 @@
     20048966.10
   ],
   "center": [
-    1700000,
-    8275000
+    1841760,
+    8313394
   ],
-  "zoom": 8,
+  "zoom": 10,
   "resolutions": [
     156543.03,
     78271.52,
@@ -138,37 +138,54 @@
       "group": "llg",
       "visible": true,
       "source": "bebyggelse",
-      "attributes": [{
-          "title": "AJOUR_DATUM: ",
-          "name": "AJOUR_DATUM"
-        },
+      "sources": [
         {
-          "title": "AJOUR_IP: ",
-          "name": "AJOUR_IP"
-        },
-        {
-          "title": "ANDAMAL: ",
-          "name": "OBJEKTNR"
-        },
-        {
-          "title": "FREE_CODE: ",
-          "name": "FREE_CODE"
-        },
-        {
-          "title": "OBJECTID: ",
-          "name": "OBJECTID"
-        },
-        {
-          "title": "OBJEKTNR: ",
-          "name": "OBJEKTNR"
-        },
-        {
-          "title": "OLDOBJECT_ID: ",
-          "name": "OLDOBJECT_ID"
-        },
-        {
-          "title": "TYPKOD: ",
-          "name": "TYPKOD"
+          "config": {
+            "url": "http://localhost:9966/objects/",
+            "connect": "OBJEKTNR",
+            "api": "",
+            "fetch": {
+              "method": "GET",
+              "dataType": "jsonp",
+              "cache": "no-cache",
+              "credentials": "same-origin",
+              "headers": {
+                "Content-Type": "application/json; charset=utf-8"
+              },
+              "redirect": "follow",
+              "referrer": "no-referrer"
+            },
+            "attributes": [{
+                "title": "LandLord ID",
+                "name": "id",
+                "connect": "OBJEKTNR"
+              },
+              {
+                "title": "Populärnamn",
+                "name": "popularname"
+              },
+              {
+                "title": "Objekttyp",
+                "name": "type"
+              },
+              {
+                "title": "Förvaltare",
+                "name": "trustee"
+              },
+              {
+                "title": "Förvaltningsenhet",
+                "name": "name"
+              },
+              {
+                "title": "Areal",
+                "name": "area"
+              },
+              {
+                "title": "Fastighet",
+                "name": "landunits"
+              }
+            ]
+          }
         }
       ]
     },

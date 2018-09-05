@@ -16,6 +16,7 @@ import layerCreator from './layercreator';
 import Observable from 'ol/observable';
 import search from './controls/search';
 import getAttributes from './getattributes';
+import sources from './utils/sources';
 
 let map;
 const settings = {
@@ -430,26 +431,38 @@ function init(el, mapOptions) {
     });
   } else if (urlParams.select) {
     const query = urlParams.select;
-    let cache = []; 
+    const cache = [];
     map.getLayers().forEach((l) => {
       if (l.get('name') === query.layer) {
         const source = l.getSource();
+        const more = l.get('sources') || {};
         const listnerKey = source.on('change', () => {
           if (source.getState() === 'ready') {
             const features = source.getFeatures();
             features.forEach((feature) => {
               query.attributes.map((attribute) => {
                 const key = Object.keys(attribute)[0];
-                const value = Object.values(attribute)[0];
-                if (feature.get(key).toString() === value) {
-                  // console.log(feature.get(key).toString() === value, feature.get(key).toString(), value);
+                const fvalue = feature.get(key);
+                let value = Object.values(attribute)[0];
+                if (typeof fvalue === 'number' && typeof value === 'string') {
+                  value = parseInt(value, 10);
+                  if (fvalue === value) {
+                    cache.push(feature);
+                  }
+                } else if (typeof fvalue === 'string' && typeof value === 'number') {
+                  if (fvalue === value.toString()) {
+                    cache.push(feature);
+                  }
+                } else if (fvalue === value) {
                   cache.push(feature);
+                } else {
+                  console.log('Feature is not part of the intital extent.');
                 }
               });
             });
+            cache[0] = sources.update(cache[0], more);
             settings.featureinfoOptions.savedSelection = cache[0];
             featureinfo.init(settings.featureinfoOptions);
-            
             if (cache[0]) {
               map.getView().animate({
                 center: cache[0].getGeometry().getCoordinates(),
@@ -458,9 +471,9 @@ function init(el, mapOptions) {
                 if (completed) {
                   search.showFeatureInfo(cache, l.get('title'), getAttributes(cache[0], l));
                 }
-              });  
+              });
             } else {
-              console.log('Feature not found: ' + query);
+              console.log(`Feature not found: ${query}`);
             }
             Observable.unByKey(listnerKey);
           }

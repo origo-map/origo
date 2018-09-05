@@ -1,9 +1,14 @@
-import $ from 'jquery';
 import EsriJSON from 'ol/format/esrijson';
 import VectorSource from 'ol/source/vector';
 import loadingstrategy from 'ol/loadingstrategy';
 import viewer from '../viewer';
 import vector from './vector';
+import deep from '../utils/deep';
+import meld from '../utils/meld';
+
+function agsFeatureError(error) {
+  console.log('AGS FEATURE FETCH ERROR: ', error);
+}
 
 function createSource(options) {
   const esriSrs = options.projectionCode.split(':').pop();
@@ -14,7 +19,8 @@ function createSource(options) {
     loader(extent, resolution, projection) {
       const that = this;
       const url = options.url + options.id +
-        encodeURI(['/query?f=json&',
+        encodeURI([
+          '/query?f=json&',
           'returnGeometry=true',
           '&spatialRel=esriSpatialRelIntersects',
           `&geometry={"xmin":${extent[0]},"ymin":`,
@@ -25,23 +31,15 @@ function createSource(options) {
           '&returnIdsOnly=false&returnCountOnly=false',
           '&geometryPrecision=2',
           `&outSR=${esriSrs}${queryFilter}`].join(''));
-      $.ajax({
-        url,
-        dataType: 'jsonp',
-        success: (response) => {
-          if (response.error) {
-            alert(`${response.error.message}\n${response.error.details.join('\n')}`);
-          } else {
-            // dataProjection will be read from document
-            const features = esrijsonFormat.readFeatures(response, {
-              featureProjection: projection
-            });
-            if (features.length > 0) {
-              that.addFeatures(features);
-            }
-          }
-        }
-      });
+      try {
+        fetch(url).then(response => response.json()).then((json) => {
+          that.addFeatures(json.features.map(feature => esrijsonFormat.readFeature(feature, {
+            featureProjection: projection
+          })));
+        });
+      } catch (error) {
+        agsFeatureError(error);
+      }
     },
     strategy: loadingstrategy.bbox
   });
@@ -49,18 +47,20 @@ function createSource(options) {
 }
 
 const agsFeature = function agsFeature(layerOptions) {
-  const agsDefault = {
+  const agsDefault = deep({
     layerType: 'vector'
-  };
+  });
   const sourceDefault = {};
-  const agsOptions = $.extend(agsDefault, layerOptions);
-  const sourceOptions = $.extend(sourceDefault, viewer.getMapSource()[layerOptions.sourceName]);
+  const options = deep(layerOptions);
+  const name = deep(viewer.getMapSource()[layerOptions.sourceName]);
+  const agsOptions = meld(agsDefault, options);
+  const sourceOptions = meld(sourceDefault, name);
   sourceOptions.geometryName = agsOptions.geometryName;
   sourceOptions.filter = agsOptions.filter;
   sourceOptions.attribution = agsOptions.attribution;
   sourceOptions.projectionCode = viewer.getProjectionCode();
   sourceOptions.id = agsOptions.id;
-
+  sourceOptions.sources = agsOptions.sources;
   const agsSource = createSource(sourceOptions);
   return vector(agsOptions, agsSource);
 };

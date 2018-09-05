@@ -12,6 +12,19 @@ module.exports = merge(common, {
   },
   devServer: {
     contentBase: './',
-    port: 9966
+    port: 9966,
+    proxy: {
+      '/api': {
+        target: 'http://kartportal.vasteras.se/services/gisela/v2/objects/',
+        pathRewrite: { '^/api': '' },
+        changeOrigin: true,
+        secure: false
+      },
+      '/objects': {
+        target: 'http://kartportal.vasteras.se/services/gisela/v2/',
+        changeOrigin: true,
+        secure: false
+      }
+    }
   }
 });

@@ -27,7 +27,9 @@
     "localforage": "1.5.0",
     "ol": "^4.6.5",
     "owl.carousel": "^2.3.4",
-    "proj4": "2.3.10"
+    "proj4": "2.3.10",
+    "request": "^2.88.0",
+    "babel-polyfill": "^6.0.16"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
