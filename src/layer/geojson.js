@@ -6,11 +6,27 @@ import vector from './vector';
 import isUrl from '../utils/isurl';
 
 function createSource(options) {
-  return new VectorSource({
+  const vectorSource = new VectorSource({
     attributions: options.attribution,
-    url: options.url,
+    loader() {
+      $.ajax({
+        url: options.url,
+        cache: false
+      })
+        .done((response) => {
+          vectorSource.addFeatures(vectorSource.getFormat().readFeatures(response));
+          const numFeatures = vectorSource.getFeatures().length;
+          for (let i = 0; i < numFeatures; i += 1) {
+            vectorSource.forEachFeature((feature) => {
+              feature.setId(i);
+              i += 1;
+            });
+          }
+        });
+    },
     format: new GeoJSON()
   });
+  return vectorSource;
 }
 
 const geojson = function geojson(layerOptions) {

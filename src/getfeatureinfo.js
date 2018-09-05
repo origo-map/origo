@@ -219,6 +219,7 @@ function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
         item.title = l.get('title');
         item.feature = collection[0];
         item.content = getAttributes(collection[0], l);
+        item.layer = l;
         result.push(item);
       }
     } else if (queryable) {
@@ -226,6 +227,7 @@ function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
       item.title = l.get('title');
       item.feature = feature;
       item.content = getAttributes(feature, l);
+      item.layer = l;
       result.push(item);
     }
 
