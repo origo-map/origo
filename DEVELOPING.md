@@ -1,7 +1,7 @@
 # Developing with Origo
 
 ## Language
-Origo uses JavaScript ECMAScript 5, HTML5 and CSS3. Dependencies to other frameworks shall be avoided. Utilizing other libraries and components are however allowed. The ambition is to use smaller libraries as building blocks rather than building Origo into a big and complex framework such as ExtJS or AngularJS. When using third party libraries or components it is important to ensure that the license is compatible with the license for Origo, see the [license file](LICENSE.txt). 
+Origo uses JavaScript ECMAScript 6, HTML5 and CSS3. Dependencies to other frameworks shall be avoided. Utilizing other libraries and components are however allowed. The ambition is to use smaller libraries as building blocks rather than building Origo into a big and complex framework such as ExtJS or AngularJS. When using third party libraries or components it is important to ensure that the license is compatible with the license for Origo, see the [license file](LICENSE.txt). 
 
 Origo uses OpenLayers as the map component and jQuery is used primarily for DOM manipulation. Development in Origo shall support versions according to package.json at GitHub. Origo shall support the most commonly used web browsers such as Internet Explorer 10-11, Edge, FireFox, Chrome and Safari. 
 
@@ -10,7 +10,7 @@ When developing, progressive enhancement is an encouraged strategy. That means t
 ## JavaScript
 Origo follows the [Airbnb's JavaScript Style Guide](https://github.com/airbnb/javascript) for EcmaScript 6.
 
-The ambition for Origo is modular development. To promote this the framework is using Browserify to just like in Node.js be able to load packages by requiring them according to CommonJS. That makes it possible to install modules through npm even for browsers. To accept a module in the framework it must be loadable with Browserify.
+We wish to promote modular development, and in order to do this we have chosen [webpack](https://github.com/webpack/webpack) as the bundler.
 
 Server components are handled separately in the [Origo-server repository](https://github.com/origo-map/origo-server) and are not part of the Origo framework.
 
