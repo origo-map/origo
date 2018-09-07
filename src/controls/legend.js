@@ -29,12 +29,15 @@ function createFill(fillProperties) {
   return fill;
 }
 
-function createCircle(circleProperties) {
+function createCircle(circleProperties, scale) {
   const c = circleProperties.circle;
+  const s = scale || 1;
   let stroke;
   let strokeWidth = 0;
+  c.radius *= s;
 
   if (Object.prototype.hasOwnProperty.call(c, 'stroke')) {
+    c.stroke.width *= s;
     strokeWidth = c.stroke.width >= 3 ? 3 : c.stroke.width;
     stroke = `stroke:${c.stroke.color};` || 'stroke:none;';
     stroke += `stroke-width:${strokeWidth};` || '';
@@ -95,8 +98,11 @@ function getSymbol(style) {
     </svg></div>`;
   } else if (Object.prototype.hasOwnProperty.call(s[0], 'circle')) {
     let circle = '';
+    const radius = s.map(x => x.circle.radius);
+    const maxRadius = Math.max(...radius);
+    const scale = (maxRadius * 2) > (symbolSize - 3) ? (symbolSize - 3) / (maxRadius * 2) : 1;
     for (let i = 0; i < s.length; i += 1) {
-      circle += createCircle(s[i]);
+      circle += createCircle(s[i], scale);
     }
     symbol += `<div class="o-legend-item-img"><svg height="${symbolSize}" width="${symbolSize}">
     ${circle}
