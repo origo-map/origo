@@ -200,7 +200,11 @@ function styleFunction(styleSettings, styleList, clusterStyleSettings, clusterSt
 function createStyle(styleName, clusterStyleName) {
   const styleSettings = viewer.getStyleSettings()[styleName];
   if ($.isEmptyObject(styleSettings)) {
-    alert(`Style ${styleName} is not defined`);
+    if(styleName !== 'default'){
+      alert(`Style ${styleName} is not defined`);
+    } 
+    const style = stylefunctions('default');
+    return style;
   }
   if (Object.prototype.hasOwnProperty.call(styleSettings[0][0], 'custom')) {
     const style = stylefunctions(styleSettings[0][0].custom, styleSettings[0][0].params);

@@ -67,6 +67,7 @@ function createStroke(strokeProperties) {
 }
 
 function getSymbol(style) {
+  if(style){
   let symbol = '';
   const s = style[0];
   if (Object.prototype.hasOwnProperty.call(s[0], 'icon')) {
@@ -114,6 +115,9 @@ function getSymbol(style) {
   }
 
   return symbol;
+  } else {
+    return '<div class="o-legend-item-img"></div>';
+  }
 }
 
 function addAbstractButton(item) {
