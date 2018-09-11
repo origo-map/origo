@@ -25,6 +25,28 @@ module.exports = {
                  '</div>';
         return el;
     },
+    /**
+     * One-liner for creation of <option> elements for the dropdown lists in the print panel.
+     * Returns: option elements for each of the incoming array cells as a string.
+     * 
+     * options: string-array containing the names of option elements to be created
+     */
+    createDdOptions: function(options) {
+        return options.map(function (option) { 
+            return '<option value="'+ option +'">' + option + '</option>'; }).toString().replace(new RegExp(',', 'g'), '');
+    },
+    /**
+     * Creates radiobuttons for every cell of the incoming array of names.
+     * Returns: input elements type radio and corresponding label as string
+     *
+     * options: string-array containing the names of radiobuttons to be created
+     * group: group number for the input attribute 'name'
+     */
+    createRadioButtons: function(options, group) {
+        return options.map(function (rBtn, i) {
+            return '<label for="o-r' + i + group + '"><input type="radio" name="group'+ group + '" id="o-r' + i + group +'" value="'+ i + '" /> ' + rBtn + '</label><br />';
+        }).toString().replace(new RegExp(',', 'g'), '');
+    },
     createListButton: function(options) {
         var el = '<li>' +
                     '<div id="' + options.id + '-button" class="o-menu-button"' + '>' +
