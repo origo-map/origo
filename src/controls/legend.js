@@ -7,6 +7,7 @@ const symbolSize = 20;
 let styleSettings;
 let baseUrl;
 let hasMapLegend;
+let toggleSubgroups;
 
 function createFill(fillProperties) {
   const f = fillProperties;
@@ -256,11 +257,15 @@ function offToggleCheck(layername) {
 }
 
 // Expand and minimize group
-function toggleGroup(groupheader) {
+function toggleGroup(groupheader, expanded) {
   const group = groupheader.parent('.o-legend-group');
   const groupicon = $(`#${group.attr('id')} .o-icon-expand:first`);
+  let expand = expanded;
+  if (expand === undefined) {
+    expand = groupicon.hasClass('o-icon-expand-false');
+  }
 
-  if (groupicon.hasClass('o-icon-expand-false')) {
+  if (expand) {
     groupicon.removeClass('o-icon-expand-false');
     groupicon.addClass('o-icon-expand-true');
     group.removeClass('o-ul-expand-false');
@@ -285,6 +290,9 @@ function toggleSubGroupCheck(subgroup, toggleAll) {
       const inMapLegend = layerid.split('o-legend-').length > 1;
 
       if (subGroup.children().first().find('.o-checkbox').hasClass('o-checkbox-true')) {
+        if (toggleSubgroups) {
+          toggleGroup(subGroup.children().first(), false);
+        }
         $(`.${layername} .o-checkbox`).removeClass('o-checkbox-true');
         $(`.${layername} .o-checkbox`).addClass('o-checkbox-false');
 
@@ -297,6 +305,9 @@ function toggleSubGroupCheck(subgroup, toggleAll) {
 
         layer.setVisible(false);
       } else {
+        if (toggleSubgroups) {
+          toggleGroup(subGroup.children().first(), true);
+        }
         if (inMapLegend === false && $(`#o-legend-${layername}`).length === 0) {
           $('#o-overlay-list').prepend(createLegendItem(`o-legend-${layername}`));
           onToggleCheck(`o-legend-${layername}`);
@@ -678,6 +689,7 @@ function init(opt) {
   baseUrl = viewer.getBaseUrl();
   hasMapLegend = Object.prototype.hasOwnProperty.call(options, 'hasMapLegend') ? options.hasMapLegend : true;
   styleSettings = viewer.getStyleSettings();
+  toggleSubgroups = options.toggleSubgroups !== false;
 
   render();
   addLegend(viewer.getGroups('top'));
