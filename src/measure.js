@@ -35,7 +35,7 @@ function init(opt_options) {
   options.measureTools = options.measureTools || ["length", "area"];
   lengthTool = options.measureTools.indexOf('length') >= 0;
   areaTool = options.measureTools.indexOf('area') >= 0;
-  defaultTool = options.default ? options.default : "length";
+  defaultTool = options.default ? options.default : lengthTool ? "length" : "area";
   if(lengthTool || areaTool){
     var target = options.target || '#o-toolbar-maptools';
     map = Viewer.getMap();
@@ -93,8 +93,8 @@ function onEnableInteraction(e) {
 
 }
 
+function setActive(state) {
 isActive = state ? true : false;
-
 }
 
 function render(target) {
