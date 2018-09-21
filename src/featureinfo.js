@@ -1,3 +1,4 @@
+import 'babel-polyfill';
 import 'owl.carousel';
 import Overlay from 'ol/overlay';
 import $ from 'jquery';
@@ -9,6 +10,7 @@ import featurelayer from './featurelayer';
 import Style from './style';
 import StyleTypes from './style/styletypes';
 import getFeatureInfo from './getfeatureinfo';
+import sources from './utils/sources';
 
 const style = Style();
 const styleTypes = StyleTypes();
@@ -146,8 +148,13 @@ function onClick(evt) {
         const serverResult = data || [];
         const result = serverResult.concat(clientResult);
         if (result.length > 0) {
-          selectionLayer.clear();
-          identify(result, identifyTarget, evt.coordinate);
+          const resultSource = result[0].feature.sources;
+          if (typeof resultSource !== 'undefined' || resultSource.length === 0) {
+            sources.updateResults(result, identifyTarget, evt.coordinate, selectionLayer, identify);
+          } else {
+            selectionLayer.clear();
+            identify(result, identifyTarget, evt.coordinate);
+          }
         } else if (selectionLayer.getFeatures().length > 0) {
           clear();
         } else if (pinning) {

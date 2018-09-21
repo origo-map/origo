@@ -3,7 +3,7 @@ function nested(object) {
     if (object.length === 0) {
       return '[ ]';
     }
-    let res = object.map((item) => {
+    const res = object.map((item) => {
       let template;
       Object.keys(item).map((key) => {
         template += `<li>&ensp;<b>${key}</b>: ${item[key]}</li>`;

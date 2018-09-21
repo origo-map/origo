@@ -4,6 +4,7 @@ import viewer from './viewer';
 import maputils from './maputils';
 import getAttributes from './getattributes';
 import featureInfo from './featureinfo';
+import sources from './utils/sources';
 
 let map;
 
@@ -221,7 +222,47 @@ function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
     } else if (queryable) {
       const item = {};
       item.title = l.get('title');
+
+      // const values = feature['values_'];
+      // Object.assign(values, { test: 'abc' });
+      // Object.assign(values, sources.getValues(feature, feature.sources));
+
+      /* const attributes = feature.sources[0].config.attributes || {};
+      attributes.map((att) => {
+        const title = att.title;
+        console.log(title);
+        Object.assign(values, {
+          title
+        });
+      });
+      console.log(feature);
+      //console.log(values);
+      const sourrces = feature.sources;
+      sourrces.forEach((source) => {
+        const config = source.config;
+        const options = config.fetch;
+
+        const url = config.url;
+        const value = feature.get(config.connect);
+        const location = url + value;
+        fetch(location, options).then(response => response.json()).then((json) => {
+          json.forEach((j) => {
+            Object.assign(values, j)
+          });
+        });
+      }) */
+      // const test = sources.getValues(feature, feature.sources);
+      // console.log(test);
+      // test.forEach(t => Object.assign(values, t));
+      // console.log(values);
+
       item.feature = feature;
+
+      // /////////////////////////////////////////////// WIP SOURCES
+      // const test = sources.find(feature, feature.sources);
+      // console.log(test);
+      // item.feature = sources.find(feature, feature.sources);
+
       item.content = getAttributes(feature, l);
       result.push(item);
     }

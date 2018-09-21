@@ -11,6 +11,7 @@ function agsFeatureError(error) {
 }
 
 function createSource(options) {
+  const sources = options.sources;
   const esriSrs = options.projectionCode.split(':').pop();
   const queryFilter = options.filter ? `&where=${options.filter}` : '';
   const esrijsonFormat = new EsriJSON();
@@ -33,15 +34,19 @@ function createSource(options) {
           `&outSR=${esriSrs}${queryFilter}`].join(''));
       try {
         fetch(url).then(response => response.json()).then((json) => {
-          that.addFeatures(json.features.map(feature => esrijsonFormat.readFeature(feature, {
-            featureProjection: projection
-          })));
+          that.addFeatures(json.features.map((feature) => {
+            const f = esrijsonFormat.readFeature(feature, {
+              featureProjection: projection
+            });
+            return Object.assign(f, { sources });
+          }));
         });
       } catch (error) {
         agsFeatureError(error);
       }
     },
-    strategy: loadingstrategy.bbox
+    strategy: loadingstrategy.bbox,
+    sources: () => sources
   });
   return vectorSource;
 }

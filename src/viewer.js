@@ -467,10 +467,9 @@ function init(el, mapOptions) {
               map.getView().animate({
                 center: cache[0].getGeometry().getCoordinates(),
                 zoom: 14
-              }, (completed) => {
-                if (completed) {
-                  search.showFeatureInfo(cache, l.get('title'), getAttributes(cache[0], l));
-                }
+              });
+              map.once('moveend', () => {
+                search.showFeatureInfo(cache, l.get('title'), getAttributes(cache[0], l));
               });
             } else {
               console.log(`Feature not found: ${query}`);
