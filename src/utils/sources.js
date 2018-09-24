@@ -26,8 +26,8 @@ const pick = function pick(feature, response, attributes) {
 
 /**
  * Takes sources and a feature and awauts fetched data from sources.
- * @param {*} feature 
- * @param {*} sources 
+ * @param {*} feature
+ * @param {*} sources
  */
 
 const asyncReq = function asyncReq(feature, sources) {
@@ -50,8 +50,8 @@ const asyncReq = function asyncReq(feature, sources) {
 
 /**
  * Takes sources and a feature and fetches data from sources.
- * @param {*} feature 
- * @param {*} sources 
+ * @param {*} feature
+ * @param {*} sources
  */
 
 const syncReq = function syncReq(feature, sources) {
@@ -107,7 +107,39 @@ const translate = async (feature, source) => {
   return json;
 };
 
-async function updateResults(result, identifyTarget, coordinate, selectionLayer, identify) {
+async function updateResults(results, identifyTarget, coordinate, selectionLayer, identify) {
+  try {
+    await results.forEach((result) => {
+      const res = result;
+      const feature = result.feature;
+      const sources = feature.sources;
+      sources.forEach((source) => {
+        const attributes = source.config.attributes;
+        const empty = {};
+        translate(feature, source).then((responses) => {
+          responses.forEach((response) => {
+            attributes.forEach((sourceAttribute) => {
+              const name = sourceAttribute.name; 
+              const title = sourceAttribute.title; 
+              empty[title] = response[name];
+              feature.setProperties(empty);
+            });
+          });
+        });
+        res.content = getList(feature);
+        selectionLayer.clear();
+        console.log(res.feature);
+        //updateResult(res, identifyTarget, coordinate, selectionLayer, identify);
+        return res;
+      });
+      identify(results, identifyTarget, coordinate);
+    });
+  } catch (err) {
+    console.log('There was an error fetching the data: \n', err);
+  }
+}
+
+async function updateResult(result, identifyTarget, coordinate, selectionLayer, identify) {
   const all = result;
   try {
     const feature = result[0].feature;
@@ -125,13 +157,11 @@ async function updateResults(result, identifyTarget, coordinate, selectionLayer,
           }
         });
       });
-      all.forEach((item) => {
-        console.log(item, "content "+item.content, feature);
-      })
       all[0].content = getList(feature);
       selectionLayer.clear();
       identify(all, identifyTarget, coordinate);
     });
+    //updateResults(result, identifyTarget, coordinate, selectionLayer, identify);
   } catch (err) {
     console.log('There was an error fetching the data: \n', err);
   }
@@ -140,6 +170,7 @@ async function updateResults(result, identifyTarget, coordinate, selectionLayer,
 const sources = {
   find,
   update,
+  updateResult,
   updateResults
 };
 

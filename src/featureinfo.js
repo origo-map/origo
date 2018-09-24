@@ -1,5 +1,5 @@
 import 'babel-polyfill';
-import 'owl.carousel';
+import owl from 'owl.carousel';
 import Overlay from 'ol/overlay';
 import $ from 'jquery';
 import viewer from './viewer';
@@ -66,7 +66,30 @@ function initCarousel(id, opt) {
     const popupHeight = $('.o-popup').outerHeight() + 20;
     $('#o-popup').height(popupHeight);
   }
-  return $(id).owlCarousel(carouselOptions);
+  const custom = $(id).owlCarousel(carouselOptions);
+
+  $('#o-identify-carousel > div.owl-nav > button.owl-next').on('click', (e) => {
+    const feature = selectionLayer.getFeatures()[0];
+    const values = feature.values_;
+    delete values.geometry;
+    const ul = $('#o-identify-carousel > div.owl-stage-outer > div > div.owl-item.active > div > ul');
+    const liss = ul.children();
+    let n = Object.keys(values);
+    let q = Object.values(values);
+    liss.map((item) => {
+      const h = $(liss[item].innerHTML).text();
+      const index = n.indexOf(h);
+      if (index !== -1) n.splice(index, 1);
+      if (index !== -1) q.splice(index, 1);
+    });
+    if (liss.length < (liss.length + n.length)) {
+      q.map((o, i) => {
+        ul.append(`<li><b>${n[i]}</b> : ${q[i]}</li>`);
+        return o;
+      });
+    }
+  });
+  return custom;
 }
 
 function getSelectionLayer() {
@@ -150,7 +173,12 @@ function onClick(evt) {
         if (result.length > 0) {
           const resultSource = result[0].feature.sources;
           if (typeof resultSource !== 'undefined' || resultSource.length === 0) {
-            sources.updateResults(result, identifyTarget, evt.coordinate, selectionLayer, identify);
+            if (result.length > 1) {
+              sources.updateResult(result, identifyTarget, evt.coordinate, selectionLayer, identify);
+              sources.updateResults(result, identifyTarget, evt.coordinate, selectionLayer, identify);
+            } else {
+              sources.updateResult(result, identifyTarget, evt.coordinate, selectionLayer, identify);
+            }
           } else {
             selectionLayer.clear();
             identify(result, identifyTarget, evt.coordinate);
