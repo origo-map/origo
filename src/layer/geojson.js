@@ -1,19 +1,41 @@
-"use strict";
+import VectorSource from 'ol/source/vector';
+import GeoJSON from 'ol/format/geojson';
+import $ from 'jquery';
+import viewer from '../viewer';
+import vector from './vector';
+import isUrl from '../utils/isurl';
 
-var ol = require('openlayers');
-var $ = require('jquery');
-var viewer = require('../viewer');
-var vector = require('./vector');
-var isUrl = require('../utils/isurl');
+function createSource(options) {
+  const vectorSource = new VectorSource({
+    attributions: options.attribution,
+    loader() {
+      $.ajax({
+        url: options.url,
+        cache: false
+      })
+        .done((response) => {
+          vectorSource.addFeatures(vectorSource.getFormat().readFeatures(response));
+          const numFeatures = vectorSource.getFeatures().length;
+          for (let i = 0; i < numFeatures; i += 1) {
+            vectorSource.forEachFeature((feature) => {
+              feature.setId(i);
+              i += 1;
+            });
+          }
+        });
+    },
+    format: new GeoJSON()
+  });
+  return vectorSource;
+}
 
-var geojson = function geojson(layerOptions) {
-  var baseUrl = viewer.getBaseUrl();
-  var geojsonDefault = {
+const geojson = function geojson(layerOptions) {
+  const baseUrl = viewer.getBaseUrl();
+  const geojsonDefault = {
     layerType: 'vector'
   };
-  var geojsonOptions = $.extend(geojsonDefault, layerOptions);
-  var geojsonSource;
-  var sourceOptions = {};
+  const geojsonOptions = $.extend(geojsonDefault, layerOptions);
+  const sourceOptions = {};
   sourceOptions.attribution = geojsonOptions.attribution;
   sourceOptions.projectionCode = viewer.getProjectionCode();
   sourceOptions.sourceName = layerOptions.source;
@@ -24,16 +46,8 @@ var geojson = function geojson(layerOptions) {
     sourceOptions.url = baseUrl + geojsonOptions.source;
   }
 
-  geojsonSource = createSource(sourceOptions);
+  const geojsonSource = createSource(sourceOptions);
   return vector(geojsonOptions, geojsonSource);
+};
 
-  function createSource(options) {
-    return new ol.source.Vector({
-      attributions: options.attribution,
-      url: options.url,
-      format: new ol.format.GeoJSON()
-    });
-  }
-}
-
-module.exports = geojson;
+export default geojson;

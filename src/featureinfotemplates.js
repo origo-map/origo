@@ -1,8 +1,9 @@
-"use strict";
-var templates = {};
-templates.default = require("./templates/featureinfotemplates/default");
+import defaultTemplate from './templates/featureinfotemplate';
+
+const templates = {};
+templates.default = defaultTemplate;
 
 function featureinfotemplates(template, attributes) {
-    return templates[template](attributes);
+  return templates[template](attributes);
 }
-module.exports = featureinfotemplates;
+export default featureinfotemplates;

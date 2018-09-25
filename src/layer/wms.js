@@ -1,25 +1,56 @@
-'use strict';
+import $ from 'jquery';
+import TileWMSSource from 'ol/source/tilewms';
+import ImageWMSSource from 'ol/source/imagewms';
+import viewer from '../viewer';
+import tile from './tile';
+import maputils from '../maputils';
+import image from './image';
 
-var ol = require('openlayers');
-var $ = require('jquery');
-var viewer = require('../viewer');
-var tile = require('./tile');
-var maputils = require('../maputils');
-var image = require('./image');
+function createTileSource(options) {
+  return new TileWMSSource(({
+    attributions: options.attribution,
+    url: options.url,
+    gutter: options.gutter,
+    crossOrigin: 'anonymous',
+    projection: options.projectionCode,
+    tileGrid: options.tileGrid,
+    params: {
+      LAYERS: options.id,
+      TILED: true,
+      VERSION: options.version,
+      FORMAT: options.format
+    }
+  }));
+}
 
-var wms = function wms(layerOptions) {
-  var wmsDefault = {
+function createImageSource(options) {
+  return new ImageWMSSource(({
+    attributions: options.attribution,
+    url: options.url,
+    crossOrigin: 'anonymous',
+    projection: options.projectionCode,
+    params: {
+      LAYERS: options.id,
+      VERSION: options.version,
+      FORMAT: options.format
+    }
+  }));
+}
+
+
+const wms = function wms(layerOptions) {
+  const wmsDefault = {
     featureinfoLayer: null
   };
-  var sourceDefault = {
+  const sourceDefault = {
     version: '1.1.1',
     gutter: 0,
     format: 'image/png'
   };
-  var wmsOptions = $.extend(wmsDefault, layerOptions);
-  var renderMode = wmsOptions.renderMode || 'tile';
+  const wmsOptions = $.extend(wmsDefault, layerOptions);
+  const renderMode = wmsOptions.renderMode || 'tile';
   wmsOptions.name.split(':').pop();
-  var sourceOptions = $.extend(sourceDefault, viewer.getMapSource()[layerOptions.source]);
+  const sourceOptions = $.extend(sourceDefault, viewer.getMapSource()[layerOptions.source]);
   sourceOptions.attribution = wmsOptions.attribution;
   sourceOptions.projectionCode = viewer.getProjectionCode();
   sourceOptions.id = wmsOptions.id;
@@ -41,37 +72,6 @@ var wms = function wms(layerOptions) {
     return image(wmsOptions, createImageSource(sourceOptions));
   }
   return tile(wmsOptions, createTileSource(sourceOptions));
-
-  function createTileSource(options) {
-    return new ol.source.TileWMS(({
-      attributions: options.attribution,
-      url: options.url,
-      gutter: options.gutter,
-      crossOrigin: 'anonymous',
-      projection: options.projectionCode,
-      tileGrid: options.tileGrid,
-      params: {
-        'LAYERS': options.id,
-        'TILED': true,
-        'VERSION': options.version,
-        'FORMAT': options.format
-      }
-    }));
-  }
-
-  function createImageSource(options) {
-    return new ol.source.ImageWMS(({
-      attributions: options.attribution,
-      url: options.url,
-      crossOrigin: 'anonymous',
-      projection: options.projectionCode,
-      params: {
-        'LAYERS': options.id,
-        'VERSION': options.version,
-        'FORMAT': options.format
-      }
-    }));
-  }
 };
 
-module.exports = wms;
+export default wms;

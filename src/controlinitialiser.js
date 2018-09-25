@@ -1,15 +1,17 @@
-"use strict";
+const controlInitialiser = (controls) => {
+  let controlName;
+  let controlOptions;
+  controls.forEach((control) => {
+    controlName = control.name;
+    controlOptions = control.options || undefined;
+    if (Object.prototype.hasOwnProperty.call(origo.controls, controlName)) {
+      if (controlOptions) {
+        origo.controls[controlName].init(controlOptions);
+      } else {
+        origo.controls[controlName].init();
+      }
+    }
+  });
+};
 
-var controlInitialiser = function(controls) {
-    var controlName, controlOptions;
-    controls.forEach(function(control) {
-        controlName = control.name;
-        controlOptions = control.options || undefined;
-        if (origo.controls.hasOwnProperty(controlName)) {
-            controlOptions ? origo.controls[controlName].init(controlOptions) : origo.controls[controlName].init();
-        }
-    });
-}
-
-
-module.exports = controlInitialiser;
+export default controlInitialiser;

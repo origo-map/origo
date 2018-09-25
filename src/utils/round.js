@@ -1,7 +1,6 @@
-"use strict";
+const round = function round(value, decimals) {
+  const val = Math.round(`${value}e${decimals}`);
+  return Number(`${val}e-${decimals}`);
+};
 
-var round = function round(value, decimals) {
-  return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
-}
-
-module.exports = round;
+export default round;

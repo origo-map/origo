@@ -1,24 +1,47 @@
-var controls = {};
-controls.geoposition = require('../src/geoposition');
-controls.mapmenu = require('../src/mapmenu');
-controls.print = require('../src/print');
-controls.sharemap = require('../src/sharemap');
-controls.legend = require('../src/legend');
-controls.search = require('../src/search');
-controls.editor = require('../src/editor');
-controls.home = require('../src/home');
-controls.measure = require('../src/measure');
-controls.about = require('../src/about');
-controls.scale = require('../src/scale');
-controls.offline = require('../src/offline');
-controls.link = require('../src/link');
-controls.scaleline = require('../src/scaleline');
-controls.zoom = require('../src/zoom');
-controls.rotate = require('../src/rotate');
-controls.attribution = require('../src/attribution');
-controls.position = require('../src/position');
-controls.fullscreen = require('../src/fullscreen');
-controls.splash = require('../src/splash');
-controls.draganddrop = require('../src/draganddrop')
+import about from '../src/controls/about';
+import attribution from '../src/controls/attribution';
+import draganddrop from '../src/controls/draganddrop';
+import editor from '../src/controls/editor';
+import fullscreen from '../src/controls/fullscreen';
+import geoposition from '../src/controls/geoposition';
+import home from '../src/controls/home';
+import legend from '../src/controls/legend';
+import link from '../src/controls/link';
+import mapmenu from '../src/controls/mapmenu';
+import measure from '../src/controls/measure';
+import offline from '../src/controls/offline';
+import position from '../src/controls/position';
+import print from '../src/controls/print';
+import rotate from '../src/controls/rotate';
+import scale from '../src/controls/scale';
+import scaleline from '../src/controls/scaleline';
+import search from '../src/controls/search';
+import sharemap from '../src/controls/sharemap';
+import splash from '../src/controls/splash';
+import zoom from '../src/controls/zoom';
 
-module.exports = controls;
+const controls = {
+  about,
+  attribution,
+  draganddrop,
+  editor,
+  fullscreen,
+  geoposition,
+  home,
+  legend,
+  link,
+  mapmenu,
+  measure,
+  offline,
+  position,
+  print,
+  rotate,
+  scale,
+  scaleline,
+  search,
+  sharemap,
+  splash,
+  zoom
+};
+
+export default controls;

@@ -73,6 +73,8 @@ Once you are ready to create a minified bundle, you will use:
 
 This will create a bundle called `origo.min.js` in the dist folder. Note that you will need to change the path to the Origo javascript file in the `index.html` file, from `origo.js` to `origo.min.js`, if you wish to run the map using the bundled version.
 
+To further reduce the bundle size of Origo it's recommended to enable gzip on your web server, as in this example for [IIS](https://docs.microsoft.com/en-us/iis/configuration/system.webserver/httpcompression/). This will reduce the file size to approximately a fourth of the original size.
+
 ### Notes
 Guidelines for developing in Origo are available in the [`DEVELOPING.md`](https://github.com/origo-map/origo/blob/master/DEVELOPING.md) file.
 

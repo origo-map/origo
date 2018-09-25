@@ -1,6 +1,4 @@
-"use strict";
-
-module.exports = function isUrl(s) {
-   var regexp = new RegExp('^(?:[a-z]+:)?//', 'i');
-   return regexp.test(s);
+export default function isUrl(s) {
+  const regexp = new RegExp('^(?:[a-z]+:)?//', 'i');
+  return regexp.test(s);
 }

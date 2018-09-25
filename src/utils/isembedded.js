@@ -1,11 +1,8 @@
-"use strict";
+import $ from 'jquery';
 
-var $ = require('jquery');
-
-module.exports = function isEmbedded(target) {
+export default function isEmbedded(target) {
   if (window.top !== window.self || $(target).parent().is('BODY') === false) {
     return true;
-  } else {
-    return false;
   }
+  return false;
 }
