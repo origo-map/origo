@@ -5,7 +5,7 @@ import project from 'ol/proj';
 const registerProjections = function registerProjections(proj4Defs) {
   if (proj4Defs && proj4) {
     project.setProj4(proj4);
-    Object.keys(proj4Defs).forEach((def) => {
+    proj4Defs.forEach((def) => {
       proj4.defs(def.code, def.projection);
     });
   }

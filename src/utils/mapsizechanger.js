@@ -11,9 +11,9 @@ function arrToObj(arr, start) {
 export default function (map, {
   breakPoints,
   breakPointsPrefix: prefix,
-  mapTarget
+  mapId
 }) {
-  const targetEl = document.querySelector(`.${mapTarget}`);
+  const targetEl = document.getElementById(mapId);
   const breakNames = Object.getOwnPropertyNames(breakPoints);
   const breakCls = arrToObj(breakNames, prefix);
   const breakClsNames = breakNames.map(breakSize => breakCls[breakSize]);

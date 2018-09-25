@@ -70,5 +70,5 @@ export default function wfs(layerOptions, viewer) {
       break;
   }
   const wfsSource = createSource(sourceOptions);
-  return vector(wfsOptions, wfsSource);
+  return vector(wfsOptions, wfsSource, viewer);
 }

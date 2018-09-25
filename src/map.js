@@ -3,6 +3,8 @@ import OlView from 'ol/view';
 
 const Map = (options = {}) => {
   const map = new OlMap({
+    loadTilesWhileAnimating: options.loadTilesWhileAnimating ? options.loadTilesWhileAnimating : false,
+    loadTilesWhileInteracting: options.loadTilesWhileInteracting ? options.loadTilesWhileInteracting : true,
     target: options.target,
     controls: [],
     view: new OlView({

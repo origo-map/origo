@@ -208,7 +208,8 @@ function createStyle({
 } = {}) {
   const resolutions = viewer.getResolutions();
   const projection = viewer.getProjection();
-  const styleSettings = viewer.getStyleSettings()[styleName];
+  const styleSettings = viewer.getStyle(styleName);
+
   if (Object.keys(styleSettings).length === 0 || !styleSettings) {
     throw new Error(`Style ${styleName} is not defined`);
   }
@@ -216,7 +217,8 @@ function createStyle({
     const style = stylefunctions(styleSettings[0][0].custom, styleSettings[0][0].params);
     return style;
   }
-  const clusterStyleSettings = viewer.getStyleSettings()[clusterStyleName];
+  const clusterStyleSettings = clusterStyleName ? viewer.getStyle(clusterStyleName) : null;
+
   const style = (function style() {
     // Create style for each rule
     const styleList = createStyleList(styleSettings);

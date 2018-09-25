@@ -1,4 +1,4 @@
-import cu from 'codesketch';
+import cu from 'ceeu';
 import 'owl.carousel';
 import Overlay from 'ol/overlay';
 import $ from 'jquery';

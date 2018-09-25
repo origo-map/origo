@@ -1,14 +1,15 @@
-import cu from 'codesketch';
+import cu from 'ceeu';
 import Collection from 'ol/collection';
 import Feature from 'ol/feature';
 import geom from 'ol/geom/geometry';
 import Map from './map';
 import proj from './projection';
-import viewerTemplate from './templates/viewertemplate';
 import mapSizeChanger from './utils/mapsizechanger';
 import Featureinfo from './featureinfo';
 import maputils from './maputils';
 import Layer from './layer';
+import Main from './components/main';
+import Footer from './components/footer';
 
 const Viewer = function Viewer(targetOption, options = {}) {
   let map;
@@ -25,11 +26,13 @@ const Viewer = function Viewer(targetOption, options = {}) {
     breakPointsPrefix,
     clsOptions = '',
     consoleId = 'o-console',
-    mapTarget = 'o-map',
+    mapCls = 'o-map',
     controls = [],
     enableRotation = true,
     featureinfoOptions = {},
     groups = [],
+    mapGrid = true,
+    pageSettings = {},
     projectionCode,
     projectionExtent,
     extent = [],
@@ -47,9 +50,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     url
   } = options;
 
-  let pageSettings;
   const target = targetOption;
-  const pageTemplate = {};
   const center = urlParams.center || centerOption;
   const zoom = urlParams.zoom || zoomOption;
   const defaultTileGridOptions = {
@@ -59,16 +60,25 @@ const Viewer = function Viewer(targetOption, options = {}) {
     tileSize: [256, 256]
   };
   const tileGridSettings = Object.assign({}, defaultTileGridOptions, tileGridOptions);
-  const cls = `${clsOptions} ${mapTarget} cu`.trim();
+  const mapGridCls = mapGrid ? 'o-mapgrid' : '';
+  const cls = `${clsOptions} ${mapGridCls} ${mapCls} cu`.trim();
+  const footerData = pageSettings.footer || {};
+  const main = Main();
+  const footer = Footer({
+    footerData
+  });
 
-  const addLayer = function addLayer(layerProps) {
-    const layer = Layer(layerProps, this);
-    map.addLayer(layer);
+  const addControl = function addControl(control) {
+    if (control.onAdd && control.dispatch) {
+      this.addComponent(control);
+    } else {
+      throw new Error('Valid control must have onAdd and dispatch methods');
+    }
   };
 
-  const addLayers = function addLayers(layersProps) {
-    layersProps.reverse().forEach((layerProps) => {
-      this.addLayer(layerProps);
+  const addControls = function addControls() {
+    controls.forEach((control) => {
+      this.addControl(control);
     });
   };
 
@@ -92,7 +102,14 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
   const getUrl = () => url;
 
-  const getStyleSettings = () => styles;
+  const getStyle = (styleName) => {
+    if (styleName in styles) {
+      return styles[styleName];
+    }
+    throw new Error(`There is no style named ${styleName}`);
+  };
+
+  const getStyles = () => styles;
 
   const getResolutions = () => resolutions;
 
@@ -159,6 +176,13 @@ const Viewer = function Viewer(targetOption, options = {}) {
     return getLayers().filter(obj => obj.get('group') === group);
   };
 
+  const getSource = function getSource(name) {
+    if (name in source) {
+      return source[name];
+    }
+    throw new Error(`There is no source with name: ${name}`);
+  };
+
   const getSubGroups = function getSubgroups() {
     const subgroups = [];
 
@@ -197,8 +221,6 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
   const getMapSource = () => source;
 
-  const getMapTarget = () => mapTarget;
-
   const getControlNames = () => controls.map(obj => obj.name);
 
   const getTarget = () => target;
@@ -208,6 +230,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
   const getConsoleId = () => consoleId;
 
   const getInitialZoom = () => zoom;
+
+  const getMain = () => main;
 
   const mergeSavedLayerProps = (initialLayerProps, savedLayerProps) => {
     if (savedLayerProps) {
@@ -279,6 +303,37 @@ const Viewer = function Viewer(targetOption, options = {}) {
     return false;
   };
 
+  const addLayer = function addLayer(layerProps) {
+    const layer = Layer(layerProps, this);
+    map.addLayer(layer);
+    this.dispatch('addlayer', { layerName: layerProps.name });
+  };
+
+  const addLayers = function addLayers(layersProps) {
+    layersProps.reverse().forEach((layerProps) => {
+      this.addLayer(layerProps);
+    });
+  };
+
+  const addGroup = function addGroup(groupOptions) {
+    const name = groupOptions.name;
+    if (!(groups.filter(group => group.name === name).length)) {
+      groups.push(groupOptions);
+    }
+  };
+
+  const addSource = function addSource(sourceName, sourceProps) {
+    if (!(sourceName in source)) {
+      source[sourceName] = sourceProps;
+    }
+  };
+
+  const addStyle = function addStyle(styleName, styleProps) {
+    if (!(styleName in styles)) {
+      styles[styleName] = styleProps;
+    }
+  };
+
   return cu.Component({
     onInit() {
       this.render();
@@ -299,7 +354,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
         resolutions,
         zoom,
         enableRotation,
-        target: mapTarget
+        target: this.getId()
       }));
 
       const layerProps = mergeSavedLayerProps(layerOptions, urlParams.layers);
@@ -308,7 +363,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
       mapSizeChanger(map, {
         breakPoints,
         breakPointsPrefix,
-        mapTarget
+        mapId: this.getId()
       });
 
       if (urlParams.pin) {
@@ -322,38 +377,26 @@ const Viewer = function Viewer(targetOption, options = {}) {
       featureinfoOptions.viewer = this;
       featureinfo = Featureinfo(featureinfoOptions);
       this.addComponent(featureinfo);
+      this.addControls();
     },
     render() {
-      pageTemplate.mapClass = cls;
-
-      if (pageSettings) {
-        if (pageSettings.footer) {
-          if ('img' in pageSettings.footer) {
-            pageTemplate.img = pageSettings.footer.img;
-          }
-          if ('text' in pageSettings.footer) {
-            pageTemplate.text = pageSettings.footer.text;
-          }
-          if ('url' in pageSettings.footer) {
-            pageTemplate.url = pageSettings.footer.url;
-          }
-          if ('urlText' in pageSettings.footer) {
-            pageTemplate.urlText = pageSettings.footer.urlText;
-          }
-        }
-        if (pageSettings.mapGrid) {
-          if ('visible' in pageSettings.mapGrid && pageSettings.mapGrid.visible === true) {
-            pageTemplate.mapClass = 'o-map o-map-grid';
-          }
-        }
-      }
-      const htmlString = viewerTemplate(pageTemplate);
+      const htmlString = `<div id="${this.getId()}" class="${cls}">
+                            <div class="transparent flex column height-full width-full absolute top-left no-margin z-index-low">
+                              ${main.render()}
+                              ${footer.render()}
+                            </div>
+                          </div>`;
       const el = document.querySelector(target);
       el.innerHTML = htmlString;
       this.dispatch('render');
     },
+    addControl,
+    addControls,
+    addGroup,
     addLayer,
     addLayers,
+    addSource,
+    addStyle,
     getBaseUrl,
     getBreakPoints,
     getClusterOptions,
@@ -364,8 +407,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getTileGridSettings,
     getGroup,
     getGroups,
+    getMain,
     getMapSource,
-    getMapTarget,
     getQueryableLayers,
     getResolutions,
     getSearchableLayers,
@@ -378,7 +421,9 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getMapUrl,
     getProjection,
     getProjectionCode,
-    getStyleSettings,
+    getSource,
+    getStyle,
+    getStyles,
     getTarget,
     getTileGrid,
     getTileSize,

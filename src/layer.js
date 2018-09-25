@@ -12,7 +12,6 @@ const Layer = function Layer(optOptions, viewer) {
     geometryName: 'geom',
     geometryType: undefined,
     filter: undefined,
-    layerType: undefined,
     legend: false,
     sourceName: undefined,
     attribution: undefined,
