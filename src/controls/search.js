@@ -368,4 +368,7 @@ function init(options) {
   bindUIActions();
 }
 
-export default { init, showFeatureInfo };
+export default {
+  init,
+  showFeatureInfo
+};

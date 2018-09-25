@@ -1,8 +1,6 @@
-import ImageLayer from 'ol/layer/image';
 import VectorLayer from 'ol/layer/vector';
 import VectorTileLayer from 'ol/layer/vectortile';
 import ClusterSource from 'ol/source/cluster';
-import ImageVectorSource from 'ol/source/imagevector';
 import style from '../style';
 import viewer from '../viewer';
 
@@ -61,11 +59,10 @@ export default function vector(opt, src) {
     }
     case 'image':
     {
-      options.source = new ImageVectorSource({
-        source,
-        style: style().createStyle(options.style)
-      });
-      vectorLayer = new ImageLayer(options);
+      options.source = source;
+      options.style = style().createStyle(options.style);
+      options.renderMode = 'image';
+      vectorLayer = new VectorLayer(options);
       break;
     }
     case 'vectortile':

@@ -12,7 +12,8 @@ function getGetFeatureInfoUrl(layer, coordinate) {
   const resolution = map.getView().getResolution();
   const projection = viewer.getProjection();
   const url = layer.getSource().getGetFeatureInfoUrl(coordinate, resolution, projection, {
-    INFO_FORMAT: 'application/json'
+    INFO_FORMAT: 'application/json',
+    FEATURE_COUNT: '20'
   });
 
   return $.ajax(url, {
@@ -63,7 +64,7 @@ function getAGSIdentifyUrl(layer, coordinate) {
       const features = esrijsonFormat.readFeatures(obj, {
         featureProjection: viewer.getProjection()
       });
-      return features[0];
+      return features;
     });
 }
 
@@ -167,13 +168,15 @@ function getFeatureInfoRequests(evt) {
 function getFeaturesFromRemote(evt) {
   map = viewer.getMap();
   const requestResult = [];
-  const requestPromises = getFeatureInfoRequests(evt).map(request => request.fn.then((feature) => {
+  const requestPromises = getFeatureInfoRequests(evt).map(request => request.fn.then((features) => {
     const layer = viewer.getLayer(request.layer);
-    if (feature) {
-      requestResult.push({
-        title: layer.get('title'),
-        feature,
-        content: getAttributes(feature, layer)
+    if (features) {
+      features.forEach((feature) => {
+        requestResult.push({
+          title: layer.get('title'),
+          feature,
+          content: getAttributes(feature, layer)
+        });
       });
       return requestResult;
     }
@@ -217,6 +220,7 @@ function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
         item.title = l.get('title');
         item.feature = collection[0];
         item.content = getAttributes(collection[0], l);
+        item.layer = l;
         result.push(item);
       }
     } else if (queryable) {
@@ -264,6 +268,7 @@ function getFeaturesAtPixel(evt, clusterFeatureinfoLevel) {
       // item.feature = sources.find(feature, feature.sources);
 
       item.content = getAttributes(feature, l);
+      item.layer = l;
       result.push(item);
     }
 

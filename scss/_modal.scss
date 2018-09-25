@@ -9,7 +9,7 @@
   position: absolute;
   top: 0;
   width: 100%;
-  z-index: 105;
+  z-index: 1050;
 }
 .o-modal {
   background-color: white;
@@ -29,7 +29,7 @@
   -moz-transform-style: preserve-3d;
   transform-style: preserve-3d;
   width: 300px;
-  z-index: 110;
+  z-index: 1100;
 }
 .o-no-csstransforms .o-modal {
   margin-left: -150px;
