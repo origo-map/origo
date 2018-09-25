@@ -14,7 +14,7 @@ export { default as Home } from './controls/home';
 // export { default as Print } from './controls/print';
 export { default as Rotate } from './controls/rotate';
 // export { default as Scale } from './controls/scale';
-// export { default as Scaleline } from './controls/scaleline';
+export { default as Scaleline } from './controls/scaleline';
 // export { default as Search } from './controls/search';
 // export { default as Sharemap } from './controls/sharemap';
 // export { default as Splash } from './controls/splash';
