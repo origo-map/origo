@@ -405,6 +405,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getConsoleId,
     getControlNames,
     getExtent,
+    getFeatureinfo,
     getFooter,
     getInitialZoom,
     getTileGridSettings,
