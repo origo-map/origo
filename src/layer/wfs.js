@@ -32,8 +32,24 @@ function createSource(options) {
         url,
         cache: false
       })
+        .fail((e) => {
+          if (e.status === 404) {
+            alert('Invalid url, resource not found!');
+          } else {
+            alert(`AJAX call failed, due to ${e.status}`);
+          }
+        })
         .done((response) => {
-          vectorSource.addFeatures(vectorSource.getFormat().readFeatures(response));
+          if (response.features) {
+            vectorSource.addFeatures(vectorSource.getFormat().readFeatures(response));
+          } else {
+            const str = new XMLSerializer().serializeToString(response);
+            const parser = new DOMParser();
+            const xml = parser.parseFromString(str, 'text/xml');
+            const error = xml.getElementsByTagName('ows:ExceptionText')[0].innerHTML;
+            const json = JSON.stringify(response);
+            alert(`${json}, ${options}, ${error}`);
+          }
         });
     },
     strategy: options.loadingstrategy
