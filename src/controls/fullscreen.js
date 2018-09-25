@@ -26,18 +26,17 @@ const Fullscreen = function Fullscreen(options = {}) {
         icon: '#ic_fullscreen_24px'
       });
       if (!target) target = `${viewer.getMain().getNavigation().getId()}`;
-      this.on('render', this.onRender);
-      this.addComponents([fullscreenButton]);
-      this.render();
+      if (isEmbedded(viewer.getTarget())) {
+        this.on('render', this.onRender);
+        this.addComponents([fullscreenButton]);
+        this.render();
+      }
     },
     onInit() {
     },
     render() {
       const htmlString = fullscreenButton.render();
       const el = cu.dom.html(htmlString);
-      if (isEmbedded(viewer.getTarget())) {
-        document.getElementById(target).appendChild(el);
-      }
       document.getElementById(target).appendChild(el);
       this.dispatch('render');
     }
