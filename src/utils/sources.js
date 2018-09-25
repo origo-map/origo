@@ -1,7 +1,6 @@
 import 'babel-polyfill';
 import isEmpty from './isEmpty';
 import fling from './fling';
-import featureinfo from '../featureinfo';
 import getList from '../getList';
 
 /**
@@ -96,17 +95,14 @@ const find = function find(feature, sources) {
   return syncReq(feature, sources);
 };
 
-const translate = async (feature, source) => {
-  const config = source.config;
-  const fetchOpt = config.fetch;
-  const url = config.url;
-  const value = feature.get(config.connect);
-  const location = url + value;
-  const response = await fetch(location, fetchOpt);
-  const json = response.json();
-  return json;
-};
-
+/**
+ * Updates multiple results. 
+ * @param {*} results 
+ * @param {*} identifyTarget 
+ * @param {*} coordinate 
+ * @param {*} selectionLayer 
+ * @param {*} identify 
+ */
 async function updateResults(results, identifyTarget, coordinate, selectionLayer, identify) {
   try {
     await results.forEach((result) => {
@@ -116,7 +112,7 @@ async function updateResults(results, identifyTarget, coordinate, selectionLayer
       sources.forEach((source) => {
         const attributes = source.config.attributes;
         const empty = {};
-        translate(feature, source).then((responses) => {
+        fling.translate(feature, source).then((responses) => {
           responses.forEach((response) => {
             attributes.forEach((sourceAttribute) => {
               const name = sourceAttribute.name; 
@@ -128,17 +124,22 @@ async function updateResults(results, identifyTarget, coordinate, selectionLayer
         });
         res.content = getList(feature);
         selectionLayer.clear();
-        console.log(res.feature);
-        //updateResult(res, identifyTarget, coordinate, selectionLayer, identify);
         return res;
       });
       identify(results, identifyTarget, coordinate);
     });
   } catch (err) {
-    console.log('There was an error fetching the data: \n', err);
+    alert('There was an error fetching the data: \n', err);
   }
 }
-
+/**
+ * 
+ * @param {*} result 
+ * @param {*} identifyTarget 
+ * @param {*} coordinate 
+ * @param {*} selectionLayer 
+ * @param {*} identify 
+ */
 async function updateResult(result, identifyTarget, coordinate, selectionLayer, identify) {
   const all = result;
   try {
@@ -146,7 +147,7 @@ async function updateResult(result, identifyTarget, coordinate, selectionLayer, 
     const source = feature.sources[0];
     const attributes = source.config.attributes;
     const newAttributes = {};
-    await translate(feature, source).then((data) => {
+    await fling.translate(feature, source).then((data) => {
       data.forEach((res) => {
         attributes.forEach((sourceAttribute) => {
           const sourceAttributeName = sourceAttribute.name;
@@ -161,9 +162,8 @@ async function updateResult(result, identifyTarget, coordinate, selectionLayer, 
       selectionLayer.clear();
       identify(all, identifyTarget, coordinate);
     });
-    //updateResults(result, identifyTarget, coordinate, selectionLayer, identify);
   } catch (err) {
-    console.log('There was an error fetching the data: \n', err);
+    alert('There was an error fetching the data: \n', err);
   }
 }
 

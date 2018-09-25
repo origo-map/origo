@@ -1,5 +1,5 @@
 import 'babel-polyfill';
-import owl from 'owl.carousel';
+import 'owl.carousel';
 import Overlay from 'ol/overlay';
 import $ from 'jquery';
 import viewer from './viewer';
@@ -71,7 +71,7 @@ function initCarousel(id, opt) {
   }
   const custom = $(id).owlCarousel(carouselOptions);
 
-  $('#o-identify-carousel > div.owl-nav > button.owl-next').on('click', (e) => {
+  $('#o-identify-carousel > div.owl-nav > button.owl-next').on('click', () => {
     const feature = selectionLayer.getFeatures()[0];
     const values = feature.values_;
     delete values.geometry;

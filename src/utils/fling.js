@@ -30,7 +30,7 @@ const request = async function request(url, options) {
   return json;
 };
 /**
- * 
+ *  AJAX replacer.
  * @param {*} feature 
  * @param {*} source 
  */
