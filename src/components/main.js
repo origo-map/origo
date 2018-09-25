@@ -9,7 +9,7 @@ export default function Main(options = {}) {
   const navigation = cu.Element({ cls: 'flex column relative spacing-vertical-small' });
   const mapTools = cu.Element({ cls: 'flex column relative spacing-vertical-small' });
   const miscTools = cu.Element({ cls: 'flex column relative spacing-vertical-small' });
-  const bottomTools = cu.Element({ cls: 'o-tools-bottom box bottom-left width-full no-margin' });
+  const bottomTools = cu.Element({ cls: 'o-tools-bottom absolute bottom-left width-full no-margin' });
 
   return cu.Component({
     getBottomTools: () => bottomTools,
