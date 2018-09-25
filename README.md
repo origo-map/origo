@@ -23,7 +23,7 @@ Download the latest [release](https://github.com/origo-map/origo/releases/) and 
 Learn more how to use Origo with the [api documentation](https://origo-map.github.io/api-documentation/latest/#origo-api).
 
 ## Want to contribute?
-We happily accept contributions of any kind. Guidelines are available in the [`CONTRIBUTING.md`](https://github.com/origo-map/origo/blob/master/CONTRIBUTING.md) file.
+We happily accept contributions of any kind. Guidelines are available in the [`CONTRIBUTING.md`](https://github.com/origo-map/origo/blob/master/CONTRIBUTING.md) and [`DEVELOPING.md`](https://github.com/origo-map/origo/blob/master/DEVELOPING.md) files.
 
 Thank you for considering contributing to Origo.
 
@@ -33,6 +33,7 @@ For all bugs and feature requests please use ["Issues"](https://github.com/origo
 ## Live examples
 Not convinced? Or maybe you need some inspiration? Check out these examples of web maps that have been developed using the Origo framework:
  * [Enakartan](http://karta.enkoping.se)
+ * [Eskilstunakartan](https://karta.eskilstuna.se)
  * [Hallstakartan](http://karta.hallstahammar.se)
  * [Karlstadskartan](http://gi.karlstad.se)
  * [Mälardalskartan](http://www.malardalskartan.se)
@@ -40,7 +41,7 @@ Not convinced? Or maybe you need some inspiration? Check out these examples of w
  * [Strängnäskartan](https://karta.strangnas.se)
  * [Västerås Stads samlingskarta](http://kartor.vasteras.se/sam)
 
-## Developing with Origo
+## Getting started
 So you have decided to take matters into your own hands and get coding? Great!
 
 Just follow these three steps and you will be up and running in no time.
@@ -72,8 +73,10 @@ Once you are ready to create a minified bundle, you will use:
 
 This will create a bundle called `origo.min.js` in the dist folder. Note that you will need to change the path to the Origo javascript file in the `index.html` file, from `origo.js` to `origo.min.js`, if you wish to run the map using the bundled version.
 
+To further reduce the bundle size of Origo it's recommended to enable gzip on your web server, as in this example for [IIS](https://docs.microsoft.com/en-us/iis/configuration/system.webserver/httpcompression/). This will reduce the file size to approximately a fourth of the original size.
+
 ### Notes
-Origo follows the [Airbnb's JavaScript Style Guide](https://github.com/airbnb/javascript/tree/es5-deprecated/es5). It might be a good idea to configure your text editor so that it adheres to the guidelines.
+Guidelines for developing in Origo are available in the [`DEVELOPING.md`](https://github.com/origo-map/origo/blob/master/DEVELOPING.md) file.
 
 ## Copyright
 The project is licensed under the BSD 2-clause license. It is specified in the [license file](LICENSE.txt).

@@ -1,35 +1,28 @@
-/*requires Modal.js*/
-"use strict";
+import permalinkParser from './permalinkparser';
+import permalinkStore from './permalinkstore';
+import urlparser from '../utils/urlparser';
 
-var permalinkParser = require('./permalinkparser');
-var permalinkStore = require('./permalinkstore');
-var urlparser =require('../utils/urlparser');
-
-module.exports = function() {
-
-return {
-    getPermalink: function getPermalink(options) {
-        var hash = urlparser.formatUrl(permalinkStore.getState());
-        var url = permalinkStore.getUrl() + "#" + hash;
-        return(url);
-    },
-    parsePermalink: function parsePermalink(url) {
-        if(url.indexOf('#') > -1) {
-            var urlSearch = url.split('#')[1];
-            var urlParts = urlSearch.split('&');
-            var urlAsObj = {};
-            urlParts.forEach(function(part) {
-                var key = part.split('=')[0];
-                var val = part.split('=')[1];
-                if(permalinkParser.hasOwnProperty(key)) {
-                    urlAsObj[key] = permalinkParser[key](val);
-                }
-            });
-            return urlAsObj;
+export default (() => ({
+  getPermalink: function getPermalink() {
+    const hash = urlparser.formatUrl(permalinkStore.getState());
+    const url = `${permalinkStore.getUrl()}#${hash}`;
+    return (url);
+  },
+  parsePermalink: function parsePermalink(url) {
+    if (url.indexOf('#') > -1) {
+      const urlSearch = url.split('#')[1];
+      const urlParts = urlSearch.split('&');
+      const urlAsObj = {};
+      urlParts.forEach((part) => {
+        const key = part.split('=')[0];
+        const val = part.split('=')[1];
+        if (Object.prototype.hasOwnProperty.call(permalinkParser, key)) {
+          urlAsObj[key] = permalinkParser[key](val);
         }
-        else {
-            return false;
-        }
+      });
+      return urlAsObj;
     }
-};
-}();
+
+    return false;
+  }
+}))();

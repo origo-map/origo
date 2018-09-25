@@ -1,34 +1,28 @@
-"use strict";
+import $ from 'jquery';
 
-var $ = require('jquery');
-
-module.exports = function elQuery(targetObj, options) {
-  var target = '.o-map';
-  var prefix = options.breakPointsPrefix;
-  var breakPoints = options.breakPoints;
-  var breakNames = Object.getOwnPropertyNames(breakPoints);
-  var breakCls = arrToObj(breakNames, prefix);
-  var breakClsNames = breakNames.map(function(breakSize) {
-    return breakCls[breakSize];
-  });
+export default function (targetObj, options) {
+  const target = '.o-map';
+  const prefix = options.breakPointsPrefix;
+  const breakPoints = options.breakPoints;
+  const breakNames = Object.getOwnPropertyNames(breakPoints);
+  const breakCls = arrToObj(breakNames, prefix);
+  const breakClsNames = breakNames.map(breakSize => breakCls[breakSize]);
 
   $(window).on('resize', onSizeChange);
   onSizeChange();
 
   function onSizeChange() {
-    var mapSize = targetObj.getSize();
-    var val = breakNames.reduce(function(prev, curr) {
-      var height = breakPoints[curr][1];
-      var width = breakPoints[curr][0];
+    const mapSize = targetObj.getSize();
+    const val = breakNames.reduce((prev, curr) => {
+      const height = breakPoints[curr][1];
+      const width = breakPoints[curr][0];
       if (mapSize[0] <= width || mapSize[1] <= height) {
         if (!prev) {
           return curr;
-        } else {
-          return prev;
         }
-      } else {
         return prev;
       }
+      return prev;
     }, undefined);
     $(target).removeClass(breakClsNames.join(' '));
     if (val) {
@@ -37,10 +31,10 @@ module.exports = function elQuery(targetObj, options) {
   }
 
   function arrToObj(arr, start) {
-    var obj = {};
-    var val = start;
-    arr.slice().reverse().forEach(function(curr) {
-      val += '-' + curr;
+    const obj = {};
+    let val = start;
+    arr.slice().reverse().forEach((curr) => {
+      val += `-${curr}`;
       obj[curr] = val;
     });
     return obj;

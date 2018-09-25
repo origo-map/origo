@@ -11,68 +11,43 @@
   "license": "BSD-2-Clause",
   "main": "origo.js",
   "scripts": {
-    "start": "npm run prebuild-sass | run-p start-origo watch-sass",
-    "start-origo": "budo origo.js:js/origo.js --live -- --s origo --d",
-    "watch": "watchify origo.js --s origo --d --outfile js/origo.js",
+    "start": "npm run prebuild-sass | run-p watch-js watch-sass",
+    "watch-js": "webpack-dev-server --config ./tasks/webpack.dev.js --mode development",
     "watch-sass": "node-sass -w --include-path scss scss/origo.scss css/style.css",
     "prebuild-sass": "node-sass --include-path scss scss/origo.scss css/style.css",
-    "build": "npm run build-origo && npm run build-sass",
+    "build": "npm run build-js && npm run build-sass | npm run copy",
     "build-sass": "node-sass --include-path scss scss/origo.scss dist/style.css",
-    "build-origo": "browserify origo.js --s origo | uglifyjs --compress --mangle --output dist/origo.min.js",
-    "build-ol": "node node_modules/openlayers/tasks/build.js tasks/build-ol-standard.json node_modules/openlayers/dist/ol.js"
+    "build-js": "webpack --config ./tasks/webpack.prod.js",
+    "build-js-analyze": "webpack --config ./tasks/webpack.analyze.js",
+    "copy": "webpack --config ./tasks/webpack.copy.js"
   },
   "dependencies": {
     "awesomplete": "1.1.2",
-    "browserify": "11.0.1",
     "jquery": "3.3.1",
     "localforage": "1.5.0",
-    "openlayers": "4.5.0",
+    "ol": "^4.6.5",
+    "owl.carousel": "^2.3.4",
     "proj4": "2.3.10"
   },
   "devDependencies": {
+    "babel-core": "^6.26.0",
     "babel-eslint": "^8.0.1",
-    "browser-sync": "2.9.5",
-    "browserify": "11.0.1",
-    "browserify-shim": "3.8.10",
-    "budo": "^9.0.0",
-    "eslint": "^4.10.0",
-    "eslint-config-airbnb-es5": "^1.2.0",
-    "eslint-plugin-react": "^7.4.0",
-    "gulp": "3.9.1",
-    "gulp-csso": "3.0.0",
-    "gulp-eslint": "4.0.0",
-    "gulp-rename": "1.2.2",
-    "gulp-sass": "3.1.0",
-    "gulp-sequence": "0.4.6",
-    "gulp-uglify": "3.0.0",
-    "gulp-util": "3.0.8",
-    "handlebars": "4.0.5",
-    "hbsfy": "2.5.1",
+    "babel-loader": "^7.1.4",
+    "babel-preset-env": "^1.6.1",
+    "compression-webpack-plugin": "^1.1.11",
+    "copy-webpack-plugin": "^4.5.1",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.10.0",
     "node-sass": "4.7.2",
     "npm-run-all": "^3.1.2",
     "run-sequence": "^2.1.0",
     "uglify-js": "3.2.0",
-    "vinyl-buffer": "^1.0.0",
-    "vinyl-source-stream": "1.1.0",
-    "watchify": "3.3.1"
-  },
-  "browserify": {
-    "transform": [
-      "browserify-shim",
-      [
-        "hbsfy"
-      ]
-    ]
-  },
-  "eslintConfig": {
-    "env": {
-      "browser": true,
-      "node": true
-    },
-    "extends": "eslint-config-airbnb-es5",
-    "rules": {
-      "func-names": "off"
-    }
-  },
-  "browserify-shim": {}
+    "uglifyjs-webpack-plugin": "^1.2.5",
+    "webpack": "^4.11.1",
+    "webpack-bundle-analyzer": "^2.13.1",
+    "webpack-cli": "^2.0.14",
+    "webpack-dev-server": "^3.1.3",
+    "webpack-merge": "^4.1.2"
+  }
 }

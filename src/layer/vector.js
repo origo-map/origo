@@ -1,50 +1,51 @@
-"use strict";
+import VectorLayer from 'ol/layer/vector';
+import VectorTileLayer from 'ol/layer/vectortile';
+import ClusterSource from 'ol/source/cluster';
+import style from '../style';
+import viewer from '../viewer';
 
-var ol = require('openlayers');
-var style = require('../style')();
-var viewer = require('../viewer');
-
-module.exports = function vector(options, source) {
-  var vectorLayer;
+export default function vector(opt, src) {
+  const options = opt;
+  const source = src;
+  const distance = 60;
+  const map = viewer.getMap();
+  const view = map.getView();
+  const maxZoom = view.getResolutions().length - 1;
+  let vectorLayer;
   switch (options.layerType) {
     case 'vector':
+    {
       options.source = source;
-      options.style = style.createStyle(options.style);
-      vectorLayer = new ol.layer.Vector(options);
+      options.style = style().createStyle(options.style);
+      vectorLayer = new VectorLayer(options);
       break;
+    }
     case 'cluster':
+    {
       options.clusterOptions = options.clusterOptions || {};
-      if(options.type === 'WFS' || options.type === 'AGS_FEATURE'){
+      if (options.type === 'WFS' || options.type === 'AGS_FEATURE') {
         source.clusterOptions = viewer.getMapSource()[options.sourceName].clusterOptions || {};
       } else {
         source.clusterOptions = {};
       }
-      var distance = 60;
-      var clusterDistance = options.clusterOptions.clusterDistance || source.clusterOptions.clusterDistance || viewer.getClusterOptions().clusterDistance || distance;
-      var clusterMaxZoom = options.clusterOptions.clusterMaxZoom || source.clusterOptions.clusterMaxZoom || viewer.getClusterOptions().clusterMaxZoom || viewer.getResolutions().length-1;
-      var clusterInitialDistance = viewer.getSettings().zoom > clusterMaxZoom ? 0 : clusterDistance;
-      var map = viewer.getMap();
-      var view = map.getView();
-      var maxZoom = view.getResolutions().length-1;
-      options.source = new ol.source.Cluster({
+      const clusterDistance = options.clusterOptions.clusterDistance || source.clusterOptions.clusterDistance || viewer.getClusterOptions().clusterDistance || distance;
+      const clusterMaxZoom = options.clusterOptions.clusterMaxZoom || source.clusterOptions.clusterMaxZoom || viewer.getClusterOptions().clusterMaxZoom || viewer.getResolutions().length - 1;
+      const clusterInitialDistance = viewer.getSettings().zoom > clusterMaxZoom ? 0 : clusterDistance;
+      options.source = new ClusterSource({
         attributions: options.attribution,
-        source: source,
+        source,
         distance: clusterInitialDistance
       });
       options.source.setProperties({
-        clusterDistance : clusterDistance,
-        clusterMaxZoom : clusterMaxZoom
+        clusterDistance,
+        clusterMaxZoom
       });
-      options.style = style.createStyle(options.style, options.clusterStyle);
-      vectorLayer = new ol.layer.Vector(options);
-      map.on('movestart', onMoveStart);
-
-      function onMoveStart(evt) {
-        var mapZoom = view.getZoomForResolution(evt.frameState.viewState.resolution);
-        var clusterDistance = options.source.getProperties().clusterDistance || distance;
-        var clusterMaxZoom = options.source.getProperties().clusterMaxZoom || maxZoom;
-        map.once('moveend', function(evt) {
-          var currentZoom = parseInt(view.getZoom(), 10);
+      options.style = style().createStyle(options.style, options.clusterStyle);
+      vectorLayer = new VectorLayer(options);
+      map.on('movestart', (evt) => {
+        const mapZoom = view.getZoomForResolution(evt.frameState.viewState.resolution);
+        map.once('moveend', () => {
+          const currentZoom = parseInt(view.getZoom(), 10);
           if (currentZoom !== mapZoom) {
             if (currentZoom >= clusterMaxZoom) {
               options.source.setDistance(0);
@@ -52,21 +53,29 @@ module.exports = function vector(options, source) {
               options.source.setDistance(clusterDistance);
             }
           }
-        })
-      }
-      break;
-    case 'image':
-      options.source = new ol.source.ImageVector({
-        source: source,
-        style: style.createStyle(options.style)
+        });
       });
-      vectorLayer = new ol.layer.Image(options);
       break;
-    case 'vectortile':
+    }
+    case 'image':
+    {
       options.source = source;
-      options.style = style.createStyle(options.style);
-      vectorLayer = new ol.layer.VectorTile(options);
+      options.style = style().createStyle(options.style);
+      options.renderMode = 'image';
+      vectorLayer = new VectorLayer(options);
       break;
+    }
+    case 'vectortile':
+    {
+      options.source = source;
+      options.style = style().createStyle(options.style);
+      vectorLayer = new VectorTileLayer(options);
+      break;
+    }
+    default:
+    {
+      break;
+    }
   }
   return vectorLayer;
 }
