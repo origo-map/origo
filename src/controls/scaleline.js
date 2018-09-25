@@ -1,17 +1,27 @@
-import ScaleLine from 'ol/control/scaleline';
-import viewer from '../viewer';
+import cu from 'ceeu';
+import olScaleLine from 'ol/control/scaleline';
 
-let map;
-
-function init(optOptions) {
-  const options = optOptions || {};
-  const target = options.target || 'o-tools-bottom';
-  map = viewer.getMap();
-
-  const scaleLine = new ScaleLine({
+const ScaleLine = function ScaleLine(options = {}) {
+  let {
     target
-  });
-  map.addControl(scaleLine);
-}
+  } = options;
+  let viewer;
+  let scaleLine;
 
-export default { init };
+  return cu.Component({
+    onAdd(evt) {
+      viewer = evt.target;
+      if (!target) target = `${viewer.getMain().getBottomTools().getId()}`;
+      scaleLine = new olScaleLine({
+        target
+      });
+      this.render();
+    },
+    render() {
+      viewer.getMap().addControl(scaleLine);
+      this.dispatch('render');
+    }
+  });
+};
+
+export default ScaleLine;
