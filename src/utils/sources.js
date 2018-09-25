@@ -96,12 +96,12 @@ const find = function find(feature, sources) {
 };
 
 /**
- * Updates multiple results. 
- * @param {*} results 
- * @param {*} identifyTarget 
- * @param {*} coordinate 
- * @param {*} selectionLayer 
- * @param {*} identify 
+ * Updates multiple results.
+ * @param {*} results
+ * @param {*} identifyTarget
+ * @param {*} coordinate
+ * @param {*} selectionLayer
+ * @param {*} identify
  */
 async function updateResults(results, identifyTarget, coordinate, selectionLayer, identify) {
   try {
@@ -115,8 +115,8 @@ async function updateResults(results, identifyTarget, coordinate, selectionLayer
         fling.translate(feature, source).then((responses) => {
           responses.forEach((response) => {
             attributes.forEach((sourceAttribute) => {
-              const name = sourceAttribute.name; 
-              const title = sourceAttribute.title; 
+              const name = sourceAttribute.name;
+              const title = sourceAttribute.title;
               empty[title] = response[name];
               feature.setProperties(empty);
             });
@@ -133,12 +133,12 @@ async function updateResults(results, identifyTarget, coordinate, selectionLayer
   }
 }
 /**
- * 
- * @param {*} result 
- * @param {*} identifyTarget 
- * @param {*} coordinate 
- * @param {*} selectionLayer 
- * @param {*} identify 
+ *
+ * @param {*} result
+ * @param {*} identifyTarget
+ * @param {*} coordinate
+ * @param {*} selectionLayer
+ * @param {*} identify
  */
 async function updateResult(result, identifyTarget, coordinate, selectionLayer, identify) {
   const all = result;

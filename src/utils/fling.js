@@ -6,7 +6,7 @@ import 'babel-polyfill';
  */
 
 const fetchError = function fetchError(error) {
-  return console.log(`Fetch error: ${error}`, error);
+  return alert(`Fetch error: ${error}`, error);
 };
 
 /**

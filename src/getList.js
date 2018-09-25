@@ -2,7 +2,7 @@ import featureinfotemplates from './featureinfotemplates';
 
 /**
  * Helper for handling jQuery objekt, to compile list.
- * @param {ol_feature_} feature 
+ * @param {ol_feature_} feature
  */
 export default function (feature) {
   const attributes = feature.getProperties();
