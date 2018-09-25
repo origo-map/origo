@@ -1,23 +1,38 @@
-import Rotate from 'ol/control/rotate';
-import $ from 'jquery';
-import viewer from '../viewer';
-import utils from '../utils';
+import cu from 'ceeu';
+import olRotate from 'ol/control/rotate';
 
-let map;
+const Rotate = function Rotate(options = {}) {
+  let {
+    target
+  } = options;
 
-function init() {
-  const icon = utils.createSvg({
-    href: '#origo-compass',
+  const icon = cu.Icon({
+    icon: '#origo-compass',
     cls: 'o-icon-compass'
   });
-  map = viewer.getMap();
 
-  const rotateControl = new Rotate({
-    label: $.parseHTML(`<span>${icon}</span>`)[0],
-    tipLabel: ' ',
-    target: 'o-toolbar-misc'
+  let rotateControl;
+  let viewer;
+
+  return cu.Component({
+    onAdd(evt) {
+      viewer = evt.target;
+      if (!target) target = `${viewer.getMain().getMiscTools().getId()}`;
+      const label = document.createElement('span');
+      label.innerHTML = icon.render();
+      rotateControl = new olRotate({
+        label,
+        tipLabel: ' ',
+        target
+      });
+
+      this.render();
+    },
+    render() {
+      viewer.getMap().addControl(rotateControl);
+      this.dispatch('render');
+    }
   });
-  map.addControl(rotateControl);
-}
+};
 
-export default { init };
+export default Rotate;

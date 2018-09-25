@@ -55,7 +55,7 @@ const Zoom = function Zoom(options = {}) {
     render() {
       const htmlString = `<div class="o-zoom flex column box-shadow">
                             ${zoomIn.render()}
-                            <div class="divider vertical"></div>
+                            <div class="divider horizontal"></div>
                             ${zoomOut.render()}
                          </div>`;
       const el = cu.dom.html(htmlString);

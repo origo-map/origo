@@ -12,7 +12,7 @@ export { default as Home } from './controls/home';
 // export { default as Offline } from './controls/offline';
 // export { default as Position } from './controls/position';
 // export { default as Print } from './controls/print';
-// export { default as Rotate } from './controls/rotate';
+export { default as Rotate } from './controls/rotate';
 // export { default as Scale } from './controls/scale';
 // export { default as Scaleline } from './controls/scaleline';
 // export { default as Search } from './controls/search';
