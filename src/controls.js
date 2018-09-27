@@ -1,6 +1,6 @@
 // export { default as About } from './controls/about';
 export { default as Attribution } from './controls/attribution';
-// export { default as Draganddrop } from './controls/draganddrop';
+export { default as Draganddrop } from './controls/draganddrop';
 // export { default as Editor } from './controls/editor';
 export { default as Fullscreen } from './controls/fullscreen';
 export { default as Geoposition } from './controls/geoposition';
