@@ -231,6 +231,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
   const getInitialZoom = () => zoom;
 
+  const getFooter = () => footer;
+
   const getMain = () => main;
 
   const mergeSavedLayerProps = (initialLayerProps, savedLayerProps) => {
@@ -403,6 +405,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getConsoleId,
     getControlNames,
     getExtent,
+    getFeatureinfo,
+    getFooter,
     getInitialZoom,
     getTileGridSettings,
     getGroup,
