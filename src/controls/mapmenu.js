@@ -1,87 +1,93 @@
-import $ from 'jquery';
-import utils from '../utils';
-import viewer from '../viewer';
+import cu from 'ceeu';
 
-let $closeButton;
-let $mapMenu;
-let $menuButton;
+let closeButton;
+let mapMenu;
+let mapMenuButton;
 
 let options;
 let isActive;
 
 function toggleMenu() {
-  if ($mapMenu.hasClass('o-mapmenu-show')) {
-    $mapMenu.removeClass('o-mapmenu-show');
-  } else {
-    $mapMenu.addClass('o-mapmenu-show');
-  }
+  document.getElementById(mapMenu.getId()).classList.toggle('o-mapmenu-show');
 }
 
 function getTarget() {
-  return $mapMenu;
+  return mapMenu;
 }
 
-function bindUIActions() {
-  $menuButton.on('click', (e) => {
-    toggleMenu();
-    $menuButton.blur();
-    e.preventDefault();
+const Mapmenu = function Mapmenu(opt = {}) {
+  let viewer;
+  let target;
+  options = opt;
+
+  return cu.Component({
+    onAdd(evt) {
+      viewer = evt.target;
+      target = `${viewer.getMain().getId()}`;
+      this.on('render', this.onRender);
+      this.addComponents([mapMenuButton]);
+      this.addComponents([mapMenu]);
+      this.addComponents([closeButton]);
+      this.render();
+
+      const breakPointSize = options.breakPointSize || 'l';
+      const breakPoint = viewer.getBreakPoints(breakPointSize);
+      isActive = options.isActive || false;
+
+      if (isActive && document.getElementById(target).offsetWidth >= breakPoint[0]) {
+        toggleMenu();
+      }
+    },
+    onInit() {
+      mapMenuButton = cu.Button({
+        cls: 'o-mapmenu-button padding-small icon-smaller rounded light box-shadow absolute',
+        icon: '#fa-bars',
+        text: 'Meny',
+        textCls: 'o-button-text',
+        tooltipText: 'Meny',
+        tooltipPlacement: 'west',
+        click() {
+          toggleMenu();
+        }
+      });
+
+      closeButton = cu.Button({
+        cls: 'o-mapmenu-button-close padding-small icon-smaller rounded light absolute',
+        icon: '#fa-times',
+        tooltipText: 'Stäng meny',
+        tooltipPlacement: 'west',
+        click() {
+          toggleMenu();
+        }
+      });
+
+      mapMenu = cu.Element({
+        cls: 'o-mapmenu',
+        innerHTML: '<div class="o-block"><ul id="o-menutools"><li></li></ul></div>'
+      });
+    },
+    render() {
+      const buttonHtmlString = mapMenuButton.render();
+      const closeButtonHtmlString = closeButton.render();
+      const menuHtmlString = mapMenu.render();
+
+      const menuButtonEl = cu.dom.html(buttonHtmlString);
+      const closeButtonEl = cu.dom.html(closeButtonHtmlString);
+      const menuEl = cu.dom.html(menuHtmlString);
+
+      document.getElementById(target).appendChild(menuButtonEl);
+      document.getElementById(target).appendChild(menuEl);
+      document.getElementById('o-menutools').appendChild(closeButtonEl);
+
+      this.dispatch('render');
+    }
   });
-  $closeButton.on('click', (e) => {
-    toggleMenu();
-    $closeButton.blur();
-    e.preventDefault();
-  });
-}
-
-function init(opt) {
-  options = opt || {};
-  isActive = options.isActive || false;
-  const breakPointSize = options.breakPointSize || 'l';
-  const breakPoint = viewer.getBreakPoints(breakPointSize);
-
-  const el = utils.createButton({
-    text: 'Meny',
-    id: 'o-mapmenu-button',
-    cls: 'o-mapmenu-button-true',
-    iconCls: 'o-icon-fa-bars',
-    src: '#fa-bars',
-    tooltipText: 'Meny',
-    tooltipPlacement: 'west'
-  });
-  $('#o-map').append(el);
-  $menuButton = $('#o-mapmenu-button button');
-
-  const menuEl = `<div id="o-mapmenu" class="o-mapmenu">
-  <div class="o-block">
-    <ul id="o-menutools">
-      <li></li>
-    </ul>
-  </div>
-</div>`;
-  $('#o-map').append(menuEl);
-  $mapMenu = $('#o-mapmenu');
-
-  const closeButton = utils.createButton({
-    id: 'o-mapmenu-button-close',
-    cls: 'o-no-boxshadow',
-    iconCls: 'o-icon-menu-fa-times',
-    src: '#fa-times',
-    tooltipText: 'Stäng meny',
-    tooltipPlacement: 'west'
-  });
-  $('#o-menutools').append(closeButton);
-  $closeButton = $('#o-mapmenu-button-close');
-
-  bindUIActions();
-
-  if (isActive && $('#o-map').width() >= breakPoint[0]) {
-    toggleMenu();
-  }
-}
-
-export default {
-  init,
-  toggleMenu,
-  getTarget
 };
+
+export default Mapmenu;
+
+// export default {
+//   Mapmenu,
+//   toggleMenu,
+//   getTarget
+// };
