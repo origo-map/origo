@@ -10,10 +10,6 @@ import VectorLayer from 'ol/layer/vector';
 import legend from './legend';
 
 const DragAndDrop = function DragAndDrop(options = {}) {
-  let {
-    target
-  } = options;
-
   let viewer;
 
   return cu.Component({
