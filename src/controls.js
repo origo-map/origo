@@ -6,7 +6,7 @@ export { default as Fullscreen } from './controls/fullscreen';
 export { default as Geoposition } from './controls/geoposition';
 export { default as Home } from './controls/home';
 // export { default as Legend } from './controls/legend';
-// export { default as Link } from './controls/link';
+export { default as Link } from './controls/link';
 export { default as Mapmenu } from './controls/mapmenu';
 // export { default as Measure } from './controls/measure';
 // export { default as Offline } from './controls/offline';
