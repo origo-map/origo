@@ -9,7 +9,10 @@ const Splash = function Splash(options = {}) {
 
   let {
     title,
-    content,
+    content
+  } = options;
+
+  const {
     url
   } = options;
 
