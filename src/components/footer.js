@@ -17,7 +17,7 @@ export default function Footer(options = {}) {
         middleContent = `<p>${data.text}</p>`;
       }
 
-      return `<div id="o-footer" class="o-footer relative">
+      return `<div id=${this.getId()} class="o-footer relative">
                 <div id="o-console" class="o-footer-left">&nbsp;</div>
                 <div class="o-footer-middle">
                   <div class="o-footer-middle-content">

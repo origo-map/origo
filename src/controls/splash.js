@@ -1,41 +1,52 @@
-import $ from 'jquery';
+import cu from 'ceeu';
 import modal from '../modal';
-import viewer from '../viewer';
 
-const defaultTitle = 'Om kartan';
-const defaultContent = '<p></p>';
-const cls = 'o-splash';
-let title;
-let content;
+const Splash = function Splash(options = {}) {
+  const defaultTitle = 'Om kartan';
+  const defaultContent = '<p></p>';
+  const cls = 'o-splash';
+  let viewer;
 
-
-function getContent(url) {
-  return $.get(url);
-}
-
-function openModal() {
-  modal.createModal('#o-map', {
+  let {
     title,
-    content,
-    cls
-  });
-  modal.showModal();
-}
+    content
+  } = options;
 
-function init(optOptions) {
-  const options = optOptions || {};
-  title = options.title || defaultTitle;
-  if (options.url) {
-    const url = viewer.getBaseUrl() + options.url;
-    getContent(url)
-      .done((data) => {
-        content = data;
-        openModal();
-      });
-  } else {
-    content = options.content || defaultContent;
-    openModal();
+  const {
+    url
+  } = options;
+
+  function openModal() {
+    modal.createModal(`#${viewer.getId()}`, {
+      title,
+      content,
+      cls
+    });
+    modal.showModal();
   }
-}
 
-export default { init };
+  return cu.Component({
+    onAdd(evt) {
+      viewer = evt.target;
+      if (!title) title = defaultTitle;
+
+      if (url) {
+        const fullUrl = viewer.getBaseUrl() + url;
+        const req = new Request(`${fullUrl}`);
+        fetch(req).then(response => response.text().then((text) => {
+          content = text;
+          this.render();
+        }));
+      } else {
+        if (!content) content = defaultContent;
+        this.render();
+      }
+    },
+    render() {
+      openModal();
+      this.dispatch('render');
+    }
+  });
+};
+
+export default Splash;
