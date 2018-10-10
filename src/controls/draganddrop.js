@@ -68,7 +68,6 @@ const DragAndDrop = function DragAndDrop(options = {}) {
         legend.addTickListener(vectorLayer);
         legend.addMapLegendListener(vectorLayer);
       });
-      this.on('render', this.onRender);
       this.render();
     },
     onInit() {
