@@ -1,4 +1,4 @@
-// export { default as About } from './controls/about';
+export { default as About } from './controls/about';
 export { default as Attribution } from './controls/attribution';
 export { default as Draganddrop } from './controls/draganddrop';
 // export { default as Editor } from './controls/editor';

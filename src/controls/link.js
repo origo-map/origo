@@ -1,20 +1,19 @@
 import cu from 'ceeu';
 
 const Link = function Link(options = {}) {
-  let url;
-  let title;
+  const {
+    url,
+    title
+  } = options;
   let linkButton;
   let linkElement;
 
   return cu.Component({
     onAdd() {
-      this.on('render', this.onRender);
       this.addComponents([linkButton]);
       this.render();
     },
     onInit() {
-      url = options.url;
-      title = options.title;
       linkButton = cu.Button({
         id: 'o-link-button',
         cls: 'o-menu-button',

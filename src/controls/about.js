@@ -1,43 +1,64 @@
-import $ from 'jquery';
-import utils from '../utils';
+import cu from 'ceeu';
 import modal from '../modal';
 
-let $aboutButton;
-let buttonText;
-let title;
-let content;
+const About = function About(options = {}) {
+  let {
+    buttonText,
+    content,
+    title
+  } = options;
 
-function render() {
-  const el = utils.createListButton({
-    id: 'o-about',
-    iconCls: 'o-icon-fa-info-circle',
-    src: '#fa-info-circle',
-    text: buttonText
-  });
-  $('#o-menutools').append(el);
-  $aboutButton = $('#o-about-button');
-}
+  const defaultContent = '<p></p>';
+  const defaultTitle = 'Om kartan';
+  let viewer;
+  let aboutButton;
+  let aboutElement;
 
-function bindUIActions() {
-  $aboutButton.on('click', (e) => {
-    modal.createModal('#o-map', {
+  function openModal() {
+    modal.createModal(`#${viewer.getId()}`, {
       title,
       content
     });
-
     modal.showModal();
-    e.preventDefault();
+  }
+
+  return cu.Component({
+    onAdd(evt) {
+      viewer = evt.target;
+      this.addComponents([aboutButton]);
+      this.render();
+    },
+    onInit() {
+      if (!title) title = defaultTitle;
+      if (!buttonText) buttonText = defaultTitle;
+      if (!content) content = defaultContent;
+
+      aboutButton = cu.Button({
+        id: 'o-about-button',
+        cls: 'o-menu-button',
+        click() {
+          openModal();
+        },
+        text: title,
+        icon: '#ic_help_outline_24px',
+        iconCls: 'o-button-icon'
+      });
+
+      const rendered = aboutButton.render();
+
+      aboutElement = cu.Element({
+        cls: '',
+        tagName: 'li',
+        innerHTML: `${rendered}`
+      });
+    },
+    render() {
+      const htmlString = aboutElement.render();
+      const el = cu.dom.html(htmlString);
+      document.getElementById('o-menutools').appendChild(el);
+      this.dispatch('render');
+    }
   });
-}
+};
 
-function init(opt) {
-  const options = opt || {};
-  buttonText = options.buttonText || 'Om kartan';
-  title = options.title || 'Om kartan';
-  content = options.content || '<p></p>';
-
-  render();
-  bindUIActions();
-}
-
-export default { init };
+export default About;
