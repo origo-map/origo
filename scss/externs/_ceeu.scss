@@ -545,17 +545,23 @@
   .cu .box-shadow-subtle {
     box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.2); }
   .cu .round {
-    border-radius: 50%; }
+    border-radius: 50%;
+    overflow: hidden; }
   .cu .rounded {
-    border-radius: 0.25rem; }
+    border-radius: 0.25rem;
+    overflow: hidden; }
   .cu .rounded-top {
-    border-radius: 0.25rem 0.25rem 0 0; }
+    border-radius: 0.25rem 0.25rem 0 0;
+    overflow: hidden; }
   .cu .rounded-right {
-    border-radius: 0 0.25rem 0.25rem 0; }
+    border-radius: 0 0.25rem 0.25rem 0;
+    overflow: hidden; }
   .cu .rounded-bottom {
-    border-radius: 0 0 0.25rem 0.25rem; }
+    border-radius: 0 0 0.25rem 0.25rem;
+    overflow: hidden; }
   .cu .rounded-left {
-    border-radius: 0.25rem 0 0 0.25rem; }
+    border-radius: 0.25rem 0 0 0.25rem;
+    overflow: hidden; }
   .cu .cursor-auto {
     cursor: auto; }
   .cu .cell {
@@ -708,6 +714,9 @@
     .cu .button.primary,
     .cu button.primary {
       background-color: #008ff5; }
+    .cu .button.danger,
+    .cu button.danger {
+      background-color: #c33932; }
     .cu .button.light,
     .cu button.light {
       background-color: white; }
@@ -759,6 +768,9 @@
     .cu button:hover.primary:hover,
     .cu .button:hover.primary:hover {
       background-color: #0080db; }
+    .cu button:hover.danger:hover,
+    .cu .button:hover.danger:hover {
+      background-color: #ae332d; }
   .cu .icon > * {
     margin: 0;
     padding: 0; }

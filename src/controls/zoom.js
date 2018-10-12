@@ -39,14 +39,14 @@ const Zoom = function Zoom(options = {}) {
     },
     onInit() {
       zoomIn = cu.Button({
-        cls: 'o-zoom-in padding-small icon-smaller rounded-top light',
+        cls: 'o-zoom-in padding-small icon-smaller light',
         click() {
           zoomByDelta(delta);
         },
         icon: '#ic_add_24px'
       });
       zoomOut = cu.Button({
-        cls: 'o-zoom-out padding-small icon-smaller rounded-bottom light',
+        cls: 'o-zoom-out padding-small icon-smaller light',
         click() {
           zoomByDelta(-delta);
         },
@@ -54,7 +54,7 @@ const Zoom = function Zoom(options = {}) {
       });
     },
     render() {
-      const htmlString = `<div class="o-zoom flex column box-shadow">
+      const htmlString = `<div class="o-zoom flex column rounded box-shadow">
                             ${zoomIn.render()}
                             <div class="divider horizontal"></div>
                             ${zoomOut.render()}
