@@ -22,6 +22,7 @@ const Mapmenu = function Mapmenu(opt = {}) {
 
   return cu.Component({
     name: 'mapmenu',
+    toggleMenu,
     onAdd(evt) {
       viewer = evt.target;
       target = `${viewer.getMain().getId()}`;
