@@ -3,16 +3,11 @@ import cu from 'ceeu';
 let closeButton;
 let mapMenu;
 let mapMenuButton;
-
 let options;
 let isActive;
 
 function toggleMenu() {
   document.getElementById(mapMenu.getId()).classList.toggle('o-mapmenu-show');
-}
-
-function getTarget() {
-  return mapMenu;
 }
 
 const Mapmenu = function Mapmenu(opt = {}) {
@@ -87,9 +82,3 @@ const Mapmenu = function Mapmenu(opt = {}) {
 };
 
 export default Mapmenu;
-
-// export default {
-//   Mapmenu,
-//   toggleMenu,
-//   getTarget
-// };
