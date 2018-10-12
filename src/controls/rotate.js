@@ -15,6 +15,7 @@ const Rotate = function Rotate(options = {}) {
   let viewer;
 
   return cu.Component({
+    name: 'rotate',
     onAdd(evt) {
       viewer = evt.target;
       if (!target) target = `${viewer.getMain().getMiscTools().getId()}`;

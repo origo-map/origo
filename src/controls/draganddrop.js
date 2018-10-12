@@ -13,6 +13,7 @@ const DragAndDrop = function DragAndDrop(options = {}) {
   let viewer;
 
   return cu.Component({
+    name: 'draganddrop',
     onAdd(evt) {
       viewer = evt.target;
       const map = viewer.getMap();

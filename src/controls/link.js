@@ -9,6 +9,7 @@ const Link = function Link(options = {}) {
   let linkElement;
 
   return cu.Component({
+    name: 'link',
     onAdd() {
       this.addComponents([linkButton]);
       this.render();

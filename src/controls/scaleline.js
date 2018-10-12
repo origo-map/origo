@@ -9,6 +9,7 @@ const ScaleLine = function ScaleLine(options = {}) {
   let scaleLine;
 
   return cu.Component({
+    name: 'scaleline',
     onAdd(evt) {
       viewer = evt.target;
       if (!target) target = `${viewer.getMain().getBottomTools().getId()}`;

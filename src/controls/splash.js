@@ -26,6 +26,7 @@ const Splash = function Splash(options = {}) {
   }
 
   return cu.Component({
+    name: 'splash',
     onAdd(evt) {
       viewer = evt.target;
       if (!title) title = defaultTitle;

@@ -14,6 +14,7 @@ const Home = function Home(options = {}) {
   };
 
   return cu.Component({
+    name: 'home',
     onAdd(evt) {
       viewer = evt.target;
       const map = viewer.getMap();

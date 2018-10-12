@@ -16,6 +16,7 @@ const Fullscreen = function Fullscreen(options = {}) {
   };
 
   return cu.Component({
+    name: 'fullscreen',
     onAdd(evt) {
       viewer = evt.target;
       fullscreenButton = cu.Button({

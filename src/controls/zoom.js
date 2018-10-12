@@ -29,6 +29,7 @@ const Zoom = function Zoom(options = {}) {
   };
 
   return cu.Component({
+    name: 'zoom',
     onAdd(evt) {
       viewer = evt.target;
       if (!target) target = `${viewer.getMain().getNavigation().getId()}`;

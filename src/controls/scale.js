@@ -34,6 +34,7 @@ const Scale = function Scale(options = {}) {
   }
 
   return cu.Component({
+    name: 'scale',
     onAdd(evt) {
       viewer = evt.target;
       map = viewer.getMap();

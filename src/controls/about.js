@@ -23,6 +23,7 @@ const About = function About(options = {}) {
   }
 
   return cu.Component({
+    name: 'about',
     onAdd(evt) {
       viewer = evt.target;
       this.addComponents([aboutButton]);

@@ -75,6 +75,7 @@ const Geoposition = function Geoposition(options = {}) {
   };
 
   return cu.Component({
+    name: 'geoposition',
     onAdd(evt) {
       viewer = evt.target;
       if (!target) target = `${viewer.getMain().getNavigation().getId()}`;

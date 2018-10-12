@@ -221,7 +221,14 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
   const getMapSource = () => source;
 
-  const getControlNames = () => controls.map(obj => obj.name);
+  const getControlByName = function getControlByName(name) {
+    const components = this.getComponents();
+    const control = components.find(component => component.name === name);
+    if (!control) {
+      return null;
+    }
+    return control;
+  };
 
   const getTarget = () => target;
 
@@ -403,7 +410,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getBreakPoints,
     getClusterOptions,
     getConsoleId,
-    getControlNames,
+    getControlByName,
     getExtent,
     getFeatureinfo,
     getFooter,

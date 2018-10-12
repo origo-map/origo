@@ -14,6 +14,7 @@ const Attribution = function Attribution(options = {}) {
   }
 
   return cu.Component({
+    name: 'attribution',
     onAdd(evt) {
       viewer = evt.target;
       breakPoint = options.breakPoint || [768, 500];
