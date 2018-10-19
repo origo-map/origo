@@ -240,7 +240,7 @@ const Position = function Position(options = {}) {
       if (!suffix) suffix = '';
       if (!title) title = undefined;
 
-      this.addComponents([centerButton, projButton, coordsDivElement, coordsFindElement, containerElement]);
+      this.addComponents([centerButton, centerButtonElement, projButton, projButtonElement, coordsDivElement, coordsFindElement, containerElement]);
       this.render();
     },
     onInit() {
