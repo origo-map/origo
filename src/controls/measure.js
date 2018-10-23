@@ -45,13 +45,13 @@ const Measure = function Measure({
   const buttons = [];
   let target;
 
-  const disableMeasureEvent = new Event('enableInteraction', {
-    interaction: 'featureInfo',
-    bubbles: true
+  const disableMeasureEvent = new CustomEvent('enableInteraction', {
+    bubbles: true,
+    detail: 'featureInfo'
   });
-  const enableMeasureEvent = new Event('enableInteraction', {
-    interaction: 'measure',
-    bubbles: true
+  const enableMeasureEvent = new CustomEvent('enableInteraction', {
+    bubbles: true,
+    detail: 'measure'
   });
 
   function createStyle(feature) {
@@ -250,10 +250,16 @@ const Measure = function Measure({
 
   function toggleMeasure() {
     if (isActive) {
-      mapEl.dispatchEvent(disableMeasureEvent);
+      document.dispatchEvent(new CustomEvent('toggleInteraction', {
+        bubbles: true,
+        detail: 'featureInfo'
+      }));
       disableInteraction();
     } else {
-      mapEl.dispatchEvent(enableMeasureEvent);
+      document.dispatchEvent(new CustomEvent('toggleInteraction', {
+        bubbles: true,
+        detail: 'measure'
+      }));
       enableInteraction();
     }
   }
@@ -275,12 +281,6 @@ const Measure = function Measure({
       viewer = evt.target;
       target = `${viewer.getMain().getMiscTools().getId()}`;
       mapEl = document.getElementById(viewer.getMain().getId());
-      mapEl.addEventListener('enableInteraction', () => {
-        enableInteraction();
-      });
-      mapEl.addEventListener('disableInteraction', () => {
-        disableInteraction();
-      });
 
       map = viewer.getMap();
       source = new VectorSource();
