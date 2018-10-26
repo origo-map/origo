@@ -83,7 +83,8 @@ function getLegendGraphicStyle(layer) {
       properties = {
         request: "getLegendGraphic",
         layer: layer.getProperties().id,
-        format: "image/png"
+        format: "image/png",
+        version: layer.getSource().getParams().VERSION
       };
 
   if (layer.getProperties().legendGraphicSettings) {
