@@ -45,10 +45,8 @@ function convertToMapfishOptions(options) {
 	if(backgroundLayer) {
 		var url;
 		if (backgroundLayer.getSource() instanceof ol.source.TileWMS) {
-			//url = backgroundLayer.getSource().getUrls()[0];
             url = fetchSourceUrl(backgroundLayer)
 		} else if (backgroundLayer.getSource() instanceof ol.source.ImageWMS) {
-			//url = backgroundLayer.getSource().getUrl();
             url = fetchSourceUrl(backgroundLayer)
 		} else {
 			console.log('Bakgrundslager är av okänd bildtyp: ', backgroundLayer.getSource);
