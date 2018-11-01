@@ -45,15 +45,15 @@ function convertToMapfishOptions(options) {
 	if(backgroundLayer) {
 		var url;
 		if (backgroundLayer.getSource() instanceof ol.source.TileWMS) {
-			url = backgroundLayer.getSource().getUrls()[0];
+            url = fetchSourceUrl(backgroundLayer)
 		} else if (backgroundLayer.getSource() instanceof ol.source.ImageWMS) {
-			url = backgroundLayer.getSource().getUrl();
+            url = fetchSourceUrl(backgroundLayer)
 		} else {
 			console.log('Bakgrundslager är av okänd bildtyp: ', backgroundLayer.getSource);
 		}
 		var backgroundLayerObject = {
 			type: backgroundLayer.get('type'),
-			baseURL: 'http://karta.eskilstuna.se' + url,
+			baseURL: url,
 			format: backgroundLayer.getSource().getParams().FORMAT,
 			layers: [backgroundLayer.getSource().getParams().LAYERS]
 		};
@@ -99,20 +99,20 @@ function buildLegend(layers) {
         switch (type.toUpperCase()) {
 			case "WMS":
 				var o = [];
-				var url = fetchSourceUrl(layer);
+				var url = fetchSourceUrl(layer)
 				var name = layer.get('name');
 				return {
 					name: layer.get('title'),
-					icons: [ 'http://karta.eskilstuna.se' + url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&SCALE=1&legend_options=dpi:400']
+					icons: [url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&SCALE=1&legend_options=dpi:400']
 				};
             break;
 			case "WFS":
 			var o = [];
-				var url = fetchSourceUrl(layer);
+				var url = fetchSourceUrl(layer)
 				var name = layer.get('name');
 				return {
 					name: layer.get('title'),
-					icons: [ 'http://karta.eskilstuna.se' + url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&SCALE=1&legend_options=dpi:400']
+					icons: [url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&SCALE=1&legend_options=dpi:400']
 				}
             break;
         }
@@ -126,10 +126,13 @@ function fetchSourceUrl(layer) {
 	switch (layer.get('type').toUpperCase()) {
 		case "WMS":
 			if (layer.getSource() instanceof ol.source.TileWMS) {
-				url = layer.getSource().getUrls()[0];
+				url = layer.getSource().getUrls()[0]; 
 			} else if (layer.getSource() instanceof ol.source.ImageWMS) {
-				url = layer.getSource().getUrl();
+				url = layer.getSource().getUrl(); 
 			}
+            if (url.charAt(0) == "/") {
+                url=config.localHost+url
+            }
 			return url;
 		break;
 		case "WFS":
@@ -180,9 +183,9 @@ function buildLayersObjects(inLayers, type) {
 		//Build wms objects one per source
 		layers.forEach(function(layer) {
 			if (layer.getSource() instanceof ol.source.TileWMS) {
-				url = layer.getSource().getUrls()[0];
+                url = fetchSourceUrl(layer)
 			} else if (layer.getSource() instanceof ol.source.ImageWMS) {
-				url = layer.getSource().getUrl();
+				url = fetchSourceUrl(layer)
 			} else {
 				console.log('Lagertyp stöds ej.');
 			}
@@ -192,7 +195,7 @@ function buildLayersObjects(inLayers, type) {
 			} else {
 				printableLayers.push({
 					type: layer.get('type'),
-					baseURL: 'http://karta.eskilstuna.se' + url,
+					baseURL: url,
 					format: layer.getSource().getParams().FORMAT,
 					layers: [layer.getSource().getParams().LAYERS]
 				});
@@ -351,7 +354,7 @@ function executeMapfishCall(url, data) {
 		contentType: 'application/json',
 		dataType: 'json',
 		success: function (data) {
-			var url = 'https://karta.eskilstuna.se/' + newUrl(data.getURL);
+			var url = newUrl(data.getURL);
 			console.log('SUCCESS', url);
 			$('#o-dl-progress').hide();
 			$('#o-dl-cancel').hide();
@@ -367,7 +370,9 @@ function executeMapfishCall(url, data) {
 
 // because mapfish can't return a dang url which isnt localhost
 function newUrl(url) {
-	return url.substr(url.indexOf('/', 7) + 1)
+    var basePart = config.printCreate.substr(0, config.printCreate.indexOf('/', 8)) 
+    var mapfishPart = url.substr(url.indexOf('/', 8), url.length -1)
+    return basePart+mapfishPart
 }
 
 function printMap(settings) {
@@ -376,4 +381,3 @@ function printMap(settings) {
 }
 
 module.exports.printMap = printMap;
-
