@@ -5,7 +5,7 @@ export default function Main(options = {}) {
     cls: clsSettings = ''
   } = options;
 
-  const cls = `${clsSettings} o-main transparent relative flex grow`.trim();
+  const cls = `${clsSettings} o-main transparent relative flex column grow`.trim();
   const navigation = cu.Element({ cls: 'o-navigation flex column relative spacing-vertical-small' });
   const mapTools = cu.Element({ cls: 'o-maptools flex column relative spacing-vertical-small' });
   const miscTools = cu.Element({ cls: 'o-misc flex column relative spacing-vertical-small' });
@@ -18,7 +18,7 @@ export default function Main(options = {}) {
     getMiscTools: () => miscTools,
     render: function render() {
       return `<div id=${this.getId()} class="${cls}">
-                <div id="o-tools-left" class="box top-left transparent flex column spacing-vertical-small">
+                <div id="o-tools-left" class="box top-left transparent flex column spacing-vertical">
                   ${navigation.render()}
                   ${mapTools.render()}
                   ${miscTools.render()}

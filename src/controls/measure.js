@@ -279,7 +279,7 @@ const Measure = function Measure({
     name: 'measure',
     onAdd(evt) {
       viewer = evt.target;
-      target = `${viewer.getMain().getMiscTools().getId()}`;
+      target = `${viewer.getMain().getMapTools().getId()}`;
       mapEl = document.getElementById(viewer.getMain().getId());
 
       map = viewer.getMap();
