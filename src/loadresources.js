@@ -1,5 +1,4 @@
 import $ from 'jquery';
-import supports from './utils/supports';
 import permalink from './permalink/permalink';
 import getUrl from './utils/geturl';
 import isUrl from './utils/isurl';
@@ -20,9 +19,9 @@ function loadSvgSprites(baseUrl, config) {
   });
 }
 
-const mapLoader = function mapLoader(mapOptions, config) {
+const loadResources = function loadResources(mapOptions, config) {
   const map = {};
-  let mapEl = config.target;
+  const mapEl = config.target;
   const format = 'json';
   let urlParams;
   let url;
@@ -31,11 +30,6 @@ const mapLoader = function mapLoader(mapOptions, config) {
   let json;
 
   map.el = mapEl;
-
-  // Check browser support
-  if (supports('browser', mapEl) === false) {
-    return undefined;
-  }
 
   function loadMapOptions() {
     if (typeof (mapOptions) === 'object') {
@@ -114,4 +108,4 @@ const mapLoader = function mapLoader(mapOptions, config) {
   return loadMapOptions();
 };
 
-export default mapLoader;
+export default loadResources;

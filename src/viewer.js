@@ -21,7 +21,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
   } = options;
 
   const {
-    baseUrl,
+    baseUrl = '',
     breakPoints,
     breakPointsPrefix,
     clsOptions = '',

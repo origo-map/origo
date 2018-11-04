@@ -6,9 +6,9 @@ export default function Main(options = {}) {
   } = options;
 
   const cls = `${clsSettings} o-main transparent relative flex grow`.trim();
-  const navigation = cu.Element({ cls: 'flex column relative spacing-vertical-small' });
-  const mapTools = cu.Element({ cls: 'flex column relative spacing-vertical-small' });
-  const miscTools = cu.Element({ cls: 'flex column relative spacing-vertical-small' });
+  const navigation = cu.Element({ cls: 'o-navigation flex column relative spacing-vertical-small' });
+  const mapTools = cu.Element({ cls: 'o-maptools flex column relative spacing-vertical-small' });
+  const miscTools = cu.Element({ cls: 'o-misc flex column relative spacing-vertical-small' });
   const bottomTools = cu.Element({ cls: 'o-tools-bottom absolute bottom-left width-full no-margin' });
 
   return cu.Component({

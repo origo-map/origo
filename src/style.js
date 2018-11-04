@@ -10,8 +10,6 @@ import stylefunctions from './style/stylefunctions';
 import replacer from '../src/utils/replacer';
 import maputils from './maputils';
 
-let baseUrl;
-
 const white = [255, 255, 255, 1];
 const blue = [0, 153, 255, 1];
 const width = 3;
@@ -58,7 +56,7 @@ const editStyleOptions = {
   ]
 };
 
-function createStyleOptions(styleParams) {
+function createStyleOptions(styleParams, baseUrl) {
   const styleOptions = {};
   if (Object.prototype.hasOwnProperty.call(styleParams, 'geometry')) {
     switch (styleParams.geometry) {
@@ -115,7 +113,7 @@ function createStyleOptions(styleParams) {
   return styleOptions;
 }
 
-function createStyleList(styleOptions) {
+function createStyleList(styleOptions, baseUrl) {
   const styleList = [];
   // Create style for each rule
   for (let i = 0; i < styleOptions.length; i += 1) {
@@ -124,11 +122,11 @@ function createStyleList(styleOptions) {
     // Check if rule is array, ie multiple styles for the rule
     if (styleOptions[i].constructor === Array) {
       for (let j = 0; j < styleOptions[i].length; j += 1) {
-        styleOption = createStyleOptions(styleOptions[i][j]);
+        styleOption = createStyleOptions(styleOptions[i][j], baseUrl);
         styleRule.push(new Style(styleOption));
       }
     } else {
-      styleOption = createStyleOptions(styleOptions[i]);
+      styleOption = createStyleOptions(styleOptions[i], baseUrl);
       styleRule = [new Style(styleOption)];
     }
 
@@ -209,6 +207,7 @@ function createStyle({
   const resolutions = viewer.getResolutions();
   const projection = viewer.getProjection();
   const styleSettings = viewer.getStyle(styleName);
+  const baseUrl = viewer.getBaseUrl();
 
   if (Object.keys(styleSettings).length === 0 || !styleSettings) {
     throw new Error(`Style ${styleName} is not defined`);
@@ -221,9 +220,9 @@ function createStyle({
 
   const style = (function style() {
     // Create style for each rule
-    const styleList = createStyleList(styleSettings);
+    const styleList = createStyleList(styleSettings, baseUrl);
     if (clusterStyleSettings) {
-      const clusterStyleList = createStyleList(clusterStyleSettings);
+      const clusterStyleList = createStyleList(clusterStyleSettings, baseUrl);
       return styleFunction({
         styleSettings,
         styleList,
@@ -243,16 +242,16 @@ function createStyle({
   return style;
 }
 
-function createStyleRule(options) {
+function createStyleRule(options, baseUrl) {
   let styleRule = [];
   let styleOption;
   if (options.constructor === Array) {
     for (let i = 0; i < options.length; i += 1) {
-      styleOption = createStyleOptions(options[i]);
+      styleOption = createStyleOptions(options[i], baseUrl);
       styleRule.push(new Style(styleOption));
     }
   } else {
-    styleOption = createStyleOptions(options);
+    styleOption = createStyleOptions(options, baseUrl);
     styleRule = [new Style(styleOption)];
   }
   return styleRule;

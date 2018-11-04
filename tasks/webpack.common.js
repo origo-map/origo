@@ -19,6 +19,12 @@ module.exports = {
               },
               modules: false
             }]
+          ],
+          plugins: [
+            ['transform-runtime', {
+              regenerator: true,
+              polyfill: true
+            }]
           ]
         }
       }

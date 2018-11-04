@@ -1,8 +1,10 @@
 import cu from 'ceeu';
 import Viewer from './src/viewer';
-import mapLoader from './src/maploader';
+import loadResources from './src/loadresources';
 import titleCase from './src/utils/titlecase';
 import * as origoControls from './src/controls';
+import supports from './src/utils/supports';
+import renderError from './src/utils/rendererror';
 
 const Origo = function Origo(configPath, options = {}) {
   const origoConfig = {
@@ -27,6 +29,13 @@ const Origo = function Origo(configPath, options = {}) {
     ]
   };
 
+  const isSupported = supports();
+  const el = options.target || origoConfig.target;
+  if (!isSupported) {
+    renderError('browser', el);
+    return null;
+  }
+
   const initControls = (controlDefs) => {
     const controls = [];
     controlDefs.forEach((def) => {
@@ -48,7 +57,7 @@ const Origo = function Origo(configPath, options = {}) {
     getConfig,
     onInit() {
       const defaultConfig = Object.assign({}, origoConfig, options);
-      const request = mapLoader(configPath, defaultConfig);
+      const request = loadResources(configPath, defaultConfig);
 
       if (request) {
         request.then((data) => {
