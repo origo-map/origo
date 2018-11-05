@@ -309,7 +309,7 @@ const Measure = function Measure({
         });
 
         measureButton = cu.Button({
-          cls: 'o-home-in padding-small icon-smaller rounded light box-shadow',
+          cls: 'padding-small icon-smaller rounded light box-shadow',
           click() {
             toggleMeasure();
           },

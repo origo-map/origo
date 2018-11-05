@@ -73,5 +73,6 @@ const Origo = function Origo(configPath, options = {}) {
 };
 
 Origo.controls = origoControls;
+Origo.ui = cu;
 
 export default Origo;
