@@ -1,3 +1,4 @@
+import polyfill from './src/utils/polyfill';
 import cu from 'ceeu';
 import Viewer from './src/viewer';
 import loadResources from './src/loadresources';
@@ -35,6 +36,7 @@ const Origo = function Origo(configPath, options = {}) {
     renderError('browser', el);
     return null;
   }
+  polyfill();
 
   const initControls = (controlDefs) => {
     const controls = [];
@@ -58,7 +60,6 @@ const Origo = function Origo(configPath, options = {}) {
     onInit() {
       const defaultConfig = Object.assign({}, origoConfig, options);
       const request = loadResources(configPath, defaultConfig);
-
       if (request) {
         request.then((data) => {
           const viewerOptions = data.options;

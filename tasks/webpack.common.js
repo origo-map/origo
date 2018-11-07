@@ -13,17 +13,18 @@ module.exports = {
         query: {
           cacheDirectory: false,
           presets: [
-            ['env', {
+            ['@babel/preset-env', {
               targets: {
                 browsers: ['ie >= 11']
               },
-              modules: false
+              modules: false,
+              useBuiltIns: 'entry'
             }]
           ],
           plugins: [
-            ['transform-runtime', {
+            ['@babel/plugin-transform-runtime', {
               regenerator: true,
-              polyfill: true
+              corejs: 2
             }]
           ]
         }
@@ -39,6 +40,9 @@ module.exports = {
       jQuery: 'jquery',
       'window.jQuery': 'jquery',
       proj4: 'proj4'
+    }),
+    new webpack.ProvidePlugin({
+      fetch: 'imports-loader?this=>global!exports-loader?global.fetch!whatwg-fetch'
     })
   ]
 };

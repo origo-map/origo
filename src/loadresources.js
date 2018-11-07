@@ -4,7 +4,7 @@ import getUrl from './utils/geturl';
 import isUrl from './utils/isurl';
 import trimUrl from './utils/trimurl';
 
-function loadSvgSprites(baseUrl, config) {
+const loadSvgSprites = function loadSvgSprites(baseUrl, config) {
   const svgSprites = config.svgSprites;
   const svgPath = config.svgSpritePath;
   const svgPromises = [];
@@ -17,9 +17,9 @@ function loadSvgSprites(baseUrl, config) {
     svgPromises.push(promise);
     return svgPromises;
   });
-}
+};
 
-const loadResources = function loadResources(mapOptions, config) {
+const loadResources = async function loadResources(mapOptions, config) {
   const map = {};
   const mapEl = config.target;
   const format = 'json';
