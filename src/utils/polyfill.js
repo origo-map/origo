@@ -15,7 +15,7 @@ import 'core-js/fn/promise';
  * Fetch is provided in a webpack plugin.
  */
 
-/** Polyfill for CustomEvent from https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent */
+// Polyfill for CustomEvent from https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent
 function CustomEvent(event, {
   bubbles = false,
   cancelable = false,
@@ -26,6 +26,23 @@ function CustomEvent(event, {
   return evt;
 }
 
+// Polyfill for Element remove https://developer.mozilla.org/en-US/docs/Web/API/ChildNode/remove
+function ElementRemove(arr) {
+  arr.forEach((item) => {
+    if ('remove' in item) {
+      return;
+    }
+    Object.defineProperty(item, 'remove', {
+      configurable: true,
+      enumerable: true,
+      writable: true,
+      value: function remove() {
+        this.parentNode.removeChild(this);
+      }
+    });
+  });
+}
+
 export default function polyfill() {
   if (typeof window.CustomEvent !== 'function') {
     CustomEvent.prototype = window.Event.prototype;
@@ -34,5 +51,6 @@ export default function polyfill() {
   if (!Element.prototype.matches) {
     Element.prototype.matches = Element.prototype.msMatchesSelector;
   }
+  ElementRemove([Element.prototype, CharacterData.prototype, DocumentType.prototype].filter(Boolean));
 }
 

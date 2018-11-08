@@ -5,7 +5,7 @@ export default function Main(options = {}) {
     cls: clsSettings = ''
   } = options;
 
-  const cls = `${clsSettings} o-main transparent relative flex column grow`.trim();
+  const cls = `${clsSettings} o-main transparent relative flex column grow height-full no-margin`.trim();
   const navigation = cu.Element({ cls: 'o-navigation flex column relative spacing-vertical-small' });
   const mapTools = cu.Element({ cls: 'o-maptools flex column relative spacing-vertical-small' });
   const miscTools = cu.Element({ cls: 'o-misc flex column relative spacing-vertical-small' });
