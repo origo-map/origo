@@ -1,9 +1,9 @@
 import proj4 from 'proj4';
-import Map from 'ol/map';
+import Map from 'ol/Map';
 import View from 'ol/View';
 import Collection from 'ol/Collection';
 import Projection from 'ol/proj/Projection';
-import {register} from 'ol/proj/proj4';
+import { register } from 'ol/proj/proj4';
 import Feature from 'ol/Feature';
 import geom from 'ol/geom/Geometry';
 import $ from 'jquery';

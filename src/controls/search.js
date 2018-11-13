@@ -1,4 +1,4 @@
-import Overlay from 'ol/overlay';
+import Overlay from 'ol/Overlay';
 import Point from 'ol/geom/Point';
 import Awesomplete from 'awesomplete';
 import $ from 'jquery';

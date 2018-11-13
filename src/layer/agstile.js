@@ -1,4 +1,4 @@
-import TileArcGISRest from 'ol/source/tilearcgisrest';
+import TileArcGISRest from 'ol/source/TileArcGISRest';
 import $ from 'jquery';
 import viewer from '../viewer';
 import tile from './tile';

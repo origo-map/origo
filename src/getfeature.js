@@ -1,5 +1,5 @@
-import EsriJSONFormat from 'ol/format/esrijson';
-import GeoJSONFormat from 'ol/format/geojson';
+import EsriJSONFormat from 'ol/format/EsriJSON';
+import GeoJSONFormat from 'ol/format/GeoJSON';
 import $ from 'jquery';
 import viewer from './viewer';
 

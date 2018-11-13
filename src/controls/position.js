@@ -1,7 +1,7 @@
-import MousePosition from 'ol/control/mouseposition';
+import MousePosition from 'ol/control/MousePosition';
 import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
-import {createStringXY} from 'ol/coordinate';
+import { createStringXY } from 'ol/coordinate';
 import $ from 'jquery';
 import viewer from '../viewer';
 import utils from '../utils';

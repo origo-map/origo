@@ -3,9 +3,9 @@ import TileGrid from 'ol/tilegrid/TileGrid';
 import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
 import Vector from 'ol/source/Vector';
-import GeoJSON from 'ol/format/geojson';
-import {getTopLeft, getBottomLeft} from 'ol/extent';
-import WKT from 'ol/format/wkt';
+import GeoJSON from 'ol/format/GeoJSON';
+import { getTopLeft, getBottomLeft } from 'ol/extent';
+import WKT from 'ol/format/WKT';
 import viewer from './viewer';
 
 export default {

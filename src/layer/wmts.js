@@ -1,6 +1,6 @@
-import WMTSSource from 'ol/source/wmts';
+import WMTSSource from 'ol/source/WMTS';
 import Tilegrid from 'ol/tilegrid/WMTS';
-import {getTopLeft} from 'ol/extent';
+import { getTopLeft } from 'ol/extent';
 import $ from 'jquery';
 import viewer from '../viewer';
 import tile from './tile';

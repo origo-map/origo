@@ -1,9 +1,9 @@
 import $ from 'jquery';
-import {getArea, getLength} from 'ol/sphere';
+import { getArea, getLength } from 'ol/sphere';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import DrawInteraction from 'ol/interaction/Draw';
-import Overlay from 'ol/overlay';
+import Overlay from 'ol/Overlay';
 import Polygon from 'ol/geom/Polygon';
 import LineString from 'ol/geom/LineString';
 import viewer from '../viewer';
@@ -151,7 +151,7 @@ function pointerMoveHandler(evt) {
   if (sketch) {
     const geom = (sketch.getGeometry());
     let output;
-    
+
     if (geom.getType() === 'Polygon') {
       output = formatArea((geom));
       tooltipCoord = geom.getInteriorPoint().getCoordinates();

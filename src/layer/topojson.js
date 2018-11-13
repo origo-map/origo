@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import VectorSource from 'ol/source/Vector';
-import TopoJSONFormat from 'ol/format/topojson';
+import TopoJSONFormat from 'ol/format/TopoJSON';
 import viewer from '../viewer';
 import vector from './vector';
 import isUrl from '../utils/isurl';
