@@ -1,12 +1,12 @@
 #o-popup {
   width: 270px;
+  display: none;
 }
 #o-identify-carousel,
 #o-identify {
 	height: 100%;
 }
 .o-popup {
-  display: none;
   bottom: 12px;
   width: 100%;
   z-index: 1010;

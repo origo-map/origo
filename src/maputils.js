@@ -45,7 +45,7 @@ export default {
     const vectorSource = new Vector({
       features: (new GeoJSON()).readFeatures(obj)
     });
-    return vectorSource.getFeatures()[0];
+    return vectorSource.getFeatures();
   },
   wktToFeature: function wktToFeature(wkt, srsName) {
     const format = new WKT();
