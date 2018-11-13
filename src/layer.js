@@ -38,10 +38,13 @@ const Layer = function Layer(optOptions, viewer) {
   if (layerOptions.id === undefined) {
     layerOptions.id = name.split('__').shift();
   }
+  if (!layerOptions.type) {
+    layerOptions.type = viewer.getSource(layerOptions.sourceName).type || null;
+  }
 
   layerOptions.name = name.split(':').pop();
 
-  if ('type' in layerOptions) {
+  if (layerOptions.type) {
     return type[layerOptions.type](layerOptions, viewer);
   }
 

@@ -4,15 +4,22 @@ import VectorSource from 'ol/source/vector';
 import loadingstrategy from 'ol/loadingstrategy';
 import vector from './vector';
 
-function createSource(options) {
-  const esriSrs = options.projectionCode.split(':').pop();
-  const queryFilter = options.filter ? `&where=${options.filter}` : '';
+function createSource({
+  attribution,
+  id,
+  filter,
+  projectionCode,
+  url: sourceUrl
+} = {}) {
+  const esriSrs = projectionCode.split(':').pop();
+  const queryFilter = filter ? `&where=${filter}` : '';
   const esrijsonFormat = new EsriJSON();
   const vectorSource = new VectorSource({
-    attributions: options.attribution,
+    attributions: attribution,
     loader(extent, resolution, projection) {
       const that = this;
-      const url = options.url + options.id +
+      let url = sourceUrl.endsWith('/') ? sourceUrl : `${sourceUrl}/`;
+      url += id +
         encodeURI(['/query?f=json&',
           'returnGeometry=true',
           '&spatialRel=esriSpatialRelIntersects',

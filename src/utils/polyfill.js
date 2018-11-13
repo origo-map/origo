@@ -1,3 +1,4 @@
+import 'core-js/fn/string/ends-with';
 import 'core-js/fn/string/starts-with';
 import 'core-js/fn/array/find';
 import 'core-js/fn/array/is-array';
