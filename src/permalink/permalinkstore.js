@@ -29,6 +29,10 @@ permalinkStore.getState = function getState() {
   state.center = view.getCenter().map(coord => Math.round(coord)).join();
   state.zoom = view.getZoom().toString();
 
+  if (featureinfo.getSelection().id) {
+    state.feature = featureinfo.getSelection().id;
+  }
+
   if (getPin()) {
     state.pin = getPin().getGeometry().getCoordinates().map(coord => Math.round(coord))
       .join();
