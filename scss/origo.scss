@@ -19,7 +19,7 @@
   @import 'externs/owl.theme.default.scss';
   // @import 'font.scss';
   // @import 'table.scss';
-  // @import 'card.scss';
+  @import 'card.scss';
   // @import 'container-fluid.scss';
   // @import 'container.scss';
   // @import 'card.scss';
@@ -27,11 +27,11 @@
   @import 'button.scss';
   // @import 'image.scss';
    @import 'modal.scss';
-  // @import 'popup.scss';
+  @import 'popup.scss';
   // @import 'popover.scss';
   // @import 'dropdown.scss';
   // @import 'sidebar.scss';
-  // @import 'close.scss';
+  @import 'close.scss';
   @import 'icon.scss';
   // @import 'tooltip.scss';
   // @import 'control.scss';

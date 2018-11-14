@@ -111,7 +111,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     switch (target) {
       case 'overlay':
       {
-        popup = Popup('#o-map');
+        popup = Popup(`#${viewer.getId()}`);
         popup.setContent({
           content,
           title: items[0].title
