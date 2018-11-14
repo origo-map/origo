@@ -9,6 +9,7 @@ import featurelayer from './featurelayer';
 import Style from './style';
 import StyleTypes from './style/styletypes';
 import getFeatureInfo from './getfeatureinfo';
+import replacer from '../src/utils/replacer';
 
 const style = Style();
 const styleTypes = StyleTypes();
@@ -46,11 +47,23 @@ function callback(evt) {
       clone,
       selectionStyles[items[currentItem].feature.getGeometry().getType()]
     );
+    const layer = viewer.getLayersByProperty('name', items[currentItem].name)[0];
+    const featureinfoTitle = layer.getProperties().featureinfoTitle;
+    let title;
+    if (featureinfoTitle) {
+      const featureProps = items[currentItem].feature.getProperties();
+      title = replacer.replace(featureinfoTitle, featureProps);
+      if (!title) {
+        title = items[currentItem].title ? items[currentItem].title : items[currentItem].name;
+      }
+    } else {
+      title = items[currentItem].title ? items[currentItem].title : items[currentItem].name;
+    }
     selectionLayer.setSourceLayer(items[currentItem].layer);
     if (identifyTarget === 'overlay') {
-      popup.setTitle(items[currentItem].title);
+      popup.setTitle(title);
     } else {
-      sidebar.setTitle(items[currentItem].title);
+      sidebar.setTitle(title);
     }
   }
 }
