@@ -27,6 +27,20 @@ function render() {
   $editClose = $('#o-editor-close');
 }
 
+function toggleToolbar(state) {
+  if (state) {
+    $('.o-map').first().trigger({
+      type: 'enableInteraction',
+      interaction: 'editor'
+    });
+  } else {
+    $('.o-map').first().trigger({
+      type: 'enableInteraction',
+      interaction: 'featureInfo'
+    });
+  }
+}
+
 function bindUIActions() {
   $editDraw.on('click', (e) => {
     dispatcher.emitToggleEdit('draw');
@@ -54,14 +68,8 @@ function bindUIActions() {
     $editSave.blur();
     e.preventDefault();
   });
-  $editClose.on('click', (e) => {
-    $('.o-map').first().trigger({
-      type: 'enableInteraction',
-      interaction: 'featureInfo'
-    });
-    $editClose.blur();
-    e.stopPropagation();
-    e.preventDefault();
+  $editClose.on('click', () => {
+    toggleToolbar(false);
   });
 }
 
@@ -115,16 +123,16 @@ function toggleSave(e) {
   }
 }
 
-function init(options) {
+function init(options, v) {
   currentLayer = options.currentLayer;
   editableLayers = options.editableLayers;
 
-  editHandler(options);
+  editHandler(options, v);
   render();
   editorLayers(editableLayers, {
     activeLayer: currentLayer
-  });
-  drawTools(options.drawTools, currentLayer);
+  }, v);
+  drawTools(options.drawTools, currentLayer, v);
 
   $(document).on('enableInteraction', onEnableInteraction);
   $(document).on('changeEdit', onChangeEdit);
@@ -139,6 +147,7 @@ function init(options) {
 
 export default (function exportInit() {
   return {
-    init
+    init,
+    toggleToolbar
   };
 }());

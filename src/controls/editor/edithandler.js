@@ -5,9 +5,7 @@ import Snap from 'ol/interaction/snap';
 import Collection from 'ol/collection';
 import Feature from 'ol/feature';
 import $ from 'jquery';
-import viewer from '../../viewer';
 import modal from '../../modal';
-import featureInfo from '../../featureinfo';
 import store from './editsstore';
 import generateUUID from '../../utils/generateuuid';
 import transactionHandler from './transactionhandler';
@@ -34,6 +32,8 @@ let hasSnap;
 let select;
 let modify;
 let snap;
+let viewer;
+let featureInfo;
 
 function isActive() {
   if (modify === undefined || select === undefined) {
@@ -118,7 +118,7 @@ function saveFeatures() {
       }
     });
 
-    transactionHandler(transaction, layerName);
+    transactionHandler(transaction, layerName, viewer);
   });
 }
 
@@ -477,7 +477,7 @@ function editAttributes(feat) {
 
     const formElement = attributeObjects.reduce((prev, next) => prev + next.formElement, '');
     const form = `<form>${formElement}<br><div class="o-form-save"><input id="o-save-button" type="button" value="Ok"></input></div></form>`;
-    modal.createModal('#o-map', {
+    modal.createModal(`#${viewer.getId()}`, {
       title,
       content: form,
       static: true
@@ -526,7 +526,9 @@ function onChangeEdit(e) {
   }
 }
 
-export default function editHandler(options) {
+export default function editHandler(options, v) {
+  viewer = v;
+  featureInfo = viewer.getControlByName('featureInfo');
   map = viewer.getMap();
   currentLayer = options.currentLayer;
   editableLayers = options.editableLayers;

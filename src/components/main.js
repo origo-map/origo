@@ -23,7 +23,9 @@ export default function Main(options = {}) {
                   ${mapTools.render()}
                   ${miscTools.render()}
                 </div>
-                ${bottomTools.render()}
+                <div id="o-tools-bottom" class="box bottom-center transparent width-full ">
+                  ${bottomTools.render()}
+                </div>
               </div>`;
     }
   });
