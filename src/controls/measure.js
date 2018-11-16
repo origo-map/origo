@@ -304,7 +304,6 @@ const Measure = function Measure({
       defaultTool = lengthTool ? defaultMeasureTool : 'area';
       if (lengthTool || areaTool) {
         measureElement = cu.Element({
-          cls: 'o-toolbar-horizontal',
           tagName: 'div'
         });
 
@@ -334,7 +333,7 @@ const Measure = function Measure({
 
         if (areaTool) {
           areaToolButton = cu.Button({
-            cls: 'o-home-in padding-small margin-left-smaller icon-smaller rounded light box-shadow absolute hidden',
+            cls: 'o-home-in padding-small margin-left-smaller icon-smaller rounded light box-shadow hidden',
             click() {
               type = 'Polygon';
               toggleType(this);
@@ -349,9 +348,7 @@ const Measure = function Measure({
       }
     },
     render() {
-      let htmlString = `<div class="absolute width-8">
-                            ${measureElement.render()}
-                         </div>`;
+      let htmlString = `${measureElement.render()}`;
       let el = cu.dom.html(htmlString);
       document.getElementById(target).appendChild(el);
       htmlString = measureButton.render();
