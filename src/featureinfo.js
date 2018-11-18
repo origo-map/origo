@@ -223,6 +223,7 @@ const Featureinfo = function Featureinfo(options = {}) {
   };
 
   return cu.Component({
+    name: 'featureInfo',
     clear,
     getHitTolerance,
     getPin,
