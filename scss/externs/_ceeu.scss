@@ -98,6 +98,8 @@
       color: currentColor; }
     .cu a:hover {
       color: #b5b5b5; }
+  .cu svg use {
+    pointer-events: none; }
   .cu .fade-in {
     animation: 0.3s fade-in ease; }
 
@@ -396,13 +398,13 @@
     margin: 0.5rem 0; }
   .cu .spacing-vertical-small > * {
     margin: 0.25rem 0; }
-  .cu .spacing-horizontal-large > *:first-child,
-  .cu .spacing-horizontal > *:first-child,
-  .cu .spacing-horizontal-small > *:first-child {
+  .cu .spacing-horizontal-large:first-child,
+  .cu .spacing-horizontal:first-child,
+  .cu .spacing-horizontal-small:first-child {
     margin-left: 0; }
-  .cu .spacing-horizontal-large > *:last-child,
-  .cu .spacing-horizontal > *:last-child,
-  .cu .spacing-horizontal-small > *:last-child {
+  .cu .spacing-horizontal-large:last-child,
+  .cu .spacing-horizontal:last-child,
+  .cu .spacing-horizontal-small:last-child {
     margin-right: 0; }
   .cu .spacing-vertical-large:first-child,
   .cu .spacing-vertical:first-child,
@@ -780,6 +782,11 @@
   .cu button:hover.grey-lightest:hover,
   .cu .button:hover.grey-lightest:hover {
     background-color: #dbdbdb; }
+  .cu .collapse-container {
+    overflow: hidden;
+    position: relative;
+    will-change: transform;
+    transition: all 0.3s; }
   .cu .icon-smallest:not(.button):not(button) {
     height: 0.75rem;
     width: 0.75rem; }
@@ -795,28 +802,28 @@
   .cu .icon-large:not(.button):not(button) {
     height: 2.5rem;
     width: 2.5rem; }
-  .cu .button.icon > *,
-  .cu button.icon > * {
+  .cu .button.icon,
+  .cu button.icon {
     margin: 0;
     padding: 0; }
-  .cu .button.icon-smallest > *,
-  .cu button.icon-smallest > * {
+  .cu .button.icon-smallest .icon,
+  .cu button.icon-smallest .icon {
     height: 0.75rem;
     width: 0.75rem; }
-  .cu .button.icon-smaller > *,
-  .cu button.icon-smaller > * {
+  .cu .button.icon-smaller .icon,
+  .cu button.icon-smaller .icon {
     height: 1.125rem;
     width: 1.125rem; }
-  .cu .button.icon-small > *,
-  .cu button.icon-small > * {
+  .cu .button.icon-small .icon,
+  .cu button.icon-small .icon {
     height: 1.5rem;
     width: 1.5rem; }
-  .cu .button.icon-medium > *,
-  .cu button.icon-medium > * {
+  .cu .button.icon-medium .icon,
+  .cu button.icon-medium .icon {
     height: 2rem;
     width: 2rem; }
-  .cu .button.icon-large > *,
-  .cu button.icon-large > * {
+  .cu .button.icon-large .icon,
+  .cu button.icon-large .icon {
     height: 2.5rem;
     width: 2.5rem; }
   .cu .button[class^="icon"],
@@ -824,14 +831,16 @@
   .cu button[class^="icon"],
   .cu button[class*="icon"] {
     line-height: 0; }
-  .cu .button > svg,
-  .cu button > svg {
-    fill: #4a4a4a; }
-  .cu .button.active > svg,
-  .cu button.active > svg {
+  .cu .button svg,
+  .cu button svg {
+    fill: #4a4a4a;
+    height: inherit;
+    width: inherit; }
+  .cu .button.active svg,
+  .cu button.active svg {
     fill: #008ff5; }
-  .cu .button.primary > svg,
-  .cu button.primary > svg {
+  .cu .button.primary svg,
+  .cu button.primary svg {
     fill: white; }
   .cu svg.primary {
     fill: #008ff5; }
@@ -848,6 +857,7 @@
     .cu .divider.horizontal {
       border-bottom: 1px solid #dbdbdb;
       border-right: none;
+      line-height: 0;
       width: 100%; }
   .cu .list > .item {
     padding-top: 0.75rem;
@@ -856,6 +866,27 @@
     border-bottom: 1px solid #dbdbdb; }
   .cu .list.divided > .item:last-child {
     border: none; }
+  .cu .list.hover:hover,
+  .cu li.hover:hover {
+    background-color: #dbdbdb; }
+  .cu .list.hover.light:hover,
+  .cu li.hover.light:hover {
+    background-color: #dbdbdb; }
+  .cu .list.hover.primary:hover,
+  .cu li.hover.primary:hover {
+    background-color: #0080db; }
+  .cu .list.hover.danger:hover,
+  .cu li.hover.danger:hover {
+    background-color: #ae332d; }
+  .cu .list.hover.grey-light:hover,
+  .cu li.hover.grey-light:hover {
+    background-color: #7a7a7a; }
+  .cu .list.hover.grey-lighter:hover,
+  .cu li.hover.grey-lighter:hover {
+    background-color: #b5b5b5; }
+  .cu .list.hover.grey-lightest:hover,
+  .cu li.hover.grey-lightest:hover {
+    background-color: #dbdbdb; }
   .cu .toggle-group {
     display: inline-block; }
   .cu .sidenav {

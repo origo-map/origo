@@ -2,13 +2,15 @@ import cu from 'ceeu';
 import template from './print/printtemplate';
 
 const Print = function Print(options = {}) {
-  let {
-    attribution
+  const {
+    attribution = '© Lantmäteriet Geodatasamverkan',
+    icon = '#ic_print_24px',
+    title = 'Skriv ut'
   } = options;
 
   let viewer;
-  let printButton;
-  let printElement;
+  let mapMenu;
+  let menuItem;
   let baseUrl;
 
   function imageToPrint(printCanvasEl) {
@@ -84,37 +86,21 @@ const Print = function Print(options = {}) {
     onAdd(evt) {
       viewer = evt.target;
       baseUrl = viewer.getBaseUrl();
-      this.addComponents([printButton]);
-      this.render();
-    },
-    onInit() {
-      if (!attribution) attribution = '© Lantmäteriet Geodatasamverkan';
-
-      printButton = cu.Button({
-        id: 'o-print-button',
-        cls: 'o-menu-button',
+      mapMenu = viewer.getControlByName('mapmenu');
+      menuItem = mapMenu.MenuItem({
         click() {
           const canvasEl = cu.dom.html('<canvas id="o-print" style="display: none"></canvas>');
           document.getElementById('app-wrapper').append(canvasEl);
           createImage();
         },
-        text: 'Skriv ut',
-        icon: '#ic_print_24px',
-        iconCls: 'o-button-icon'
+        icon,
+        title
       });
-
-      const rendered = printButton.render();
-
-      printElement = cu.Element({
-        cls: '',
-        tagName: 'li',
-        innerHTML: `${rendered}`
-      });
+      this.addComponent(menuItem);
+      this.render();
     },
     render() {
-      const htmlString = printElement.render();
-      const el = cu.dom.html(htmlString);
-      document.getElementById('o-menutools').appendChild(el);
+      mapMenu.appendMenuItem(menuItem);
       this.dispatch('render');
     }
   });

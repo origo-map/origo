@@ -3,16 +3,17 @@ import modal from '../modal';
 
 const About = function About(options = {}) {
   let {
-    buttonText,
-    content,
-    title
+    buttonText
+  } = options;
+  const {
+    content = '<p></p>',
+    icon = '#ic_help_outline_24px',
+    title = 'Om kartan'
   } = options;
 
-  const defaultContent = '<p></p>';
-  const defaultTitle = 'Om kartan';
   let viewer;
-  let aboutButton;
-  let aboutElement;
+  let mapMenu;
+  let menuItem;
 
   function openModal() {
     modal.createModal(`#${viewer.getId()}`, {
@@ -20,43 +21,27 @@ const About = function About(options = {}) {
       content
     });
     modal.showModal();
+    mapMenu.close();
   }
 
   return cu.Component({
     name: 'about',
     onAdd(evt) {
+      if (!buttonText) buttonText = title;
       viewer = evt.target;
-      this.addComponents([aboutButton]);
-      this.render();
-    },
-    onInit() {
-      if (!title) title = defaultTitle;
-      if (!buttonText) buttonText = defaultTitle;
-      if (!content) content = defaultContent;
-
-      aboutButton = cu.Button({
-        id: 'o-about-button',
-        cls: 'o-menu-button',
+      mapMenu = viewer.getControlByName('mapmenu');
+      menuItem = mapMenu.MenuItem({
         click() {
           openModal();
         },
-        text: title,
-        icon: '#ic_help_outline_24px',
-        iconCls: 'o-button-icon'
+        icon,
+        title: buttonText
       });
-
-      const rendered = aboutButton.render();
-
-      aboutElement = cu.Element({
-        cls: '',
-        tagName: 'li',
-        innerHTML: `${rendered}`
-      });
+      this.addComponent(menuItem);
+      this.render();
     },
     render() {
-      const htmlString = aboutElement.render();
-      const el = cu.dom.html(htmlString);
-      document.getElementById('o-menutools').appendChild(el);
+      mapMenu.appendMenuItem(menuItem);
       this.dispatch('render');
     }
   });

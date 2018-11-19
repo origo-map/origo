@@ -2,41 +2,31 @@ import cu from 'ceeu';
 
 const Link = function Link(options = {}) {
   const {
+    icon = '#ic_launch_24px',
     url,
     title
   } = options;
-  let linkButton;
-  let linkElement;
+  let mapMenu;
+  let menuItem;
+  let viewer;
 
   return cu.Component({
     name: 'link',
-    onAdd() {
-      this.addComponents([linkButton]);
-      this.render();
-    },
-    onInit() {
-      linkButton = cu.Button({
-        id: 'o-link-button',
-        cls: 'o-menu-button',
+    onAdd(evt) {
+      viewer = evt.target;
+      mapMenu = viewer.getControlByName('mapmenu');
+      menuItem = mapMenu.MenuItem({
         click() {
           window.open(url);
         },
-        text: title,
-        icon: '#ic_launch_24px',
-        iconCls: 'o-button-icon'
+        icon,
+        title
       });
-
-      const rendered = linkButton.render();
-      linkElement = cu.Element({
-        cls: '',
-        tagName: 'li',
-        innerHTML: `${rendered}`
-      });
+      this.addComponent(menuItem);
+      this.render();
     },
     render() {
-      const htmlString = linkElement.render();
-      const el = cu.dom.html(htmlString);
-      document.getElementById('o-menutools').appendChild(el);
+      mapMenu.appendMenuItem(menuItem);
       this.dispatch('render');
     }
   });

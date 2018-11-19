@@ -2,10 +2,14 @@ import cu from 'ceeu';
 import modal from '../modal';
 import permalink from '../permalink/permalink';
 
-const ShareMap = function ShareMap() {
+const ShareMap = function ShareMap(options = {}) {
+  const {
+    icon = '#ic_screen_share_outline_24px',
+    title = 'Dela karta'
+  } = options;
   let viewer;
-  let shareMapButton;
-  let shareMapElement;
+  let mapMenu;
+  let menuItem;
 
   const createContent = function createContent() {
     return '<div class="o-share-link"><input type="text"></div>' +
@@ -26,36 +30,26 @@ const ShareMap = function ShareMap() {
     });
     modal.showModal();
     createLink(); // Add link to input
-    viewer.getControlByName('mapmenu').toggleMenu();
+    mapMenu.close();
   };
+
   return cu.Component({
+    name: 'sharemap',
     onAdd(evt) {
       viewer = evt.target;
-      this.addComponents([shareMapButton]);
-      this.render();
-    },
-    onInit() {
-      shareMapButton = cu.Button({
-        cls: 'o-menu-button',
+      mapMenu = viewer.getControlByName('mapmenu');
+      menuItem = mapMenu.MenuItem({
         click() {
           openModal();
         },
-        text: 'Dela karta',
-        icon: '#ic_screen_share_outline_24px',
-        iconCls: 'o-button-icon'
+        icon,
+        title
       });
-
-      const rendered = shareMapButton.render();
-
-      shareMapElement = cu.Element({
-        cls: '',
-        tagName: 'li',
-        innerHTML: `${rendered}`
-      });
+      this.addComponent(menuItem);
+      this.render();
     },
     render() {
-      const el = cu.dom.html(shareMapElement.render());
-      document.getElementById('o-menutools').appendChild(el);
+      mapMenu.appendMenuItem(menuItem);
       this.dispatch('render');
     }
   });

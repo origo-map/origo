@@ -1,81 +1,127 @@
 import cu from 'ceeu';
 
-let closeButton;
-let mapMenu;
-let mapMenuButton;
-let options;
-let isActive;
-
-function toggleMenu() {
-  document.getElementById(mapMenu.getId()).classList.toggle('o-mapmenu-show');
-}
-
-const Mapmenu = function Mapmenu(opt = {}) {
+const Mapmenu = function Mapmenu({
+  closeIcon = '#ic_close_24px',
+  menuIcon = '#ic_menu_24px'
+} = {}) {
+  let headerComponent;
+  let contentComponent;
+  let menuButton;
+  let closeButton;
+  let mapMenu;
   let viewer;
   let target;
-  options = opt;
+
+  const toggle = function toggle() {
+    if (menuButton.getState() === 'hidden') {
+      menuButton.setState('initial');
+      closeButton.setState('hidden');
+    } else {
+      menuButton.setState('hidden');
+      closeButton.setState('initial');
+    }
+    const customEvt = new CustomEvent('collapse:toggle', {
+      bubbles: true
+    });
+    document.getElementById(menuButton.getId()).dispatchEvent(customEvt);
+  };
+
+  const close = function close() {
+    menuButton.setState('initial');
+    closeButton.setState('hidden');
+    const customEvt = new CustomEvent('collapse:collapse', {
+      bubbles: true
+    });
+    document.getElementById(menuButton.getId()).dispatchEvent(customEvt);
+  };
+
+  const MenuItem = function MenuItem({
+    icon,
+    click,
+    title = ''
+  } = {}) {
+    const button = cu.Button({
+      cls: 'icon-smaller compact no-grow',
+      click,
+      icon
+    });
+    const titleCmp = cu.Element({ cls: 'grow padding-left', innerHTML: title });
+    return cu.Component({
+      close,
+      onInit() {
+        this.addComponent(button);
+      },
+      onRender() {
+        this.dispatch('render');
+        document.getElementById(titleCmp.getId()).addEventListener('click', () => {
+          button.dispatch('click');
+        });
+      },
+      render() {
+        return `<li class="flex row align-center padding-x padding-y-smaller hover pointer">
+                  ${button.render()}
+                  ${titleCmp.render()}
+                </li>`;
+      }
+    });
+  };
 
   return cu.Component({
     name: 'mapmenu',
-    toggleMenu,
+    close,
+    MenuItem,
+    appendMenuItem(menuItem) {
+      const menuItemEl = cu.dom.html(menuItem.render());
+      document.getElementById(contentComponent.getId()).appendChild(menuItemEl);
+    },
     onAdd(evt) {
       viewer = evt.target;
       target = `${viewer.getMain().getId()}`;
       this.on('render', this.onRender);
-      this.addComponents([mapMenuButton]);
       this.addComponents([mapMenu]);
-      this.addComponents([closeButton]);
       this.render();
-
-      const breakPointSize = options.breakPointSize || 'l';
-      const breakPoint = viewer.getBreakPoints(breakPointSize);
-      isActive = options.isActive || false;
-
-      if (isActive && document.getElementById(target).offsetWidth >= breakPoint[0]) {
-        toggleMenu();
-      }
     },
     onInit() {
-      mapMenuButton = cu.Button({
-        cls: 'o-mapmenu-button padding-small icon-smaller rounded light box-shadow absolute',
-        icon: '#fa-bars',
+      menuButton = cu.Button({
+        cls: 'padding-y-small padding-x icon-small light',
+        icon: menuIcon,
         text: 'Meny',
-        textCls: 'o-button-text',
         tooltipText: 'Meny',
         tooltipPlacement: 'west',
+        state: 'initial',
+        validStates: ['initial', 'hidden'],
         click() {
-          toggleMenu();
+          toggle();
         }
       });
-
       closeButton = cu.Button({
-        cls: 'o-mapmenu-button-close padding-small icon-smaller rounded light absolute',
-        icon: '#fa-times',
-        tooltipText: 'Stäng meny',
-        tooltipPlacement: 'west',
+        cls: 'small round margin-top-small margin-right small icon-smaller grey-lightest',
+        icon: closeIcon,
+        state: 'hidden',
+        validStates: ['initial', 'hidden'],
         click() {
-          toggleMenu();
+          toggle();
         }
       });
-
-      mapMenu = cu.Element({
-        cls: 'o-mapmenu',
-        innerHTML: '<div class="o-block"><ul id="o-menutools"><li></li></ul></div>'
+      headerComponent = cu.Element({
+        cls: 'flex row justify-end',
+        style: { width: '100%' },
+        components: [menuButton, closeButton]
+      });
+      contentComponent = cu.Component({
+        render() {
+          return `<div class="relative width-12"><ul class="padding-y-small" id="${this.getId()}""></ul></div>`;
+        }
+      });
+      mapMenu = cu.Collapse({
+        cls: 'absolute flex column top-right rounded box-shadow bg-white overflow-hidden',
+        headerComponent,
+        contentComponent
       });
     },
     render() {
-      const buttonHtmlString = mapMenuButton.render();
-      const closeButtonHtmlString = closeButton.render();
-      const menuHtmlString = mapMenu.render();
-
-      const menuButtonEl = cu.dom.html(buttonHtmlString);
-      const closeButtonEl = cu.dom.html(closeButtonHtmlString);
-      const menuEl = cu.dom.html(menuHtmlString);
-
-      document.getElementById(target).appendChild(menuButtonEl);
+      const menuEl = cu.dom.html(mapMenu.render());
       document.getElementById(target).appendChild(menuEl);
-      document.getElementById('o-menutools').appendChild(closeButtonEl);
-
       this.dispatch('render');
     }
   });
