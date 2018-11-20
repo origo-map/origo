@@ -25,13 +25,12 @@
     "@babel/polyfill": "^7.0.0",
     "@babel/runtime-corejs2": "^7.1.2",
     "awesomplete": "1.1.2",
+    "core-js": "^2.4.0",
     "jquery": "3.3.1",
-    "localforage": "1.5.0",
     "ol": "^4.6.5",
     "owl.carousel": "^2.3.4",
     "proj4": "2.3.10",
-    "whatwg-fetch": "^2.0.4",
-    "core-js": "^2.4.0"
+    "whatwg-fetch": "^2.0.4"
   },
   "devDependencies": {
     "@babel/core": "^7.1.2",
