@@ -37,22 +37,12 @@ const Measure = function Measure({
   const overlayArray = [];
 
   let viewer;
-  let mapEl;
   let measureElement;
   let measureButton;
   let lengthToolButton;
   let areaToolButton;
   const buttons = [];
   let target;
-
-  const disableMeasureEvent = new CustomEvent('enableInteraction', {
-    bubbles: true,
-    detail: 'featureInfo'
-  });
-  const enableMeasureEvent = new CustomEvent('enableInteraction', {
-    bubbles: true,
-    detail: 'measure'
-  });
 
   function createStyle(feature) {
     const featureType = feature.getGeometry().getType();
@@ -280,7 +270,6 @@ const Measure = function Measure({
     onAdd(evt) {
       viewer = evt.target;
       target = `${viewer.getMain().getMapTools().getId()}`;
-      mapEl = document.getElementById(viewer.getMain().getId());
 
       map = viewer.getMap();
       source = new VectorSource();
