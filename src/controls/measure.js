@@ -304,11 +304,12 @@ const Measure = function Measure({
       defaultTool = lengthTool ? defaultMeasureTool : 'area';
       if (lengthTool || areaTool) {
         measureElement = cu.Element({
-          tagName: 'div'
+          tagName: 'div',
+          cls: 'flex column'
         });
 
         measureButton = cu.Button({
-          cls: 'padding-small icon-smaller rounded light box-shadow',
+          cls: 'o-measure padding-small margin-bottom-smaller icon-smaller rounded light box-shadow',
           click() {
             toggleMeasure();
           },
@@ -318,7 +319,7 @@ const Measure = function Measure({
 
         if (lengthTool) {
           lengthToolButton = cu.Button({
-            cls: 'o-home-in padding-small margin-left-smaller icon-smaller rounded light box-shadow hidden',
+            cls: 'o-measure-length padding-small margin-bottom-smaller icon-smaller rounded light box-shadow hidden',
             click() {
               type = 'LineString';
               toggleType(this);
@@ -333,7 +334,7 @@ const Measure = function Measure({
 
         if (areaTool) {
           areaToolButton = cu.Button({
-            cls: 'o-home-in padding-small margin-left-smaller icon-smaller rounded light box-shadow hidden',
+            cls: 'o-measure-area padding-small icon-smaller rounded light box-shadow hidden',
             click() {
               type = 'Polygon';
               toggleType(this);
