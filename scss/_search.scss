@@ -28,7 +28,7 @@ $search-width-l: calc(100% - calc(#{$search-menu-button-width} + #{$search-paddi
   font-size: 1.25rem;
 	height: 1.5rem;
   margin: 0;
-  margin-right: 2.5rem;
+  margin-right: $search-button-l;
   overflow: hidden;
   padding: .5rem;
   width: $search-field-width;
