@@ -183,36 +183,23 @@ const Viewer = function Viewer(targetOption, options = {}) {
     throw new Error(`There is no source with name: ${name}`);
   };
 
-  const getSubGroups = function getSubgroups() {
-    const subgroups = [];
-
-    function findSubgroups(targetGroups, n) {
-      if (n >= targetGroups.length) {
-        return;
+  const flattenGroups = function flattenGroups(arr, parent) {
+    return arr.reduce((acc, item) => {
+      const group = Object.assign({}, item);
+      if (parent) group.parent = parent;
+      if (group.groups) {
+        const parentGroup = Object.assign({}, group);
+        delete parentGroup.groups;
+        return acc.concat(parentGroup, flattenGroups(group.groups, parentGroup.name));
       }
-
-      if (targetGroups[n].groups) {
-        targetGroups[n].groups.forEach((subgroup) => {
-          subgroups.push(subgroup);
-        });
-
-        findSubgroups(targetGroups[n].groups, 0);
-      }
-
-      findSubgroups(targetGroups, n + 1);
-    }
-
-    findSubgroups(groups, 0);
-    return subgroups;
+      acc.push(group);
+      return acc;
+    }, []);
   };
 
-  const getGroups = function getGroups(opt) {
-    if (opt === 'top') {
-      return groups;
-    } else if (opt === 'sub') {
-      return getSubGroups();
-    }
-    return groups.concat(getSubGroups());
+  const getGroups = function getGroups(flat = true) {
+    if (flat) return flattenGroups(groups);
+    return groups;
   };
 
   const getProjectionCode = () => projectionCode;
@@ -423,7 +410,6 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getQueryableLayers,
     getResolutions,
     getSearchableLayers,
-    getSubGroups,
     getLayer,
     getLayers,
     getLayersByProperty,
