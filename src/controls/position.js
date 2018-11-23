@@ -26,10 +26,8 @@ const Position = function Position(options = {}) {
   let markerIcon;
   let markerElement;
   let centerButton;
-  let centerButtonElement;
   let projButton;
-  let projButtonElement;
-  let coordsDivElement;
+  let coordsElement;
   let coordsFindElement;
   let containerElement;
 
@@ -37,18 +35,18 @@ const Position = function Position(options = {}) {
     mousePositionControl = new MousePosition({
       coordinateFormat: Coordinate.createStringXY(precision),
       projection: currentProjection,
-      target: document.getElementById(`${coordsDivElement.getId()}`),
+      target: document.getElementById(`${coordsElement.getId()}`),
       undefinedHTML: '&nbsp;'
     });
 
     map.addControl(mousePositionControl);
     mousePositionActive = true;
-    document.getElementById(`${coordsDivElement.getId()}`).classList.add('o-active');
+    document.getElementById(`${coordsElement.getId()}`).classList.add('o-active');
   }
 
   function removeMousePosition() {
     map.removeControl(mousePositionControl);
-    document.getElementById(`${coordsDivElement.getId()}`).classList.remove('o-active');
+    document.getElementById(`${coordsElement.getId()}`).classList.remove('o-active');
     mousePositionActive = false;
   }
 
@@ -59,7 +57,6 @@ const Position = function Position(options = {}) {
     });
 
     markerElement = cu.dom.html(markerIcon.render());
-
     document.getElementById(`${viewer.getId()}`).appendChild(markerElement);
   }
 
@@ -240,7 +237,7 @@ const Position = function Position(options = {}) {
       if (!suffix) suffix = '';
       if (!title) title = undefined;
 
-      this.addComponents([centerButton, centerButtonElement, projButton, projButtonElement, coordsDivElement, coordsFindElement, containerElement]);
+      this.addComponents([containerElement]);
       this.render();
     },
     onInit() {
@@ -252,25 +249,13 @@ const Position = function Position(options = {}) {
         icon: '#ic_gps_not_fixed_24px',
         iconCls: 'o-icon-position'
       });
-      const centerButtonRendered = centerButton.render();
-      centerButtonElement = cu.Element({
-        cls: '',
-        style: 'display: inline-block;',
-        innerHTML: `${centerButtonRendered}`
-      });
       projButton = cu.Button({
         cls: 'o-position-button',
         click() {
           onToggleProjection();
         }
       });
-      const projButtonRendered = projButton.render();
-      projButtonElement = cu.Element({
-        cls: '',
-        style: 'display: inline-block;',
-        innerHTML: `${projButtonRendered}`
-      });
-      coordsDivElement = cu.Element({
+      coordsElement = cu.Element({
         cls: 'o-position-coords',
         style: 'padding-left: 5px;'
       });
@@ -281,16 +266,13 @@ const Position = function Position(options = {}) {
       });
       containerElement = cu.Element({
         cls: 'o-position',
-        style: 'display: inline-block;'
+        style: 'display: inline-block;',
+        components: [centerButton, projButton, coordsElement, coordsFindElement]
       });
     },
     render() {
-      const containerHtmlString = containerElement.render();
-      const containerEl = cu.dom.html(containerHtmlString);
-      const children = [centerButtonElement, projButtonElement, coordsDivElement, coordsFindElement];
-
-      document.getElementById(viewer.getFooter().getId()).firstElementChild.appendChild(containerEl);
-      cu.dom.renderChildren(children, document.getElementById(containerElement.getId()));
+      const el = cu.dom.html(containerElement.render());
+      document.getElementById(viewer.getFooter().getId()).firstElementChild.appendChild(el);
 
       document.getElementById(`${projButton.getId()}`).value = currentProjection;
       document.getElementById(`${projButton.getId()}`).textContent = projections[currentProjection];
