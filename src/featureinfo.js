@@ -32,7 +32,7 @@ const Featureinfo = function Featureinfo(options = {}) {
   let selectionLayer;
   let viewer;
 
-  const pinStyle = Style.createStyleRule(pinStyleOptions)[0];
+  const pinStyle = Style.createStyleRule(pinStyleOptions, '')[0];
   const selectionStyles = selectionStylesOptions ? Style.createGeometryStyle(selectionStylesOptions) : Style.createEditStyle();
   let savedPin = savedPinOptions ? maputils.createPointFeature(savedPinOptions, pinStyle) : undefined;
   const savedFeature = savedPin || savedSelection || undefined;
