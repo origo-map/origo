@@ -90,7 +90,7 @@ const Print = function Print(options = {}) {
       menuItem = mapMenu.MenuItem({
         click() {
           const canvasEl = cu.dom.html('<canvas id="o-print" style="display: none"></canvas>');
-          document.getElementById('app-wrapper').append(canvasEl);
+          document.getElementById('app-wrapper').appendChild(canvasEl);
           createImage();
         },
         icon,
