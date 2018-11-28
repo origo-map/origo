@@ -29,30 +29,30 @@ const editStyleOptions = {
     }
   }],
   LineString: [{
-      stroke: {
-        color: white,
-        width: width + 2
-      }
-    },
-    {
-      stroke: {
-        color: blue,
-        width
-      }
+    stroke: {
+      color: white,
+      width: width + 2
     }
+  },
+  {
+    stroke: {
+      color: blue,
+      width
+    }
+  }
   ],
   Polygon: [{
-      stroke: {
-        color: white,
-        width: width + 2
-      }
-    },
-    {
-      stroke: {
-        color: blue,
-        width
-      }
+    stroke: {
+      color: white,
+      width: width + 2
     }
+  },
+  {
+    stroke: {
+      color: blue,
+      width
+    }
+  }
   ]
 };
 
@@ -73,9 +73,9 @@ function createStyleOptions(styleParams, baseUrl) {
         };
         break;
       default:
-        {
-          break;
-        }
+      {
+        break;
+      }
     }
   }
   if ('zIndex' in styleParams) {
@@ -242,7 +242,7 @@ function createStyle({
   return style;
 }
 
-function createStyleRule(options, baseUrl) {
+function createStyleRule(options, baseUrl = '') {
   let styleRule = [];
   let styleOption;
   if (options.constructor === Array) {
