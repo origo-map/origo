@@ -1,11 +1,11 @@
-import Projection from 'ol/proj/projection';
-import TileGrid from 'ol/tilegrid/tilegrid';
-import Feature from 'ol/feature';
-import Point from 'ol/geom/point';
-import Vector from 'ol/source/vector';
-import GeoJSON from 'ol/format/geojson';
-import Extent from 'ol/extent';
-import WKT from 'ol/format/wkt';
+import Projection from 'ol/proj/Projection';
+import TileGrid from 'ol/tilegrid/TileGrid';
+import Feature from 'ol/Feature';
+import Point from 'ol/geom/Point';
+import Vector from 'ol/source/Vector';
+import GeoJSON from 'ol/format/GeoJSON';
+import { getTopLeft, getBottomLeft } from 'ol/extent';
+import WKT from 'ol/format/WKT';
 import viewer from './viewer';
 
 export default {
@@ -17,7 +17,7 @@ export default {
   },
   tileGrid: function tileGrid(settings) {
     const extent = settings.extent || viewer.getExtent();
-    const origin = settings.alignBottomLeft === false ? Extent.getTopLeft(extent) : Extent.getBottomLeft(extent);
+    const origin = settings.alignBottomLeft === false ? getTopLeft(extent) : getBottomLeft(extent);
     const resolutions = settings.resolutions || viewer.getResolutions();
     const tileSize = settings.tileSize || viewer.getTileSize();
     return new TileGrid({

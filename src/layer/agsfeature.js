@@ -1,7 +1,7 @@
 import $ from 'jquery';
-import EsriJSON from 'ol/format/esrijson';
-import VectorSource from 'ol/source/vector';
-import loadingstrategy from 'ol/loadingstrategy';
+import EsriJSON from 'ol/format/EsriJSON';
+import VectorSource from 'ol/source/Vector';
+import * as loadingstrategy from 'ol/loadingstrategy';
 import viewer from '../viewer';
 import vector from './vector';
 

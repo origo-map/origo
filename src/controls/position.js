@@ -1,7 +1,7 @@
-import MousePosition from 'ol/control/mouseposition';
-import Feature from 'ol/feature';
-import Point from 'ol/geom/point';
-import coordinate from 'ol/coordinate';
+import MousePosition from 'ol/control/MousePosition';
+import Feature from 'ol/Feature';
+import Point from 'ol/geom/Point';
+import { createStringXY } from 'ol/coordinate';
 import $ from 'jquery';
 import viewer from '../viewer';
 import utils from '../utils';
@@ -63,7 +63,7 @@ function render() {
 
 function addMousePosition() {
   mousePositionControl = new MousePosition({
-    coordinateFormat: coordinate.createStringXY(precision),
+    coordinateFormat: createStringXY(precision),
     projection: currentProjection,
     target: document.getElementById(coordsId),
     undefinedHTML: '&nbsp;'

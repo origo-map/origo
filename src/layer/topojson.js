@@ -1,6 +1,6 @@
 import $ from 'jquery';
-import VectorSource from 'ol/source/vector';
-import TopoJSONFormat from 'ol/format/topojson';
+import VectorSource from 'ol/source/Vector';
+import TopoJSONFormat from 'ol/format/TopoJSON';
 import viewer from '../viewer';
 import vector from './vector';
 import isUrl from '../utils/isurl';
@@ -10,7 +10,7 @@ function createSource(options) {
     attributions: options.attribution,
     url: options.url,
     format: new TopoJSONFormat({
-      defaultDataProjection: options.projectionCode
+      dataProjection: options.projectionCode
     })
   });
 }

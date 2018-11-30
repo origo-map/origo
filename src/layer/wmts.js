@@ -1,6 +1,6 @@
-import WMTSSource from 'ol/source/wmts';
-import Tilegrid from 'ol/tilegrid/wmts';
-import Extent from 'ol/extent';
+import WMTSSource from 'ol/source/WMTS';
+import Tilegrid from 'ol/tilegrid/WMTS';
+import { getTopLeft } from 'ol/extent';
 import $ from 'jquery';
 import viewer from '../viewer';
 import tile from './tile';
@@ -15,7 +15,7 @@ function createSource(options) {
     matrixSet: options.matrixSet,
     format: options.format,
     tileGrid: new Tilegrid({
-      origin: options.origin || Extent.getTopLeft(options.projectionExtent),
+      origin: options.origin || getTopLeft(options.projectionExtent),
       resolutions: options.resolutions,
       matrixIds: options.matrixIds,
       tileSize: options.tileSize

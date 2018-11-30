@@ -1,5 +1,5 @@
-import Overlay from 'ol/overlay';
-import Point from 'ol/geom/point';
+import Overlay from 'ol/Overlay';
+import Point from 'ol/geom/Point';
 import Awesomplete from 'awesomplete';
 import $ from 'jquery';
 import featureInfo from '../featureinfo';

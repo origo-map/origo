@@ -1,5 +1,5 @@
-import VectorSource from 'ol/source/vector';
-import GeoJSON from 'ol/format/geojson';
+import VectorSource from 'ol/source/Vector';
+import GeoJSON from 'ol/format/GeoJSON';
 import $ from 'jquery';
 import viewer from '../viewer';
 import vector from './vector';

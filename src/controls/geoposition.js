@@ -1,6 +1,6 @@
 import $ from 'jquery';
-import Geolocation from 'ol/geolocation';
-import Overlay from 'ol/overlay';
+import Geolocation from 'ol/Geolocation';
+import Overlay from 'ol/Overlay';
 import viewer from '../viewer';
 import utils from '../utils';
 

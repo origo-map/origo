@@ -1,4 +1,4 @@
-import Rotate from 'ol/control/rotate';
+import Rotate from 'ol/control/Rotate';
 import $ from 'jquery';
 import viewer from '../viewer';
 import utils from '../utils';

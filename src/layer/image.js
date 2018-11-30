@@ -1,4 +1,4 @@
-import Image from 'ol/layer/image';
+import Image from 'ol/layer/Image';
 
 export default function image(options, source) {
   const opt = options;

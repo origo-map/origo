@@ -1,5 +1,5 @@
 import 'owl.carousel';
-import Overlay from 'ol/overlay';
+import Overlay from 'ol/Overlay';
 import $ from 'jquery';
 import viewer from './viewer';
 import Popup from './popup';
