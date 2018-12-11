@@ -79,7 +79,7 @@ function createMeasureTooltip() {
 }
 
 function formatLength(line) {
-  const projection = map.getView().getProjection().code;
+  const projection = map.getView().getProjection();
   const length = getLength(line, {
     projection
   });
@@ -95,7 +95,7 @@ function formatLength(line) {
 }
 
 function formatArea(polygon) {
-  const projection = map.getView().getProjection().code;
+  const projection = map.getView().getProjection();
   const area = getArea(polygon, {
     projection
   });
