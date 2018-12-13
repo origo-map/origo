@@ -18,12 +18,13 @@ export default function (map, {
   const breakCls = arrToObj(breakNames, prefix);
   const breakClsNames = breakNames.map(breakSize => breakCls[breakSize]);
 
-  function onSizeChange() {
-    const mapSize = map.getSize();
-    const val = breakNames.reduce((prev, curr) => {
+  const getSize = function getSize() {
+    const size = map.getSize();
+    const sizes = Object.keys(breakPoints);
+    const val = sizes.reduce((prev, curr) => {
       const height = breakPoints[curr][1];
       const width = breakPoints[curr][0];
-      if (mapSize[0] <= width || mapSize[1] <= height) {
+      if (size[0] <= width || size[1] <= height) {
         if (!prev) {
           return curr;
         }
@@ -31,12 +32,21 @@ export default function (map, {
       }
       return prev;
     }, undefined);
+    return val;
+  };
+
+  const onSizeChange = function onSizeChange() {
+    const val = getSize();
     targetEl.classList.remove(...breakClsNames);
     if (val) {
       targetEl.classList.add(breakCls[val]);
     }
-  }
+  };
 
   window.addEventListener('resize', onSizeChange);
   onSizeChange();
+
+  return {
+    getSize
+  };
 }

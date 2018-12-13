@@ -4,12 +4,13 @@ import Feature from 'ol/feature';
 import geom from 'ol/geom/geometry';
 import Map from './map';
 import proj from './projection';
-import mapSizeChanger from './utils/mapsizechanger';
+import MapSize from './utils/mapsize';
 import Featureinfo from './featureinfo';
 import maputils from './maputils';
 import Layer from './layer';
 import Main from './components/main';
 import Footer from './components/footer';
+import flattenGroups from './utils/flattengroups';
 
 const Viewer = function Viewer(targetOption, options = {}) {
   let map;
@@ -30,7 +31,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     controls = [],
     enableRotation = true,
     featureinfoOptions = {},
-    groups = [],
+    groups: groupOptions = [],
     mapGrid = true,
     pageSettings = {},
     projectionCode,
@@ -53,6 +54,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
   const target = targetOption;
   const center = urlParams.center || centerOption;
   const zoom = urlParams.zoom || zoomOption;
+  const groups = flattenGroups(groupOptions);
   const defaultTileGridOptions = {
     alignBottomLeft: true,
     extent,
@@ -67,6 +69,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
   const footer = Footer({
     footerData
   });
+  let mapSize;
 
   const addControl = function addControl(control) {
     if (control.onAdd && control.dispatch) {
@@ -172,8 +175,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
     return searchableLayers;
   };
 
-  const getGroup = function getGroup(group) {
-    return getLayers().filter(obj => obj.get('group') === group);
+  const getGroup = function getGroup(groupName) {
+    return groups.find(group => group.name === groupName);
   };
 
   const getSource = function getSource(name) {
@@ -183,24 +186,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     throw new Error(`There is no source with name: ${name}`);
   };
 
-  const flattenGroups = function flattenGroups(arr, parent) {
-    return arr.reduce((acc, item) => {
-      const group = Object.assign({}, item);
-      if (parent) group.parent = parent;
-      if (group.groups) {
-        const parentGroup = Object.assign({}, group);
-        delete parentGroup.groups;
-        return acc.concat(parentGroup, flattenGroups(group.groups, parentGroup.name));
-      }
-      acc.push(group);
-      return acc;
-    }, []);
-  };
-
-  const getGroups = function getGroups(flat = true) {
-    if (flat) return flattenGroups(groups);
-    return groups;
-  };
+  const getGroups = () => groups;
 
   const getProjectionCode = () => projectionCode;
 
@@ -215,6 +201,10 @@ const Viewer = function Viewer(targetOption, options = {}) {
       return null;
     }
     return control;
+  };
+
+  const getSize = function getSize() {
+    return mapSize.getSize();
   };
 
   const getTarget = () => target;
@@ -311,10 +301,45 @@ const Viewer = function Viewer(targetOption, options = {}) {
     });
   };
 
-  const addGroup = function addGroup(groupOptions) {
-    const name = groupOptions.name;
+  const addGroup = function addGroup(groupProps) {
+    const defaultProps = { type: 'group' };
+    const groupDef = Object.assign({}, defaultProps, groupProps);
+    const name = groupDef.name;
     if (!(groups.filter(group => group.name === name).length)) {
-      groups.push(groupOptions);
+      groups.push(groupDef);
+      this.dispatch('add:group', { group: groupDef });
+    }
+  };
+
+  const addGroups = function addGroups(groupsProps) {
+    groupsProps.forEach((groupProps) => {
+      this.addGroup(groupProps);
+    });
+  };
+
+  // removes group and any depending subgroups and layers
+  const removeGroup = function removeGroup(groupName) {
+    const group = groups.find(item => item.name === groupName);
+    if (group) {
+      const layers = getLayersByProperty('group', groupName);
+      layers.forEach((layer) => {
+        map.removeLayer(layer);
+      });
+      const groupIndex = groups.indexOf(group);
+      groups.splice(groupIndex, 1);
+      this.dispatch('remove:group', { group });
+    }
+    const subgroups = groups.filter((item) => {
+      if (item.parent) {
+        return item.parent === groupName;
+      }
+      return false;
+    });
+    if (subgroups.length) {
+      subgroups.forEach((subgroup) => {
+        const name = subgroup.name;
+        removeGroup(groups[name]);
+      });
     }
   };
 
@@ -356,7 +381,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
       const layerProps = mergeSavedLayerProps(layerOptions, urlParams.layers);
       this.addLayers(layerProps);
 
-      mapSizeChanger(map, {
+      mapSize = MapSize(map, {
         breakPoints,
         breakPointsPrefix,
         mapId: this.getId()
@@ -389,6 +414,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     addControl,
     addControls,
     addGroup,
+    addGroups,
     addLayer,
     addLayers,
     addSource,
@@ -410,6 +436,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getQueryableLayers,
     getResolutions,
     getSearchableLayers,
+    getSize,
     getLayer,
     getLayers,
     getLayersByProperty,
@@ -425,6 +452,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getTileGrid,
     getTileSize,
     getUrl,
+    removeGroup,
     removeLayer,
     removeOverlays,
     zoomToExtent
