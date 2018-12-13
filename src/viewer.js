@@ -237,23 +237,6 @@ const Viewer = function Viewer(targetOption, options = {}) {
     return initialLayerProps;
   };
 
-  const removeLayer = function removeLayer(name) {
-    // getLayers.forEach((layer, i, obj) => {
-    //   if (layer.get('name') === name) {
-    //     obj.splice(i, 1);
-    //   }
-    // });
-
-    // const $ul = $('#o-mapmenu').find(`#${name}`).closest('ul');
-    // $ul.find(`#${name}`).remove();
-    // if ($ul.children().length === 1) {
-    //   $ul.remove();
-    // }
-
-    // $(`#o-legend-${name}`).remove();
-    // map.removeLayer(getLayersByProperty('name', name)[0]);
-  };
-
   const removeOverlays = function removeOverlays(overlays) {
     if (overlays) {
       if (overlays.constructor === Array || overlays instanceof Collection) {
@@ -453,7 +436,6 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getTileSize,
     getUrl,
     removeGroup,
-    removeLayer,
     removeOverlays,
     zoomToExtent
   });
