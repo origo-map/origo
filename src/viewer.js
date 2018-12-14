@@ -109,7 +109,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     if (styleName in styles) {
       return styles[styleName];
     }
-    throw new Error(`There is no style named ${styleName}`);
+    return null;
   };
 
   const getStyles = () => styles;

@@ -277,6 +277,7 @@ const Measure = function Measure({
 
       // Drawn features
       vector = new VectorLayer({
+        group: 'none',
         source,
         name: 'measure',
         visible: false,

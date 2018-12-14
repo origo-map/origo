@@ -2,12 +2,15 @@ import cu from 'ceeu';
 
 const Home = function Home(options = {}) {
   let {
+    extent,
     target
+  } = options;
+  const {
+    zoomOnStart = false
   } = options;
 
   let viewer;
   let homeButton;
-  let extent;
 
   const zoomToHome = function zoomToHome() {
     viewer.getMap().getView().fit(extent, { duration: 1000 });
@@ -23,6 +26,9 @@ const Home = function Home(options = {}) {
       this.on('render', this.onRender);
       this.addComponents([homeButton]);
       this.render();
+      if (zoomOnStart) {
+        zoomToHome();
+      }
     },
     onInit() {
       homeButton = cu.Button({

@@ -1,58 +1,11 @@
-.o-mapmenu {
-  background-color: #fff;
-  border-radius: 1px; /*workaround for box-shadow bug in ios*/
-  -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.45);
-	box-shadow: 0 0 5px rgba(0,0,0,0.45);
-	height: 100%;
-	overflow: hidden;
-	overflow-y: auto;
-	position: absolute;
-	right: -230px;
-	top: 0px;
-  margin: 0;
-	width: 230px;
-	z-index: 103;
-	-ms-transform: translateX(0);
-	-webkit-transform: translateX(0);
-	transform: translateX(0);
-	-ms-transition: .3s ease all;
-	-webkit-transition: .3s ease all;
-	transition: .3s ease all;
-}
-li .o-menu-button {
-  cursor: pointer;
-  display: inline-block;
-  font-family: Arial,sans-serif;
-  font-size: 0.9em;
-  line-height: 1.5em;
-  padding: 0 5px;
-  text-decoration: none;
-  text-align: left;
-  width: 100%;
-  height: 1.5em;
-  border: none;
-  vertical-align: middle;
-}
-&[class*=#{$media-l}] {
-#o-mapmenu-button,
-#o-mapmenu-button button.o-button {
-	width: 2rem;
-}
-#o-mapmenu-button .o-button-text {
-	display: none;
-}
-}
 &[class*=#{$media-l-m-s}] {
-#o-sidebar,
-#o-mapmenu {
+#o-sidebar{
   max-width: 230px;
   width: 100%;
 }
 }
 &[class*=#{$media-l-m-s-xs}] {
-#o-mapmenu-button,
-#o-sidebar,
-#o-mapmenu {
+#o-sidebar {
   display: none;
 }
 }
