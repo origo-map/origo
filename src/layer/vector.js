@@ -33,7 +33,7 @@ export default function vector(opt, src, viewer) {
       }
       const clusterDistance = options.clusterOptions.clusterDistance || source.clusterOptions.clusterDistance || viewer.getClusterOptions().clusterDistance || distance;
       const clusterMaxZoom = options.clusterOptions.clusterMaxZoom || source.clusterOptions.clusterMaxZoom || viewer.getClusterOptions().clusterMaxZoom || viewer.getResolutions().length - 1;
-      const clusterInitialDistance = viewer.getInitialZooom() > clusterMaxZoom ? 0 : clusterDistance;
+      const clusterInitialDistance = viewer.getInitialZoom() > clusterMaxZoom ? 0 : clusterDistance;
       options.source = new ClusterSource({
         attributions: options.attribution,
         source,
