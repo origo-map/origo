@@ -2,7 +2,7 @@ import { Component, Button, Element as El, ToggleGroup, dom } from '../ui';
 import imageSource from './legend/imagesource';
 import Overlays from './legend/overlays';
 
-const LayerSwitcher = function LayerSwitcher(options = {}) {
+const Legend = function Legend(options = {}) {
   const {
     cls: clsSettings = '',
     style: styleSettings = {},
@@ -23,7 +23,7 @@ const LayerSwitcher = function LayerSwitcher(options = {}) {
   let layerButton;
   let layerButtonEl;
   let isExpanded;
-  const cls = `${clsSettings} control bottom-right box overflow-hidden flex row o-layer-switcher`.trim();
+  const cls = `${clsSettings} control bottom-right box overflow-hidden flex row o-legend`.trim();
   const style = dom.createStyle(Object.assign({}, { width: 'auto' }, styleSettings));
 
   const addBackgroundButton = function addBackgroundButton(layer) {
@@ -177,4 +177,4 @@ const LayerSwitcher = function LayerSwitcher(options = {}) {
   });
 };
 
-export default LayerSwitcher;
+export default Legend;
