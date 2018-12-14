@@ -101,7 +101,7 @@ export const renderSvgIcon = function renderSvgIcon(styleRule, {
   return '';
 };
 
-export const renderLegendItem = function renderLegenItem(svgIcon, label = '') {
+export const renderLegendItem = function renderLegendItem(svgIcon, label = '') {
   const style = `style="width: ${size}px; height: ${size}px;"`;
   return `<li class="flex row align-center padding-y-smallest">
             <div ${style} class="icon-small round">${svgIcon}</div>
