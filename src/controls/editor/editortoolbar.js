@@ -15,7 +15,6 @@ let $editDraw;
 let $editDelete;
 let $editLayers;
 let $editSave;
-let $editClose;
 
 function render() {
   $('#o-tools-bottom').append(editortemplate);
@@ -24,7 +23,6 @@ function render() {
   $editDelete = $('#o-editor-delete');
   $editLayers = $('#o-editor-layers');
   $editSave = $('#o-editor-save');
-  $editClose = $('#o-editor-close');
 }
 
 function toggleToolbar(state) {
@@ -67,9 +65,6 @@ function bindUIActions() {
     dispatcher.emitToggleEdit('save');
     $editSave.blur();
     e.preventDefault();
-  });
-  $editClose.on('click', () => {
-    toggleToolbar(false);
   });
 }
 
@@ -142,7 +137,7 @@ function init(options, v) {
 
   if (options.isActive) {
     setActive(true);
-  }
+  }  
 }
 
 export default (function exportInit() {

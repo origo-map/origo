@@ -1,50 +1,68 @@
-import { Component, Button, Element as El, dom } from '../ui';
+import { Component, Button, dom } from '../ui';
 import editorToolbar from './editor/editortoolbar';
 
-const Editor = function Editor(opt = {}) {
+const Editor = function Editor(options = {}) {
+  const {
+    autoForm = false,
+    autoSave = true,
+    isActive = true
+  } = options;
   let editorButton;
-  let editorElement;
+  let target;
+
+  const toggleState = function toggleState() {
+    if (editorButton.getState() === 'initial') {
+      editorButton.dispatch('change', { state: 'active' });
+    } else {
+      editorButton.dispatch('change', { state: 'initial' });
+    }
+  };
+
+  const onActive = function onActive() {
+    editorToolbar.toggleToolbar(true);
+  };
+
+  const onInitial = function onInitial() {
+    editorToolbar.toggleToolbar(false);
+  };
 
   return Component({
-    name: 'about',
+    name: 'editor',
     onAdd(evt) {
       const viewer = evt.target;
-      const options = opt || {};
+      target = `${viewer.getMain().getMapTools().getId()}`;
       const editableLayers = viewer.getLayersByProperty('editable', true, true);
-      if (editableLayers.length) {
-        options.editableLayers = editableLayers;
-      }
-      options.autoSave = 'autoSave' in options ? options.autoSave : true;
-      options.autoForm = 'autoForm' in options ? options.autoForm : false;
-      options.currentLayer = options.defaultLayer || options.editableLayers[0];
-      this.addComponents([editorButton]);
+      const currentLayer = options.defaultLayer || editableLayers[0];
+      const toolbarOptions = Object.assign({}, options, {
+        autoForm,
+        autoSave,
+        currentLayer,
+        editableLayers
+      });
+      this.addComponent(editorButton);
+      this.on('render', this.onRender);
       this.render();
-      editorToolbar.init(options, viewer);
+      editorToolbar.init(toolbarOptions, viewer);
     },
     onInit() {
+      const state = isActive ? 'active' : 'initial';
       editorButton = Button({
-        id: 'o-about-button',
-        cls: 'o-menu-button',
+        cls: 'o-menu-button padding-small icon-smaller rounded light box-shadow',
         click() {
-          editorToolbar.toggleToolbar(true);
+          toggleState();
         },
-        text: 'Redigera',
         icon: '#ic_edit_24px',
-        iconCls: 'o-button-icon'
-      });
-
-      const rendered = editorButton.render();
-
-      editorElement = El({
-        cls: '',
-        tagName: 'li',
-        innerHTML: `${rendered}`
+        state,
+        methods: {
+          active: onActive,
+          initial: onInitial
+        }
       });
     },
     render() {
-      const htmlString = editorElement.render();
+      const htmlString = editorButton.render();
       const el = dom.html(htmlString);
-      document.getElementById('o-menutools').appendChild(el);
+      document.getElementById(target).appendChild(el);
       this.dispatch('render');
     }
   });
