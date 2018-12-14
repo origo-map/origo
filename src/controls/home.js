@@ -1,4 +1,4 @@
-import cu from 'ceeu';
+import { Component, Button, dom } from '../ui';
 
 const Home = function Home(options = {}) {
   let {
@@ -16,7 +16,7 @@ const Home = function Home(options = {}) {
     viewer.getMap().getView().fit(extent, { duration: 1000 });
   };
 
-  return cu.Component({
+  return Component({
     name: 'home',
     onAdd(evt) {
       viewer = evt.target;
@@ -31,7 +31,7 @@ const Home = function Home(options = {}) {
       }
     },
     onInit() {
-      homeButton = cu.Button({
+      homeButton = Button({
         cls: 'o-home-in padding-small icon-smaller rounded light box-shadow',
         click() {
           zoomToHome();
@@ -41,7 +41,7 @@ const Home = function Home(options = {}) {
     },
     render() {
       const htmlString = homeButton.render();
-      const el = cu.dom.html(htmlString);
+      const el = dom.html(htmlString);
       document.getElementById(target).appendChild(el);
       this.dispatch('render');
     }

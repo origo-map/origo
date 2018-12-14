@@ -1,4 +1,4 @@
-import cu from 'ceeu';
+import { Component, Button, Collapse, CollapseHeader, dom } from '../../ui';
 import GroupList from './grouplist';
 
 /**
@@ -44,7 +44,7 @@ const Group = function Group(options = {}, viewer) {
 
   const getVisible = () => visibleState;
 
-  const tickButton = cu.Button({
+  const tickButton = Button({
     cls: 'icon-smaller round small',
     click() {
       const eventType = visibleState === 'all' ? 'untick:all' : 'tick:all';
@@ -63,7 +63,7 @@ const Group = function Group(options = {}, viewer) {
   });
 
   const SubGroupHeader = function SubGroupHeader() {
-    const expandButton = cu.Button({
+    const expandButton = Button({
       cls: 'icon-small compact round',
       icon,
       iconCls: 'rotate grey',
@@ -72,7 +72,7 @@ const Group = function Group(options = {}, viewer) {
       }
     });
 
-    return cu.Component({
+    return Component({
       onInit() {
         this.addComponent(expandButton);
         this.addComponent(tickButton);
@@ -101,7 +101,7 @@ const Group = function Group(options = {}, viewer) {
   };
 
   const GroupHeader = function GroupHeader() {
-    const headerComponent = cu.CollapseHeader({
+    const headerComponent = CollapseHeader({
       cls: 'hover padding-x padding-y-small grey-lightest border-bottom text-small',
       icon,
       title
@@ -111,7 +111,7 @@ const Group = function Group(options = {}, viewer) {
 
   const headerComponent = type === 'grouplayer' ? SubGroupHeader() : GroupHeader();
 
-  const collapse = cu.Collapse({
+  const collapse = Collapse({
     cls: '',
     expanded,
     headerComponent,
@@ -125,7 +125,7 @@ const Group = function Group(options = {}, viewer) {
   };
 
   const appendGroup = function appendGroup(targetCmp) {
-    const html = cu.dom.html(this.render());
+    const html = dom.html(this.render());
     const targetEl = targetCmp.getEl();
     if (position === 'top') {
       targetEl.insertBefore(html, targetEl.firstChild);
@@ -148,7 +148,7 @@ const Group = function Group(options = {}, viewer) {
     groupList.removeGroup(group);
   };
 
-  return cu.Component({
+  return Component({
     addOverlay,
     getEl,
     getOverlayList,

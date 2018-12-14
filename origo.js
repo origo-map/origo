@@ -1,5 +1,5 @@
 import polyfill from './src/utils/polyfill';
-import cu from 'ceeu';
+import * as ui from './src/ui';
 import Viewer from './src/viewer';
 import loadResources from './src/loadresources';
 import titleCase from './src/utils/titlecase';
@@ -55,7 +55,7 @@ const Origo = function Origo(configPath, options = {}) {
 
   const getConfig = () => origoConfig;
 
-  return cu.Component({
+  return ui.Component({
     getConfig,
     onInit() {
       const defaultConfig = Object.assign({}, origoConfig, options);
@@ -74,6 +74,6 @@ const Origo = function Origo(configPath, options = {}) {
 };
 
 Origo.controls = origoControls;
-Origo.ui = cu;
+Origo.ui = ui;
 
 export default Origo;

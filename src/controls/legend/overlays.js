@@ -1,4 +1,4 @@
-import cu from 'ceeu';
+import { Component, Collapse, Element as El, Slidenav, Button, dom } from '../../ui';
 import ThemeGroups from './themegroups';
 import Group from './group';
 import GroupList from './grouplist';
@@ -21,7 +21,7 @@ const Overlays = function Overlays(options) {
   } = options;
 
   const cls = `${clsSettings} o-layerswitcher-overlays flex row overflow-hidden`.trim();
-  const style = cu.dom.createStyle(Object.assign({}, { width: '220px;' }, styleSettings));
+  const style = dom.createStyle(Object.assign({}, { width: '220px;' }, styleSettings));
   const nonGroupNames = ['background', 'none'];
   const rootGroupNames = ['root', '', null, undefined];
   let overlays;
@@ -45,22 +45,22 @@ const Overlays = function Overlays(options) {
     }
   });
 
-  const groupContainer = cu.Element({
+  const groupContainer = El({
     components: [themeGroups, rootGroup]
   });
 
-  const layerProps = cu.Element({
+  const layerProps = El({
     cls: 'border-bottom overflow-hidden',
     innerHTML: 'Layerproperties'
   });
 
-  const slidenav = cu.Slidenav({
+  const slidenav = Slidenav({
     mainComponent: groupContainer,
     secondaryComponent: layerProps,
     cls: 'right flex width-100'
   });
 
-  const navContainer = cu.Component({
+  const navContainer = Component({
     onInit() {
       this.addComponent(slidenav);
     },
@@ -73,7 +73,7 @@ const Overlays = function Overlays(options) {
   });
 
   const initialState = expanded ? 'expanded' : 'collapsed';
-  const collapseButton = cu.Button({
+  const collapseButton = Button({
     icon: '#o_expand_more_24px',
     iconCls: 'rotate-180 grey',
     cls: 'icon-smaller compact round',
@@ -88,7 +88,7 @@ const Overlays = function Overlays(options) {
     }
   });
 
-  const collapseHeader = cu.Component({
+  const collapseHeader = Component({
     onInit() {
       this.addComponent(collapseButton);
     },
@@ -111,7 +111,7 @@ const Overlays = function Overlays(options) {
     }
   });
 
-  const overlaysCollapse = cu.Collapse({
+  const overlaysCollapse = Collapse({
     bubble: true,
     collapseX: false,
     cls: 'flex column overflow-hidden width-100',
@@ -216,7 +216,7 @@ const Overlays = function Overlays(options) {
   };
 
 
-  return cu.Component({
+  return Component({
     onAddGroup,
     onChangeLayer,
     onInit() {

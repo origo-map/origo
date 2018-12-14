@@ -1,12 +1,12 @@
-import cu from 'ceeu';
 import olRotate from 'ol/control/rotate';
+import { Component, Icon } from '../ui';
 
 const Rotate = function Rotate(options = {}) {
   let {
     target
   } = options;
 
-  const icon = cu.Icon({
+  const icon = Icon({
     icon: '#origo-compass',
     cls: 'o-icon-compass'
   });
@@ -14,7 +14,7 @@ const Rotate = function Rotate(options = {}) {
   let rotateControl;
   let viewer;
 
-  return cu.Component({
+  return Component({
     name: 'rotate',
     onAdd(evt) {
       viewer = evt.target;

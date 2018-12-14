@@ -1,0 +1,156 @@
+@import './animations';
+@import './colors';
+@import './margin';
+@import './padding';
+@import './position';
+@import './sizes';
+@import './spacing';
+@import './text';
+@import './zindex';
+
+.transparent {
+  background-color: transparent;
+  pointer-events: none;
+}
+.transparent > * {
+  pointer-events: auto;
+}
+.transparent > .transparent {
+  pointer-events: none;
+}
+
+.faded {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.boxshadow-subtle {
+  box-shadow: $shadow-subtle;
+}
+
+
+// overflow
+.overflow-hidden {
+  overflow: hidden;
+}
+.overflow-scroll {
+  overflow: scroll;
+}
+.overflow-scroll-x {
+  overflow-x: scroll;
+}
+.overflow-scroll-y {
+  overflow-y: scroll;
+}
+.overflow-auto {
+  overflow: auto;
+}
+.overflow-auto-x {
+  overflow-x: auto;
+}
+.overflow-auto-y {
+  overflow-y: auto;
+}
+
+// position
+.absolute {
+  position: absolute;
+}
+.relative {
+  position: relative;
+}
+
+// display
+.block {
+  display: block;
+}
+.inline-block {
+  display: inline-block;
+}
+
+// box-shadow
+.box-shadow {
+  box-shadow: $shadow;  
+}
+.box-shadow-subtle {
+  box-shadow: $shadow-subtle;  
+}
+
+// border-radius
+.round {
+  border-radius: $radius-round;
+  overflow: hidden;     
+}
+.rounded {
+  border-radius: $radius-small;
+  overflow: hidden;
+}
+.rounded-top {
+  border-radius: $radius-small $radius-small 0 0;
+  overflow: hidden;
+}
+.rounded-right {
+  border-radius:  0 $radius-small $radius-small 0;
+  overflow: hidden;
+}
+.rounded-bottom {
+  border-radius:  0 0 $radius-small $radius-small;
+  overflow: hidden;
+}
+.rounded-left {
+  border-radius:  $radius-small 0  0 $radius-small;
+  overflow: hidden;
+}
+
+// border
+.border {
+  border: 1px solid $border-color;
+}
+.border-top {
+  border-top: 1px solid $border-color;
+}
+.border-bottom {
+  border-bottom: 1px solid $border-color;
+}
+.border-left {
+  border-left: 1px solid $border-color;
+}
+.border-right {
+  border-right: 1px solid $border-color;
+}
+
+// box-sizing
+.border-box {
+  box-sizing: border-box;
+}
+.no-border-box {
+  box-sizing: initial;
+}
+
+// cursors
+.cursor-auto {cursor: auto;}
+.cell {cursor: cell;}
+.col-resize {cursor: col-resize;}
+.copy {cursor: copy;}
+.crosshair {cursor: crosshair;}
+.cursor-default {cursor: default;}
+.ew-resize {cursor: ew-resize;}
+.grab {cursor: grab;}
+.grabbing {cursor: grabbing;}
+.help {cursor: help;}
+.move {cursor: move;}
+.ns-resize {cursor: ns-resize;}
+.no-cursor {cursor: none;}
+.pointer {cursor: pointer;}
+.progress {cursor: progress;}
+.cursor-text {cursor: text;}
+
+// select
+.no-select {
+  user-select: none;
+}
+
+// hide
+.hidden {
+  display: none !important;
+}

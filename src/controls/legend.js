@@ -1,4 +1,4 @@
-import cu from 'ceeu';
+import { Component, Button, Element as El, ToggleGroup, dom } from '../ui';
 import imageSource from './legend/imagesource';
 import Overlays from './legend/overlays';
 
@@ -24,12 +24,12 @@ const LayerSwitcher = function LayerSwitcher(options = {}) {
   let layerButtonEl;
   let isExpanded;
   const cls = `${clsSettings} control bottom-right box overflow-hidden flex row o-layer-switcher`.trim();
-  const style = cu.dom.createStyle(Object.assign({}, { width: 'auto' }, styleSettings));
+  const style = dom.createStyle(Object.assign({}, { width: 'auto' }, styleSettings));
 
   const addBackgroundButton = function addBackgroundButton(layer) {
     const styleName = layer.get('styleName') || 'default';
     const icon = imageSource(viewer.getStyle(styleName));
-    backgroundLayerButtons.push(cu.Button({
+    backgroundLayerButtons.push(Button({
       icon,
       cls: 'round smallest border icon-small',
       state: layer.get('visible') ? 'active' : undefined,
@@ -59,7 +59,7 @@ const LayerSwitcher = function LayerSwitcher(options = {}) {
     mainContainerEl.style.maxHeight = `${calcMaxHeight(getTargetHeight())}px`;
   };
 
-  const divider = cu.Element({
+  const divider = El({
     cls: 'divider margin-x-small',
     style: {
       'border-width': '2px',
@@ -68,7 +68,7 @@ const LayerSwitcher = function LayerSwitcher(options = {}) {
     }
   });
 
-  const addButton = cu.Button({
+  const addButton = Button({
     cls: 'round compact primary icon-small margin-x-smaller',
     click() {
       viewer.dispatch('active:layermanager');
@@ -86,20 +86,20 @@ const LayerSwitcher = function LayerSwitcher(options = {}) {
     if (isExpanded) {
       layerSwitcherEl.classList.add('fade-out');
       layerSwitcherEl.classList.remove('fade-in');
-      layerButtonEl.classList.add('fade-in'); 
-      layerButtonEl.classList.remove('fade-out');          
+      layerButtonEl.classList.add('fade-in');
+      layerButtonEl.classList.remove('fade-out');
     } else {
       layerSwitcherEl.classList.remove('fade-out');
       layerSwitcherEl.classList.add('fade-in');
       layerButtonEl.classList.remove('fade-out');
-      layerButtonEl.classList.add('fade-in');              
+      layerButtonEl.classList.add('fade-in');
     }
     layerButtonEl.classList.toggle('faded');
-    layerSwitcherEl.classList.toggle('faded');        
+    layerSwitcherEl.classList.toggle('faded');
     isExpanded = !isExpanded;
   };
 
-  return cu.Component({
+  return Component({
     name,
     onInit() {
       this.on('render', this.onRender);
@@ -108,7 +108,7 @@ const LayerSwitcher = function LayerSwitcher(options = {}) {
       viewer = evt.target;
       const backgroundLayers = viewer.getLayersByProperty('group', 'background').reverse();
       addBackgroundButtons(backgroundLayers);
-      toggleGroup = cu.ToggleGroup({
+      toggleGroup = ToggleGroup({
         components: backgroundLayerButtons,
         cls: 'spacing-horizontal-small'
       });
@@ -133,7 +133,7 @@ const LayerSwitcher = function LayerSwitcher(options = {}) {
       const maxHeight = calcMaxHeight(getTargetHeight());
       const overlaysCmp = Overlays({ viewer, cls: contentCls, style: contentStyle });
       const baselayerCmps = addControl ? [toggleGroup, divider, addButton] : [toggleGroup];
-      const baselayersCmp = cu.Element({
+      const baselayersCmp = El({
         cls: 'flex padding-small no-shrink',
         style: {
           'background-color': '#fff',
@@ -141,7 +141,7 @@ const LayerSwitcher = function LayerSwitcher(options = {}) {
         },
         components: baselayerCmps
       });
-      mainContainerCmp = cu.Element({
+      mainContainerCmp = El({
         cls: 'flex column overflow-hidden relative',
         components: [overlaysCmp, baselayersCmp],
         style: {
@@ -150,17 +150,17 @@ const LayerSwitcher = function LayerSwitcher(options = {}) {
       });
 
       const layerSwitcherCls = isExpanded ? '' : ' faded';
-      const layerSwitcherCmp = cu.Element({
+      const layerSwitcherCmp = El({
         style,
         cls: `${cls}${layerSwitcherCls}`,
         components: [mainContainerCmp],
         target
       });
       layerSwitcherCmp.render();
-      layerSwitcherEl = document.getElementById(layerSwitcherCmp.getId()); 
+      layerSwitcherEl = document.getElementById(layerSwitcherCmp.getId());
 
       const layerButtonCls = isExpanded ? ' faded' : '';
-      layerButton = cu.Button({
+      layerButton = Button({
         icon: '#ic_layers_24px',
         cls: `control icon-small medium round absolute bottom-right${layerButtonCls}`,
         click() {
@@ -171,7 +171,7 @@ const LayerSwitcher = function LayerSwitcher(options = {}) {
         }
       });
       this.addComponent(layerButton);
-      const el = cu.dom.html(layerButton.render());
+      const el = dom.html(layerButton.render());
       target.appendChild(el);
     }
   });

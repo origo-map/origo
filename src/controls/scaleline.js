@@ -1,5 +1,5 @@
-import cu from 'ceeu';
 import olScaleLine from 'ol/control/scaleline';
+import { Component } from '../ui';
 
 const ScaleLine = function ScaleLine(options = {}) {
   let {
@@ -8,7 +8,7 @@ const ScaleLine = function ScaleLine(options = {}) {
   let viewer;
   let scaleLine;
 
-  return cu.Component({
+  return Component({
     name: 'scaleline',
     onAdd(evt) {
       viewer = evt.target;

@@ -1,8 +1,8 @@
-import cu from 'ceeu';
 import MousePosition from 'ol/control/mouseposition';
 import Feature from 'ol/feature';
 import Point from 'ol/geom/point';
 import Coordinate from 'ol/coordinate';
+import { Component, Icon, Button, Element as El, dom } from '../ui';
 
 const Position = function Position(options = {}) {
   let {
@@ -51,12 +51,12 @@ const Position = function Position(options = {}) {
   }
 
   function renderMarker() {
-    markerIcon = cu.Icon({
+    markerIcon = Icon({
       icon: '#o_centerposition_24px',
       cls: 'o-position-marker'
     });
 
-    markerElement = cu.dom.html(markerIcon.render());
+    markerElement = dom.html(markerIcon.render());
     document.getElementById(`${viewer.getId()}`).appendChild(markerElement);
   }
 
@@ -214,7 +214,7 @@ const Position = function Position(options = {}) {
     }
   }
 
-  return cu.Component({
+  return Component({
     name: 'position',
     onAdd(evt) {
       viewer = evt.target;
@@ -241,7 +241,7 @@ const Position = function Position(options = {}) {
       this.render();
     },
     onInit() {
-      centerButton = cu.Button({
+      centerButton = Button({
         cls: 'o-position-center-button',
         click() {
           onTogglePosition();
@@ -249,29 +249,29 @@ const Position = function Position(options = {}) {
         icon: '#ic_gps_not_fixed_24px',
         iconCls: 'o-icon-position'
       });
-      projButton = cu.Button({
+      projButton = Button({
         cls: 'o-position-button',
         click() {
           onToggleProjection();
         }
       });
-      coordsElement = cu.Element({
+      coordsElement = El({
         cls: 'o-position-coords',
         style: 'padding-left: 5px;'
       });
-      coordsFindElement = cu.Element({
+      coordsFindElement = El({
         cls: 'o-position-find',
         tagName: 'input',
         style: 'padding-left: 5px; margin-left: 5px;'
       });
-      containerElement = cu.Element({
+      containerElement = El({
         cls: 'o-position',
         style: 'display: inline-block;',
         components: [centerButton, projButton, coordsElement, coordsFindElement]
       });
     },
     render() {
-      const el = cu.dom.html(containerElement.render());
+      const el = dom.html(containerElement.render());
       document.getElementById(viewer.getFooter().getId()).firstElementChild.appendChild(el);
 
       document.getElementById(`${projButton.getId()}`).value = currentProjection;

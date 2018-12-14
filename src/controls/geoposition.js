@@ -1,6 +1,6 @@
-import cu from 'ceeu';
 import Geolocation from 'ol/geolocation';
 import Overlay from 'ol/overlay';
+import { Component, Button, dom } from '../ui';
 
 const Geoposition = function Geoposition(options = {}) {
   let {
@@ -52,7 +52,7 @@ const Geoposition = function Geoposition(options = {}) {
   };
 
   const onActive = function onActive() {
-    const markerEl = cu.dom.createElement('img', '', {
+    const markerEl = dom.createElement('img', '', {
       src: `${baseUrl}img/geolocation_marker.png`
     });
     viewer.getMap().getTargetElement().appendChild(markerEl);
@@ -74,7 +74,7 @@ const Geoposition = function Geoposition(options = {}) {
     viewer.getMap().removeOverlay(markerOverlay);
   };
 
-  return cu.Component({
+  return Component({
     name: 'geoposition',
     onAdd(evt) {
       viewer = evt.target;
@@ -96,7 +96,7 @@ const Geoposition = function Geoposition(options = {}) {
       this.render();
     },
     onInit() {
-      positionButton = cu.Button({
+      positionButton = Button({
         cls: 'o-geoposition padding-small icon-smaller rounded light box-shadow',
         click() {
           toggleState();
@@ -110,7 +110,7 @@ const Geoposition = function Geoposition(options = {}) {
     },
     render() {
       const htmlString = positionButton.render();
-      const el = cu.dom.html(htmlString);
+      const el = dom.html(htmlString);
       document.getElementById(target).appendChild(el);
       this.dispatch('render');
     }

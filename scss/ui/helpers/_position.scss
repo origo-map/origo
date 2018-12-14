@@ -1,0 +1,62 @@
+$position-margin: $app-margin;
+$position-no-margin: 0;
+
+.bottom-right {
+  bottom: $position-margin;
+  right: $position-margin;
+  &.no-margin {
+    bottom: $position-no-margin;
+    right: $position-no-margin;
+  }
+}
+
+.bottom-left {
+  left: $position-margin;
+  bottom: $position-margin;
+  &.no-margin {
+    left: $position-no-margin;
+    bottom: $position-no-margin;
+  }
+}
+
+.top-left {
+  left: $position-margin;
+  top: $position-margin;
+  &.no-margin {
+    left: $position-no-margin;
+    top: $position-no-margin;
+  }
+}
+
+.top-right {
+  right: $position-margin;
+  top: $position-margin;
+  &.no-margin {
+    right: $position-no-margin;
+    top: $position-no-margin;
+  }
+}
+
+.bottom-center {
+  bottom: $position-margin;
+  left: 50%;
+  transform: translateX(-50%);
+  &.no-margin {
+    bottom: $position-no-margin;
+  }
+}
+
+.top-center {
+  left: 50%;
+  top: $position-margin;
+  transform: translateX(-50%);
+  &.no-margin {
+    top: $position-no-margin;
+  }
+}
+
+.center-center {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

@@ -1,5 +1,5 @@
-import cu from 'ceeu';
 import olAttribution from 'ol/control/attribution';
+import { Component } from '../ui';
 
 const Attribution = function Attribution(options = {}) {
   let viewer;
@@ -13,7 +13,7 @@ const Attribution = function Attribution(options = {}) {
     attribution.setCollapsed(collapsed);
   }
 
-  return cu.Component({
+  return Component({
     name: 'attribution',
     onAdd(evt) {
       viewer = evt.target;

@@ -1,4 +1,4 @@
-import cu from 'ceeu';
+import { Component } from '../ui';
 import modal from '../modal';
 
 const Splash = function Splash(options = {}) {
@@ -25,7 +25,7 @@ const Splash = function Splash(options = {}) {
     modal.showModal();
   }
 
-  return cu.Component({
+  return Component({
     name: 'splash',
     onAdd(evt) {
       viewer = evt.target;

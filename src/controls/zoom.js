@@ -1,4 +1,4 @@
-import cu from 'ceeu';
+import { Component, Button, dom } from '../ui';
 
 const Zoom = function Zoom(options = {}) {
   let {
@@ -28,7 +28,7 @@ const Zoom = function Zoom(options = {}) {
     }
   };
 
-  return cu.Component({
+  return Component({
     name: 'zoom',
     onAdd(evt) {
       viewer = evt.target;
@@ -38,14 +38,14 @@ const Zoom = function Zoom(options = {}) {
       this.render();
     },
     onInit() {
-      zoomIn = cu.Button({
+      zoomIn = Button({
         cls: 'o-zoom-in padding-small icon-smaller light',
         click() {
           zoomByDelta(delta);
         },
         icon: '#ic_add_24px'
       });
-      zoomOut = cu.Button({
+      zoomOut = Button({
         cls: 'o-zoom-out padding-small icon-smaller light',
         click() {
           zoomByDelta(-delta);
@@ -59,7 +59,7 @@ const Zoom = function Zoom(options = {}) {
                             <div class="divider horizontal"></div>
                             ${zoomOut.render()}
                          </div>`;
-      const el = cu.dom.html(htmlString);
+      const el = dom.html(htmlString);
       document.getElementById(target).appendChild(el);
       this.dispatch('render');
     }

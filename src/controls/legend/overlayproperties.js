@@ -1,4 +1,4 @@
-import cu from 'ceeu';
+import { Component } from '../../ui';
 import { Legend } from '../../utils/legendmaker';
 
 const OverlayProperties = function OverlayProperties(options = {}) {
@@ -15,7 +15,7 @@ const OverlayProperties = function OverlayProperties(options = {}) {
   const style = viewer.getStyle(layer.get('styleName'));
   const legend = Legend(style, opacity);
 
-  return cu.Component({
+  return Component({
     render() {
       return `<div id="${this.getId()}" class="${cls} border-bottom">
                 <div class="padding-small">${legend}</div>

@@ -1,7 +1,7 @@
-import cu from 'ceeu';
 import 'owl.carousel';
 import Overlay from 'ol/overlay';
 import $ from 'jquery';
+import { Component } from './ui';
 import Popup from './popup';
 import sidebar from './sidebar';
 import maputils from './maputils';
@@ -222,7 +222,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     }
   };
 
-  return cu.Component({
+  return Component({
     name: 'featureInfo',
     clear,
     getHitTolerance,

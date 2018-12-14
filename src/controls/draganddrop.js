@@ -1,4 +1,3 @@
-import cu from 'ceeu';
 import olDragAndDrop from 'ol/interaction/draganddrop';
 import GPXFormat from 'ol/format/gpx';
 import GeoJSONFormat from 'ol/format/geojson';
@@ -7,12 +6,13 @@ import KMLFormat from 'ol/format/kml';
 import TopoJSONFormat from 'ol/format/topojson';
 import VectorSource from 'ol/source/vector';
 import VectorLayer from 'ol/layer/vector';
+import { Component } from '../ui';
 import legend from './legend';
 
 const DragAndDrop = function DragAndDrop(options = {}) {
   let viewer;
 
-  return cu.Component({
+  return Component({
     name: 'draganddrop',
     onAdd(evt) {
       viewer = evt.target;

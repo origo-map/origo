@@ -1,4 +1,4 @@
-import cu from 'ceeu';
+import { Component } from '../ui';
 import modal from '../modal';
 import permalink from '../permalink/permalink';
 
@@ -33,7 +33,7 @@ const ShareMap = function ShareMap(options = {}) {
     mapMenu.close();
   };
 
-  return cu.Component({
+  return Component({
     name: 'sharemap',
     onAdd(evt) {
       viewer = evt.target;

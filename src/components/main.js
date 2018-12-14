@@ -1,4 +1,4 @@
-import cu from 'ceeu';
+import { Component, Element as El } from '../ui';
 
 export default function Main(options = {}) {
   const {
@@ -6,12 +6,12 @@ export default function Main(options = {}) {
   } = options;
 
   const cls = `${clsSettings} o-main transparent relative flex column grow height-full no-margin`.trim();
-  const navigation = cu.Element({ cls: 'o-navigation flex column relative spacing-vertical-small' });
-  const mapTools = cu.Element({ cls: 'o-maptools flex column relative spacing-vertical-small' });
-  const miscTools = cu.Element({ cls: 'o-misc flex column relative spacing-vertical-small' });
-  const bottomTools = cu.Element({ cls: 'o-tools-bottom absolute bottom-left width-full no-margin' });
+  const navigation = El({ cls: 'o-navigation flex column relative spacing-vertical-small' });
+  const mapTools = El({ cls: 'o-maptools flex column relative spacing-vertical-small' });
+  const miscTools = El({ cls: 'o-misc flex column relative spacing-vertical-small' });
+  const bottomTools = El({ cls: 'o-tools-bottom absolute bottom-left width-full no-margin' });
 
-  return cu.Component({
+  return Component({
     getBottomTools: () => bottomTools,
     getNavigation: () => navigation,
     getMapTools: () => mapTools,

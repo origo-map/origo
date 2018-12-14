@@ -1,4 +1,4 @@
-import cu from 'ceeu';
+import { Component } from '../ui';
 
 const Link = function Link(options = {}) {
   const {
@@ -10,7 +10,7 @@ const Link = function Link(options = {}) {
   let menuItem;
   let viewer;
 
-  return cu.Component({
+  return Component({
     name: 'link',
     onAdd(evt) {
       viewer = evt.target;

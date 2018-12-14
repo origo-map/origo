@@ -1,4 +1,4 @@
-import cu from 'ceeu';
+import { dom } from '../ui';
 
 const size = 24;
 
@@ -74,7 +74,7 @@ export const renderIcon = {
     const fit = iconStyle.fit ? 'contain' : 'cover';
     const iconSize = iconStyle.size || iconStyle.imgSize || [size, size];
     const marginTop = !iconStyle.fit && iconSize[1] > size ? `${-(iconSize[1] - size) / 2}px` : 0;
-    const style = cu.dom.createStyle({
+    const style = dom.createStyle({
       height: `${iconSize[0]}px`,
       width: `${iconSize[1]}px`,
       'margin-top': marginTop

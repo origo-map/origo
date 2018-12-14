@@ -1,11 +1,11 @@
-import cu from 'ceeu';
+import { Component, Button, Element as El, dom } from '../ui';
 import editorToolbar from './editor/editortoolbar';
 
 const Editor = function Editor(opt = {}) {
   let editorButton;
   let editorElement;
 
-  return cu.Component({
+  return Component({
     name: 'about',
     onAdd(evt) {
       const viewer = evt.target;
@@ -22,7 +22,7 @@ const Editor = function Editor(opt = {}) {
       editorToolbar.init(options, viewer);
     },
     onInit() {
-      editorButton = cu.Button({
+      editorButton = Button({
         id: 'o-about-button',
         cls: 'o-menu-button',
         click() {
@@ -35,7 +35,7 @@ const Editor = function Editor(opt = {}) {
 
       const rendered = editorButton.render();
 
-      editorElement = cu.Element({
+      editorElement = El({
         cls: '',
         tagName: 'li',
         innerHTML: `${rendered}`
@@ -43,7 +43,7 @@ const Editor = function Editor(opt = {}) {
     },
     render() {
       const htmlString = editorElement.render();
-      const el = cu.dom.html(htmlString);
+      const el = dom.html(htmlString);
       document.getElementById('o-menutools').appendChild(el);
       this.dispatch('render');
     }

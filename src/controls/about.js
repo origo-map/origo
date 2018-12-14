@@ -1,4 +1,4 @@
-import cu from 'ceeu';
+import { Component } from '../ui';
 import modal from '../modal';
 
 const About = function About(options = {}) {
@@ -24,7 +24,7 @@ const About = function About(options = {}) {
     mapMenu.close();
   }
 
-  return cu.Component({
+  return Component({
     name: 'about',
     onAdd(evt) {
       if (!buttonText) buttonText = title;

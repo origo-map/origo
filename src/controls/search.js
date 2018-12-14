@@ -1,7 +1,7 @@
-import cu from 'ceeu';
 import Overlay from 'ol/overlay';
 import Point from 'ol/geom/point';
 import Awesomplete from 'awesomplete';
+import { Component, Element as El, Button, dom } from '../ui';
 import generateUUID from '../utils/generateuuid';
 import getAttributes from '../getattributes';
 import getCenter from '../geometry/getcenter';
@@ -334,7 +334,7 @@ const Search = function Search(options = {}) {
     });
   }
 
-  return cu.Component({
+  return Component({
     name: 'search',
     onAdd(evt) {
       viewer = evt.target;
@@ -363,12 +363,12 @@ const Search = function Search(options = {}) {
       this.render();
     },
     onInit() {
-      searchButton = cu.Button({
+      searchButton = Button({
         cls: 'o-search-button absolute top-right no-margin padding-smaller icon-medium',
         icon: '#ic_search_24px'
       });
 
-      closeButton = cu.Button({
+      closeButton = Button({
         cls: 'o-search-button-close absolute top-right no-margin padding-small icon-small',
         click() {
           onClearSearch();
@@ -376,12 +376,12 @@ const Search = function Search(options = {}) {
         icon: '#ic_close_24px'
       });
 
-      containerElement = cu.Element({
+      containerElement = El({
         cls: 'o-search o-search-false',
         innerHTML: `<input id="hjl" class="o-search-field form-control" type="text" placeholder="${hintText}"></input>`
       });
 
-      wrapperElement = cu.Element({
+      wrapperElement = El({
         cls: 'o-search-wrapper absolute top-center rounded box-shadow bg-white',
         style: 'overflow:visible;'
       });
@@ -391,19 +391,19 @@ const Search = function Search(options = {}) {
       const mapEl = document.getElementById(viewer.getMain().getId());
 
       let htmlString = wrapperElement.render();
-      let el = cu.dom.html(htmlString);
+      let el = dom.html(htmlString);
       mapEl.appendChild(el);
 
       htmlString = containerElement.render();
-      el = cu.dom.html(htmlString);
+      el = dom.html(htmlString);
       document.getElementById(wrapperElement.getId()).appendChild(el);
 
       htmlString = searchButton.render();
-      el = cu.dom.html(htmlString);
+      el = dom.html(htmlString);
       document.getElementById(containerElement.getId()).appendChild(el);
 
       htmlString = closeButton.render();
-      el = cu.dom.html(htmlString);
+      el = dom.html(htmlString);
       document.getElementById(containerElement.getId()).appendChild(el);
 
       initAutocomplete();

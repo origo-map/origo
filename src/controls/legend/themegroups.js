@@ -1,4 +1,4 @@
-import cu from "ceeu";
+import { Component } from '../../ui';
 
 // Container component for theme groups
 const ThemeGroups = function ThemeGroups() {
@@ -6,7 +6,7 @@ const ThemeGroups = function ThemeGroups() {
 
   const getEl = () => el;
 
-  return cu.Component({
+  return Component({
     getEl,
     onRender() {
       el = document.getElementById(this.getId());

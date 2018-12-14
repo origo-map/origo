@@ -1,4 +1,4 @@
-import cu from 'ceeu';
+import { Component, Button, dom } from '../../ui';
 import { HeaderIcon } from '../../utils/legendmaker';
 
 const OverlayLayer = function OverlayLayer(options) {
@@ -41,7 +41,7 @@ const OverlayLayer = function OverlayLayer(options) {
     return !visible;
   };
 
-  const layerIcon = cu.Button({
+  const layerIcon = Button({
     cls: `${headerIconCls} round compact icon-small light relative no-shrink`,
     click() {
       const eventOverlayProps = new CustomEvent('overlayproperties', {
@@ -59,7 +59,7 @@ const OverlayLayer = function OverlayLayer(options) {
     icon: headerIcon
   });
 
-  const toggleButton = cu.Button({
+  const toggleButton = Button({
     cls: 'round small icon-smaller no-shrink',
     click() {
       toggleVisible(layer.getVisible());
@@ -76,7 +76,7 @@ const OverlayLayer = function OverlayLayer(options) {
     el.remove();
   };
 
-  const label = cu.Component({
+  const label = Component({
     onRender() {
       const labelEl = document.getElementById(this.getId());
       labelEl.addEventListener('click', (e) => {
@@ -90,7 +90,7 @@ const OverlayLayer = function OverlayLayer(options) {
     }
   });
 
-  return cu.Component({
+  return Component({
     name,
     getLayer,
     onInit() {
@@ -99,7 +99,7 @@ const OverlayLayer = function OverlayLayer(options) {
     onAdd(evt) {
       const parentEl = document.getElementById(evt.target.getId());
       const htmlString = this.render();
-      const el = cu.dom.html(htmlString);
+      const el = dom.html(htmlString);
       if (position === 'top') {
         parentEl.insertBefore(el, parentEl.firstChild);
       } else {

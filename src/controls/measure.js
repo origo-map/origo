@@ -1,4 +1,3 @@
-import cu from 'ceeu';
 import Sphere from 'ol/sphere';
 import VectorSource from 'ol/source/vector';
 import VectorLayer from 'ol/layer/vector';
@@ -6,6 +5,7 @@ import DrawInteraction from 'ol/interaction/draw';
 import Overlay from 'ol/overlay';
 import Polygon from 'ol/geom/polygon';
 import LineString from 'ol/geom/linestring';
+import { Component, Element as El, Button, dom } from '../ui';
 import Style from '../style';
 import StyleTypes from '../style/styletypes';
 
@@ -265,7 +265,7 @@ const Measure = function Measure({
     addInteraction();
   }
 
-  return cu.Component({
+  return Component({
     name: 'measure',
     onAdd(evt) {
       viewer = evt.target;
@@ -293,12 +293,12 @@ const Measure = function Measure({
       areaTool = measureTools.indexOf('area') >= 0;
       defaultTool = lengthTool ? defaultMeasureTool : 'area';
       if (lengthTool || areaTool) {
-        measureElement = cu.Element({
+        measureElement = El({
           tagName: 'div',
           cls: 'flex column'
         });
 
-        measureButton = cu.Button({
+        measureButton = Button({
           cls: 'o-measure padding-small margin-bottom-smaller icon-smaller rounded light box-shadow',
           click() {
             toggleMeasure();
@@ -308,7 +308,7 @@ const Measure = function Measure({
         buttons.push(measureButton);
 
         if (lengthTool) {
-          lengthToolButton = cu.Button({
+          lengthToolButton = Button({
             cls: 'o-measure-length padding-small margin-bottom-smaller icon-smaller rounded light box-shadow hidden',
             click() {
               type = 'LineString';
@@ -323,7 +323,7 @@ const Measure = function Measure({
         }
 
         if (areaTool) {
-          areaToolButton = cu.Button({
+          areaToolButton = Button({
             cls: 'o-measure-area padding-small icon-smaller rounded light box-shadow hidden',
             click() {
               type = 'Polygon';
@@ -340,20 +340,20 @@ const Measure = function Measure({
     },
     render() {
       let htmlString = `${measureElement.render()}`;
-      let el = cu.dom.html(htmlString);
+      let el = dom.html(htmlString);
       document.getElementById(target).appendChild(el);
       htmlString = measureButton.render();
-      el = cu.dom.html(htmlString);
+      el = dom.html(htmlString);
       document.getElementById(measureElement.getId()).appendChild(el);
       if (lengthTool) {
         htmlString = lengthToolButton.render();
         buttons.push(lengthToolButton);
-        el = cu.dom.html(htmlString);
+        el = dom.html(htmlString);
         document.getElementById(measureElement.getId()).appendChild(el);
       }
       if (areaTool) {
         htmlString = areaToolButton.render();
-        el = cu.dom.html(htmlString);
+        el = dom.html(htmlString);
         document.getElementById(measureElement.getId()).appendChild(el);
       }
       this.dispatch('render');

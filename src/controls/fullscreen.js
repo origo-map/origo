@@ -1,4 +1,4 @@
-import cu from 'ceeu';
+import { Component, Button, dom } from '../ui';
 import permalink from '../permalink/permalink';
 import isEmbedded from '../utils/isembedded';
 
@@ -15,11 +15,11 @@ const Fullscreen = function Fullscreen(options = {}) {
     window.open(url);
   };
 
-  return cu.Component({
+  return Component({
     name: 'fullscreen',
     onAdd(evt) {
       viewer = evt.target;
-      fullscreenButton = cu.Button({
+      fullscreenButton = Button({
         cls: 'o-home-in padding-small icon-smaller rounded light box-shadow',
         click() {
           goFullScreen();
@@ -37,7 +37,7 @@ const Fullscreen = function Fullscreen(options = {}) {
     },
     render() {
       const htmlString = fullscreenButton.render();
-      const el = cu.dom.html(htmlString);
+      const el = dom.html(htmlString);
       document.getElementById(target).appendChild(el);
       this.dispatch('render');
     }

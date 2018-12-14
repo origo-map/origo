@@ -1,4 +1,4 @@
-import cu from 'ceeu';
+import { Component, Element as El, dom } from '../ui';
 import maputils from '../maputils';
 import numberFormatter from '../utils/numberformatter';
 
@@ -33,7 +33,7 @@ const Scale = function Scale(options = {}) {
     }
   }
 
-  return cu.Component({
+  return Component({
     name: 'scale',
     onAdd(evt) {
       viewer = evt.target;
@@ -46,12 +46,12 @@ const Scale = function Scale(options = {}) {
       this.render();
     },
     onInit() {
-      container = cu.Element({
+      container = El({
         style: 'display: inline-block'
       });
     },
     render() {
-      const el = cu.dom.html(container.render());
+      const el = dom.html(container.render());
       document.getElementById(viewer.getFooter().getId()).firstElementChild.appendChild(el);
       this.dispatch('render');
     }

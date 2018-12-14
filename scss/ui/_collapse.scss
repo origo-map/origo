@@ -1,0 +1,27 @@
+.collapse-container {
+  overflow: hidden;
+  position: relative;
+  transition: all 0.3s;
+}
+
+.collapse {
+  > .collapse-header {
+    .rotate {
+      &.icon {
+        transition:  all 0.3s ease;
+      }
+    }    
+  }  
+  &.expanded > .collapse-header {
+    .rotate {
+      &.icon {
+        transform: rotate(90deg);
+      }     
+    }
+    .rotate-180 {
+      &.icon {
+        transform: rotate(180deg);
+      }     
+    }    
+  }
+}

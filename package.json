@@ -26,6 +26,7 @@
     "@babel/runtime-corejs2": "^7.1.2",
     "awesomplete": "1.1.2",
     "core-js": "^2.4.0",
+    "cuid": "^2.1.4",
     "jquery": "3.3.1",
     "ol": "^4.6.5",
     "owl.carousel": "^2.3.4",

@@ -1,4 +1,4 @@
-import cu from 'ceeu';
+import { Component } from '../../ui';
 
 const LayerList = function LayerList(options) {
   const {
@@ -89,7 +89,7 @@ const LayerList = function LayerList(options) {
     }
   };
 
-  return cu.Component({
+  return Component({
     addGroup,
     addOverlay,
     getGroups,

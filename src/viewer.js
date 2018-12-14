@@ -1,7 +1,7 @@
-import cu from 'ceeu';
 import Collection from 'ol/collection';
 import Feature from 'ol/feature';
 import geom from 'ol/geom/geometry';
+import { Component } from './ui';
 import Map from './map';
 import proj from './projection';
 import MapSize from './utils/mapsize';
@@ -63,7 +63,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
   };
   const tileGridSettings = Object.assign({}, defaultTileGridOptions, tileGridOptions);
   const mapGridCls = mapGrid ? 'o-mapgrid' : '';
-  const cls = `${clsOptions} ${mapGridCls} ${mapCls} cu`.trim();
+  const cls = `${clsOptions} ${mapGridCls} ${mapCls} o-ui`.trim();
   const footerData = pageSettings.footer || {};
   const main = Main();
   const footer = Footer({
@@ -338,7 +338,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     }
   };
 
-  return cu.Component({
+  return Component({
     onInit() {
       this.render();
 

@@ -1,4 +1,4 @@
-import cu from 'ceeu';
+import { Component } from '../ui';
 
 export default function Footer(options = {}) {
   const {
@@ -6,7 +6,7 @@ export default function Footer(options = {}) {
     data = {}
   } = options;
 
-  return cu.Component({
+  return Component({
     render: function render() {
       let middleContent = '';
       if (data.img) {
@@ -17,7 +17,7 @@ export default function Footer(options = {}) {
         middleContent = `<p>${data.text}</p>`;
       }
 
-      return `<div id=${this.getId()} class="o-footer relative">
+      return `<div id=${this.getId()} class="o-footer relative ${cls}">
                 <div id="o-console" class="o-footer-left">&nbsp;</div>
                 <div class="o-footer-middle">
                   <div class="o-footer-middle-content">

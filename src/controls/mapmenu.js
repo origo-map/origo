@@ -1,4 +1,4 @@
-import cu from 'ceeu';
+import { Component, Button, Element as El, Collapse, dom } from '../ui';
 
 const Mapmenu = function Mapmenu({
   closeIcon = '#ic_close_24px',
@@ -40,13 +40,13 @@ const Mapmenu = function Mapmenu({
     click,
     title = ''
   } = {}) {
-    const button = cu.Button({
+    const button = Button({
       cls: 'icon-smaller compact no-grow',
       click,
       icon
     });
-    const titleCmp = cu.Element({ cls: 'grow padding-left', innerHTML: title });
-    return cu.Component({
+    const titleCmp = El({ cls: 'grow padding-left', innerHTML: title });
+    return Component({
       close,
       onInit() {
         this.addComponent(button);
@@ -66,12 +66,12 @@ const Mapmenu = function Mapmenu({
     });
   };
 
-  return cu.Component({
+  return Component({
     name: 'mapmenu',
     close,
     MenuItem,
     appendMenuItem(menuItem) {
-      const menuItemEl = cu.dom.html(menuItem.render());
+      const menuItemEl = dom.html(menuItem.render());
       document.getElementById(contentComponent.getId()).appendChild(menuItemEl);
     },
     onAdd(evt) {
@@ -82,7 +82,7 @@ const Mapmenu = function Mapmenu({
       this.render();
     },
     onInit() {
-      menuButton = cu.Button({
+      menuButton = Button({
         cls: 'padding-y-small padding-x icon-small light',
         icon: menuIcon,
         text: 'Meny',
@@ -94,7 +94,7 @@ const Mapmenu = function Mapmenu({
           toggle();
         }
       });
-      closeButton = cu.Button({
+      closeButton = Button({
         cls: 'small round margin-top-small margin-right small icon-smaller grey-lightest',
         icon: closeIcon,
         state: 'hidden',
@@ -103,24 +103,25 @@ const Mapmenu = function Mapmenu({
           toggle();
         }
       });
-      headerComponent = cu.Element({
+      headerComponent = El({
         cls: 'flex row justify-end',
         style: { width: '100%' },
         components: [menuButton, closeButton]
       });
-      contentComponent = cu.Component({
+      contentComponent = Component({
         render() {
           return `<div class="relative width-12"><ul class="padding-y-small" id="${this.getId()}""></ul></div>`;
         }
       });
-      mapMenu = cu.Collapse({
+      mapMenu = Collapse({
         cls: 'absolute flex column top-right rounded box-shadow bg-white overflow-hidden',
+        collapseX: true,
         headerComponent,
         contentComponent
       });
     },
     render() {
-      const menuEl = cu.dom.html(mapMenu.render());
+      const menuEl = dom.html(mapMenu.render());
       document.getElementById(target).appendChild(menuEl);
       this.dispatch('render');
     }
