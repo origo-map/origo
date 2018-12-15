@@ -7,9 +7,8 @@ import TopoJSONFormat from 'ol/format/topojson';
 import VectorSource from 'ol/source/vector';
 import VectorLayer from 'ol/layer/vector';
 import { Component } from '../ui';
-import legend from './legend';
 
-const DragAndDrop = function DragAndDrop(options = {}) {
+const DragAndDrop = function DragAndDrop() {
   let viewer;
 
   return Component({
@@ -17,11 +16,8 @@ const DragAndDrop = function DragAndDrop(options = {}) {
     onAdd(evt) {
       viewer = evt.target;
       const map = viewer.getMap();
-      const groupTitle = options.groupTitle || 'Egna lager';
       let vectorSource;
       let vectorLayer;
-      let vectorLayerName;
-      let group;
 
       const dragAndDrop = new olDragAndDrop({
         formatConstructors: [
@@ -43,7 +39,7 @@ const DragAndDrop = function DragAndDrop(options = {}) {
         vectorLayer = new VectorLayer({
           source: vectorSource,
           name: event.file.name.split('.')[0].replace(/\W/g, ''),
-          group: 'draganddrop',
+          group: 'root',
           title: event.file.name.split('.')[0],
           queryable: true,
           removable: true
@@ -51,23 +47,6 @@ const DragAndDrop = function DragAndDrop(options = {}) {
 
         map.addLayer(vectorLayer);
         map.getView().fit(vectorSource.getExtent());
-
-        if (!document.getElementById('o-group-draganddrop')) {
-          group = {
-            name: 'draganddrop',
-            title: groupTitle,
-            expanded: true
-          };
-          legend.createGroup(group, undefined, true);
-        }
-
-        vectorLayerName = vectorLayer.get('name');
-
-        legend.createLegendItem(vectorLayerName, true);
-        legend.addMapLegendItem(vectorLayer, vectorLayerName);
-        legend.addCheckbox(vectorLayer, vectorLayerName);
-        legend.addTickListener(vectorLayer);
-        legend.addMapLegendListener(vectorLayer);
       });
       this.render();
     },
