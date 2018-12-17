@@ -117,9 +117,12 @@ const Search = function Search(options = {}) {
     let content;
     let coord;
     if (layerNameAttribute && idAttribute) {
+      const source = viewer.getMapSource();
+      const projCode = viewer.getProjectionCode();
+      const proj = viewer.getProjection();
       layer = viewer.getLayer(data[layerNameAttribute]);
       id = data[idAttribute];
-      getFeature(id, layer)
+      getFeature(id, layer, source, projCode, proj)
         .done((res) => {
           let featureWkt;
           let coordWkt;
