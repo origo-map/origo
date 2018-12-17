@@ -19,7 +19,8 @@ const Attribution = function Attribution(options = {}) {
       viewer = evt.target;
       breakPoint = options.breakPoint || [768, 500];
       attribution = new olAttribution({
-        collapsible: false
+        collapsible: false,
+        collapseLabel: '\u00AB'
       });
       this.render();
     },
