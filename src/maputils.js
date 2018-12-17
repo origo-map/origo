@@ -109,7 +109,7 @@ export default {
     scale = Math.round(scale);
     return scale;
   },
-  scaletoResolution: function scaleToResolution(scale, projection) {
+  scaleToResolution: function scaleToResolution(scale, projection) {
     const dpi = 25.4 / 0.28;
     const mpu = projection.getMetersPerUnit();
     const resolution = scale / (mpu * 39.37 * dpi);
