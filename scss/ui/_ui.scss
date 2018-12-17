@@ -2,12 +2,12 @@
 .o-ui {
   @import './utils/mixins';
   @import './base/base';
-  @import './helpers/helpers';
   @import './control';
   @import './container';
   @import './flex';
   @import './grid';
   @import './box';
+  @import './input';
   @import './button';
   @import './collapse';  
   @import './icon';
@@ -15,6 +15,7 @@
   @import './list';
   @import './toggle-group';
   @import './slidenav';
+  @import './helpers/helpers';
   font-family: $font-family-base;
   font-size: $font-size-base;
   font-weight: $font-weight-base;

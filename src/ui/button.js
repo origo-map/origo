@@ -89,15 +89,15 @@ export default function Button(options = {}) {
     onInit() {
       this.on('change', onChange.bind(this));
       this.on('update', onUpdate.bind(this));
-    },
-    onRender() {
-      buttonEl = document.getElementById(this.getId());
       if (click) {
         this.on('click', click.bind(this));
         this.on('clear', () => {
           this.un('click', click.bind(this));
         });
       }
+    },
+    onRender() {
+      buttonEl = document.getElementById(this.getId());
       buttonEl.addEventListener('click', (e) => {
         this.dispatch('click');
         e.preventDefault();
