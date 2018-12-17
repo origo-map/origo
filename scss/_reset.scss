@@ -5,37 +5,3 @@ svg,
 object{
   width: 100%;
 }
-
-// form
-textarea,
-select,
-input {
-  border: 1px solid #ccc;
-  border-radius: 3px;
-  box-sizing: border-box;
-  font-size: .875rem;
-  margin-bottom: .375rem;
-  padding: .375rem;
-  line-height: 1.5rem;
-}
-label {
-  font-weight: bold;
-  font-size: .875rem;
-  line-height: 1.5rem;
-}
-input[type=checkbox] {
-  color: #fff;
-  height: 1rem;
-  line-height: 1.5rem;
-  margin: .25rem;
-  vertical-align: bottom;
-  width: 1rem;
-}
-input[type=button] {
-  background-color: #fff;
-  border-radius: 3px;
-  cursor: pointer;
-}
-input[type=button]:hover {
-  background-color: #ccc;
-}
