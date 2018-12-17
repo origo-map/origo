@@ -357,7 +357,6 @@ const Search = function Search(options = {}) {
       searchableDefault = Object.prototype.hasOwnProperty.call(options, 'searchableDefault') ? options.searchableDefault : false;
       if (!maxZoomLevel) maxZoomLevel = viewer.getResolutions().length - 2 || viewer.getResolutions();
       if (!limit) limit = 9;
-      if (!hintText) hintText = 'Sök...';
       if (!minLength) minLength = 4;
       projectionCode = viewer.getProjectionCode();
       map = viewer.getMap();
@@ -366,6 +365,7 @@ const Search = function Search(options = {}) {
       this.render();
     },
     onInit() {
+      if (!hintText) hintText = 'Sök...';
       searchButton = Button({
         cls: 'o-search-button absolute top-right no-margin padding-smaller icon-medium',
         icon: '#ic_search_24px'
