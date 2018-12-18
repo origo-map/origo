@@ -4,11 +4,10 @@ import maputils from './maputils';
 import getAttributes from './getattributes';
 
 function getGetFeatureInfoUrl({
-  layer,
   coordinate,
   resolution,
   projection
-}) {
+}, layer) {
   const url = layer.getSource().getGetFeatureInfoUrl(coordinate, resolution, projection, {
     INFO_FORMAT: 'application/json'
   });
@@ -94,6 +93,8 @@ function layerAtPixel({
 function getGetFeatureInfoRequest({ layer, coordinate }, viewer) {
   const layerType = layer.get('type');
   const obj = {};
+  const projection = viewer.getProjection();
+  const resolution = viewer.getMap().getView().getResolution();
   obj.layer = layer.get('name');
 
   switch (layerType) {
@@ -111,7 +112,7 @@ function getGetFeatureInfoRequest({ layer, coordinate }, viewer) {
         return getGetFeatureInfoRequest({ featureinfoLayer, coordinate }, viewer);
       }
       obj.cb = 'GEOJSON';
-      obj.fn = getGetFeatureInfoUrl({ layer, coordinate }, viewer);
+      obj.fn = getGetFeatureInfoUrl({ coordinate, resolution, projection }, layer);
       return obj;
     case 'AGS_TILE':
       if (layer.get('featureinfoLayer')) {

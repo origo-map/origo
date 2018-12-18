@@ -11,7 +11,7 @@ function createTileSource(options) {
     url: options.url,
     gutter: options.gutter,
     crossOrigin: 'anonymous',
-    projection: options.projectionCode,
+    projection: options.projection,
     tileGrid: options.tileGrid,
     params: {
       LAYERS: options.id,
@@ -27,7 +27,7 @@ function createImageSource(options) {
     attributions: options.attribution,
     url: options.url,
     crossOrigin: 'anonymous',
-    projection: options.projectionCode,
+    projection: options.projection,
     params: {
       LAYERS: options.id,
       VERSION: options.version,
@@ -51,7 +51,7 @@ const wms = function wms(layerOptions, viewer) {
   wmsOptions.name.split(':').pop();
   const sourceOptions = $.extend(sourceDefault, viewer.getMapSource()[layerOptions.source]);
   sourceOptions.attribution = wmsOptions.attribution;
-  sourceOptions.projectionCode = viewer.getProjectionCode();
+  sourceOptions.projection = viewer.getProjection();
   sourceOptions.id = wmsOptions.id;
   sourceOptions.format = wmsOptions.format ? wmsOptions.format : sourceOptions.format;
 
