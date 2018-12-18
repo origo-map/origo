@@ -5,11 +5,11 @@ export default function Main(options = {}) {
     cls: clsSettings = ''
   } = options;
 
-  const cls = `${clsSettings} o-main transparent relative flex column grow height-full no-margin`.trim();
-  const navigation = El({ cls: 'o-navigation flex column relative spacing-vertical-small' });
-  const mapTools = El({ cls: 'o-maptools flex column relative spacing-vertical-small' });
-  const miscTools = El({ cls: 'o-misc flex column relative spacing-vertical-small' });
-  const bottomTools = El({ cls: 'o-tools-bottom absolute bottom-left width-full no-margin' });
+  const cls = `${clsSettings} o-main transparent relative flex column grow transparent height-full no-margin`.trim();
+  const navigation = El({ cls: 'o-navigation flex column relative transparent spacing-vertical-small' });
+  const mapTools = El({ cls: 'o-maptools flex column relative transparent spacing-vertical-small' });
+  const miscTools = El({ cls: 'o-misc flex column relative transparent spacing-vertical-small' });
+  const bottomTools = El({ cls: 'o-tools-bottom absolute transparent bottom-left width-full no-margin' });
 
   return Component({
     getBottomTools: () => bottomTools,
