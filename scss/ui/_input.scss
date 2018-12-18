@@ -1,5 +1,9 @@
 $button-padding-medium: $padding-small $padding-small * 1.5;
 
+input::-ms-clear {
+  display: none;
+}
+
 // form
 textarea,
 select,

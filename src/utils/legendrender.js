@@ -73,12 +73,18 @@ export const renderIcon = {
   Icon(iconStyle) {
     const fit = iconStyle.fit ? 'contain' : 'cover';
     const iconSize = iconStyle.size || iconStyle.imgSize || [size, size];
-    const marginTop = !iconStyle.fit && iconSize[1] > size ? `${-(iconSize[1] - size) / 2}px` : 0;
-    const style = dom.createStyle({
-      height: `${iconSize[0]}px`,
-      width: `${iconSize[1]}px`,
-      'margin-top': marginTop
-    });
+
+    // if imgSize is set, svg is assumed
+    const isSvg = 'imgSize' in iconSize;
+    let style = '';
+    if (isSvg) {
+      const marginTop = !iconStyle.fit && iconSize[1] > size ? `${-(iconSize[1] - size) / 2}px` : 0;
+      style = dom.createStyle({
+        height: `${iconSize[0]}px`,
+        width: `${iconSize[1]}px`,
+        'margin-top': marginTop
+      });
+    }
     return `<img class="${fit}" src="${iconStyle.src}" style="${style}"/>`;
   },
   Text(color) {
