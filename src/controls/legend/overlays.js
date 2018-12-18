@@ -126,7 +126,7 @@ const Overlays = function Overlays(options) {
 
   const readOverlays = () => {
     overlays = viewer.getLayers().filter(layer => layer.get('group') !== 'background' && layer.get('group') !== 'none');
-    return overlays;
+    return overlays.reverse();
   };
 
   // Hide overlays container when empty
