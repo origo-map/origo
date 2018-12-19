@@ -1,9 +1,9 @@
-import { Component } from '../ui';
-import modal from '../modal';
+import { Component, Modal } from '../ui';
 
 const About = function About(options = {}) {
   let {
-    buttonText
+    buttonText,
+    target
   } = options;
   const {
     content = '<p></p>',
@@ -14,25 +14,23 @@ const About = function About(options = {}) {
   let viewer;
   let mapMenu;
   let menuItem;
-
-  function openModal() {
-    modal.createModal(`#${viewer.getId()}`, {
-      title,
-      content
-    });
-    modal.showModal();
-    mapMenu.close();
-  }
+  let modal;
 
   return Component({
     name: 'about',
     onAdd(evt) {
       if (!buttonText) buttonText = title;
       viewer = evt.target;
+      target = viewer.getId();
       mapMenu = viewer.getControlByName('mapmenu');
       menuItem = mapMenu.MenuItem({
         click() {
-          openModal();
+          modal = Modal({
+            title,
+            content,
+            target
+          });
+          this.addComponent(modal);
         },
         icon,
         title: buttonText

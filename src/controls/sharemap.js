@@ -1,8 +1,10 @@
-import { Component } from '../ui';
-import modal from '../modal';
+import { Component, Modal } from '../ui';
 import permalink from '../permalink/permalink';
 
 const ShareMap = function ShareMap(options = {}) {
+  let {
+    target
+  } = options;
   const {
     icon = '#ic_screen_share_outline_24px',
     title = 'Dela karta'
@@ -10,6 +12,7 @@ const ShareMap = function ShareMap(options = {}) {
   let viewer;
   let mapMenu;
   let menuItem;
+  let modal;
 
   const createContent = function createContent() {
     return '<div class="o-share-link"><input type="text"></div>' +
@@ -23,24 +26,21 @@ const ShareMap = function ShareMap(options = {}) {
     inputElement.select();
   };
 
-  const openModal = function openModal() {
-    modal.createModal(`#${viewer.getId()}`, {
-      title: 'Länk till karta',
-      content: createContent()
-    });
-    modal.showModal();
-    createLink(); // Add link to input
-    mapMenu.close();
-  };
-
   return Component({
     name: 'sharemap',
     onAdd(evt) {
       viewer = evt.target;
+      target = viewer.getId();
       mapMenu = viewer.getControlByName('mapmenu');
       menuItem = mapMenu.MenuItem({
         click() {
-          openModal();
+          modal = Modal({
+            title: 'Länk till karta',
+            content: createContent(),
+            target
+          });
+          this.addComponent(modal);
+          createLink();
         },
         icon,
         title

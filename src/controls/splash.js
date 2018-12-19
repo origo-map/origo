@@ -1,34 +1,27 @@
-import { Component } from '../ui';
-import modal from '../modal';
+import { Component, Modal } from '../ui';
 
 const Splash = function Splash(options = {}) {
   const defaultTitle = 'Om kartan';
   const defaultContent = '<p></p>';
   const cls = 'o-splash';
   let viewer;
+  let modal;
 
   let {
     title,
-    content
+    content,
+    target
   } = options;
 
   const {
     url
   } = options;
 
-  function openModal() {
-    modal.createModal(`#${viewer.getId()}`, {
-      title,
-      content,
-      cls
-    });
-    modal.showModal();
-  }
-
   return Component({
     name: 'splash',
     onAdd(evt) {
       viewer = evt.target;
+      target = viewer.getId();
       if (!title) title = defaultTitle;
 
       if (url) {
@@ -44,7 +37,13 @@ const Splash = function Splash(options = {}) {
       }
     },
     render() {
-      openModal();
+      modal = Modal({
+        title,
+        content,
+        cls,
+        target
+      });
+      this.addComponent(modal);
       this.dispatch('render');
     }
   });

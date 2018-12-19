@@ -5,7 +5,7 @@ import Snap from 'ol/interaction/snap';
 import Collection from 'ol/collection';
 import Feature from 'ol/feature';
 import $ from 'jquery';
-import modal from '../../modal';
+import { Modal } from '../../ui';
 import store from './editsstore';
 import generateUUID from '../../utils/generateuuid';
 import transactionHandler from './transactionhandler';
@@ -34,6 +34,7 @@ let modify;
 let snap;
 let viewer;
 let featureInfo;
+let modal;
 
 function isActive() {
   if (modify === undefined || select === undefined) {
@@ -477,12 +478,13 @@ function editAttributes(feat) {
 
     const formElement = attributeObjects.reduce((prev, next) => prev + next.formElement, '');
     const form = `<form>${formElement}<br><div class="o-form-save"><input id="o-save-button" type="button" value="Ok"></input></div></form>`;
-    modal.createModal(`#${viewer.getId()}`, {
+
+    modal = Modal({
       title,
       content: form,
-      static: true
+      static: true,
+      target: viewer.getId()
     });
-    modal.showModal();
 
     attributeObjects.forEach((obj) => {
       if ('addListener' in obj) {
