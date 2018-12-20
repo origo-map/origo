@@ -197,6 +197,10 @@ function getLayers() {
   return settings.layers;
 }
 
+function getVisibleLayers() {
+  return settings.layers.filter(layer => layer.getVisible());
+}
+
 function getLayersByProperty(key, val, byName) {
   const layers = map.getLayers().getArray().filter(layer => layer.get(key) && layer.get(key) === val);
 

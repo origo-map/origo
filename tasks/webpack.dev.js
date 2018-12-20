@@ -12,6 +12,6 @@ module.exports = merge(common, {
   },
   devServer: {
     contentBase: './',
-    port: 9966
+    port: 9967
   }
 });

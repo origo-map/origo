@@ -1,0 +1,25 @@
+.o-export-format {
+  padding: 0 .2rem;
+  //color: darkcyan;
+  cursor: pointer;
+  font-family: Arial,sans-serif;
+  font-size: 0.9em;
+  line-height: 1.5em;
+  text-decoration: none;
+  text-align: left;
+  height: 1.5em;
+  border: none;
+  vertical-align: middle;
+}
+
+.o-export-format:hover {
+  color: rgb(58, 130, 198);
+}
+
+#o-select-format-button {
+  padding-left: 2rem;
+}
+
+.clicks-disabled { 
+  pointer-events: none 
+}
