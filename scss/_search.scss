@@ -75,3 +75,6 @@ input.o-search-field::-ms-clear {
   	display: inline-block;
   }
 }
+.o-search-wrapper {
+  z-index: -1;
+}
