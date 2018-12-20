@@ -83,9 +83,8 @@ const Mapmenu = function Mapmenu({
     },
     onInit() {
       menuButton = Button({
-        cls: 'padding-y-small padding-x icon-small light text-normal',
+        cls: 'padding-small icon-smaller light text-normal',
         icon: menuIcon,
-        text: 'Meny',
         tooltipText: 'Meny',
         tooltipPlacement: 'west',
         state: 'initial',
