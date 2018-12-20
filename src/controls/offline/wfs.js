@@ -5,6 +5,8 @@ import wfsTransaction from '../editor/wfstransaction';
 
 const wfs = {};
 wfs.request = function request(layer) {
+  // Note that if there is a GeoJSON layer enabled om the map the following line will throw an error. because a GeoJSON layer does not have a seperate source defined and
+  // the address to the GeoJSON file is given directly in the source property of the layer options.
   const sourceOptions = viewer.getMapSource()[layer.get('sourceName')];
   sourceOptions.featureType = layer.get('name').split('__').shift();
   sourceOptions.geometryName = layer.get('geometryName');

@@ -19,6 +19,7 @@ import search from '../src/controls/search';
 import sharemap from '../src/controls/sharemap';
 import splash from '../src/controls/splash';
 import zoom from '../src/controls/zoom';
+import externalurl from '../src/controls/externalurl'
 
 const controls = {
   about,
@@ -41,7 +42,8 @@ const controls = {
   search,
   sharemap,
   splash,
-  zoom
+  zoom,
+  externalurl
 };
 
 export default controls;

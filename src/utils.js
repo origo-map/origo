@@ -13,9 +13,32 @@ export default {
     }
     const el = `<div id="${options.id}" class="o-button-container o-tooltip">
       <button class="o-button ${cls}">${text}
-      <svg class="${iconCls}">
-      <use xlink:href="${options.src}"></use>
-      </svg>
+        <svg class="${iconCls}">
+          <use xlink:href="${options.src}"></use>
+        </svg>
+      </button>
+      ${tooltip}
+      </div>`;
+    return el;
+  },
+  // The same button as above function, but recieves a url to an image instead of svg icon.
+  createImageButton(options) {
+    let tooltip = '';
+    let text = '';
+    const cls = options.cls || '';
+    const iconCls = options.iconCls || '';
+    const placement = options.tooltipPlacement || 'east';
+    if (options.text) {
+      text = `<span class="o-button-text">${options.text}</span>`;
+    }
+    if (options.tooltipText) {
+      tooltip = `<span data-tooltip="${options.tooltipText}" data-placement="${placement}"></span>`;
+    }
+    const el = `<div id="${options.id}" class="o-button-container o-tooltip">
+      <button class="o-button ${cls}">${text}
+        <svg class="${iconCls}">
+          <image xlink:href="${options.src}" height="2em" width="2em" />
+        </svg>
       </button>
       ${tooltip}
       </div>`;
@@ -25,9 +48,9 @@ export default {
     const el = `<li>
       <div id="${options.id}-button" class="o-menu-button">
       <div class="o-button-icon">
-      <svg class="${options.iconCls}">
-      <use xlink:href="${options.src}"></use>
-      </svg>
+        <svg class="${options.iconCls}">
+          <use xlink:href="${options.src}"></use>
+        </svg>
       </div>
       ${options.text}
       </div>
