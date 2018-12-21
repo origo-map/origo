@@ -367,26 +367,31 @@ const Search = function Search(options = {}) {
     onInit() {
       if (!hintText) hintText = 'Sök...';
       searchButton = Button({
-        cls: 'o-search-button absolute top-right no-margin padding-smaller icon-medium',
-        icon: '#ic_search_24px'
+        cls: 'o-search-button no-shrink no-grow compact icon-small',
+        icon: '#ic_search_24px',
+        iconCls: 'grey'
       });
 
       closeButton = Button({
-        cls: 'o-search-button-close absolute top-right no-margin padding-small icon-small',
+        cls: 'o-search-button-close no-shrink no-grow compact icon-small',
         click() {
           onClearSearch();
         },
-        icon: '#ic_close_24px'
+        icon: '#ic_close_24px',
+        iconCls: 'grey'
       });
 
       containerElement = El({
-        cls: 'o-search o-search-false',
-        innerHTML: `<input id="hjl" class="o-search-field form-control" type="text" placeholder="${hintText}"></input>`
+        cls: 'o-search o-search-false flex row align-center padding-right-small',
+        innerHTML: `<input id="hjl" class="o-search-field form-control text-grey-darker" type="text" placeholder="${hintText}"></input>`
       });
 
       wrapperElement = El({
         cls: 'o-search-wrapper absolute top-center rounded box-shadow bg-white',
-        style: 'overflow:visible;'
+        style: {
+          'flex-wrap': 'wrap',
+          overflow: 'visible'
+        }
       });
     },
 
