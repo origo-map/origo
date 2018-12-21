@@ -17,6 +17,7 @@ const Link = function Link(options = {}) {
       mapMenu = viewer.getControlByName('mapmenu');
       menuItem = mapMenu.MenuItem({
         click() {
+          mapMenu.close();
           window.open(url);
         },
         icon,

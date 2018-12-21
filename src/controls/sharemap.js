@@ -34,6 +34,7 @@ const ShareMap = function ShareMap(options = {}) {
       mapMenu = viewer.getControlByName('mapmenu');
       menuItem = mapMenu.MenuItem({
         click() {
+          mapMenu.close();
           modal = Modal({
             title: 'Länk till karta',
             content: createContent(),

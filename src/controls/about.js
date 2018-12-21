@@ -31,6 +31,7 @@ const About = function About(options = {}) {
             target
           });
           this.addComponent(modal);
+          mapMenu.close();
         },
         icon,
         title: buttonText

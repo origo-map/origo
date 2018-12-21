@@ -89,6 +89,7 @@ const Print = function Print(options = {}) {
       mapMenu = viewer.getControlByName('mapmenu');
       menuItem = mapMenu.MenuItem({
         click() {
+          mapMenu.close();
           const canvasEl = dom.html('<canvas id="o-print" style="display: none"></canvas>');
           document.getElementById('app-wrapper').appendChild(canvasEl);
           createImage();
