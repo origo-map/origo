@@ -1,2 +1,8 @@
 # Default line ending is set to LF
-* text eol=lf
+*.js eol=lf
+*.html eol=lf
+*.css eol=lf
+*.scss eol=lf
+*.txt eol=lf
+*.json eol=lf
+*.md eol=lf
