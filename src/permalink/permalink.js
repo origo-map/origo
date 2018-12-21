@@ -3,9 +3,9 @@ import permalinkStore from './permalinkstore';
 import urlparser from '../utils/urlparser';
 
 export default (() => ({
-  getPermalink: function getPermalink() {
-    const hash = urlparser.formatUrl(permalinkStore.getState());
-    const url = `${permalinkStore.getUrl()}#${hash}`;
+  getPermalink: function getPermalink(viewer) {
+    const hash = urlparser.formatUrl(permalinkStore.getState(viewer));
+    const url = `${permalinkStore.getUrl(viewer)}#${hash}`;
     return (url);
   },
   parsePermalink: function parsePermalink(url) {

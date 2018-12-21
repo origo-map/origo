@@ -1,45 +1,59 @@
-import $ from 'jquery';
-import modal from '../modal';
-import mapmenu from './mapmenu';
-import utils from '../utils';
+import { Component, Modal } from '../ui';
 import permalink from '../permalink/permalink';
 
-let shareButton;
+const ShareMap = function ShareMap(options = {}) {
+  let {
+    target
+  } = options;
+  const {
+    icon = '#ic_screen_share_outline_24px',
+    title = 'Dela karta'
+  } = options;
+  let viewer;
+  let mapMenu;
+  let menuItem;
+  let modal;
 
+  const createContent = function createContent() {
+    return '<div class="o-share-link"><input type="text"></div>' +
+      '<i>Kopiera och klistra in länken för att dela kartan.</i>';
+  };
 
-function createContent() {
-  return '<div class="o-share-link"><input type="text"></div>' +
-    '<i>Kopiera och klistra in länken för att dela kartan.</i>';
-}
+  const createLink = function createLink() {
+    const url = permalink.getPermalink(viewer);
+    const inputElement = document.getElementsByClassName('o-share-link')[0].firstElementChild;
+    inputElement.value = url;
+    inputElement.select();
+  };
 
-function createLink() {
-  const url = permalink.getPermalink();
-  $('.o-share-link input').val(url).select();
-}
-
-function bindUIActions() {
-  shareButton.on('click', (e) => {
-    modal.createModal('#o-map', {
-      title: 'Länk till karta',
-      content: createContent()
-    });
-    modal.showModal();
-    createLink(); // Add link to input
-    mapmenu.toggleMenu();
-    e.preventDefault();
+  return Component({
+    name: 'sharemap',
+    onAdd(evt) {
+      viewer = evt.target;
+      target = viewer.getId();
+      mapMenu = viewer.getControlByName('mapmenu');
+      menuItem = mapMenu.MenuItem({
+        click() {
+          mapMenu.close();
+          modal = Modal({
+            title: 'Länk till karta',
+            content: createContent(),
+            target
+          });
+          this.addComponent(modal);
+          createLink();
+        },
+        icon,
+        title
+      });
+      this.addComponent(menuItem);
+      this.render();
+    },
+    render() {
+      mapMenu.appendMenuItem(menuItem);
+      this.dispatch('render');
+    }
   });
-}
+};
 
-function init() {
-  const el = utils.createListButton({
-    id: 'o-share',
-    iconCls: 'o-icon-fa-share-square-o',
-    src: '#fa-share-square-o',
-    text: 'Dela karta'
-  });
-  $('#o-menutools').append(el);
-  shareButton = $('#o-share-button');
-  bindUIActions();
-}
-
-export default { init };
+export default ShareMap;

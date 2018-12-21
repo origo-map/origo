@@ -1,7 +1,6 @@
 import $ from 'jquery';
 import VectorSource from 'ol/source/Vector';
 import TopoJSONFormat from 'ol/format/TopoJSON';
-import viewer from '../viewer';
 import vector from './vector';
 import isUrl from '../utils/isurl';
 
@@ -15,7 +14,7 @@ function createSource(options) {
   });
 }
 
-const topojson = function topojson(layerOptions) {
+const topojson = function topojson(layerOptions, viewer) {
   const baseUrl = viewer.getBaseUrl();
   const topojsonDefault = {
     layerType: 'vector'
@@ -34,7 +33,7 @@ const topojson = function topojson(layerOptions) {
   }
 
   const topojsonSource = createSource(sourceOptions);
-  return vector(topojsonOptions, topojsonSource);
+  return vector(topojsonOptions, topojsonSource, viewer);
 };
 
 export default topojson;

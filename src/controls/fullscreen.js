@@ -1,47 +1,47 @@
-import $ from 'jquery';
-import utils from '../utils';
+import { Component, Button, dom } from '../ui';
 import permalink from '../permalink/permalink';
 import isEmbedded from '../utils/isembedded';
-import viewer from '../viewer';
 
-let tooltip;
-let mapTarget;
+const Fullscreen = function Fullscreen(options = {}) {
+  let {
+    target
+  } = options;
 
-function goFullScreen() {
-  const url = permalink.getPermalink();
-  window.open(url);
-}
+  let viewer;
+  let fullscreenButton;
 
-function render(target) {
-  const el = utils.createButton({
-    id: 'o-fullscreen-button',
-    cls: 'o-fullscreen-button',
-    iconCls: 'o-icon-fa-expand',
-    src: '#fa-expand',
-    tooltipText: tooltip,
-    tooltipPlacement: 'east'
+  const goFullScreen = function goFullScreen() {
+    const url = permalink.getPermalink(viewer);
+    window.open(url);
+  };
+
+  return Component({
+    name: 'fullscreen',
+    onAdd(evt) {
+      viewer = evt.target;
+      fullscreenButton = Button({
+        cls: 'o-home-in padding-small icon-smaller rounded light box-shadow',
+        click() {
+          goFullScreen();
+        },
+        icon: '#ic_fullscreen_24px'
+      });
+      if (!target) target = `${viewer.getMain().getNavigation().getId()}`;
+      if (isEmbedded(viewer.getTarget())) {
+        this.on('render', this.onRender);
+        this.addComponents([fullscreenButton]);
+        this.render();
+      }
+    },
+    onInit() {
+    },
+    render() {
+      const htmlString = fullscreenButton.render();
+      const el = dom.html(htmlString);
+      document.getElementById(target).appendChild(el);
+      this.dispatch('render');
+    }
   });
-  if (isEmbedded(mapTarget)) {
-    $(target).append(el);
-  }
-}
+};
 
-function bindUIActions() {
-  $('#o-fullscreen-button button').click((e) => {
-    goFullScreen();
-    $('#o-fullscreen-button button').blur();
-    e.preventDefault();
-  });
-}
-
-function init(optOptions) {
-  const options = optOptions || {};
-  const target = options.target || '#o-toolbar-misc';
-  mapTarget = viewer.getTarget();
-  tooltip = options.tooltipText || 'Visa stor karta';
-
-  render(target);
-  bindUIActions();
-}
-
-export default { init };
+export default Fullscreen;

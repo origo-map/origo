@@ -1,39 +1,51 @@
-import $ from 'jquery';
-import viewer from '../viewer';
-import utils from '../utils';
+import { Component, Button, dom } from '../ui';
 
-let map;
-let tooltip;
-let extent;
+const Home = function Home(options = {}) {
+  let {
+    extent,
+    target
+  } = options;
+  const {
+    zoomOnStart = false
+  } = options;
 
-function render(target) {
-  const el = utils.createButton({
-    id: 'o-home-button',
-    iconCls: 'o-icon-fa-home',
-    src: '#fa-home',
-    tooltipText: tooltip
+  let viewer;
+  let homeButton;
+
+  const zoomToHome = function zoomToHome() {
+    viewer.getMap().getView().fit(extent, { duration: 1000 });
+  };
+
+  return Component({
+    name: 'home',
+    onAdd(evt) {
+      viewer = evt.target;
+      const map = viewer.getMap();
+      if (!target) target = `${viewer.getMain().getNavigation().getId()}`;
+      if (!extent) extent = map.getView().calculateExtent(map.getSize());
+      this.on('render', this.onRender);
+      this.addComponents([homeButton]);
+      this.render();
+      if (zoomOnStart) {
+        zoomToHome();
+      }
+    },
+    onInit() {
+      homeButton = Button({
+        cls: 'o-home-in padding-small icon-smaller rounded light box-shadow',
+        click() {
+          zoomToHome();
+        },
+        icon: '#ic_home_24px'
+      });
+    },
+    render() {
+      const htmlString = homeButton.render();
+      const el = dom.html(htmlString);
+      document.getElementById(target).appendChild(el);
+      this.dispatch('render');
+    }
   });
-  $(target).append(el);
-}
-
-function bindUIActions() {
-  $('#o-home-button').on('click', (e) => {
-    map.getView().fit(extent);
-    $('#o-home-button button').blur();
-    e.preventDefault();
-  });
-}
-
-function init(optOptions) {
-  const options = optOptions || {};
-  const target = options.target || '#o-toolbar-navigation';
-  map = viewer.getMap();
-  tooltip = options.tooltipText || 'Zooma till hela kartan';
-  extent = options.extent || map.getView().calculateExtent(map.getSize());
-  render(target);
-  bindUIActions();
-}
-
-export default {
-  init
 };
+
+export default Home;

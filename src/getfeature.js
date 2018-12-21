@@ -1,14 +1,14 @@
 import EsriJSONFormat from 'ol/format/EsriJSON';
 import GeoJSONFormat from 'ol/format/GeoJSON';
 import $ from 'jquery';
-import viewer from './viewer';
 
 let projectionCode;
+let projection;
 const sourceType = {};
 
-export default function (id, layer) {
-  projectionCode = viewer.getProjectionCode();
-  const source = viewer.getMapSource();
+export default function (id, layer, source, projCode, proj) {
+  projectionCode = projCode;
+  projection = proj;
   const serverUrl = source[layer.get('sourceName')].url;
   const type = layer.get('type');
   // returns a promise with features as result
@@ -49,7 +49,7 @@ sourceType.AGS_FEATURE = function agsFeature(id, layer, serverUrl) {
         return [];
       }
       const features = esrijsonFormat.readFeatures(response, {
-        featureProjection: viewer.getProjection()
+        featureProjection: projection
       });
       return features;
     }, fail);

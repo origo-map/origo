@@ -1,10 +1,9 @@
 import VectorLayer from 'ol/layer/Vector';
 import VectorTileLayer from 'ol/layer/VectorTile';
 import ClusterSource from 'ol/source/Cluster';
-import style from '../style';
-import viewer from '../viewer';
+import Style from '../style';
 
-export default function vector(opt, src) {
+export default function vector(opt, src, viewer) {
   const options = opt;
   const source = src;
   const distance = 60;
@@ -15,7 +14,10 @@ export default function vector(opt, src) {
     case 'vector':
     {
       options.source = source;
-      options.style = style().createStyle(options.style);
+      options.style = Style.createStyle({
+        style: options.style,
+        viewer
+      });
       vectorLayer = new VectorLayer(options);
       break;
     }
@@ -29,7 +31,7 @@ export default function vector(opt, src) {
       }
       const clusterDistance = options.clusterOptions.clusterDistance || source.clusterOptions.clusterDistance || viewer.getClusterOptions().clusterDistance || distance;
       const clusterMaxZoom = options.clusterOptions.clusterMaxZoom || source.clusterOptions.clusterMaxZoom || viewer.getClusterOptions().clusterMaxZoom || viewer.getResolutions().length - 1;
-      const clusterInitialDistance = viewer.getSettings().zoom > clusterMaxZoom ? 0 : clusterDistance;
+      const clusterInitialDistance = viewer.getInitialZoom() > clusterMaxZoom ? 0 : clusterDistance;
       options.source = new ClusterSource({
         attributions: options.attribution,
         source,
@@ -39,7 +41,11 @@ export default function vector(opt, src) {
         clusterDistance,
         clusterMaxZoom
       });
-      options.style = style().createStyle(options.style, options.clusterStyle);
+      options.style = Style.createStyle({
+        style: options.style,
+        clusterStyle: options.clusterStyle,
+        viewer
+      });
       vectorLayer = new VectorLayer(options);
       map.on('movestart', (evt) => {
         const mapZoom = view.getZoomForResolution(evt.frameState.viewState.resolution);
@@ -59,7 +65,10 @@ export default function vector(opt, src) {
     case 'image':
     {
       options.source = source;
-      options.style = style().createStyle(options.style);
+      options.style = Style.createStyle({
+        style: options.style,
+        viewer
+      });
       options.renderMode = 'image';
       vectorLayer = new VectorLayer(options);
       break;
@@ -67,7 +76,10 @@ export default function vector(opt, src) {
     case 'vectortile':
     {
       options.source = source;
-      options.style = style().createStyle(options.style);
+      options.style = Style.createStyle({
+        style: options.style,
+        viewer
+      });
       vectorLayer = new VectorTileLayer(options);
       break;
     }

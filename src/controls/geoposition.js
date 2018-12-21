@@ -1,121 +1,120 @@
-import $ from 'jquery';
 import Geolocation from 'ol/Geolocation';
 import Overlay from 'ol/Overlay';
-import viewer from '../viewer';
-import utils from '../utils';
+import { Component, Button, dom } from '../ui';
 
-let $geolocateButtonId;
-let $geolocateButton;
-let map;
-let geolocation;
-let marker;
-let markerEl;
-let baseUrl;
-let zoomLevel;
-let enabled = false;
+const Geoposition = function Geoposition(options = {}) {
+  let {
+    target,
+    zoomLevel
+  } = options;
 
-function addPosition(current) {
-  const position = current.position;
+  let viewer;
+  let positionButton;
+  let baseUrl;
+  let markerOverlay;
+  let geolocation;
+  // const tooltipText = 'Visa nuvarande position i kartan';
 
-  if (enabled === false && geolocation.getTracking()) {
-    marker.setPosition(position);
-    map.getView().animate({
-      center: position,
-      zoom: zoomLevel
-    });
-    enabled = true;
-  } else if (geolocation.getTracking()) {
-    marker.setPosition(position);
-  }
-}
-
-function getPositionVal() {
-  const current = {};
-  current.position = geolocation.getPosition();
-  current.accuracy = geolocation.getAccuracy();
-  current.heading = geolocation.getHeading() || 0;
-  current.speed = geolocation.getSpeed() || 0;
-  current.m = Date.now();
-  return current;
-}
-
-function updatePosition() {
-  addPosition(getPositionVal());
-}
-
-function toggle() {
-  if ($geolocateButton.hasClass('o-geolocation-button-true')) {
-    $geolocateButton.removeClass('o-geolocation-button-true');
-    geolocation.setTracking(false);
-
-    geolocation.un('change', updatePosition);
-    map.removeOverlay(marker);
-  } else {
-    $geolocateButton.addClass('o-geolocation-button-true');
-    map.addOverlay(marker);
-
-    // Listen to position changes
-    geolocation.on('change', updatePosition);
-    geolocation.setTracking(true); // Start position tracking
-  }
-}
-
-function render(target) {
-  const tooltipText = 'Visa nuvarande position i kartan';
-  const src = `${baseUrl}img/geolocation_marker.png`;
-  const markerImg = `<img id="o-geolocation_marker" src="${src}"/>`;
-
-  // Element for control
-  const el = utils.createButton({
-    id: 'o-geolocation-button',
-    cls: 'o-geolocation-button',
-    iconCls: 'o-icon-fa-location-arrow',
-    src: '#fa-location-arrow',
-    tooltipText,
-    tooltipPlacement: 'east'
-  });
-  $(target).append(el);
-  $('#o-map').prepend(markerImg);
-}
-
-function bindUIActions() {
-  $geolocateButtonId.on('click', (e) => {
-    enabled = false;
-    toggle();
-    $geolocateButton.blur();
-    e.preventDefault();
-  });
-}
-
-function init(optOptions) {
-  const options = optOptions || {};
-  const target = options.target || '#o-toolbar-navigation';
-  map = viewer.getMap();
-  baseUrl = viewer.getBaseUrl();
-  zoomLevel = options.zoomLevel || viewer.getResolutions().length - 3 || 0;
-
-  render(target);
-
-  $geolocateButtonId = $('#o-geolocation-button');
-  $geolocateButton = $('#o-geolocation-button button');
-
-  markerEl = $('#o-geolocation_marker').get(0);
-  marker = new Overlay({
-    positioning: 'center-center',
-    element: markerEl,
-    stopEvent: false
-  });
-
-  geolocation = new Geolocation(({
-    projection: map.getView().getProjection(),
-    trackingOptions: {
-      maximumAge: 10000,
-      enableHighAccuracy: true,
-      timeout: 600000
+  const centerPosition = () => {
+    if (geolocation.getTracking()) {
+      viewer.getMap().getView().animate({
+        center: geolocation.getPosition(),
+        zoom: zoomLevel
+      });
     }
-  }));
+  };
 
-  bindUIActions();
-}
+  const addPosition = function addPosition(current) {
+    const position = current.position;
+    markerOverlay.setPosition(position);
+  };
 
-export default { init };
+  const getPositionVal = function getPositionVal() {
+    const current = {};
+    current.position = geolocation.getPosition();
+    current.accuracy = geolocation.getAccuracy();
+    current.heading = geolocation.getHeading() || 0;
+    current.speed = geolocation.getSpeed() || 0;
+    current.m = Date.now();
+    return current;
+  };
+
+  const updatePosition = function updatePosition() {
+    addPosition(getPositionVal());
+  };
+
+  const toggleState = function toggleState() {
+    if (positionButton.getState() === 'initial') {
+      positionButton.dispatch('change', { state: 'active' });
+    } else {
+      positionButton.dispatch('change', { state: 'initial' });
+    }
+  };
+
+  const onActive = function onActive() {
+    const markerEl = dom.createElement('img', '', {
+      src: `${baseUrl}img/geolocation_marker.png`
+    });
+    viewer.getMap().getTargetElement().appendChild(markerEl);
+    markerOverlay = new Overlay({
+      positioning: 'center-center',
+      element: markerEl,
+      stopEvent: false
+    });
+    viewer.getMap().addOverlay(markerOverlay);
+
+    geolocation.on('change', updatePosition);
+    geolocation.once('change', centerPosition);
+    geolocation.setTracking(true);
+  };
+
+  const onInitial = function onInitial() {
+    geolocation.setTracking(false);
+    geolocation.un('change', updatePosition);
+    viewer.getMap().removeOverlay(markerOverlay);
+  };
+
+  return Component({
+    name: 'geoposition',
+    onAdd(evt) {
+      viewer = evt.target;
+      if (!target) target = `${viewer.getMain().getNavigation().getId()}`;
+      if (!zoomLevel) zoomLevel = viewer.getResolutions().length - 3 || 0;
+      baseUrl = viewer.getBaseUrl();
+      this.on('render', this.onRender);
+      this.addComponents([positionButton]);
+
+      geolocation = new Geolocation(({
+        projection: viewer.getProjection(),
+        trackingOptions: {
+          maximumAge: 10000,
+          enableHighAccuracy: true,
+          timeout: 600000
+        }
+      }));
+
+      this.render();
+    },
+    onInit() {
+      positionButton = Button({
+        cls: 'o-geoposition padding-small icon-smaller rounded light box-shadow',
+        click() {
+          toggleState();
+        },
+        icon: '#ic_near_me_24px',
+        methods: {
+          active: onActive,
+          initial: onInitial
+        }
+      });
+    },
+    render() {
+      const htmlString = positionButton.render();
+      const el = dom.html(htmlString);
+      document.getElementById(target).appendChild(el);
+      this.dispatch('render');
+    }
+  });
+};
+
+export default Geoposition;

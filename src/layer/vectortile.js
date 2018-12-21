@@ -3,7 +3,6 @@ import TopoJSONFormat from 'ol/format/TopoJSON';
 import GeoJSONFormat from 'ol/format/GeoJSON';
 import MVTFormat from 'ol/format/MVT';
 import VectorTileSource from 'ol/source/VectorTile';
-import viewer from '../viewer';
 import vector from './vector';
 import maputils from '../maputils';
 
@@ -32,7 +31,7 @@ function createSource(opt, vectortileOptions) {
   return new VectorTileSource(options);
 }
 
-const vectortile = function vectortile(layerOptions) {
+const vectortile = function vectortile(layerOptions, viewer) {
   const vectortileDefault = {
     layerType: 'vectortile',
     featureinfoLayer: undefined
@@ -57,7 +56,7 @@ const vectortile = function vectortile(layerOptions) {
   }
 
   const vectortileSource = createSource(sourceOptions, vectortileOptions);
-  return vector(vectortileOptions, vectortileSource);
+  return vector(vectortileOptions, vectortileSource, viewer);
 };
 
 export default vectortile;

@@ -1,6 +1,5 @@
 import WFSFormat from 'ol/format/WFS';
 import $ from 'jquery';
-import viewer from '../../viewer';
 import dispatcher from './editdispatcher';
 
 const format = new WFSFormat();
@@ -23,7 +22,7 @@ function writeWfsTransaction(transObj, options) {
   return node;
 }
 
-function wfsTransaction(transObj, layerName) {
+function wfsTransaction(transObj, layerName, viewer) {
   const srsName = viewer.getProjectionCode();
   const layer = viewer.getLayer(layerName);
   const featureType = layer.get('featureType');
@@ -103,6 +102,6 @@ function wfsTransaction(transObj, layerName) {
     });
 }
 
-export default function (transObj, layerName) {
-  return wfsTransaction(transObj, layerName);
+export default function (transObj, layerName, viewer) {
+  return wfsTransaction(transObj, layerName, viewer);
 }
