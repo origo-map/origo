@@ -1,4 +1,4 @@
-import olScaleLine from 'ol/control/scaleline';
+import olScaleLine from 'ol/control/ScaleLine';
 import { Component } from '../ui';
 
 const ScaleLine = function ScaleLine(options = {}) {

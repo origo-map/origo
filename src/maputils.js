@@ -1,13 +1,13 @@
-import Projection from 'ol/proj/projection';
-import TileGrid from 'ol/tilegrid/tilegrid';
-import Feature from 'ol/feature';
-import Point from 'ol/geom/point';
-import Vector from 'ol/source/vector';
-import GeoJSON from 'ol/format/geojson';
-import Extent from 'ol/extent';
-import WKT from 'ol/format/wkt';
+import Projection from 'ol/proj/Projection';
+import TileGrid from 'ol/tilegrid/TileGrid';
+import Feature from 'ol/Feature';
+import Point from 'ol/geom/Point';
+import Vector from 'ol/source/Vector';
+import GeoJSON from 'ol/format/GeoJSON';
+import { getTopLeft, getBottomLeft } from 'ol/extent';
+import WKT from 'ol/format/WKT';
 
-export default {
+const maputils = {
   isWithinVisibleScales: function isWithinVisibleScales(scale, maxScale, minScale) {
     if (maxScale || minScale) {
       // Alter 1: maxscale and minscale
@@ -41,7 +41,7 @@ export default {
   tileGrid: function tileGrid(settings, defaultSettings = {}) {
     const tileGridSettings = Object.assign({}, defaultSettings, settings);
     const extent = tileGridSettings.extent;
-    tileGridSettings.origin = tileGridSettings.alignBottomLeft === false ? Extent.getTopLeft(extent) : Extent.getBottomLeft(extent);
+    tileGridSettings.origin = tileGridSettings.alignBottomLeft === false ? getTopLeft(extent) : getBottomLeft(extent);
     return new TileGrid(tileGridSettings);
   },
   checkZoomChange: function checkZoomChange(resolution, currentResolution) {
@@ -62,7 +62,7 @@ export default {
     const vectorSource = new Vector({
       features: (new GeoJSON()).readFeatures(obj)
     });
-    return vectorSource.getFeatures()[0];
+    return vectorSource.getFeatures();
   },
   wktToFeature: function wktToFeature(wkt, srsName) {
     const format = new WKT();
@@ -116,3 +116,5 @@ export default {
     return resolution;
   }
 };
+
+export default maputils;

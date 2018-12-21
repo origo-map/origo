@@ -1,11 +1,11 @@
-import olDragAndDrop from 'ol/interaction/draganddrop';
-import GPXFormat from 'ol/format/gpx';
-import GeoJSONFormat from 'ol/format/geojson';
-import IGCFormat from 'ol/format/igc';
-import KMLFormat from 'ol/format/kml';
-import TopoJSONFormat from 'ol/format/topojson';
-import VectorSource from 'ol/source/vector';
-import VectorLayer from 'ol/layer/vector';
+import olDragAndDrop from 'ol/interaction/DragAndDrop';
+import GPXFormat from 'ol/format/GPX';
+import GeoJSONFormat from 'ol/format/GeoJSON';
+import IGCFormat from 'ol/format/IGC';
+import KMLFormat from 'ol/format/KML';
+import TopoJSONFormat from 'ol/format/TopoJSON';
+import VectorSource from 'ol/source/Vector';
+import VectorLayer from 'ol/layer/Vector';
 import { Component } from '../ui';
 
 const DragAndDrop = function DragAndDrop() {

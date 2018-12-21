@@ -1,14 +1,14 @@
 import proj4 from 'proj4';
-import olProjection from 'ol/proj/projection';
-import project from 'ol/proj';
+import { register } from 'ol/proj/proj4';
+import olProjection from 'ol/proj/Projection';
 
 const registerProjections = function registerProjections(proj4Defs) {
   if (proj4Defs && proj4) {
-    project.setProj4(proj4);
     proj4Defs.forEach((def) => {
       proj4.defs(def.code, def.projection);
     });
   }
+  register(proj4);
 };
 
 const getUnits = function getUnits(projectionCode) {

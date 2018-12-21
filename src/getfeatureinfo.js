@@ -1,4 +1,4 @@
-import EsriJSON from 'ol/format/esrijson';
+import EsriJSON from 'ol/format/EsriJSON';
 import $ from 'jquery';
 import maputils from './maputils';
 import getAttributes from './getattributes';
@@ -9,7 +9,8 @@ function getGetFeatureInfoUrl({
   projection
 }, layer) {
   const url = layer.getSource().getGetFeatureInfoUrl(coordinate, resolution, projection, {
-    INFO_FORMAT: 'application/json'
+    INFO_FORMAT: 'application/json',
+    FEATURE_COUNT: '20'
   });
 
   return $.ajax(url, {
@@ -61,7 +62,7 @@ function getAGSIdentifyUrl({ layer, coordinate }, viewer) {
       const features = esrijsonFormat.readFeatures(obj, {
         featureProjection: viewer.getProjection()
       });
-      return features[0];
+      return features;
     });
 }
 
@@ -178,13 +179,17 @@ function getFeatureInfoRequests({
 
 function getFeaturesFromRemote(requestOptions, viewer) {
   const requestResult = [];
-  const requestPromises = getFeatureInfoRequests(requestOptions, viewer).map(request => request.fn.then((feature) => {
+
+  const requestPromises = getFeatureInfoRequests(requestOptions, viewer).map(request => request.fn.then((features) => {
     const layer = viewer.getLayer(request.layer);
-    if (feature) {
-      requestResult.push({
-        title: layer.get('title'),
-        feature,
-        content: getAttributes(feature, layer)
+    if (features) {
+      features.forEach((feature) => {
+        requestResult.push({
+          title: layer.get('title'),
+          feature,
+          content: getAttributes(feature, layer),
+          layer: layer.get('name')
+        });
       });
       return requestResult;
     }
@@ -227,6 +232,7 @@ function getFeaturesAtPixel({
           item.title = l.get('title');
           item.feature = f;
           item.content = getAttributes(f, l);
+          item.name = l.get('name');
           result.push(item);
         });
       } else if (collection.length === 1 && queryable) {
@@ -234,6 +240,8 @@ function getFeaturesAtPixel({
         item.title = l.get('title');
         item.feature = collection[0];
         item.content = getAttributes(collection[0], l);
+        item.name = l.get('name');
+        item.layer = l;
         result.push(item);
       }
     } else if (queryable) {
@@ -241,6 +249,8 @@ function getFeaturesAtPixel({
       item.title = l.get('title');
       item.feature = feature;
       item.content = getAttributes(feature, l);
+      item.name = l.get('name');
+      item.layer = l;
       result.push(item);
     }
 

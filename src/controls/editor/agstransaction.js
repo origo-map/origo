@@ -1,4 +1,4 @@
-import EsriJSON from 'ol/format/esrijson';
+import EsriJSON from 'ol/format/EsriJSON';
 import $ from 'jquery';
 import viewer from '../../viewer';
 import dispatcher from './editdispatcher';

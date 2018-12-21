@@ -1,10 +1,10 @@
-import Sphere from 'ol/sphere';
-import VectorSource from 'ol/source/vector';
-import VectorLayer from 'ol/layer/vector';
-import DrawInteraction from 'ol/interaction/draw';
-import Overlay from 'ol/overlay';
-import Polygon from 'ol/geom/polygon';
-import LineString from 'ol/geom/linestring';
+import { getArea, getLength } from 'ol/sphere';
+import VectorSource from 'ol/source/Vector';
+import VectorLayer from 'ol/layer/Vector';
+import DrawInteraction from 'ol/interaction/Draw';
+import Overlay from 'ol/Overlay';
+import Polygon from 'ol/geom/Polygon';
+import LineString from 'ol/geom/LineString';
 import { Component, Element as El, Button, dom } from '../ui';
 import Style from '../style';
 import StyleTypes from '../style/styletypes';
@@ -93,7 +93,7 @@ const Measure = function Measure({
 
   function formatLength(line) {
     const projection = map.getView().getProjection();
-    const length = Sphere.getLength(line, {
+    const length = getLength(line, {
       projection
     });
     let output;
@@ -109,7 +109,7 @@ const Measure = function Measure({
 
   function formatArea(polygon) {
     const projection = map.getView().getProjection();
-    const area = Sphere.getArea(polygon, {
+    const area = getArea(polygon, {
       projection
     });
     let output;

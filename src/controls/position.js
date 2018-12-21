@@ -1,7 +1,7 @@
-import MousePosition from 'ol/control/mouseposition';
-import Feature from 'ol/feature';
-import Point from 'ol/geom/point';
-import Coordinate from 'ol/coordinate';
+import MousePosition from 'ol/control/MousePosition';
+import Feature from 'ol/Feature';
+import Point from 'ol/geom/Point';
+import { createStringXY } from 'ol/coordinate';
 import { Component, Icon, Button, Element as El, dom } from '../ui';
 
 const Position = function Position(options = {}) {
@@ -33,7 +33,7 @@ const Position = function Position(options = {}) {
 
   function addMousePosition() {
     mousePositionControl = new MousePosition({
-      coordinateFormat: Coordinate.createStringXY(precision),
+      coordinateFormat: createStringXY(precision),
       projection: currentProjection,
       target: document.getElementById(`${coordsElement.getId()}`),
       undefinedHTML: '&nbsp;'

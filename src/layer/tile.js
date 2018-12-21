@@ -1,4 +1,4 @@
-import TileLayer from 'ol/layer/tile';
+import TileLayer from 'ol/layer/Tile';
 
 export default function tile(options, source) {
   const opt = options;

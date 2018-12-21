@@ -1,4 +1,4 @@
-import XYZSource from 'ol/source/xyz';
+import XYZSource from 'ol/source/XYZ';
 import $ from 'jquery';
 import tile from './tile';
 import maputils from '../maputils';

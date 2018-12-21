@@ -1,6 +1,6 @@
-import Collection from 'ol/collection';
-import Feature from 'ol/feature';
-import geom from 'ol/geom/geometry';
+import Collection from 'ol/Collection';
+import Feature from 'ol/Feature';
+import geom from 'ol/geom/Geometry';
 import { Component } from './ui';
 import Map from './map';
 import proj from './projection';

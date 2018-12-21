@@ -1,5 +1,5 @@
-import Geolocation from 'ol/geolocation';
-import Overlay from 'ol/overlay';
+import Geolocation from 'ol/Geolocation';
+import Overlay from 'ol/Overlay';
 import { Component, Button, dom } from '../ui';
 
 const Geoposition = function Geoposition(options = {}) {

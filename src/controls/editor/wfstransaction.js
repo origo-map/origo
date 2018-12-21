@@ -1,4 +1,4 @@
-import WFSFormat from 'ol/format/wfs';
+import WFSFormat from 'ol/format/WFS';
 import $ from 'jquery';
 import dispatcher from './editdispatcher';
 

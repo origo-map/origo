@@ -23,12 +23,18 @@ permalinkStore.getState = function getState(viewer) {
   const state = {};
   const view = viewer.getMap().getView();
   const layers = viewer.getLayers();
+  const featureinfo = viewer.getFeatureinfo();
+  getPin = featureinfo.getPin;
   state.layers = getSaveLayers(layers);
   state.center = view.getCenter().map(coord => Math.round(coord)).join();
   state.zoom = view.getZoom().toString();
-  getPin = viewer.getFeatureinfo().getPin();
-  if (getPin) {
-    state.pin = getPin.getGeometry().getCoordinates().map(coord => Math.round(coord))
+
+  if (featureinfo.getSelection().id) {
+    state.feature = featureinfo.getSelection().id;
+  }
+
+  if (getPin()) {
+    state.pin = getPin().getGeometry().getCoordinates().map(coord => Math.round(coord))
       .join();
   }
 

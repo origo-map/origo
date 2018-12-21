@@ -1,5 +1,5 @@
-import OlMap from 'ol/map';
-import OlView from 'ol/view';
+import OlMap from 'ol/Map';
+import OlView from 'ol/View';
 
 const Map = (options = {}) => {
   const map = new OlMap({

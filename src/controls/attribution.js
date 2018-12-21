@@ -1,4 +1,4 @@
-import olAttribution from 'ol/control/attribution';
+import olAttribution from 'ol/control/Attribution';
 import { Component } from '../ui';
 
 const Attribution = function Attribution(options = {}) {

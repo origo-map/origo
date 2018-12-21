@@ -1,4 +1,4 @@
-import olRotate from 'ol/control/rotate';
+import olRotate from 'ol/control/Rotate';
 import { Component, Icon } from '../ui';
 
 const Rotate = function Rotate(options = {}) {
