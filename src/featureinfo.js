@@ -62,7 +62,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         clone,
         selectionStyles[items[currentItem].feature.getGeometry().getType()]
       );
-      const layer = viewer.getLayer(items[currentItem].layer);
+      const layer = viewer.getLayer(items[currentItem].layer.get('name'));
       const featureinfoTitle = layer.getProperties().featureinfoTitle;
       let title;
       if (featureinfoTitle) {
@@ -155,7 +155,7 @@ const Featureinfo = function Featureinfo(options = {}) {
           title: items[0].title
         });
 
-        initCarousel('#o-identify-carousel');        
+        initCarousel('#o-identify-carousel');
         popup.setVisibility(true);
         const popupHeight = $('.o-popup').outerHeight() + 20;
         $('#o-popup').height(popupHeight);
