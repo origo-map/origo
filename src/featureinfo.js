@@ -62,9 +62,13 @@ const Featureinfo = function Featureinfo(options = {}) {
         clone,
         selectionStyles[items[currentItem].feature.getGeometry().getType()]
       );
-      const layer = viewer.getLayer(items[currentItem].layer.get('name'));
-      const featureinfoTitle = layer.getProperties().featureinfoTitle;
+      let featureinfoTitle;
       let title;
+      const layer = viewer.getLayer(items[currentItem].layer.get('name'));
+      if (layer) {
+        featureinfoTitle = layer.getProperties().featureinfoTitle;
+      }
+
       if (featureinfoTitle) {
         const featureProps = items[currentItem].feature.getProperties();
         title = replacer.replace(featureinfoTitle, featureProps);
