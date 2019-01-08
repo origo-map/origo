@@ -158,9 +158,8 @@ const Featureinfo = function Featureinfo(options = {}) {
           content,
           title: items[0].title
         });
-
-        initCarousel('#o-identify-carousel');
         popup.setVisibility(true);
+        initCarousel('#o-identify-carousel');
         const popupHeight = $('.o-popup').outerHeight() + 20;
         $('#o-popup').height(popupHeight);
         overlay = new Overlay({
