@@ -1,4 +1,4 @@
-import ImageArcGISRest from 'ol/source/imagearcgisrest';
+import ImageArcGISRest from 'ol/source/ImageArcGISRest';
 import tile from './tile';
 import image from './image';
 import maputils from '../maputils';
