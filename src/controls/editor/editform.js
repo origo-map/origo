@@ -22,13 +22,13 @@ const createForm = function createForm(obj) {
       break;
     case 'checkbox':
       checked = val ? ' checked' : '';
-      el = `<div class="o-form-checkbox"><label>${label}</label><input type="checkbox" id="${id}" value="${val} " ${checked}></div>`;
+      el = `<div class="o-form-checkbox"><label>${label}</label><input type="checkbox" id="${id}" value="${val} "${checked}></div>`;
       break;
     case 'dropdown':
       if (val) {
-        firstOption = `<option value=" ${val}" selected>${val}</option>`;
+        firstOption = `<option value="${val}"selected>${val}</option>`;
       } else {
-        firstOption = '<option value="" selected>Välj</option>';
+        firstOption = '<option value=""selected>Välj</option>';
       }
       el = `<div class="${cls}"><label>${label}</label><br><select id=${id}>${firstOption}`;
       for (let i = 0; i < dropdownOptions.length; i += 1) {
