@@ -38,13 +38,6 @@ const Featureinfo = function Featureinfo(options = {}) {
   let savedPin = savedPinOptions ? maputils.createPointFeature(savedPinOptions, pinStyle) : undefined;
   const savedFeature = savedPin || savedSelection || undefined;
 
-  if (showOverlay) {
-    identifyTarget = 'overlay';
-  } else {
-    sidebar.init();
-    identifyTarget = 'sidebar';
-  }
-
   const clear = function clear() {
     selectionLayer.clear();
     sidebar.setVisibility(false);
@@ -273,6 +266,12 @@ const Featureinfo = function Featureinfo(options = {}) {
     getSelection,
     onAdd(e) {
       viewer = e.target;
+      if (showOverlay) {
+        identifyTarget = 'overlay';
+      } else {
+        sidebar.init(viewer);
+        identifyTarget = 'sidebar';
+      }
       const map = viewer.getMap();
       selectionLayer = featurelayer(savedFeature, map);
       map.on(clickEvent, onClick);

@@ -36,7 +36,8 @@ function setContent(config) {
   }
 }
 
-function init() {
+function init(viewer) {
+  const mapId = viewer.getId();
   const el = `<div id="o-sidebar">
     <div class="o-sidebar o-card">
     <div class="o-close-button"><svg class="o-icon-fa-times"><use xlink:href="#fa-times"></use></svg></div>
@@ -44,7 +45,7 @@ function init() {
     <div class="o-card-content"></div>
     </div>
     </div>`;
-  $('#o-map').append(el);
+  $(`#${mapId}`).append(el);
 
   bindUIActions();
 }
