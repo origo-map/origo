@@ -64,7 +64,10 @@ const Featureinfo = function Featureinfo(options = {}) {
       );
       let featureinfoTitle;
       let title;
-      const layer = viewer.getLayer(items[currentItem].layer.get('name'));
+      let layer;
+
+      if (items[currentItem].layer)
+      layer = viewer.getLayer(items[currentItem].layer.get('name'));
       if (layer) {
         featureinfoTitle = layer.getProperties().featureinfoTitle;
       }
