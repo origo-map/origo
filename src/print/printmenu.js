@@ -291,10 +291,10 @@ function bindUIActions() {
         scale = detectAndFixE(scale);
 		scale = scale.split('.')[0];
 		printarea.addPreview(scale, paper);
-		checkPrintability();
+		checkPrintability('size');
 	});
 
-	$printDpi.change(checkPrintability);
+	$printDpi.change(function () {checkPrintability('dpi')});
 
 	$layoutselect.change(function () {
 		var namesAndSizes = getAvailableSizes($layoutselect.find(":selected").text(), mapfishConfig);
@@ -469,6 +469,48 @@ function addDefaultPrintButton(){
  $('#o-menutools').append(skrivUtKnapp);
 }
 
+function checkPrintability(parameter){
+    if(parameter == 'dpi'){ 
+        if($('#o-resolution-dd').val() == '300') {
+            $('#o-size-dd').children('[value=0]').prop('disabled', true)
+            $('#o-size-dd').children('[value=1]').prop('disabled', true)
+            $('#o-size-dd').children('[value=2]').prop('disabled', true)
+            $('#o-size-dd').children('[value=3]').prop('disabled', true)
+            $('#o-size-dd').val('4')
+            //disable all sizes except A4
+        }
+        else if($('#o-resolution-dd').val() == '150') {
+            $('#o-size-dd').children('[value=0]').prop('disabled', true)
+            $('#o-size-dd').children('[value=1]').prop('disabled', true)
+            $('#o-size-dd').children('[value=2]').prop('disabled', false)
+            $('#o-size-dd').children('[value=3]').prop('disabled', false)
+            //disable sizes A0 and A1, enable the rest
+        }
+        else {
+            $('#o-size-dd').children().prop('disabled', false)
+            //enable all sizes
+        }
+    }
+    else if(parameter == 'size'){
+        if($('#o-size-dd').find(':selected').text() == 'A0' || $('#o-size-dd').find(':selected').text() == 'A1'){
+            $('#o-resolution-dd').children('[value=300]').prop('disabled', true)
+            $('#o-resolution-dd').children('[value=150]').prop('disabled', true)
+            $('#o-resolution-dd').val('75')
+            //disable dpis 150 and 300 
+        }
+        else if($('#o-size-dd').find(':selected').text() == 'A2' || $('#o-size-dd').find(':selected').text() == 'A3') {
+            $('#o-resolution-dd').children('[value=300]').prop('disabled', true)
+            $('#o-resolution-dd').children('[value=150]').prop('disabled', false)
+            //disable dpi 300 and enable dpi 150 
+        }
+        else {
+            $('#o-resolution-dd').children().prop('disabled', false)
+            //enable all dpis
+        }        
+    }
+} 
+
+/*
 function checkPrintability(){
 	if($printselect.val() == '0'){
 		$printDpi.children('[value=300]').prop('disabled', true);
@@ -484,6 +526,6 @@ function checkPrintability(){
 		$printDpi.children('[value=300]').attr('title', '');
 		$printselect.children('[value=0]').attr('title', '');
 	}
-}
+} */
 
 module.exports.init = init;
