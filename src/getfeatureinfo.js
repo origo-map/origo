@@ -182,12 +182,13 @@ function getFeaturesFromRemote(requestOptions, viewer) {
 
   const requestPromises = getFeatureInfoRequests(requestOptions, viewer).map(request => request.fn.then((features) => {
     const layer = viewer.getLayer(request.layer);
+    const map = viewer.getMap();
     if (features) {
       features.forEach((feature) => {
         requestResult.push({
           title: layer.get('title'),
           feature,
-          content: getAttributes(feature, layer),
+          content: getAttributes(feature, layer, map),
           layer: layer.get('name')
         });
       });
@@ -205,12 +206,13 @@ function getFeaturesAtPixel({
   hitTolerance,
   map,
   pixel
-}) {
+}, viewer) {
   const result = [];
   let cluster = false;
   const resolutions = map.getView().getResolutions();
   map.forEachFeatureAtPixel(pixel, (feature, layer) => {
     const l = layer;
+    const map = viewer.getMap();
     let queryable = false;
     if (layer) {
       queryable = layer.get('queryable');
@@ -231,7 +233,7 @@ function getFeaturesAtPixel({
           const item = {};
           item.title = l.get('title');
           item.feature = f;
-          item.content = getAttributes(f, l);
+          item.content = getAttributes(f, l, map);
           item.name = l.get('name');
           result.push(item);
         });
@@ -239,7 +241,7 @@ function getFeaturesAtPixel({
         const item = {};
         item.title = l.get('title');
         item.feature = collection[0];
-        item.content = getAttributes(collection[0], l);
+        item.content = getAttributes(collection[0], l,map);
         item.name = l.get('name');
         item.layer = l;
         result.push(item);
@@ -248,7 +250,7 @@ function getFeaturesAtPixel({
       const item = {};
       item.title = l.get('title');
       item.feature = feature;
-      item.content = getAttributes(feature, l);
+      item.content = getAttributes(feature, l,map);
       item.name = l.get('name');
       item.layer = l;
       result.push(item);
