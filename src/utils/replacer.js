@@ -32,7 +32,7 @@ const replacer = function replacer() {
     return name;
   }
 
-  function replace(name, obj, options) {
+  function replace(name, obj, options, map) {
     start = options.start || '{{';
     end = options.end || '}}';
     helper = options.helper || {};
@@ -44,9 +44,9 @@ const replacer = function replacer() {
   }
 
   return {
-    replace(name, obj, options) {
+    replace(name, obj, options, map) {
       const opt = options || {};
-      return (replace(name, obj, opt));
+      return (replace(name, obj, opt, map));
     }
   };
 };
