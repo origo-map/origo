@@ -1,4 +1,4 @@
-import Draw from 'ol/interaction/draw';
+import Draw from 'ol/interaction/Draw';
 
 export default (drawType) => {
   const types = {

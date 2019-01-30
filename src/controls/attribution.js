@@ -1,29 +1,36 @@
-import Attribution from 'ol/control/attribution';
-import $ from 'jquery';
-import viewer from '../viewer';
+import olAttribution from 'ol/control/Attribution';
+import { Component } from '../ui';
 
-let map;
+const Attribution = function Attribution(options = {}) {
+  let viewer;
+  let breakPoint;
+  let attribution;
 
-function checkSize(attribution, breakPoint) {
-  const mapSize = map.getSize();
-  const collapsed = (mapSize[0] <= breakPoint[0] || mapSize[1] <= breakPoint[1]);
-  attribution.setCollapsible(collapsed);
-  attribution.setCollapsed(collapsed);
-}
+  function checkSize() {
+    const mapSize = viewer.getMap().getSize();
+    const collapsed = (mapSize[0] <= breakPoint[0] || mapSize[1] <= breakPoint[1]);
+    attribution.setCollapsible(collapsed);
+    attribution.setCollapsed(collapsed);
+  }
 
-function init(opt) {
-  const options = opt || {};
-  const breakPoint = options.breakPoint || [768, 500];
-  map = viewer.getMap();
-
-  const attribution = new Attribution({
-    collapsible: false
+  return Component({
+    name: 'attribution',
+    onAdd(evt) {
+      viewer = evt.target;
+      breakPoint = options.breakPoint || [768, 500];
+      attribution = new olAttribution({
+        collapsible: false,
+        collapseLabel: '\u00AB'
+      });
+      this.render();
+    },
+    render() {
+      viewer.getMap().addControl(attribution);
+      window.addEventListener('resize', checkSize);
+      checkSize(attribution, breakPoint);
+      this.dispatch('render');
+    }
   });
+};
 
-  map.addControl(attribution);
-
-  $(window).on('resize', checkSize(attribution, breakPoint));
-  checkSize(attribution, breakPoint);
-}
-
-export default { init };
+export default Attribution;

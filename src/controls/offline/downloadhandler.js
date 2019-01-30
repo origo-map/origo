@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import Feature from 'ol/feature';
+import Feature from 'ol/Feature';
 import viewer from '../../viewer';
 import layerCreator from '../../layercreator';
 import downloadSources from './downloadsources';

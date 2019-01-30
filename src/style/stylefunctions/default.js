@@ -1,7 +1,7 @@
-import Circle from 'ol/style/circle';
-import Fill from 'ol/style/fill';
-import Stroke from 'ol/style/stroke';
-import Style from 'ol/style/style';
+import Circle from 'ol/style/Circle';
+import Fill from 'ol/style/Fill';
+import Stroke from 'ol/style/Stroke';
+import Style from 'ol/style/Style';
 import getColor from '../getcolor';
 
 export default function defaultStyle() {

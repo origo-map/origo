@@ -1,0 +1,13 @@
+$divider-color: $grey-lighter;
+.divider {
+  border-right: 1px solid $divider-color;
+  display: inline-block;
+  width: auto;
+
+  &.horizontal {
+    border-bottom: 1px solid $divider-color;
+    border-right: none;
+    line-height: 0;
+    width: 100%;
+  }
+}

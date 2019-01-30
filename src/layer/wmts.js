@@ -1,8 +1,7 @@
-import WMTSSource from 'ol/source/wmts';
-import Tilegrid from 'ol/tilegrid/wmts';
-import Extent from 'ol/extent';
+import WMTSSource from 'ol/source/WMTS';
+import Tilegrid from 'ol/tilegrid/WMTS';
+import { getTopLeft } from 'ol/extent';
 import $ from 'jquery';
-import viewer from '../viewer';
 import tile from './tile';
 
 function createSource(options) {
@@ -15,7 +14,7 @@ function createSource(options) {
     matrixSet: options.matrixSet,
     format: options.format,
     tileGrid: new Tilegrid({
-      origin: options.origin || Extent.getTopLeft(options.projectionExtent),
+      origin: options.origin || getTopLeft(options.projectionExtent),
       resolutions: options.resolutions,
       matrixIds: options.matrixIds,
       tileSize: options.tileSize
@@ -24,7 +23,7 @@ function createSource(options) {
   });
 }
 
-const wmts = function wmts(layerOptions) {
+const wmts = function wmts(layerOptions, viewer) {
   const wmtsDefault = {
     layerType: 'tile',
     featureinfoLayer: undefined
@@ -53,7 +52,7 @@ const wmts = function wmts(layerOptions) {
   sourceOptions.id = wmtsOptions.id;
 
   const wmtsSource = createSource(sourceOptions);
-  return tile(wmtsOptions, wmtsSource);
+  return tile(wmtsOptions, wmtsSource, viewer);
 };
 
 export default wmts;

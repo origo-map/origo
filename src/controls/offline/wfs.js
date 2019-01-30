@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import GeoJSONFormat from 'ol/format/geojson';
+import GeoJSONFormat from 'ol/format/GeoJSON';
 import viewer from '../../viewer';
 import wfsTransaction from '../editor/wfstransaction';
 

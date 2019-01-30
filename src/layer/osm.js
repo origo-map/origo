@@ -1,4 +1,4 @@
-import OSMSource from 'ol/source/osm';
+import OSMSource from 'ol/source/OSM';
 import $ from 'jquery';
 import tile from './tile';
 

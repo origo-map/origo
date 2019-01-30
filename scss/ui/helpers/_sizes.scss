@@ -1,0 +1,77 @@
+.full {
+  height: $size-full;
+  width: $size-full;
+}
+.width-full {
+  width: $size-full;
+}
+.height-full {
+  height: $size-full;
+}
+.no-margin {
+  &.full {
+    height: $size-100;
+    width: $size-100;
+  }
+  &.height-full {
+    height: $size-100;
+  }
+  &.width-full {
+    width: $size-100;
+  }
+}
+.height-100 {
+  height: 100%;
+}
+.width-100 {
+  width: 100%;
+}
+
+.width-4 {
+  @include absolute-width($base-size, 4);
+}
+.width-8 {
+  @include absolute-width($base-size, 8);
+}
+.width-12 {
+  @include absolute-width($base-size, 12);
+}
+.width-16 {
+  @include absolute-width($base-size, 16);
+}
+.width-20 {
+  @include absolute-width($base-size, 20);
+}
+.width-24 {
+  @include absolute-width($base-size, 24);
+}
+.width-28 {
+  @include absolute-width($base-size, 28);
+}
+.width-32 {
+  @include absolute-width($base-size, 32);
+}
+.width-36 {
+  @include absolute-width($base-size, 36);
+}
+.width-40 {
+  @include absolute-width($base-size, 40);
+}
+.width-44 {
+  @include absolute-width($base-size, 44);
+}
+.width-48 {
+  @include absolute-width($base-size, 48);
+}
+.width-52 {
+  @include absolute-width($base-size, 52);
+}
+.width-56 {
+  @include absolute-width($base-size, 56);
+}
+.width-60 {
+  @include absolute-width($base-size, 60);
+}
+.width-64 {
+  @include absolute-width($base-size, 64);
+}

@@ -1,0 +1,38 @@
+.spacing-horizontal-large > * {
+  margin: 0 $spacing-large;
+}
+.spacing-horizontal > * {
+  margin: 0 $spacing-standard;
+}
+.spacing-horizontal-small > * {
+  margin: 0 $spacing-small;
+}
+.spacing-vertical-large > * {
+  margin: $spacing-large 0;
+}
+.spacing-vertical > * {
+  margin: $spacing-standard 0;
+}
+.spacing-vertical-small > * {
+  margin: $spacing-small 0;
+}
+.spacing-horizontal-large:first-child,
+.spacing-horizontal:first-child,
+.spacing-horizontal-small:first-child {
+  margin-left: 0;
+}
+.spacing-horizontal-large:last-child,
+.spacing-horizontal:last-child,
+.spacing-horizontal-small:last-child {
+  margin-right: 0;
+}
+.spacing-vertical-large:first-child,
+.spacing-vertical:first-child,
+.spacing-vertical-small:first-child {
+  margin-top: 0;
+}
+.spacing-vertical-large:last-child,
+.spacing-vertical:last-child,
+.spacing-vertical-small:last-child {
+  margin-bottom: 0;
+}

@@ -1,9 +1,8 @@
-import LoadingStrategy from 'ol/loadingstrategy';
-import TileGrid from 'ol/tilegrid';
-import VectorSource from 'ol/source/vector';
-import GeoJSONFormat from 'ol/format/geojson';
+import * as LoadingStrategy from 'ol/loadingstrategy';
+import { createXYZ } from 'ol/tilegrid';
+import VectorSource from 'ol/source/Vector';
+import GeoJSONFormat from 'ol/format/GeoJSON';
 import $ from 'jquery';
-import viewer from '../viewer';
 import vector from './vector';
 
 function createSource(options) {
@@ -41,13 +40,13 @@ function createSource(options) {
   return vectorSource;
 }
 
-export default function wfs(layerOptions) {
+export default function wfs(layerOptions, viewer) {
   const wfsDefault = {
     layerType: 'vector'
   };
   const sourceDefault = {};
-  const wfsOptions = $.extend(wfsDefault, layerOptions);
-  const sourceOptions = $.extend(sourceDefault, viewer.getMapSource()[layerOptions.sourceName]);
+  const wfsOptions = Object.assign({}, wfsDefault, layerOptions);
+  const sourceOptions = Object.assign({}, sourceDefault, viewer.getMapSource()[layerOptions.sourceName]);
   sourceOptions.featureType = wfsOptions.id;
   wfsOptions.featureType = wfsOptions.id;
   sourceOptions.geometryName = wfsOptions.geometryName;
@@ -62,7 +61,7 @@ export default function wfs(layerOptions) {
       sourceOptions.loadingstrategy = LoadingStrategy.all;
       break;
     case 'tile':
-      sourceOptions.loadingstrategy = LoadingStrategy.tile(TileGrid.createXYZ({
+      sourceOptions.loadingstrategy = LoadingStrategy.tile(createXYZ({
         maxZoom: sourceOptions.resolutions.length
       }));
       break;
@@ -71,5 +70,5 @@ export default function wfs(layerOptions) {
       break;
   }
   const wfsSource = createSource(sourceOptions);
-  return vector(wfsOptions, wfsSource);
+  return vector(wfsOptions, wfsSource, viewer);
 }

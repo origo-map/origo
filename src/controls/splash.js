@@ -1,41 +1,52 @@
-import $ from 'jquery';
-import modal from '../modal';
-import viewer from '../viewer';
+import { Component, Modal } from '../ui';
 
-const defaultTitle = 'Om kartan';
-const defaultContent = '<p></p>';
-const cls = 'o-splash';
-let title;
-let content;
+const Splash = function Splash(options = {}) {
+  const defaultTitle = 'Om kartan';
+  const defaultContent = '<p></p>';
+  const cls = 'o-splash';
+  let viewer;
+  let modal;
 
-
-function getContent(url) {
-  return $.get(url);
-}
-
-function openModal() {
-  modal.createModal('#o-map', {
+  let {
     title,
     content,
-    cls
-  });
-  modal.showModal();
-}
+    target
+  } = options;
 
-function init(optOptions) {
-  const options = optOptions || {};
-  title = options.title || defaultTitle;
-  if (options.url) {
-    const url = viewer.getBaseUrl() + options.url;
-    getContent(url)
-      .done((data) => {
-        content = data;
-        openModal();
+  const {
+    url
+  } = options;
+
+  return Component({
+    name: 'splash',
+    onAdd(evt) {
+      viewer = evt.target;
+      target = viewer.getId();
+      if (!title) title = defaultTitle;
+
+      if (url) {
+        const fullUrl = viewer.getBaseUrl() + url;
+        const req = new Request(`${fullUrl}`);
+        fetch(req).then(response => response.text().then((text) => {
+          content = text;
+          this.render();
+        }));
+      } else {
+        if (!content) content = defaultContent;
+        this.render();
+      }
+    },
+    render() {
+      modal = Modal({
+        title,
+        content,
+        cls,
+        target
       });
-  } else {
-    content = options.content || defaultContent;
-    openModal();
-  }
-}
+      this.addComponent(modal);
+      this.dispatch('render');
+    }
+  });
+};
 
-export default { init };
+export default Splash;
