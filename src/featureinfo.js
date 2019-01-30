@@ -65,9 +65,14 @@ const Featureinfo = function Featureinfo(options = {}) {
       let featureinfoTitle;
       let title;
       let layer;
-
-      if (items[currentItem].layer)
-      layer = viewer.getLayer(items[currentItem].layer.get('name'));
+      if (items[currentItem].layer) {
+        if (typeof items[currentItem].layer === 'string') {
+          layer = viewer.getLayer(items[currentItem].layer);
+        }
+        else {
+          layer = viewer.getLayer(items[currentItem].layer.get('name'));
+        }
+    }
       if (layer) {
         featureinfoTitle = layer.getProperties().featureinfoTitle;
       }
@@ -208,7 +213,7 @@ const Featureinfo = function Featureinfo(options = {}) {
       hitTolerance,
       map,
       pixel
-    });
+    }, viewer);
     // Abort if clientResult is false
     if (clientResult !== false) {
       getFeatureInfo.getFeaturesFromRemote({
