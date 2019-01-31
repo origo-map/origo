@@ -7,8 +7,8 @@ function getSaveLayers(layers) {
   const saveLayers = [];
   layers.forEach((layer) => {
     const saveLayer = {};
-    saveLayer.v = layer.getVisible() === true ? 1 : 0;
-    saveLayer.s = layer.get('legend') === true ? 1 : 0;
+    saveLayer.v = layer.getVisible() ? 1 : 0;
+    saveLayer.s = layer.get('legend') ? 1 : 0;
     if (saveLayer.s || saveLayer.v) {
       saveLayer.name = layer.get('name');
       saveLayers.push(urlparser.stringify(saveLayer, {
