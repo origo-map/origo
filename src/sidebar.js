@@ -13,21 +13,21 @@ function closeSidebar() {
 }
 
 function bindUIActions() {
-  $('#o-sidebar .o-sidebar .o-close-button').on('click', (evt) => {
+  $('#o-sidebar .o-sidebar #o-close-button').on('click', (evt) => {
     closeSidebar();
     evt.preventDefault();
   });
 }
 
 function setTitle(title) {
-  $('#o-sidebar .o-card-title').html(title);
+  $('#o-sidebar #o-card-title').html(title);
 }
 
 function setContent(config) {
   if (config.title) {
-    $('#o-sidebar .o-sidebar .o-card-title').html(config.title);
+    $('#o-sidebar .o-sidebar #o-card-title').html(config.title);
   } else {
-    $('#o-sidebar .o-sidebar .o-card-title').html('');
+    $('#o-sidebar .o-sidebar #o-card-title').html('');
   }
   if (config.content) {
     $('#o-sidebar .o-sidebar .o-card-content').html(config.content);
@@ -36,15 +36,24 @@ function setContent(config) {
   }
 }
 
-function init() {
+function init(viewer) {
+  const mapId = viewer.getId();
   const el = `<div id="o-sidebar">
     <div class="o-sidebar o-card">
-    <div class="o-close-button"><svg class="o-icon-fa-times"><use xlink:href="#fa-times"></use></svg></div>
-    <div class="o-card-title"></div>
-    <div class="o-card-content"></div>
+        <div class="flex row justify-end">
+          <div id="o-card-title" class="justify-start margin-top-small margin-left text-weight-bold width-full"></div>
+          <button id="o-close-button" class="small round margin-top-small margin-right-small icon-smallest grey-lightest no-shrink">
+            <span class="icon ">
+              <svg>
+                <use xlink:href="#ic_close_24px"></use>
+              </svg>
+            </span>
+          </button>
+        </div>
+        <div class="flex column o-card-content"></div>
     </div>
     </div>`;
-  $('#o-map').append(el);
+  $(`#${mapId}`).append(el);
 
   bindUIActions();
 }
