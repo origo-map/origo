@@ -1,7 +1,9 @@
 import Collection from 'ol/Collection';
 import Feature from 'ol/Feature';
 import geom from 'ol/geom/Geometry';
-import { Component } from './ui';
+import {
+  Component
+} from './ui';
 import Map from './map';
 import proj from './projection';
 import MapSize from './utils/mapsize';
@@ -11,6 +13,8 @@ import Layer from './layer';
 import Main from './components/main';
 import Footer from './components/footer';
 import flattenGroups from './utils/flattengroups';
+import getattributes from './getattributes';
+import getcenter from './geometry/getcenter';
 
 const Viewer = function Viewer(targetOption, options = {}) {
   let map;
@@ -23,32 +27,32 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
   const {
     baseUrl = '',
-    breakPoints,
-    breakPointsPrefix,
-    clsOptions = '',
-    consoleId = 'o-console',
-    mapCls = 'o-map',
-    controls = [],
-    enableRotation = true,
-    featureinfoOptions = {},
-    groups: groupOptions = [],
-    mapGrid = true,
-    pageSettings = {},
-    projectionCode,
-    projectionExtent,
-    extent = [],
-    center: centerOption = [0, 0],
-    zoom: zoomOption = 0,
-    resolutions = null,
-    layers: layerOptions = [],
-    map: mapName,
-    params: urlParams = {},
-    proj4Defs,
-    styles = {},
-    source = {},
-    clusterOptions = {},
-    tileGridOptions = {},
-    url
+      breakPoints,
+      breakPointsPrefix,
+      clsOptions = '',
+      consoleId = 'o-console',
+      mapCls = 'o-map',
+      controls = [],
+      enableRotation = true,
+      featureinfoOptions = {},
+      groups: groupOptions = [],
+      mapGrid = true,
+      pageSettings = {},
+      projectionCode,
+      projectionExtent,
+      extent = [],
+      center: centerOption = [0, 0],
+      zoom: zoomOption = 0,
+      resolutions = null,
+      layers: layerOptions = [],
+      map: mapName,
+      params: urlParams = {},
+      proj4Defs,
+      styles = {},
+      source = {},
+      clusterOptions = {},
+      tileGridOptions = {},
+      url
   } = options;
 
   const target = targetOption;
@@ -275,7 +279,9 @@ const Viewer = function Viewer(targetOption, options = {}) {
   const addLayer = function addLayer(layerProps) {
     const layer = Layer(layerProps, this);
     map.addLayer(layer);
-    this.dispatch('addlayer', { layerName: layerProps.name });
+    this.dispatch('addlayer', {
+      layerName: layerProps.name
+    });
   };
 
   const addLayers = function addLayers(layersProps) {
@@ -285,12 +291,16 @@ const Viewer = function Viewer(targetOption, options = {}) {
   };
 
   const addGroup = function addGroup(groupProps) {
-    const defaultProps = { type: 'group' };
+    const defaultProps = {
+      type: 'group'
+    };
     const groupDef = Object.assign({}, defaultProps, groupProps);
     const name = groupDef.name;
     if (!(groups.filter(group => group.name === name).length)) {
       groups.push(groupDef);
-      this.dispatch('add:group', { group: groupDef });
+      this.dispatch('add:group', {
+        group: groupDef
+      });
     }
   };
 
@@ -310,7 +320,9 @@ const Viewer = function Viewer(targetOption, options = {}) {
       });
       const groupIndex = groups.indexOf(group);
       groups.splice(groupIndex, 1);
-      this.dispatch('remove:group', { group });
+      this.dispatch('remove:group', {
+        group
+      });
     }
     const subgroups = groups.filter((item) => {
       if (item.parent) {
@@ -369,6 +381,44 @@ const Viewer = function Viewer(targetOption, options = {}) {
         breakPointsPrefix,
         mapId: this.getId()
       });
+
+      if (urlParams.feature) {
+        const featureId = urlParams.feature;
+        const layerName = featureId.split('.')[0];
+        const layer = getLayer(layerName);
+        if (layer) {
+          layer.once('render', () => {
+            let feature;
+            const type = layer.get('type');
+            feature = layer.getSource().getFeatureById(featureId);
+            if (type === 'WFS') {
+              feature = layer.getSource().getFeatureById(featureId);
+            } else {
+              const id = featureId.split('.')[1];
+              let origin = layer.getSource();
+              feature = origin.getFeatureById(id);
+              // feature has no id it is not found it maybe a cluster, therefore try again.
+              if (feature === null && type !== 'TOPOJSON') {
+                origin = origin.getSource();
+                feature = origin.getFeatureById(id);
+              }
+            }
+            if (feature) {
+              const obj = {};
+              obj.feature = feature;
+              obj.title = layer.get('title');
+              obj.content = getattributes(feature, layer);
+              obj.layer = layer;
+              const centerGeometry = getcenter(feature.getGeometry());
+              featureinfo.render([obj], 'overlay', centerGeometry);
+              map.getView().animate({
+                center: getcenter(feature.getGeometry()),
+                zoom: getResolutions().length - 2
+              });
+            }
+          });
+        }
+      }
 
       if (urlParams.pin) {
         featureinfoOptions.savedPin = urlParams.pin;
