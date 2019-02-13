@@ -1,7 +1,9 @@
 import 'owl.carousel';
 import Overlay from 'ol/Overlay';
 import $ from 'jquery';
-import {Component} from './ui';
+import {
+  Component
+} from './ui';
 import Popup from './popup';
 import sidebar from './sidebar';
 import maputils from './maputils';
@@ -16,14 +18,14 @@ const styleTypes = StyleTypes();
 const Featureinfo = function Featureinfo(options = {}) {
   const {
     clickEvent = 'click',
-    clusterFeatureinfoLevel = 1,
-    hitTolerance = 0,
-    pinning = true,
-    pinsStyle: pinStyleOptions = styleTypes.getStyle('pin'),
-    savedPin: savedPinOptions,
-    savedSelection,
-    selectionStyles: selectionStylesOptions,
-    showOverlay = true
+      clusterFeatureinfoLevel = 1,
+      hitTolerance = 0,
+      pinning = true,
+      pinsStyle: pinStyleOptions = styleTypes.getStyle('pin'),
+      savedPin: savedPinOptions,
+      savedSelection,
+      selectionStyles: selectionStylesOptions,
+      showOverlay = true
   } = options;
 
   let identifyTarget;
@@ -118,16 +120,11 @@ const Featureinfo = function Featureinfo(options = {}) {
   function getSelection() {
     const selection = {};
     const firstFeature = selectionLayer.getFeatures()[0];
-    // console.log('first Feature: ', firstFeature);
     if (firstFeature) {
       selection.geometryType = firstFeature.getGeometry().getType();
-      // console.log('selection geometry type: ', selection.geometryType);
       selection.coordinates = firstFeature.getGeometry().getCoordinates();
-      // console.log('selection coordinate: ', selection.coordinates);
-      selection.id = firstFeature.getId() || firstFeature.ol_uid;
-      // console.log('selection id: ', selection.id);
+      selection.id = firstFeature.getId() != null ? firstFeature.getId() : firstFeature.ol_uid;
       selection.type = typeof selectionLayer.getSourceLayer() === 'string' ? selectionLayer.getFeatureLayer().type : selectionLayer.getSourceLayer().get('type');
-      // console.log('selection type: ', selection.type);
 
       if (selection.type === 'WFS') {
         selection.id = firstFeature.getId();
@@ -136,7 +133,6 @@ const Featureinfo = function Featureinfo(options = {}) {
         const id = firstFeature.getId() || selection.id;
         selection.id = `${name}.${id}`;
       }
-      // console.log('selection', selection.id);
     }
     return selection;
   }
@@ -157,45 +153,45 @@ const Featureinfo = function Featureinfo(options = {}) {
     content = `<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme">${content}</div></div>`;
     switch (target) {
       case 'overlay':
-      {
-        popup = Popup(`#${viewer.getId()}`);
-        popup.setContent({
-          content,
-          title: items[0].title
-        });
-        popup.setVisibility(true);
-        initCarousel('#o-identify-carousel');
-        const popupHeight = $('.o-popup').outerHeight() + 20;
-        $('#o-popup').height(popupHeight);
-        overlay = new Overlay({
-          element: popup.getEl(),
-          autoPan: true,
-          autoPanAnimation: {
-            duration: 500
-          },
-          autoPanMargin: 40,
-          positioning: 'bottom-center'
-        });
-        const geometry = items[0].feature.getGeometry();
-        const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
-        map.addOverlay(overlay);
-        overlay.setPosition(coord);
-        break;
-      }
+        {
+          popup = Popup(`#${viewer.getId()}`);
+          popup.setContent({
+            content,
+            title: items[0].title
+          });
+          popup.setVisibility(true);
+          initCarousel('#o-identify-carousel');
+          const popupHeight = $('.o-popup').outerHeight() + 20;
+          $('#o-popup').height(popupHeight);
+          overlay = new Overlay({
+            element: popup.getEl(),
+            autoPan: true,
+            autoPanAnimation: {
+              duration: 500
+            },
+            autoPanMargin: 40,
+            positioning: 'bottom-center'
+          });
+          const geometry = items[0].feature.getGeometry();
+          const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
+          map.addOverlay(overlay);
+          overlay.setPosition(coord);
+          break;
+        }
       case 'sidebar':
-      {
-        sidebar.setContent({
-          content,
-          title: items[0].title
-        });
-        sidebar.setVisibility(true);
-        initCarousel('#o-identify-carousel');
-        break;
-      }
+        {
+          sidebar.setContent({
+            content,
+            title: items[0].title
+          });
+          sidebar.setVisibility(true);
+          initCarousel('#o-identify-carousel');
+          break;
+        }
       default:
-      {
-        break;
-      }
+        {
+          break;
+        }
     }
   };
 
@@ -216,11 +212,11 @@ const Featureinfo = function Featureinfo(options = {}) {
     // Abort if clientResult is false
     if (clientResult !== false) {
       getFeatureInfo.getFeaturesFromRemote({
-        coordinate,
-        layers,
-        map,
-        pixel
-      }, viewer)
+          coordinate,
+          layers,
+          map,
+          pixel
+        }, viewer)
         .done((data) => {
           const serverResult = data || [];
           const result = serverResult.concat(clientResult);
@@ -271,7 +267,6 @@ const Featureinfo = function Featureinfo(options = {}) {
     }
   };
 
-  // TODO: Open featureinfo, name.id layer
   return Component({
     name: 'featureInfo',
     clear,
