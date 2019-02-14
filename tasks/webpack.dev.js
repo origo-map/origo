@@ -3,7 +3,6 @@ const common = require('./webpack.common.js');
 
 module.exports = merge(common, {
   output: {
-    path: `${__dirname}/../js`,
     publicPath: '/js',
     filename: 'origo.js',
     libraryTarget: 'var',
