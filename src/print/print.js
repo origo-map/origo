@@ -113,6 +113,20 @@ function buildLegend(layers) {
 							icons: ['http://karta.eskilstuna.se' + url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&RULE='+ rule +'&SCALE=1&legend_options=dpi:400'] 
 						})
 					}
+				//special case for grouped layers
+				}else if(layer.get('grouplayer') == true){
+					var subLayer = layer.get('sublayers');
+					for(var i = 0; i < subLayer.length; i++){
+						var subName = subLayer[i].name;
+						var rule = subLayer[i].rule;
+						var style = subLayer[i].style;
+						var layername = subLayer[i].layer;
+						result.push({
+							name : subName, 
+							icons: ['http://karta.eskilstuna.se' + url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + layername + '&STYLE=' + style +'&RULE='+ rule +'&SCALE=1&legend_options=dpi:400'] 
+						})
+					}
+				//normal case, single layer
 				}else{
 					result.push({
 						name: layer.get('title'),
