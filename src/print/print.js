@@ -94,7 +94,6 @@ function convertToMapfishOptions(options) {
 }
 
 function buildLegend(layers) {
-	var themeLayers = [];
 	var legendObjects = layers.reduce(function(result, layer) {
 		const type = layer.get('type') || "";
         switch (type.toUpperCase()) {
@@ -110,7 +109,7 @@ function buildLegend(layers) {
 						var rule = subLayer[i].rule;
 						result.push({
 							name : subName, 
-							icons: ['http://karta.eskilstuna.se' + url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&RULE='+ rule +'&SCALE=1&legend_options=dpi:400'] 
+							icons: [url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&RULE='+ rule +'&SCALE=1&legend_options=dpi:400'] 
 						})
 					}
 				//special case for grouped layers
@@ -123,14 +122,14 @@ function buildLegend(layers) {
 						var layername = subLayer[i].layer;
 						result.push({
 							name : subName, 
-							icons: ['http://karta.eskilstuna.se' + url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + layername + '&STYLE=' + style +'&RULE='+ rule +'&SCALE=1&legend_options=dpi:400'] 
+							icons: [url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + layername + '&STYLE=' + style +'&RULE='+ rule +'&SCALE=1&legend_options=dpi:400'] 
 						})
 					}
 				//normal case, single layer
 				}else{
 					result.push({
 						name: layer.get('title'),
-						icons: [ 'http://karta.eskilstuna.se' + url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&SCALE=1&legend_options=dpi:400']
+						icons: [ url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&SCALE=1&legend_options=dpi:400']
 					})
 				}
 				return result;
@@ -141,7 +140,7 @@ function buildLegend(layers) {
 				var name = layer.get('name');
 				result.push({
 					name: layer.get('title'),
-					icons: [ 'http://karta.eskilstuna.se' + url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&SCALE=1&legend_options=dpi:400']
+					icons: [ url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&SCALE=1&legend_options=dpi:400']
 				})
 				return result;
             break;
