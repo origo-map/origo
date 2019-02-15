@@ -94,29 +94,45 @@ function convertToMapfishOptions(options) {
 }
 
 function buildLegend(layers) {
-	var legendObjects = layers.map(function(layer) {
-		var type = layer.get('type') || "";
+	var themeLayers = [];
+	var legendObjects = layers.reduce(function(result, layer) {
+		const type = layer.get('type') || "";
         switch (type.toUpperCase()) {
 			case "WMS":
 				var o = [];
-				var url = fetchSourceUrl(layer)
+				var url = fetchSourceUrl(layer);
 				var name = layer.get('name');
-				return {
-					name: layer.get('title'),
-					icons: [url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&SCALE=1&legend_options=dpi:400']
-				};
+				//special case for theme layers
+				if(layer.get('theme') == true){
+					var subLayer = layer.get('sublayers');
+					for(var i = 0; i < subLayer.length; i++){
+						var subName = subLayer[i].name;
+						var rule = subLayer[i].rule;
+						result.push({
+							name : subName, 
+							icons: ['http://karta.eskilstuna.se' + url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&RULE='+ rule +'&SCALE=1&legend_options=dpi:400'] 
+						})
+					}
+				}else{
+					result.push({
+						name: layer.get('title'),
+						icons: [ 'http://karta.eskilstuna.se' + url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&SCALE=1&legend_options=dpi:400']
+					})
+				}
+				return result;
             break;
 			case "WFS":
-			var o = [];
-				var url = fetchSourceUrl(layer)
+				var o = [];
+				var url = fetchSourceUrl(layer);
 				var name = layer.get('name');
-				return {
+				result.push({
 					name: layer.get('title'),
-					icons: [url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&SCALE=1&legend_options=dpi:400']
-				}
+					icons: [ 'http://karta.eskilstuna.se' + url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&SCALE=1&legend_options=dpi:400']
+				})
+				return result;
             break;
         }
-	});
+	},[]);
 	
     return legendObjects;
 }
