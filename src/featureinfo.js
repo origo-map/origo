@@ -38,13 +38,20 @@ const Featureinfo = function Featureinfo(options = {}) {
   let savedPin = savedPinOptions ? maputils.createPointFeature(savedPinOptions, pinStyle) : undefined;
   const savedFeature = savedPin || savedSelection || undefined;
 
+  if (showOverlay) {
+    identifyTarget = 'overlay';
+  } else {
+    sidebar.init();
+    identifyTarget = 'sidebar';
+  }
+
   const clear = function clear() {
     selectionLayer.clear();
     sidebar.setVisibility(false);
     if (overlay) {
       viewer.removeOverlays(overlay);
     }
-  }
+  };
 
   const callback = function callback(evt) {
     const currentItem = evt.item.index;
@@ -61,11 +68,10 @@ const Featureinfo = function Featureinfo(options = {}) {
       if (items[currentItem].layer) {
         if (typeof items[currentItem].layer === 'string') {
           layer = viewer.getLayer(items[currentItem].layer);
-        }
-        else {
+        } else {
           layer = viewer.getLayer(items[currentItem].layer.get('name'));
         }
-    }
+      }
       if (layer) {
         featureinfoTitle = layer.getProperties().featureinfoTitle;
       }
@@ -103,7 +109,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     }
 
     return $(id).owlCarousel(carouselOptions);
-  }
+  };
 
   function getSelectionLayer() {
     return selectionLayer.getFeatureLayer();
@@ -111,31 +117,23 @@ const Featureinfo = function Featureinfo(options = {}) {
 
   function getSelection() {
     const selection = {};
-    if (selectionLayer.getFeatures()[0]) {
-      selection.geometryType = selectionLayer.getFeatures()[0].getGeometry().getType();
-      selection.coordinates = selectionLayer.getFeatures()[0].getGeometry().getCoordinates();
-      selection.id = selectionLayer.getFeatures()[0].getId();
-      selection.type = selectionLayer.getSourceLayer().get('type');
+    const firstFeature = selectionLayer.getFeatures()[0];
+    if (firstFeature) {
+      selection.geometryType = firstFeature.getGeometry().getType();
+      selection.coordinates = firstFeature.getGeometry().getCoordinates();
+      selection.id = firstFeature.getId() != null ? firstFeature.getId() : firstFeature.ol_uid;
+      selection.type = typeof selectionLayer.getSourceLayer() === 'string' ? selectionLayer.getFeatureLayer().type : selectionLayer.getSourceLayer().get('type');
 
       if (selection.type === 'WFS') {
-        selection.id = selectionLayer.getFeatures()[0].getId();
+        selection.id = firstFeature.getId();
       } else {
-        selection.id = `${selectionLayer.getSourceLayer().get('name')}.${selectionLayer.getFeatures()[0].getId()}`;
+        const name = typeof selectionLayer.getSourceLayer() === 'string' ? selectionLayer.getSourceLayer() : selectionLayer.getSourceLayer().get('name');
+        const id = firstFeature.getId() || selection.id;
+        selection.id = `${name}.${id}`;
       }
     }
     return selection;
   }
-
-  const getSelectionLayer = function getSelectionLayer() {
-    return selectionLayer.getFeatureLayer();
-  };
-
-  const getSelection = function getSelection() {
-    const selection = {};
-    selection.geometryType = selectionLayer.getFeatures()[0].getGeometry().getType();
-    selection.coordinates = selectionLayer.getFeatures()[0].getGeometry().getCoordinates();
-    return selection;
-  };
 
   const getPin = function getPin() {
     return savedPin;
@@ -178,7 +176,8 @@ const Featureinfo = function Featureinfo(options = {}) {
         overlay.setPosition(coord);
         break;
       }
-      case 'sidebar': {
+      case 'sidebar':
+      {
         sidebar.setContent({
           content,
           title: items[0].title
@@ -187,7 +186,8 @@ const Featureinfo = function Featureinfo(options = {}) {
         initCarousel('#o-identify-carousel');
         break;
       }
-      default: {
+      default:
+      {
         break;
       }
     }
@@ -274,12 +274,6 @@ const Featureinfo = function Featureinfo(options = {}) {
     getSelection,
     onAdd(e) {
       viewer = e.target;
-      if (showOverlay) {
-        identifyTarget = 'overlay';
-      } else {
-        sidebar.init(viewer);
-        identifyTarget = 'sidebar';
-      }
       const map = viewer.getMap();
       selectionLayer = featurelayer(savedFeature, map);
       map.on(clickEvent, onClick);
