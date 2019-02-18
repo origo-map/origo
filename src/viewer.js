@@ -1,9 +1,7 @@
 import Collection from 'ol/Collection';
 import Feature from 'ol/Feature';
 import geom from 'ol/geom/Geometry';
-import {
-  Component
-} from './ui';
+import { Component } from './ui';
 import Map from './map';
 import proj from './projection';
 import MapSize from './utils/mapsize';
@@ -27,32 +25,32 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
   const {
     baseUrl = '',
-      breakPoints,
-      breakPointsPrefix,
-      clsOptions = '',
-      consoleId = 'o-console',
-      mapCls = 'o-map',
-      controls = [],
-      enableRotation = true,
-      featureinfoOptions = {},
-      groups: groupOptions = [],
-      mapGrid = true,
-      pageSettings = {},
-      projectionCode,
-      projectionExtent,
-      extent = [],
-      center: centerOption = [0, 0],
-      zoom: zoomOption = 0,
-      resolutions = null,
-      layers: layerOptions = [],
-      map: mapName,
-      params: urlParams = {},
-      proj4Defs,
-      styles = {},
-      source = {},
-      clusterOptions = {},
-      tileGridOptions = {},
-      url
+    breakPoints,
+    breakPointsPrefix,
+    clsOptions = '',
+    consoleId = 'o-console',
+    mapCls = 'o-map',
+    controls = [],
+    enableRotation = true,
+    featureinfoOptions = {},
+    groups: groupOptions = [],
+    mapGrid = true,
+    pageSettings = {},
+    projectionCode,
+    projectionExtent,
+    extent = [],
+    center: centerOption = [0, 0],
+    zoom: zoomOption = 0,
+    resolutions = null,
+    layers: layerOptions = [],
+    map: mapName,
+    params: urlParams = {},
+    proj4Defs,
+    styles = {},
+    source = {},
+    clusterOptions = {},
+    tileGridOptions = {},
+    url
   } = options;
 
   const target = targetOption;
