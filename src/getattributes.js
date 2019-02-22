@@ -29,7 +29,7 @@ export default function (feature, layer, map) {
         title = '';
         val = '';
         if (attribute.name) {
-          if (feature.get(attribute.name)) {
+          if (feature.get(attribute.name) !== undefined) {
             val = feature.get(attribute.name);
             if (attribute.title) {
               title = `<b>${attribute.title}</b>`;
