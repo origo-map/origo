@@ -1,10 +1,10 @@
 import viewer from '../viewer';
 
-export default function getCenter(geometryIn, destination, axisOrientation) {
+export default function getCenter(geometryIn, destination, axisOrientation, map) {
   const geometry = geometryIn.clone();
 
-  if (destination) {
-    geometry.transform(viewer.getMap().getView().getProjection(), destination);
+  if (destination && map) {
+    geometry.transform(map.getView().getProjection(), destination);
   }
 
 

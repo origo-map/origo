@@ -1,0 +1,158 @@
+// Margin and padding
+$app-margin: 1rem;
+$spacer: 1rem;
+
+// Colors
+$black: rgba(0,0,0,1);
+$white: rgba(255,255,255,1);
+$red: hsl(3,59,48);
+$orange: hsl(35,100,50);
+$yellow: hsl(48,100,50);
+$green: hsl(130,65,58);
+$blue: hsl(205,100,48);
+$purple: hsl(241,61,59);
+$pink: hsl(349,100,59);
+
+$grey-darker: hsl(0,0,21);
+$grey-dark: hsl(0,0,29);
+$grey: hsl(0,0,48);
+$grey-light: hsl(0,0,71);
+$grey-lighter: hsl(0,0,86);
+$grey-lightest: hsl(0,0,92);
+
+
+// General colors
+$primary-color: $blue;
+$background-color: $white;
+$primary-color-inverse: $white;
+$info-color: $blue;
+$success-color: $green;
+$warning-color: $yellow;
+$danger-color: $red;
+
+$primary-color-dark: hsl(205,100, 43);
+$primary-color-light: hsl(205,100, 60);
+$light-color: $white;
+$danger-color-dark: hsl(3,59,43);
+
+$border-color: $grey-lighter;
+
+$primary-text-color: $black;
+$primary-text-color-inverse: $white;
+
+// Link colors
+$link-color: $blue;
+$link-visited: $blue;
+$link-hover: $grey-light;
+$link-focus: $grey-light;
+$link-active: $grey-light;
+
+// z-index
+$z-bottom: 0;
+$z-low: 25;
+$z-middle: 50;
+$z-high: 75;
+$z-top: 100;
+
+// Typography
+$font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+$font-size-base: 1rem;
+$font-size-smaller: $font-size-base * .75;
+$font-size-small: $font-size-base * .875;
+$font-size-normal: $font-size-base;
+$font-size-large: $font-size-base * 1.25;
+
+$line-height-large: 2;
+$line-height-base: 1.5;
+$line-height-small: 1.25;
+$line-height-smaller: 1.125;
+$line-height-smallest: 1;
+
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+$font-weight-base: $font-weight-normal;
+
+$headings-margin-bottom: $spacer / 2;
+$h1-font-size: $font-size-base * 2.5;
+$h2-font-size: $font-size-base * 2;
+$h3-font-size: $font-size-base * 1.75;
+$h4-font-size: $font-size-base * 1.5;
+$h5-font-size: $font-size-base * 1.25;
+$h6-font-size: $font-size-base;
+
+// Responsiveness
+
+// The container horizontal gap, which acts as the offset for breakpoints
+$gap: 32px;
+// 960, 1152, and 1344 have been chosen because they are divisible by both 12 and 16
+$tablet: 769px;
+// 960px container + 3rem
+$desktop: 960px + (2 * $gap);
+// 1152px container + 3rem
+$widescreen: 1152px + (2 * $gap) ;
+// 1344px container + 3rem
+$fullhd: 1344px + (2 * $gap) ;
+
+// Miscellaneous
+
+$easing: ease-out;
+$radius-small: 2px;
+$radius: 3px;
+$radius-large: 5px;
+$speed: 86ms;
+
+
+// Sizes
+$size-0-125: .125rem;
+$size-0-25: .25rem;
+$size-1-125: 1.125rem;
+$size-0: .5rem;
+$size-1: .75rem;
+$size-2: 1rem;
+$size-3: 1.25rem;
+$size-4: 1.5rem;
+$size-5: 2rem;
+$size-6: 2.5rem;
+$size-7: 3rem;
+$base-size: $size-2;
+
+$size-small: $size-7;
+$size-normal: $size-6;
+$size-medium: $size-5;
+$size-large: $size-4;
+
+$size-full: calc(100% - (#{$app-margin} * 2));
+$size-100: 100%;
+
+// padding
+$padding-larger: $size-5;
+$padding-large: $size-2;
+$padding-standard: $size-1;
+$padding-small: $size-0;
+$padding-smaller: $size-0-25;
+$padding-smallest: $size-0-125;
+
+// margin
+$margin-larger: $size-5;
+$margin-large: $size-2;
+$margin-standard: $size-1;
+$margin-small: $size-0;
+$margin-smaller: $size-0-25;
+$margin-smallest: $size-0-125;
+
+// spacing
+$spacing-large: $size-1;
+$spacing-standard: $size-0;
+$spacing-small: $size-0-25;
+
+// Miscellaneous
+
+$base-scale: 1;
+$radius-base: .5rem;
+$radius-small: .25rem;
+$radius-round: 50%;
+$shadow: 0 4px 6px 0 hsla(0,0%,0%,0.2);
+$shadow-subtle: 0 2px 6px 0 hsla(0,0%,0%,0.2);

@@ -1,6 +1,5 @@
 import XYZSource from 'ol/source/XYZ';
 import $ from 'jquery';
-import viewer from '../viewer';
 import tile from './tile';
 import maputils from '../maputils';
 
@@ -8,7 +7,7 @@ function createSource(options) {
   return new XYZSource(options);
 }
 
-const xyz = function xyz(layerOptions) {
+const xyz = function xyz(layerOptions, viewer) {
   const xyzDefault = {
     layerType: 'tile',
     featureinfoLayer: undefined
@@ -42,7 +41,7 @@ const xyz = function xyz(layerOptions) {
   }
   sourceOptions.crossOrigin = 'anonymous';
   const xyzSource = createSource(sourceOptions);
-  return tile(xyzOptions, xyzSource);
+  return tile(xyzOptions, xyzSource, viewer);
 };
 
 export default xyz;

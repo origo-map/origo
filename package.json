@@ -1,6 +1,6 @@
 {
   "name": "origo",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Framework to build web map apps",
   "keywords": [
     "map",
@@ -22,23 +22,30 @@
     "copy": "webpack --config ./tasks/webpack.copy.js"
   },
   "dependencies": {
+    "@babel/polyfill": "^7.0.0",
+    "@babel/runtime-corejs2": "^7.1.2",
     "awesomplete": "1.1.2",
+    "core-js": "^2.4.0",
+    "cuid": "^2.1.4",
     "jquery": "3.3.1",
-    "localforage": "1.5.0",
     "ol": "5.3.0",
     "owl.carousel": "^2.3.4",
-    "proj4": "2.3.10"
+    "proj4": "2.3.10",
+    "whatwg-fetch": "^2.0.4"
   },
   "devDependencies": {
-    "babel-core": "^6.26.0",
+    "@babel/core": "^7.1.2",
+    "@babel/plugin-transform-runtime": "^7.1.0",
+    "@babel/preset-env": "^7.1.0",
     "babel-eslint": "^8.0.1",
-    "babel-loader": "^7.1.4",
-    "babel-preset-env": "^1.6.1",
+    "babel-loader": "^8.0.4",
     "compression-webpack-plugin": "^1.1.11",
     "copy-webpack-plugin": "^4.5.1",
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^12.1.0",
     "eslint-plugin-import": "^2.10.0",
+    "exports-loader": "^0.7.0",
+    "imports-loader": "^0.8.0",
     "node-sass": "4.7.2",
     "npm-run-all": "^3.1.2",
     "run-sequence": "^2.1.0",

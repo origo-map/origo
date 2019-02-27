@@ -2,18 +2,24 @@ import $ from 'jquery';
 import EsriJSON from 'ol/format/EsriJSON';
 import VectorSource from 'ol/source/Vector';
 import * as loadingstrategy from 'ol/loadingstrategy';
-import viewer from '../viewer';
 import vector from './vector';
 
-function createSource(options) {
-  const esriSrs = options.projectionCode.split(':').pop();
-  const queryFilter = options.filter ? `&where=${options.filter}` : '';
+function createSource({
+  attribution,
+  id,
+  filter,
+  projectionCode,
+  url: sourceUrl
+} = {}) {
+  const esriSrs = projectionCode.split(':').pop();
+  const queryFilter = filter ? `&where=${filter}` : '';
   const esrijsonFormat = new EsriJSON();
   const vectorSource = new VectorSource({
-    attributions: options.attribution,
+    attributions: attribution,
     loader(extent, resolution, projection) {
       const that = this;
-      const url = options.url + options.id +
+      let url = sourceUrl.endsWith('/') ? sourceUrl : `${sourceUrl}/`;
+      url += id +
         encodeURI(['/query?f=json&',
           'returnGeometry=true',
           '&spatialRel=esriSpatialRelIntersects',
@@ -48,7 +54,7 @@ function createSource(options) {
   return vectorSource;
 }
 
-const agsFeature = function agsFeature(layerOptions) {
+const agsFeature = function agsFeature(layerOptions, viewer) {
   const agsDefault = {
     layerType: 'vector'
   };
@@ -62,7 +68,7 @@ const agsFeature = function agsFeature(layerOptions) {
   sourceOptions.id = agsOptions.id;
 
   const agsSource = createSource(sourceOptions);
-  return vector(agsOptions, agsSource);
+  return vector(agsOptions, agsSource, viewer);
 };
 
 export default agsFeature;

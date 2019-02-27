@@ -1,43 +1,49 @@
-import $ from 'jquery';
-import utils from '../utils';
-import modal from '../modal';
+import { Component, Modal } from '../ui';
 
-let $aboutButton;
-let buttonText;
-let title;
-let content;
+const About = function About(options = {}) {
+  let {
+    buttonText,
+    target
+  } = options;
+  const {
+    content = '<p></p>',
+    icon = '#ic_help_outline_24px',
+    title = 'Om kartan'
+  } = options;
 
-function render() {
-  const el = utils.createListButton({
-    id: 'o-about',
-    iconCls: 'o-icon-fa-info-circle',
-    src: '#fa-info-circle',
-    text: buttonText
+  let viewer;
+  let mapMenu;
+  let menuItem;
+  let modal;
+
+  return Component({
+    name: 'about',
+    onAdd(evt) {
+      if (!buttonText) buttonText = title;
+      viewer = evt.target;
+      target = viewer.getId();
+      mapMenu = viewer.getControlByName('mapmenu');
+      menuItem = mapMenu.MenuItem({
+        click() {
+          modal = Modal({
+            title,
+            content,
+            target
+          });
+          this.addComponent(modal);
+          mapMenu.close();
+        },
+        icon,
+        title: buttonText
+      });
+      this.addComponent(menuItem);
+      this.render();
+    },
+    render() {
+      mapMenu.appendMenuItem(menuItem);
+      this.dispatch('render');
+    }
   });
-  $('#o-menutools').append(el);
-  $aboutButton = $('#o-about-button');
-}
+};
 
-function bindUIActions() {
-  $aboutButton.on('click', (e) => {
-    modal.createModal('#o-map', {
-      title,
-      content
-    });
-
-    modal.showModal();
-    e.preventDefault();
-  });
-}
-
-function init(opt) {
-  const options = opt || {};
-  buttonText = options.buttonText || 'Om kartan';
-  title = options.title || 'Om kartan';
-  content = options.content || '<p></p>';
-
-  render();
-  bindUIActions();
-}
-
-export default { init };
+export default About;
