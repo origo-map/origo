@@ -15,14 +15,14 @@ const createForm = function createForm(obj) {
   let firstOption;
   switch (type) {
     case 'text':
-      el = `<div><label>${label}</label><br><input type="text" id="${id}" value="${val}" ${maxLength}></div>`;
+      el = `<div class="${cls}"><label>${label}</label><br><input type="text" id="${id}" value="${val}" ${maxLength}></div>`;
       break;
     case 'textarea':
-      el = `<div><label>${label}</label><br><textarea id="${id}" ${maxLength} rows="3">${val}</textarea></div>`;
+      el = `<div class="${cls}"><label>${label}</label><br><textarea id="${id}" ${maxLength} rows="3">${val}</textarea></div>`;
       break;
     case 'checkbox':
       checked = val ? ' checked' : '';
-      el = `<div class="o-form-checkbox"><label>${label}</label><input type="checkbox" id="${id}" value="${val}"${checked}></div>`;
+      el = `<div class="o-form-checkbox ${cls}"><label>${label}</label><input type="checkbox" id="${id}" value="${val}"${checked}></div>`;
       break;
     case 'dropdown':
       if (val) {
@@ -55,7 +55,7 @@ const createForm = function createForm(obj) {
           val = isoDate.slice(0, 10);
         }
       }
-      el = `<div><label>${label}</label><br><input type="date" id="${id}" placeholder="YYYY-MM-DD" value="${val}"></div>`;
+      el = `<div class="${cls}"><label>${label}</label><br><input type="date" id="${id}" placeholder="YYYY-MM-DD" value="${val}"></div>`;
       break;
     case 'datetime':
       if (!val) {
@@ -67,13 +67,13 @@ const createForm = function createForm(obj) {
           val = isoDate.slice(0, 16);
         }
       }
-      el = `<div><label>${label}</label><br><input type="datetime-local" id="${id}" placeholder="YYYY-MM-DDThh:mm" value="${val}"></div>`;
+      el = `<div class="${cls}"><label>${label}</label><br><input type="datetime-local" id="${id}" placeholder="YYYY-MM-DDThh:mm" value="${val}"></div>`;
       break;
     case 'color':
       if (!val) {
         val = obj.defaultColor ? obj.defaultColor : '';
       }
-      el = `<div><label>${label}</label><br><input type="color" id="${id}" value="${val}"></div>`;
+      el = `<div class="${cls}"><label>${label}</label><br><input type="color" id="${id}" value="${val}"></div>`;
       break;
     default:
       break;
