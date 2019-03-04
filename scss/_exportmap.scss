@@ -1,5 +1,5 @@
 .o-export-format {
-  padding: 0 .2rem;
+  padding: 0 .2em;
   //color: darkcyan;
   cursor: pointer;
   font-family: Arial,sans-serif;
@@ -7,9 +7,30 @@
   line-height: 1.5em;
   text-decoration: none;
   text-align: left;
-  height: 1.5em;
+  // height: 1.5em;
   border: none;
+  max-height: 0px;
   vertical-align: middle;
+}
+
+.folded {
+  max-height: 0px;
+  overflow: hidden;
+  transition: max-height .5s;
+  -webkit-transition: max-height .5s;
+  -moz-transition: max-height .5s;   
+  -ms-transition: max-height .5s;   
+  -o-transition: max-height .5s;
+}
+
+.unfolded {
+  max-height: 5em;
+  overflow: hidden;
+  transition: max-height 1s;
+  -webkit-transition: max-height 1s;
+  -moz-transition: max-height 1s;   
+  -ms-transition: max-height 1s;   
+  -o-transition: max-height 1s;
 }
 
 .o-export-format:hover {
@@ -17,7 +38,7 @@
 }
 
 #o-select-format-button {
-  padding-left: 2rem;
+  padding-left: 2.5em;
 }
 
 .clicks-disabled { 
