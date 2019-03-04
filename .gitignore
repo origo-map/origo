@@ -7,4 +7,8 @@ npm-debug-log
 index-settings-sample.json
 index00.json
 index01.json
+<<<<<<< HEAD
 index02.json
+=======
+index02.json
+>>>>>>> 4acecc0... external url single butten converted to Origo 2

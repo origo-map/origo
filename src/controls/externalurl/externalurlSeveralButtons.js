@@ -1,7 +1,7 @@
 import $ from 'jquery';
-import utils from '../utils';
-import viewer from '../viewer';
-import replacer from '../utils/replacer';
+import utils from '../../utils';
+import viewer from '../../viewer';
+import replacer from '../../utils/replacer';
 import { transform, toLonLat } from 'ol/proj';
 
 let mainbuttonTooltipText;

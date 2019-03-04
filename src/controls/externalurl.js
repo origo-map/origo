@@ -1,12 +1,13 @@
-import externalurlSingleButton from './externalurlSingleButton'
-import externalurlSeveralButtons from './externalurlSeveralButtons'
+import ExternalurlSingleButton from './externalurl/externalurlSingleButton'
+import ExternalurlSeveralButtons from './externalurl/externalurlSeveralButtons'
 
-function init(optOptions) {
+const Externalurl = function Externalurl(optOptions) {
+  
   const options = optOptions || {};
   if (options.links.length === 1)
-    externalurlSingleButton.init(options);
+    return ExternalurlSingleButton(options);
   else if (options.links.length > 1)
-    externalurlSeveralButtons.init(options);
+    return ExternalurlSeveralButtons(options);
 }
 
-export default { init };
+export default Externalurl;
