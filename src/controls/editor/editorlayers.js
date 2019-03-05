@@ -1,12 +1,14 @@
 import $ from 'jquery';
-import viewer from '../../viewer';
 import dropDown from '../../dropdown';
 import dispatcher from './editdispatcher';
 import utils from '../../utils';
 
 const createElement = utils.createElement;
 
-export default function editorLayers(editableLayers, optOptions = {}) {
+let viewer;
+
+export default function editorLayers(editableLayers, optOptions = {}, v) {
+  viewer = v;
   function selectionModel(layerNames) {
     const selectOptions = layerNames.map((layerName) => {
       const obj = {};

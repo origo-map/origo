@@ -1,0 +1,47 @@
+
+$list-border: 1px solid $border-color;
+$list-spacer: .25rem;
+$list-spacer-divided: .75rem;
+
+.list {
+  & > li,
+  & > .item {
+    padding-top: $list-spacer;
+    padding-bottom: $list-spacer;  
+  }
+  & > li:first-child,  
+  & > .item:first-child {
+    padding-top: $list-spacer * 2;
+  }
+  & > li:last-child,  
+  & > .item:last-child {
+    padding-bottom: $list-spacer * 2;
+  }    
+  &.divided > .item {
+    border-bottom: $list-border;
+    padding-top: $list-spacer-divided;
+    padding-bottom: $list-spacer-divided;      
+  }
+  &.divided > .item:first-child {
+    padding-top: $list-spacer-divided;
+  }
+  &.divided > .item:last-child {
+    border: none;
+    padding-bottom: $list-spacer-divided;
+  }
+  &.divider-start > li:first-child {
+    border-top: $list-border;
+  }
+  &.divider-end > li:last-child {
+    border-bottom: $list-border;
+  }
+  &.divider-end > li:last-child .divider-end > li:last-child {
+    border-bottom: none;
+  }
+  &.divider-end > li:last-child .divider-end > li:last-child {
+    border-bottom: none;
+  }
+  &.divider-end > li:last-child li:not(:last-child) .divider-end > li:last-child {
+    border-bottom: $list-border;
+  }    
+}

@@ -1,35 +1,36 @@
-import $ from 'jquery';
-import utils from '../utils';
+import { Component } from '../ui';
 
-let url;
-let title;
-let $linkButton;
+const Link = function Link(options = {}) {
+  const {
+    icon = '#ic_launch_24px',
+    url,
+    title
+  } = options;
+  let mapMenu;
+  let menuItem;
+  let viewer;
 
-function render() {
-  const el = utils.createListButton({
-    id: 'o-link',
-    iconCls: 'o-icon-fa-external-link',
-    src: '#fa-external-link',
-    text: title
-
+  return Component({
+    name: 'link',
+    onAdd(evt) {
+      viewer = evt.target;
+      mapMenu = viewer.getControlByName('mapmenu');
+      menuItem = mapMenu.MenuItem({
+        click() {
+          mapMenu.close();
+          window.open(url);
+        },
+        icon,
+        title
+      });
+      this.addComponent(menuItem);
+      this.render();
+    },
+    render() {
+      mapMenu.appendMenuItem(menuItem);
+      this.dispatch('render');
+    }
   });
-  $('#o-menutools').append(el);
-  $linkButton = $('#o-link-button');
-}
+};
 
-function bindUIActions() {
-  $linkButton.on('click', () => {
-    window.open(url);
-  });
-}
-
-function init(optOptions) {
-  const options = optOptions || {};
-  url = options.url;
-  title = options.title;
-
-  render();
-  bindUIActions();
-}
-
-export default { init };
+export default Link;

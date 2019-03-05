@@ -2,7 +2,6 @@ import WMTSSource from 'ol/source/WMTS';
 import Tilegrid from 'ol/tilegrid/WMTS';
 import { getTopLeft } from 'ol/extent';
 import $ from 'jquery';
-import viewer from '../viewer';
 import tile from './tile';
 
 function createSource(options) {
@@ -24,7 +23,7 @@ function createSource(options) {
   });
 }
 
-const wmts = function wmts(layerOptions) {
+const wmts = function wmts(layerOptions, viewer) {
   const wmtsDefault = {
     layerType: 'tile',
     featureinfoLayer: undefined
@@ -53,7 +52,7 @@ const wmts = function wmts(layerOptions) {
   sourceOptions.id = wmtsOptions.id;
 
   const wmtsSource = createSource(sourceOptions);
-  return tile(wmtsOptions, wmtsSource);
+  return tile(wmtsOptions, wmtsSource, viewer);
 };
 
 export default wmts;

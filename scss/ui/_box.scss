@@ -1,0 +1,20 @@
+$box-full: $size-full;
+$box-full-no-margin: $size-100;
+
+.box {
+  background-color: $background-color;
+  box-sizing: border-box;
+  max-height: $box-full;
+  max-width: $box-full;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  position: absolute;
+  &.no-margin {
+    max-height: $box-full-no-margin;
+    max-width: $box-full-no-margin;
+  }
+  &.transparent {
+    background-color: transparent;
+    overflow: visible;
+  }
+}

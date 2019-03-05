@@ -1,6 +1,5 @@
 import TileArcGISRest from 'ol/source/TileArcGISRest';
 import $ from 'jquery';
-import viewer from '../viewer';
 import tile from './tile';
 import maputils from '../maputils';
 
@@ -15,7 +14,7 @@ function createSource(options) {
   });
 }
 
-const agsTile = function agsTile(layerOptions) {
+const agsTile = function agsTile(layerOptions, viewer) {
   const agsDefault = {
     layerType: 'tile',
     featureinfoLayer: undefined
@@ -41,7 +40,7 @@ const agsTile = function agsTile(layerOptions) {
   }
 
   const agsSource = createSource(sourceOptions);
-  return tile(agsOptions, agsSource);
+  return tile(agsOptions, agsSource, viewer);
 };
 
 export default agsTile;

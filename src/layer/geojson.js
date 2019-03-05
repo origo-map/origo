@@ -1,7 +1,6 @@
 import VectorSource from 'ol/source/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
 import $ from 'jquery';
-import viewer from '../viewer';
 import vector from './vector';
 import isUrl from '../utils/isurl';
 
@@ -29,7 +28,7 @@ function createSource(options) {
   return vectorSource;
 }
 
-const geojson = function geojson(layerOptions) {
+const geojson = function geojson(layerOptions, viewer) {
   const baseUrl = viewer.getBaseUrl();
   const geojsonDefault = {
     layerType: 'vector'
@@ -47,7 +46,7 @@ const geojson = function geojson(layerOptions) {
   }
 
   const geojsonSource = createSource(sourceOptions);
-  return vector(geojsonOptions, geojsonSource);
+  return vector(geojsonOptions, geojsonSource, viewer);
 };
 
 export default geojson;

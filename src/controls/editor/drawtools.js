@@ -1,18 +1,20 @@
 import $ from 'jquery';
-import viewer from '../../viewer';
 import dropDown from '../../dropdown';
 import dispatcher from './editdispatcher';
 import utils from '../../utils';
 
 const createElement = utils.createElement;
 
-const drawToolsSelector = function drawToolsSelector(tools, defaultLayer) {
+let viewer;
+
+const drawToolsSelector = function drawToolsSelector(tools, defaultLayer, v) {
   const toolNames = {
     Polygon: 'Polygon',
     Point: 'Punkt',
     Line: 'Linje',
     box: 'Rektangel'
   };
+  viewer = v;
   const defaultTools = tools || {};
   let drawTools;
   let currentLayer = defaultLayer;
