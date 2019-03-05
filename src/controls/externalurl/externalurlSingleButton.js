@@ -2,22 +2,24 @@ import { Component, Element as El, Button, dom } from '../../ui';
 import { transform, toLonLat } from 'ol/proj';
 import replacer from '../../utils/replacer';
 
-let buttonImage;
-let url;
-let method;
-let destinationProjection;
-let map;
-let viewer;
-let exUrlElement;
-let exUrlBtn;
-let buttons = [];
-let target;
-let tooltip;
+const ExternalurlSingleButton = function ExternalurlSingleButton(options = {}) {
 
-const ExternalurlSingleButton = function ExternalurlSingleButton(options) {
+  console.log('Single Button');
+  
+  let buttonImage;
+  let url;
+  let method;
+  let destinationProjection;
+  let map;
+  let viewer;
+  let exUrlElement;
+  let exUrlBtn;
+  let buttons = [];
+  let target;
+  let tooltip;
 
   tooltip = options.links[0].tooltipText || options.tooltipText || 'Visa i BlomURBEX';
-  buttonImage = options.links[0].buttonImage || '#minicons-line-vector';
+  buttonImage = options.links[0].buttonImage || '#fa-external-link';
   url = options.links[0].url;
   method = options.links[0].method;
   destinationProjection = options.links[0].projection || 'EPSG:3857';
@@ -49,19 +51,11 @@ const ExternalurlSingleButton = function ExternalurlSingleButton(options) {
 
   return Component({
     name: 'externalurl',
-    onAdd(evt) {
-      viewer = evt.target;
-      target = `${viewer.getMain().getMapTools().getId()}`;
-      map = viewer.getMap();
-      this.addComponents(buttons);
-      this.render();
-    },
     onInit() {
       exUrlElement = El({
         tagName: 'div',
         cls: 'flex column'
       });
-
       exUrlBtn = Button({
         cls: 'o-measure padding-small margin-bottom-smaller icon-smaller rounded light box-shadow',
         click() {
@@ -70,8 +64,14 @@ const ExternalurlSingleButton = function ExternalurlSingleButton(options) {
         },
         icon: buttonImage
       });
-
       buttons.push(exUrlBtn);
+    },
+    onAdd(evt) {
+      viewer = evt.target;
+      target = `${viewer.getMain().getMapTools().getId()}`;
+      map = viewer.getMap();
+      this.addComponents(buttons);
+      this.render();
     },
     render() {
       let htmlString = `${exUrlElement.render()}`;

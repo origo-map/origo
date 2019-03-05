@@ -1,130 +1,126 @@
-import $ from 'jquery';
-import utils from '../../utils';
-import viewer from '../../viewer';
-import replacer from '../../utils/replacer';
+import { Component, Element as El, Button, dom } from '../../ui';
 import { transform, toLonLat } from 'ol/proj';
+import replacer from '../../utils/replacer';
 
-let mainbuttonTooltipText;
-let $toolbar;
-let links = [];
-let buttonIds = [];
-let isMainButtonActive = false;
-let map;
 
-function init(options) {
-  mainbuttonTooltipText = options.tooltipText || 'Visa kartan i en external platform';
-  links = options.links;
-  map = viewer.getMap();
-  render();
-  bindUIActions();
-}
+import { getArea, getLength } from 'ol/sphere';
+import VectorSource from 'ol/source/Vector';
+import VectorLayer from 'ol/layer/Vector';
+import DrawInteraction from 'ol/interaction/Draw';
+import Overlay from 'ol/Overlay';
+import Polygon from 'ol/geom/Polygon';
+import LineString from 'ol/geom/LineString';
 
-function render() {
-  const target = $('#o-toolbar-externalurl');
-  const toolbar = utils.createElement('div', '', {
-    id: 'o-externalurl-toolbar',
-    cls: 'o-toolbar-horizontal'
-  });
-  target.append(toolbar);
+import Style from '../../style';
+import StyleTypes from '../../style/styletypes';
 
-  $toolbar = $('#o-externalurl-toolbar');
+const externalurlSeveralButtons = function externalurlSeveralButtons(options = {}) {
 
-  const mainbutton = utils.createButton({
-    id: 'o-externalurl-main-button',
-    cls: 'o-externalurl-main-button',
-    iconCls: 'o-icon-fa-external-link',
-    src: '#fa-external-link',
-    tooltipText: mainbuttonTooltipText
-  });
-  $toolbar.append(mainbutton);
+  console.log('External Buuton Several');
+  console.log(options);
 
-  // we cannot use for...of because IE does not support it.
-  for (let i = 0; i < links.length; i++) {
-    let link = links[i];
-    let el;
-    const id = `o-externalurl-${link.name}-button`;
-    const tooltip = link.tooltipText;
-    const tooltipPlacement = 'north';
-    if (link.buttonImage)
-      el = utils.createImageButton({
-        id: id,
-        iconCls: 'o-image-external-link',
-        src: link.buttonImage,
-        tooltipText: tooltip,
-        tooltipPlacement: tooltipPlacement
-      });
-    else
-      el = utils.createButton({
-        id: id,
-        iconCls: 'o-icon-fa-external-link',
-        src: '#fa-external-link',
-        tooltipText: tooltip,
-        tooltipPlacement: tooltipPlacement
-      });
-    $toolbar.append(el);
-    // el above is just a string not a real element, so we cannot work with it directly.
-    const $elem = $('#' + id);
-    $elem.addClass('o-hidden');
-    buttonIds.push(id);
+  const mainbuttonTooltipText = options.tooltipText || 'Visa kartan i en external platform';
+  const links = options.links;
+  let map;
+  let isMainButtonActive = false;
+  let viewer;
+  let containerElement;
+  let externalUrlMainButton;
+  let target;
+  const buttons = [];
+  const subButtons = [];
+
+  function toggleMainButton() {
+    if (!isMainButtonActive) {
+      document.getElementById(externalUrlMainButton.getId()).classList.add('active');
+      for (let button of subButtons) {
+        document.getElementById(button.getId()).classList.remove('hidden');
+      }
+      document.getElementById(externalUrlMainButton.getId()).classList.remove('tooltip');
+      isMainButtonActive = true;
+    } else {
+      document.getElementById(externalUrlMainButton.getId()).classList.remove('active');
+      for (let button of subButtons) {
+        document.getElementById(button.getId()).classList.add('hidden');
+      }
+      document.getElementById(externalUrlMainButton.getId()).classList.add('tooltip');
+      isMainButtonActive = false;
+    }
   }
-}
 
-function bindUIActions() {
+  return Component({
+    name: 'externalurl',
+    onInit() {
+      containerElement = El({
+        tagName: 'div',
+        cls: 'flex column'
+      });
 
-  $('#o-externalurl-main-button').on('click', (e) => {
-    toggleMainButton();
-    $('#o-externalurl-main-button button').blur();
-    e.preventDefault();
-  });
-  
-  for (let i = 0; i < links.length; i++) {
-    let link = links[i];
-    const id = `o-externalurl-${link.name}-button`;
-    
-    $('#' + id).on('click', (e) => {
-      const mapView = map.getView();
-      const center = mapView.getCenter();
-      const projection = mapView.getProjection();
-      const destinationProjection = link.projection || 'EPSG:3857';
-      const transformedCenter = transform(center, projection, destinationProjection);
+      externalUrlMainButton = Button({
+        cls: 'o-measure padding-small margin-bottom-smaller icon-smaller rounded light box-shadow',
+        click() {
+          toggleMainButton();
+        },
+        icon: '#fa-external-link'
+      });
+      buttons.push(externalUrlMainButton);
 
-      let replacedUrl;
-      
-      if (link.method === 'XY') {
-        replacedUrl = replacer.replace(link.url, { X: transformedCenter[0], Y: transformedCenter[1] });
-      } else if (link.method === 'LatLon') {
-        const centerLonlat = toLonLat(transformedCenter);
-        replacedUrl = replacer.replace(link.url, { LON: centerLonlat[0], LAT: centerLonlat[1] });
+      for (let link of links) {
+        const tooltipText = link.tooltipText;
+        const buttonImage = link.buttonImage || '#fa-external-link';
+        const subButton = Button({
+          cls: 'o-measure-length padding-small margin-bottom-smaller icon-smaller rounded light box-shadow hidden',
+          icon: buttonImage,
+          tooltipText: tooltipText,
+          tooltipPlacement: 'north',
+          click() {
+            const mapView = map.getView();
+            const center = mapView.getCenter();
+            const projection = mapView.getProjection();
+            const destinationProjection = link.projection || 'EPSG:3857';
+            const transformedCenter = transform(center, projection, destinationProjection);
+            let replacedUrl;
+            if (link.method === 'XY') {
+              replacedUrl = replacer.replace(link.url, { X: transformedCenter[0], Y: transformedCenter[1] });
+            } else if (link.method === 'LatLon') {
+              const centerLonlat = toLonLat(transformedCenter);
+              replacedUrl = replacer.replace(link.url, { LON: centerLonlat[0], LAT: centerLonlat[1] });
+            }
+            window.open(replacedUrl, '_blank');
+          }
+        });
+        buttons.push(subButton);
+        subButtons.push(subButton);
+      }
+    },
+    onAdd(evt) {
+      viewer = evt.target;
+      target = `${viewer.getMain().getMapTools().getId()}`;
+      map = viewer.getMap();
+      this.addComponents(buttons);
+      this.render();
+    },
+    render() {
+      let htmlString = `${containerElement.render()}`;
+      let el = dom.html(htmlString);
+      document.getElementById(target).appendChild(el);
+
+      // To get the real html element:
+      const containerElementElement = document.getElementById(containerElement.getId());
+
+      htmlString = externalUrlMainButton.render();
+      el = dom.html(htmlString);
+      containerElementElement.appendChild(el);
+
+      for (let subButton of subButtons) {
+        htmlString = subButton.render();
+        el = dom.html(htmlString);
+        containerElementElement.appendChild(el);
       }
 
-      window.open(replacedUrl, '_blank');
-      $('#' + id + ' button').blur();
-      e.preventDefault();
-    });
-  }
-}
-
-function toggleMainButton() {
-  if (!isMainButtonActive) {
-
-    $('#o-externalurl-main-button button').addClass('o-externalurl-main-button-true');
-    for (let index = 0; index < buttonIds.length; index++) {
-      const id = buttonIds[index];
-      $('#' + id).removeClass('o-hidden');
+      this.dispatch('render');
     }
-    $('#o-externalurl-main-button').removeClass('o-tooltip');
-    isMainButtonActive = true;
+  });
+};
 
-  } else {
-
-    $('#o-externalurl-main-button button').removeClass('o-externalurl-main-button-true');
-    for (let index = 0; index < buttonIds.length; index++) {
-      const id = buttonIds[index];
-      $('#' + id).addClass('o-hidden');
-    }
-    $('#o-externalurl-main-button').addClass('o-tooltip');
-    isMainButtonActive = false;
-  }
-}
-
-export default { init };
+export default externalurlSeveralButtons;

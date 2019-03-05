@@ -286,7 +286,7 @@ const Measure = function Measure({
 
       map.addLayer(vector);
       this.addComponents(buttons);
-      this.render();
+      this.render();      
     },
     onInit() {
       lengthTool = measureTools.indexOf('length') >= 0;
@@ -297,7 +297,6 @@ const Measure = function Measure({
           tagName: 'div',
           cls: 'flex column'
         });
-
         measureButton = Button({
           cls: 'o-measure padding-small margin-bottom-smaller icon-smaller rounded light box-shadow',
           click() {
@@ -347,7 +346,6 @@ const Measure = function Measure({
       document.getElementById(measureElement.getId()).appendChild(el);
       if (lengthTool) {
         htmlString = lengthToolButton.render();
-        buttons.push(lengthToolButton);
         el = dom.html(htmlString);
         document.getElementById(measureElement.getId()).appendChild(el);
       }
