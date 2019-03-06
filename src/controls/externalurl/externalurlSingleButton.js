@@ -1,31 +1,21 @@
-import { Component, Element as El, Button, dom } from '../../ui';
 import { transform, toLonLat } from 'ol/proj';
+import { Component, Element as El, Button, dom } from '../../ui';
 import replacer from '../../utils/replacer';
 
 const ExternalurlSingleButton = function ExternalurlSingleButton(options = {}) {
-
-  console.log('Single Button');
-  
-  let buttonImage;
-  let url;
-  let method;
-  let destinationProjection;
   let map;
   let viewer;
   let exUrlElement;
   let exUrlBtn;
-  let buttons = [];
   let target;
-  let tooltip;
-
-  tooltip = options.links[0].tooltipText || options.tooltipText || 'Visa i BlomURBEX';
-  buttonImage = options.links[0].buttonImage || '#ic_baseline_link_24px';
-  url = options.links[0].url;
-  method = options.links[0].method;
-  destinationProjection = options.links[0].projection || 'EPSG:3857';
+  const buttons = [];
+  const tooltip = options.links[0].tooltipText || options.tooltipText || 'Visa i BlomURBEX';
+  const buttonImage = options.links[0].buttonImage || '#ic_baseline_link_24px';
+  const url = options.links[0].url;
+  const method = options.links[0].method;
+  const destinationProjection = options.links[0].projection || 'EPSG:3857';
 
   function onClick() {
-
     if (!url) {
       alert('No URL is specified in the configurations');
       return;
@@ -58,11 +48,11 @@ const ExternalurlSingleButton = function ExternalurlSingleButton(options = {}) {
       });
       exUrlBtn = Button({
         cls: 'o-measure padding-small margin-bottom-smaller icon-smaller rounded light box-shadow',
+        icon: buttonImage,
+        tooltip,
         click() {
           onClick();
-          console.log('clicked');
-        },
-        icon: buttonImage
+        }
       });
       buttons.push(exUrlBtn);
     },
@@ -83,8 +73,6 @@ const ExternalurlSingleButton = function ExternalurlSingleButton(options = {}) {
       this.dispatch('render');
     }
   });
-}
-
-
+};
 
 export default ExternalurlSingleButton;
