@@ -1,10 +1,10 @@
-import Draw from 'ol/interaction/Draw';
+import { createBox } from 'ol/interaction/Draw';
 
 export default (drawType) => {
   const types = {
     box: {
       type: 'Circle',
-      geometryFunction: Draw.createBox()
+      geometryFunction: createBox()
     }
   };
 
