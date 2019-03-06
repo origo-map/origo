@@ -1,21 +1,8 @@
-import { Component, Element as El, Button, dom } from '../../ui';
 import { transform, toLonLat } from 'ol/proj';
+import { Component, Element as El, Button, dom } from '../../ui';
 import replacer from '../../utils/replacer';
 
-
-import { getArea, getLength } from 'ol/sphere';
-import VectorSource from 'ol/source/Vector';
-import VectorLayer from 'ol/layer/Vector';
-import DrawInteraction from 'ol/interaction/Draw';
-import Overlay from 'ol/Overlay';
-import Polygon from 'ol/geom/Polygon';
-import LineString from 'ol/geom/LineString';
-
-import Style from '../../style';
-import StyleTypes from '../../style/styletypes';
-
 const externalurlSeveralButtons = function externalurlSeveralButtons(options = {}) {
-
   const mainbuttonTooltipText = options.tooltipText || 'Visa kartan i en external platform';
   const links = options.links;
   let map;
@@ -30,16 +17,16 @@ const externalurlSeveralButtons = function externalurlSeveralButtons(options = {
   function toggleMainButton() {
     if (!isMainButtonActive) {
       document.getElementById(externalUrlMainButton.getId()).classList.add('active');
-      for (let button of subButtons) {
+      subButtons.forEach((button) => {
         document.getElementById(button.getId()).classList.remove('hidden');
-      }
+      });
       document.getElementById(externalUrlMainButton.getId()).classList.remove('tooltip');
       isMainButtonActive = true;
     } else {
       document.getElementById(externalUrlMainButton.getId()).classList.remove('active');
-      for (let button of subButtons) {
+      subButtons.forEach((button) => {
         document.getElementById(button.getId()).classList.add('hidden');
-      }
+      });
       document.getElementById(externalUrlMainButton.getId()).classList.add('tooltip');
       isMainButtonActive = false;
     }
@@ -63,14 +50,13 @@ const externalurlSeveralButtons = function externalurlSeveralButtons(options = {
         }
       });
       buttons.push(externalUrlMainButton);
-
-      for (let link of links) {
+      links.forEach((link) => {
         const tooltipText = link.tooltipText;
         const buttonImage = link.buttonImage || '#fa-external-link';
         const subButton = Button({
           cls: 'o-measure-length padding-small margin-bottom-smaller icon-smaller rounded light box-shadow hidden',
           icon: buttonImage,
-          tooltipText: tooltipText,
+          tooltipText,
           tooltipPlacement: 'north',
           click() {
             const mapView = map.getView();
@@ -90,7 +76,7 @@ const externalurlSeveralButtons = function externalurlSeveralButtons(options = {
         });
         buttons.push(subButton);
         subButtons.push(subButton);
-      }
+      });
     },
     onAdd(evt) {
       viewer = evt.target;
@@ -111,11 +97,11 @@ const externalurlSeveralButtons = function externalurlSeveralButtons(options = {
       el = dom.html(htmlString);
       containerElementElement.appendChild(el);
 
-      for (let subButton of subButtons) {
+      subButtons.forEach((subButton) => {
         htmlString = subButton.render();
         el = dom.html(htmlString);
         containerElementElement.appendChild(el);
-      }
+      });
 
       this.dispatch('render');
     }
