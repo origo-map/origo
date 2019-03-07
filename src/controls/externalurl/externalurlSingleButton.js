@@ -9,7 +9,7 @@ const ExternalurlSingleButton = function ExternalurlSingleButton(options = {}) {
   let exUrlBtn;
   let target;
   const buttons = [];
-  const tooltip = options.links[0].tooltipText || options.tooltipText || 'Visa i BlomURBEX';
+  const tooltip = options.links[0].tooltipText || options.tooltipText || 'Visa kartan i en external platform';
   const buttonImage = options.links[0].buttonImage || '#ic_baseline_link_24px';
   const url = options.links[0].url;
   const method = options.links[0].method;
