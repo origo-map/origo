@@ -143,7 +143,9 @@ const Overlays = function Overlays(options) {
   } = {}) {
     const styleName = layer.get('styleName') || null;
     const layerStyle = styleName ? viewer.getStyle(styleName) : undefined;
-    const overlay = Overlay({ layer, style: layerStyle, position });
+    const overlay = Overlay({
+      layer, style: layerStyle, position, viewer
+    });
     const groupName = layer.get('group');
     if (rootGroupNames.includes(groupName)) {
       rootGroup.addOverlay(overlay);

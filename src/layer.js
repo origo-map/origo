@@ -21,6 +21,7 @@ const Layer = function Layer(optOptions, viewer) {
     minResolution: undefined,
     maxResolution: undefined,
     visible: false,
+    removable: undefined,
     type: undefined,
     extent: undefined,
     attributes: undefined,
