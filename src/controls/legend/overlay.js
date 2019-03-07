@@ -149,7 +149,7 @@ const OverlayLayer = function OverlayLayer(options) {
       });
     },
     render() {
-      return `<li id="${this.getId()}" class="${cls}"> ${ButtonsHtml}</li>`;
+      return `<li id="${this.getId()}" class="${cls}">${ButtonsHtml}</li>`;
     }
   });
 };
