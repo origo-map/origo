@@ -31,7 +31,7 @@ If you are planning to contribute code to the project, open a new issue describi
 
 Your pull request should:
 
- * Follow [Airbnb's JavaScript Style Guide](https://github.com/airbnb/javascript/tree/es5-deprecated/es5) for ECMAScript 5.
+ * Follow [Airbnb's JavaScript Style Guide](https://github.com/airbnb/javascript) for ECMAScript 6.
 
  * Target a single issue, or add single item of functionality to Origo.
 
@@ -45,7 +45,7 @@ Your pull request should:
 
 ### Commit messages guidelines
 
-We are using the same guidelines for commit messages as the [OpenLayers project](https://github.com/openlayers/ol3).
+We are using the same guidelines for commit messages as the [OpenLayers project](https://github.com/openlayers/openlayers).
 
 Commit messages should look like:
 

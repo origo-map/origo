@@ -59,18 +59,18 @@ The minimum requirements are:
 
   		   npm install
 
- 3. To start budo, a browserify development server, use:
+ 3. To start webpack-dev-server use:
 
    		  npm start
 
-The server will be available at <http://localhost:9966/>. Budo utilizes LiveReload which means you do not have to refresh the browser page whenever you make a change in your code.
+The server will be available at <http://localhost:9966/>. It utilizes LiveReload which means you do not have to refresh the browser page whenever you make a change in your code.
 
 ### Creating a bundle
 Once you are ready to create a minified bundle, you will use:
 
      npm run build
 
-This will create a bundle called `origo.min.js` in the dist folder. Note that you will need to change the path to the Origo javascript file in the `index.html` file, from `origo.js` to `origo.min.js`, if you wish to run the map using the bundled version.
+This will create a build of Origo in the build folder. Note that you will need to change the path to the Origo javascript file in the `index.html` file, from `origo.js` to `origo.min.js`, if you wish to run the map using the bundled version.
 
 ### Notes
 Guidelines for developing in Origo are available in the [`DEVELOPING.md`](https://github.com/origo-map/origo/blob/master/DEVELOPING.md) file.
