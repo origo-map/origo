@@ -186,11 +186,10 @@ function styleFunction({
   const fn = function fn(feature, resolution) {
     const scale = maputils.resolutionToScale(resolution, projection);
     let styleL;
-    // If size is larger than, it is a cluster
+    // If size is larger than 1, it is a cluster
     const size = clusterStyleList ? feature.get('features').length : 1;
     if (size > 1 && resolution !== resolutions[resolutions.length + 1]) {
       styleL = checkOptions(feature, scale, clusterStyleSettings, clusterStyleList, size.toString());
-      // clusterStyleList[0].setText(size);
     } else {
       styleL = checkOptions(feature, scale, styleSettings, styleList);
     }
