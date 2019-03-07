@@ -47,8 +47,6 @@ const OverlayLayer = function OverlayLayer(options) {
     return !visible;
   };
 
-  const removable = layer.get('removable');
-
   const layerIcon = Button({
     cls: `${headerIconCls} round compact icon-small light relative no-shrink`,
     click() {
@@ -97,7 +95,7 @@ const OverlayLayer = function OverlayLayer(options) {
 
   buttons.push(toggleButton);
 
-  if (removable) {
+  if (layer.get('removable')) {
     removeButton = Button({
       cls: 'round small icon-smaller no-shrink',
       click() {
