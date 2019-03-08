@@ -53,7 +53,7 @@ button.o-disabled:hover [class*=" o-icon-"],
 .o-check-false .o-icon-fa-check,
 .o-icon-expand-false .o-icon-fa-chevron-down,
 .o-icon-expand-true .o-icon-fa-chevron-right,
-.o-search-true #o-search-button,
-.o-search-false #o-search-button-close {
+.o-search-true .o-search-button,
+.o-search-false .o-search-button-close {
 	display: none
 }

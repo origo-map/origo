@@ -1,8 +1,9 @@
-import VectorSource from 'ol/source/vector';
-import VectorLayer from 'ol/layer/vector';
+import VectorSource from 'ol/source/Vector';
+import VectorLayer from 'ol/layer/Vector';
 
 // create unmanaged layer
 export default function (features, map) {
+  let sourceLayer;
   const collection = features ? [features] : [];
   const featureLayerStore = new VectorSource({
     features: collection
@@ -15,6 +16,9 @@ export default function (features, map) {
     addFeature: function addFeature(feature) {
       featureLayerStore.addFeature(feature);
     },
+    setSourceLayer: function setSourceLayer(layer) {
+      sourceLayer = layer;
+    },
     getFeatures: function getFeatures() {
       return featureLayerStore.getFeatures();
     },
@@ -23,6 +27,9 @@ export default function (features, map) {
     },
     getFeatureStore: function getFeatureStore() {
       return featureLayerStore;
+    },
+    getSourceLayer: function getSourceLayer() {
+      return sourceLayer;
     },
     clear: function clear() {
       featureLayerStore.clear();

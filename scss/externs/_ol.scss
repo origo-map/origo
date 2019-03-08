@@ -11,7 +11,6 @@
   -webkit-tap-highlight-color: rgba(0,0,0,0);
 }
 .ol-control {
-  position: absolute;
   border-radius: 4px;
   background-color: #fff;
   -webkit-box-shadow: 0 2px 5px rgba(0,0,0,0.45);
@@ -91,10 +90,9 @@ button.ol-zoom-out {
   background: #ffffff;
   background: rgba(255,255,255,0.7);
   border-radius: 4px;
-  bottom: .5rem;
-  right: .5rem;
+  display: inline-block;
   padding: 2px;
-  position: absolute;
+  position: relative;
 }
 .ol-scale-line-inner {
   border-bottom-right-radius: 3px;
@@ -128,7 +126,7 @@ button.ol-zoom-out {
   position: absolute;
   right: .5em;
   max-width: calc(100% - 3.5em);
-  z-index: 2;
+  z-index: 30;
 }
 .ol-attribution ul {
   margin: 0;
@@ -246,4 +244,12 @@ button.ol-zoom-out {
   height: 1.5em;
   width: 1.5em;
 }
+}
+
+&[class*=#{$media-l}] {
+  .ol-attribution {
+    bottom: 1rem;
+    left: 1rem;
+    right: initial;
+  }
 }

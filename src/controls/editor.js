@@ -1,45 +1,71 @@
-import $ from 'jquery';
-import viewer from '../viewer';
-import utils from '../utils';
+import { Component, Button, dom } from '../ui';
 import editorToolbar from './editor/editortoolbar';
 
-let $editorButton;
+const Editor = function Editor(options = {}) {
+  const {
+    autoForm = false,
+    autoSave = true,
+    isActive = true
+  } = options;
+  let editorButton;
+  let target;
 
-function bindUIActions() {
-  $editorButton.on('click', (e) => {
-    $('.o-map').first().trigger({
-      type: 'enableInteraction',
-      interaction: 'editor'
-    });
-    this.blur();
-    e.stopPropagation();
-    e.preventDefault();
+  const toggleState = function toggleState() {
+    if (editorButton.getState() === 'initial') {
+      editorButton.dispatch('change', { state: 'active' });
+    } else {
+      editorButton.dispatch('change', { state: 'initial' });
+    }
+  };
+
+  const onActive = function onActive() {
+    editorToolbar.toggleToolbar(true);
+  };
+
+  const onInitial = function onInitial() {
+    editorToolbar.toggleToolbar(false);
+  };
+
+  return Component({
+    name: 'editor',
+    onAdd(evt) {
+      const viewer = evt.target;
+      target = `${viewer.getMain().getMapTools().getId()}`;
+      const editableLayers = viewer.getLayersByProperty('editable', true, true);
+      const currentLayer = options.defaultLayer || editableLayers[0];
+      const toolbarOptions = Object.assign({}, options, {
+        autoForm,
+        autoSave,
+        currentLayer,
+        editableLayers
+      });
+      this.addComponent(editorButton);
+      this.on('render', this.onRender);
+      this.render();
+      editorToolbar.init(toolbarOptions, viewer);
+    },
+    onInit() {
+      const state = isActive ? 'active' : 'initial';
+      editorButton = Button({
+        cls: 'o-menu-button padding-small icon-smaller rounded light box-shadow',
+        click() {
+          toggleState();
+        },
+        icon: '#ic_edit_24px',
+        state,
+        methods: {
+          active: onActive,
+          initial: onInitial
+        }
+      });
+    },
+    render() {
+      const htmlString = editorButton.render();
+      const el = dom.html(htmlString);
+      document.getElementById(target).appendChild(el);
+      this.dispatch('render');
+    }
   });
-}
+};
 
-function render() {
-  const el = utils.createListButton({
-    id: 'o-editor',
-    iconCls: 'o-icon-fa-pencil',
-    src: '#fa-pencil',
-    text: 'Redigera'
-  });
-  $('#o-menutools').append(el);
-}
-
-function init(optOptions) {
-  const options = optOptions || {};
-  const editableLayers = viewer.getLayersByProperty('editable', true, true);
-  if (editableLayers.length) {
-    options.editableLayers = editableLayers;
-  }
-  options.autoSave = 'autoSave' in options ? options.autoSave : true;
-  options.autoForm = 'autoForm' in options ? options.autoForm : false;
-  options.currentLayer = options.defaultLayer || options.editableLayers[0];
-  editorToolbar.init(options);
-  render();
-  $editorButton = $('#o-editor-button');
-  bindUIActions();
-}
-
-export default { init };
+export default Editor;

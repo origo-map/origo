@@ -8,11 +8,11 @@ function createUrl(prefix, suffix, url) {
   return p + url + s;
 }
 
-export default function (feature, layer) {
+export default function (feature, layer, map) {
   const attributes = feature.getProperties();
   const geometryName = feature.getGeometryName();
   delete attributes[geometryName];
-  let content = '<div><ul>';
+  let content = '<div class="o-identify-content"><ul>';
   let attribute;
   let li = '';
   let title;
@@ -36,7 +36,7 @@ export default function (feature, layer) {
             }
             if (attribute.url) {
               if (feature.get(attribute.url)) {
-                const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.url), feature.getProperties()));
+                const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.url), feature.getProperties(), null, map));
                 val = `<a href="${url}" target="_blank">
                   ${feature.get(attribute.name)}
                   </a>`;
@@ -46,14 +46,14 @@ export default function (feature, layer) {
         } else if (attribute.url) {
           if (feature.get(attribute.url)) {
             const text = attribute.html || attribute.url;
-            const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.url), attributes));
+            const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.url), attributes, null, map));
             val = `<a href="${url}" target="_blank">
               ${text}
               </a>`;
           }
         } else if (attribute.img) {
           if (feature.get(attribute.img)) {
-            const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.img), attributes));
+            const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.img), attributes, null, map));
             const attribution = attribute.attribution ? `<div class="o-image-attribution">${attribute.attribution}</div>` : '';
             val = `<div class="o-image-container">
               <img src="${url}">${attribution}
@@ -63,7 +63,7 @@ export default function (feature, layer) {
           val = replacer.replace(attribute.html, attributes, {
             helper: geom,
             helperArg: feature.getGeometry()
-          });
+          }, map);
         }
 
         const cls = ` class="${attribute.cls}" ` || '';

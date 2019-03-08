@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import GeoJSONFormat from 'ol/format/geojson';
+import GeoJSONFormat from 'ol/format/GeoJSON';
 import verifyFeatureIds from './verifyfeatureids';
 
 const geojson = {};

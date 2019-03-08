@@ -1,8 +1,6 @@
-import viewer from '../viewer';
-import featureinfo from '../featureinfo';
 import urlparser from '../utils/urlparser';
 
-const getPin = featureinfo.getPin;
+let getPin;
 const permalinkStore = {};
 
 function getSaveLayers(layers) {
@@ -21,13 +19,19 @@ function getSaveLayers(layers) {
   return saveLayers;
 }
 
-permalinkStore.getState = function getState() {
+permalinkStore.getState = function getState(viewer) {
   const state = {};
   const view = viewer.getMap().getView();
   const layers = viewer.getLayers();
+  const featureinfo = viewer.getFeatureinfo();
+  getPin = featureinfo.getPin;
   state.layers = getSaveLayers(layers);
   state.center = view.getCenter().map(coord => Math.round(coord)).join();
   state.zoom = view.getZoom().toString();
+
+  if (featureinfo.getSelection().id) {
+    state.feature = featureinfo.getSelection().id;
+  }
 
   if (getPin()) {
     state.pin = getPin().getGeometry().getCoordinates().map(coord => Math.round(coord))
@@ -41,7 +45,7 @@ permalinkStore.getState = function getState() {
   return state;
 };
 
-permalinkStore.getUrl = function getUrl() {
+permalinkStore.getUrl = function getUrl(viewer) {
   const url = viewer.getUrl();
   return url;
 };

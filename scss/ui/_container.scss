@@ -1,0 +1,9 @@
+$container-margin: $app-margin * 2;
+.container {
+  display: flex;
+  margin: $container-margin;
+  position: relative;
+  &.no-margin {
+    margin: 0;
+  }
+}

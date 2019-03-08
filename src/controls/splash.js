@@ -1,41 +1,49 @@
-import $ from 'jquery';
-import modal from '../modal';
-import viewer from '../viewer';
+import { Component, Modal } from '../ui';
 
-const defaultTitle = 'Om kartan';
-const defaultContent = '<p></p>';
-const cls = 'o-splash';
-let title;
-let content;
+const Splash = function Splash(options = {}) {
+  const defaultTitle = 'Om kartan';
+  const defaultContent = '';
+  const cls = 'o-splash';
+  let viewer;
 
-
-function getContent(url) {
-  return $.get(url);
-}
-
-function openModal() {
-  modal.createModal('#o-map', {
+  let {
     title,
     content,
-    cls
+    target
+  } = options;
+
+  const {
+    url
+  } = options;
+
+  const createModal = function createModal(modalContent) {
+    return Modal({
+      title,
+      content: modalContent,
+      cls,
+      target
+    });
+  };
+
+  return Component({
+    name: 'splash',
+    onAdd(evt) {
+      viewer = evt.target;
+      target = viewer.getId();
+      if (!title) title = defaultTitle;
+      if (!content) content = defaultContent;
+
+      if (url) {
+        const fullUrl = viewer.getBaseUrl() + url;
+        const req = new Request(`${fullUrl}`);
+        fetch(req).then(response => response.text().then((text) => {
+          this.addComponent(createModal(text));
+        }));
+      } else {
+        this.addComponent(createModal(content));
+      }
+    }
   });
-  modal.showModal();
-}
+};
 
-function init(optOptions) {
-  const options = optOptions || {};
-  title = options.title || defaultTitle;
-  if (options.url) {
-    const url = viewer.getBaseUrl() + options.url;
-    getContent(url)
-      .done((data) => {
-        content = data;
-        openModal();
-      });
-  } else {
-    content = options.content || defaultContent;
-    openModal();
-  }
-}
-
-export default { init };
+export default Splash;
