@@ -6,6 +6,7 @@ import Map from './map';
 import proj from './projection';
 import MapSize from './utils/mapsize';
 import Featureinfo from './featureinfo';
+import Selectionmanager from './selectionmanager';
 import maputils from './maputils';
 import Layer from './layer';
 import Main from './components/main';
@@ -18,6 +19,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
   let map;
   let tileGrid;
   let featureinfo;
+  let selectionmanager;
 
   let {
     projection
@@ -429,6 +431,10 @@ const Viewer = function Viewer(targetOption, options = {}) {
       featureinfoOptions.viewer = this;
       featureinfo = Featureinfo(featureinfoOptions);
       this.addComponent(featureinfo);
+
+      selectionmanager = Selectionmanager(featureinfoOptions);
+      this.addComponent(selectionmanager);
+      
       this.addControls();
     },
     render() {
