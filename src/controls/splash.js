@@ -2,7 +2,7 @@ import { Component, Modal } from '../ui';
 
 const Splash = function Splash(options = {}) {
   const defaultTitle = 'Om kartan';
-  const defaultContent = '<p></p>';
+  const defaultContent = '';
   const cls = 'o-splash';
   let viewer;
 
