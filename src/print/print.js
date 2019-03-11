@@ -70,7 +70,7 @@ function convertToMapfishOptions(options) {
 	// build legend objects and add to mapfishconfig
 	var legendArray = buildLegend(layers.filter(function(layer) {return (layer.get('name').indexOf("_bk_") == -1) } )); //TODO: Make it more user configurable
 	//Sets layer limit to 12 in legend
-	legendArray = legendArray.filter(function(legend, index){return index < 12})
+	legendArray = legendArray.filter(function(legend, index){return index < 18})
 
 	legendArray.forEach(function(obj) {
 		if(obj) mapfishOptions.legends[0].classes.push(obj);
@@ -94,6 +94,7 @@ function convertToMapfishOptions(options) {
 }
 
 function buildLegend(layers) {
+	var themeLayers = [];
 	var legendObjects = layers.reduce(function(result, layer) {
 		const type = layer.get('type') || "";
         switch (type.toUpperCase()) {
@@ -102,16 +103,8 @@ function buildLegend(layers) {
 				var url = fetchSourceUrl(layer);
 				var name = layer.get('name');
 				//special case for theme layers
-				if(layer.get('theme') == true){
-					var subLayer = layer.get('sublayers');
-					for(var i = 0; i < subLayer.length; i++){
-						var subName = subLayer[i].name;
-						var rule = subLayer[i].rule;
-						result.push({
-							name : subName, 
-							icons: [url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&RULE='+ rule +'&SCALE=1&legend_options=dpi:400'] 
-						})
-					}
+				if(layer.get('theme') == true || layer.get('ArcGIStheme') == true){
+					themeLayers.push(layer);
 				//special case for grouped layers
 				}else if(layer.get('grouplayer') == true){
 					var subLayer = layer.get('sublayers');
@@ -129,7 +122,7 @@ function buildLegend(layers) {
 				}else{
 					result.push({
 						name: layer.get('title'),
-						icons: [ url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&SCALE=1&legend_options=dpi:400']
+						icons: [url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&SCALE=1&legend_options=dpi:400']
 					})
 				}
 				return result;
@@ -146,6 +139,40 @@ function buildLegend(layers) {
             break;
         }
 	},[]);
+
+	//handle the cases for themelayers and add to same array as the rest of the layers
+	//handle after to make sure any single layers is added before every theme layer
+	themeLayers.forEach(function (layer, index) {
+		var spaceLeft = 18 - legendObjects.length;
+		var subLayers = layer.get("sublayers");
+		var url = fetchSourceUrl(layer);
+		var name = layer.get("name");
+		//Only add the theme layer if theres place for the whole theme
+		if((subLayers.length+1) <= spaceLeft){
+			//newline for some separation between theme layers
+			legendObjects.push({ name : "\n"+layer.get('title') });
+			if(layer.get('theme') == true){
+				for(var i = 0; i < subLayers.length; i++){
+					var subName = subLayers[i].name;
+					var rule = subLayers[i].rule;
+					legendObjects.push({
+						name : subName, 
+						icons: [url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&RULE='+ rule +'&SCALE=1&legend_options=dpi:400'] 
+					});
+				};
+			}	
+			else if(layer.get('ArcGIStheme') == true){
+				for(var i = 0; i < subLayers.length; i++){
+					var subName = subLayers[i].name;
+					var subUrl = subLayers[i].url;
+					legendObjects.push({
+						name : subName, 
+						icons: [subUrl] 
+					});
+				}
+			}
+		}
+	});
 	
     return legendObjects;
 }
