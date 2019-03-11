@@ -1,0 +1,209 @@
+
+.sidebarcontainer {
+    position: absolute;
+    // margin-right: 2rem;
+    // height: 10rem;
+    width: 320px;
+    top: 1em;
+    right: 15em;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0px 0px 12px #888888;
+  }
+   
+  /** 
+   * ============ Urval ==============
+   */
+  
+  .urvalcontainer {
+    padding: 1em 1em 1em 2em;
+    font-size: 12px;
+    font-weight: bold;
+    border-bottom: 1px solid #d9d9d9;
+  }
+  
+  .urval-textnode-container {
+    margin-bottom: 0.5em;
+  }
+  
+  .urvalelement {
+    display: inline-block;
+    padding: 0.5em 0;
+    font-weight: normal;
+    cursor: pointer;
+    margin-right: 1em;
+    border-bottom: 3px solid white;
+  }
+  
+  .selectedurvalelement {
+    border-bottom: 3px solid #d9d9d9;
+  }
+  
+  .closebutton-svg-container {
+    position: absolute;
+    top: 1em;
+    right: 1em;
+    height: 1.2em;
+    width: 1.2em;
+    cursor: pointer;
+  }
+  
+  .closebutton-svg {
+    height: 100%;
+    width: 100%;
+    fill: rgb(77, 77, 77);
+  }
+  
+  /** 
+   * ============ List ==============
+   */
+  
+  .listcontainer {
+    font-size: 12px;
+    font-weight: normal;
+    max-height: 40em;
+    overflow-y: scroll;
+    margin-right: 0.5em;
+    scroll-behavior: smooth;
+  }
+  
+  .removelistelement-svg-container {
+    display: inline-block;
+    height: 1em;
+    width: 1em;
+    padding: 0.5em;
+    cursor: pointer;
+    vertical-align: top;
+  }
+  
+  .removelistelement-svg {
+    height: 100%;
+    width: 100%;
+    fill: rgba(204, 0, 0, 0.8);
+  }
+  
+  .listelement-content-container {
+    display: inline-block;
+    width: 85%;
+    border-bottom: 1px solid #d9d9d9;
+    padding: 0.5em;
+    cursor: pointer;
+  }
+  
+  .expandlistelement-svg {
+    height: 100%;
+    width: 100%;
+    fill: rgb(100, 100, 100);
+  }
+  
+  .expandlistelement-svg-container {
+    height: 1em;
+    width: 1em;
+    float: right;
+    transition: 0.5s;
+    // margin-top: 0.5em; 
+    // In case the seceonf attribute is not definded for a feature or takes more than on line setting margin-top cause that it becamoes heterogeneous.
+    // It is better to leave the expand arrow to stay always up top because we never know how much height an element is going to have.
+  }
+  
+  .rotated {
+    -ms-transform: rotate(90deg); /* IE 9 */
+    -webkit-transform: rotate(90deg); /* Safari */
+    transform: rotate(90deg);
+    transition: 0.5s;
+    -webkit-transition: .5s;
+    -moz-transition: .5s;   
+    -ms-transition: .5s;   
+    -o-transition: .5s;
+  }
+  
+  .o-identify-content {
+    display: inline-block;
+    width: 235px; // bredd måste sättas annars expand ikonen faller ner i ie och edge.
+  }
+  
+  .folded {
+    max-height: 0px;
+    overflow: hidden;
+    transition: max-height .5s;
+    -webkit-transition: max-height .5s;
+    -moz-transition: max-height .5s;   
+    -ms-transition: max-height .5s;   
+    -o-transition: max-height .5s;
+  }
+  
+  .unfolded {
+    max-height: 5em;
+    overflow: hidden;
+    transition: max-height 1s;
+    -webkit-transition: max-height 1s;
+    -moz-transition: max-height 1s;   
+    -ms-transition: max-height 1s;   
+    -o-transition: max-height 1s;
+  }
+  
+  .highlighted {
+    background-color: whitesmoke;
+    transition: background-color 0.5s;
+    -webkit-transition: background-color 0.5s;
+    -moz-transition: background-color 0.5s;
+    -ms-transition: background-color 0.5s;
+    -o-transition: background-color 0.5s;
+    border-radius: 0 1em 1em 0;
+  }
+  
+  /** 
+   * ============ Export ==============
+   */
+  
+  .exportcontainer {
+    padding-left: 2em;
+    font-size: 12px;
+    font-weight: normal;
+    border-top: 1px solid #d9d9d9;
+  }
+  
+  .export-svg-container {
+    display: inline-block;
+    height: 1em;
+    width: 1em;
+    // padding: 0.5em 1em;
+  }
+  
+  .export-svg {
+    height: 100%;
+    width: 100%;
+    fill: dimgray;
+  }
+  
+  .export-textnode-container {
+    display: inline-block;
+    height: 1em;
+    padding: 0.5em;
+    -ms-transform: translateY(-1px); /* IE 9 */
+    -webkit-transform: translateY(-1px); /* Safari */
+    transform: translateY(-1px);
+    cursor: pointer;
+  }
+  
+  .hidden {
+    display: none;
+  }
+  
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    // box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    // -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    // border-radius: 4px;
+    // background-color: gray;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: #a6a6a6;
+    // -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+    // box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+  }

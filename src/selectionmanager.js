@@ -15,7 +15,7 @@ import Style from './style';
 import StyleTypes from './style/styletypes';
 
 const styleTypes = StyleTypes();
-const multiselectStyleOptions = styleTypes.getStyle('selection');
+const multiselectStyleOptions = styleTypes.getStyle('multiselection');
 
 const Selectionmanager = function Selectionmanager(options = {}) {
   const {
@@ -40,12 +40,13 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   let urval;
   let map;
   let infowindow;
-
+  
+  
   const isInfowindow = options.hasOwnProperty('infowindow') ? options.infowindow === 'infowindow' : false;
   const pinStyle = Style.createStyleRule(pinStyleOptions)[0];
   const selectionStyles = selectionStylesOptions ? Style.createGeometryStyle(selectionStylesOptions) : Style.createEditStyle();
-  let savedPin = savedPinOptions ? maputils.createPointFeature(savedPinOptions, pinStyle) : undefined;
-  const savedFeature = savedPin || savedSelection || undefined;
+  // let savedPin = savedPinOptions ? maputils.createPointFeature(savedPinOptions, pinStyle) : undefined;
+  // const savedFeature = savedPin || savedSelection || undefined;
 
   function addItem(item) {
     if (alreadyExists(item)) {
@@ -129,9 +130,9 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   
   function featureStyler(feature) {
     if (feature.get('state') === 'selected') {
-      return style.createStyleRule(multiselectStyleOptions.highlighted);
+      return Style.createStyleRule(multiselectStyleOptions.highlighted);
     } else {
-      return style.createStyleRule(multiselectStyleOptions.selected);
+      return Style.createStyleRule(multiselectStyleOptions.selected);
     }
   }
   
@@ -264,14 +265,13 @@ const Selectionmanager = function Selectionmanager(options = {}) {
       runPolyfill();
       selectedItems = new Collection([], { unique: true });
       urval = new Map();
-      // infowindow = infowindowManager.init(options.infowindowOptions ? options.infowindowOptions : {});
       selectedItems.on('add', onItemAdded);
       selectedItems.on('remove', onItemRemoved);
     },
     onAdd(e) {
       viewer = e.target;
       map = viewer.getMap();
-      console.log('selection manager added');
+      infowindow = infowindowManager.init(options);
     }
   });
 };

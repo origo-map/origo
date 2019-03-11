@@ -241,14 +241,14 @@ const Featureinfo = function Featureinfo(options = {}) {
     const map = viewer.getMap();
     if (state) {
       map.on(clickEvent, onClick);
-    } else {
+    } else {      
       clear();
       map.un(clickEvent, onClick);
     }
   };
 
   // jQuery Events
-  const onEnableInteraction = function onEnableInteraction(e) {
+  const onEnableInteraction = function onEnableInteraction(e) {    
     if (e.interaction === 'featureInfo') {
       setActive(true);
     } else {
@@ -257,7 +257,7 @@ const Featureinfo = function Featureinfo(options = {}) {
   };
 
   // ES6 Events
-  const onToggleInteraction = function onToggleInteraction(e) {
+  const onToggleInteraction = function onToggleInteraction(e) {    
     if (e.detail === 'featureInfo') {
       setActive(true);
     } else {

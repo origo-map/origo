@@ -99,6 +99,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
   const getFeatureinfo = () => featureinfo;
 
+  const getSelectionManager = () => selectionmanager;
+
   const getMapName = () => mapName;
 
   const getTileGrid = () => tileGrid;
@@ -491,7 +493,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getUrl,
     removeGroup,
     removeOverlays,
-    zoomToExtent
+    zoomToExtent,
+    getSelectionManager
   });
 };
 

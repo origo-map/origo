@@ -1,7 +1,3 @@
-import $ from 'jquery';
-import selectionManager from './selectionmanager';
-import viewer from './viewer';
-
 let mainContainer;
 let urvalContainer;
 let listContainer;
@@ -10,8 +6,9 @@ let urvalElements;
 let expandableContents;
 let exportOptions;
 let activeLayer;
+let selectionManager;
 
-function render() {
+function render(viewerId) {
     mainContainer = document.createElement('div');
     mainContainer.classList.add('sidebarcontainer');
     urvalContainer = document.createElement('div');
@@ -21,12 +18,15 @@ function render() {
     const urvalTextNode = document.createTextNode('Urval');
     urvalTextNodeContainer.appendChild(urvalTextNode);
     urvalContainer.appendChild(urvalTextNodeContainer);
-    const closeButtonSvg = createSvgElement('fa-window-close', 'closebutton-svg');
+    const closeButtonSvg = createSvgElement('ic_close_24px', 'closebutton-svg');
     closeButtonSvg.addEventListener('click', (e) => {
-        $('.o-map').trigger({
-            type: 'enableInteraction',
-            interaction: 'featureInfo'
-        });
+        document.dispatchEvent(new CustomEvent('infowindowclosed', {
+            bubbles: true
+        }));
+        document.dispatchEvent(new CustomEvent('toggleInteraction', {
+            bubbles: true,
+            detail: 'featureInfo'
+        }));
     });
     urvalContainer.appendChild(closeButtonSvg);
     listContainer = document.createElement('div');
@@ -46,7 +46,8 @@ function render() {
     mainContainer.appendChild(urvalContainer);
     mainContainer.appendChild(listContainer);
     mainContainer.appendChild(exportContainer);
-    const parentElement = document.getElementById('o-map');
+
+    const parentElement = document.getElementById(viewerId);
     parentElement.appendChild(mainContainer);
     mainContainer.classList.add('hidden');
 }
@@ -60,7 +61,6 @@ function handleExport() {
     if (exportOptions.layerSpecificExport) {
         layerSpecificExportOptions = exportOptions.layerSpecificExport.find(i => i.layer === activeLayer);
     }
-    console.log(layerSpecificExportOptions);
     if (layerSpecificExportOptions) {
         console.log('spesific Exporting layer ' + activeLayer);
 
@@ -77,14 +77,14 @@ function handleExport() {
         const data = features.map(f => {
             const obj = f.getProperties();
             console.log(Object.keys(obj));
-            
+
             delete obj.geom;
             return obj;
         });
-        
+
         console.log(data);
         console.log(layerAttributes);
-        
+
         fetch(simpleExportUrl, {
             method: 'POST', // or 'PUT'
             body: JSON.stringify(data), // data can be `string` or {object}!
@@ -102,8 +102,6 @@ function handleExport() {
         console.log('layer ' + activeLayer + ' cannot be exported!');
 
     }
-
-
 }
 
 function createUrvalElement(layerName, layerTitle) {
@@ -354,13 +352,17 @@ function showInfowindow() {
 
 function init(options) {
 
-    exportOptions = options.export || {};
+
+    selectionManager = options.viewer.getSelectionManager();
+
+    const infowindowOptions = options.infowindowOptions ? options.infowindowOptions : {};
+    exportOptions = infowindowOptions.export || {};
 
     sublists = new Map();
     urvalElements = new Map();
     expandableContents = new Map();
 
-    render();
+    render(options.viewer.getId());
 
     return {
         createListElement: createListElement,
