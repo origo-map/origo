@@ -26,7 +26,6 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     pinsStyle: pinStyleOptions = styleTypes.getStyle('pin'),
     savedPin: savedPinOptions,
     savedSelection,
-    selectionStyles: selectionStylesOptions,
     showOverlay = true
   } = options;
 
@@ -43,8 +42,8 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   
   
   const isInfowindow = options.hasOwnProperty('infowindow') ? options.infowindow === 'infowindow' : false;
-  const pinStyle = Style.createStyleRule(pinStyleOptions)[0];
-  const selectionStyles = selectionStylesOptions ? Style.createGeometryStyle(selectionStylesOptions) : Style.createEditStyle();
+  // const pinStyle = Style.createStyleRule(pinStyleOptions)[0];
+  // const selectionStyles = selectionStylesOptions ? Style.createGeometryStyle(selectionStylesOptions) : Style.createEditStyle();
   // let savedPin = savedPinOptions ? maputils.createPointFeature(savedPinOptions, pinStyle) : undefined;
   // const savedFeature = savedPin || savedSelection || undefined;
 
@@ -70,6 +69,9 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   }
   
   function highlightItem(item) {
+    
+    console.log('highlighting item');
+    
     const featureId = item.getFeature().getId();
     highlightFeatureById(featureId);
     infowindow.showSelectedList(item.getLayer().get('name'));
@@ -79,6 +81,8 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   }
   
   function addOrHighlightItem(item) {
+    console.log('add or highlighting item');
+
     if (alreadyExists(item)) {
       // highlight
       highlightItem(item);
@@ -154,8 +158,9 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     const sum = urval.get(layerName).getFeatures().length;
     infowindow.updateUrvalElementText(layerName, layerTitle, sum);
   
-    if (isInfowindow)
+    if (isInfowindow) {
       infowindow.show();
+    }    
   }
   
   function onItemRemoved(event) {

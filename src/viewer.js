@@ -431,11 +431,12 @@ const Viewer = function Viewer(targetOption, options = {}) {
         });
       }
       featureinfoOptions.viewer = this;
-      featureinfo = Featureinfo(featureinfoOptions);
-      this.addComponent(featureinfo);
-
+      
       selectionmanager = Selectionmanager(featureinfoOptions);
       this.addComponent(selectionmanager);
+
+      featureinfo = Featureinfo(featureinfoOptions);
+      this.addComponent(featureinfo);
       
       this.addControls();
     },

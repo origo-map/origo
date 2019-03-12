@@ -22,8 +22,9 @@ const Featureinfo = function Featureinfo(options = {}) {
     pinsStyle: pinStyleOptions = styleTypes.getStyle('pin'),
     savedPin: savedPinOptions,
     savedSelection,
+    // const selectionStylesOptions = options.selectionStyles
     selectionStyles: selectionStylesOptions,
-    showOverlay = true
+    showOverlay = true,
   } = options;
 
   let identifyTarget;
@@ -32,63 +33,78 @@ const Featureinfo = function Featureinfo(options = {}) {
   let popup;
   let selectionLayer;
   let viewer;
+  let selectionManager;
 
   const pinStyle = Style.createStyleRule(pinStyleOptions)[0];
   const selectionStyles = selectionStylesOptions ? Style.createGeometryStyle(selectionStylesOptions) : Style.createEditStyle();
   let savedPin = savedPinOptions ? maputils.createPointFeature(savedPinOptions, pinStyle) : undefined;
   const savedFeature = savedPin || savedSelection || undefined;
+  const infowindow = 'infowindow' in options ? options.infowindow : 'overlay';
 
-  if (showOverlay) {
-    identifyTarget = 'overlay';
-  } else {
+  identifyTarget = infowindow;
+  if (identifyTarget === 'sidebar') {
     sidebar.init();
-    identifyTarget = 'sidebar';
   }
+
+  // if (showOverlay) {
+  //   identifyTarget = 'overlay';
+  // } else {
+  //   sidebar.init();
+  //   identifyTarget = 'sidebar';
+  // }
 
   const clear = function clear() {
     selectionLayer.clear();
+    selectionManager.clearSelection();
     sidebar.setVisibility(false);
     if (overlay) {
       viewer.removeOverlays(overlay);
     }
   };
 
+  // TODO: direct access to feature and layer should be converted to getFeature and getLayer methods on currentItem
   const callback = function callback(evt) {
-    const currentItem = evt.item.index;
-    if (currentItem !== null) {
-      const clone = items[currentItem].feature.clone();
-      clone.setId(items[currentItem].feature.getId());
+    const currentItemIndex = evt.item.index;
+    if (currentItemIndex !== null) {
+      let currentItem = items[currentItemIndex];
+      const clone = currentItem.feature.clone();
+      clone.setId(currentItem.feature.getId());
       selectionLayer.clearAndAdd(
         clone,
-        selectionStyles[items[currentItem].feature.getGeometry().getType()]
+        selectionStyles[currentItem.feature.getGeometry().getType()]
       );
       let featureinfoTitle;
       let title;
       let layer;
-      if (items[currentItem].layer) {
-        if (typeof items[currentItem].layer === 'string') {
-          layer = viewer.getLayer(items[currentItem].layer);
+
+      if (currentItem.layer) {
+        if (typeof currentItem.layer === 'string') {
+          // bcuz in getfeatureinfo -> getFeaturesFromRemote only name of the layer is set on the object! (old version before using SelectedItems class)
+          layer = viewer.getLayer(currentItem.layer);
         } else {
-          layer = viewer.getLayer(items[currentItem].layer.get('name'));
+          layer = viewer.getLayer(currentItem.layer.get('name'));
         }
       }
+      // This is very stange: layer above is only a string, could not possibly have method.
       if (layer) {
         featureinfoTitle = layer.getProperties().featureinfoTitle;
       }
 
       if (featureinfoTitle) {
-        const featureProps = items[currentItem].feature.getProperties();
+        const featureProps = currentItem.feature.getProperties();
         title = replacer.replace(featureinfoTitle, featureProps);
         if (!title) {
-          title = items[currentItem].title ? items[currentItem].title : items[currentItem].name;
+          // title = currentItem.title ? currentItem.title : currentItem.name;
+          title = currentItem.getLayer().get('title') ? currentItem.getLayer().get('title') : currentItem.getLayer().get('name');
         }
       } else {
-        title = items[currentItem].title ? items[currentItem].title : items[currentItem].name;
+        // title = currentItem.title ? currentItem.title : currentItem.name;
+        title = currentItem.getLayer().get('title') ? currentItem.getLayer().get('title') : currentItem.getLayer().get('name');
       }
-      selectionLayer.setSourceLayer(items[currentItem].layer);
+      selectionLayer.setSourceLayer(currentItem.layer);
       if (identifyTarget === 'overlay') {
         popup.setTitle(title);
-      } else {
+      } else if (identifyTarget === 'sidebar') {
         sidebar.setTitle(title);
       }
     }
@@ -147,49 +163,60 @@ const Featureinfo = function Featureinfo(options = {}) {
     const map = viewer.getMap();
     items = identifyItems;
     clear();
-    let content = items.map(i => i.content).join('');
+    let content = items.map(i => i.getContent()).join('');
     content = `<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme">${content}</div></div>`;
     switch (target) {
       case 'overlay':
-      {
-        popup = Popup(`#${viewer.getId()}`);
-        popup.setContent({
-          content,
-          title: items[0].title
-        });
-        popup.setVisibility(true);
-        initCarousel('#o-identify-carousel');
-        const popupHeight = $('.o-popup').outerHeight() + 20;
-        $('#o-popup').height(popupHeight);
-        overlay = new Overlay({
-          element: popup.getEl(),
-          autoPan: true,
-          autoPanAnimation: {
-            duration: 500
-          },
-          autoPanMargin: 40,
-          positioning: 'bottom-center'
-        });
-        const geometry = items[0].feature.getGeometry();
-        const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
-        map.addOverlay(overlay);
-        overlay.setPosition(coord);
-        break;
-      }
+        {
+          popup = Popup(`#${viewer.getId()}`);
+          popup.setContent({
+            content,
+            // title: items[0].title
+            title: items[0].getLayer().get('title')
+          });
+          popup.setVisibility(true);
+          initCarousel('#o-identify-carousel');
+          const popupHeight = $('.o-popup').outerHeight() + 20;
+          $('#o-popup').height(popupHeight);
+          overlay = new Overlay({
+            element: popup.getEl(),
+            autoPan: true,
+            autoPanAnimation: {
+              duration: 500
+            },
+            autoPanMargin: 40,
+            positioning: 'bottom-center'
+          });
+          const geometry = items[0].getFeature().getGeometry();
+          const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
+          map.addOverlay(overlay);
+          overlay.setPosition(coord);
+          break;
+        }
       case 'sidebar':
-      {
-        sidebar.setContent({
-          content,
-          title: items[0].title
-        });
-        sidebar.setVisibility(true);
-        initCarousel('#o-identify-carousel');
-        break;
-      }
+        {
+          sidebar.setContent({
+            content,
+            title: items[0].getLayer().get('title')
+          });
+          sidebar.setVisibility(true);
+          initCarousel('#o-identify-carousel');
+          break;
+        }
+      case 'infowindow':
+        {
+          if (items.length === 1) {
+            selectionManager.addOrHighlightItem(items[0]);
+          } else if (items.length > 1) {
+            selectionManager.addItems(items);
+          }
+          break;
+        }
+
       default:
-      {
-        break;
-      }
+        {
+          break;
+        }
     }
   };
 
@@ -221,7 +248,7 @@ const Featureinfo = function Featureinfo(options = {}) {
           if (result.length > 0) {
             selectionLayer.clear();
             render(result, identifyTarget, evt.coordinate);
-          } else if (selectionLayer.getFeatures().length > 0) {
+          } else if (selectionLayer.getFeatures().length > 0 || (identifyTarget === 'infowindow' && selectionManager.getNumberOfSelectedItems() > 0)) {
             clear();
           } else if (pinning) {
             const resolution = map.getView().getResolution();
@@ -241,14 +268,14 @@ const Featureinfo = function Featureinfo(options = {}) {
     const map = viewer.getMap();
     if (state) {
       map.on(clickEvent, onClick);
-    } else {      
+    } else {
       clear();
       map.un(clickEvent, onClick);
     }
   };
 
   // jQuery Events
-  const onEnableInteraction = function onEnableInteraction(e) {    
+  const onEnableInteraction = function onEnableInteraction(e) {
     if (e.interaction === 'featureInfo') {
       setActive(true);
     } else {
@@ -257,7 +284,7 @@ const Featureinfo = function Featureinfo(options = {}) {
   };
 
   // ES6 Events
-  const onToggleInteraction = function onToggleInteraction(e) {    
+  const onToggleInteraction = function onToggleInteraction(e) {
     if (e.detail === 'featureInfo') {
       setActive(true);
     } else {
@@ -276,6 +303,7 @@ const Featureinfo = function Featureinfo(options = {}) {
       viewer = e.target;
       const map = viewer.getMap();
       selectionLayer = featurelayer(savedFeature, map);
+      selectionManager = viewer.getSelectionManager();
       map.on(clickEvent, onClick);
       $(document).on('enableInteraction', onEnableInteraction);
       document.addEventListener('toggleInteraction', onToggleInteraction);

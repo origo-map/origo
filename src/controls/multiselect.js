@@ -1,7 +1,7 @@
 import { getArea, getLength } from 'ol/sphere';
 import Polygon from 'ol/geom/Polygon';
 import LineString from 'ol/geom/LineString';
-import { Component, Element as El, Button, dom } from '../ui';
+import { Component, Element as El, Button, dom, Modal } from '../ui';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import DrawInteraction, { createBox } from 'ol/interaction/Draw';
@@ -71,6 +71,44 @@ const Multiselect = function Multiselect(options = {}) {
     isActive = state;
   }
 
+  function toggleMultiselection() {
+    if (isActive) {
+      document.dispatchEvent(new CustomEvent('toggleInteraction', {
+        bubbles: true,
+        detail: 'featureInfo'
+      }));
+      disableInteraction();
+    } else {
+      document.dispatchEvent(new CustomEvent('toggleInteraction', {
+        bubbles: true,
+        detail: 'multiselection'
+      }));
+      enableInteraction();
+    }
+  }
+
+  function enableInteraction() {
+    document.getElementById(multiselectButton.getId()).classList.add('active');
+    if (clickSelection) {
+      document.getElementById(clickSelectionButton.getId()).classList.remove('hidden');
+    }
+    if (boxSelection) {
+      document.getElementById(boxSelectionButton.getId()).classList.remove('hidden');
+    }
+    if (circleSelection) {
+      document.getElementById(circleSelectionButton.getId()).classList.remove('hidden');
+    }
+    if (bufferSelection) {
+      document.getElementById(bufferSelectionButton.getId()).classList.remove('hidden');
+    }
+    document.getElementById(multiselectButton.getId()).classList.remove('tooltip');
+    setActive(true);
+    addInteractions();
+    document.getElementById(defaultButton.getId()).click();
+    // if features are added to selection managaer from featureinfo, this will clear that selection when activating multiselect.
+    // selectionManager.clearSelection();
+  }
+
   function disableInteraction() {
     if (activeButton) {
       document.getElementById(activeButton.getId()).classList.remove('active');
@@ -97,76 +135,38 @@ const Multiselect = function Multiselect(options = {}) {
     setActive(false);
   }
 
-  function enableInteraction() {
-    document.getElementById(multiselectButton.getId()).classList.add('active');
-    if (clickSelection) {
-      document.getElementById(clickSelectionButton.getId()).classList.remove('hidden');
-    }
-    if (boxSelection) {
-      document.getElementById(boxSelectionButton.getId()).classList.remove('hidden');
-    }
-    if (circleSelection) {
-      document.getElementById(circleSelectionButton.getId()).classList.remove('hidden');
-    }
-    if (bufferSelection) {
-      document.getElementById(bufferSelectionButton.getId()).classList.remove('hidden');
-    }
-    document.getElementById(multiselectButton.getId()).classList.remove('tooltip');
-    document.getElementById(defaultButton.getId()).click();
-    setActive(true);
-    addInteractions();
-    // if features are added to selection managaer from featureinfo, this will clear that selection when activating multiselect.
-    // selectionManager.clearSelection();
-  }
-
   function addInteractions() {
 
     clickInteraction = new PointerInteraction({
       handleEvent: fetchFeatures_Click
     });
 
-    // boxInteraction = new DrawInteraction({
-    //   source: selectSource,
-    //   type: 'Circle',
-    //   geometryFunction: createBox()
-    // });
+    boxInteraction = new DrawInteraction({
+      source: selectSource,
+      type: 'Circle',
+      geometryFunction: createBox()
+    });
 
-    // circleInteraction = new DrawInteraction({
-    //   source: selectSource,
-    //   type: 'Circle'
-    // });
+    circleInteraction = new DrawInteraction({
+      source: selectSource,
+      type: 'Circle'
+    });
 
-    // bufferInteraction = new PointerInteraction({
-    //   handleEvent: fetchFeatures_Buffer_click
-    // });
+    bufferInteraction = new PointerInteraction({
+      handleEvent: fetchFeatures_Buffer_click
+    });
 
     map.addInteraction(clickInteraction);
-    // map.addInteraction(boxInteraction);
-    // map.addInteraction(circleInteraction);
-    // map.addInteraction(bufferInteraction);
+    map.addInteraction(boxInteraction);
+    map.addInteraction(circleInteraction);
+    map.addInteraction(bufferInteraction);
 
-    // boxInteraction.on('drawend', fetchFeatures_Box);
-    // circleInteraction.on('drawstart', (evt) => {
-    //   sketch = evt.feature.getGeometry();
-    //   createRadiusLengthTooltip();
-    // });
-    // circleInteraction.on('drawend', fetchFeatures_Circle);
-  }
-
-  function toggleMultiselection() {
-    if (isActive) {
-      document.dispatchEvent(new CustomEvent('toggleInteraction', {
-        bubbles: true,
-        detail: 'featureInfo'
-      }));
-      disableInteraction();
-    } else {
-      document.dispatchEvent(new CustomEvent('toggleInteraction', {
-        bubbles: true,
-        detail: 'multiselection'
-      }));
-      enableInteraction();
-    }
+    boxInteraction.on('drawend', fetchFeatures_Box);
+    circleInteraction.on('drawstart', (evt) => {
+      sketch = evt.feature.getGeometry();
+      createRadiusLengthTooltip();
+    });
+    circleInteraction.on('drawend', fetchFeatures_Circle);
   }
 
   function toggleType(button) {
@@ -266,13 +266,21 @@ const Multiselect = function Multiselect(options = {}) {
     if (layers.length < 1) {
       return;
     }
+    let allItems = [];
     const results = getItemsIntersectingExtent(layers, extent);
     // adding clint features
-    selectionManager.addItems(results.selectedClientItems);
+    allItems = allItems.concat(results.selectedClientItems);
+
     // adding features got from wfs GetFeature
     Promise.all(results.selectedRemoteItemsPromises).then(data => {
       // data is an array containing corresponding array of features for each layer.
-      data.forEach(items => selectionManager.addItems(items));
+      data.forEach(items => allItems = allItems.concat(items));
+      
+      if (allItems.length === 1) {
+        selectionManager.addOrHighlightItem(allItems[0]);
+      } else if (allItems.length > 1) {
+        selectionManager.addItems(allItems);
+      }
     }).catch(err => console.error(err));
   }
 
@@ -290,14 +298,22 @@ const Multiselect = function Multiselect(options = {}) {
     const extent = circle.getExtent();
     const layers = viewer.getQueryableLayers();
 
+    let allItems = [];
     const results = getItemsIntersectingExtent(layers, extent);
 
     // adding clint features
-    selectionManager.addItems(getItemsIntersectingGeometry(results.selectedClientItems, circle));
+    allItems = allItems.concat(getItemsIntersectingGeometry(results.selectedClientItems, circle));
+
     // adding features got from wfs GetFeature
     Promise.all(results.selectedRemoteItemsPromises).then(data => {
       // data is an array containing corresponding arrays of features for each layer.
-      data.forEach(items => selectionManager.addItems(getItemsIntersectingGeometry(items, circle)));
+      data.forEach(items => allItems = allItems.concat(getItemsIntersectingGeometry(items, circle)));
+      
+      if (allItems.length === 1) {
+        selectionManager.addOrHighlightItem(allItems[0]);
+      } else if (allItems.length > 1) {
+        selectionManager.addItems(allItems);
+      }
     });
 
     //Uncomment this to draw the extent on the map for debugging porposes
@@ -310,10 +326,24 @@ const Multiselect = function Multiselect(options = {}) {
     if (evt.type === 'singleclick') {
 
       // Featurinfo in two steps. Concat serverside and clientside when serverside is finished
-      const clientResult = getFeatureInfo.getFeaturesAtPixel(evt, -1);
+      const pixel = evt.pixel;
+      const coordinate = evt.coordinate;
+      const layers = viewer.getQueryableLayers();
+      const clientResult = getFeatureInfo.getFeaturesAtPixel({
+        coordinate,
+        map,
+        pixel,
+        clusterFeatureinfoLevel,
+        hitTolerance
+      }, viewer);
       // Abort if clientResult is false
       if (clientResult !== false) {
-        getFeatureInfo.getFeaturesFromRemote(evt)
+        getFeatureInfo.getFeaturesFromRemote({
+          coordinate,
+          layers,
+          map,
+          pixel
+        }, viewer)
           .done((data) => {
             const serverResult = data || [];
             const result = serverResult.concat(clientResult);
@@ -336,6 +366,78 @@ const Multiselect = function Multiselect(options = {}) {
     return true;
   }
 
+  function createFeatureSelectionModal(features) {
+
+    const featuresList = features.map(f => {
+      const title = f.get('namn') ? f.get('namn') : f.getId();
+      return `<div class="featureSelectorItem" id="${f.getId()}"> ${title} </div>`;
+    });
+
+    return new Promise((resolve, reject) => {
+      const title = 'Du har valt flera objekt:';
+      const content = `<div id="featureSelector"> 
+                        ${featuresList.join('')}
+                      </div>`;
+      const target = viewer.getId();
+      const modal = Modal({
+        title,
+        content,
+        target
+      });
+      const featureSelectors = document.getElementsByClassName('featureSelectorItem');
+      console.log(featureSelectors);
+
+      for (let index = 0; index < featureSelectors.length; index++) {
+        const f = featureSelectors[index];
+        f.addEventListener('click', (e) => {
+          bufferFeature = features.find(f => f.getId().toString() === e.target.id).clone();
+          console.log(bufferFeature);
+          modal.closeModal();
+          resolve();
+          e.stopPropagation();
+        });
+      }
+    });
+  }
+
+  function createRadiusModal() {
+    const title = 'Ange buffer radie:';
+    const content = `<div> 
+                      <input type="number" id="bufferradius">
+                      <button id="bufferradiusBtn">OK</button>
+                    </div>`;
+    const target = viewer.getId();
+    const modal = Modal({
+      title,
+      content,
+      target
+    });
+    const bufferradiusEl = document.getElementById('bufferradius');
+    const bufferradiusBtn = document.getElementById('bufferradiusBtn');
+    bufferradiusBtn.addEventListener('click', (e) => {
+      const radiusVal = bufferradiusEl.value;
+      // entered value should only be a number
+      // const pattern = /^[0-9]*$/;
+      // const onlyNumbers = pattern.test(radiusVal);
+      // console.log(onlyNumbers);
+      const radius = parseFloat(radiusVal);
+
+      if ((!radius && radius !== 0) ||
+        (radius <= 0 && (bufferFeature.getGeometry().getType() === GeometryType.POINT ||
+          bufferFeature.getGeometry().getType() === GeometryType.MULTI_POINT ||
+          bufferFeature.getGeometry().getType() === GeometryType.MULTI_LINE_STRING ||
+          bufferFeature.getGeometry().getType() === GeometryType.LINE_STRING))) {
+        bufferradiusEl.classList.add('unvalidValue')
+        e.stopPropagation();
+        return;
+      }
+      e.stopPropagation();
+      modal.closeModal();
+      // TODO: validating radius(only number, min, max)
+      fetchFeatures_Buffer_buffer(radius);
+    });
+  }
+
   function fetchFeatures_Buffer_buffer(radius) {
     const geometry = bufferFeature.getGeometry();
     const bufferedFeature = createBufferedFeature(geometry, radius);
@@ -347,14 +449,22 @@ const Multiselect = function Multiselect(options = {}) {
     // const f = new Feature(fromExtent(extent));
     // debugLayer.addFeature(f);
 
+    let allItems = [];
     const results = getItemsIntersectingExtent(layers, extent);
 
     // adding clint features
-    selectionManager.addItems(getItemsIntersectingGeometry(results.selectedClientItems, bufferedGeometry));
+    allItems = allItems.concat(getItemsIntersectingGeometry(results.selectedClientItems, bufferedGeometry));
+
     // adding features got from wfs GetFeature
     Promise.all(results.selectedRemoteItemsPromises).then(data => {
       // data is an array containing corresponding arrays of features for each layer.
-      data.forEach(items => selectionManager.addItems(getItemsIntersectingGeometry(items, bufferedGeometry)));
+      data.forEach(items => allItems = allItems.concat(getItemsIntersectingGeometry(items, bufferedGeometry)));
+      
+      if (allItems.length === 1) {
+        selectionManager.addOrHighlightItem(allItems[0]);
+      } else if (allItems.length > 1) {
+        selectionManager.addItems(allItems);
+      }
     });
   }
 
@@ -579,7 +689,7 @@ const Multiselect = function Multiselect(options = {}) {
           clickSelectionButton = Button({
             cls: 'o-multiselect-click padding-small margin-bottom-smaller icon-smaller rounded light box-shadow hidden',
             click() {
-              type = 'LineString';
+              type = 'click';
               toggleType(this);
             },
             icon: '#fa-mouse-pointer',
@@ -594,7 +704,7 @@ const Multiselect = function Multiselect(options = {}) {
           boxSelectionButton = Button({
             cls: 'o-multiselect-box padding-small margin-bottom-smaller icon-smaller rounded light box-shadow hidden',
             click() {
-              type = 'Polygon';
+              type = 'box';
               toggleType(this);
             },
             //icon: '#baseline-crop_square-24px',
@@ -609,7 +719,7 @@ const Multiselect = function Multiselect(options = {}) {
           circleSelectionButton = Button({
             cls: 'o-multiselect-circle padding-small margin-bottom-smaller icon-smaller rounded light box-shadow hidden',
             click() {
-              type = 'Polygon';
+              type = 'circle';
               toggleType(this);
             },
             icon: '#fa-circle-o',
@@ -623,7 +733,7 @@ const Multiselect = function Multiselect(options = {}) {
           bufferSelectionButton = Button({
             cls: 'o-multiselect-buffer padding-small margin-bottom-smaller icon-smaller rounded light box-shadow hidden',
             click() {
-              type = 'Polygon';
+              type = 'buffer';
               toggleType(this);
             },
             icon: '#fa-bullseye',
