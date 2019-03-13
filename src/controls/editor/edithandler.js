@@ -448,7 +448,7 @@ function editAttributes(feat) {
       attributeObjects = attributes.map((attributeObject) => {
         const obj = {};
         $.extend(obj, attributeObject);
-        obj.val = feature.get(obj.name) || '';
+        obj.val = feature.get(obj.name) !== undefined ? feature.get(obj.name) : '';
         if ('constraint' in obj) {
           const constraintProps = obj.constraint.split(':');
           if (constraintProps.length === 3) {
