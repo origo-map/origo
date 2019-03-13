@@ -123,10 +123,7 @@ const Featureinfo = function Featureinfo(options = {}) {
       selection.coordinates = firstFeature.getGeometry().getCoordinates();
       selection.id = firstFeature.getId() != null ? firstFeature.getId() : firstFeature.ol_uid;
       selection.type = typeof selectionLayer.getSourceLayer() === 'string' ? selectionLayer.getFeatureLayer().type : selectionLayer.getSourceLayer().get('type');
-
-      if (selection.type === 'WFS') {
-        selection.id = firstFeature.getId();
-      } else {
+      if (selection.type === 'GEOJSON' || selection.type === 'AGS_FEATURE') {
         const name = typeof selectionLayer.getSourceLayer() === 'string' ? selectionLayer.getSourceLayer() : selectionLayer.getSourceLayer().get('name');
         const id = firstFeature.getId() || selection.id;
         selection.id = `${name}.${id}`;
