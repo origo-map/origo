@@ -1,6 +1,6 @@
 {
   "name": "origo",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Framework to build web map apps",
   "keywords": [
     "map",
@@ -24,6 +24,7 @@
   "dependencies": {
     "@babel/polyfill": "^7.0.0",
     "@babel/runtime-corejs2": "^7.1.2",
+    "acorn": "^6.1.1",
     "awesomplete": "1.1.2",
     "core-js": "^2.4.0",
     "cuid": "^2.1.4",
