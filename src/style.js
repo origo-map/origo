@@ -208,8 +208,9 @@ function createStyle({
   const styleSettings = viewer.getStyle(styleName);
   const baseUrl = viewer.getBaseUrl();
 
-  if (Object.keys(styleSettings).length === 0 || !styleSettings) {
-    throw new Error(`Style ${styleName} is not defined`);
+  if (!styleSettings || Object.keys(styleSettings).length === 0) {
+    const style = stylefunctions('default');
+    return style;
   }
   if ('custom' in styleSettings[0][0]) {
     const style = stylefunctions(styleSettings[0][0].custom, styleSettings[0][0].params);
