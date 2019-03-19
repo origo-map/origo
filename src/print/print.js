@@ -104,22 +104,39 @@ function buildLegend(layers) {
 				var name = layer.get('name');
 				//special case for theme layers
 				if(layer.get('theme') == true || layer.get('ArcGIStheme') == true){
-					themeLayers.push(layer);
+					themeLayers.push({
+						sublayers : layer.get('sublayers'),
+						title : layer.get('title'),
+						name : layer.get('name'),
+						theme : layer.get('theme'),
+						ArcGIStheme : layer.get('ArcGIStheme'),
+						url : url
+					})
+				}
 				//special case for grouped layers
-				}else if(layer.get('grouplayer') == true){
-					var subLayer = layer.get('sublayers');
-					for(var i = 0; i < subLayer.length; i++){
-						var subName = subLayer[i].name;
-						var rule = subLayer[i].rule;
-						var style = subLayer[i].style;
-						var layername = subLayer[i].layer;
-						result.push({
-							name : subName, 
-							icons: [url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + layername + '&STYLE=' + style +'&RULE='+ rule +'&SCALE=1&legend_options=dpi:400'] 
-						})
+				else if(layer.get('grouplayer') == true){
+					var sublayers = layer.get('sublayers');
+					for(var i = 0; i < sublayers.length; i++){
+						//theme layers might be in grouped layers
+						if(sublayers[i].theme == true || sublayers[i].ArcGIStheme == true) {
+							if (!sublayers[i].url) 
+								sublayers[i].url = url;
+							themeLayers.push(sublayers[i]);
+						}
+						else{
+							var subName = sublayers[i].title;
+							var rule = sublayers[i].rule;
+							var style = sublayers[i].style;
+							var layername = sublayers[i].name;
+							result.push({
+								name : subName, 
+								icons: [url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + layername + '&STYLE=' + style +'&RULE='+ rule +'&SCALE=1&legend_options=dpi:400'] 
+							})
+						}
 					}
+				}
 				//normal case, single layer
-				}else{
+				else{
 					result.push({
 						name: layer.get('title'),
 						icons: [url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&SCALE=1&legend_options=dpi:400']
@@ -143,28 +160,32 @@ function buildLegend(layers) {
 	//handle the cases for themelayers and add to same array as the rest of the layers
 	//handle after to make sure any single layers is added before every theme layer
 	themeLayers.forEach(function (layer, index) {
-		var spaceLeft = 18 - legendObjects.length;
-		var subLayers = layer.get("sublayers");
-		var url = fetchSourceUrl(layer);
-		var name = layer.get("name");
+		var spaceLeft = printLimit - legendObjects.length;
+		var sublayers = layer.sublayers;
+		var url = layer.url;
+		var name = layer.name;
 		//Only add the theme layer if theres place for the whole theme
-		if((subLayers.length+1) <= spaceLeft){
+		if((sublayers.length+1) <= spaceLeft){
 			//newline for some separation between theme layers
-			legendObjects.push({ name : "\n"+layer.get('title') });
-			if(layer.get('theme') == true){
-				for(var i = 0; i < subLayers.length; i++){
-					var subName = subLayers[i].name;
-					var rule = subLayers[i].rule;
+			legendObjects.push({ name : "\n"+layer.title });
+			if(layer.theme == true){
+				for(var i = 0; i < sublayers.length; i++){
+					var subName = sublayers[i].title;
+					var rule = sublayers[i].rule;
+					//handle if another style is specified
+					var url = layer.style ? 
+						layer.url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name + '&STYLE=' + layer.style +'&RULE='+ rule +'&SCALE=1&legend_options=dpi:400'
+						: layer.url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&RULE='+ rule +'&SCALE=1&legend_options=dpi:400'
 					legendObjects.push({
 						name : subName, 
-						icons: [url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&RULE='+ rule +'&SCALE=1&legend_options=dpi:400'] 
+						icons: [url] 
 					});
 				};
 			}	
-			else if(layer.get('ArcGIStheme') == true){
-				for(var i = 0; i < subLayers.length; i++){
-					var subName = subLayers[i].name;
-					var subUrl = subLayers[i].url;
+			else if(layer.ArcGIStheme == true){
+				for(var i = 0; i < sublayers.length; i++){
+					var subName = sublayers[i].title;
+					var subUrl = sublayers[i].url;
 					legendObjects.push({
 						name : subName, 
 						icons: [subUrl] 
