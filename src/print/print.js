@@ -268,7 +268,8 @@ function buildLayersObjects(inLayers, type) {
 					type: layer.get('type'),
 					baseURL: url,
 					format: layer.getSource().getParams().FORMAT,
-					layers: [layer.getSource().getParams().LAYERS]
+					layers: [layer.getSource().getParams().LAYERS],
+                    opacity: layer.get('opacity')
 				});
 			}
 		});
