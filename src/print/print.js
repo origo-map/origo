@@ -69,8 +69,6 @@ function convertToMapfishOptions(options) {
 
 	// build legend objects and add to mapfishconfig
 	var legendArray = buildLegend(layers.filter(function(layer) {return (layer.get('name').indexOf("_bk_") == -1) } )); //TODO: Make it more user configurable
-	//Sets layer limit to 12 in legend
-	legendArray = legendArray.filter(function(legend, index){return index < 12})
 
 	legendArray.forEach(function(obj) {
 		if(obj) mapfishOptions.legends[0].classes.push(obj);
@@ -94,28 +92,101 @@ function convertToMapfishOptions(options) {
 }
 
 function buildLegend(layers) {
-	var legendObjects = layers.map(function(layer) {
-		var type = layer.get('type') || "";
+	var themeLayers = [];
+	var legendObjects = layers.reduce(function(result, layer) {
+		const type = layer.get('type') || "";
         switch (type.toUpperCase()) {
 			case "WMS":
 				var o = [];
-				var url = fetchSourceUrl(layer)
+				var url = fetchSourceUrl(layer);
 				var name = layer.get('name');
-				return {
-					name: layer.get('title'),
-					icons: [url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&SCALE=1&legend_options=dpi:400']
-				};
+				//special case for theme layers
+				if(layer.get('theme') == true || layer.get('ArcGIStheme') == true){
+					themeLayers.push({
+						sublayers : layer.get('sublayers'),
+						title : layer.get('title'),
+						name : layer.get('name'),
+						theme : layer.get('theme'),
+						ArcGIStheme : layer.get('ArcGIStheme'),
+						url : url
+					})
+				}
+				//special case for grouped layers
+				else if(layer.get('grouplayer') == true){
+					var sublayers = layer.get('sublayers');
+					for(var i = 0; i < sublayers.length; i++){
+						//theme layers might be in grouped layers
+						if(sublayers[i].theme == true || sublayers[i].ArcGIStheme == true) {
+							if (!sublayers[i].url) 
+								sublayers[i].url = url;
+							themeLayers.push(sublayers[i]);
+						}
+						else{
+							var subName = sublayers[i].title;
+							var rule = sublayers[i].rule;
+							var style = sublayers[i].style;
+							var layername = sublayers[i].name;
+							result.push({
+								name : subName, 
+								icons: [url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + layername + '&STYLE=' + style +'&RULE='+ rule +'&SCALE=1&legend_options=dpi:400'] 
+							})
+						}
+					}
+				}
+				//normal case, single layer
+				else{
+					result.push({
+						name: layer.get('title'),
+						icons: [url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&SCALE=1&legend_options=dpi:400']
+					})
+				}
+				return result;
             break;
 			case "WFS":
-			var o = [];
-				var url = fetchSourceUrl(layer)
+				var o = [];
+				var url = fetchSourceUrl(layer);
 				var name = layer.get('name');
-				return {
+				result.push({
 					name: layer.get('title'),
-					icons: [url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&SCALE=1&legend_options=dpi:400']
-				}
+					icons: [ url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&SCALE=1&legend_options=dpi:400']
+				})
+				return result;
             break;
         }
+	},[]);
+
+	//handle the cases for themelayers and add to same array as the rest of the layers
+	//handle after to make sure any single layers is added before every theme layer
+	themeLayers.forEach(function (layer, index) {
+		var sublayers = layer.sublayers;
+		var url = layer.url;
+		var name = layer.name;
+		//newline for some separation between theme layers
+		legendObjects.push({ name : "\n"+layer.title });
+		if(layer.theme == true){
+			for(var i = 0; i < sublayers.length; i++){
+				var subName = sublayers[i].title;
+				var rule = sublayers[i].rule;
+				//handle if another style is specified
+				var url = layer.style ? 
+					layer.url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name + '&STYLE=' + layer.style +'&RULE='+ rule +'&SCALE=1&legend_options=dpi:400'
+					: layer.url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name +'&RULE='+ rule +'&SCALE=1&legend_options=dpi:400'
+				legendObjects.push({
+					name : subName, 
+					icons: [url] 
+				});
+			};
+		}	
+		else if(layer.ArcGIStheme == true){
+			for(var i = 0; i < sublayers.length; i++){
+				var subName = sublayers[i].title;
+				var subUrl = sublayers[i].url;
+				legendObjects.push({
+					name : subName, 
+					icons: [subUrl] 
+				});
+			}
+		}
 	});
 	
     return legendObjects;
