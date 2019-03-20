@@ -6,7 +6,10 @@ module.exports = merge(common, {
   context: `${__dirname}/../`,
   output: {
     path: `${__dirname}/../build`,
-    filename: 'js/origo.js'
+    filename: 'js/origo.js',
+    libraryTarget: 'var',
+    libraryExport: 'default',
+    library: 'Origo'
   },
   mode: 'development',
   plugins: [
