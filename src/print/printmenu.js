@@ -10,7 +10,7 @@ var Viewer = require('../viewer');
 var ol = require('openlayers');
 
 var mapfishConfig, hideLayouts, layoutIfHidden;
-var $printButton, $printButtonTool, $printselect, vector, $scaleselect, $orientationselect, $clearButton, $layoutselect, $defaultPrintButton, $printDpi;
+var $printButton, $printButtonTool, $sizeselect, vector, $scaleselect, $orientationselect, $clearButton, $layoutselect, $defaultPrintButton, $printDpi;
 
 function init() {
 	hideLayouts = true;
@@ -135,7 +135,7 @@ function init() {
 		$('#o-toolbar-misc').append(printButtonTool);
 		$printButtonTool = $('#o-print-tool');
 		$printButton = $('#o-printmenu-button-close');
-		$printselect = $('#o-size-dd');
+		$sizeselect = $('#o-size-dd');
 		$scaleselect = $('#o-scale-dd');
 		$orientationselect = $('#o-orientation-dd');
 		$clearButton = $('#o-print-clear-button');
@@ -153,7 +153,7 @@ function init() {
 		}
 		$.each(namesAndSizes.reverse(), function(key, value) {
 			var index = (namesAndSizes.length-1)-key;
-			$printselect.append($('<option></option>').attr('value', index).text(value));
+			$sizeselect.append($('<option></option>').attr('value', index).text(value));
 		});
 		bindUIActions();
 	}
@@ -284,9 +284,9 @@ function bindUIActions() {
 		}	
 		e.preventDefault();
 	});
-	$printselect.change(function () {
+	$sizeselect.change(function () {
 		var map = Viewer.getMap();
-		var paper = getPaperMeasures($printselect.val());
+		var paper = getPaperMeasures($sizeselect.val());
 		var scale = $scaleselect.val();
         scale = detectAndFixE(scale);
 		scale = scale.split('.')[0];
@@ -304,7 +304,7 @@ function bindUIActions() {
 			sizeDd.append($('<option></option>').attr('value', key).text(value));
 		});
 		var map = Viewer.getMap();
-		var paper = getPaperMeasures($printselect.val());
+		var paper = getPaperMeasures($sizeselect.val());
 		var scale = $scaleselect.val();
         scale = detectAndFixE(scale);
 		scale = scale.split('.')[0];
@@ -313,7 +313,7 @@ function bindUIActions() {
 
 	$scaleselect.change(function () {
 		var map = Viewer.getMap();
-		var paper = getPaperMeasures($printselect.val());
+		var paper = getPaperMeasures($sizeselect.val());
 		var scale = $scaleselect.val();
         scale = detectAndFixE(scale);
 		scale = scale.split('.')[0];
@@ -322,7 +322,7 @@ function bindUIActions() {
 
 	$orientationselect.change(function () {
 		var map = Viewer.getMap();
-		var paper = getPaperMeasures($printselect.val());
+		var paper = getPaperMeasures($sizeselect.val());
 		var scale = $scaleselect.val();
         scale = detectAndFixE(scale);
 		scale = scale.split('.')[0];
@@ -402,7 +402,7 @@ function bindUIActions() {
 		});
 
 		var contract = {
-			dpi: $('#o-resolution-dd').val(),
+			dpi: $printDpi.val(),
 			layers: visibleLayers,
 			outputFormat: $('#o-format-dd').val().trim().toLowerCase(),
 			scale: $('#o-scale-dd').val(),
@@ -470,62 +470,67 @@ function addDefaultPrintButton(){
 }
 
 function checkPrintability(parameter){
-    if(parameter == 'dpi'){ 
-        if($('#o-resolution-dd').val() == '300') {
-            $('#o-size-dd').children('[value=0]').prop('disabled', true)
-            $('#o-size-dd').children('[value=1]').prop('disabled', true)
-            $('#o-size-dd').children('[value=2]').prop('disabled', true)
-            $('#o-size-dd').children('[value=3]').prop('disabled', true)
-            $('#o-size-dd').val('4')
-            //disable all sizes except A4
-        }
-        else if($('#o-resolution-dd').val() == '150') {
-            $('#o-size-dd').children('[value=0]').prop('disabled', true)
-            $('#o-size-dd').children('[value=1]').prop('disabled', true)
-            $('#o-size-dd').children('[value=2]').prop('disabled', false)
-            $('#o-size-dd').children('[value=3]').prop('disabled', false)
-            //disable sizes A0 and A1, enable the rest
-        }
-        else {
-            $('#o-size-dd').children().prop('disabled', false)
-            //enable all sizes
-        }
-    }
-    else if(parameter == 'size'){
-        if($('#o-size-dd').find(':selected').text() == 'A0' || $('#o-size-dd').find(':selected').text() == 'A1'){
-            $('#o-resolution-dd').children('[value=300]').prop('disabled', true)
-            $('#o-resolution-dd').children('[value=150]').prop('disabled', true)
-            $('#o-resolution-dd').val('75')
-            //disable dpis 150 and 300 
-        }
-        else if($('#o-size-dd').find(':selected').text() == 'A2' || $('#o-size-dd').find(':selected').text() == 'A3') {
-            $('#o-resolution-dd').children('[value=300]').prop('disabled', true)
-            $('#o-resolution-dd').children('[value=150]').prop('disabled', false)
-            //disable dpi 300 and enable dpi 150 
-        }
-        else {
-            $('#o-resolution-dd').children().prop('disabled', false)
-            //enable all dpis
-        }        
-    }
+	//specific printability-check
+	if(options.hasArcGISServerWMS()){
+		if(parameter == 'dpi'){ 
+	        if($printDpi.val() == '300') {
+	            $sizeselect.children('[value=0]').prop('disabled', true)
+	            $sizeselect.children('[value=1]').prop('disabled', true)
+	            $sizeselect.children('[value=2]').prop('disabled', true)
+	            $sizeselect.children('[value=3]').prop('disabled', true)
+	            $sizeselect.val('4')
+	            //disable all sizes except A4
+	        }
+	        else if($printDpi.val() == '150') {
+	            $sizeselect.children('[value=0]').prop('disabled', true)
+	            $sizeselect.children('[value=1]').prop('disabled', true)
+	            $sizeselect.children('[value=2]').prop('disabled', false)
+	            $sizeselect.children('[value=3]').prop('disabled', false)
+	            //disable sizes A0 and A1, enable the rest
+	        }
+	        else {
+	            $sizeselect.children().prop('disabled', false)
+	            //enable all sizes
+	        }
+	    }
+	    else if(parameter == 'size'){
+	        if($sizeselect.find(':selected').text() == 'A0' || $sizeselect.find(':selected').text() == 'A1'){
+	            $printDpi.children('[value=300]').prop('disabled', true)
+	            $printDpi.children('[value=150]').prop('disabled', true)
+	            $printDpi.val('75')
+	            //disable dpis 150 and 300 
+	        }
+	        else if($sizeselect.find(':selected').text() == 'A2' || $sizeselect.find(':selected').text() == 'A3') {
+	            $printDpi.children('[value=300]').prop('disabled', true)
+	            $printDpi.children('[value=150]').prop('disabled', false)
+	            //disable dpi 300 and enable dpi 150 
+	        }
+	        else {
+	            $printDpi.children().prop('disabled', false)
+	            //enable all dpis
+	        }        
+	    }
+	}
+
+	//normal printability-check
+	else{
+		if($sizeselect.val() == '0'){
+			$printDpi.children('[value=300]').prop('disabled', true);
+			$printDpi.children('[value=300]').attr('title', '300 dpi är inte tillgänglig för A0');
+		}
+		else if( $printDpi.val() == '300' ){
+			$sizeselect.children('[value=0]').prop('disabled', true);
+			$sizeselect.children('[value=0]').attr('title', 'A0 är inte tillgänglig i 300 dpi');
+		}
+		else{
+			$printDpi.children('[value=300]').prop('disabled', false);
+			$sizeselect.children('[value=0]').prop('disabled', false);
+			$printDpi.children('[value=300]').attr('title', '');
+			$sizeselect.children('[value=0]').attr('title', '');
+		}
+	}
+
 } 
 
-/*
-function checkPrintability(){
-	if($printselect.val() == '0'){
-		$printDpi.children('[value=300]').prop('disabled', true);
-		$printDpi.children('[value=300]').attr('title', '300 dpi är inte tillgänglig för A0');
-	}
-	else if( $printDpi.val() == '300' ){
-		$printselect.children('[value=0]').prop('disabled', true);
-		$printselect.children('[value=0]').attr('title', 'A0 är inte tillgänglig i 300 dpi');
-	}
-	else{
-		$printDpi.children('[value=300]').prop('disabled', false);
-		$printselect.children('[value=0]').prop('disabled', false);
-		$printDpi.children('[value=300]').attr('title', '');
-		$printselect.children('[value=0]').attr('title', '');
-	}
-} */
 
 module.exports.init = init;
