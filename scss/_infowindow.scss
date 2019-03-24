@@ -4,7 +4,7 @@
     // margin-right: 2rem;
     // height: 10rem;
     width: 320px;
-    top: 1em;
+    top: 4em;
     right: 15em;
     background-color: white;
     border-radius: 5px;
@@ -20,6 +20,8 @@
     font-size: 12px;
     font-weight: bold;
     border-bottom: 1px solid #d9d9d9;
+    cursor: move;
+    z-index: 10;
   }
   
   .urval-textnode-container {

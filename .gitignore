@@ -1,4 +1,10 @@
 dist
+build
 css/style.css
 node_modules
 npm-debug-log
+
+index.json
+index00.json
+index01.json
+index02.json
