@@ -1,0 +1,30 @@
+
+#bufferradiusBtn {
+    display: block;
+    padding: 0.5em 2em;
+    border-radius: 6px;
+    margin-top: 0.5em;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #e6e6e6;
+  }
+  
+  #bufferradius {
+    height: 2em;
+    display: block;
+    margin: auto;
+  }
+  
+  .featureSelectorItem {
+    padding: 5px;
+    border-radius: 4px;
+  }
+  
+  .featureSelectorItem:hover {
+    background-color: #e6e6e6;
+    cursor: pointer;
+  }
+  
+  .unvalidValue {
+    border: 1px solid red;
+  }

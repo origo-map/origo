@@ -6,6 +6,7 @@ import Map from './map';
 import proj from './projection';
 import MapSize from './utils/mapsize';
 import Featureinfo from './featureinfo';
+import Selectionmanager from './selectionmanager';
 import maputils from './maputils';
 import Layer from './layer';
 import Main from './components/main';
@@ -18,6 +19,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
   let map;
   let tileGrid;
   let featureinfo;
+  let selectionmanager;
 
   let {
     projection
@@ -96,6 +98,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
   };
 
   const getFeatureinfo = () => featureinfo;
+
+  const getSelectionManager = () => selectionmanager;
 
   const getMapName = () => mapName;
 
@@ -427,8 +431,13 @@ const Viewer = function Viewer(targetOption, options = {}) {
         });
       }
       featureinfoOptions.viewer = this;
+      
+      selectionmanager = Selectionmanager(featureinfoOptions);
+      this.addComponent(selectionmanager);
+
       featureinfo = Featureinfo(featureinfoOptions);
       this.addComponent(featureinfo);
+      
       this.addControls();
     },
     render() {
@@ -485,7 +494,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getUrl,
     removeGroup,
     removeOverlays,
-    zoomToExtent
+    zoomToExtent,
+    getSelectionManager
   });
 };
 

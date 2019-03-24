@@ -2,6 +2,8 @@ import EsriJSON from 'ol/format/EsriJSON';
 import $ from 'jquery';
 import maputils from './maputils';
 import getAttributes from './getattributes';
+import SelectedItem from './models/SelectedItem';
+
 
 function getGetFeatureInfoUrl({
   coordinate,
@@ -185,12 +187,14 @@ function getFeaturesFromRemote(requestOptions, viewer) {
     const map = viewer.getMap();
     if (features) {
       features.forEach((feature) => {
-        requestResult.push({
+        requestResult.push(
+          new SelectedItem(feature, layer, map)
+          /* {
           title: layer.get('title'),
           feature,
           content: getAttributes(feature, layer, map),
           layer: layer.get('name')
-        });
+        } */);
       });
       return requestResult;
     }
@@ -230,30 +234,41 @@ function getFeaturesAtPixel({
           return true;
         }
         collection.forEach((f) => {
-          const item = {};
+          const si = new SelectedItem(f, layer, map);
+          result.push(si);
+
+          /* const item = {};
           item.title = l.get('title');
           item.feature = f;
           item.content = getAttributes(f, l, map);
           item.name = l.get('name');
-          result.push(item);
+          result.push(item); */
         });
       } else if (collection.length === 1 && queryable) {
-        const item = {};
+
+        const si = new SelectedItem(collection[0], layer, map);
+        result.push(si);
+
+      /*   const item = {};
         item.title = l.get('title');
         item.feature = collection[0];
-        item.content = getAttributes(collection[0], l,map);
+        item.content = getAttributes(collection[0], l, map);
         item.name = l.get('name');
         item.layer = l;
-        result.push(item);
+        result.push(item); */
       }
     } else if (queryable) {
-      const item = {};
+      
+      const si = new SelectedItem(feature, layer, map);
+      result.push(si);
+
+    /*   const item = {};
       item.title = l.get('title');
       item.feature = feature;
       item.content = getAttributes(feature, l,map);
       item.name = l.get('name');
       item.layer = l;
-      result.push(item);
+      result.push(item); */
     }
 
     return false;

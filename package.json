@@ -24,6 +24,8 @@
   "dependencies": {
     "@babel/polyfill": "^7.0.0",
     "@babel/runtime-corejs2": "^7.1.2",
+    "@turf/boolean-disjoint": "^6.0.2",
+    "@turf/buffer": "^5.1.5",
     "awesomplete": "1.1.2",
     "core-js": "^2.4.0",
     "cuid": "^2.1.4",
