@@ -58,6 +58,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     if (currentItem !== null) {
       const clone = items[currentItem].feature.clone();
       clone.setId(items[currentItem].feature.getId());
+      clone.layerName = items[currentItem].name;
       selectionLayer.clearAndAdd(
         clone,
         selectionStyles[items[currentItem].feature.getGeometry().getType()]
@@ -123,7 +124,7 @@ const Featureinfo = function Featureinfo(options = {}) {
       selection.coordinates = firstFeature.getGeometry().getCoordinates();
       selection.id = firstFeature.getId() != null ? firstFeature.getId() : firstFeature.ol_uid;
       selection.type = typeof selectionLayer.getSourceLayer() === 'string' ? selectionLayer.getFeatureLayer().type : selectionLayer.getSourceLayer().get('type');
-      if (selection.type === 'GEOJSON' || selection.type === 'AGS_FEATURE') {
+      if (selection.type !== 'WFS') {
         const name = typeof selectionLayer.getSourceLayer() === 'string' ? selectionLayer.getSourceLayer() : selectionLayer.getSourceLayer().get('name');
         const id = firstFeature.getId() || selection.id;
         selection.id = `${name}.${id}`;
