@@ -13,7 +13,7 @@
   vertical-align: middle;
 }
 
-.folded {
+.folded-export-element {
   max-height: 0px;
   overflow: hidden;
   transition: max-height .5s;
@@ -23,7 +23,7 @@
   -o-transition: max-height .5s;
 }
 
-.unfolded {
+.unfolded-export-element {
   max-height: 5em;
   overflow: hidden;
   transition: max-height 1s;

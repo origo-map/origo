@@ -195,7 +195,7 @@ const Exportmap = function Exportmap(options = {}) {
 
   function createFormatsContainer(opts) {
     const el = `
-      <div id="${opts.id}" class="folded">
+      <div id="${opts.id}" class="folded-export-element">
         <span id="o-export-format-png" class="o-export-format"> PNG </span>
         <span id="o-export-format-jpg" class="o-export-format"> JPG </span>
       </div>`;
@@ -208,14 +208,14 @@ const Exportmap = function Exportmap(options = {}) {
   function toggleFormatContainter() {
     if (formatsContainerVisible) {
       setTimeout(() => {
-        fc.classList.add('folded');
-        fc.classList.remove('unfolded');
+        fc.classList.add('folded-export-element');
+        fc.classList.remove('unfolded-export-element');
         formatsContainerVisible = false;
       }, 50);
     } else {
       setTimeout(() => {
-        fc.classList.add('unfolded');
-        fc.classList.remove('folded');
+        fc.classList.add('unfolded-export-element');
+        fc.classList.remove('folded-export-element');
         formatsContainerVisible = true;
       }, 50);
     }
@@ -239,8 +239,8 @@ const Exportmap = function Exportmap(options = {}) {
     // dom.html method used above doesn't create a real element. To be able to use classList we need to use getElementBtId
     fc = document.getElementById(formatsContainerId);
     setTimeout(() => {
-      fc.classList.add('unfolded');
-      fc.classList.remove('folded');
+      fc.classList.add('unfolded-export-element');
+      fc.classList.remove('folded-export-element');
     }, 100);
 
     const pngButton = document.getElementById('o-export-format-png');
