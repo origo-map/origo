@@ -190,7 +190,7 @@ function createListElement(item) {
     const listElement = document.createElement('div');
     listElement.classList.add('listelement');
     listElement.id = item.getId();
-    const svg = createSvgElement('fa-times-circle', 'removelistelement-svg');
+    const svg = createSvgElement('ic_remove_circle_outline_24px', 'removelistelement-svg');
     svg.addEventListener('click', (e) => {
         selectionManager.removeItem(item);
     });
