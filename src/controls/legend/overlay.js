@@ -11,11 +11,17 @@ const OverlayLayer = function OverlayLayer(options) {
     iconCls = 'grey-lightest',
     layer,
     position = 'top',
-    style
+    style,
+    viewer
   } = options;
 
+  const buttons = [];
+  let removeButton;
+  let ButtonsHtml;
+  let layerList;
+
   const cls = `${clsSettings} flex row align-center padding-left padding-right item`.trim();
-  const title = layer.get('title') || 'No title';
+  const title = layer.get('title') || 'Titel saknas';
   const name = layer.get('name');
 
   const checkIcon = '#ic_check_circle_24px';
@@ -59,22 +65,7 @@ const OverlayLayer = function OverlayLayer(options) {
     icon: headerIcon
   });
 
-  const toggleButton = Button({
-    cls: 'round small icon-smaller no-shrink',
-    click() {
-      toggleVisible(layer.getVisible());
-    },
-    style: {
-      'align-self': 'center',
-      'padding-left': '.5rem'
-    },
-    icon: getCheckIcon(layer.getVisible())
-  });
-
-  const onRemove = function onRemove() {
-    const el = document.getElementById(this.getId());
-    el.remove();
-  };
+  buttons.push(layerIcon);
 
   const label = Component({
     onRender() {
@@ -90,6 +81,44 @@ const OverlayLayer = function OverlayLayer(options) {
     }
   });
 
+  const toggleButton = Button({
+    cls: 'round small icon-smaller no-shrink',
+    click() {
+      toggleVisible(layer.getVisible());
+    },
+    style: {
+      'align-self': 'center',
+      'padding-left': '.5rem'
+    },
+    icon: getCheckIcon(layer.getVisible())
+  });
+
+  buttons.push(toggleButton);
+
+  if (layer.get('removable')) {
+    removeButton = Button({
+      cls: 'round small icon-smaller no-shrink',
+      click() {
+        layerList.removeOverlay(layer.get('name'));
+        viewer.getMap().removeLayer(layer);
+      },
+      style: {
+        'align-self': 'center',
+        'padding-left': '.5rem'
+      },
+      icon: '#ic_remove_circle_outline_24px'
+    });
+    buttons.push(removeButton);
+    ButtonsHtml = `${layerIcon.render()}${label.render()}${removeButton.render()}${toggleButton.render()}`;
+  } else {
+    ButtonsHtml = `${layerIcon.render()}${label.render()}${toggleButton.render()}`;
+  }
+
+  const onRemove = function onRemove() {
+    const el = document.getElementById(this.getId());
+    el.remove();
+  };
+
   return Component({
     name,
     getLayer,
@@ -97,6 +126,7 @@ const OverlayLayer = function OverlayLayer(options) {
       this.on('clear', onRemove.bind(this));
     },
     onAdd(evt) {
+      layerList = evt.target;
       const parentEl = document.getElementById(evt.target.getId());
       const htmlString = this.render();
       const el = dom.html(htmlString);
@@ -105,9 +135,8 @@ const OverlayLayer = function OverlayLayer(options) {
       } else {
         parentEl.appendChild(el);
       }
-      this.addComponent(layerIcon);
+      this.addComponents(buttons);
       this.addComponent(label);
-      this.addComponent(toggleButton);
       this.dispatch('render');
       layer.on('change:visible', (e) => {
         toggleButton.dispatch('change', { icon: getCheckIcon(!e.oldValue) });
@@ -118,9 +147,7 @@ const OverlayLayer = function OverlayLayer(options) {
       });
     },
     render() {
-      return `<li id="${this.getId()}" class="${cls}">
-                ${layerIcon.render()}${label.render()}${toggleButton.render()}
-              </li>`;
+      return `<li id="${this.getId()}" class="${cls}">${ButtonsHtml}</li>`;
     }
   });
 };

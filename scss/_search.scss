@@ -50,14 +50,12 @@ input.o-search-field::-ms-clear {
   line-height: 1rem;
 }
 }
-&[class*=#{$media-l-m}] {
-  // .o-search-field {
-  // 	width: $search-field-width-m;
-  // }
-}
 &[class*=#{$media-l-m-s-xs}] {
   .o-search-wrapper {
     display: none;
+  }
+  .o-search-wrapper.active {
+  	display: inline-block;
   }
 }
 .o-search-wrapper {

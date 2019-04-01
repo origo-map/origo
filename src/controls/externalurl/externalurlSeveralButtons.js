@@ -3,7 +3,7 @@ import { Component, Element as El, Button, dom } from '../../ui';
 import replacer from '../../utils/replacer';
 
 const externalurlSeveralButtons = function externalurlSeveralButtons(options = {}) {
-  const mainbuttonTooltipText = options.tooltipText || 'Visa kartan i en external platform';
+  const mainbuttonTooltipText = options.tooltipText || 'Visa kartan i en extern karttjänst';
   const links = options.links;
   let map;
   let isMainButtonActive = false;

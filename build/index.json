@@ -83,10 +83,10 @@
     20048966.10
   ],
   "center": [
-    1700000,
-    8275000
+    1770000,
+    8770000
   ],
-  "zoom": 8,
+  "zoom": 7,
   "resolutions": [
     156543.03,
     78271.52,
@@ -174,10 +174,10 @@
           {
             "label": "Origokommuner",
             "circle": {
-              "radius": 16,
+              "radius": 10,
               "stroke": {
                 "color": "rgba(0,0,0,1)",
-                "width": 5
+                "width": 2.5
               },
               "fill": {
                 "color": "rgba(255,255,255,0.9)"
@@ -186,7 +186,7 @@
           },
           {
             "circle": {
-              "radius": 4,
+              "radius": 2.5,
               "stroke": {
                 "color": "rgba(0,0,0,0)",
                 "width": 1

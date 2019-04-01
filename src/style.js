@@ -186,11 +186,10 @@ function styleFunction({
   const fn = function fn(feature, resolution) {
     const scale = maputils.resolutionToScale(resolution, projection);
     let styleL;
-    // If size is larger than, it is a cluster
+    // If size is larger than 1, it is a cluster
     const size = clusterStyleList ? feature.get('features').length : 1;
     if (size > 1 && resolution !== resolutions[resolutions.length + 1]) {
       styleL = checkOptions(feature, scale, clusterStyleSettings, clusterStyleList, size.toString());
-      // clusterStyleList[0].setText(size);
     } else {
       styleL = checkOptions(feature, scale, styleSettings, styleList);
     }
@@ -209,8 +208,9 @@ function createStyle({
   const styleSettings = viewer.getStyle(styleName);
   const baseUrl = viewer.getBaseUrl();
 
-  if (Object.keys(styleSettings).length === 0 || !styleSettings) {
-    throw new Error(`Style ${styleName} is not defined`);
+  if (!styleSettings || Object.keys(styleSettings).length === 0) {
+    const style = stylefunctions('default');
+    return style;
   }
   if ('custom' in styleSettings[0][0]) {
     const style = stylefunctions(styleSettings[0][0].custom, styleSettings[0][0].params);

@@ -32,7 +32,11 @@ export default function (features, map) {
       return featureLayerStore;
     },
     getSourceLayer: function getSourceLayer() {
-      return sourceLayer;
+      if (sourceLayer) {
+        return sourceLayer;
+      }
+      featureLayer.set('name', 'unmanaged');
+      return featureLayer;
     },
     clear: function clear() {
       featureLayerStore.clear();

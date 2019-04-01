@@ -43,7 +43,7 @@ export default function vector(opt, src, viewer) {
       });
       options.style = Style.createStyle({
         style: options.style,
-        clusterStyle: options.clusterStyle,
+        clusterStyleName: options.clusterStyle,
         viewer
       });
       vectorLayer = new VectorLayer(options);

@@ -1325,7 +1325,7 @@ body {
   .o-map[class*=o-media-l] .ol-attribution {
     bottom: 1rem;
     left: 1rem;
-    right: initial; }
+    right: auto; }
   .o-map .ol-attribution li a {
     color: #bbb; }
   .o-map .owl-carousel {
@@ -1760,6 +1760,40 @@ body {
     float: right; }
   .o-map .o-dropdown .o-active .o-icon {
     display: inline-block; }
+  .o-map #o-sidebar.o-sidebar-show {
+    -ms-transform: translateX(-270px);
+    -webkit-transform: translateX(-270px);
+    transform: translateX(-270px); }
+  .o-map #o-sidebar {
+    border-radius: 1px;
+    /*workaround for box-shadow bug in ios*/
+    -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.45);
+    height: 100%;
+    position: absolute;
+    right: -270px;
+    top: 0px;
+    width: 270px;
+    z-index: 110;
+    -ms-transform: translateX(0);
+    -webkit-transform: translateX(0);
+    transform: translateX(0);
+    -ms-transition: .1s ease all;
+    -webkit-transition: .1s ease all;
+    transition: .1s ease all; }
+  .o-map .o-sidebar,
+  .o-map .o-sidebar .o-card-content {
+    height: 100%; }
+  .o-map #o-sidebar .owl-carousel .owl-wrapper-outer {
+    overflow-y: auto; }
+  @media screen and (max-width: 320px) {
+    .o-map #o-sidebar {
+      width: 100%;
+      right: -320px; }
+    .o-map #o-sidebar.o-sidebar-show {
+      -ms-transform: translateX(-320px);
+      -webkit-transform: translateX(-320px);
+      transform: translateX(-320px); } }
   .o-map .o-close-button {
     height: 2.429em;
     float: right;
@@ -1991,8 +2025,6 @@ body {
     color: #fff;
     font-family: Arial, "Helvetica Neue", sans-serif;
     font-size: 0.625rem;
-    height: 1.25rem;
-    line-height: 1.25rem;
     margin: 0; }
   .o-map input.o-position-find {
     padding: 0;
@@ -2128,6 +2160,8 @@ body {
     line-height: 1rem; }
   .o-map[class*=o-media-l-m-s-xs] .o-search-wrapper {
     display: none; }
+  .o-map[class*=o-media-l-m-s-xs] .o-search-wrapper.active {
+    display: inline-block; }
   .o-map .o-search-wrapper {
     z-index: -1; }
   .o-map .o-hidden {

@@ -1,6 +1,6 @@
 {
   "name": "origo",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Framework to build web map apps",
   "keywords": [
     "map",
@@ -26,6 +26,7 @@
     "@babel/runtime-corejs2": "^7.1.2",
     "@turf/boolean-disjoint": "^6.0.2",
     "@turf/buffer": "^5.1.5",
+    "acorn": "^6.1.1",
     "awesomplete": "1.1.2",
     "core-js": "^2.4.0",
     "cuid": "^2.1.4",
@@ -56,7 +57,7 @@
     "webpack": "^4.27.1",
     "webpack-bundle-analyzer": "^3.0.3",
     "webpack-cli": "^3.1.2",
-    "webpack-dev-server": "3.1.8",
+    "webpack-dev-server": "^3.2.1",
     "webpack-merge": "^4.1.5"
   }
 }
