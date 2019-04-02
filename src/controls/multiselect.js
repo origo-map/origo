@@ -510,7 +510,7 @@ const Multiselect = function Multiselect(options = {}) {
       // Basically here we get all vector features from client.
       if (layer.getSource().forEachFeatureIntersectingExtent) {
         layer.getSource().forEachFeatureIntersectingExtent(extent, (feature) => {
-          const item = new SelectedItem(feature, layer);
+          const item = new SelectedItem(feature, layer, map);
           selectedClientItems.push(item);
         });
       } else {
@@ -574,7 +574,7 @@ const Multiselect = function Multiselect(options = {}) {
       req
         .then(data => {
           const selectedRemoteItems = data.map(feature => {
-            return new SelectedItem(feature, layer);
+            return new SelectedItem(feature, layer, map);
           });
           resolve(selectedRemoteItems);
         })
