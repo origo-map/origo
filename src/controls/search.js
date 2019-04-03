@@ -116,6 +116,7 @@ const Search = function Search(options = {}) {
     let feature;
     let content;
     let coord;
+    // 1
     if (layerNameAttribute && idAttribute) {
       const source = viewer.getMapSource();
       const projCode = viewer.getProjectionCode();
@@ -135,20 +136,23 @@ const Search = function Search(options = {}) {
             showOverlay(data, coordWkt);
           }
         });
+    // 2
     } else if (geometryAttribute && layerName) {
       feature = mapUtils.wktToFeature(data[geometryAttribute], projectionCode);
       layer = viewer.getLayer(data[layerName]);
       showFeatureInfo([feature], layer.get('title'), getAttributes(feature, layer));
+    // 3
     } else if (titleAttribute && contentAttribute && geometryAttribute) {
       feature = mapUtils.wktToFeature(data[geometryAttribute], projectionCode);
-
       // Make sure the response is wrapped in a html element
       content = utils.createElement('div', data[contentAttribute]);
       showFeatureInfo([feature], data[titleAttribute], content);
+    // 4  
     } else if (geometryAttribute && title) {
       feature = mapUtils.wktToFeature(data[geometryAttribute], projectionCode);
       content = utils.createElement('div', data[name]);
       showFeatureInfo([feature], title, content);
+    // 5
     } else if (easting && northing && title) {
       coord = [data[easting], data[northing]];
       showOverlay(data, coord);

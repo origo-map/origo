@@ -10,6 +10,7 @@ import Style from './style';
 import StyleTypes from './style/styletypes';
 import getFeatureInfo from './getfeatureinfo';
 import replacer from '../src/utils/replacer';
+import SelectedItem from './models/SelectedItem';
 
 const styleTypes = StyleTypes();
 
@@ -85,7 +86,7 @@ const Featureinfo = function Featureinfo(options = {}) {
           layer = viewer.getLayer(currentItem.layer.get('name'));
         }
       }
-      // This is very stange: layer above is only a string, could not possibly have method.
+      // This is very strange: layer above is only a string, could not possibly have method.
       if (layer) {
         featureinfoTitle = layer.getProperties().featureinfoTitle;
       }
@@ -94,12 +95,18 @@ const Featureinfo = function Featureinfo(options = {}) {
         const featureProps = currentItem.feature.getProperties();
         title = replacer.replace(featureinfoTitle, featureProps);
         if (!title) {
-          // title = currentItem.title ? currentItem.title : currentItem.name;
-          title = currentItem.getLayer().get('title') ? currentItem.getLayer().get('title') : currentItem.getLayer().get('name');
+          if (currentItem instanceof SelectedItem) {
+            title = currentItem.getLayer().get('title') ? currentItem.getLayer().get('title') : currentItem.getLayer().get('name');
+          } else {
+            title = currentItem.title ? currentItem.title : currentItem.name;
+          }
         }
       } else {
-        // title = currentItem.title ? currentItem.title : currentItem.name;
-        title = currentItem.getLayer().get('title') ? currentItem.getLayer().get('title') : currentItem.getLayer().get('name');
+        if (currentItem instanceof SelectedItem) {
+          title = currentItem.getLayer().get('title') ? currentItem.getLayer().get('title') : currentItem.getLayer().get('name');
+        } else {
+          title = currentItem.title ? currentItem.title : currentItem.name;
+        }
       }
       selectionLayer.setSourceLayer(currentItem.layer);
       if (identifyTarget === 'overlay') {
@@ -160,7 +167,8 @@ const Featureinfo = function Featureinfo(options = {}) {
     const map = viewer.getMap();
     items = identifyItems;
     clear();
-    let content = items.map(i => i.getContent()).join('');
+    let content = items.map(i => i.content).join('');
+//    let content = items.map(i => i.getContent()).join('');
     content = `<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme">${content}</div></div>`;
     switch (target) {
       case 'overlay':
@@ -168,8 +176,8 @@ const Featureinfo = function Featureinfo(options = {}) {
           popup = Popup(`#${viewer.getId()}`);
           popup.setContent({
             content,
-            // title: items[0].title
-            title: items[0].getLayer().get('title')
+             title: items[0] instanceof SelectedItem ? items[0].getLayer().get('title') : items[0].title
+            //title: items[0].getLayer().get('title')
           });
           popup.setVisibility(true);
           initCarousel('#o-identify-carousel');
@@ -184,7 +192,8 @@ const Featureinfo = function Featureinfo(options = {}) {
             autoPanMargin: 40,
             positioning: 'bottom-center'
           });
-          const geometry = items[0].getFeature().getGeometry();
+          //const geometry = items[0].getFeature().getGeometry();
+          const geometry = items[0].feature.getGeometry();
           const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
           map.addOverlay(overlay);
           overlay.setPosition(coord);
@@ -194,7 +203,8 @@ const Featureinfo = function Featureinfo(options = {}) {
         {
           sidebar.setContent({
             content,
-            title: items[0].getLayer().get('title')
+            title: items[0] instanceof SelectedItem ? items[0].getLayer().get('title') : items[0].title
+           // title: items[0].getLayer().get('title')
           });
           sidebar.setVisibility(true);
           initCarousel('#o-identify-carousel');

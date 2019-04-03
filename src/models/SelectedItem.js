@@ -6,7 +6,9 @@ export default class SelectedItem {
         
         this.feature = feature;
         this.layer = layer;
-        this.content = getAttributes(feature, layer, map);
+        if (layer && map) {
+            this.content = getAttributes(feature, layer, map);
+        }
     }
 
     getId() {

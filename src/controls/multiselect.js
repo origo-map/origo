@@ -263,9 +263,11 @@ const Multiselect = function Multiselect(options = {}) {
   function fetchFeatures_Box(evt) {
     const extent = evt.feature.getGeometry().getExtent();
     const layers = viewer.getQueryableLayers();
+    
     if (layers.length < 1) {
       return;
     }
+
     let allItems = [];
     const results = getItemsIntersectingExtent(layers, extent);
     // adding clint features
@@ -504,7 +506,7 @@ const Multiselect = function Multiselect(options = {}) {
     const selectedClientItems = [];
     const selectedRemoteItemsPromises = [];
 
-    layers.forEach(layer => {
+    function extractResultsForALayer(layer) {
       // check if layer supports this method, or basically is some sort of vector layer.
       // Alternatively we can check layer.getType() === 'VECTOR', but a bit unsure if all types of vector layer have 'VECTOR' as type.
       // Basically here we get all vector features from client.
@@ -515,6 +517,22 @@ const Multiselect = function Multiselect(options = {}) {
         });
       } else {
         selectedRemoteItemsPromises.push(getFeaturesFromWfsServer(layer, extent));
+      }
+    }
+
+    layers.forEach(layer => {
+
+      if (layer.get('type') === 'GROUP') {
+        const subLayers = layer.getLayers();
+        subLayers.forEach(subLayer => {
+          if (subLayer.get('type') === 'GROUP') {
+            console.log('LayersGroups deeper than one level are not handled!');
+          } else {
+            extractResultsForALayer(subLayer);
+          }
+        });
+      } else {
+        extractResultsForALayer(layer);
       }
     });
 
@@ -667,6 +685,8 @@ const Multiselect = function Multiselect(options = {}) {
   return Component({
     name: 'multiselection',
     onInit() {
+      
+      runpolyfill();
 
       if (clickSelection || boxSelection || circleSelection || bufferSelection) {
         multiselectElement = El({
