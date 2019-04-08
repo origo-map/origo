@@ -167,6 +167,11 @@ const Viewer = function Viewer(targetOption, options = {}) {
     const queryableLayers = getLayers().filter(layer => layer.get('queryable') && layer.getVisible());
     return queryableLayers;
   };
+  
+  const getGroupLayers = function getGroupLayers() {
+    const groupLayers = getLayers().filter(layer => layer.get('type') === "GROUP");
+    return groupLayers;
+  };
 
   const getSearchableLayers = function getSearchableLayers(searchableDefault) {
     const searchableLayers = [];
@@ -474,6 +479,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getMain,
     getMapSource,
     getQueryableLayers,
+    getGroupLayers,
     getResolutions,
     getSearchableLayers,
     getSize,

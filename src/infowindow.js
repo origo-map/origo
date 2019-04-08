@@ -101,6 +101,8 @@ function makeElementDraggable(elmnt) {
 
 function handleExport() {
 
+    // TODO: activeLayer should be activeSelectionGroup now
+
     let layerSpecificExportOptions;
     let simpleExport = exportOptions.enableSimpleExport ? exportOptions.enableSimpleExport : false;
     let simpleExportUrl = exportOptions.simpleExportUrl;
@@ -117,7 +119,7 @@ function handleExport() {
             return;
         }
         console.log('simple Exporting layer ' + activeLayer);
-        const items = selectionManager.getSelectedItemsForALayer(activeLayer);
+        const items = selectionManager.getSelectedItemsForASelecctionGroup(activeLayer);
         const layer = viewer.getLayer(activeLayer);
         const layerAttributes = layer.get('attributes');
         const features = items.map(i => i.getFeature());
@@ -151,33 +153,33 @@ function handleExport() {
     }
 }
 
-function createUrvalElement(layerName, layerTitle) {
+function createUrvalElement(selectionGroup, selectionGroupTitle) {
 
     const urvalElement = document.createElement('div');
     urvalElement.classList.add('urvalelement');
-    const textNode = document.createTextNode(layerTitle);
+    const textNode = document.createTextNode(selectionGroupTitle);
     urvalElement.appendChild(textNode);
     urvalContainer.appendChild(urvalElement);
-    urvalElements.set(layerName, urvalElement);
+    urvalElements.set(selectionGroup, urvalElement);
     urvalElement.addEventListener('click', (e) => {
-        showSelectedList(layerName);
+        showSelectedList(selectionGroup);
     });
     const sublistContainter = document.createElement('div');
-    sublists.set(layerName, sublistContainter);
+    sublists.set(selectionGroup, sublistContainter);
 }
 
-function showSelectedList(layerName) {
+function showSelectedList(selectionGroup) {
 
-    activeLayer = layerName;
+    activeLayer = selectionGroup;
     while (listContainer.firstChild) {
         listContainer.removeChild(listContainer.firstChild);
     }
 
-    const sublistToAppend = sublists.get(layerName);
+    const sublistToAppend = sublists.get(selectionGroup);
     listContainer.appendChild(sublistToAppend);
 
     urvalElements.forEach((value, key, map) => {
-        if (key === layerName) {
+        if (key === selectionGroup) {
             value.classList.add('selectedurvalelement');
         } else {
             value.classList.remove('selectedurvalelement');
@@ -201,9 +203,11 @@ function createListElement(item) {
     listElementContentContainer.appendChild(content);
     listElement.appendChild(listElementContentContainer);
     createExpandableContent(listElementContentContainer, content, item.getId());
-    const sublist = sublists.get(item.getLayer().get('name'));
+    //const sublist = sublists.get(item.getLayer().get('name'));
+    const sublist = sublists.get(item.getSelectionGroup());
     sublist.appendChild(listElement);
-    showUrvalElement(item.getLayer().get('name'));
+    //showUrvalElement(item.getLayer().get('name'));
+    showUrvalElement(item.getSelectionGroup());
 }
 
 function createElementFromHTML(htmlString) {
@@ -341,13 +345,14 @@ function scrollListElementToView(featureId) {
     });
 }
 
-function showUrvalElement(layerName) {
-    const urvalElement = urvalElements.get(layerName);
+function showUrvalElement(selectionGroup) {
+    const urvalElement = urvalElements.get(selectionGroup);
     urvalElement.classList.remove('hidden');
 }
 
 function removeListElement(item) {
-    const sublist = sublists.get(item.getLayer().get('name'));
+    //const sublist = sublists.get(item.getLayer().get('name'));
+    const sublist = sublists.get(item.getSelectionGroup());
     /*  
     This loop is needed because when clear() is called it will try to remove ALL elements, but elements 
     for not-selected list are already removed, thus the element found by id becomes null if document.getElementById was used.
@@ -378,14 +383,14 @@ function createSvgElement(id, className) {
     return svgContainer;
 }
 
-function hideUrvalElement(layerName) {
-    const urvalElement = urvalElements.get(layerName);
+function hideUrvalElement(selectionGroup) {
+    const urvalElement = urvalElements.get(selectionGroup);
     urvalElement.classList.add('hidden');
 }
 
-function updateUrvalElementText(layerName, layerTitle, sum) {
-    const urvalElement = urvalElements.get(layerName);
-    const newNodeValue = `${layerTitle} (${sum})`;
+function updateUrvalElementText(selectionGroup, selectionGroupTitle, sum) {
+    const urvalElement = urvalElements.get(selectionGroup);
+    const newNodeValue = `${selectionGroupTitle} (${sum})`;
     urvalElement.childNodes[0].nodeValue = newNodeValue;
 }
 

@@ -63,26 +63,23 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   function highlightAndExpandItem(item) {
     const featureId = item.getFeature().getId();
     highlightFeatureById(featureId);
-    infowindow.showSelectedList(item.getLayer().get('name'));
+    // infowindow.showSelectedList(item.getLayer().get('name'));
+    infowindow.showSelectedList(item.getSelectionGroup());
     infowindow.expandListElement(featureId);
     infowindow.highlightListElement(featureId);
   }
   
-  function highlightItem(item) {
-    
-    console.log('highlighting item');
-    
+  function highlightItem(item) {    
     const featureId = item.getFeature().getId();
     highlightFeatureById(featureId);
-    infowindow.showSelectedList(item.getLayer().get('name'));
+    // infowindow.showSelectedList(item.getLayer().get('name'));
+    infowindow.showSelectedList(item.getSelectionGroup());
     infowindow.expandListElement(featureId);
     infowindow.highlightListElement(featureId);
     infowindow.scrollListElementToView(featureId);
   }
   
   function addOrHighlightItem(item) {
-    console.log('add or highlighting item');
-
     if (alreadyExists(item)) {
       // highlight
       highlightItem(item);
@@ -95,8 +92,9 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     }
   }
   
-  function getSelectedItemsForALayer(layerName) {
-    const items = selectedItems.getArray().filter(i => i.getLayer().get('name') === layerName);
+  function getSelectedItemsForASelecctionGroup(selectionGroup) {
+    // const items = selectedItems.getArray().filter(i => i.getLayer().get('name') === selectionGroup);
+    const items = selectedItems.getArray().filter(i => i.getSelectionGroup() === selectionGroup);
     return items;
   }
   
@@ -142,21 +140,24 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   
   function onItemAdded(event) {
     const item = event.element;
-    const layerName = event.element.getLayer().get('name');
-    const layerTitle = event.element.getLayer().get('title');
+
+    // const selectionGroup = event.element.getLayer().get('name');
+    const selectionGroup = event.element.getSelectionGroup();
+    // const selectionGroupTitle = event.element.getLayer().get('title');
+    const selectionGroupTitle = event.element.getSelectionGroupTitle();
   
-    if (!urval.has(layerName)) {
+    if (!urval.has(selectionGroup)) {
       const urvalLayer = featurelayer(null, map);
       urvalLayer.setStyle(featureStyler);
-      urval.set(layerName, urvalLayer);
-      infowindow.createUrvalElement(layerName, layerTitle);
+      urval.set(selectionGroup, urvalLayer);
+      infowindow.createUrvalElement(selectionGroup, selectionGroupTitle);
     }
   
-    urval.get(layerName).addFeature(item.getFeature());
+    urval.get(selectionGroup).addFeature(item.getFeature());
     infowindow.createListElement(item);
   
-    const sum = urval.get(layerName).getFeatures().length;
-    infowindow.updateUrvalElementText(layerName, layerTitle, sum);
+    const sum = urval.get(selectionGroup).getFeatures().length;
+    infowindow.updateUrvalElementText(selectionGroup, selectionGroupTitle, sum);
   
     if (isInfowindow) {
       infowindow.show();
@@ -166,19 +167,23 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   function onItemRemoved(event) {
   
     const item = event.element;
-    const layerName = event.element.getLayer().get('name');
-    const layerTitle = event.element.getLayer().get('title');
+
+    // const selectionGroup = event.element.getLayer().get('name');
+    const selectionGroup = event.element.getSelectionGroup();
+    // const selectionGroupTitle = event.element.getLayer().get('title');
+    const selectionGroupTitle = event.element.getSelectionGroupTitle();
+    
     const feature = item.getFeature();
     feature.unset('state', 'selected');
   
-    urval.get(layerName).removeFeature(feature);
+    urval.get(selectionGroup).removeFeature(feature);
     infowindow.removeListElement(item);
   
-    const sum = urval.get(layerName).getFeatures().length;
-    infowindow.updateUrvalElementText(layerName, layerTitle, sum);
+    const sum = urval.get(selectionGroup).getFeatures().length;
+    infowindow.updateUrvalElementText(selectionGroup, selectionGroupTitle, sum);
   
-    if (urval.get(layerName).getFeatures().length < 1) {
-      infowindow.hideUrvalElement(layerName);
+    if (urval.get(selectionGroup).getFeatures().length < 1) {
+      infowindow.hideUrvalElement(selectionGroup);
     }
   
     if (selectedItems.getLength() < 1) {
@@ -265,7 +270,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     highlightFeature,
     highlightFeatureById,
     getNumberOfSelectedItems,
-    getSelectedItemsForALayer,
+    getSelectedItemsForASelecctionGroup,
     onInit() {
       runPolyfill();
       selectedItems = new Collection([], { unique: true });

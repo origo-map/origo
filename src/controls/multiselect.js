@@ -506,29 +506,40 @@ const Multiselect = function Multiselect(options = {}) {
     const selectedClientItems = [];
     const selectedRemoteItemsPromises = [];
 
-    function extractResultsForALayer(layer) {
+    function extractResultsForALayer(layer, groupLayer) {
+
+      let selectionGroup;
+      let selectionGroupTitle;
+
+      if (groupLayer) {
+        selectionGroup = groupLayer.get('name');
+        selectionGroupTitle = groupLayer.get('title');
+      } else {
+        selectionGroup = layer.get('name');
+        selectionGroupTitle = layer.get('title');
+      }
+
       // check if layer supports this method, or basically is some sort of vector layer.
       // Alternatively we can check layer.getType() === 'VECTOR', but a bit unsure if all types of vector layer have 'VECTOR' as type.
       // Basically here we get all vector features from client.
       if (layer.getSource().forEachFeatureIntersectingExtent) {
         layer.getSource().forEachFeatureIntersectingExtent(extent, (feature) => {
-          const item = new SelectedItem(feature, layer, map);
+          const item = new SelectedItem(feature, layer, map, selectionGroup, selectionGroupTitle);
           selectedClientItems.push(item);
         });
       } else {
-        selectedRemoteItemsPromises.push(getFeaturesFromWfsServer(layer, extent));
+        selectedRemoteItemsPromises.push(getFeaturesFromWfsServer(layer, extent, selectionGroup, selectionGroupTitle));
       }
     }
 
     layers.forEach(layer => {
-
       if (layer.get('type') === 'GROUP') {
         const subLayers = layer.getLayers();
         subLayers.forEach(subLayer => {
           if (subLayer.get('type') === 'GROUP') {
             console.log('LayersGroups deeper than one level are not handled!');
           } else {
-            extractResultsForALayer(subLayer);
+            extractResultsForALayer(subLayer, layer);
           }
         });
       } else {
@@ -586,13 +597,13 @@ const Multiselect = function Multiselect(options = {}) {
     return intersectingItems;
   }
 
-  function getFeaturesFromWfsServer(layer, extent) {
+  function getFeaturesFromWfsServer(layer, extent, selectionGroup, selectionGroupTitle) {
     return new Promise(function (resolve, reject) {
       const req = wfs.request(layer, extent);
       req
         .then(data => {
           const selectedRemoteItems = data.map(feature => {
-            return new SelectedItem(feature, layer, map);
+            return new SelectedItem(feature, layer, map, selectionGroup, selectionGroupTitle);
           });
           resolve(selectedRemoteItems);
         })
