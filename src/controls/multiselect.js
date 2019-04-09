@@ -403,7 +403,7 @@ const Multiselect = function Multiselect(options = {}) {
   }
 
   function createRadiusModal() {
-    const title = 'Ange buffer radie:';
+    const title = 'Ange buffert i meter (ex 10,4):';
     const content = `<div> 
                       <input type="number" id="bufferradius">
                       <button id="bufferradiusBtn">OK</button>
