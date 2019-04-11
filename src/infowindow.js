@@ -1,3 +1,5 @@
+import { simpleExportHandler, layerSpecificExportHandler } from './infowindow_exporthandler';
+
 let mainContainer;
 let urvalContainer;
 let listContainer;
@@ -5,8 +7,9 @@ let sublists;
 let urvalElements;
 let expandableContents;
 let exportOptions;
-let activeLayer;
+let activeSelectionGroup;
 let selectionManager;
+let viewer;
 
 function render(viewerId) {
     mainContainer = document.createElement('div');
@@ -101,54 +104,31 @@ function makeElementDraggable(elmnt) {
 
 function handleExport() {
 
-    // TODO: activeLayer should be activeSelectionGroup now
+    // OBS! activeSelectionGroup corrisponds to a layer with the same name in most cases, but in case of a group layer it can contain selected items from all the layers in that GroupLayer.
 
     let layerSpecificExportOptions;
     let simpleExport = exportOptions.enableSimpleExport ? exportOptions.enableSimpleExport : false;
     let simpleExportUrl = exportOptions.simpleExportUrl;
 
-    if (exportOptions.layerSpecificExport) {
-        layerSpecificExportOptions = exportOptions.layerSpecificExport.find(i => i.layer === activeLayer);
+    const activeLayer = viewer.getLayer(activeSelectionGroup);
+    const selectedItems = selectionManager.getSelectedItemsForASelecctionGroup(activeSelectionGroup);
+
+    if (activeLayer.get('type') === 'GROUP') {
+        console.warn('The selected layer is a LayerGroup, be careful!');
     }
+
+    if (exportOptions.layerSpecificExport) {
+        layerSpecificExportOptions = exportOptions.layerSpecificExport.find(i => i.layer === activeSelectionGroup);
+    }
+
     if (layerSpecificExportOptions) {
-        console.log('spesific Exporting layer ' + activeLayer);
+        layerSpecificExportHandler(layerSpecificExportOptions, activeLayer, selectedItems);
 
     } else if (simpleExport) {
-        if (!simpleExportUrl) {
-            alert('Export URL is not specified.');
-            return;
-        }
-        console.log('simple Exporting layer ' + activeLayer);
-        const items = selectionManager.getSelectedItemsForASelecctionGroup(activeLayer);
-        const layer = viewer.getLayer(activeLayer);
-        const layerAttributes = layer.get('attributes');
-        const features = items.map(i => i.getFeature());
-        const data = features.map(f => {
-            const obj = f.getProperties();
-            console.log(Object.keys(obj));
-
-            delete obj.geom;
-            return obj;
-        });
-
-        console.log(data);
-        console.log(layerAttributes);
-
-        fetch(simpleExportUrl, {
-            method: 'POST', // or 'PUT'
-            body: JSON.stringify(data), // data can be `string` or {object}!
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-            .then(res => res.json())
-            .then(data => {
-                console.log(data);
-            })
-            .catch(err => console.log(err));
+        simpleExportHandler(simpleExportUrl, activeLayer, selectedItems);
 
     } else {
-        console.log('layer ' + activeLayer + ' cannot be exported!');
+        console.log('layer ' + activeSelectionGroup + ' cannot be exported!');
 
     }
 }
@@ -170,7 +150,7 @@ function createUrvalElement(selectionGroup, selectionGroupTitle) {
 
 function showSelectedList(selectionGroup) {
 
-    activeLayer = selectionGroup;
+    activeSelectionGroup = selectionGroup;
     while (listContainer.firstChild) {
         listContainer.removeChild(listContainer.firstChild);
     }
@@ -404,7 +384,7 @@ function showInfowindow() {
 
 function init(options) {
 
-
+    viewer = options.viewer;
     selectionManager = options.viewer.getSelectionManager();
 
     const infowindowOptions = options.infowindowOptions ? options.infowindowOptions : {};
