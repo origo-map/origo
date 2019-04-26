@@ -15,15 +15,14 @@
 }
 
 #searchList .dropdown-btn {
-    vertical-align: top;
-    height: 2.11em;
-    border-top-left-radius: 0;
-    border-top-right-radius: 5px;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 5px;
+    height: 36px;
+    border-radius: 5px;
     border: 1px solid #ccc;
     float: right;
     width: 20%;
+    position: relative;
+    top: -42px;
+    width: 50px;
 }
 
 #searchList .caret {
