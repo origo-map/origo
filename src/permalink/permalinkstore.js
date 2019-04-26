@@ -29,13 +29,17 @@ permalinkStore.getState = function getState(viewer) {
   state.center = view.getCenter().map(coord => Math.round(coord)).join();
   state.zoom = view.getZoom().toString();
 
+  const draw = viewer.getControlByName('draw');
+  state.controls = {
+    draw: draw.getState()
+  };
+
   if (featureinfo.getSelection().id) {
     state.feature = featureinfo.getSelection().id;
   }
 
   if (getPin()) {
-    state.pin = getPin().getGeometry().getCoordinates().map(coord => Math.round(coord))
-      .join();
+    state.pin = getPin().getGeometry().getCoordinates().map(coord => Math.round(coord)).join();
   }
 
   if (viewer.getMapName()) {
