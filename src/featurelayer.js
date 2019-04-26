@@ -42,6 +42,9 @@ export default function (features, map) {
       featureLayerStore.clear();
       featureLayer.setStyle(style);
       featureLayerStore.addFeature(feature);
+    },
+    setStyle: function setStyle(style) {
+      featureLayer.setStyle(style);
     }
   };
 }
