@@ -37,11 +37,11 @@ export default (() => ({
   saveStateToServer: function saveStateToServer(viewer) {
     return fetch(saveOnServerServiceEndPoint, {
       method: 'POST',
-      body: JSON.stringify(permalinkStore.getState(viewer)),
+      body: JSON.stringify(permalinkStore.getState(viewer, true)),
       headers: {
         "Content-Type": "application/json; charset=utf-8"
       }
-    }).then(function(response) {
+    }).then(function (response) {
       return response.json();
     });
   },
@@ -51,9 +51,10 @@ export default (() => ({
     }
     if (!saveOnServerServiceEndPoint || saveOnServerServiceEndPoint == "") {
       throw "No saveOnServerServiceEndPoint defined";
-    }
-    else {
-      return fetch(saveOnServerServiceEndPoint + "/" + mapStateId).then(function (data) {
+    } else {
+      return fetch(saveOnServerServiceEndPoint + "/" + mapStateId).then(function (response) {
+        return response.json();
+      }).then(function (data) {
         var mapObj = {};
         for (var key in data) {
           mapObj[key] = permalinkParser[key](data[key]);

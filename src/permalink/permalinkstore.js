@@ -19,7 +19,7 @@ function getSaveLayers(layers) {
   return saveLayers;
 }
 
-permalinkStore.getState = function getState(viewer) {
+permalinkStore.getState = function getState(viewer, isExtended) {
   const state = {};
   const view = viewer.getMap().getView();
   const layers = viewer.getLayers();
@@ -29,10 +29,14 @@ permalinkStore.getState = function getState(viewer) {
   state.center = view.getCenter().map(coord => Math.round(coord)).join();
   state.zoom = view.getZoom().toString();
 
-  const draw = viewer.getControlByName('draw');
-  state.controls = {
-    draw: draw.getState()
-  };
+  if (isExtended) {
+    const draw = viewer.getControlByName('draw');
+    if (draw) {
+      state.controls = {
+        draw: draw.getState()
+      };
+    }
+  } 
 
   if (featureinfo.getSelection().id) {
     state.feature = featureinfo.getSelection().id;

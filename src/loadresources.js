@@ -50,6 +50,7 @@ const loadResources = async function loadResources(mapOptions, config) {
 
       return $.when(loadSvgSprites(baseUrl, config))
         .then(() => map);
+
     } else if (typeof (mapOptions) === 'string') {
       if (isUrl(mapOptions)) {
         urlParams = permalink.parsePermalink(mapOptions);
@@ -92,7 +93,29 @@ const loadResources = async function loadResources(mapOptions, config) {
             map.options.map = json;
             map.options.params = urlParams;
             map.options.baseUrl = baseUrl;
-            return map;
+
+            /* We need to find the setting from sharemap to get the serviceEndPoint 
+                but it will not have been initialized yet when we need to restore
+                from permalink.
+                Typical bootstrap problem. This solutions works but not very clean. Lets talk about it :)
+                Lukas Bergliden Decerno
+            */
+            for (var i = 0; i < map.options.controls.length; i++) {
+              if (map.options.controls[i].name == "sharemap") {
+                if (map.options.controls[i].options) {
+                  var options = map.options.controls[i].options;
+                  if (options.storeMethod && options.storeMethod == "saveStateToServer") {
+                    permalink.setSaveOnServerServiceEndpoint(map.options.controls[i].options.serviceEndpoint);
+                  }
+                }
+              }
+            }
+            return restorePermalink().then(function (urlParams) {
+              if (urlParams) {
+                map.options.params = urlParams;
+              }
+              return map;
+            });
           }));
     }
     return null;
@@ -107,5 +130,30 @@ const loadResources = async function loadResources(mapOptions, config) {
   }
   return loadMapOptions();
 };
+
+
+function restorePermalink() {
+
+  var mapStateId = getQueryVariable("mapStateId");
+  if (mapStateId) {
+    return permalink.readStateFromServer(mapStateId);
+  }
+  return Promise.resolve();
+}
+
+function getQueryVariable(variable) {
+  var query = window.location.search.substring(1);
+  var vars = query.split('&');
+  for (var i = 0; i < vars.length; i++) {
+    var pair = vars[i].split('=');
+    if (decodeURIComponent(pair[0]) == variable) {
+      return decodeURIComponent(pair[1]);
+    }
+  }
+  console.log('Query variable %s not found', variable);
+  return undefined;
+};
+
+
 
 export default loadResources;

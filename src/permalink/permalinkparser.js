@@ -15,7 +15,10 @@ const layerModel = {
 
 export default {
   layers(layersStr) {
-    const layers = layersStr.split(',');
+    let layers = layersStr;
+    if (!Array.isArray(layersStr)) {
+      layers = layersStr.split(',');
+    }
     const layerObjects = {};
     layers.forEach((layer) => {
       const obj = {};
