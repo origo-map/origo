@@ -1,0 +1,115 @@
+#o-printmenu {
+    background-color: #fff;
+    border-radius: 1px; /*workaround for box-shadow bug in ios*/
+    -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.45);
+	box-shadow: 0 0 5px rgba(0,0,0,0.45);
+	height: 100%;
+	overflow: hidden;
+	overflow-y: auto;
+	position: absolute;
+	// left: -280px;
+	top: 0px;
+	width: 280px;
+	z-index: 100;
+	-ms-transform: translateX(0);
+	-webkit-transform: translateX(0);
+	transform: translateX(0);
+	-ms-transition: .3s ease all;
+	-webkit-transition: .3s ease all;
+	transition: .3s ease all;
+}
+
+#o-main-setting-heading {
+    margin: 5px 0 5px 5px;
+}
+#o-dl-progress {
+    display: none;
+}
+#o-dl-link {
+    text-decoration: none;
+    display: none;
+}
+
+#o-dl-cancel {
+    height: 20px;
+    width: 20px;
+    margin-right: 10px;
+    float: right;
+    display: none; 
+}
+
+#o-dl-link:hover {
+    text-decoration: none;
+}
+
+.o-dd-input {
+    width: 75%;
+}
+
+.o-setting-heading {
+    display: block;
+    font-weight: bold;
+}
+#o-printmenu.o-printmenu-show {
+    -ms-transform: translateX(280px);
+    -webkit-transform: translateX(280px);
+    transform: translateX(280px); 
+}
+#o-printmenu {
+    background-color: #fff;
+    border-radius: 1px;
+    /*workaround for box-shadow bug in ios*/
+    -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.45);
+    height: 100%;
+    overflow: hidden;
+    overflow-y: auto;
+    position: absolute;
+    top: 0px;
+    width: 280px;
+    z-index: 100;
+    left: -280px;
+    -ms-transform: translateX(0);
+    -webkit-transform: translateX(0);
+    transform: translateX(0);
+    -ms-transition: .3s ease all;
+    -webkit-transition: .3s ease all;
+    transition: .3s ease all;
+ }
+#o-printmenu-button-close {
+    right: 9px; 
+}
+
+form .o-block {
+    margin-left: 10px;
+}
+
+form .o-text-input {
+    width: 75%;
+}
+
+form button {
+    background-color: #555555; /* Green */
+    border: none;
+    color: white;
+    padding: 10px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+}
+
+form h6 {
+    font-weight: bold;
+}
+
+form label {
+    font-weight: normal;
+}
+
+select:-moz-focusring {
+    color: transparent;
+    text-shadow: 0 0 0 #000;
+}
+
+
