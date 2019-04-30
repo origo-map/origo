@@ -159,7 +159,7 @@
    */
   
   .exportcontainer {
-    padding-left: 2em;
+    padding-left: 0.5em;
     font-size: 12px;
     font-weight: normal;
     border-top: 1px solid #d9d9d9;
@@ -185,7 +185,24 @@
     -ms-transform: translateY(-1px); /* IE 9 */
     -webkit-transform: translateY(-1px); /* Safari */
     transform: translateY(-1px);
-    cursor: pointer;
+    //cursor: pointer;
+  }
+
+  .export-buttons-container {
+    margin-left: 1.1em;
+    margin-bottom: 0.5em;
+  }
+
+  .export-button {
+    font-size: 12px;
+    font-weight: normal;
+    color: black;
+    background-color: whitesmoke;
+    display: block;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    padding: 2px 8px;
+    margin: 4px;
   }
   
   .hidden {

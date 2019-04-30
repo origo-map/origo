@@ -40,5 +40,4 @@ export function simpleExportHandler(simpleExportUrl, activeLayer, selectedItems)
 
 export function layerSpecificExportHandler(layerSpecificExportOptions, activeLayer, selectedItems) {
     console.log('spesific Exporting layer ' + activeLayer);
-
 }

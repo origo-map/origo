@@ -3,6 +3,8 @@ import { simpleExportHandler, layerSpecificExportHandler } from './infowindow_ex
 let mainContainer;
 let urvalContainer;
 let listContainer;
+let exportContainer;
+let exportButtonsContainer;
 let sublists;
 let urvalElements;
 let expandableContents;
@@ -37,7 +39,8 @@ function render(viewerId) {
     urvalContainer.appendChild(closeButtonSvg);
     listContainer = document.createElement('div');
     listContainer.classList.add('listcontainer');
-    const exportContainer = document.createElement('div');
+
+    exportContainer = document.createElement('div');
     exportContainer.classList.add('exportcontainer');
     const svg = createSvgElement('fa-caret-square-o-right', 'export-svg');
     exportContainer.appendChild(svg);
@@ -46,9 +49,11 @@ function render(viewerId) {
     const exportTextNode = document.createTextNode('Exportera urvalet');
     exportTextNodeContainer.appendChild(exportTextNode);
     exportContainer.appendChild(exportTextNodeContainer);
-    exportTextNodeContainer.addEventListener('click', (e) => {
-        handleExport();
-    });
+
+    exportButtonsContainer = document.createElement('div');
+    exportButtonsContainer.classList.add('export-buttons-container');
+    exportContainer.appendChild(exportButtonsContainer);
+
     mainContainer.appendChild(urvalContainer);
     mainContainer.appendChild(listContainer);
     mainContainer.appendChild(exportContainer);
@@ -102,37 +107,6 @@ function makeElementDraggable(elmnt) {
     }
 }
 
-function handleExport() {
-
-    // OBS! activeSelectionGroup corrisponds to a layer with the same name in most cases, but in case of a group layer it can contain selected items from all the layers in that GroupLayer.
-
-    let layerSpecificExportOptions;
-    let simpleExport = exportOptions.enableSimpleExport ? exportOptions.enableSimpleExport : false;
-    let simpleExportUrl = exportOptions.simpleExportUrl;
-
-    const activeLayer = viewer.getLayer(activeSelectionGroup);
-    const selectedItems = selectionManager.getSelectedItemsForASelecctionGroup(activeSelectionGroup);
-
-    if (activeLayer.get('type') === 'GROUP') {
-        console.warn('The selected layer is a LayerGroup, be careful!');
-    }
-
-    if (exportOptions.layerSpecificExport) {
-        layerSpecificExportOptions = exportOptions.layerSpecificExport.find(i => i.layer === activeSelectionGroup);
-    }
-
-    if (layerSpecificExportOptions) {
-        layerSpecificExportHandler(layerSpecificExportOptions, activeLayer, selectedItems);
-
-    } else if (simpleExport) {
-        simpleExportHandler(simpleExportUrl, activeLayer, selectedItems);
-
-    } else {
-        console.log('layer ' + activeSelectionGroup + ' cannot be exported!');
-
-    }
-}
-
 function createUrvalElement(selectionGroup, selectionGroupTitle) {
 
     const urvalElement = document.createElement('div');
@@ -150,6 +124,10 @@ function createUrvalElement(selectionGroup, selectionGroupTitle) {
 
 function showSelectedList(selectionGroup) {
 
+    if (activeSelectionGroup === selectionGroup) {
+        return;
+    }
+
     activeSelectionGroup = selectionGroup;
     while (listContainer.firstChild) {
         listContainer.removeChild(listContainer.firstChild);
@@ -165,6 +143,73 @@ function showSelectedList(selectionGroup) {
             value.classList.remove('selectedurvalelement');
         }
     });
+
+    updateExportContainer();
+}
+
+function updateExportContainer() {
+    console.log('updating export container => active selection group: ' + activeSelectionGroup);
+
+    // OBS! activeSelectionGroup corresponds to a layer with the same name in most cases, but in case of a group layer it can contain selected items from all the layers in that GroupLayer.
+
+    let layerSpecificExportOptions;
+    const simpleExport = exportOptions.enableSimpleExport ? exportOptions.enableSimpleExport : false;
+    const simpleExportLayers = exportOptions.simpleExportLayers ? exportOptions.simpleExportLayers : [];
+    const simpleExportUrl = exportOptions.simpleExportUrl;
+    const simpleExportButtonText = exportOptions.simpleExportButtonText;
+
+    const activeLayer = viewer.getLayer(activeSelectionGroup);
+
+
+    while (exportButtonsContainer.firstChild) {
+        exportButtonsContainer.removeChild(exportButtonsContainer.firstChild);
+    }
+
+    if (activeLayer.get('type') === 'GROUP') {
+        console.warn('The selected layer is a LayerGroup, be careful!');
+    }
+
+    if (exportOptions.layerSpecificExport) {
+        layerSpecificExportOptions = exportOptions.layerSpecificExport.find(i => i.layer === activeSelectionGroup);
+    }
+
+    if (layerSpecificExportOptions) {
+        createExteranlCallExportButton();
+
+    } else if (simpleExport) {
+        const exportAllowed = simpleExportLayers.find(l => l === activeSelectionGroup);
+        if (exportAllowed) {
+            const btn = createSimpleExportButton(simpleExportButtonText);
+            btn.addEventListener('click', (e) => {
+                const selectedItems = selectionManager.getSelectedItemsForASelectionGroup(activeSelectionGroup);
+                simpleExportHandler(simpleExportUrl, activeLayer, selectedItems);
+            });
+            exportButtonsContainer.appendChild(btn);
+        } else {
+            console.log('Export is not allowed for selection group: ' + activeSelectionGroup);
+        }
+
+    } else {
+        console.log('Neither Specific Export is specified for selection group: ' + activeSelectionGroup + ' nor Simple Export is allowed!');
+    }
+}
+
+function createSimpleExportButton(buttonText) {
+
+    // const simpleExportButtonContainer = document.createElement('div');
+    // simpleExportButtonContainer.classList.add('simple-export-button-container');
+    // const simpleExportButtonTextNode = document.createTextNode(buttonText);
+    // exportTextNodeContainer.appendChild(simpleExportButtonTextNode);
+    // simpleExportButtonContainer.appendChild(exportTextNodeContainer);
+    // return simpleExportButtonContainer;
+    const button = document.createElement('button');
+    button.classList.add('export-button');
+    button.textContent = buttonText;
+    return button;
+}
+
+function createExteranlCallExportButton(params) {
+    //layerSpecificExportHandler(layerSpecificExportOptions, activeLayer, selectedItems);
 }
 
 function createListElement(item) {

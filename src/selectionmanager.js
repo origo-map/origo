@@ -92,7 +92,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     }
   }
   
-  function getSelectedItemsForASelecctionGroup(selectionGroup) {
+  function getSelectedItemsForASelectionGroup(selectionGroup) {
     // const items = selectedItems.getArray().filter(i => i.getLayer().get('name') === selectionGroup);
     const items = selectedItems.getArray().filter(i => i.getSelectionGroup() === selectionGroup);
     return items;
@@ -270,7 +270,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     highlightFeature,
     highlightFeatureById,
     getNumberOfSelectedItems,
-    getSelectedItemsForASelecctionGroup,
+    getSelectedItemsForASelectionGroup,
     onInit() {
       runPolyfill();
       selectedItems = new Collection([], { unique: true });
