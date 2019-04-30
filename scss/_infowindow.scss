@@ -189,8 +189,7 @@
   }
 
   .export-buttons-container {
-    margin-left: 1.1em;
-    margin-bottom: 0.5em;
+    margin: 0 1.5em 0.5em;
   }
 
   .export-button {
@@ -202,7 +201,8 @@
     border: 1px solid #cccccc;
     border-radius: 4px;
     padding: 2px 8px;
-    margin: 4px;
+    margin: 4px 0;
+    text-align: left;
   }
   
   .hidden {

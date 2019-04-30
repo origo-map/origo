@@ -1,11 +1,13 @@
 import download from 'downloadjs';
+import replacer from '../src/utils/replacer';
+
 
 export function simpleExportHandler(simpleExportUrl, activeLayer, selectedItems) {
     if (!simpleExportUrl) {
         alert('Export URL is not specified.');
         return;
     }
-    console.log('simple Exporting layer ' + activeLayer.get('name'));
+    // console.log('simple Exporting layer ' + activeLayer.get('name'));
 
     /* if (activeLayer.get('type') === 'GROUP') {
         const subLayers = activeLayer.getLayers().getArray();
@@ -38,6 +40,47 @@ export function simpleExportHandler(simpleExportUrl, activeLayer, selectedItems)
         .catch(err => console.log(err));
 }
 
-export function layerSpecificExportHandler(layerSpecificExportOptions, activeLayer, selectedItems) {
-    console.log('spesific Exporting layer ' + activeLayer);
+export function layerSpecificExportHandler(url, activeLayer, selectedItems, attributesToSendToExport) {
+    if (!url) {
+        alert('Export URL is not specified.');
+        return;
+    }
+    let replacedUrl;
+    // console.log('spesific Exporting layer ' + activeLayer.get('name') + url);
+    // console.log(attributesToSendToExport);
+    
+    const features = {};
+    selectedItems.forEach(item => {
+        const layerName = item.getLayer().get('name');
+        if (!features[layerName]) {
+            features[layerName] = [];
+        }
+        const properties = item.getFeature().getProperties();
+        replacedUrl = replacer.replace(url, properties);
+        let obj = {};
+        if (attributesToSendToExport) {
+            attributesToSendToExport.forEach(att => {
+                if (att in properties) {
+                    obj[att] = properties[att];
+                }
+            });
+        } else {
+            obj = properties;
+        }
+        if (obj.geom) delete obj.geom;        
+        features[layerName].push(obj);
+    });
+    
+    fetch(url, {
+        method: 'POST', // or 'PUT'
+        body: JSON.stringify(features), // data can be `string` or {object}!
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(response => response.blob())
+        .then(blob => {
+            download(blob, 'ExportedFeatures.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');     
+        })
+        .catch(err => console.log(err));
 }

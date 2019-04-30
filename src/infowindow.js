@@ -148,18 +148,15 @@ function showSelectedList(selectionGroup) {
 }
 
 function updateExportContainer() {
-    console.log('updating export container => active selection group: ' + activeSelectionGroup);
-
     // OBS! activeSelectionGroup corresponds to a layer with the same name in most cases, but in case of a group layer it can contain selected items from all the layers in that GroupLayer.
 
     let layerSpecificExportOptions;
     const simpleExport = exportOptions.enableSimpleExport ? exportOptions.enableSimpleExport : false;
     const simpleExportLayers = exportOptions.simpleExportLayers ? exportOptions.simpleExportLayers : [];
     const simpleExportUrl = exportOptions.simpleExportUrl;
-    const simpleExportButtonText = exportOptions.simpleExportButtonText;
+    const simpleExportButtonText = exportOptions.simpleExportButtonText || 'Exporera alla features i urvalet';
 
     const activeLayer = viewer.getLayer(activeSelectionGroup);
-
 
     while (exportButtonsContainer.firstChild) {
         exportButtonsContainer.removeChild(exportButtonsContainer.firstChild);
@@ -174,13 +171,33 @@ function updateExportContainer() {
     }
 
     if (layerSpecificExportOptions) {
-        createExteranlCallExportButton();
+        const exportUrls = layerSpecificExportOptions.exportUrls || [];
+        const attributesToSendToExport_per_layer = layerSpecificExportOptions.attributesToSendToExport;
+        exportUrls.forEach(obj => {
+            const buttonText = obj.buttonText || "External Call";
+            const url = obj.url;
+            const attributesToSendToExport = obj.attributesToSendToExport ? obj.attributesToSendToExport : attributesToSendToExport_per_layer;
+            const btn = createExportButton(buttonText);
+            btn.addEventListener('click', (e) => {
+                if (!url) {
+                    alert('No export url is specified.');
+                    return;
+                }
+                const selectedItems = selectionManager.getSelectedItemsForASelectionGroup(activeSelectionGroup);
+                layerSpecificExportHandler(url, activeLayer, selectedItems, attributesToSendToExport);
+            });
+            exportButtonsContainer.appendChild(btn);
+        });
 
     } else if (simpleExport) {
         const exportAllowed = simpleExportLayers.find(l => l === activeSelectionGroup);
         if (exportAllowed) {
-            const btn = createSimpleExportButton(simpleExportButtonText);
+            const btn = createExportButton(simpleExportButtonText);
             btn.addEventListener('click', (e) => {
+                if (!simpleExportUrl) {
+                    alert('No export url is specified.');
+                    return;
+                }
                 const selectedItems = selectionManager.getSelectedItemsForASelectionGroup(activeSelectionGroup);
                 simpleExportHandler(simpleExportUrl, activeLayer, selectedItems);
             });
@@ -194,22 +211,11 @@ function updateExportContainer() {
     }
 }
 
-function createSimpleExportButton(buttonText) {
-
-    // const simpleExportButtonContainer = document.createElement('div');
-    // simpleExportButtonContainer.classList.add('simple-export-button-container');
-    // const simpleExportButtonTextNode = document.createTextNode(buttonText);
-    // exportTextNodeContainer.appendChild(simpleExportButtonTextNode);
-    // simpleExportButtonContainer.appendChild(exportTextNodeContainer);
-    // return simpleExportButtonContainer;
+function createExportButton(buttonText) {
     const button = document.createElement('button');
     button.classList.add('export-button');
     button.textContent = buttonText;
     return button;
-}
-
-function createExteranlCallExportButton(params) {
-    //layerSpecificExportHandler(layerSpecificExportOptions, activeLayer, selectedItems);
 }
 
 function createListElement(item) {
