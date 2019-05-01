@@ -243,26 +243,18 @@ const Featureinfo = function Featureinfo(options = {}) {
       map.un(clickEvent, onClick);
     }
   };
-
-  // jQuery Events
-  const onEnableInteraction = function onEnableInteraction(e) {
-    if (e.interaction === 'featureInfo') {
-      setActive(true);
-    } else {
-      setActive(false);
-    }
+  
+  const disableInteraction = function disableInteraction(e) {
+    setActive(false);
   };
-
-  // ES6 Events
-  const onToggleInteraction = function onToggleInteraction(e) {
-    if (e.detail === 'featureInfo') {
+  
+  const enableInteraction = function enableInteraction(e) {
       setActive(true);
-    } else {
-      setActive(false);
-    }
   };
 
   return Component({
+    disableInteraction,
+    enableInteraction,
     name: 'featureInfo',
     clear,
     getHitTolerance,
@@ -274,8 +266,6 @@ const Featureinfo = function Featureinfo(options = {}) {
       const map = viewer.getMap();
       selectionLayer = featurelayer(savedFeature, map);
       map.on(clickEvent, onClick);
-      $(document).on('enableInteraction', onEnableInteraction);
-      document.addEventListener('toggleInteraction', onToggleInteraction);
     },
     render
   });

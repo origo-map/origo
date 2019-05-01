@@ -239,19 +239,13 @@ const Measure = function Measure({
   }
 
   function toggleMeasure() {
-    if (isActive) {
-      document.dispatchEvent(new CustomEvent('toggleInteraction', {
-        bubbles: true,
-        detail: 'featureInfo'
-      }));
-      disableInteraction();
-    } else {
-      document.dispatchEvent(new CustomEvent('toggleInteraction', {
-        bubbles: true,
-        detail: 'measure'
-      }));
-      enableInteraction();
-    }
+    document.dispatchEvent(new CustomEvent('toggleInteraction', {
+      bubbles: true,
+      detail: { 
+        name: "measure",
+        active: !isActive
+      }
+    }));
   }
 
   function toggleType(button) {
@@ -266,6 +260,8 @@ const Measure = function Measure({
   }
 
   return Component({
+    disableInteraction,
+    enableInteraction,
     name: 'measure',
     onAdd(evt) {
       viewer = evt.target;
