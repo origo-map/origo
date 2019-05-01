@@ -349,17 +349,17 @@ const Viewer = function Viewer(targetOption, options = {}) {
       styles[styleName] = styleProps;
     }
   };
-  
+
   const onToggleInteraction = function onToggleInteraction(e) {
-    let clickInteractionControl = that.getControlByName(e.detail.name);
-    if(e.detail.active){
-      let oldClickInteractionControl = that.getControlByName(activeClickInteractionControl);
+    const clickInteractionControl = that.getControlByName(e.detail.name);
+    if (e.detail.active) {
+      const oldClickInteractionControl = that.getControlByName(activeClickInteractionControl);
       oldClickInteractionControl.disableInteraction();
       clickInteractionControl.enableInteraction();
       activeClickInteractionControl = e.detail.name;
     } else {
       clickInteractionControl.disableInteraction();
-      let featureinfoControl = that.getControlByName('featureInfo');
+      const featureinfoControl = that.getControlByName('featureInfo');
       featureinfoControl.enableInteraction();
       activeClickInteractionControl = 'featureInfo';
     }
