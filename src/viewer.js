@@ -18,6 +18,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
   let map;
   let tileGrid;
   let featureinfo;
+  let activeClickInteractionControl = 'featureInfo';
+  let that;
 
   let {
     projection
@@ -347,8 +349,24 @@ const Viewer = function Viewer(targetOption, options = {}) {
       styles[styleName] = styleProps;
     }
   };
+  
+  const onToggleInteraction = function onToggleInteraction(e) {
+    let clickInteractionControl = that.getControlByName(e.detail.name);
+    if(e.detail.active){
+      let oldClickInteractionControl = that.getControlByName(activeClickInteractionControl);
+      oldClickInteractionControl.disableInteraction();
+      clickInteractionControl.enableInteraction();
+      activeClickInteractionControl = e.detail.name;
+    } else {
+      clickInteractionControl.disableInteraction();
+      let featureinfoControl = that.getControlByName('featureInfo');
+      featureinfoControl.enableInteraction();
+      activeClickInteractionControl = 'featureInfo';
+    }
+  };
 
   return Component({
+    onToggleInteraction,
     onInit() {
       this.render();
 
@@ -430,6 +448,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
       featureinfo = Featureinfo(featureinfoOptions);
       this.addComponent(featureinfo);
       this.addControls();
+      that = this;
     },
     render() {
       const htmlString = `<div id="${this.getId()}" class="${cls}">
@@ -441,6 +460,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
       const el = document.querySelector(target);
       el.innerHTML = htmlString;
       this.dispatch('render');
+      document.addEventListener('toggleInteraction', this.onToggleInteraction);
     },
     addControl,
     addControls,
