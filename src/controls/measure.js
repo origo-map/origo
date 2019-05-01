@@ -241,8 +241,8 @@ const Measure = function Measure({
   function toggleMeasure() {
     document.dispatchEvent(new CustomEvent('toggleInteraction', {
       bubbles: true,
-      detail: { 
-        name: "measure",
+      detail: {
+        name: 'measure',
         active: !isActive
       }
     }));

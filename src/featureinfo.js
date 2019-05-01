@@ -243,13 +243,13 @@ const Featureinfo = function Featureinfo(options = {}) {
       map.un(clickEvent, onClick);
     }
   };
-  
-  const disableInteraction = function disableInteraction(e) {
+
+  const disableInteraction = function disableInteraction() {
     setActive(false);
   };
-  
-  const enableInteraction = function enableInteraction(e) {
-      setActive(true);
+
+  const enableInteraction = function enableInteraction() {
+    setActive(true);
   };
 
   return Component({
