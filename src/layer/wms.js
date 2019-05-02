@@ -17,7 +17,8 @@ function createTileSource(options) {
       LAYERS: options.id,
       TILED: true,
       VERSION: options.version,
-      FORMAT: options.format
+      FORMAT: options.format,
+      STYLES: options.style
     }
   }));
 }
@@ -54,6 +55,12 @@ const wms = function wms(layerOptions, viewer) {
   sourceOptions.projection = viewer.getProjection();
   sourceOptions.id = wmsOptions.id;
   sourceOptions.format = wmsOptions.format ? wmsOptions.format : sourceOptions.format;
+
+  const styleSettings = viewer.getStyle(wmsOptions.styleName);
+  const sldStyleObject = styleSettings[0].find(s => s.sldStyle);
+  if (sldStyleObject) {
+    sourceOptions.style = sldStyleObject.sldStyle;
+  }
 
   if (wmsOptions.tileGrid) {
     sourceOptions.tileGrid = maputils.tileGrid(wmsOptions.tileGrid);
