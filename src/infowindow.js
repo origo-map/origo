@@ -42,13 +42,13 @@ function render(viewerId) {
 
     exportContainer = document.createElement('div');
     exportContainer.classList.add('exportcontainer');
-    const svg = createSvgElement('fa-caret-square-o-right', 'export-svg');
-    exportContainer.appendChild(svg);
-    const exportTextNodeContainer = document.createElement('div');
-    exportTextNodeContainer.classList.add('export-textnode-container');
-    const exportTextNode = document.createTextNode('Exportera urvalet');
-    exportTextNodeContainer.appendChild(exportTextNode);
-    exportContainer.appendChild(exportTextNodeContainer);
+    // const svg = createSvgElement('fa-caret-square-o-right', 'export-svg');
+    // exportContainer.appendChild(svg);
+    // const exportTextNodeContainer = document.createElement('div');
+    // exportTextNodeContainer.classList.add('export-textnode-container');
+    // const exportTextNode = document.createTextNode('Exportera urvalet');
+    // exportTextNodeContainer.appendChild(exportTextNode);
+    //exportContainer.appendChild(exportTextNodeContainer);
 
     exportButtonsContainer = document.createElement('div');
     exportButtonsContainer.classList.add('export-buttons-container');
@@ -184,7 +184,25 @@ function updateExportContainer() {
                     return;
                 }
                 const selectedItems = selectionManager.getSelectedItemsForASelectionGroup(activeSelectionGroup);
-                layerSpecificExportHandler(url, activeLayer, selectedItems, attributesToSendToExport);
+                layerSpecificExportHandler(url, activeLayer, selectedItems, attributesToSendToExport).then((data) => {
+                    if (data) {
+                        switch (data.status) {
+                            case 'ok':
+                                createToaster('ok', data.message);
+                                break;
+
+                            case 'fail':
+                                createToaster('fail', data.message);
+                                break;
+
+                            default:
+                                break;
+                        }
+                    }
+                }).catch((err) => {
+                    console.log(err);
+                    btn.classList.add('unsuccessful');
+                });
             });
             exportButtonsContainer.appendChild(btn);
         });
@@ -209,6 +227,27 @@ function updateExportContainer() {
     } else {
         console.log('Neither Specific Export is specified for selection group: ' + activeSelectionGroup + ' nor Simple Export is allowed!');
     }
+}
+
+function createToaster(status, message) {
+    const toaster = document.createElement('div');
+    message ? message : status === 'ok' ? 'Det gick bra!' : 'Något gick fel!'
+    exportContainer.appendChild(toaster);
+    
+    setTimeout(() => {
+        // message must be added here inside timeout otherwise it will be shown 50 ms before it take the effect of the css
+        toaster.textContent = message;
+        toaster.classList.add('toaster');
+        if (status === 'ok') {
+            toaster.classList.add('toaster-successful');
+        } else {
+            toaster.classList.add('toaster-unsuccessful');
+        }
+    }, 50);
+    
+    setTimeout(() => {
+        toaster.parentNode.removeChild(toaster);
+    }, 5000);
 }
 
 function createExportButton(buttonText) {

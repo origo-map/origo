@@ -387,7 +387,6 @@ const Multiselect = function Multiselect(options = {}) {
         target
       });
       const featureSelectors = document.getElementsByClassName('featureSelectorItem');
-      console.log(featureSelectors);
 
       for (let index = 0; index < featureSelectors.length; index++) {
         const f = featureSelectors[index];

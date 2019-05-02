@@ -25,7 +25,7 @@ export function simpleExportHandler(simpleExportUrl, activeLayer, selectedItems)
         if (obj.geom) delete obj.geom;
         features[layerName].push(obj);
     });
-    
+
     fetch(simpleExportUrl, {
         method: 'POST', // or 'PUT'
         body: JSON.stringify(features), // data can be `string` or {object}!
@@ -35,7 +35,7 @@ export function simpleExportHandler(simpleExportUrl, activeLayer, selectedItems)
     })
         .then(response => response.blob())
         .then(blob => {
-            download(blob, 'ExportedFeatures.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');     
+            download(blob, 'ExportedFeatures.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         })
         .catch(err => console.log(err));
 }
@@ -48,7 +48,7 @@ export function layerSpecificExportHandler(url, activeLayer, selectedItems, attr
     let replacedUrl;
     // console.log('spesific Exporting layer ' + activeLayer.get('name') + url);
     // console.log(attributesToSendToExport);
-    
+
     const features = {};
     selectedItems.forEach(item => {
         const layerName = item.getLayer().get('name');
@@ -67,20 +67,31 @@ export function layerSpecificExportHandler(url, activeLayer, selectedItems, attr
         } else {
             obj = properties;
         }
-        if (obj.geom) delete obj.geom;        
+        if (obj.geom) delete obj.geom;
         features[layerName].push(obj);
     });
-    
-    fetch(url, {
+
+    return fetch(url, {
         method: 'POST', // or 'PUT'
         body: JSON.stringify(features), // data can be `string` or {object}!
         headers: {
             'Content-Type': 'application/json'
         }
     })
-        .then(response => response.blob())
-        .then(blob => {
-            download(blob, 'ExportedFeatures.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');     
+        .then(response => {            
+            switch (response.headers.get('content-type')) {
+                case 'application/json':
+                    return response.json();
+
+                case 'application/vnd.ms-excel':
+                    response.blob().then(blob => {
+                        download(blob, 'ExportedFeatures.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                    });
+                    break;
+
+                default:
+                    break;
+            }
         })
         .catch(err => console.log(err));
 }

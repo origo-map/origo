@@ -7,7 +7,7 @@
     top: 4em;
     right: 20em;
     background-color: white;
-    border-radius: 5px;
+    border-radius: 0.5em;
     box-shadow: 0px 0px 12px #888888;
   }
    
@@ -39,6 +39,7 @@
   
   .selectedurvalelement {
     border-bottom: 3px solid #d9d9d9;
+    color: rgb(0, 153, 255);
   }
   
   .closebutton-svg-container {
@@ -162,31 +163,30 @@
     padding-left: 0.5em;
     font-size: 12px;
     font-weight: normal;
-    border-top: 1px solid #d9d9d9;
+    // border-top: 1px solid #d9d9d9;
   }
   
-  .export-svg-container {
-    display: inline-block;
-    height: 1em;
-    width: 1em;
-    // padding: 0.5em 1em;
-  }
+  // .export-svg-container {
+  //   display: inline-block;
+  //   height: 1em;
+  //   width: 1em;
+  // }
   
-  .export-svg {
-    height: 100%;
-    width: 100%;
-    fill: dimgray;
-  }
+  // .export-svg {
+  //   height: 100%;
+  //   width: 100%;
+  //   fill: dimgray;
+  // }
   
-  .export-textnode-container {
-    display: inline-block;
-    height: 1em;
-    padding: 0.5em;
-    -ms-transform: translateY(-1px); /* IE 9 */
-    -webkit-transform: translateY(-1px); /* Safari */
-    transform: translateY(-1px);
-    //cursor: pointer;
-  }
+  // .export-textnode-container {
+  //   display: inline-block;
+  //   height: 1em;
+  //   padding: 0.5em;
+  //   -ms-transform: translateY(-1px); /* IE 9 */
+  //   -webkit-transform: translateY(-1px); /* Safari */
+  //   transform: translateY(-1px);
+  //   //cursor: pointer;
+  // }
 
   .export-buttons-container {
     margin: 0 1.5em 0.5em;
@@ -199,12 +199,36 @@
     background-color: whitesmoke;
     display: block;
     border: 1px solid #cccccc;
-    border-radius: 4px;
+    border-radius: 0.4em;
     padding: 2px 8px;
     margin: 4px 0;
     text-align: left;
   }
+
+  .toaster {
+    position: fixed;
+    top: 1em;
+    right: 1em;
+    padding: 1em;
+    z-index: 999;
+    box-shadow: 0px 0px 8px #888888;
+    border-radius: 0.5em;
+    transition: .5s;
+    -webkit-transition: .5s;
+    -moz-transition: .5s;   
+    -ms-transition: .5s;   
+    -o-transition: .5s;
+  }
+
+  .toaster-successful {
+    background-color: #d6f5d6;
+  }
   
+  .toaster-unsuccessful {
+    background-color: #ffcccc;
+  }
+  
+
   .hidden {
     display: none;
   }
