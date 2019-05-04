@@ -93,5 +93,8 @@ export function layerSpecificExportHandler(url, activeLayer, selectedItems, attr
                     break;
             }
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            console.log(err);
+            return Promise.reject(err);
+        });
 }

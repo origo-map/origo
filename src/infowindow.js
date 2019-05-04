@@ -1,4 +1,5 @@
 import { simpleExportHandler, layerSpecificExportHandler } from './infowindow_exporthandler';
+// import loading from '../img/gif/loading.gif';
 
 let mainContainer;
 let urvalContainer;
@@ -120,6 +121,8 @@ function createUrvalElement(selectionGroup, selectionGroupTitle) {
     });
     const sublistContainter = document.createElement('div');
     sublists.set(selectionGroup, sublistContainter);
+
+    
 }
 
 function showSelectedList(selectionGroup) {
@@ -130,7 +133,7 @@ function showSelectedList(selectionGroup) {
 
     activeSelectionGroup = selectionGroup;
     while (listContainer.firstChild) {
-        listContainer.removeChild(listContainer.firstChild);
+        listContainer.removeChild(listContainer.firstChild);        
     }
 
     const sublistToAppend = sublists.get(selectionGroup);
@@ -177,12 +180,14 @@ function updateExportContainer() {
             const buttonText = obj.buttonText || "External Call";
             const url = obj.url;
             const attributesToSendToExport = obj.attributesToSendToExport ? obj.attributesToSendToExport : attributesToSendToExport_per_layer;
-            const btn = createExportButton(buttonText);
+            const exportBtn = createExportButton(buttonText);
+            const btn = exportBtn.querySelector('button');
             btn.addEventListener('click', (e) => {
                 if (!url) {
                     alert('No export url is specified.');
                     return;
                 }
+                exportBtn.loadStart();
                 const selectedItems = selectionManager.getSelectedItemsForASelectionGroup(activeSelectionGroup);
                 layerSpecificExportHandler(url, activeLayer, selectedItems, attributesToSendToExport).then((data) => {
                     if (data) {
@@ -199,12 +204,18 @@ function updateExportContainer() {
                                 break;
                         }
                     }
+                    exportBtn.loadStop();
                 }).catch((err) => {
                     console.log(err);
-                    btn.classList.add('unsuccessful');
-                });
+                    createToaster('fail', 'Failed to fetch data from server.');
+                    exportBtn.loadStop();
+                })
+                // finallly block does not work in edge!
+                // .finally(() => {
+                //    exportBtn.loadStop();                
+                // });
             });
-            exportButtonsContainer.appendChild(btn);
+            exportButtonsContainer.appendChild(exportBtn);
         });
 
     } else if (simpleExport) {
@@ -251,10 +262,34 @@ function createToaster(status, message) {
 }
 
 function createExportButton(buttonText) {
+
+    const container = document.createElement('div');
+
+    const spinner = document.createElement('img');
+    spinner.src = '../img/gif/loading.gif';
+    spinner.classList.add('spinner');
+    spinner.style.visibility = 'hidden';
+
     const button = document.createElement('button');
     button.classList.add('export-button');
     button.textContent = buttonText;
-    return button;
+    
+    container.appendChild(spinner);
+    container.appendChild(button);
+
+    container.loadStart = () => {
+        button.disabled = true;
+        button.classList.add('disabled');
+        spinner.style.visibility = 'visible';
+    }
+    
+    container.loadStop = () => {
+        button.disabled = false;
+        button.classList.remove('disabled');
+        spinner.style.visibility = 'hidden';
+    }
+
+    return container;
 }
 
 function createListElement(item) {
