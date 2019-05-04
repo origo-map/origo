@@ -1,14 +1,14 @@
 
 .sidebarcontainer {
     position: absolute;
-    // margin-right: 2rem;
-    // height: 10rem;
+    font-size: 12px;
+    font-weight: normal;
     width: 320px;
-    top: 4em;
+    top: 6em;
     right: 20em;
     background-color: white;
     border-radius: 0.5em;
-    box-shadow: 0px 0px 12px #888888;
+    box-shadow: 0px 0px 8px #888888; 
   }
    
   /** 
@@ -160,33 +160,9 @@
    */
   
   .exportcontainer {
-   // padding-left: 0.5em;
     font-size: 12px;
     font-weight: normal;
-    // border-top: 1px solid #d9d9d9;
   }
-  
-  // .export-svg-container {
-  //   display: inline-block;
-  //   height: 1em;
-  //   width: 1em;
-  // }
-  
-  // .export-svg {
-  //   height: 100%;
-  //   width: 100%;
-  //   fill: dimgray;
-  // }
-  
-  // .export-textnode-container {
-  //   display: inline-block;
-  //   height: 1em;
-  //   padding: 0.5em;
-  //   -ms-transform: translateY(-1px); /* IE 9 */
-  //   -webkit-transform: translateY(-1px); /* Safari */
-  //   transform: translateY(-1px);
-  //   //cursor: pointer;
-  // }
 
   .export-buttons-container {
     margin: 0.5em 0.2em;
@@ -197,11 +173,9 @@
     font-weight: normal;
     color: black;
     background-color: whitesmoke;
-    // display: block;
     border: 1px solid #cccccc;
     border-radius: 0.4em;
     padding: 2px 8px;
-    // margin: 4px 0;
     text-align: left;
     max-width: 280px;
   }

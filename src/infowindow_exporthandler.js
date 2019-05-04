@@ -45,10 +45,7 @@ export function layerSpecificExportHandler(url, activeLayer, selectedItems, attr
         alert('Export URL is not specified.');
         return;
     }
-    let replacedUrl;
-    // console.log('spesific Exporting layer ' + activeLayer.get('name') + url);
-    // console.log(attributesToSendToExport);
-
+    // let replacedUrl;
     const features = {};
     selectedItems.forEach(item => {
         const layerName = item.getLayer().get('name');
@@ -56,7 +53,7 @@ export function layerSpecificExportHandler(url, activeLayer, selectedItems, attr
             features[layerName] = [];
         }
         const properties = item.getFeature().getProperties();
-        replacedUrl = replacer.replace(url, properties);
+        // replacedUrl = replacer.replace(url, properties);
         let obj = {};
         if (attributesToSendToExport) {
             attributesToSendToExport.forEach(att => {
