@@ -44,10 +44,10 @@ export const findStyleType = function findStyleType(styles) {
   return null;
 };
 
-// This returns the last styleRule flagged as header. In other words, if there are 3 styleRules 
+// If there is only one styleRule that will be used as header icon, but not if that is extendedLegend. In latter case null is returned  meaning that list_icon will be set as header icon.
+// If there are more than one styleRule the last styleRule flagged as header will be returned. In other words, if there are for example 3 styleRules 
 // an all of them have header=true, then the last one will be returned and set on the icon legend.
-// If there is only one styleRule that will be used as header icon.
-// If there are more than on styleRule but none of them has header flag, then null is returned meaning that list_icon will set as header icon
+// If there are more than one styleRule but none of them has header flag, then null is returned meaning that list_icon will be set as header icon.
 export const findHeaderStyle = function findHeaderStyle(styleRules) {
   if (styleRules.length === 1) {
     const icons = styleRules[0].filter(sr => sr.icon);
