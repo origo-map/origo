@@ -44,12 +44,23 @@ export const findStyleType = function findStyleType(styles) {
   return null;
 };
 
+// This returns the last styleRule flagged as header. In other words, if there are 3 styleRules 
+// an all of them have header=true, then the last one will be returned and set on the icon legend.
+// If there is only one styleRule that will be used as header icon.
+// If there are more than on styleRule but none of them has header flag, then null is returned meaning that list_icon will set as header icon
 export const findHeaderStyle = function findHeaderStyle(styleRules) {
   if (styleRules.length === 1) {
+    const icons = styleRules[0].filter(sr => sr.icon);
+    if (icons && icons.length && icons[0].extendedLegend) {
+      return null;
+    }
     return styleRules[0];
   }
   return styleRules.reduce((prev, styleRule) => {
-    if (styleRule.filter(style => style.header).length) {
+    const headerItems = styleRule.filter(style => {
+      return style.header
+    });
+    if (headerItems.length) {
       return styleRule;
     }
     return prev;
@@ -109,6 +120,13 @@ export const renderLegendItem = function renderLegendItem(svgIcon, label = '') {
           </li>`;
 };
 
+export const renderExtendedLegendItem = function renderExtendedLegendItem(extendedLegendItem) {
+  const style = `style="width: ${size}px; height: ${size}px;"`;
+  return `<li class="flex row align-center padding-y-smallest">
+            <img src=${extendedLegendItem.icon.src} />
+          </li>`;
+};
+
 export const Legend = function Legend(styleRules, opacity = 1) {
   const noLegend = 'Legend saknas';
   if (Array.isArray(styleRules)) {
@@ -116,8 +134,14 @@ export const Legend = function Legend(styleRules, opacity = 1) {
       if (Array.isArray(styleRule)) {
         if (!isHidden(styleRule)) {
           const labelItem = styleRule.find(style => style.label) || {};
+          const extendedLegendItem = styleRule.find(style => style.extendedLegend);
           const label = labelItem.label || '';
-          return prevRule + renderLegendItem(renderSvgIcon(styleRule, { opacity }), label);
+          if (extendedLegendItem && extendedLegendItem.icon) {
+            return prevRule + renderExtendedLegendItem(extendedLegendItem);
+          } else {
+            const svgIcon = renderSvgIcon(styleRule, { opacity });
+            return prevRule + renderLegendItem(svgIcon, label);
+          }
         }
       }
       return prevRule;
