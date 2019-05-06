@@ -263,7 +263,7 @@ const Multiselect = function Multiselect(options = {}) {
   function fetchFeatures_Box(evt) {
     const extent = evt.feature.getGeometry().getExtent();
     const layers = viewer.getQueryableLayers();
-    
+
     if (layers.length < 1) {
       return;
     }
@@ -277,7 +277,7 @@ const Multiselect = function Multiselect(options = {}) {
     Promise.all(results.selectedRemoteItemsPromises).then(data => {
       // data is an array containing corresponding array of features for each layer.
       data.forEach(items => allItems = allItems.concat(items));
-      
+
       if (allItems.length === 1) {
         selectionManager.addOrHighlightItem(allItems[0]);
       } else if (allItems.length > 1) {
@@ -310,7 +310,7 @@ const Multiselect = function Multiselect(options = {}) {
     Promise.all(results.selectedRemoteItemsPromises).then(data => {
       // data is an array containing corresponding arrays of features for each layer.
       data.forEach(items => allItems = allItems.concat(getItemsIntersectingGeometry(items, circle)));
-      
+
       if (allItems.length === 1) {
         selectionManager.addOrHighlightItem(allItems[0]);
       } else if (allItems.length > 1) {
@@ -350,14 +350,12 @@ const Multiselect = function Multiselect(options = {}) {
             const serverResult = data || [];
             const result = serverResult.concat(clientResult);
             if (result.length > 0) {
-              // extracting features only. we do not need contents which is created to use in pop-up
-              const features = result.map(item => item.getFeature());
               let promise;
-              if (features.length === 1) {
-                bufferFeature = features[0].clone();
+              if (result.length === 1) {
+                bufferFeature = result[0].getFeature().clone();
                 promise = Promise.resolve();
-              } else if (features.length > 1) {
-                promise = createFeatureSelectionModal(features);
+              } else if (result.length > 1) {
+                promise = createFeatureSelectionModal(result);
               }
               promise.then(() => createRadiusModal());
             }
@@ -368,11 +366,15 @@ const Multiselect = function Multiselect(options = {}) {
     return true;
   }
 
-  function createFeatureSelectionModal(features) {
-
-    const featuresList = features.map(f => {
-      const title = f.get('namn') ? f.get('namn') : f.getId();
-      return `<div class="featureSelectorItem" id="${f.getId()}"> ${title} </div>`;
+  function createFeatureSelectionModal(items) {
+    // extracting features
+    const features = items.map(item => item.getFeature());
+    const featuresList = items.map(item => {
+      const layerAttributes = item.getLayer().get('attributes');
+      const bufferAttribute = layerAttributes ? layerAttributes[0].name ? layerAttributes[0].name : undefined : undefined;
+      const feature = item.getFeature();
+      const title = feature.get(bufferAttribute) || feature.get('namn') || feature.getId();
+      return `<div class="featureSelectorItem" id="${feature.getId()}"> ${title} </div>`;
     });
 
     return new Promise((resolve, reject) => {
@@ -422,7 +424,6 @@ const Multiselect = function Multiselect(options = {}) {
       // const onlyNumbers = pattern.test(radiusVal);
       // console.log(onlyNumbers);
       const radius = parseFloat(radiusVal);
-
       if ((!radius && radius !== 0) ||
         (radius <= 0 && (bufferFeature.getGeometry().getType() === GeometryType.POINT ||
           bufferFeature.getGeometry().getType() === GeometryType.MULTI_POINT ||
@@ -460,7 +461,7 @@ const Multiselect = function Multiselect(options = {}) {
     Promise.all(results.selectedRemoteItemsPromises).then(data => {
       // data is an array containing corresponding arrays of features for each layer.
       data.forEach(items => allItems = allItems.concat(getItemsIntersectingGeometry(items, bufferedGeometry)));
-      
+
       if (allItems.length === 1) {
         selectionManager.addOrHighlightItem(allItems[0]);
       } else if (allItems.length > 1) {
@@ -695,7 +696,7 @@ const Multiselect = function Multiselect(options = {}) {
   return Component({
     name: 'multiselection',
     onInit() {
-      
+
       runpolyfill();
 
       if (clickSelection || boxSelection || circleSelection || bufferSelection) {
