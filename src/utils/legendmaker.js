@@ -121,7 +121,6 @@ export const renderLegendItem = function renderLegendItem(svgIcon, label = '') {
 };
 
 export const renderExtendedLegendItem = function renderExtendedLegendItem(extendedLegendItem) {
-  const style = `style="width: ${size}px; height: ${size}px;"`;
   return `<li class="flex row align-center padding-y-smallest">
             <img src=${extendedLegendItem.icon.src} />
           </li>`;
