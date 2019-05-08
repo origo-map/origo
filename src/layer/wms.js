@@ -57,8 +57,8 @@ const wms = function wms(layerOptions, viewer) {
   sourceOptions.format = wmsOptions.format ? wmsOptions.format : sourceOptions.format;
 
   const styleSettings = viewer.getStyle(wmsOptions.styleName);
-  const sldStyleObject = styleSettings[0].find(s => s.sldStyle);
-  sourceOptions.style = sldStyleObject ? sldStyleObject.sldStyle : '';
+  const wmsStyleObject = styleSettings[0].find(s => s.wmsStyle);
+  sourceOptions.style = wmsStyleObject ? wmsStyleObject.wmsStyle : '';
 
   if (wmsOptions.tileGrid) {
     sourceOptions.tileGrid = maputils.tileGrid(wmsOptions.tileGrid);
