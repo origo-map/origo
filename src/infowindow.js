@@ -259,7 +259,7 @@ function createExportButton(buttonText) {
     const container = document.createElement('div');
 
     const spinner = document.createElement('img');
-    spinner.src = '../img/gif/loading.gif';
+    spinner.src = '../img/loading.gif';
     spinner.classList.add('spinner');
     spinner.style.visibility = 'hidden';
 
