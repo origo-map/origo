@@ -43,9 +43,7 @@ const Featureinfo = function Featureinfo(options = {}) {
   const infowindow = 'infowindow' in options ? options.infowindow : 'overlay';
 
   identifyTarget = infowindow;
-  if (identifyTarget === 'sidebar') {
-    sidebar.init();
-  }
+  
 
   // if (showOverlay) {
   //   identifyTarget = 'overlay';
@@ -309,6 +307,9 @@ const Featureinfo = function Featureinfo(options = {}) {
     onAdd(e) {
       viewer = e.target;
       const map = viewer.getMap();
+      if (identifyTarget === 'sidebar') {
+        sidebar.init(viewer);
+      }
       selectionLayer = featurelayer(savedFeature, map);
       selectionManager = viewer.getSelectionManager();
       map.on(clickEvent, onClick);
