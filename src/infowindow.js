@@ -198,7 +198,7 @@ function createSubexportConponent(selectionGroup) {
                     exportBtn.loadStop();
                 }).catch((err) => {
                     console.log(err);
-                    createToaster('fail', 'Failed to fetch data from server.');
+                    createToaster('fail', err);
                     exportBtn.loadStop();
                 });
                 // finallly block does not work in edge!
@@ -225,7 +225,7 @@ function createSubexportConponent(selectionGroup) {
                     exportBtn.loadStop();
                 }).catch((err) => {
                     console.log(err);
-                    createToaster('fail', 'Failed to fetch data from server.');
+                    createToaster('fail', err);
                     exportBtn.loadStop();
                 });
             });
@@ -265,7 +265,7 @@ function createToaster(status, message) {
 function createExportButton(buttonText) {
 
     const container = document.createElement('div');
-    
+
     const spinner = document.createElement('img');
     spinner.src = '../img/loading.gif';
     spinner.classList.add('spinner');

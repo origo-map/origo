@@ -33,13 +33,20 @@ export function simpleExportHandler(simpleExportUrl, activeLayer, selectedItems)
             'Content-Type': 'application/json'
         }
     })
-        .then(response => response.blob())
+        .then(response => {
+            if (response.status !== 200) {
+                throw response.statusText;
+                // return Promise.reject(response.statusText);
+            }
+            return response.blob();
+        })
         .then(blob => {
             download(blob, 'ExportedFeatures.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         })
         .catch(err => {
             console.log(err);
-            return Promise.reject(err);
+            throw err;
+            // return Promise.reject(err);
         });
 }
 
@@ -78,12 +85,18 @@ export function layerSpecificExportHandler(url, activeLayer, selectedItems, attr
             'Content-Type': 'application/json'
         }
     })
-        .then(response => {            
+        .then(response => {
             switch (response.headers.get('content-type')) {
                 case 'application/json':
                     return response.json();
 
                 case 'application/vnd.ms-excel':
+
+                    if (response.status !== 200) {
+                        throw response.statusText;
+                        // return Promise.reject(response.statusText);
+                    }
+
                     response.blob().then(blob => {
                         download(blob, 'ExportedFeatures.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
                     });
@@ -95,6 +108,7 @@ export function layerSpecificExportHandler(url, activeLayer, selectedItems, attr
         })
         .catch(err => {
             console.log(err);
-            return Promise.reject(err);
+            throw err;
+            // return Promise.reject(err);
         });
 }
