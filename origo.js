@@ -6,6 +6,8 @@ import titleCase from './src/utils/titlecase';
 import * as origoControls from './src/controls';
 import supports from './src/utils/supports';
 import renderError from './src/utils/rendererror';
+import Style from './src/style';
+import featurelayer from './src/featurelayer';
 
 const Origo = function Origo(configPath, options = {}) {
   const origoConfig = {
@@ -75,5 +77,7 @@ const Origo = function Origo(configPath, options = {}) {
 
 Origo.controls = origoControls;
 Origo.ui = ui;
+Origo.Style = Style;
+Origo.featurelayer = featurelayer;
 
 export default Origo;
