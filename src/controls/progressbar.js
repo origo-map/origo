@@ -38,14 +38,12 @@ const hide = function hide() {
   if (this.loading === this.loaded) {
     this.element.style.visibility = 'hidden';
     this.element.style.width = '100%';
-    this.element.style.background = 'rgba(124, 186, 248, 0.8)';
     this.element.style.opacity = 0;
     this.element.style.transition = 'visibility 0s 1s, opacity 1s linear';
   }
 };
 
 const show = function show() {
-  this.element.style.background = 'rgba(124, 186, 248, 0.8)';
   this.element.style.visibility = 'visible';
   this.element.style.opacity = 1;
 };
