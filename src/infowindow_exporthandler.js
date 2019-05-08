@@ -26,7 +26,7 @@ export function simpleExportHandler(simpleExportUrl, activeLayer, selectedItems)
         features[layerName].push(obj);
     });
 
-    fetch(simpleExportUrl, {
+    return fetch(simpleExportUrl, {
         method: 'POST', // or 'PUT'
         body: JSON.stringify(features), // data can be `string` or {object}!
         headers: {
@@ -37,7 +37,10 @@ export function simpleExportHandler(simpleExportUrl, activeLayer, selectedItems)
         .then(blob => {
             download(blob, 'ExportedFeatures.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         })
-        .catch(err => console.log(err));
+        .catch(err => {
+            console.log(err);
+            return Promise.reject(err);
+        });
 }
 
 export function layerSpecificExportHandler(url, activeLayer, selectedItems, attributesToSendToExport) {

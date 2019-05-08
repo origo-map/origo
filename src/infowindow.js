@@ -175,7 +175,7 @@ function createSubexportConponent(selectionGroup) {
             const btn = exportBtn.querySelector('button');
             btn.addEventListener('click', (e) => {
                 if (!url) {
-                    alert('No export url is specified.');
+                    createToaster('fail', 'No export url is specified.');
                     return;
                 }
                 exportBtn.loadStart();
@@ -200,7 +200,7 @@ function createSubexportConponent(selectionGroup) {
                     console.log(err);
                     createToaster('fail', 'Failed to fetch data from server.');
                     exportBtn.loadStop();
-                })
+                });
                 // finallly block does not work in edge!
                 // .finally(() => {
                 //    exportBtn.loadStop();                
@@ -212,16 +212,24 @@ function createSubexportConponent(selectionGroup) {
     } else if (simpleExport) {
         const exportAllowed = simpleExportLayers.find(l => l === selectionGroup);
         if (exportAllowed) {
-            const btn = createExportButton(simpleExportButtonText);
+            const exportBtn = createExportButton(simpleExportButtonText);
+            const btn = exportBtn.querySelector('button');
             btn.addEventListener('click', (e) => {
                 if (!simpleExportUrl) {
-                    alert('No export url is specified.');
+                    createToaster('fail', 'No export url is specified.');
                     return;
                 }
+                exportBtn.loadStart();
                 const selectedItems = selectionManager.getSelectedItemsForASelectionGroup(selectionGroup);
-                simpleExportHandler(simpleExportUrl, activeLayer, selectedItems);
+                simpleExportHandler(simpleExportUrl, activeLayer, selectedItems).then(data => {
+                    exportBtn.loadStop();
+                }).catch((err) => {
+                    console.log(err);
+                    createToaster('fail', 'Failed to fetch data from server.');
+                    exportBtn.loadStop();
+                });
             });
-            subexportContainer.appendChild(btn);
+            subexportContainer.appendChild(exportBtn);
         } else {
             console.log('Export is not allowed for selection group: ' + selectionGroup);
         }
@@ -257,7 +265,7 @@ function createToaster(status, message) {
 function createExportButton(buttonText) {
 
     const container = document.createElement('div');
-
+    
     const spinner = document.createElement('img');
     spinner.src = '../img/loading.gif';
     spinner.classList.add('spinner');
