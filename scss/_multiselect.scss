@@ -28,3 +28,9 @@
   .unvalidValue {
     border: 1px solid red;
   }
+
+  &[class*=#{$media-l-m}] {
+    .o-multiselect {
+      display: none;
+    }
+  }
