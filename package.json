@@ -16,10 +16,12 @@
     "watch-sass": "node-sass -w --include-path scss scss/origo.scss css/style.css",
     "prebuild-sass": "node-sass --include-path scss scss/origo.scss css/style.css",
     "build": "npm run build-js && npm run build-sass | npm run copy",
+    "build-dev": "npm run build-js && npm run build-sass | npm run copy-dev",
     "build-sass": "node-sass --include-path scss scss/origo.scss dist/style.css",
     "build-js": "webpack --config ./tasks/webpack.prod.js",
     "build-js-analyze": "webpack --config ./tasks/webpack.analyze.js",
-    "copy": "webpack --config ./tasks/webpack.copy.js"
+    "copy": "webpack --config ./tasks/webpack.copy.js",
+    "copy-dev": "webpack --config ./tasks/webpack.copy-dev.js"
   },
   "dependencies": {
     "@babel/polyfill": "^7.0.0",
@@ -28,7 +30,7 @@
     "awesomplete": "1.1.2",
     "core-js": "^2.4.0",
     "cuid": "^2.1.4",
-    "jquery": "^3.4.0",
+    "jquery": "3.4.0",
     "ol": "5.3.0",
     "owl.carousel": "^2.3.4",
     "proj4": "2.3.10",
