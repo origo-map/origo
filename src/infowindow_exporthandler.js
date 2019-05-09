@@ -86,23 +86,32 @@ export function layerSpecificExportHandler(url, activeLayer, selectedItems, attr
         }
     })
         .then(response => {
-            switch (response.headers.get('content-type')) {
+            const contentType = response.headers.get('content-type');
+            switch (contentType) {
                 case 'application/json':
                     return response.json();
 
-                case 'application/vnd.ms-excel':
+                // case 'application/vnd.ms-excel':
 
+                //     if (response.status !== 200) {
+                //         throw response.statusText;
+                //         // return Promise.reject(response.statusText);
+                //     }
+
+                //     response.blob().then(blob => {
+                //         download(blob, 'ExportedFeatures.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                //     });
+                //     break;
+
+                default:
                     if (response.status !== 200) {
                         throw response.statusText;
                         // return Promise.reject(response.statusText);
                     }
 
                     response.blob().then(blob => {
-                        download(blob, 'ExportedFeatures.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                        download(blob, 'ExportedFeatures.xlsx', contentType);
                     });
-                    break;
-
-                default:
                     break;
             }
         })
