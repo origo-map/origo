@@ -350,7 +350,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
   const getUrlParams = function getUrlParams() {
     return urlParams;
-  }
+  };
 
   return Component({
     onInit() {

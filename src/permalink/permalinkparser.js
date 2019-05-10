@@ -61,22 +61,21 @@ export default {
     return mapStr;
   },
   controls(controlsStr) {
-    var controls = {};
-    for (var key in controlsStr) {
+    const controls = {};
+    for (const key in controlsStr) {
       controls[key] = parseFunctions[key](controlsStr[key]);
     }
     return controls;
   },
   controlDraw(drawState) {
     const features = new GeoJSON().readFeatures(drawState.features);
-    return { "features": features };
+    return { features };
   }
 };
 
-// We define the controls parse functions so they can be called from parseControlls funktion 
+// We define the controls parse functions so they can be called from parseControlls funktion
 // (I don't want to rewrite the whole file so it first defines all
 // functions and then export it as the file will then differ alot with OrigoMap and have to be merged every time.
 // Lukas Bergliden Decerno
 const parseFunctions = {};
 parseFunctions.draw = permalinkParser.controlDraw;
-

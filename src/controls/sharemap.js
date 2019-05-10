@@ -49,12 +49,11 @@ const ShareMap = function ShareMap(options = {}) {
             target
           });
           this.addComponent(modal);
-          if (storeMethod == "saveStateToServer") {
+          if (storeMethod === 'saveStateToServer') {
             permalink.saveStateToServer(viewer).then((data) => {
               createLink(data);
             });
-          }
-          else {
+          } else {
             createLink();
           }
         },

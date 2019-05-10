@@ -36,14 +36,15 @@ permalinkStore.getState = function getState(viewer, isExtended) {
         draw: draw.getState()
       };
     }
-  } 
+  }
 
   if (featureinfo.getSelection().id) {
     state.feature = featureinfo.getSelection().id;
   }
 
   if (getPin()) {
-    state.pin = getPin().getGeometry().getCoordinates().map(coord => Math.round(coord)).join();
+    state.pin = getPin().getGeometry().getCoordinates().map(coord => Math.round(coord))
+      .join();
   }
 
   if (viewer.getMapName()) {

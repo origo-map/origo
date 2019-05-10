@@ -13,11 +13,7 @@
       }
     },
     {
-      "name": "sharemap",
-      "options": {
-        "storeMethod": "saveStateToServer",
-        "serviceEndpoint": "http://localhost:3001/mapstate"
-      }
+      "name": "sharemap"
     },
     {
       "name": "geoposition"

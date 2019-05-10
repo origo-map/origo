@@ -1,15 +1,15 @@
 import permalinkParser from './permalinkparser';
 import permalinkStore from './permalinkstore';
 import urlparser from '../utils/urlparser';
-let saveOnServerServiceEndPoint = "";
+
+let saveOnServerServiceEndPoint = '';
 
 export default (() => ({
   getPermalink: function getPermalink(viewer, options) {
-    let url = "";
+    let url = '';
     if (options && options.mapStateId) {
-      url = permalinkStore.getUrl(viewer) + "?mapStateId=" + options.mapStateId;
-    }
-    else {
+      url = `${permalinkStore.getUrl(viewer)}?mapStateId=${options.mapStateId}`;
+    } else {
       const hash = urlparser.formatUrl(permalinkStore.getState(viewer));
       url = `${permalinkStore.getUrl(viewer)}#${hash}`;
     }
@@ -39,28 +39,27 @@ export default (() => ({
       method: 'POST',
       body: JSON.stringify(permalinkStore.getState(viewer, true)),
       headers: {
-        "Content-Type": "application/json; charset=utf-8"
+        'Content-Type': 'application/json; charset=utf-8'
       }
-    }).then(function (response) {
-      return response.json();
-    });
+    }).then(response => response.json());
   },
   readStateFromServer: function readStateFromServer(mapStateId) {
     if (!mapStateId) {
-      throw "No mapStateId";
+      const throwMessage = 'No mapStateId';
+      throw throwMessage;
     }
-    if (!saveOnServerServiceEndPoint || saveOnServerServiceEndPoint == "") {
-      throw "No saveOnServerServiceEndPoint defined";
+    if (!saveOnServerServiceEndPoint || saveOnServerServiceEndPoint === '') {
+      const throwMessage = 'No saveOnServerServiceEndPoint defined';
+      throw throwMessage;
     } else {
-      return fetch(saveOnServerServiceEndPoint + "/" + mapStateId).then(function (response) {
-        return response.json();
-      }).then(function (data) {
-        var mapObj = {};
-        for (var key in data) {
-          mapObj[key] = permalinkParser[key](data[key]);
-        }
-        return mapObj;
-      });
+      return fetch(`${saveOnServerServiceEndPoint}/${mapStateId}`).then(response => response.json())
+        .then((data) => {
+          const mapObj = {};
+          for (const key in data) {
+            mapObj[key] = permalinkParser[key](data[key]);
+          }
+          return mapObj;
+        });
     }
   }
 }))();
