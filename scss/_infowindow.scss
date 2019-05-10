@@ -240,9 +240,22 @@
       left: 50%;
       transform: translateX(-50%);
       width: 280px;
+      top: 5em;
     }
-
     .o-identify-content {
       width: 94%;
+    }
+  }
+
+  &[class*=#{$media-l-m}] {
+    .sidebarcontainer {
+      width: 250px;
+    }
+  }
+
+  &[class*=#{$media-l-m-s}] {
+    .sidebarcontainer {
+      transform: none;
+      left: 5em;
     }
   }

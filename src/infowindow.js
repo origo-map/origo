@@ -1,5 +1,6 @@
 import { simpleExportHandler, layerSpecificExportHandler } from './infowindow_exporthandler';
 
+let parentElement;
 let mainContainer;
 let urvalContainer;
 let listContainer;
@@ -47,7 +48,7 @@ function render(viewerId) {
     mainContainer.appendChild(listContainer);
     mainContainer.appendChild(exportContainer);
 
-    const parentElement = document.getElementById(viewerId);
+    parentElement = document.getElementById(viewerId);
     parentElement.appendChild(mainContainer);
     mainContainer.classList.add('hidden');
 
@@ -175,7 +176,7 @@ function createSubexportConponent(selectionGroup) {
             const btn = exportBtn.querySelector('button');
             btn.addEventListener('click', (e) => {
                 if (!url) {
-                    createToaster('fail', 'No export url is specified.');
+                    createToaster('fail');
                     return;
                 }
                 exportBtn.loadStart();
@@ -184,11 +185,11 @@ function createSubexportConponent(selectionGroup) {
                     if (data) {
                         switch (data.status) {
                             case 'ok':
-                                createToaster('ok', data.message);
+                                createToaster('ok');
                                 break;
 
                             case 'fail':
-                                createToaster('fail', data.message);
+                                createToaster('fail');
                                 break;
 
                             default:
@@ -198,7 +199,7 @@ function createSubexportConponent(selectionGroup) {
                     exportBtn.loadStop();
                 }).catch((err) => {
                     console.log(err);
-                    createToaster('fail', err);
+                    createToaster('fail');
                     exportBtn.loadStop();
                 });
                 // finallly block does not work in edge!
@@ -216,7 +217,7 @@ function createSubexportConponent(selectionGroup) {
             const btn = exportBtn.querySelector('button');
             btn.addEventListener('click', (e) => {
                 if (!simpleExportUrl) {
-                    createToaster('fail', 'No export url is specified.');
+                    createToaster('fail');
                     return;
                 }
                 exportBtn.loadStart();
@@ -225,7 +226,7 @@ function createSubexportConponent(selectionGroup) {
                     exportBtn.loadStop();
                 }).catch((err) => {
                     console.log(err);
-                    createToaster('fail', err);
+                    createToaster('fail');
                     exportBtn.loadStop();
                 });
             });
@@ -243,9 +244,13 @@ function createSubexportConponent(selectionGroup) {
 
 function createToaster(status, message) {
     const toaster = document.createElement('div');
-    message ? message : status === 'ok' ? 'Det gick bra!' : 'Något gick fel!'
-    mainContainer.appendChild(toaster);
-    
+    toaster.style.fontSize = '12px';
+    if (!message) {
+        message = status === 'ok' ? 'Det gick bra!' : 'Något gick fel, kontakta administratören.'
+    }
+    // mainContainer.appendChild(toaster);
+    // const parent = document.getElementsByClassName('o-main')[0];
+    parentElement.appendChild(toaster);
     setTimeout(() => {
         // message must be added here inside timeout otherwise it will be shown 50 ms before it take the effect of the css
         toaster.textContent = message;
@@ -267,7 +272,7 @@ function createExportButton(buttonText) {
     const container = document.createElement('div');
 
     const spinner = document.createElement('img');
-    spinner.src = '../img/loading.gif';
+    spinner.src = 'img/loading.gif';
     spinner.classList.add('spinner');
     spinner.style.visibility = 'hidden';
 
