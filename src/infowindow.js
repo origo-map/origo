@@ -248,8 +248,7 @@ function createToaster(status, message) {
     if (!message) {
         message = status === 'ok' ? 'Det gick bra!' : 'Något gick fel, kontakta administratören.'
     }
-    // mainContainer.appendChild(toaster);
-    // const parent = document.getElementsByClassName('o-main')[0];
+    // It cannot be appended to infowindow bcuz in mobile tranform:translate is used css, and it causes that position: fixed loses its effect.
     parentElement.appendChild(toaster);
     setTimeout(() => {
         // message must be added here inside timeout otherwise it will be shown 50 ms before it take the effect of the css
