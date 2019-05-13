@@ -24,7 +24,7 @@ function render(viewerId) {
     urvalContainer.id = 'sidebarcontainer-draggable';
     const urvalTextNodeContainer = document.createElement('div');
     urvalTextNodeContainer.classList.add('urval-textnode-container');
-    const urvalTextNode = document.createTextNode('Urval');
+    const urvalTextNode = document.createTextNode('Träffar');
     urvalTextNodeContainer.appendChild(urvalTextNode);
     urvalContainer.appendChild(urvalTextNodeContainer);
     const closeButtonSvg = createSvgElement('ic_close_24px', 'closebutton-svg');
