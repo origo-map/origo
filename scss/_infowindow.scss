@@ -26,6 +26,7 @@
   
   .urval-textnode-container {
     margin-bottom: 0.5em;
+    font-size: 15px;
   }
   
   .urvalelement {
@@ -38,8 +39,9 @@
   }
   
   .selectedurvalelement {
-    border-bottom: 3px solid #d9d9d9;
-    color: rgb(0, 153, 255);
+    border-bottom: 3px solid #0099FF;
+    font-weight: normal;
+    color: rgb(0, 0, 0);
   }
   
   .closebutton-svg-container {
