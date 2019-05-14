@@ -208,8 +208,8 @@ function getGetFeatureInfoUrl(layer, coordinate) {
             'buffer': '10'
         }
     );
-
-    return $.ajax(url, {type: 'post'}).then(function(response) {
+    //http method "get" appears to work for wms layers from ArcGIS Server as well as Geoserver
+    return $.ajax(url, {type: 'get'}).then(function(response) {
         return response.error
         ? []
         : infoFormat === 'application/json'
