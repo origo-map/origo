@@ -110,7 +110,7 @@ export function layerSpecificExportHandler(url, activeLayer, selectedItems, attr
                     }
 
                     response.blob().then(blob => {
-                        download(blob, ': data_siggis.xls', contentType);
+                        download(blob, 'data_siggis.xlsx', contentType);
                     });
                     break;
             }
