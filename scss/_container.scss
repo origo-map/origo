@@ -1,6 +1,9 @@
-.o-container-absolute {
-  margin: 0;
-  padding: .5rem;
-  position: absolute;
-  z-index: 100;
+$container-margin: $app-margin * 2;
+.container {
+  display: flex;
+  margin: $container-margin;
+  position: relative;
+  &.no-margin {
+    margin: 0;
+  }
 }

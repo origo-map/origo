@@ -1,7 +1,6 @@
 @import 'no-map.scss';
-// @import 'background-grid.scss';
 @import 'variables';
-@import 'ui/ui';
+@import 'components'; // User Interface Components
 .o-map {
   display: flex;
   flex-direction: column;
@@ -16,7 +15,7 @@
   @import 'externs/owl.carousel.scss';
   @import 'externs/owl.theme.default.scss';
   @import 'card.scss';
-  @import 'container.scss';
+  @import 'container-absolute.scss';
   @import 'toolbar.scss';
   @import 'button.scss';
   @import 'image.scss';
