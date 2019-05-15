@@ -122,7 +122,7 @@ function agsTransaction(transObj, layerName) {
   types.forEach((type) => {
     if (transObj[type]) {
       const u = source.url.slice(-1) === '/' ? source.url : `${source.url}/`;
-      const i = id.slice(-1) === '/' ? id : `${id}/`;
+      const i = `${id}`.slice(-1) === '/' ? id : `${id}/`;
       const url = u + i + urlSuffix[type];
       
       const data = writeAgsTransaction(transObj[type], {
