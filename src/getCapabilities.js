@@ -3,7 +3,8 @@ import $ from 'jquery';
 let getCapabilitiesLayers;
 
 function xmlToArray(xmlDoc) {
-  getCapabilitiesLayers = $(xmlDoc).find('FeatureType > Name').map(function fullLayerName() {
+  getCapabilitiesLayers = $(xmlDoc).find('Layer > Name').map(function fullLayerName() {
+  // getCapabilitiesLayers = $(xmlDoc).find('FeatureType > Name').map(function fullLayerName() {
     return $(this).text();
   }).get();
 
