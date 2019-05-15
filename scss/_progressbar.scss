@@ -1,0 +1,9 @@
+.o-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 0.2em;
+    background: $blue;
+    width: 0;
+    transition: width 1ms;
+}
