@@ -1,6 +1,5 @@
-build
+build-dev
 dist
-build
 css/style.css
 node_modules
 npm-debug-log

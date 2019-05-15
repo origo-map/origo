@@ -11,6 +11,7 @@ export { default as Mapmenu } from './controls/mapmenu';
 export { default as Measure } from './controls/measure';
 export { default as Position } from './controls/position';
 export { default as Print } from './controls/print';
+export { default as Progressbar } from './controls/progressbar';
 export { default as Rotate } from './controls/rotate';
 export { default as Scale } from './controls/scale';
 export { default as Scaleline } from './controls/scaleline';
