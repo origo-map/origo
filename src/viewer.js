@@ -7,6 +7,7 @@ import proj from './projection';
 import MapSize from './utils/mapsize';
 import Featureinfo from './featureinfo';
 import maputils from './maputils';
+import toggleClickInteraction from './interactionhandler';
 import Layer from './layer';
 import Main from './components/main';
 import Footer from './components/footer';
@@ -18,8 +19,6 @@ const Viewer = function Viewer(targetOption, options = {}) {
   let map;
   let tileGrid;
   let featureinfo;
-  let activeClickInteractionControl = 'featureInfo';
-  let that;
 
   let {
     projection
@@ -350,23 +349,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     }
   };
 
-  const onToggleInteraction = function onToggleInteraction(e) {
-    const clickInteractionControl = that.getControlByName(e.detail.name);
-    if (e.detail.active) {
-      const oldClickInteractionControl = that.getControlByName(activeClickInteractionControl);
-      oldClickInteractionControl.disableInteraction();
-      clickInteractionControl.enableInteraction();
-      activeClickInteractionControl = e.detail.name;
-    } else {
-      clickInteractionControl.disableInteraction();
-      const featureinfoControl = that.getControlByName('featureInfo');
-      featureinfoControl.enableInteraction();
-      activeClickInteractionControl = 'featureInfo';
-    }
-  };
-
   return Component({
-    onToggleInteraction,
     onInit() {
       this.render();
 
@@ -448,7 +431,6 @@ const Viewer = function Viewer(targetOption, options = {}) {
       featureinfo = Featureinfo(featureinfoOptions);
       this.addComponent(featureinfo);
       this.addControls();
-      that = this;
     },
     render() {
       const htmlString = `<div id="${this.getId()}" class="${cls}">
@@ -460,7 +442,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
       const el = document.querySelector(target);
       el.innerHTML = htmlString;
       this.dispatch('render');
-      document.addEventListener('toggleInteraction', this.onToggleInteraction);
+      document.addEventListener('toggleInteraction', toggleClickInteraction.bind(this));
     },
     addControl,
     addControls,
