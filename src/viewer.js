@@ -7,7 +7,6 @@ import proj from './projection';
 import MapSize from './utils/mapsize';
 import Featureinfo from './featureinfo';
 import maputils from './maputils';
-import toggleClickInteraction from './interactionhandler';
 import Layer from './layer';
 import Main from './components/main';
 import Footer from './components/footer';
@@ -442,7 +441,6 @@ const Viewer = function Viewer(targetOption, options = {}) {
       const el = document.querySelector(target);
       el.innerHTML = htmlString;
       this.dispatch('render');
-      document.addEventListener('toggleInteraction', toggleClickInteraction.bind(this));
     },
     addControl,
     addControls,
