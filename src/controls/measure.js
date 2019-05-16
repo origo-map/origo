@@ -239,13 +239,11 @@ const Measure = function Measure({
   }
 
   function toggleMeasure() {
-    document.dispatchEvent(new CustomEvent('toggleInteraction', {
-      bubbles: true,
-      detail: {
+      let detail = {
         name: 'measure',
         active: !isActive
-      }
-    }));
+      };
+      viewer.dispatch('toggleClickInteraction', detail);
   }
 
   function toggleType(button) {
@@ -260,8 +258,6 @@ const Measure = function Measure({
   }
 
   return Component({
-    disableInteraction,
-    enableInteraction,
     name: 'measure',
     onAdd(evt) {
       viewer = evt.target;
@@ -283,6 +279,13 @@ const Measure = function Measure({
       map.addLayer(vector);
       this.addComponents(buttons);
       this.render();
+      viewer.on('toggleClickInteraction', (detail) => {
+        if(detail.name === 'measure' && detail.active){
+          enableInteraction();
+        } else {
+          disableInteraction();
+        }
+      });
     },
     onInit() {
       lengthTool = measureTools.indexOf('length') >= 0;

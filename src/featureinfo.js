@@ -244,17 +244,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     }
   };
 
-  const disableInteraction = function disableInteraction() {
-    setActive(false);
-  };
-
-  const enableInteraction = function enableInteraction() {
-    setActive(true);
-  };
-
   return Component({
-    disableInteraction,
-    enableInteraction,
     name: 'featureInfo',
     clear,
     getHitTolerance,
@@ -266,6 +256,13 @@ const Featureinfo = function Featureinfo(options = {}) {
       const map = viewer.getMap();
       selectionLayer = featurelayer(savedFeature, map);
       map.on(clickEvent, onClick);
+      viewer.on('toggleClickInteraction', (detail) => {
+        if((detail.name === 'featureinfo' && detail.active) || (detail.name !== 'featureinfo' && !detail.active)){
+          setActive(true);
+        } else {
+          setActive(false);
+        }
+      });
     },
     render
   });
