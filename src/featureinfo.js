@@ -257,7 +257,7 @@ const Featureinfo = function Featureinfo(options = {}) {
       selectionLayer = featurelayer(savedFeature, map);
       map.on(clickEvent, onClick);
       viewer.on('toggleClickInteraction', (detail) => {
-        if((detail.name === 'featureinfo' && detail.active) || (detail.name !== 'featureinfo' && !detail.active)){
+        if ((detail.name === 'featureinfo' && detail.active) || (detail.name !== 'featureinfo' && !detail.active)) {
           setActive(true);
         } else {
           setActive(false);

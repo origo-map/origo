@@ -239,11 +239,11 @@ const Measure = function Measure({
   }
 
   function toggleMeasure() {
-      let detail = {
-        name: 'measure',
-        active: !isActive
-      };
-      viewer.dispatch('toggleClickInteraction', detail);
+    const detail = {
+      name: 'measure',
+      active: !isActive
+    };
+    viewer.dispatch('toggleClickInteraction', detail);
   }
 
   function toggleType(button) {
@@ -280,7 +280,7 @@ const Measure = function Measure({
       this.addComponents(buttons);
       this.render();
       viewer.on('toggleClickInteraction', (detail) => {
-        if(detail.name === 'measure' && detail.active){
+        if (detail.name === 'measure' && detail.active) {
           enableInteraction();
         } else {
           disableInteraction();
