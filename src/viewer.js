@@ -61,7 +61,15 @@ const Viewer = function Viewer(targetOption, options = {}) {
   const center = urlParams.center || centerOption;
   const zoom = urlParams.zoom || zoomOption;
   const groups = flattenGroups(groupOptions);
-  const getCapabilitiesLayers = (capabilitiesURL === null) ? null : getCapabilities(capabilitiesURL);
+
+  let getCapabilitiesLayers = {};
+  (Object.keys(source)).forEach(sourceName => {
+    const sourceOptions = source[sourceName];
+    if (sourceOptions && sourceOptions.capabilitiesURL) {
+      getCapabilitiesLayers[sourceName] = getCapabilities(sourceOptions.capabilitiesURL);
+    }
+  });
+
   const defaultTileGridOptions = {
     alignBottomLeft: true,
     extent,
@@ -236,10 +244,13 @@ const Viewer = function Viewer(targetOption, options = {}) {
   const getMain = () => main;
 
   const mergeSecuredLayer = (layerlist, capabilitiesLayers) => {
-    if (capabilitiesLayers !== null) {
+    if (capabilitiesLayers && Object.keys(capabilitiesLayers).length > 0) {
       layerlist.forEach((layer) => {
-        if (capabilitiesLayers.indexOf(layer.name) >= 0) {
-          layer.secure = false;
+        const layerSourceOptions = layer.source ? getSource(layer.source) : null;
+        if (layerSourceOptions && layerSourceOptions.capabilitiesURL) {
+          if (capabilitiesLayers[layer.source].indexOf(layer.name) >= 0) {
+            layer.secure = false;
+          }
         } else {
           layer.secure = true;
         }
@@ -305,8 +316,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
   const addLayer = function addLayer(layerProps) {
     const layer = Layer(layerProps, this);
     map.addLayer(layer);
-    this.dispatch('addlayer', { 
-      layerName: layerProps.name 
+    this.dispatch('addlayer', {
+      layerName: layerProps.name
     });
   };
 
@@ -317,15 +328,15 @@ const Viewer = function Viewer(targetOption, options = {}) {
   };
 
   const addGroup = function addGroup(groupProps) {
-    const defaultProps = { 
+    const defaultProps = {
       type: 'group'
     };
     const groupDef = Object.assign({}, defaultProps, groupProps);
     const name = groupDef.name;
     if (!(groups.filter(group => group.name === name).length)) {
       groups.push(groupDef);
-      this.dispatch('add:group', { 
-        group: groupDef 
+      this.dispatch('add:group', {
+        group: groupDef
       });
     }
   };
@@ -346,7 +357,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
       });
       const groupIndex = groups.indexOf(group);
       groups.splice(groupIndex, 1);
-      this.dispatch('remove:group', { 
+      this.dispatch('remove:group', {
         group
       });
     }
