@@ -263,7 +263,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
           }
         
         } else {
-          layer.secure = true;
+          layer.secure = false;
         }
       });
     }
