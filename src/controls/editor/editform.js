@@ -4,7 +4,7 @@ const createForm = function createForm(obj) {
   cls += id;
   cls += obj.isVisible ? '' : ' o-hidden';
   const label = obj.title;
-  let val = obj.isVisible ? obj.val : '';
+  let val = obj.isVisible && obj.val != null ? obj.val : '';
   const type = obj.type;
   const maxLength = obj.maxLength ? ` maxlength="${obj.maxLength}" ` : '';
   const dropdownOptions = obj.options || [];
