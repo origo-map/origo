@@ -210,6 +210,13 @@ const Viewer = function Viewer(targetOption, options = {}) {
     throw new Error(`There is no source with name: ${name}`);
   };
 
+  const getSource2 = function getSource2(name) {
+    if (name in source) {
+      return source[name];
+    }
+    return undefined;
+  };
+
   const getGroups = () => groups;
 
   const getProjectionCode = () => projectionCode;
@@ -246,7 +253,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
   const mergeSecuredLayer = (layerlist, capabilitiesLayers) => {
     if (capabilitiesLayers && Object.keys(capabilitiesLayers).length > 0) {
       layerlist.forEach((layer) => {
-        const layerSourceOptions = layer.source ? getSource(layer.source) : null;
+        const layerSourceOptions = layer.source ? getSource2(layer.source) : undefined;
         if (layerSourceOptions && layerSourceOptions.capabilitiesURL) {
           if (capabilitiesLayers[layer.source].indexOf(layer.name) >= 0) {
             layer.secure = false;
