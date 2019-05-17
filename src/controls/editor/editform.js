@@ -57,6 +57,18 @@ const createForm = function createForm(obj) {
       }
       el = `<div><label>${label}</label><br><input type="date" id="${id}" placeholder="YYYY-MM-DD" value="${val}"></div>`;
       break;
+    case 'time':
+      if (!val) {
+        if (obj.defaultTime === false) {
+          val = '';
+        } else if (obj.defaultTime) {
+          val = obj.defaultTime;
+        } else {
+          val = isoDate.slice(11, 16);
+        }
+      }
+      el = `<div><label>${label}</label><br><input type="time" id="${id}" placeholder="hh:mm" value="${val}"></div>`;
+      break;
     case 'datetime':
       if (!val) {
         if (obj.defaultDatetime === false) {
