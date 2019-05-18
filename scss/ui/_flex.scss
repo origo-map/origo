@@ -17,6 +17,7 @@ $flex-grow-all: 2;
   }
   &.column {
     flex-direction: column;
+    margin-top: 0;
   }   
   &.column-reverse {
     flex-direction: column-reverse;
