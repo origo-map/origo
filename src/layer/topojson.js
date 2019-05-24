@@ -19,7 +19,7 @@ const topojson = function topojson(layerOptions, viewer) {
   const topojsonDefault = {
     layerType: 'vector'
   };
-  const topojsonOptions = $.extend(topojsonDefault, layerOptions);
+  const topojsonOptions = Object.assign(topojsonDefault, layerOptions);
   const sourceOptions = {};
 
   sourceOptions.attribution = topojsonOptions.attribution;
