@@ -19,7 +19,7 @@ const agsTile = function agsTile(layerOptions, viewer) {
     featureinfoLayer: undefined
   };
   const sourceDefault = {};
-  const agsOptions = $.extend(agsDefault, layerOptions);
+  const agsOptions = Object.assign(agsDefault, layerOptions);
   const sourceOptions = Object.assign(sourceDefault, viewer.getMapSource()[layerOptions.source]);
   sourceOptions.attribution = agsOptions.attribution;
   sourceOptions.projection = viewer.getProjection();
