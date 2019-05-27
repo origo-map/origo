@@ -39,7 +39,7 @@ Not convinced? Or maybe you need some inspiration? Check out these examples of w
  * [Mälardalskartan](http://www.malardalskartan.se)
  * [Sigtunakartan](https://karta.sigtuna.se)
  * [Strängnäskartan](https://karta.strangnas.se)
- * [Västerås Stads samlingskarta](http://kartor.vasteras.se/sam)
+ * [Västerås Stads samlingskarta](https://kartor.vasteras.se/sam)
 
 ## Getting started
 So you have decided to take matters into your own hands and get coding? Great!
