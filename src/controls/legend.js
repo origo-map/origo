@@ -28,7 +28,7 @@ const Legend = function Legend(options = {}) {
 
   const addBackgroundButton = function addBackgroundButton(layer) {
     const styleName = layer.get('styleName') || 'default';
-    const icon = imageSource(viewer.getStyle(styleName));
+    const icon = viewer.getStyle(styleName) ? imageSource(viewer.getStyle(styleName)) : 'img/png/farg.png';
     backgroundLayerButtons.push(Button({
       icon,
       cls: 'round smallest border icon-small',
