@@ -57,7 +57,7 @@ const wms = function wms(layerOptions, viewer) {
   sourceOptions.format = wmsOptions.format ? wmsOptions.format : sourceOptions.format;
 
   const styleSettings = viewer.getStyle(wmsOptions.styleName);
-  const wmsStyleObject = styleSettings[0].find(s => s.wmsStyle);
+  const wmsStyleObject = styleSettings ? styleSettings[0].find(s => s.wmsStyle) : undefined;
   sourceOptions.style = wmsStyleObject ? wmsStyleObject.wmsStyle : '';
 
   if (wmsOptions.tileGrid) {
