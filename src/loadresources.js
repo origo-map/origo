@@ -4,7 +4,7 @@ import getUrl from './utils/geturl';
 import isUrl from './utils/isurl';
 import trimUrl from './utils/trimurl';
 
-function getQueryVariable(variable) {
+function getQueryVariable(variable, storeMethod) {
   const query = window.location.search.substring(1);
   const vars = query.split('&');
   for (let i = 0; i < vars.length; i += 1) {
@@ -13,12 +13,15 @@ function getQueryVariable(variable) {
       return decodeURIComponent(pair[1]);
     }
   }
-  console.log('Query variable %s not found', variable);
+
+  if (storeMethod === 'saveStateToServer') {
+    console.log('Query variable %s not found', variable);
+  }
   return undefined;
 }
 
-function restorePermalink() {
-  const mapStateId = getQueryVariable('mapStateId');
+function restorePermalink(storeMethod) {
+  const mapStateId = getQueryVariable('mapStateId', storeMethod);
   if (mapStateId) {
     return permalink.readStateFromServer(mapStateId);
   }
@@ -44,6 +47,7 @@ const loadResources = async function loadResources(mapOptions, config) {
   const map = {};
   const mapEl = config.target;
   const format = 'json';
+  let storeMethod = 'default';
   let urlParams;
   let url;
   let mapUrl;
@@ -114,23 +118,18 @@ const loadResources = async function loadResources(mapOptions, config) {
             map.options.params = urlParams;
             map.options.baseUrl = baseUrl;
 
-            /* We need to find the setting from sharemap to get the serviceEndPoint
-                but it will not have been initialized yet when we need to restore
-                from permalink.
-                Typical bootstrap problem. This solutions works but not very clean. Lets talk about it :)
-                Lukas Bergliden Decerno
-            */
             for (let i = 0; i < map.options.controls.length; i += 1) {
               if (map.options.controls[i].name === 'sharemap') {
                 if (map.options.controls[i].options) {
                   const options = map.options.controls[i].options;
                   if (options.storeMethod && options.storeMethod === 'saveStateToServer') {
+                    storeMethod = options.storeMethod;
                     permalink.setSaveOnServerServiceEndpoint(map.options.controls[i].options.serviceEndpoint);
                   }
                 }
               }
             }
-            return restorePermalink().then((params) => {
+            return restorePermalink(storeMethod).then((params) => {
               if (params) {
                 map.options.params = params;
               }
