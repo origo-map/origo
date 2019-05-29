@@ -3,8 +3,11 @@ import permalink from '../permalink/permalink';
 
 const ShareMap = function ShareMap(options = {}) {
   let {
-    target
+    target,
+    storeMethod,
+    serviceEndpoint
   } = options;
+
   const {
     icon = '#ic_screen_share_outline_24px',
     title = 'Dela karta'
@@ -19,8 +22,8 @@ const ShareMap = function ShareMap(options = {}) {
       '<i>Kopiera och klistra in länken för att dela kartan.</i>';
   };
 
-  const createLink = function createLink() {
-    const url = permalink.getPermalink(viewer);
+  const createLink = function createLink(data) {
+    const url = permalink.getPermalink(viewer, data);
     const inputElement = document.getElementsByClassName('o-share-link')[0].firstElementChild;
     inputElement.value = url;
     inputElement.select();
@@ -28,6 +31,11 @@ const ShareMap = function ShareMap(options = {}) {
 
   return Component({
     name: 'sharemap',
+    onInit() {
+      if (storeMethod && serviceEndpoint) {
+        permalink.setSaveOnServerServiceEndpoint(serviceEndpoint);
+      }
+    },
     onAdd(evt) {
       viewer = evt.target;
       target = viewer.getId();
@@ -41,7 +49,13 @@ const ShareMap = function ShareMap(options = {}) {
             target
           });
           this.addComponent(modal);
-          createLink();
+          if (storeMethod === 'saveStateToServer') {
+            permalink.saveStateToServer(viewer).then((data) => {
+              createLink(data);
+            });
+          } else {
+            createLink();
+          }
         },
         icon,
         title
