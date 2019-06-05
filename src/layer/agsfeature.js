@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import EsriJSON from 'ol/format/EsriJSON';
 import VectorSource from 'ol/source/Vector';
 import * as loadingstrategy from 'ol/loadingstrategy';
@@ -31,23 +30,14 @@ function createSource({
           '&returnIdsOnly=false&returnCountOnly=false',
           '&geometryPrecision=2',
           `&outSR=${esriSrs}${queryFilter}`].join(''));
-      $.ajax({
-        url,
-        dataType: 'jsonp',
-        success: (response) => {
-          if (response.error) {
-            alert(`${response.error.message}\n${response.error.details.join('\n')}`);
-          } else {
-            // dataProjection will be read from document
-            const features = esrijsonFormat.readFeatures(response, {
-              featureProjection: projection
-            });
-            if (features.length > 0) {
-              that.addFeatures(features);
-            }
-          }
+      fetch(url).then(response => response.json()).then((data) => {
+        const features = esrijsonFormat.readFeatures(data, {
+          featureProjection: projection
+        });
+        if (features.length > 0) {
+          that.addFeatures(features);
         }
-      });
+      }).catch(error => console.warn(error));
     },
     strategy: loadingstrategy.bbox
   });
@@ -59,8 +49,8 @@ const agsFeature = function agsFeature(layerOptions, viewer) {
     layerType: 'vector'
   };
   const sourceDefault = {};
-  const agsOptions = $.extend(agsDefault, layerOptions);
-  const sourceOptions = $.extend(sourceDefault, viewer.getMapSource()[layerOptions.sourceName]);
+  const agsOptions = Object.assign(agsDefault, layerOptions);
+  const sourceOptions = Object.assign(sourceDefault, viewer.getMapSource()[layerOptions.sourceName]);
   sourceOptions.geometryName = agsOptions.geometryName;
   sourceOptions.filter = agsOptions.filter;
   sourceOptions.attribution = agsOptions.attribution;
