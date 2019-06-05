@@ -1,10 +1,9 @@
 import OSMSource from 'ol/source/OSM';
-import $ from 'jquery';
 import tile from './tile';
 
 export default function osm(layerOptions) {
   const osmDefault = {};
-  const osmOptions = $.extend(osmDefault, layerOptions);
+  const osmOptions = Object.assign(osmDefault, layerOptions);
 
   function createSource() {
     return new OSMSource();
