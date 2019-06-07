@@ -31,8 +31,7 @@ function createSource(options) {
 
       fetch(url).then(response => response.json({
         cache: false
-      })
-      .done((response) => {
+      })).then((response) => {
         wfsErrorHelper(response, vectorSource);
       });
     },
