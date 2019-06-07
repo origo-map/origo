@@ -1,4 +1,6 @@
+import GeoJSON from 'ol/format/GeoJSON';
 import urlparser from '../utils/urlparser';
+import permalinkParser from './permalinkparser';
 
 const layerModel = {
   v: {
@@ -13,7 +15,10 @@ const layerModel = {
 
 export default {
   layers(layersStr) {
-    const layers = layersStr.split(',');
+    let layers = layersStr;
+    if (!Array.isArray(layersStr)) {
+      layers = layersStr.split(',');
+    }
     const layerObjects = {};
     layers.forEach((layer) => {
       const obj = {};
@@ -54,5 +59,19 @@ export default {
   },
   map(mapStr) {
     return mapStr;
+  },
+  controls(controlsStr) {
+    const controls = {};
+    for (const key in controlsStr) {
+      controls[key] = parseFunctions[key](controlsStr[key]);
+    }
+    return controls;
+  },
+  controlDraw(drawState) {
+    const features = new GeoJSON().readFeatures(drawState.features);
+    return { features };
   }
 };
+
+const parseFunctions = {};
+parseFunctions.draw = permalinkParser.controlDraw;

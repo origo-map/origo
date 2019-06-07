@@ -244,24 +244,6 @@ const Featureinfo = function Featureinfo(options = {}) {
     }
   };
 
-  // jQuery Events
-  const onEnableInteraction = function onEnableInteraction(e) {
-    if (e.interaction === 'featureInfo') {
-      setActive(true);
-    } else {
-      setActive(false);
-    }
-  };
-
-  // ES6 Events
-  const onToggleInteraction = function onToggleInteraction(e) {
-    if (e.detail === 'featureInfo') {
-      setActive(true);
-    } else {
-      setActive(false);
-    }
-  };
-
   return Component({
     name: 'featureInfo',
     clear,
@@ -274,8 +256,13 @@ const Featureinfo = function Featureinfo(options = {}) {
       const map = viewer.getMap();
       selectionLayer = featurelayer(savedFeature, map);
       map.on(clickEvent, onClick);
-      $(document).on('enableInteraction', onEnableInteraction);
-      document.addEventListener('toggleInteraction', onToggleInteraction);
+      viewer.on('toggleClickInteraction', (detail) => {
+        if ((detail.name === 'featureinfo' && detail.active) || (detail.name !== 'featureinfo' && !detail.active)) {
+          setActive(true);
+        } else {
+          setActive(false);
+        }
+      });
     },
     render
   });

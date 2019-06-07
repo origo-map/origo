@@ -2,7 +2,6 @@ import * as LoadingStrategy from 'ol/loadingstrategy';
 import { createXYZ } from 'ol/tilegrid';
 import VectorSource from 'ol/source/Vector';
 import GeoJSONFormat from 'ol/format/GeoJSON';
-import $ from 'jquery';
 import vector from './vector';
 import wfsErrorHelper from '../helpers/alert/wfs';
 
@@ -29,13 +28,13 @@ function createSource(options) {
       ].join('');
       url += options.strategy === 'all' ? queryFilter : `${queryFilter + extent.join(',')},${bboxProjectionCode}`;
       url = encodeURI(url);
-      $.ajax({
-        url,
+
+      fetch(url).then(response => response.json({
         cache: false
       })
-        .done((response) => {
-          wfsErrorHelper(response, vectorSource);
-        });
+      .done((response) => {
+        wfsErrorHelper(response, vectorSource);
+      });
     },
     strategy: options.loadingstrategy
   });
