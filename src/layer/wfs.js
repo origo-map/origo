@@ -4,6 +4,7 @@ import VectorSource from 'ol/source/Vector';
 import GeoJSONFormat from 'ol/format/GeoJSON';
 import $ from 'jquery';
 import vector from './vector';
+import wfsErrorHelper from '../helpers/alert/wfs';
 
 function createSource(options) {
   const serverUrl = options.url;
@@ -24,7 +25,8 @@ function createSource(options) {
     loader(extent) {
       let url = [`${serverUrl}?service=WFS`,
         `&version=1.1.0&request=GetFeature&typeName=${options.featureType}&outputFormat=application/json`,
-        `&srsname=${options.projectionCode}`].join('');
+        `&srsname=${options.projectionCode}`
+      ].join('');
       url += options.strategy === 'all' ? queryFilter : `${queryFilter + extent.join(',')},${bboxProjectionCode}`;
       url = encodeURI(url);
       $.ajax({
@@ -32,7 +34,7 @@ function createSource(options) {
         cache: false
       })
         .done((response) => {
-          vectorSource.addFeatures(vectorSource.getFormat().readFeatures(response));
+          wfsErrorHelper(response, vectorSource);
         });
     },
     strategy: options.loadingstrategy
