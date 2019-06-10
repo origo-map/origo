@@ -28,12 +28,9 @@ function createSource(options) {
       ].join('');
       url += options.strategy === 'all' ? queryFilter : `${queryFilter + extent.join(',')},${bboxProjectionCode}`;
       url = encodeURI(url);
-
-      fetch(url).then(response => response.json({
-        cache: false
-      })).then((response) => {
-        wfsErrorHelper(response, vectorSource);
-      });
+      fetch(url)
+        .then(response => wfsErrorHelper.checkJSON(response, { cache: false }))
+        .then(response => wfsErrorHelper.checkResponse(response, vectorSource));
     },
     strategy: options.loadingstrategy
   });
