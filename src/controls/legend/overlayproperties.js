@@ -19,10 +19,12 @@ const OverlayProperties = function OverlayProperties(options = {}) {
   function extendedLegendZoom(e) {
     const parentOverlay = document.getElementById(options.parent.getId());
 
-    if (e.target.classList.contains('extendedlegend') && e.target.naturalWidth > e.target.width) {
-      parentOverlay.classList.add('width-100');
-    } else {
-      parentOverlay.classList.remove('width-100');
+    if (e.target.classList.contains('extendedlegend')) {
+      if (parentOverlay.classList.contains('width-100')) {
+        parentOverlay.classList.remove('width-100');
+      } else {
+        parentOverlay.classList.add('width-100');
+      }
     }
   }
 
