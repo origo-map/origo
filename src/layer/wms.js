@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import TileWMSSource from 'ol/source/TileWMS';
 import ImageWMSSource from 'ol/source/ImageWMS';
 import tile from './tile';
@@ -47,17 +46,17 @@ const wms = function wms(layerOptions, viewer) {
     gutter: 0,
     format: 'image/png'
   };
-  const wmsOptions = $.extend(wmsDefault, layerOptions);
+  const wmsOptions = Object.assign(wmsDefault, layerOptions);
   const renderMode = wmsOptions.renderMode || 'tile';
   wmsOptions.name.split(':').pop();
-  const sourceOptions = $.extend(sourceDefault, viewer.getMapSource()[layerOptions.source]);
+  const sourceOptions = Object.assign(sourceDefault, viewer.getMapSource()[layerOptions.source]);
   sourceOptions.attribution = wmsOptions.attribution;
   sourceOptions.projection = viewer.getProjection();
   sourceOptions.id = wmsOptions.id;
   sourceOptions.format = wmsOptions.format ? wmsOptions.format : sourceOptions.format;
 
   const styleSettings = viewer.getStyle(wmsOptions.styleName);
-  const wmsStyleObject = styleSettings[0].find(s => s.wmsStyle);
+  const wmsStyleObject = styleSettings ? styleSettings[0].find(s => s.wmsStyle) : undefined;
   sourceOptions.style = wmsStyleObject ? wmsStyleObject.wmsStyle : '';
 
   if (wmsOptions.tileGrid) {

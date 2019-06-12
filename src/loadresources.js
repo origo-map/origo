@@ -4,6 +4,30 @@ import getUrl from './utils/geturl';
 import isUrl from './utils/isurl';
 import trimUrl from './utils/trimurl';
 
+function getQueryVariable(variable, storeMethod) {
+  const query = window.location.search.substring(1);
+  const vars = query.split('&');
+  for (let i = 0; i < vars.length; i += 1) {
+    const pair = vars[i].split('=');
+    if (decodeURIComponent(pair[0]) === variable) {
+      return decodeURIComponent(pair[1]);
+    }
+  }
+
+  if (storeMethod === 'saveStateToServer') {
+    console.log('Query variable %s not found', variable);
+  }
+  return undefined;
+}
+
+function restorePermalink(storeMethod) {
+  const mapStateId = getQueryVariable('mapStateId', storeMethod);
+  if (mapStateId) {
+    return permalink.readStateFromServer(mapStateId);
+  }
+  return Promise.resolve();
+}
+
 const loadSvgSprites = function loadSvgSprites(baseUrl, config) {
   const svgSprites = config.svgSprites;
   const svgPath = config.svgSpritePath;
@@ -23,6 +47,7 @@ const loadResources = async function loadResources(mapOptions, config) {
   const map = {};
   const mapEl = config.target;
   const format = 'json';
+  let storeMethod = 'default';
   let urlParams;
   let url;
   let mapUrl;
@@ -92,7 +117,24 @@ const loadResources = async function loadResources(mapOptions, config) {
             map.options.map = json;
             map.options.params = urlParams;
             map.options.baseUrl = baseUrl;
-            return map;
+
+            for (let i = 0; i < map.options.controls.length; i += 1) {
+              if (map.options.controls[i].name === 'sharemap') {
+                if (map.options.controls[i].options) {
+                  const options = map.options.controls[i].options;
+                  if (options.storeMethod && options.storeMethod === 'saveStateToServer') {
+                    storeMethod = options.storeMethod;
+                    permalink.setSaveOnServerServiceEndpoint(map.options.controls[i].options.serviceEndpoint);
+                  }
+                }
+              }
+            }
+            return restorePermalink(storeMethod).then((params) => {
+              if (params) {
+                map.options.params = params;
+              }
+              return map;
+            });
           }));
     }
     return null;

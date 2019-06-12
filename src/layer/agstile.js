@@ -1,5 +1,4 @@
 import TileArcGISRest from 'ol/source/TileArcGISRest';
-import $ from 'jquery';
 import tile from './tile';
 import maputils from '../maputils';
 
@@ -20,8 +19,8 @@ const agsTile = function agsTile(layerOptions, viewer) {
     featureinfoLayer: undefined
   };
   const sourceDefault = {};
-  const agsOptions = $.extend(agsDefault, layerOptions);
-  const sourceOptions = $.extend(sourceDefault, viewer.getMapSource()[layerOptions.source]);
+  const agsOptions = Object.assign(agsDefault, layerOptions);
+  const sourceOptions = Object.assign(sourceDefault, viewer.getMapSource()[layerOptions.source]);
   sourceOptions.attribution = agsOptions.attribution;
   sourceOptions.projection = viewer.getProjection();
   sourceOptions.params = agsOptions.params || {};
