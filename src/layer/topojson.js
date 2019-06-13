@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import VectorSource from 'ol/source/Vector';
 import TopoJSONFormat from 'ol/format/TopoJSON';
 import vector from './vector';
@@ -19,7 +18,7 @@ const topojson = function topojson(layerOptions, viewer) {
   const topojsonDefault = {
     layerType: 'vector'
   };
-  const topojsonOptions = $.extend(topojsonDefault, layerOptions);
+  const topojsonOptions = Object.assign(topojsonDefault, layerOptions);
   const sourceOptions = {};
 
   sourceOptions.attribution = topojsonOptions.attribution;

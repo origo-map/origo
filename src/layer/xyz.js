@@ -1,5 +1,4 @@
 import XYZSource from 'ol/source/XYZ';
-import $ from 'jquery';
 import tile from './tile';
 import maputils from '../maputils';
 
@@ -13,9 +12,9 @@ const xyz = function xyz(layerOptions, viewer) {
     featureinfoLayer: undefined
   };
   const sourceDefault = {};
-  const xyzOptions = $.extend(xyzDefault, layerOptions);
+  const xyzOptions = Object.assign(xyzDefault, layerOptions);
   xyzOptions.sourceName = xyzOptions.id;
-  const sourceOptions = $.extend(sourceDefault, viewer.getMapSource()[layerOptions.source]);
+  const sourceOptions = Object.assign(sourceDefault, viewer.getMapSource()[layerOptions.source]);
   sourceOptions.attributions = xyzOptions.attribution;
   sourceOptions.projection = viewer.getProjectionCode() || 'EPSG:3857';
 
