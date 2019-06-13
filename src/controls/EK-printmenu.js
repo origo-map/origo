@@ -1,5 +1,4 @@
 import { Component, Button, dom, Element } from '../ui';
-import config from '../../conf/origoConfig';
 import printoptions from '../../conf/printSettings';
 import printinfo from '../../conf/printinfo';
 import Mapfishprint from './EK-mapfishprint';
@@ -584,7 +583,7 @@ const Printmenu = function Printmenu(options = {}) {
                     thisComp.render();
                 }
             };
-            xmlhttp.open("GET", config.printInfo);
+            xmlhttp.open("GET", printoptions.printInfo);
             xmlhttp.send();
 
             /**** --- used to do some debugging locally --- ****/

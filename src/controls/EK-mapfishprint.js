@@ -6,7 +6,7 @@ import {
 import GeoJSON from 'ol/format/GeoJSON';
 import $ from 'jquery';
 import { Component, Button, dom} from '../ui';
-import config from '../../conf/origoConfig';
+import config from '../../conf/printSettings';
 
 const Mapfishprint = function Mapfishprint(options = {}) {
     let {
