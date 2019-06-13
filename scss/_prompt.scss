@@ -1,0 +1,45 @@
+$bg-color-main: rgba(250,250,250,0.6);
+$bg-color-warning: rgba(255, 174, 66, 0.6);
+$bg-color-error: rgba(243, 63, 18, 0.432);
+
+$xlg-space: 10px;
+$lg-space: 5px;
+$md-space: 2px;
+
+$lg-border-radius: 20px;
+
+.o-prompt-console-show {
+    display: block;
+}
+
+.o-prompt-console-hide {
+    display: none; 
+}
+
+.o-console-prompt {
+    background-color: $bg-color-main;
+    position: absolute;
+    width: 50%;
+}
+
+.o-console-prompt ul {
+    padding: $lg-space;
+}
+
+.o-console-prompt li {
+    padding-left: $xlg-space;
+    border-radius: $lg-space;
+    margin-bottom: $md-space;
+}
+
+.o-console-prompt button {
+    padding-top: 4px;
+    float: right;
+}
+
+.o-console-prompt-warning {
+    background-color: $bg-color-warning;
+}
+.o-console-prompt-error {
+    background-color: $bg-color-error;
+}

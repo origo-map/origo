@@ -18,5 +18,6 @@ export { default as Scaleline } from './controls/scaleline';
 export { default as Search } from './controls/search';
 export { default as Sharemap } from './controls/sharemap';
 export { default as Splash } from './controls/splash';
+export { default as Prompt } from './controls/prompt';
 export { default as Zoom } from './controls/zoom';
 export { default as Externalurl } from './controls/externalurl';

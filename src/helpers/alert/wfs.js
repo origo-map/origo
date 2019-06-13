@@ -1,3 +1,25 @@
+let panel;
+let btn;
+
+const setPanel = function setPanel(p) {
+  panel = p;
+};
+
+const getPanel = () => panel;
+
+const setBtn = function setBtn(b) {
+  btn = b;
+};
+
+const getBtn = () => btn;
+
+const updatePrompt = function updatePrompt(type, message) {
+  btn.showBtn();
+  btn.addAlert(type);
+  panel.messageVisibility(type);
+  panel.updateItem(type, message);
+};
+
 const getOWSExceptionText = (str) => {
   const parser = new DOMParser();
   const xml = parser.parseFromString(str, 'text/xml');
@@ -21,8 +43,12 @@ const handleError = (response) => {
   const request = getXHReq(response.url);
   request.onreadystatechange = function onReadystatechange() {
     if (request.readyState === 4 && request.status === 200) {
-      const error = getOWSExceptionText(request.responseText);
-      console.warn(error);
+      try {
+        const error = getOWSExceptionText(request.responseText);
+        updatePrompt('error', error);
+      } catch (error) {
+        throw new Error('Failed to get OWSException: ', error);
+      }
     }
   }
 };
@@ -32,7 +58,7 @@ const checkJSON = (response, config) => {
     if (error.toString().includes('JSON')) {
       handleError(response);
     } else {
-      console.warn(error);
+      updatePrompt('error', error);
     }
   });
   return data;
@@ -44,17 +70,21 @@ const checkResponse = (response, source) => {
       if (response.features.length > 0) {
         source.addFeatures(source.getFormat().readFeatures(response));
       } else {
-        console.warn('Source returned 0 features.');
+        updatePrompt('warning', 'Source returned 0 features.');
       }
     } else {
-      console.warn(serialize(response));
+      updatePrompt('warning', serialize(response));
     }
   } else {
-    console.warn('The request is not being sent to a server that is OGC:WFS compliant, see source configuration.');
+    updatePrompt('warning', 'Check your source configuration.');
   }
 };
 
 export default {
   checkJSON,
-  checkResponse
+  checkResponse,
+  getPanel,
+  getBtn,
+  setBtn,
+  setPanel
 };

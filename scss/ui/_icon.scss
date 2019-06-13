@@ -5,6 +5,8 @@ $icon-size-medium: $size-5;
 $icon-size-large: $size-6;
 $icon-active-color: $primary-color;
 $icon-inactive-color: $grey;
+$icon-warning-color: $danger-color-dark;
+$icon-light-warning-color: $danger-light-color-dark;
 $icon-disabled-color: $grey-light;
 $icon-default-color: $grey-dark;
 $icon-primary-color: $primary-color;
@@ -82,6 +84,14 @@ button svg {
 .button.active svg,
 button.active svg {
   fill: $icon-active-color;
+}
+.button.warning svg,
+button.warning svg {
+  fill: $icon-warning-color;
+}
+.button.lightWarning svg,
+button.lightWarning svg {
+  fill: $icon-light-warning-color;
 }
 .button.inactive svg,
 button.inactive svg {
