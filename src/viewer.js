@@ -5,7 +5,7 @@ import { Component } from './ui';
 import Map from './map';
 import proj from './projection';
 import MapSize from './utils/mapsize';
-import Featureinfo from './featureinfo';
+import Featureinfo from './EK_featureinfo';
 import maputils from './maputils';
 import Layer from './layer';
 import Main from './components/main';
