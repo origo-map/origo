@@ -16,7 +16,7 @@ export { default as Progressbar } from './controls/progressbar';
 export { default as Rotate } from './controls/rotate';
 export { default as Scale } from './controls/scale';
 export { default as Scaleline } from './controls/scaleline';
-export { default as Search } from './controls/search';
+export { default as Search } from './controls/EK-search';
 export { default as Sharemap } from './controls/sharemap';
 export { default as Splash } from './controls/splash';
 export { default as Zoom } from './controls/zoom';
