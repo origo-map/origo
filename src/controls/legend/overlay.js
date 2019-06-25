@@ -1,5 +1,6 @@
 import { Component, Button, dom } from '../../ui';
 import { HeaderIcon } from '../../utils/legendmaker';
+import { getLegendGraphicIcon } from './EK_getLegendGraphicsUtils'
 
 const OverlayLayer = function OverlayLayer(options) {
   let {
@@ -29,7 +30,10 @@ const OverlayLayer = function OverlayLayer(options) {
 
   const opacity = layer.getOpacity();
 
-  let headerIcon = HeaderIcon(style, opacity);
+  //Handle layers with getLegendGraphic option, override default function
+  let useLegendGraphic = layer.get('useLegendGraphics') || false;
+  let headerIcon = useLegendGraphic ? getLegendGraphicIcon(layer,viewer) : HeaderIcon(style, opacity);
+
   if (!headerIcon) {
     headerIcon = icon;
     headerIconCls = iconCls;

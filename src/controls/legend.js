@@ -1,6 +1,7 @@
 import { Component, Button, Element as El, ToggleGroup, dom } from '../ui';
 import imageSource from './legend/imagesource';
 import Overlays from './legend/overlays';
+import GetLegendGraphics from './legend/EK_getLegendGraphic';
 
 const Legend = function Legend(options = {}) {
   const {
@@ -23,6 +24,7 @@ const Legend = function Legend(options = {}) {
   let layerButton;
   let layerButtonEl;
   let isExpanded;
+  let getLegendGraphics;
   const cls = `${clsSettings} control bottom-right box overflow-hidden flex row o-legend`.trim();
   const style = dom.createStyle(Object.assign({}, { width: 'auto' }, styleSettings));
 
@@ -113,6 +115,9 @@ const Legend = function Legend(options = {}) {
         cls: 'spacing-horizontal-small'
       });
 
+      //Initialize EK_getLegendGraphics component
+      getLegendGraphics = GetLegendGraphics({viewer}); 
+
       this.render();
       this.dispatch('render');
     },
@@ -125,6 +130,9 @@ const Legend = function Legend(options = {}) {
         toggleVisibility();
       });
       window.addEventListener('resize', updateMaxHeight);
+      
+      //Updates legend graphics when zooming in and out in map
+      getLegendGraphics.initUpdatingWhenZoom(); 
     },
     render() {
       const size = viewer.getSize();

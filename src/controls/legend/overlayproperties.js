@@ -1,5 +1,6 @@
 import { Component } from '../../ui';
 import { Legend } from '../../utils/legendmaker';
+import { getLegendGraphicUrlStyle } from './EK_getLegendGraphicsUtils'
 
 const OverlayProperties = function OverlayProperties(options = {}) {
   const {
@@ -12,7 +13,11 @@ const OverlayProperties = function OverlayProperties(options = {}) {
   const title = layer.get('title') || '';
   const abstract = layer.get('abstract') || '';
   const opacity = layer.getOpacity();
-  const style = viewer.getStyle(layer.get('styleName'));
+
+  //Override style if we are using getLegendGraphics
+  const legendGraphics = layer.get('useLegendGraphics') || false
+  const style = legendGraphics ? getLegendGraphicUrlStyle(layer,viewer) : viewer.getStyle(layer.get('styleName'));
+
   const legend = Legend(style, opacity);
 
   return Component({
