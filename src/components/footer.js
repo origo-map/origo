@@ -12,7 +12,7 @@ export default function Footer(options = {}) {
       if (data.img && !data.url && !data.urlText) {
         middleContent = `<img src="${data.img}">`;
       } else if (data.img && data.url && !data.urlText) {
-        middleContent = `<img src="${data.img}"><a href="${data.url}"></a>`;
+        middleContent = `<a href="${data.url}"><img src="${data.img}"></a>`;
       } else if (data.img && !data.url && data.urlText) {
         middleContent = `<img src="${data.img}">${data.urlText}`;
       } else if (data.img && data.url && data.urlText) {
