@@ -13,6 +13,7 @@ export default function Collapse(options = {}) {
     collapseY = true,
     contentComponent,
     headerComponent,
+    footerComponent,
     contentCls = '',
     contentStyle: contentStyleOptions = {},
     data = {},
@@ -83,8 +84,9 @@ export default function Collapse(options = {}) {
     data,
     expand,
     onInit() {
-      if (headerComponent && contentComponent) {
-        this.addComponent(headerComponent);
+      if ((headerComponent || footerComponent) && contentComponent) {
+        if (headerComponent) { this.addComponent(headerComponent); }
+        if (footerComponent) { this.addComponent(footerComponent); }
         this.addComponent(contentComponent);
       } else {
         throw new Error('Header or content component is missing in collapse');
@@ -102,11 +104,14 @@ export default function Collapse(options = {}) {
       const height = !expanded && collapseY ? 'height: 0;' : '';
       const width = !expanded && collapseX ? 'width: 0;' : '';
       const isExpanded = expanded ? 'expanded' : '';
+      const header = headerComponent ? headerComponent.render() : '';
+      const footer = footerComponent ? footerComponent.render() : '';
       return `<${tagName} id="${this.getId()}" class="collapse ${cls} ${isExpanded}" style="${style}">
-                ${headerComponent.render()}
+                ${header}
                 <div id="${containerId}" class="collapse-container ${contentCls}" style="${height} ${width} ${contentStyle}">
                   ${contentComponent.render()}
                 </div>
+                ${footer}
               </${tagName}>`;
     },
     toggle
