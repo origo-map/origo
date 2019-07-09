@@ -55,7 +55,7 @@ const createForm = function createForm(obj) {
           val = isoDate.slice(0, 10);
         }
       }
-      el = `<div><label>${label}</label><br><input type="date" id="${id}" placeholder="YYYY-MM-DD" value="${val}"></div>`;
+      el = `<div><label>${label}</label><br><input type="date" id="${id}" placeholder="ÅÅÅÅ-MM-DD" value="${val}"></div>`;
       break;
     case 'time':
       if (!val) {
@@ -67,7 +67,7 @@ const createForm = function createForm(obj) {
           val = isoDate.slice(11, 16);
         }
       }
-      el = `<div><label>${label}</label><br><input type="time" id="${id}" placeholder="hh:mm" value="${val}"></div>`;
+      el = `<div><label>${label}</label><br><input type="time" id="${id}" placeholder="tt:mm" value="${val}"></div>`;
       break;
     case 'datetime':
       if (!val) {
@@ -79,7 +79,7 @@ const createForm = function createForm(obj) {
           val = isoDate.slice(0, 16);
         }
       }
-      el = `<div><label>${label}</label><br><input type="datetime-local" id="${id}" placeholder="YYYY-MM-DDThh:mm" value="${val}"></div>`;
+      el = `<div><label>${label}</label><br><input type="datetime-local" id="${id}" placeholder="ÅÅÅÅ-MM-DDTtt:mm" value="${val}"></div>`;
       break;
     case 'color':
       if (!val) {
