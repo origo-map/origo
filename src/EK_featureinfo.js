@@ -164,6 +164,10 @@ const Featureinfo = function Featureinfo(options = {}) {
         initCarousel('#o-identify-carousel');
         const popupHeight = $('.o-popup').outerHeight() + 20;
         $('#o-popup').height(popupHeight);
+        
+        //Force popup to not cover origo controls
+        popup.getEl().children[0].style.zIndex = "24";
+        
         overlay = new Overlay({
           element: popup.getEl(),
           autoPan: true,
