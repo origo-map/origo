@@ -84,6 +84,20 @@ const Legend = function Legend(options = {}) {
     }
   });
 
+  const turnOffLayersButton = Button({
+    cls: "round compact icon-small margin-x-smaller\"title=\"Släck alla lager",
+    click() {
+      viewer.dispatch('active:turnofflayers');
+    },
+    style: {
+      'align-self': 'center'
+    },
+    icon: '#ic_delete_24px',
+    iconStyle: {
+      fill: '#7a7a7a'
+    }
+  });
+
   const toggleVisibility = function toggleVisibility() {
     if (isExpanded) {
       layerSwitcherEl.classList.add('fade-out');
@@ -140,7 +154,7 @@ const Legend = function Legend(options = {}) {
       target = document.getElementById(viewer.getMain().getId());
       const maxHeight = calcMaxHeight(getTargetHeight());
       const overlaysCmp = Overlays({ viewer, cls: contentCls, style: contentStyle });
-      const baselayerCmps = addControl ? [toggleGroup, divider, addButton] : [toggleGroup];
+      const baselayerCmps = addControl ? [toggleGroup, divider, turnOffLayersButton] : [toggleGroup];
       const baselayersCmp = El({
         cls: 'flex padding-small no-shrink',
         style: {

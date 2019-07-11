@@ -21,7 +21,7 @@ const Overlays = function Overlays(options) {
   } = options;
 
   const cls = `${clsSettings} o-layerswitcher-overlays flex row overflow-hidden`.trim();
-  const style = dom.createStyle(Object.assign({}, { width: '220px;' }, styleSettings));
+  const style = dom.createStyle(Object.assign({}, { width: '266px;' }, styleSettings));
   const nonGroupNames = ['background', 'none'];
   const rootGroupNames = ['root', '', null, undefined];
   let overlays;
