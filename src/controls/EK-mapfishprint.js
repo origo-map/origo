@@ -101,7 +101,29 @@ const Mapfishprint = function Mapfishprint(options = {}) {
                 mapfishOptions.layers.push(layer);
             });
         }
+
+        let pin = viewer.getFeatureinfo().getPin();
+        if (pin) mapfishOptions.layers.push(PinToPrint(pin));
+
         return mapfishOptions;
+    }
+
+    function PinToPrint(pinFeature){
+        let pinGeoJson = new GeoJSON().writeFeaturesObject([pinFeature]);
+        pinGeoJson.features[0].properties = { "style" : "bluepin"};
+        let pin = {
+            "geoJson": pinGeoJson,
+            "type": "vector",
+            "styleProperty" : "style",
+            "styles": {
+              "bluepin": { 
+                "externalGraphic":`${viewer.getUrl()}${pinFeature.getStyle().getImage().getSrc()}`, 
+                "graphicWidth": 25, 
+                "graphicHeight": 25
+                }
+            }
+        }
+        return pin;
     }
 
     function buildLegend(layers) {
