@@ -4,6 +4,7 @@ const Splash = function Splash(options = {}) {
   const defaultTitle = 'Om kartan';
   const defaultContent = '';
   const cls = 'o-splash';
+  const style = options.style || '';
   let viewer;
   let hideButton;
   let modal;
@@ -59,7 +60,8 @@ const Splash = function Splash(options = {}) {
         title,
         content,
         cls,
-        target
+        target,
+        style
       });
       component.dispatch('render');
     }
