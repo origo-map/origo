@@ -193,6 +193,7 @@ function getFeaturesFromRemote(requestOptions, viewer) {
     if (features) {
       /*if type is string, then we are dealing with FTL*/
       if(typeof features[0] === 'string'){
+        if(features[0].indexOf("<body>\n  </body>") > 0) return false;
         features.forEach((feature) => {
           requestResult.push({
             title: layer.get('title'),
