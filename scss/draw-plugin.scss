@@ -1,0 +1,40 @@
+#o-draw-toolbar {
+  background-color: #fff;
+  color: #000;
+  position: absolute;
+  z-index: 10; 
+
+  .o-control-active svg {
+    fill: #007AFF; 
+  }
+
+  border-radius: 10px;
+  padding: 0 .5rem; 
+  bottom: 1em;
+  left: 50%;
+  -webkit-box-shadow: 0 2px 8px 1px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 2px 8px 1px rgba(0, 0, 0, 0.45);
+  -ms-transform: translate(-50%, 0);
+  -webkit-transform: translate(-50%, 0);
+  transform: translate(-50%, 0);
+
+  svg {
+    height: 2em;
+    width: 2em;
+    padding: 0.4em;
+  }
+
+  @media screen and (max-width: 500px) {
+    svg {
+      height: 1em;
+      width: 1em;
+      padding: 0.1em;
+    }
+
+    .o-btn-3 {
+      height: 2.5em;
+      width: 2em;
+    }
+  }
+
+}
