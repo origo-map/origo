@@ -12,7 +12,7 @@ let $drawClose;
 let drawTools;
 let target;
 let freemodeToggle = `
-<label  class="switch">
+<label title='On/off för frihandläge (Linje och polygon)' class="switch">
     <input id='toggle-freemode' type="checkbox" style="opacity:0;">
     <span class="slider round">
         <span class="freehand-icon">
