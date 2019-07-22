@@ -32,7 +32,7 @@ function buildGetLegendGraphicUrl(layer,viewer){
 }
 
 export const getLegendGraphicIcon = function getLegendGraphicIcon(layer, viewer) {
-	let url = buildGetLegendGraphicUrl(layer, viewer);
+	let url = (layer.get('theme') || layer.get('grouplayer')) ? 'img/svg/temaikon.svg' : buildGetLegendGraphicUrl(layer, viewer);
 	let iconOpt = { src : url};
 	//Set data-layer to layername to be able to find element and update src
 	return renderIcon.Icon(iconOpt).replace(`<img `, `<img data-layer=${layer.get('name')} `);

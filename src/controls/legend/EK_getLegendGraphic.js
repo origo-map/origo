@@ -22,6 +22,7 @@ const GetLegendGraphic = function GetLegendGraphic(options = {}) {
 
 	function updateLegendGraphics(layer){
 		let layername = layer.get('name');
+		if(layer.get('theme') || layer.get('grouplayer')) return;
 		/*Try to get and update tags with data-layer on them.
 			The data-layer property is set the utils*/
 		let img = document.querySelector(`[data-layer='${layername}']`);
