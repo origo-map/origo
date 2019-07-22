@@ -7,6 +7,11 @@ import GeoJSON from 'ol/format/GeoJSON';
 import $ from 'jquery';
 import { Component, Button, dom} from '../ui';
 import config from '../../conf/printSettings';
+import { getArea, getLength } from 'ol/sphere';
+import Polygon from 'ol/geom/Polygon';
+import LineString from 'ol/geom/LineString';
+import Point from 'ol/geom/Point';
+import Feature from 'ol/Feature';
 
 const Mapfishprint = function Mapfishprint(options = {}) {
     let {
@@ -76,7 +81,7 @@ const Mapfishprint = function Mapfishprint(options = {}) {
 
         // build legend objects and add to mapfishconfig
         let legendArray = buildLegend(layers.filter(function(layer) {
-            return (layer.get('name').indexOf("_bk_") == -1)
+            return (layer.get('name').indexOf("_bk_") == -1 && layer.get('name') != "measure")
         })); //TODO: Make it more user configurable
 
         legendArray.forEach(function(obj) {
@@ -91,6 +96,9 @@ const Mapfishprint = function Mapfishprint(options = {}) {
             return typeof layer.get('name') != "undefined"
         }), "WFS");
 
+
+
+
         if (wmsLayers.length !== 0) {
             wmsLayers.forEach(function(layer) {
                 mapfishOptions.layers.push(layer);
@@ -102,13 +110,18 @@ const Mapfishprint = function Mapfishprint(options = {}) {
             });
         }
 
+        //Both pin and measure are vector types, mapfish needs other properties for them
+        //Current version is mapfish V2 and the styles are similar to OL2
+        let measureLayer = layers.filter((layer) => layer.get('name') == "measure");
+        if(measureLayer.length > 0) mapfishOptions.layers.push(measureToPrint(measureLayer))
+
         let pin = viewer.getFeatureinfo().getPin();
-        if (pin) mapfishOptions.layers.push(PinToPrint(pin));
+        if (pin) mapfishOptions.layers.push(pinToPrint(pin));
 
         return mapfishOptions;
     }
 
-    function PinToPrint(pinFeature){
+    function pinToPrint(pinFeature){
         let pinGeoJson = new GeoJSON().writeFeaturesObject([pinFeature]);
         pinGeoJson.features[0].properties = { "style" : "bluepin"};
         let pin = {
@@ -124,6 +137,103 @@ const Mapfishprint = function Mapfishprint(options = {}) {
             }
         }
         return pin;
+    }
+
+    /*Measure function from Measure control.
+        Could not use it from measure control
+        since it was "private"*/
+    function measureFeature(feature){
+        let geom = feature.getGeometry();
+        let projection = viewer.getProjection()
+        let output = ""
+        if(geom instanceof Polygon){
+            const area = getArea(geom, {
+              projection
+            });
+            if (area > 10000000) {
+              output = `${Math.round((area / 1000000) * 100) / 100} km`;
+            } else if (area > 10000) {
+              output = `${Math.round((area / 10000) * 100) / 100} ha`;
+            } else {
+              output = `${Math.round(area * 100) / 100} m`;
+            }
+        }
+        if(geom instanceof LineString){
+            const length = getLength(geom, {
+              projection
+            });
+            if (length > 1000) {
+              output = `${Math.round((length / 1000) * 100) / 100} km`;
+            } else {
+              output = `${Math.round(length * 100) / 100} m`;
+            }
+        }
+        return output;
+    }
+
+    //Builds mapfish-friendly object from measure layer 
+    function measureToPrint(measure){
+        let geom;
+        let coord;
+        let coords;
+        let labelAlign;
+        let strokeOpacity;
+        let fillOpacity;
+        let xDirection;
+        let features = measure[0].getSource().getFeatures();
+        let styles = {
+            "measure": {
+                "fillColor": "#0099ff",
+                "fillOpacity": 0.1,
+                "strokeColor": "#0099ff",
+                "strokeWidth": 1.5
+            }
+        };
+
+        features.forEach((feature, index) =>{
+            feature.set("style", "measure");
+            geom = feature.getGeometry();
+
+            if(geom instanceof LineString){
+                coords = geom.getCoordinates();
+                coord = coords.pop();
+                //Align label depending on how the feature is drawn
+                xDirection = coord[0]-coords.pop()[0];
+                labelAlign = xDirection > 0 ? "lt" : "rt";
+                strokeOpacity = fillOpacity = 1.0;
+            }
+            if(geom instanceof Polygon){
+                coord = geom.getInteriorPoint().getCoordinates();
+                labelAlign = "cm";
+                strokeOpacity = fillOpacity = 0.0; 
+            }
+
+            /*Add a point for every feature in measure,
+                point is used to hold label and some
+                indication on where measure ended*/
+            features.push(new Feature({
+                geometry: new Point(coord),
+                "style": `measure-${index}`
+            }));
+
+            styles[`measure-${index}`] = {
+                "label": measureFeature(feature),
+                "fontColor": "#0099ff",
+                "pointRadius": 2,
+                "fillColor": "#0099ff",
+                "strokeColor": "#0099ff",
+                strokeOpacity,
+                fillOpacity,
+                labelAlign
+            }
+        });
+
+        return {
+            "geoJson" : new GeoJSON().writeFeaturesObject(features),
+            "type" : "vector",
+            "styleProperty" : "style",
+            styles
+        };
     }
 
     function buildLegend(layers) {
