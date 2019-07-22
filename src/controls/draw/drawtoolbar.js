@@ -11,9 +11,21 @@ let $drawDelete;
 let $drawClose;
 let drawTools;
 let target;
+let freemodeToggle = `
+<label  class="switch">
+    <input id='toggle-freemode' type="checkbox" style="opacity:0;">
+    <span class="slider round">
+        <span class="freehand-icon">
+            <svg class="o-icon-pencil">
+                <use xlink:href="#fa-pencil"></use>
+            </svg>
+        </span>
+    </span>
+</label>`
 
 function render() {
   $(`#${target}`).append("<div id='o-draw-toolbar' class='o-control o-toolbar o-padding-horizontal-8 o-rounded-top o-hidden'>" +
+    `${freemodeToggle}`+
     "<button id='o-draw-point' class='o-btn-3' type='button' name='button'>" +
     "<svg class='o-icon-fa-map-marker'>" +
     "<use xlink:href='#fa-map-marker'></use>" +
@@ -60,6 +72,12 @@ function render() {
 }
 
 function bindUIActions() {
+  $('#toggle-freemode').on("click", () => {
+    //deactivate current tool and reactivate it again with freemode
+    let active = drawHandler.getActiveTool()
+    dispatcher.emitToggleDraw(active)
+    dispatcher.emitToggleDraw(active)
+  })
   $drawDelete.on('click', (e) => {
     dispatcher.emitToggleDraw('delete');
     $drawDelete.blur();

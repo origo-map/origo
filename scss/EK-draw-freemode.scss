@@ -1,0 +1,60 @@
+.switch {     
+  position: relative;      
+  display: inline-block;      
+  width: 3.8rem;      
+  height: 2rem;    
+  overflow: hidden;
+}
+.slider {  
+  position: absolute;  
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  left: 0; 
+  background-color: #dbdbdb;  
+  -webkit-transition: .4s;  
+  transition: .4s;
+}
+.freehand-icon {
+  position: absolute;
+  left: .4rem;
+  bottom: .26rem;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+input:checked + .slider {
+  background-color: #1096f5;
+}
+input:checked + .slider>.freehand-icon {
+  -webkit-transform: translateX(100%);
+  -ms-transform: translateX(100%);
+  transform: translateX(100%);
+}
+.slider.round {
+  border-radius: 34px;
+}
+.freehand-icon{
+  border-radius: 50%;
+}
+.o-icon-pencil{
+  height: 1rem !important;
+  width: 1rem !important;
+  padding: .2rem !important;
+}
+@media screen and (max-width: 500px) {
+  .o-icon-pencil {
+    height: .7rem !important;
+    width: .7rem !important;
+    padding: .17rem !important;
+  }
+  .freehand-icon {
+    left: .3rem;
+    bottom: 0.12rem;
+  }
+  .switch {     
+    width: 2.8rem;
+    height: 1.3rem;
+    overflow: inherit;
+  }
+}

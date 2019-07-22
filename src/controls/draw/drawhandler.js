@@ -133,7 +133,8 @@ function setDraw(drawType) {
   }
   draw = new Draw({
     source: drawLayer.getFeatureStore(),
-    type: geometryType
+    type: geometryType,
+    freehand : $("#toggle-freemode").is(':checked')
   });
   map.addInteraction(draw);
   dispatcher.emitChangeDraw(drawType, true);
@@ -246,6 +247,8 @@ function runPolyFill() {
   }
 }
 
+const getActiveTool = () => activeTool;
+
 const init = function init(optOptions) {
   runPolyFill();
 
@@ -280,5 +283,6 @@ const init = function init(optOptions) {
 export default {
   init,
   getState,
-  restoreState
+  restoreState,
+  getActiveTool
 };
