@@ -14,6 +14,8 @@ function serialize(obj) {
 
 //Builds and returns the url based on properties
 function buildGetLegendGraphicUrl(layer,viewer){
+	console.log(layer.getSource())
+	console.log(layer.getSource().getUrls())
 	let url = layer.getSource().getUrls()[0]
 	let properties = {
 		layer : layer.get('name'),
@@ -22,7 +24,7 @@ function buildGetLegendGraphicUrl(layer,viewer){
 	}
 
 	if(layer.getProperties().legendGraphicSettings)
-		properties = layer.getProperties().legendGraphicSettings;
+		properties = Object.assign(properties, layer.getProperties().legendGraphicSettings);
 
 	properties.request = "getLegendGraphic";
 	properties.scale = maputils.resolutionToScale(viewer.getMap().getView().getResolution(), viewer.getProjection());

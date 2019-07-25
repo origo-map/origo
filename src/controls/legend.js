@@ -154,7 +154,7 @@ const Legend = function Legend(options = {}) {
       target = document.getElementById(viewer.getMain().getId());
       const maxHeight = calcMaxHeight(getTargetHeight());
       const overlaysCmp = Overlays({ viewer, cls: contentCls, style: contentStyle });
-      const baselayerCmps = addControl ? [toggleGroup, divider, turnOffLayersButton] : [toggleGroup];
+      const baselayerCmps = addControl ? [toggleGroup, divider, turnOffLayersButton, addButton] : [toggleGroup];
       const baselayersCmp = El({
         cls: 'flex padding-small no-shrink',
         style: {

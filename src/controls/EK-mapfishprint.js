@@ -272,7 +272,7 @@ const Mapfishprint = function Mapfishprint(options = {}) {
                                 let layername = sublayers[i].name;
                                 result.push({
                                     name: subName,
-                                    icons: [url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + layername + '&STYLE=' + style + '&RULE=' + rule + '&SCALE=1&legend_options=dpi:400']
+                                    icons: [url + '/?REQUEST=GetLegendGraphic&transparent=true&service=WMS&VERSION=1.0.0&FORMAT=image/png&LAYER=' + layername + '&STYLE=' + style + '&RULE=' + rule + '&SCALE=1&legend_options=dpi:400']
                                 })
                             }
                         }
@@ -281,7 +281,7 @@ const Mapfishprint = function Mapfishprint(options = {}) {
                     else {
                         result.push({
                             name: layer.get('title'),
-                            icons: [url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name + '&SCALE=1&legend_options=dpi:400']
+                            icons: [url + '/?REQUEST=GetLegendGraphic&transparent=true&service=WMS&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name + '&SCALE=1&legend_options=dpi:400']
                         })
                     }
                     return result;
@@ -291,7 +291,7 @@ const Mapfishprint = function Mapfishprint(options = {}) {
                     name = layer.get('name');
                     result.push({
                         name: layer.get('title'),
-                        icons: [url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name + '&SCALE=1&legend_options=dpi:400']
+                        icons: [url + '/?REQUEST=GetLegendGraphic&transparent=true&service=WMS&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name + '&SCALE=1&legend_options=dpi:400']
                     })
                     return result;
                     break;
@@ -314,8 +314,8 @@ const Mapfishprint = function Mapfishprint(options = {}) {
                     let rule = sublayers[i].rule;
                     //handle if another style is specified
                     let url = layer.style ?
-                        layer.url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name + '&STYLE=' + layer.style + '&RULE=' + rule + '&SCALE=1&legend_options=dpi:400' :
-                        layer.url + '/?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name + '&RULE=' + rule + '&SCALE=1&legend_options=dpi:400'
+                        layer.url + '/?REQUEST=GetLegendGraphic&transparent=true&service=WMS&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name + '&STYLE=' + layer.style + '&RULE=' + rule + '&SCALE=1&legend_options=dpi:400' :
+                        layer.url + '/?REQUEST=GetLegendGraphic&transparent=true&service=WMS&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name + '&RULE=' + rule + '&SCALE=1&legend_options=dpi:400'
                     legendObjects.push({
                         name: subName,
                         icons: [url]
