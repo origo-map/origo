@@ -4,6 +4,7 @@ import Group from './group';
 import GroupList from './grouplist';
 import LayerProperties from './overlayproperties';
 import Overlay from './overlay';
+import AddLayerOverlay from './addlayerbutton';
 
 /**
  * The Overlays component works as a container for
@@ -246,10 +247,15 @@ const Overlays = function Overlays(options) {
         }
         evt.stopPropagation();
       });
+    
+      let variable = groupCmps.find(cmp => cmp.name === "mylayers")
+      variable.addOverlay(AddLayerOverlay({viewer, position: "bottom"}))
+
       this.dispatch('render');
     },
     render() {
       const emptyCls = hasOverlays() ? '' : 'hidden';
+      //document.getElementById(cjyjsho69006r355kwju99h9v).appendChild(dom.html(`<button>heyoo</button>`))
       return `<div id="${this.getId()}" class="${cls} ${emptyCls}" style="${style}">
                 ${overlaysCollapse.render()}
               </div>`;

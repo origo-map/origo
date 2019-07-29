@@ -229,6 +229,9 @@ const Search = function Search(options = {}) {
 
   function bindUIActions() {
     document.getElementById('hjl').addEventListener('awesomplete-selectcomplete', selectHandler);
+    document.getElementById('hjl').addEventListener("awesomplete-open", (evt) => {
+      viewer.dispatch('search:open')
+    });
 
     document.getElementsByClassName('o-search-field')[0].addEventListener('input', () => {
       if (document.getElementsByClassName('o-search-field')[0].value && document.getElementById(`${containerElement.getId()}`).classList.contains('o-search-false')) {
