@@ -1,6 +1,7 @@
 //import 'Origo';
 import LayerItem from './layeritem';
 import { Component, Element as El, Button, dom } from '../../ui';
+import layerRequester from './layerrequester';
 
 const LayerList = function LayerList(options = {}) {
   const {
@@ -12,7 +13,7 @@ const LayerList = function LayerList(options = {}) {
   } = options;
 
   let layerItems;
-  console.log(sourceFields)
+  let scrollPos; //control scroll position when loading in more
   const searchFields = Object.keys(sourceFields).reduce((prev, curr) => {
     if (sourceFields[curr].searchable) {
       return prev.concat(curr);
@@ -30,8 +31,9 @@ const LayerList = function LayerList(options = {}) {
   };
 
   const createLayerItems = (list) => {
-    const sorted = sortAscending(list, sourceFields.title.name);
-    return sorted.map((layer) => {
+    //const sorted = sortAscending(list, sourceFields.title.name);
+    //let CSW-call do the sorting
+    return list.map((layer) => {
       return LayerItem({ 
         data: layer,
         sourceFields,
@@ -65,11 +67,16 @@ const LayerList = function LayerList(options = {}) {
     return matches;
   };
 
+  
+
   return Component({
     addLayers(list) {
       layerItems = createLayerItems(list);
       this.addComponents(layerItems);
       this.update();
+    },
+    onRender(){
+      scrollPos = 0
     },
     render(cmps) {
       const components = cmps ? cmps : this.getComponents();
@@ -78,17 +85,30 @@ const LayerList = function LayerList(options = {}) {
               </div>`
     },
     search(searchText) {
-      const matches = searchByText(searchText);
-      this.clearComponents();
-      this.addComponents(matches);
-      this.update(matches);
+      console.log("search")
+      layerRequester({ searchText : searchText }); //new request with searchstring
+      scrollPos = document.getElementById(this.getId()).scrollTop 
+      // const matches = searchByText(searchText);
+      // this.clearComponents();
+      // this.addComponents(matches);
+      // this.update(matches);
     },
     update(cmps) {
       const el = document.getElementById(this.getId());
       const htmlString = cmps ? this.render(cmps) : this.render();
       const newEl = dom.html(htmlString);
       el.parentNode.replaceChild(newEl, el);
-      this.dispatch('render');      
+      this.dispatch('render'); 
+      //After rendering and updating is done, set the scroll event
+      const currentEl = document.getElementById(this.getId())    
+      currentEl.addEventListener('scroll', () => {
+        if(currentEl.scrollTop == currentEl.scrollHeight - currentEl.offsetHeight){
+          scrollPos = currentEl.scrollHeight - currentEl.offsetHeight
+          let searchText = currentEl.parentNode.getElementsByTagName("input")[0].value
+          layerRequester({searchText, startRecord: this.getComponents().length+1, extend : true})
+        } 
+      })
+      currentEl.scrollTop = scrollPos
     }
   });
 };

@@ -14,8 +14,6 @@ function serialize(obj) {
 
 //Builds and returns the url based on properties
 function buildGetLegendGraphicUrl(layer,viewer){
-	console.log(layer.getSource())
-	console.log(layer.getSource().getUrls())
 	let url = layer.getSource().getUrls()[0]
 	let properties = {
 		layer : layer.get('name'),

@@ -26,7 +26,6 @@ const layerItem = function layerItem(options = {}) {
   return Component({
     getData: () => data,
     onInit() {
-      console.log(data)
       layerAdder = LayerAdder({ 
         viewer,
         layerId: data[layerId.name],
@@ -38,7 +37,6 @@ const layerItem = function layerItem(options = {}) {
       this.addComponent(layerAdder);
     },
     onRender() {
-      console.log(viewer.getGroup("mylayers"))
       this.dispatch('render');
     },
     render() {
