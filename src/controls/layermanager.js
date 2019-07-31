@@ -73,7 +73,8 @@ const Layermanager = function Layermanager(options = {}) {
     },
     render() {
       const template = `
-        <div id="${this.getId()}" class="${cls}" style="height: 700px;">      
+      <div id="${this.getId()}" style="width: 100%;height: 100%;background: #0000005e;z-index: 51;">
+        <div class="${cls}" style="height: 700px;">      
           <div class="relative padding-y flex overflow-hidden width-100" ">
             <div class="flex row width-100 overflow-hidden">
               ${filterMenu.render()}
@@ -82,6 +83,7 @@ const Layermanager = function Layermanager(options = {}) {
           </div>
           ${closeButton.render()}  
         </div>
+      </div>
       `;
       const elLayerManger = dom.html(template);
       document.getElementById(viewer.getMain().getId()).appendChild(elLayerManger);
