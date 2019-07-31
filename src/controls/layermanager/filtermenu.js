@@ -1,5 +1,6 @@
 //import'Origo';
 import { Component, Element as El, Button, dom } from '../../ui';
+import layerRequester from './layerrequester';
 
 const FilterMenu = function FilterMenu(options = {}) {
   let {
@@ -21,15 +22,17 @@ const FilterMenu = function FilterMenu(options = {}) {
 
   function createButtons(titles){
     let buttons = [];
-    let searchText = 'Bebyggelse'
     titles.forEach(currentTitle => {
+
       buttons.push(Button({
         cls: "medium rounded width-full light text-align-left text-color-grey text-nowrap text-overflow-ellipsis",
         click() {
-          viewer.dispatch('change:text', { searchText });
+          document.getElementById(this.getId()).style.backgroundColor = "#fa4";
+          layerRequester({ searchText: currentTitle });
         },
         text: currentTitle
       }))
+
     })
     return buttons;
   }
@@ -38,22 +41,17 @@ const FilterMenu = function FilterMenu(options = {}) {
     let list = '';
     buttons.forEach(button => {
       list += `<li>${button.render()}</li>`;
-      console.log(button.render());
     });
     return list;
   }
 
   let buttons;
   return Component({
-    onAdd(e) {
-      viewer = e.target;
-    },
     onInit() {
       buttons = createButtons(titles);
       this.addComponents(buttons);
     },
     onRender() {
-      console.log("ON RENDER ON FILTER");
       this.dispatch('render');
     },
     render() {
