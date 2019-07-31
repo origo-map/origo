@@ -48,8 +48,8 @@ const Layermanager = function Layermanager(options = {}) {
   };
 
   return Component({
+    name: 'layermanager',
     onAdd(e) {
-      console.log("layermanager onAdd");
       viewer = e.target;
       viewer.on('active:layermanager', setActive.bind(this));
       main = Main({ 
@@ -83,7 +83,6 @@ const Layermanager = function Layermanager(options = {}) {
           ${closeButton.render()}  
         </div>
       `;
-    
       const elLayerManger = dom.html(template);
       document.getElementById(viewer.getMain().getId()).appendChild(elLayerManger);
       this.dispatch('render');

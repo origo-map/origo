@@ -21,6 +21,7 @@ const LayerAdder = function LayerAdder(options = {}) {
   const initialIcon = initialState === 'initial' ? addIcon : removeIcon;
   const initialBgCls = initialState === 'initial' ? 'primary' : 'danger';
   const cls = `${clsSettings} layeradder ${initialBgCls}`.trim();
+  const isValid = src == "no src" ? "none" : "block" //decides hide or show button, depends if src exist for layer
 
   const fetchLayer = async function fetchLayer() {
     const body = JSON.stringify([{
@@ -90,8 +91,10 @@ const LayerAdder = function LayerAdder(options = {}) {
         //const errorMsg = error || layerConfig.error;
         //console.log(errorMsg);
      // } else if (layerConfig.layers.length) {
+
+      //add layers with same format as in json
         let srcUrl = src
-        if (src[src.length-1] == '?') srcUrl = src.substring(0,src.length-1)
+        if (src[src.length-1] == '?') srcUrl = src.substring(0,src.length-1) //some extra '?' from request breaks the url
         let layers = [{
             name: layerId,
             title: title,
@@ -124,6 +127,7 @@ const LayerAdder = function LayerAdder(options = {}) {
   };
 
   return Button({
+    style: `display: ${isValid}`, //hide button if you cant add it
     click,
     cls,
     icon: initialIcon,
