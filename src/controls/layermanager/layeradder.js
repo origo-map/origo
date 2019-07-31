@@ -6,8 +6,8 @@ const LayerAdder = function LayerAdder(options = {}) {
   const {
     layerId,
     cls: clsSettings = 'round compact boxshadow-subtle text-inverse icon-small',
-    addIcon = '#cu_add_24px',
-    removeIcon = '#cu_remove_24px',
+    addIcon = '#ic_add_24px',
+    removeIcon = '#ic_remove_24px',
     sourceUrl,
     type = 'layer',
     title,
