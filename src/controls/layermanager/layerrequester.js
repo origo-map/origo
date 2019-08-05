@@ -12,20 +12,45 @@ const layerRequester = async function layerRequester({
   url = '',
   searchText = '',
   startRecord = 1,
-  extend = false
+  extend = false,
+  themes = []
 }  = {}) {
+  function parseThemes(){
+    let activeThemes = ''
+    themes.forEach(theme => {
+      activeThemes += `<ogc:PropertyIsLike matchCase="false" wildCard="%" singleChar="_" escapeChar="\">
+          <ogc:PropertyName>title</ogc:PropertyName>
+          <ogc:Literal>%${theme}%</ogc:Literal>
+        </ogc:PropertyIsLike>`
+    })
+    return activeThemes;
+  }
+
+  function buildFilter(){
+    let filter = '<ogc:Filter>';
+    let themesActive = false;
+    if (themes.length != 0){
+       filter+= '<ogc:And>';
+       themesActive = true;
+    }
+    filter += `<ogc:PropertyIsLike matchCase="false" wildCard="%" singleChar="_" escapeChar="\">
+                <ogc:PropertyName>title</ogc:PropertyName>
+                <ogc:Literal>%${searchText}%</ogc:Literal>
+              </ogc:PropertyIsLike>`
+    if(themesActive){
+      filter += `${parseThemes()}</ogc:And>`
+    }
+    filter += '</ogc:Filter>'
+    return filter
+  }
+
   if (type === 'all') {
     //LayerListStore.updateList(requestAll());
     let body = `<csw:GetRecords xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:ogc="http://www.opengis.net/ogc" service="CSW" version="2.0.2" resultType="results" startPosition="${startRecord}" maxRecords="30" outputFormat="application/xml" outputSchema="http://www.opengis.net/cat/csw/2.0.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-discovery.xsd" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:apiso="http://www.opengis.net/cat/csw/apiso/1.0">
   <csw:Query typeNames="csw:Record">
     <csw:ElementSetName>full</csw:ElementSetName>
     <csw:Constraint version="1.1.0">
-      <ogc:Filter>
-        <ogc:PropertyIsLike matchCase="false" wildCard="%" singleChar="_" escapeChar="\">
-          <ogc:PropertyName>title</ogc:PropertyName>
-          <ogc:Literal>%${searchText}%</ogc:Literal>
-        </ogc:PropertyIsLike>
-      </ogc:Filter>
+      ${buildFilter()}
     </csw:Constraint>
     <ogc:SortBy xmlns:ogc="http://www.opengis.net/ogc">
             <ogc:SortProperty>
@@ -49,7 +74,13 @@ const layerRequester = async function layerRequester({
       console.log(xml)
       let records = xml.getElementsByTagName("csw:Record");
       //Dont do anything if empty
-      if (records.length == 0) return
+      if (records.length == 0 && extend){
+        return
+      }
+      if (records.length == 0){
+        LayerListStore.clear()
+        return
+      }
       let layers = []
       console.log(records)
       for (var i = 0; i < records.length; i++) {

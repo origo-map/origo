@@ -1,6 +1,5 @@
 //import'Origo';
 import { Component, Element as El, Button, dom } from '../../ui';
-import layerRequester from './layerrequester';
 
 const FilterMenu = function FilterMenu(options = {}) {
   let {
@@ -20,7 +19,7 @@ const FilterMenu = function FilterMenu(options = {}) {
   const titles = ["Bebyggelse", "Politik och statistik","Samhällsplanering och bestämmelse","Teknisk infrastruktur","Trafik och kommunikation","Uppleva och göra"];
   let viewer;
 
-  function createButtons(titles){
+  function createButtons(titles, menu){
     let buttons = [];
     titles.forEach(currentTitle => {
 
@@ -34,10 +33,12 @@ const FilterMenu = function FilterMenu(options = {}) {
             document.getElementById(this.getId()).style.backgroundColor = "white";
             this.setState('inactive');  
           }
-          layerRequester({ searchText: currentTitle });
+          let searchText = document.getElementById(menu.getId()).parentNode.getElementsByTagName("input")[0].value
+          menu.dispatch("filter:change", { searchText })
         },
         text: currentTitle,
-        state: 'inactive'
+        state: 'inactive',
+        data: {title:currentTitle}
       }))
 
     })
@@ -55,14 +56,24 @@ const FilterMenu = function FilterMenu(options = {}) {
   let buttons;
   return Component({
     onInit() {
-      buttons = createButtons(titles);
+      buttons = createButtons(titles, this);
       this.addComponents(buttons);
+    },
+    getActiveFilters(){
+      let activeFilters = []
+      buttons.forEach((button) =>{
+        if(button.getState() == 'active'){
+          let title = button.data.title
+          activeFilters.push(title)
+        }
+      })
+      return activeFilters;
     },
     onRender() {
       this.dispatch('render');
     },
     render() {
-      return `<div class="${cls}" style="${style}">
+      return `<div id="${this.getId()}" class="${cls}" style="${style}">
                 <h6 class="text-weight-bold text-grey-dark">Teman</h6>
                 <ul>
                   ${renderButtons(buttons)}

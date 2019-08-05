@@ -85,13 +85,12 @@ const LayerList = function LayerList(options = {}) {
               </div>`
     },
     search(searchText) {
-      console.log("search")
-      layerRequester({ searchText : searchText }); //new request with searchstring
+      let filters = viewer.getControlByName('layermanager').getActiveFilters()
+      layerRequester({ //new request with searchstring
+        searchText : searchText, 
+        themes : filters 
+      }); 
       scrollPos = document.getElementById(this.getId()).scrollTop 
-      // const matches = searchByText(searchText);
-      // this.clearComponents();
-      // this.addComponents(matches);
-      // this.update(matches);
     },
     update(cmps) {
       const el = document.getElementById(this.getId());
@@ -100,12 +99,18 @@ const LayerList = function LayerList(options = {}) {
       el.parentNode.replaceChild(newEl, el);
       this.dispatch('render'); 
       //After rendering and updating is done, set the scroll event
-      const currentEl = document.getElementById(this.getId())    
+      const currentEl = document.getElementById(this.getId())
       currentEl.addEventListener('scroll', () => {
         if(currentEl.scrollTop == currentEl.scrollHeight - currentEl.offsetHeight){
           scrollPos = currentEl.scrollHeight - currentEl.offsetHeight
           let searchText = currentEl.parentNode.getElementsByTagName("input")[0].value
-          layerRequester({searchText, startRecord: this.getComponents().length+1, extend : true})
+          let filters = viewer.getControlByName('layermanager').getActiveFilters()
+          layerRequester({
+            searchText,
+            themes : filters, 
+            startRecord: this.getComponents().length+1, 
+            extend : true
+          })
         } 
       })
       currentEl.scrollTop = scrollPos

@@ -58,6 +58,8 @@ const LayerSearch = function LayerSearch(options = {}) {
       this.dispatch('render');
     },
     render() {
+      searchText = ''
+      clearButton.setState('hidden')
       return `<div id="${this.getId()}" class="flex row align-center no-grow no-shrink bg-grey-lightest padding-small margin-bottom rounded ${cls}" style="${style}">
                 ${searchButton.render()}
                 <input id="${searchId}" class="flex grow padding-left-small search small grey" placeholder="${placeholder}">

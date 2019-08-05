@@ -62,7 +62,11 @@ const Layermanager = function Layermanager(options = {}) {
       this.addComponent(closeButton);
       this.addComponent(main);
       this.addComponent(filterMenu);
+      filterMenu.on("filter:change", main.onUpdateLayerList)
       closeButton.on('click', onClickClose.bind(this));
+    },
+    getActiveFilters(){
+      return filterMenu.getActiveFilters()
     },
     onInit() {
       this.on('render', this.onRender);
