@@ -67,6 +67,13 @@ const LayerList = function LayerList(options = {}) {
     return matches;
   };
 
+  const noItemsMessage = Component({
+    render(){
+      return `<li id="${this.getId()}">
+              Tyvärr blev det ingen träff.
+         </li>`
+    }
+  })
   
 
   return Component({
@@ -80,6 +87,12 @@ const LayerList = function LayerList(options = {}) {
     },
     render(cmps) {
       const components = cmps ? cmps : this.getComponents();
+      
+      //Empty array means no items to show, add a message as visual feedback
+      if(components.length == 0){
+        components.push(noItemsMessage)
+        this.addComponent(noItemsMessage)
+      }
       return `<div id="${this.getId()}" class="o-list-container flex column overflow-auto-y padding-right-large">
                 <ul class="divided list">${renderListItems(components)}</ul>
               </div>`
