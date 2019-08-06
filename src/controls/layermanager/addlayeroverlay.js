@@ -1,6 +1,6 @@
 import { Component, Button, dom } from '../../ui';
 import { HeaderIcon } from '../../utils/legendmaker';
-import layerRequester from '../layermanager/layerrequester';
+import layerRequester from './layerrequester';
 
 //Specialized/Adjusted overlay.js for "add layer"-button
 //tricking origo it is a normal overlay

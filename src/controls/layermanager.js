@@ -4,6 +4,7 @@ import LayerListStore from './layermanager/layerliststore';
 import Main from './layermanager/main';
 import layerRequester from './layermanager/layerrequester';
 import { Component, Element as El, Button, dom } from '../ui';
+import AddLayerOverlay from './layermanager/addlayeroverlay';
 
 const Layermanager = function Layermanager(options = {}) {
   let {
@@ -13,7 +14,8 @@ const Layermanager = function Layermanager(options = {}) {
     cls: clsSettings = 'control width-52',
     sourceFields,
     url,
-    sourceUrl
+    sourceUrl,
+    group
   } = options;
  
   const cls = `${clsSettings} flex fade-in box center-center padding-y-small padding-left layer-manager overflow-hidden`.trim();
@@ -52,6 +54,10 @@ const Layermanager = function Layermanager(options = {}) {
     onAdd(e) {
       viewer = e.target;
       viewer.on('active:layermanager', setActive.bind(this));
+      viewer.addGroup(group)
+      let groups = viewer.getControlByName('legend').getGroups()
+      let layermanagerGroup = groups.find(cmp => cmp.name === group.name)
+      layermanagerGroup.addOverlay(AddLayerOverlay({viewer, position: "bottom"}))
       main = Main({ 
         viewer,
         sourceFields,
