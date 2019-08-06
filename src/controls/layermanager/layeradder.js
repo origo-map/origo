@@ -12,7 +12,8 @@ const LayerAdder = function LayerAdder(options = {}) {
     type = 'layer',
     title,
     src,
-    viewer
+    viewer,
+    layersDefaultProps
   } = options;
 
   const layer = viewer.getLayer(layerId);
@@ -86,43 +87,22 @@ const LayerAdder = function LayerAdder(options = {}) {
       }
     } else if (this.getState() === 'initial') {
       this.setState('loading');
-      //const { error, data: layerConfig} = await readAsync(fetchLayer());
-      //if (error || layerConfig.error) {
-        //const errorMsg = error || layerConfig.error;
-        //console.log(errorMsg);
-     // } else if (layerConfig.layers.length) {
-
-      //add layers with same format as in json
+      //add layers with same format as in config-json
         let srcUrl = src
         if (src[src.length-1] == '?') srcUrl = src.substring(0,src.length-1) //some extra '?' from request breaks the url
-        let layers = [{
-            name: layerId,
-            title: title,
-            group: "mylayers",
-            queryable: true,
-            type: "WMS",
-            visible: true,
-            source: srcUrl,
-            infoFormat: "text/html",
-            useLegendGraphics: true,
-            removable: true,
-            legendGraphicSettings: {
-                transparent: true,
-                service: "WMS"
-            }
-        }]
-        //const layers = layerConfig.layers;
-        //viewer.addGroups(layerConfig.groups);
+        let layer = {
+          name: layerId,
+          title: title,
+          removable: true,
+          source: srcUrl
+        }
+        layer = Object.assign(layer, layersDefaultProps)
+
         let srcObject = {}
         srcObject[`${srcUrl}`] = {url : srcUrl}
         addSources(srcObject);
-        //addStyles(layerConfig.style);
-        viewer.addLayers(layers);
+        viewer.addLayer(layer);
         this.setState('remove');
-      // } else {
-      //   console.log('Layer could not be added to map.');
-      //   this.setState('initial');
-      // }
     }
   };
 

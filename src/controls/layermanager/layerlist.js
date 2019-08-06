@@ -9,7 +9,9 @@ const LayerList = function LayerList(options = {}) {
     sourceFields,
     sourceUrl,
     url,
-    viewer
+    viewer,
+    noSearchResultText = 'No results..',
+    layersDefaultProps
   } = options;
 
   let layerItems;
@@ -39,7 +41,8 @@ const LayerList = function LayerList(options = {}) {
         sourceFields,
         sourceUrl,
         url,
-        viewer
+        viewer,
+        layersDefaultProps
       });
     });
   };
@@ -70,7 +73,7 @@ const LayerList = function LayerList(options = {}) {
   const noItemsMessage = Component({
     render(){
       return `<li id="${this.getId()}">
-              Tyvärr blev det ingen träff.
+              ${noSearchResultText}
          </li>`
     }
   })
@@ -101,7 +104,8 @@ const LayerList = function LayerList(options = {}) {
       let filters = viewer.getControlByName('layermanager').getActiveFilters()
       layerRequester({ //new request with searchstring
         searchText : searchText, 
-        themes : filters 
+        themes : filters,
+        url
       }); 
       scrollPos = document.getElementById(this.getId()).scrollTop 
     },
@@ -122,7 +126,8 @@ const LayerList = function LayerList(options = {}) {
             searchText,
             themes : filters, 
             startRecord: this.getComponents().length+1, 
-            extend : true
+            extend : true,
+            url
           })
         } 
       })

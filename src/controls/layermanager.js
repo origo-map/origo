@@ -15,7 +15,9 @@ const Layermanager = function Layermanager(options = {}) {
     sourceFields,
     url,
     sourceUrl,
-    group
+    group,
+    layersDefaultProps,
+    noSearchResultText
   } = options;
  
   const cls = `${clsSettings} flex fade-in box center-center padding-y-small padding-left layer-manager overflow-hidden`.trim();
@@ -57,12 +59,14 @@ const Layermanager = function Layermanager(options = {}) {
       viewer.addGroup(group)
       let groups = viewer.getControlByName('legend').getGroups()
       let layermanagerGroup = groups.find(cmp => cmp.name === group.name)
-      layermanagerGroup.addOverlay(AddLayerOverlay({viewer, position: "bottom"}))
+      layermanagerGroup.addOverlay(AddLayerOverlay({viewer, position: "bottom", url}))
       main = Main({ 
         viewer,
         sourceFields,
         sourceUrl,
-        url
+        url,
+        layersDefaultProps,
+        noSearchResultText
       });
       filterMenu = FilterMenu();
       this.addComponent(closeButton);
