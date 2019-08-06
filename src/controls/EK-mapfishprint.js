@@ -12,6 +12,7 @@ import Polygon from 'ol/geom/Polygon';
 import LineString from 'ol/geom/LineString';
 import Point from 'ol/geom/Point';
 import Feature from 'ol/Feature';
+import PinStyle from '../style/pin';
 
 const Mapfishprint = function Mapfishprint(options = {}) {
     let {
@@ -110,7 +111,7 @@ const Mapfishprint = function Mapfishprint(options = {}) {
             });
         }
 
-        //Both pin and measure are vector types, mapfish needs other properties for them
+        //Both pin, draw and measure are vector types, mapfish needs other properties for them
         //Current version is mapfish V2 and the styles are similar to OL2
         let measureLayer = layers.filter((layer) => layer.get('name') == "measure");
         if(measureLayer.length > 0) mapfishOptions.layers.push(measureToPrint(measureLayer))
@@ -118,7 +119,54 @@ const Mapfishprint = function Mapfishprint(options = {}) {
         let pin = viewer.getFeatureinfo().getPin();
         if (pin) mapfishOptions.layers.push(pinToPrint(pin));
 
+        let draw = viewer.getControlByName('draw').getState()
+        draw = JSON.parse(draw.features)
+        if(draw.features.length > 0) mapfishOptions.layers.push(drawToPrint(draw))
+
         return mapfishOptions;
+    }
+
+    //Builds mapfish-friendly object to from drawn features
+    function drawToPrint(draw){
+        let styles = {
+            "draw": {
+                "fillColor": "#0099ff",
+                "fillOpacity": 0.1,
+                "strokeColor": "#0099ff",
+                "strokeWidth": 1.5
+            },
+            "point": { 
+                "externalGraphic":`${viewer.getUrl()}${PinStyle[0].icon.src}`,
+                "graphicWidth": 25, 
+                "graphicHeight": 25
+            }
+        };
+        draw.features.forEach((feature)=>{
+            if(!feature.properties)
+                feature.properties = {}
+            feature.properties.style = 'draw'
+
+
+            if(feature.geometry.type == "Point"){
+                feature.properties.style = 'point'
+            }
+
+            if(feature.properties.annonation){
+                feature.properties.style = `draw-${feature.properties.annonation}`
+                styles[`draw-${feature.properties.annonation}`] = {
+                    "fillOpacity": 0.0,
+                    "strokeOpacity": 0.0,
+                    "label": feature.properties.annonation,
+                    "fontColor": "#0099ff"
+                }
+            }
+        })
+        return {
+            "geoJson": draw,
+            "type": "vector",
+            "styleProperty" : "style",
+            styles
+        }
     }
 
     function pinToPrint(pinFeature){
