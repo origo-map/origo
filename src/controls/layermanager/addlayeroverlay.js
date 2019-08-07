@@ -1,6 +1,6 @@
 import { Component, Button, dom } from '../../ui';
 import { HeaderIcon } from '../../utils/legendmaker';
-import layerRequester from '../layermanager/layerrequester';
+import layerRequester from './layerrequester';
 
 //Specialized/Adjusted overlay.js for "add layer"-button
 //tricking origo it is a normal overlay
@@ -15,7 +15,8 @@ const AddLayerOverlay = function AddLayerOverlay(options) {
     layer,
     position = 'top',
     style,
-    viewer
+    viewer,
+    url
   } = options;
 
   const buttons = [];
@@ -113,7 +114,7 @@ const AddLayerOverlay = function AddLayerOverlay(options) {
           let layermanager = document.getElementById(id)
           let search = layermanager.getElementsByTagName('input')[0]
           search.value = document.getElementById('hjl').value
-          layerRequester({ searchText : search.value });
+          layerRequester({ searchText : search.value, url });
         })
       })
       this.addComponents(buttons);

@@ -5,6 +5,7 @@ import Main from './layermanager/main';
 import layerRequester from './layermanager/layerrequester';
 import { Component, Element as El, Button, dom } from '../ui';
 import cuid from '../ui/utils/cuid';
+import AddLayerOverlay from './layermanager/addlayeroverlay';
 
 const Layermanager = function Layermanager(options = {}) {
   let {
@@ -14,7 +15,10 @@ const Layermanager = function Layermanager(options = {}) {
     cls: clsSettings = 'control width-52',
     sourceFields,
     url,
-    sourceUrl
+    sourceUrl,
+    group,
+    layersDefaultProps,
+    noSearchResultText
   } = options;
  
   const cls = `${clsSettings} flex fade-in box center-center padding-y-small padding-left layer-manager overflow-hidden`.trim();
@@ -61,11 +65,17 @@ const Layermanager = function Layermanager(options = {}) {
     onAdd(e) {
       viewer = e.target;
       viewer.on('active:layermanager', setActive.bind(this));
+      viewer.addGroup(group)
+      let groups = viewer.getControlByName('legend').getGroups()
+      let layermanagerGroup = groups.find(cmp => cmp.name === group.name)
+      layermanagerGroup.addOverlay(AddLayerOverlay({viewer, position: "bottom", url}))
       main = Main({ 
         viewer,
         sourceFields,
         sourceUrl,
-        url
+        url,
+        layersDefaultProps,
+        noSearchResultText
       });
       filterMenu = FilterMenu();
       this.addComponent(closeButton);

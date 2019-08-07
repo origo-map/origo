@@ -10,7 +10,8 @@ const layerItem = function layerItem(options = {}) {
     cls: clsOptions = '',
     sourceUrl,
     viewer,
-    sourceFields
+    sourceFields,
+    layersDefaultProps
   } = options;
 
   const {
@@ -51,7 +52,8 @@ const layerItem = function layerItem(options = {}) {
         title: data[title.name],
         type: data[type.name],
         src: data[src.name],
-        sourceUrl
+        sourceUrl,
+        layersDefaultProps
       });
       this.addComponent(layerAdder);
     },

@@ -15,6 +15,7 @@ const layerRequester = async function layerRequester({
   extend = false,
   themes = []
 }  = {}) {
+
   function parseThemes(){
     let activeThemes = ''
     themes.forEach(theme => {
@@ -44,8 +45,6 @@ const layerRequester = async function layerRequester({
     return filter
   }
 
-  if (type === 'all') {
-    //LayerListStore.updateList(requestAll());
     let body = `<csw:GetRecords xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:ogc="http://www.opengis.net/ogc" service="CSW" version="2.0.2" resultType="results" startPosition="${startRecord}" maxRecords="30" outputFormat="application/xml" outputSchema="http://www.opengis.net/cat/csw/2.0.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-discovery.xsd" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:apiso="http://www.opengis.net/cat/csw/apiso/1.0">
   <csw:Query typeNames="csw:Record">
     <csw:ElementSetName>full</csw:ElementSetName>
@@ -61,7 +60,7 @@ const layerRequester = async function layerRequester({
   </csw:Query>
 </csw:GetRecords> 
 `
-    const { error, data } = await readAsync(fetch("https://karta.eskilstuna.se/geodatakatalogen360/srv/eng/csw", {
+    const { error, data } = await readAsync(fetch(url, {
     method: "POST", 
     headers: { "Content-Type" : "application/xml"}, 
     body: body}).then((rsp) => rsp.text()));
@@ -108,13 +107,13 @@ const layerRequester = async function layerRequester({
           src
         })
       }
+
       //if to extend current list, used for "load more on scroll"-effect
       if (extend)
         layers = LayerListStore.getList().concat(layers)
       LayerListStore.updateList(layers);
-      //LayerListStore.updateList(data.layers);
     }
-  }
+  
   return [];
 };
 
