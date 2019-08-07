@@ -4,6 +4,7 @@ import LayerListStore from './layermanager/layerliststore';
 import Main from './layermanager/main';
 import layerRequester from './layermanager/layerrequester';
 import { Component, Element as El, Button, dom } from '../ui';
+import cuid from '../ui/utils/cuid';
 
 const Layermanager = function Layermanager(options = {}) {
   let {
@@ -22,6 +23,7 @@ const Layermanager = function Layermanager(options = {}) {
   let main;
   let viewer;
   let isActive = false
+  let backDropId = cuid();
 
   const clearCls = 'absolute round small icon-smaller grey-lightest';
   const icon = '#ic_clear_24px';
@@ -43,9 +45,16 @@ const Layermanager = function Layermanager(options = {}) {
 
   const onClickClose = function onClickClose() {
     document.getElementById(this.getId()).remove();
+    document.getElementById(backDropId).remove();
     isActive = false
     this.dispatch('close');
   };
+
+  function checkESC(e){
+    if (e.keyCode == 27) {
+      closeButton.dispatch('click');
+    }
+  }
 
   return Component({
     name: 'layermanager',
@@ -74,11 +83,14 @@ const Layermanager = function Layermanager(options = {}) {
     onRender() {
       LayerListStore.clear();
       layerRequester({ url });
+      document.getElementById(backDropId).addEventListener('click', ()=>{closeButton.dispatch('click');});
+      window.addEventListener('keyup', checkESC,{once:true});
     },
     render() {
       const template = `
-      <div id="${this.getId()}" style="width: 100%;height: 100%;background: #0000005e;z-index: 51;">
-        <div class="${cls}" style="height: 700px;">      
+      <div id=${backDropId} style="width: 100%;height: 100%;background: #00000080;z-index: 51;">
+      </div>
+      <div id="${this.getId()}" class="${cls}" style="height: 700px; z-index: 52;" >      
           <div class="relative padding-y flex overflow-hidden width-100" ">
             <div class="flex row width-100 overflow-hidden">
               ${filterMenu.render()}
@@ -87,7 +99,6 @@ const Layermanager = function Layermanager(options = {}) {
           </div>
           ${closeButton.render()}  
         </div>
-      </div>
       `;
       const elLayerManger = dom.html(template);
       document.getElementById(viewer.getMain().getId()).appendChild(elLayerManger);

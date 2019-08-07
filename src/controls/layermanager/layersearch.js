@@ -55,6 +55,7 @@ const LayerSearch = function LayerSearch(options = {}) {
     onRender() {
       searchEl = document.getElementById(searchId);
       searchEl.addEventListener('keyup', this.onSearch.bind(this));
+      searchEl.focus();
       this.dispatch('render');
     },
     render() {
@@ -67,8 +68,9 @@ const LayerSearch = function LayerSearch(options = {}) {
               </div>`
     },
     onSearch(e) {
-      e.stopPropagation();
       const key = e.keyCode;
+      if (key == 27) return; //allows layermanager.checkESC to execute when ESC is pressed.
+      e.stopPropagation();
       if (!(key in keyCodes)) {
         const currentSearchValue = searchEl.value || ''
         const currentSearchText = currentSearchValue.toLowerCase();
