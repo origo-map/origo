@@ -119,10 +119,12 @@ const Mapfishprint = function Mapfishprint(options = {}) {
         let pin = viewer.getFeatureinfo().getPin();
         if (pin) mapfishOptions.layers.push(pinToPrint(pin));
 
-        let draw = viewer.getControlByName('draw').getState()
-        draw = JSON.parse(draw.features)
-        if(draw.features.length > 0) mapfishOptions.layers.push(drawToPrint(draw))
-
+        let draw = viewer.getControlByName('draw')
+        if(draw){
+            draw = JSON.parse(draw.getState().features)
+            if (draw.features.length > 0) mapfishOptions.layers.push(drawToPrint(draw))
+        }
+    
         return mapfishOptions;
     }
 
