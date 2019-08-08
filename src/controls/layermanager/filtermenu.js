@@ -27,10 +27,10 @@ const FilterMenu = function FilterMenu(options = {}) {
         cls: "medium rounded width-full light text-align-left text-color-grey text-nowrap text-overflow-ellipsis",
         click() {
         if(this.getState() == 'inactive') {
-            document.getElementById(this.getId()).style.backgroundColor = "#dbdbdb";
+            document.getElementById(this.getId()).style.backgroundColor = "#c6c6c6";
             this.setState('active');            
           }else{
-            document.getElementById(this.getId()).style.backgroundColor = "white";
+            document.getElementById(this.getId()).style.backgroundColor = "";
             this.setState('inactive');  
           }
           let searchText = document.getElementById(menu.getId()).parentNode.getElementsByTagName("input")[0].value
