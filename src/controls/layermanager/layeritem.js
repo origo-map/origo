@@ -27,13 +27,13 @@ const layerItem = function layerItem(options = {}) {
   
   const headerComponent = CollapseHeader({
     title: `${data[title.name]}`,
-    cls: "text-black text-grey-dark text-normal text-weight-bold",
-    style: {"flex-grow": "unset"}
+    cls: "text-black text-grey-dark text-normal text-weight-bold"
   });
   const contentComponent = El({
     tagName: 'p',
     innerHTML: `${data[description.name]}`,
-    cls: "text-grey text-smaller text-height-smaller text-fade"
+    cls: "text-grey text-smaller text-height-smaller text-fade",
+    style: {"word-break":"break-word"}
   })
   const collapse = Collapse({
     cls: '',
@@ -62,7 +62,7 @@ const layerItem = function layerItem(options = {}) {
     },
     render() {
       let textElements = `<div class="text-black text-grey-dark text-normal text-weight-bold">${data[title.name]}</div>
-                          <p class="relative text-grey text-smaller text-height-smaller text-fade overflow-hidden">${data[description.name]}</p>`
+                          <p class="relative text-grey text-smaller text-height-smaller overflow-hidden">${data[description.name]}</p>`
       if (data[description.name].length > 166){
         this.addComponent(collapse);
         textElements = `${collapse.render()}`;
