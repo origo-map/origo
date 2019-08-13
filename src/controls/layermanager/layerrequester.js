@@ -20,7 +20,7 @@ const layerRequester = async function layerRequester({
     let activeThemes = ''
     themes.forEach(theme => {
       activeThemes += `<ogc:PropertyIsLike matchCase="false" wildCard="%" singleChar="_" escapeChar="\">
-          <ogc:PropertyName>title</ogc:PropertyName>
+          <ogc:PropertyName>subject</ogc:PropertyName>
           <ogc:Literal>%${theme}%</ogc:Literal>
         </ogc:PropertyIsLike>`
     })

@@ -18,7 +18,8 @@ const Layermanager = function Layermanager(options = {}) {
     sourceUrl,
     group,
     layersDefaultProps,
-    noSearchResultText
+    noSearchResultText,
+    types
   } = options;
  
   const cls = `${clsSettings} flex fade-in box center-center padding-y-small padding-left layer-manager overflow-hidden`.trim();
@@ -77,7 +78,7 @@ const Layermanager = function Layermanager(options = {}) {
         layersDefaultProps,
         noSearchResultText
       });
-      filterMenu = FilterMenu();
+      filterMenu = FilterMenu({types});
       this.addComponent(closeButton);
       this.addComponent(main);
       this.addComponent(filterMenu);
