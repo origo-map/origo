@@ -69,6 +69,9 @@ const FilterMenu = function FilterMenu(options = {}) {
       return activeFilters;
     },
     onRender() {
+      buttons.forEach(button => {
+        button.setState('inactive')
+      })
       this.dispatch('render');
     },
     render() {
