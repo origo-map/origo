@@ -13,6 +13,7 @@ const LayerAdder = function LayerAdder(options = {}) {
     title,
     src,
     viewer,
+    abstract = '',
     layersDefaultProps
   } = options;
 
@@ -89,12 +90,14 @@ const LayerAdder = function LayerAdder(options = {}) {
       this.setState('loading');
       //add layers with same format as in config-json
         let srcUrl = src
+        let abstractText = (abstract == 'no description') ? '' : abstract;
         if (src[src.length-1] == '?') srcUrl = src.substring(0,src.length-1) //some extra '?' from request breaks the url
         let layer = {
           name: layerId,
           title: title,
           removable: true,
-          source: srcUrl
+          source: srcUrl,
+          abstract: abstractText
         }
         layer = Object.assign(layer, layersDefaultProps)
 

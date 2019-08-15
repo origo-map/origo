@@ -53,6 +53,7 @@ const layerItem = function layerItem(options = {}) {
         type: data[type.name],
         src: data[src.name],
         sourceUrl,
+        abstract: data[description.name],
         layersDefaultProps
       });
       this.addComponent(layerAdder);
