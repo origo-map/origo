@@ -7,7 +7,8 @@ const FilterMenu = function FilterMenu(options = {}) {
   } = options;
   const {
     style: styleOptions = {},
-    cls: clsOptions = ''
+    cls: clsOptions = '',
+    types
   } = options;
   const defaultStyle = {
     'flex-basis': '220px'
@@ -16,8 +17,6 @@ const FilterMenu = function FilterMenu(options = {}) {
   const styleSettings = Object.assign({}, defaultStyle, styleOptions);
   const style = dom.createStyle(styleSettings);
   const cls = `${clsOptions} padding-x no-grow no-shrink filter-menu`.trim();
-  const titles = ["Bebyggelse", "Politik och statistik","Samhällsplanering och bestämmelse","Teknisk infrastruktur","Trafik och kommunikation","Uppleva och göra"];
-  let viewer;
 
   function createButtons(titles, menu){
     let buttons = [];
@@ -56,7 +55,7 @@ const FilterMenu = function FilterMenu(options = {}) {
   let buttons;
   return Component({
     onInit() {
-      buttons = createButtons(titles, this);
+      buttons = createButtons(types, this);
       this.addComponents(buttons);
     },
     getActiveFilters(){
@@ -70,6 +69,9 @@ const FilterMenu = function FilterMenu(options = {}) {
       return activeFilters;
     },
     onRender() {
+      buttons.forEach(button => {
+        button.setState('inactive')
+      })
       this.dispatch('render');
     },
     render() {

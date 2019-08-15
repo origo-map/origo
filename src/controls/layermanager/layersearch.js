@@ -30,6 +30,7 @@ const LayerSearch = function LayerSearch(options = {}) {
   const searchId = cuid();
   let clearButton;
   let searchButton;
+  let typingTimer;
 
   return Component({
     onInit() {
@@ -85,7 +86,10 @@ const LayerSearch = function LayerSearch(options = {}) {
           clearButton.setState('initial');
         }
         searchText = newSearchText;
-        this.dispatch('change:text', { searchText })
+        clearTimeout(typingTimer)
+        setTimeout(() => {
+          this.dispatch('change:text', { searchText })
+        }, 200)
       }
     }
   });

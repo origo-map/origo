@@ -109,12 +109,15 @@ const AddLayerOverlay = function AddLayerOverlay(options) {
       viewer.on('search:open', () =>{
         document.getElementById('hjl').nextSibling.appendChild(dom.html(searchAddButton))
         document.getElementById(addButtonSearch.getId()).addEventListener('click', (e) => {
-          viewer.dispatch('active:layermanager')
+          //Maps searchbox id is hjl
+          let searchText = document.getElementById('hjl').value
+          //pass search test to layermanager through dispatch event
+          //layermanager can use it in its initial request
+          viewer.dispatch('active:layermanager', { searchText })
           let id = viewer.getControlByName("layermanager").getId()
           let layermanager = document.getElementById(id)
           let search = layermanager.getElementsByTagName('input')[0]
-          search.value = document.getElementById('hjl').value
-          layerRequester({ searchText : search.value, url });
+          search.value = searchText
         })
       })
       this.addComponents(buttons);

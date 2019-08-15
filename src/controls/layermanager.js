@@ -18,7 +18,8 @@ const Layermanager = function Layermanager(options = {}) {
     sourceUrl,
     group,
     layersDefaultProps,
-    noSearchResultText
+    noSearchResultText,
+    types
   } = options;
  
   const cls = `${clsSettings} flex fade-in box center-center padding-y-small padding-left layer-manager overflow-hidden`.trim();
@@ -28,6 +29,7 @@ const Layermanager = function Layermanager(options = {}) {
   let viewer;
   let isActive = false
   let backDropId = cuid();
+  let searchText = ''
 
   const clearCls = 'absolute round small icon-smaller grey-lightest';
   const icon = '#ic_clear_24px';
@@ -40,8 +42,10 @@ const Layermanager = function Layermanager(options = {}) {
     }
   });
 
-  const setActive = function setActive() {
+  const setActive = function setActive(e) {
     if(!isActive){
+      //searchText might have value if it was given with dispatch
+      searchText = e.searchText;
       isActive = true
       this.render();
     }
@@ -51,6 +55,7 @@ const Layermanager = function Layermanager(options = {}) {
     document.getElementById(this.getId()).remove();
     document.getElementById(backDropId).remove();
     isActive = false
+    searchText = '';
     this.dispatch('close');
   };
 
@@ -77,7 +82,7 @@ const Layermanager = function Layermanager(options = {}) {
         layersDefaultProps,
         noSearchResultText
       });
-      filterMenu = FilterMenu();
+      filterMenu = FilterMenu({types});
       this.addComponent(closeButton);
       this.addComponent(main);
       this.addComponent(filterMenu);
@@ -92,7 +97,7 @@ const Layermanager = function Layermanager(options = {}) {
     },
     onRender() {
       LayerListStore.clear();
-      layerRequester({ url });
+      layerRequester({ url, searchText });
       document.getElementById(backDropId).addEventListener('click', ()=>{closeButton.dispatch('click');});
       window.addEventListener('keyup', checkESC,{once:true});
     },

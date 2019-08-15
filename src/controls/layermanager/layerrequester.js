@@ -20,7 +20,7 @@ const layerRequester = async function layerRequester({
     let activeThemes = ''
     themes.forEach(theme => {
       activeThemes += `<ogc:PropertyIsLike matchCase="false" wildCard="%" singleChar="_" escapeChar="\">
-          <ogc:PropertyName>title</ogc:PropertyName>
+          <ogc:PropertyName>subject</ogc:PropertyName>
           <ogc:Literal>%${theme}%</ogc:Literal>
         </ogc:PropertyIsLike>`
     })
@@ -31,7 +31,7 @@ const layerRequester = async function layerRequester({
     let filter = '<ogc:Filter>';
     let themesActive = false;
     if (themes.length != 0){
-       filter+= '<ogc:And>';
+       filter += '<ogc:And>';
        themesActive = true;
     }
     filter += `<ogc:PropertyIsLike matchCase="false" wildCard="%" singleChar="_" escapeChar="\">
@@ -45,21 +45,35 @@ const layerRequester = async function layerRequester({
     return filter
   }
 
-    let body = `<csw:GetRecords xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" xmlns:ogc="http://www.opengis.net/ogc" service="CSW" version="2.0.2" resultType="results" startPosition="${startRecord}" maxRecords="30" outputFormat="application/xml" outputSchema="http://www.opengis.net/cat/csw/2.0.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-discovery.xsd" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:apiso="http://www.opengis.net/cat/csw/apiso/1.0">
-  <csw:Query typeNames="csw:Record">
-    <csw:ElementSetName>full</csw:ElementSetName>
-    <csw:Constraint version="1.1.0">
-      ${buildFilter()}
-    </csw:Constraint>
-    <ogc:SortBy xmlns:ogc="http://www.opengis.net/ogc">
-            <ogc:SortProperty>
-                <ogc:PropertyName>title</ogc:PropertyName>
-                <ogc:SortOrder>ASCE</ogc:SortOrder>
-            </ogc:SortProperty>
-        </ogc:SortBy>
-  </csw:Query>
-</csw:GetRecords> 
-`
+    let body = `
+    <csw:GetRecords 
+      xmlns:csw="http://www.opengis.net/cat/csw/2.0.2" 
+      xmlns:ogc="http://www.opengis.net/ogc" 
+      service="CSW" 
+      version="2.0.2" 
+      resultType="results" 
+      startPosition="${startRecord}" 
+      maxRecords="15" 
+      outputFormat="application/xml" 
+      outputSchema="http://www.opengis.net/cat/csw/2.0.2" 
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+      xsi:schemaLocation="http://www.opengis.net/cat/csw/2.0.2 http://schemas.opengis.net/csw/2.0.2/CSW-discovery.xsd" 
+      xmlns:gmd="http://www.isotc211.org/2005/gmd" 
+      xmlns:apiso="http://www.opengis.net/cat/csw/apiso/1.0">
+      <csw:Query typeNames="csw:Record">
+        <csw:ElementSetName>full</csw:ElementSetName>
+        <csw:Constraint version="1.1.0">
+          ${buildFilter()}
+        </csw:Constraint>
+        <ogc:SortBy xmlns:ogc="http://www.opengis.net/ogc">
+                <ogc:SortProperty>
+                    <ogc:PropertyName>title</ogc:PropertyName>
+                    <ogc:SortOrder>ASCE</ogc:SortOrder>
+                </ogc:SortProperty>
+            </ogc:SortBy>
+      </csw:Query>
+    </csw:GetRecords> 
+    `
     const { error, data } = await readAsync(fetch(url, {
     method: "POST", 
     headers: { "Content-Type" : "application/xml"}, 
@@ -81,7 +95,6 @@ const layerRequester = async function layerRequester({
         return
       }
       let layers = []
-      console.log(records)
       for (var i = 0; i < records.length; i++) {
         let correctUri =  records[i].querySelector(`[protocol='OGC:WMS-1.1.1-http-get-map']`)
         let layerId = correctUri ? correctUri.getAttribute('name') : "No id"
