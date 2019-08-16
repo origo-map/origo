@@ -39,7 +39,7 @@ const layerRequester = async function layerRequester({
                 <ogc:Literal>%${searchText}%</ogc:Literal>
               </ogc:PropertyIsLike>`
     if(themesActive){
-      filter += `${parseThemes()}</ogc:And>`
+      filter += (themes.length == 1) ? `${parseThemes()}</ogc:And>` : `<ogc:Or>${parseThemes()}</ogc:Or></ogc:And>`
     }
     filter += '</ogc:Filter>'
     return filter
