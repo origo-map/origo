@@ -221,6 +221,9 @@ const Overlays = function Overlays(options) {
   return Component({
     onAddGroup,
     onChangeLayer,
+    getGroups(){
+      return groupCmps;
+    },
     onInit() {
       this.addComponent(overlaysCollapse);
       readOverlays();

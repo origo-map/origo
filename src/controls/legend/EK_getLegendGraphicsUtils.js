@@ -22,7 +22,7 @@ function buildGetLegendGraphicUrl(layer,viewer){
 	}
 
 	if(layer.getProperties().legendGraphicSettings)
-		properties = layer.getProperties().legendGraphicSettings;
+		properties = Object.assign(properties, layer.getProperties().legendGraphicSettings);
 
 	properties.request = "getLegendGraphic";
 	properties.scale = maputils.resolutionToScale(viewer.getMap().getView().getResolution(), viewer.getProjection());
