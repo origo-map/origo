@@ -32,9 +32,10 @@ const Legend = function Legend(options = {}) {
   const addBackgroundButton = function addBackgroundButton(layer) {
     const styleName = layer.get('styleName') || 'default';
     const icon = viewer.getStyle(styleName) ? imageSource(viewer.getStyle(styleName)) : 'img/png/farg.png';
+    const title = layer.get('title') || "";
     backgroundLayerButtons.push(Button({
       icon,
-      cls: 'round smallest border icon-small',
+      cls: `round smallest border icon-small \"title=\"${title}`,
       state: layer.get('visible') ? 'active' : undefined,
       methods: {
         active: () => layer.setVisible(true),
