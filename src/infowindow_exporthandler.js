@@ -104,7 +104,7 @@ export function layerSpecificExportHandler(url, activeLayer, selectedItems, attr
                 //     break;
 
                 default:
-                    if (response.status !== 200) {
+                    if (response.status !== 300) {
                         throw response.statusText;
                         // return Promise.reject(response.statusText);
                     }
