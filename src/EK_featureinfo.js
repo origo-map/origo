@@ -18,12 +18,15 @@ const Featureinfo = function Featureinfo(options = {}) {
     clickEvent = 'click',
     clusterFeatureinfoLevel = 1,
     hitTolerance = 0,
-    pinning = true,
     pinsStyle: pinStyleOptions = styleTypes.getStyle('pin'),
     savedPin: savedPinOptions,
     savedSelection,
     selectionStyles: selectionStylesOptions,
     showOverlay = true
+  } = options;
+
+  let {
+    pinning = true
   } = options;
 
   let identifyTarget;
@@ -267,6 +270,9 @@ const Featureinfo = function Featureinfo(options = {}) {
     getPin,
     getSelectionLayer,
     getSelection,
+    setPinning(newState){
+      pinning = newState;
+    },
     onAdd(e) {
       viewer = e.target;
       const map = viewer.getMap();
