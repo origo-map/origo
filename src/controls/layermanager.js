@@ -107,7 +107,7 @@ const Layermanager = function Layermanager(options = {}) {
       </div>
       <div id="${this.getId()}" class="${cls}" style="height: 700px; z-index: 52;" >      
           <div class="relative padding-y flex overflow-hidden width-100" ">
-            <div class="flex row width-100 overflow-hidden">
+            <div class="flex row width-100 overflow-hidden filter-main-container">
               ${filterMenu.render()}
               ${main.render()}
             </div>
