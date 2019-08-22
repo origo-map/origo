@@ -390,11 +390,13 @@ const Search = function Search(options = {}) {
       return str.join("&");
     }
 
+  
+
     function makeRequest(reqHandler, obj) {
       if (options.type === 'postgis') {
         let data = {
           searchstring: obj.value,
-          layers: options.layers,
+          layers: viewer.getSearchableLayers().reduce((acc,curr) => acc + ";" + curr),
           date: new Date().getTime()
         }
         fetch(url, {
