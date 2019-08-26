@@ -1,7 +1,6 @@
 import WMTSSource from 'ol/source/WMTS';
 import Tilegrid from 'ol/tilegrid/WMTS';
 import { getTopLeft } from 'ol/extent';
-import $ from 'jquery';
 import tile from './tile';
 
 function createSource(options) {
@@ -35,10 +34,10 @@ const wmts = function wmts(layerOptions, viewer) {
     resolutions: viewer.getResolutions(),
     tileSize: [256, 256]
   };
-  const wmtsOptions = $.extend(wmtsDefault, layerOptions);
+  const wmtsOptions = Object.assign(wmtsDefault, layerOptions);
   wmtsOptions.name.split(':').pop();
   wmtsOptions.sourceName = wmtsOptions.name;
-  const sourceOptions = $.extend(sourceDefault, viewer.getMapSource()[layerOptions.source]);
+  const sourceOptions = Object.assign(sourceDefault, viewer.getMapSource()[layerOptions.source]);
   if (Object.prototype.hasOwnProperty.call(wmtsOptions, 'format')) {
     sourceOptions.format = wmtsOptions.format;
   }

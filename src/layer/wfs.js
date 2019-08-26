@@ -2,7 +2,6 @@ import * as LoadingStrategy from 'ol/loadingstrategy';
 import { createXYZ } from 'ol/tilegrid';
 import VectorSource from 'ol/source/Vector';
 import GeoJSONFormat from 'ol/format/GeoJSON';
-import $ from 'jquery';
 import vector from './vector';
 
 function createSource(options) {
@@ -27,13 +26,12 @@ function createSource(options) {
         `&srsname=${options.projectionCode}`].join('');
       url += options.strategy === 'all' ? queryFilter : `${queryFilter + extent.join(',')},${bboxProjectionCode}`;
       url = encodeURI(url);
-      $.ajax({
-        url,
+
+      fetch(url).then(response => response.json({
         cache: false
-      })
-        .done((response) => {
-          vectorSource.addFeatures(vectorSource.getFormat().readFeatures(response));
-        });
+      })).then((data) => {
+        vectorSource.addFeatures(vectorSource.getFormat().readFeatures(data));
+      });
     },
     strategy: options.loadingstrategy
   });

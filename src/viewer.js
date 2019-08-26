@@ -398,6 +398,10 @@ const Viewer = function Viewer(targetOption, options = {}) {
     }
   };
 
+  const getUrlParams = function getUrlParams() {
+    return urlParams;
+  };
+
   return Component({
     onInit() {
       this.render();
@@ -540,6 +544,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getTileGrid,
     getTileSize,
     getUrl,
+    getUrlParams,
     removeGroup,
     removeOverlays,
     zoomToExtent,

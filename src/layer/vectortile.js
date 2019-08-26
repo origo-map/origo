@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import TopoJSONFormat from 'ol/format/TopoJSON';
 import GeoJSONFormat from 'ol/format/GeoJSON';
 import MVTFormat from 'ol/format/MVT';
@@ -37,9 +36,9 @@ const vectortile = function vectortile(layerOptions, viewer) {
     featureinfoLayer: undefined
   };
   const sourceDefault = {};
-  const vectortileOptions = $.extend(vectortileDefault, layerOptions);
+  const vectortileOptions = Object.assign(vectortileDefault, layerOptions);
   vectortileOptions.sourceName = vectortileOptions.name;
-  const sourceOptions = $.extend(sourceDefault, viewer.getMapSource()[layerOptions.source]);
+  const sourceOptions = Object.assign(sourceDefault, viewer.getMapSource()[layerOptions.source]);
   sourceOptions.attributions = vectortileOptions.attribution;
   sourceOptions.projection = viewer.getProjectionCode() || 'EPSG:3857';
 
