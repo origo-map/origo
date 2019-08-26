@@ -29,13 +29,11 @@ function render(viewerId) {
     urvalContainer.appendChild(urvalTextNodeContainer);
     const closeButtonSvg = createSvgElement('ic_close_24px', 'closebutton-svg');
     closeButtonSvg.addEventListener('click', (e) => {
-        document.dispatchEvent(new CustomEvent('infowindowclosed', {
-            bubbles: true
-        }));
-        document.dispatchEvent(new CustomEvent('toggleInteraction', {
-            bubbles: true,
-            detail: 'featureInfo'
-        }));
+        const detail = {
+            name: 'multiselection',
+            active: false
+        };
+        viewer.dispatch('toggleClickInteraction', detail);
     });
     urvalContainer.appendChild(closeButtonSvg);
     listContainer = document.createElement('div');
@@ -124,13 +122,13 @@ function showSelectedList(selectionGroup) {
 
     activeSelectionGroup = selectionGroup;
     while (listContainer.firstChild) {
-        listContainer.removeChild(listContainer.firstChild);        
+        listContainer.removeChild(listContainer.firstChild);
     }
     const sublistToAppend = sublists.get(selectionGroup);
     listContainer.appendChild(sublistToAppend);
 
     while (exportContainer.firstChild) {
-        exportContainer.removeChild(exportContainer.firstChild);        
+        exportContainer.removeChild(exportContainer.firstChild);
     }
     const subexportToAppend = subexports.get(selectionGroup);
     exportContainer.appendChild(subexportToAppend);
@@ -260,7 +258,7 @@ function createToaster(status, message) {
             toaster.classList.add('toaster-unsuccessful');
         }
     }, 50);
-    
+
     setTimeout(() => {
         toaster.parentNode.removeChild(toaster);
     }, 5000);
@@ -278,7 +276,7 @@ function createExportButton(buttonText) {
     const button = document.createElement('button');
     button.classList.add('export-button');
     button.textContent = buttonText;
-    
+
     container.appendChild(spinner);
     container.appendChild(button);
 
@@ -287,7 +285,7 @@ function createExportButton(buttonText) {
         button.classList.add('disabled');
         spinner.style.visibility = 'visible';
     }
-    
+
     container.loadStop = () => {
         button.disabled = false;
         button.classList.remove('disabled');
