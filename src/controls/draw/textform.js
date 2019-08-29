@@ -31,7 +31,7 @@ const createForm = function createForm(options) {
     cls: 'o-form-save'
   });
   const content = `${input}<br><br>${saveWrapper}`;
-  const form = createElement('form', content);
+  const form = createElement('div', content);
   return form;
 };
 

@@ -85,6 +85,13 @@ function promptText(feature) {
     content
   });
   modal.showModal();
+  const editableText = $('#o-draw-input-text').val();
+  document.getElementById('o-draw-input-text').focus();
+  $('#o-draw-input-text').on('keyup', (e) => {
+    if (e.keyCode == 13) {
+      $('#o-draw-save-text').trigger('click');
+    }
+  });
   $('#o-draw-save-text').on('click', (e) => {
     const textVal = $('#o-draw-input-text').val();
     modal.closeModal();
@@ -92,6 +99,11 @@ function promptText(feature) {
     e.preventDefault();
     onTextEnd(feature, textVal);
   });
+  $('.o-modal-screen, .o-close-button').on('click', e => {
+    $('#o-draw-save-text').blur();
+    e.preventDefault();
+    onTextEnd(feature, editableText);
+  })
 }
 
 function addDoubleClickZoomInteraction() {
