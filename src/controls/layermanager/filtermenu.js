@@ -11,12 +11,32 @@ const FilterMenu = function FilterMenu(options = {}) {
     types
   } = options;
   const defaultStyle = {
-    'flex-basis': '220px'
+    'transition': 'all 0.3s ease-in',
+    'overflow-y': 'auto'
   };
 
   const styleSettings = Object.assign({}, defaultStyle, styleOptions);
   const style = dom.createStyle(styleSettings);
-  const cls = `${clsOptions} padding-x no-grow no-shrink filter-menu`.trim();
+  const cls = `${clsOptions} padding-x no-grow no-shrink filter-menu filter-menu-hide`.trim();
+  let menu;
+  let buttons;
+
+  let filterBtn = Button({
+    cls: 'control absolute icon-small light bottom-center filter-menu-theme-btn',
+    click(){
+      if(menu.classList.contains('filter-menu-hide')){
+        menu.classList.remove('filter-menu-hide');
+        this.dispatch('change', {text: "Katalog", icon: "#ic_chevron_right_24px"})
+      }
+      else{
+        menu.classList.add('filter-menu-hide');
+        this.dispatch('change', {text: "Teman", icon: "#ic_chevron_left_24px"})
+      }
+    },
+    text: "Teman",
+    icon: "#ic_chevron_left_24px"
+
+  })
 
   function createButtons(titles, menu){
     let buttons = [];
@@ -52,11 +72,11 @@ const FilterMenu = function FilterMenu(options = {}) {
     return list;
   }
 
-  let buttons;
   return Component({
     onInit() {
       buttons = createButtons(types, this);
       this.addComponents(buttons);
+      this.addComponent(filterBtn);
     },
     getActiveFilters(){
       let activeFilters = []
@@ -69,6 +89,7 @@ const FilterMenu = function FilterMenu(options = {}) {
       return activeFilters;
     },
     onRender() {
+      menu = document.getElementById(this.getId());
       buttons.forEach(button => {
         button.setState('inactive')
       })
@@ -76,10 +97,11 @@ const FilterMenu = function FilterMenu(options = {}) {
     },
     render() {
       return `<div id="${this.getId()}" class="${cls}" style="${style}">
-                <h6 class="text-weight-bold text-grey-dark">Teman</h6>
-                <ul>
-                  ${renderButtons(buttons)}
-                </ul>
+                ${filterBtn.render()}
+                  <h6 class="text-weight-bold text-grey-dark">Teman</h6>
+                  <ul>
+                    ${renderButtons(buttons)}
+                  </ul>
               </div>`;
     }
   });
