@@ -19,8 +19,33 @@ const OverlayProperties = function OverlayProperties(options = {}) {
   const style = legendGraphics ? getLegendGraphicUrlStyle(layer,viewer) : viewer.getStyle(layer.get('styleName'));
 
   const legend = Legend(style, opacity);
+  let overlayEl;
+
+  function extendedLegendZoom(e) {
+    const parentOverlay = document.getElementById(options.parent.getId());
+
+    if (e.target.classList.contains('extendedlegend')) {
+      if (parentOverlay.classList.contains('width-100')) {
+        parentOverlay.classList.remove('width-100');
+      } else {
+        parentOverlay.classList.add('width-100');
+      }
+    }
+  }
 
   return Component({
+    onInit() {
+      this.on('click', (e) => {
+        extendedLegendZoom(e);
+      });
+    },
+    onRender() {
+      overlayEl = document.getElementById(this.getId());
+      overlayEl.addEventListener('click', (e) => {
+        this.dispatch('click', e);
+        e.preventDefault();
+      });
+    },
     render() {
       return `<div id="${this.getId()}" class="${cls} border-bottom">
                 <div class="padding-small">${legend}</div>

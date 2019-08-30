@@ -16,7 +16,8 @@ const Group = function Group(options = {}, viewer) {
     name,
     parent,
     position = 'top',
-    type = 'group'
+    type = 'group',
+    autoExpand = true
   } = options;
 
   const stateCls = {
@@ -200,6 +201,9 @@ const Group = function Group(options = {}, viewer) {
             this.dispatch('change:visible', { state: 'none' });
             visibleState = 'none';
           }
+          if (autoExpand) {
+            collapse.collapse();
+          }
         });
         this.on('tick:all', () => {
           const overlays = groupList.getOverlays();
@@ -214,6 +218,9 @@ const Group = function Group(options = {}, viewer) {
           if (visibleState !== 'all') {
             this.dispatch('change:visible', { state: 'all' });
             visibleState = 'all';
+          }
+          if (autoExpand) {
+            collapse.expand();
           }
         });
       }
