@@ -1,4 +1,3 @@
-import 'owl.carousel';
 import { Component } from './ui';
 import featurelayer from './featurelayer';
 import infowindowManager from './infowindow';
@@ -7,7 +6,6 @@ import Style from './style';
 import StyleTypes from './style/styletypes';
 
 const styleTypes = StyleTypes();
-const multiselectStyleOptions = styleTypes.getStyle('multiselection');
 
 const Selectionmanager = function Selectionmanager(options = {}) {
 
@@ -17,6 +15,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   let map;
   let infowindow;
 
+  const multiselectStyleOptions = options.multiSelectionStyles || styleTypes.getStyle('multiselection');
   const isInfowindow = options.hasOwnProperty('infowindow') ? options.infowindow === 'infowindow' : false;
 
   function addItem(item) {
@@ -33,7 +32,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   }
 
   function highlightAndExpandItem(item) {
-    const featureId = item.getFeature().getId();
+    const featureId = item.getId();
     highlightFeatureById(featureId);
     infowindow.showSelectedList(item.getSelectionGroup());
     infowindow.expandListElement(featureId);
@@ -41,7 +40,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   }
 
   function highlightItem(item) {
-    const featureId = item.getFeature().getId();
+    const featureId = item.getId();
     highlightFeatureById(featureId);
     infowindow.showSelectedList(item.getSelectionGroup());
     infowindow.expandListElement(featureId);
@@ -96,7 +95,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   }
 
   function alreadyExists(item) {
-    return selectedItems.getArray().find(i => item.getId() === i.getId());
+    return selectedItems.getArray().some(i => item.getId() === i.getId());
   }
 
   function featureStyler(feature) {
@@ -110,9 +109,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   function onItemAdded(event) {
     const item = event.element;
 
-    // const selectionGroup = event.element.getLayer().get('name');
     const selectionGroup = event.element.getSelectionGroup();
-    // const selectionGroupTitle = event.element.getLayer().get('title');
     const selectionGroupTitle = event.element.getSelectionGroupTitle();
 
     if (!urval.has(selectionGroup)) {
@@ -137,9 +134,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
 
     const item = event.element;
 
-    // const selectionGroup = event.element.getLayer().get('name');
     const selectionGroup = event.element.getSelectionGroup();
-    // const selectionGroupTitle = event.element.getLayer().get('title');
     const selectionGroupTitle = event.element.getSelectionGroupTitle();
 
     const feature = item.getFeature();
@@ -171,7 +166,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
       }
     });
 
-    // we need to manually refresh other layers, otherwise unselecting does not take effect until the next layer refresh which is a bit strange!
+    // we need to manually refresh other layers, otherwise unselecting does not take effect until the next layer refresh.
     urval.forEach((value, key, map) => {
       value.getFeatureStore().changed();
     });

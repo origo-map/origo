@@ -14,7 +14,7 @@ let activeSelectionGroup;
 let selectionManager;
 let viewer;
 
-function render(viewerId) {
+function render(viewerId, title) {
     mainContainer = document.createElement('div');
     mainContainer.classList.add('sidebarcontainer');
     mainContainer.id = 'sidebarcontainer';
@@ -24,7 +24,7 @@ function render(viewerId) {
     urvalContainer.id = 'sidebarcontainer-draggable';
     const urvalTextNodeContainer = document.createElement('div');
     urvalTextNodeContainer.classList.add('urval-textnode-container');
-    const urvalTextNode = document.createTextNode('Träffar');
+    const urvalTextNode = document.createTextNode(title || 'Träffar');
     urvalTextNodeContainer.appendChild(urvalTextNode);
     urvalContainer.appendChild(urvalTextNodeContainer);
     const closeButtonSvg = createSvgElement('ic_close_24px', 'closebutton-svg');
@@ -34,6 +34,7 @@ function render(viewerId) {
             active: false
         };
         viewer.dispatch('toggleClickInteraction', detail);
+        selectionManager.clearSelection();
         hideInfowindow();
     });
     urvalContainer.appendChild(closeButtonSvg);
@@ -111,7 +112,7 @@ function createUrvalElement(selectionGroup, selectionGroupTitle) {
     const sublistContainter = document.createElement('div');
     sublists.set(selectionGroup, sublistContainter);
 
-    const subexportComponent = createSubexportConponent(selectionGroup);
+    const subexportComponent = createSubexportComponent(selectionGroup);
     subexports.set(selectionGroup, subexportComponent);
 }
 
@@ -143,14 +144,14 @@ function showSelectedList(selectionGroup) {
     });
 }
 
-function createSubexportConponent(selectionGroup) {
+function createSubexportComponent(selectionGroup) {
     // OBS! selectionGroup corresponds to a layer with the same name in most cases, but in case of a group layer it can contain selected items from all the layers in that GroupLayer.
 
     let layerSpecificExportOptions;
-    const simpleExport = exportOptions.enableSimpleExport ? exportOptions.enableSimpleExport : false;
     const simpleExportLayers = exportOptions.simpleExportLayers ? exportOptions.simpleExportLayers : [];
     const simpleExportUrl = exportOptions.simpleExportUrl;
     const simpleExportButtonText = exportOptions.simpleExportButtonText || 'Exporera alla features i urvalet';
+    const exportedFileName = exportOptions.exportedFileName || 'ExportedFeatures';
     const activeLayer = viewer.getLayer(selectionGroup);
 
     const subexportContainer = document.createElement('div');
@@ -167,6 +168,8 @@ function createSubexportConponent(selectionGroup) {
     if (layerSpecificExportOptions) {
         const exportUrls = layerSpecificExportOptions.exportUrls || [];
         const attributesToSendToExport_per_layer = layerSpecificExportOptions.attributesToSendToExport;
+        const layerSpecificExportedFileName = layerSpecificExportOptions.exportedFileName || exportedFileName;
+
         exportUrls.forEach(obj => {
             const buttonText = obj.buttonText || "External Call";
             const url = obj.url;
@@ -180,7 +183,7 @@ function createSubexportConponent(selectionGroup) {
                 }
                 exportBtn.loadStart();
                 const selectedItems = selectionManager.getSelectedItemsForASelectionGroup(selectionGroup);
-                layerSpecificExportHandler(url, activeLayer, selectedItems, attributesToSendToExport).then((data) => {
+                layerSpecificExportHandler(url, activeLayer, selectedItems, attributesToSendToExport, layerSpecificExportedFileName).then((data) => {
                     if (data) {
                         switch (data.status) {
                             case 'ok':
@@ -201,15 +204,11 @@ function createSubexportConponent(selectionGroup) {
                     createToaster('fail');
                     exportBtn.loadStop();
                 });
-                // finallly block does not work in edge!
-                // .finally(() => {
-                //    exportBtn.loadStop();                
-                // });
             });
             subexportContainer.appendChild(exportBtn);
         });
 
-    } else if (simpleExport) {
+    } else if (simpleExportLayers.length) {
         const exportAllowed = simpleExportLayers.find(l => l === selectionGroup);
         if (exportAllowed) {
             const exportBtn = createExportButton(simpleExportButtonText);
@@ -221,7 +220,7 @@ function createSubexportConponent(selectionGroup) {
                 }
                 exportBtn.loadStart();
                 const selectedItems = selectionManager.getSelectedItemsForASelectionGroup(selectionGroup);
-                simpleExportHandler(simpleExportUrl, activeLayer, selectedItems).then(data => {
+                simpleExportHandler(simpleExportUrl, activeLayer, selectedItems, exportedFileName).then(data => {
                     exportBtn.loadStop();
                 }).catch((err) => {
                     console.log(err);
@@ -308,7 +307,6 @@ function createListElement(item) {
     listElement.appendChild(svg);
     const listElementContentContainer = document.createElement('div');
     listElementContentContainer.classList.add('listelement-content-container');
-    // const content = createElementFromHTML(item.getContent()); // Content that is created in getattribute module is a template is supposed to be used with jQuery. without jQuery we cannot append it before it is converted to a proper html element.
     const content = (item.getContent());
     listElementContentContainer.appendChild(content);
     listElement.appendChild(listElementContentContainer);
@@ -321,7 +319,6 @@ function createListElement(item) {
 function createElementFromHTML(htmlString) {
     var div = document.createElement('div');
     div.innerHTML = htmlString.trim();
-    // Change this to div.childNodes to support multiple top-level nodes
     return div.firstChild;
 }
 
@@ -459,7 +456,6 @@ function showUrvalElement(selectionGroup) {
 }
 
 function removeListElement(item) {
-    //const sublist = sublists.get(item.getLayer().get('name'));
     const sublist = sublists.get(item.getSelectionGroup());
     /*  
     This loop is needed because when clear() is called it will try to remove ALL elements, but elements 
@@ -523,7 +519,7 @@ function init(options) {
     urvalElements = new Map();
     expandableContents = new Map();
 
-    render(options.viewer.getId());
+    render(options.viewer.getId(), infowindowOptions.title);
 
     return {
         createListElement: createListElement,

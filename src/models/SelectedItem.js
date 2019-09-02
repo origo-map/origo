@@ -3,7 +3,7 @@ import getAttributes from '../getattributes';
 
 export default class SelectedItem {
     constructor(feature, layer, map, selectionGroup, selectionGroupTitle) {
-        
+
         this.feature = feature;
         this.layer = layer;
         if (layer && map) {
@@ -15,7 +15,7 @@ export default class SelectedItem {
     }
 
     getId() {
-        let id = this.feature.getId().toString();
+        let id = this.feature.getId() ? this.feature.getId().toString() : undefined;
         if (!id) {
             id = getUid(this.feature);
         }
@@ -50,7 +50,7 @@ export default class SelectedItem {
         return this.selectionGroup;
     }
 
-    // TODO: SelectionGroupTitle should not really be handled in this object! Find a better way to handle it in selection manager.
+    // TODO: Maybe it is better to handle SelectionGroupTitle in selection manager instead.
     getSelectionGroupTitle() {
         return this.selectionGroupTitle;
     }

@@ -39,22 +39,29 @@ const Featureinfo = function Featureinfo(options = {}) {
   const selectionStyles = selectionStylesOptions ? Style.createGeometryStyle(selectionStylesOptions) : Style.createEditStyle();
   let savedPin = savedPinOptions ? maputils.createPointFeature(savedPinOptions, pinStyle) : undefined;
   const savedFeature = savedPin || savedSelection || undefined;
-  const infowindow = 'infowindow' in options ? options.infowindow : 'overlay';
+  const uiOutput = 'infowindow' in options ? options.infowindow : 'overlay';
 
-  identifyTarget = infowindow;
+  function setUIoutput(v) {
+    switch (uiOutput) {
+      case 'infowindow':
+        identifyTarget = 'infowindow';
+        break;
 
-  // function setUIoutput(v) {
-  //   if (showOverlay) {
-  //     identifyTarget = 'overlay';
-  //   } else {
-  //     sidebar.init(v);
-  //     identifyTarget = 'sidebar';
-  //   }
-  // }
+      case 'sidebar':
+        sidebar.init(v);
+        identifyTarget = 'sidebar';
+        break;
+
+      default:
+        identifyTarget = 'overlay';
+        break;
+    }
+  }
 
   const clear = function clear() {
     selectionLayer.clear();
-    selectionManager.clearSelection();
+    // check needed for when sidebar or overlay are selected.     
+    if (selectionManager) selectionManager.clearSelection();
     sidebar.setVisibility(false);
     if (overlay) {
       viewer.removeOverlays(overlay);
@@ -340,10 +347,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     onAdd(e) {
       viewer = e.target;
       const map = viewer.getMap();
-      if (identifyTarget === 'sidebar') {
-        sidebar.init(viewer);
-      }
-      // setUIoutput(viewer);
+      setUIoutput(viewer);
       selectionLayer = featurelayer(savedFeature, map);
       selectionManager = viewer.getSelectionManager();
       map.on(clickEvent, onClick);
