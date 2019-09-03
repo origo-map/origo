@@ -123,6 +123,9 @@ svg {
   &.grey-lightest {
     fill: $grey-lightest;
   }
+  &.white {
+    fill: $white;
+  }
 }
 
 img.cover {

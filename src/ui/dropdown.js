@@ -13,8 +13,9 @@ export default function Dropdown(options = {}) {
   } = options;
   const {
     cls = '',
-    containerCls = '',
-    buttonCls = '',
+    containerCls = 'bg-white',
+    buttonCls = 'padding-small rounded light box-shadow',
+    buttonIconCls = '',
     buttonContainerCls = '',
     style: styleSettings,
     click,
@@ -40,7 +41,6 @@ export default function Dropdown(options = {}) {
 
   const setButtonText = function setButtonText(buttonText) {
     document.getElementById(`${dropdownButton.getId()}`).getElementsByTagName('span')[1].innerHTML = buttonText;
-    // document.getElementById(`${dropdownButton.getId()}`).firstElementChild.innerHTML = buttonText;
   };
 
   const setItems = function setItems(listItems) {
@@ -79,18 +79,17 @@ export default function Dropdown(options = {}) {
           toggle();
         },
         style: {
-          height: '1.25rem',
           padding: '0 .5rem'
         },
         icon: `#ic_arrow_drop_${direction}_24px`,
-        iconCls: 'icon-smaller primary-inverse flex',
+        iconCls: `${buttonIconCls} icon-smaller flex`,
         textCls: 'flex'
       });
 
       if (direction === 'down') {
         position = 'top';
         headerComponent = El({
-          cls: 'collapse-header flex row justify-end',
+          cls: `${buttonContainerCls} collapse-header flex row justify-end`,
           components: [dropdownButton]
         });
       }
@@ -98,7 +97,7 @@ export default function Dropdown(options = {}) {
       if (direction === 'up') {
         position = 'bottom';
         footerComponent = El({
-          cls: 'collapse-header flex row justify-end',
+          cls: `${buttonContainerCls} collapse-header flex row justify-end`,
           components: [dropdownButton]
         });
       }
@@ -111,6 +110,7 @@ export default function Dropdown(options = {}) {
 
       containerElement = Collapse({
         cls: `${containerCls} absolute overflow-hidden`,
+        contentCls: '',
         style: `${position}:0; border-radius: .625rem;`,
         collapseX: false,
         headerComponent,
@@ -125,7 +125,8 @@ export default function Dropdown(options = {}) {
       this.dispatch('render');
     },
     render() {
-      return `<div id="${this.getId()}" class="${cls} relative inline-block" style="${style}">${containerElement.render()}</div>`;
+      // return `<div id="${this.getId()}" class="${cls} relative inline-block" style="${style}">${containerElement.render()}</div>`;
+      return `<div id="${this.getId()}" class="${cls}" style="${style}">${containerElement.render()}</div>`;
     }
   });
 }

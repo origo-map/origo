@@ -20,7 +20,7 @@
 }
 .padding-y {
   padding-bottom: $padding-standard;
-  padding-top: $padding-standard;  
+  padding-top: $padding-standard;
 }
 
 // large padding
@@ -45,7 +45,7 @@
 }
 .padding-y-large {
   padding-bottom: $padding-large;
-  padding-top: $padding-large;  
+  padding-top: $padding-large;
 }
 
 // small padding
@@ -70,7 +70,7 @@
 }
 .padding-y-small {
   padding-bottom: $padding-small;
-  padding-top: $padding-small;  
+  padding-top: $padding-small;
 }
 
 // smaller padding
@@ -95,7 +95,7 @@
 }
 .padding-y-smaller {
   padding-bottom: $padding-smaller;
-  padding-top: $padding-smaller;  
+  padding-top: $padding-smaller;
 }
 
 // smallest padding
@@ -120,5 +120,10 @@
 }
 .padding-y-smallest {
   padding-bottom: $padding-smallest;
-  padding-top: $padding-smallest;  
+  padding-top: $padding-smallest;
+}
+
+// no padding
+.padding-0 {
+  padding: 0;
 }
