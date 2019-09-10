@@ -20,6 +20,9 @@ const createForm = function createForm(obj) {
     case 'textarea':
       el = `<div><label>${label}</label><br><textarea id="${id}" ${maxLength} rows="3">${val}</textarea></div>`;
       break;
+    case 'number':
+      el = `<div><label>${label}</label><br><input type="number" id="${id}" value="${val}" ${maxLength}></div>`;
+      break;
     case 'checkbox':
       checked = val ? ' checked' : '';
       el = `<div class="o-form-checkbox"><label>${label}</label><input type="checkbox" id="${id}" value="${val}"${checked}></div>`;
@@ -86,6 +89,9 @@ const createForm = function createForm(obj) {
         val = obj.defaultColor ? obj.defaultColor : '';
       }
       el = `<div><label>${label}</label><br><input type="color" id="${id}" value="${val}"></div>`;
+      break;
+    case 'hidden':
+      el = `<input type="hidden" id="${id}" value="${val}">`;
       break;
     default:
       break;
