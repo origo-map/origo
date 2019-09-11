@@ -23,4 +23,3 @@ export { default as Zoom } from './controls/zoom';
 export { default as Externalurl } from './controls/externalurl';
 export { default as Turnofflayers } from './controls/EK-turnofflayers';
 export { default as Draw } from './controls/draw';
-export { default as Layermanager } from './controls/layermanager';
