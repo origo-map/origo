@@ -2,10 +2,10 @@ import download from 'downloadjs';
 import { createToaster } from './infowindow';
 
 export function simpleExportHandler(simpleExportUrl, activeLayer, selectedItems, exportedFileName) {
-  simpleExportUrl = null;
+
   if (!simpleExportUrl) {
-    createToaster('fail', 'Export URL is not specified.');
-    return;
+    // Here we cannot simply throw, because it won't be catched. We need to rejecet it as the calling function expects a promise.
+    return Promise.reject('Export URL is not specified.');
   }
   // console.log('simple Exporting layer ' + activeLayer.get('name'));
 
@@ -16,7 +16,7 @@ export function simpleExportHandler(simpleExportUrl, activeLayer, selectedItems,
   } */
 
   const features = {};
-  exportedFileName =  exportedFileName + '.xlsx'
+  exportedFileName = exportedFileName + '.xlsx'
   selectedItems.forEach((item) => {
     const layerName = item.getLayer().get('name');
     if (!features[layerName]) {
@@ -37,8 +37,8 @@ export function simpleExportHandler(simpleExportUrl, activeLayer, selectedItems,
   })
     .then((response) => {
       if (response.status !== 200) {
+        // Note: Throwing here has practically the same effect as returning a Promise.reject() and both will be catched down here in the catch function;
         throw response.statusText;
-        // return Promise.reject(response.statusText);
       }
       return response.blob();
     })
@@ -46,19 +46,17 @@ export function simpleExportHandler(simpleExportUrl, activeLayer, selectedItems,
       download(blob, exportedFileName, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     })
     .catch((err) => {
-      // console.log(err);
+      // Throwing here cause the whole fetch function be rejected, the same effect as returning Promise.reject();
       throw err;
-      // return Promise.reject(err);
     });
 }
 
 export function layerSpecificExportHandler(url, activeLayer, selectedItems, attributesToSendToExport, exportedFileName) {
   if (!url) {
-    createToaster('fail', 'Export URL is not specified.');
-    return;
+    throw 'Export URL is not specified.';
   }
 
-  exportedFileName =  exportedFileName + '.xlsx'
+  exportedFileName = exportedFileName + '.xlsx'
   // let replacedUrl;
   const features = {};
   selectedItems.forEach((item) => {
