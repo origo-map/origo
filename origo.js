@@ -1,3 +1,4 @@
+import * as olInteraction from 'ol/interaction';
 import polyfill from './src/utils/polyfill';
 import * as ui from './src/ui';
 import Viewer from './src/viewer';
@@ -79,5 +80,7 @@ Origo.controls = origoControls;
 Origo.ui = ui;
 Origo.Style = Style;
 Origo.featurelayer = featurelayer;
+Origo.ol = [];
+Origo.ol.interaction = olInteraction;
 
 export default Origo;
