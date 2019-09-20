@@ -56,6 +56,7 @@ const Printarea = function Printarea(options = {}) {
         printA1: () => {
             map = viewer.getMap();
             vector = new VectorLayer({
+                group: "none",
                 source: new VectorSource({
                     features: [],
                     name: 'printarea',
