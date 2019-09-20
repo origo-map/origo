@@ -60,7 +60,7 @@ const Printarea = function Printarea(options = {}) {
                 source: new VectorSource({
                     features: [],
                     name: 'printarea',
-                    visible: false,
+                    visible: true,
                     zIndex: 7
                 }),
                 style: new Style({
