@@ -28,7 +28,16 @@ export default function (feature, layer, map) {
         attribute = layer.get('attributes')[i];
         title = '';
         val = '';
-        if (attribute.name) {
+        if (attribute.img || attribute.type === 'image') {
+          const featGet = attribute.img ? feature.get(attribute.img) : feature.get(attribute.name);
+          if (featGet) {
+            const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(featGet, attributes, null, map));
+            const attribution = attribute.attribution ? `<div class="o-image-attribution">${attribute.attribution}</div>` : '';
+            val = `<div class="o-image-container">
+              <img src="${url}">${attribution}
+              </div>`;
+          }
+        } else if (attribute.name) {
           if (feature.get(attribute.name)) {
             val = feature.get(attribute.name);
             if (attribute.title) {
@@ -50,14 +59,6 @@ export default function (feature, layer, map) {
             val = `<a href="${url}" target="_blank">
               ${text}
               </a>`;
-          }
-        } else if (attribute.img) {
-          if (feature.get(attribute.img)) {
-            const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.img), attributes, null, map));
-            const attribution = attribute.attribution ? `<div class="o-image-attribution">${attribute.attribution}</div>` : '';
-            val = `<div class="o-image-container">
-              <img src="${url}">${attribution}
-              </div>`;
           }
         } else if (attribute.html) {
           val = replacer.replace(attribute.html, attributes, {
