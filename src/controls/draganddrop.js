@@ -18,9 +18,6 @@ const DragAndDrop = function DragAndDrop(options = {}) {
       const map = viewer.getMap();
       const groupName = options.groupName || 'egna-lager';
       const groupTitle = options.groupTitle || 'Egna lager';
-      if (!viewer.getGroup(groupName)) {
-        viewer.addGroup({ title: groupTitle, name: groupName, expanded: true });
-      }
       let vectorSource;
       let vectorLayer;
 
@@ -40,7 +37,9 @@ const DragAndDrop = function DragAndDrop(options = {}) {
         vectorSource = new VectorSource({
           features: event.features
         });
-
+        if (!viewer.getGroup(groupName)) {
+          viewer.addGroup({ title: groupTitle, name: groupName, expanded: true });
+        }
         vectorLayer = new VectorLayer({
           source: vectorSource,
           name: event.file.name.split('.')[0].replace(/\W/g, ''),
