@@ -2,15 +2,9 @@ import Component from './component';
 import Collapse from './collapse';
 import El from './element';
 import Button from './button';
-import Icon from './icon';
 import { html, createStyle } from './dom/dom';
 
 export default function Dropdown(options = {}) {
-  let {
-    icon,
-    state = 'initial',
-    text = ' '
-  } = options;
   const {
     cls = '',
     containerCls = 'bg-white',
@@ -18,9 +12,8 @@ export default function Dropdown(options = {}) {
     buttonIconCls = '',
     buttonContainerCls = '',
     style: styleSettings,
-    click,
-    items,
-    direction
+    direction,
+    text = ' '
   } = options;
 
   let containerElement;
