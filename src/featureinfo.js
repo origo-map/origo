@@ -100,8 +100,8 @@ const Featureinfo = function Featureinfo(options = {}) {
       onChanged: callback,
       items: 1,
       nav: true,
-      navText: ['<svg class="o-icon-fa-chevron-left"><use xlink:href="#fa-chevron-left"></use></svg>',
-        '<svg class="o-icon-fa-chevron-right"><use xlink:href="#fa-chevron-right"></use></svg>'
+      navText: ['<span class="o-icon-fa-chevron-left"><</span>',
+        '<span class="o-icon-fa-chevron-right">></span>'
       ]
     };
     if (identifyTarget === 'overlay') {
