@@ -8,7 +8,7 @@ import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import { Component } from '../ui';
 
-const DragAndDrop = function DragAndDrop() {
+const DragAndDrop = function DragAndDrop(options = {}) {
   let viewer;
 
   return Component({
@@ -16,6 +16,10 @@ const DragAndDrop = function DragAndDrop() {
     onAdd(evt) {
       viewer = evt.target;
       const map = viewer.getMap();
+      const groupTitle = options.groupTitle || "Egna lager";
+       if(!viewer.getGroup(groupTitle)){
+         viewer.addGroup({'title':groupTitle, 'name':groupTitle});
+       }
       let vectorSource;
       let vectorLayer;
 
@@ -39,7 +43,7 @@ const DragAndDrop = function DragAndDrop() {
         vectorLayer = new VectorLayer({
           source: vectorSource,
           name: event.file.name.split('.')[0].replace(/\W/g, ''),
-          group: 'root',
+          group: groupTitle,
           title: event.file.name.split('.')[0],
           queryable: true,
           removable: true
