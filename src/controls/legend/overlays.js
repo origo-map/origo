@@ -26,6 +26,11 @@ const Overlays = function Overlays(options) {
   const rootGroupNames = ['root', '', null, undefined];
   let overlays;
 
+  //drag and drop
+  var draggedElement;
+  var zIndexCounter = 500;
+  var addedOverlays = new Array;
+  
   const themeGroups = ThemeGroups();
   const rootGroup = GroupList({ viewer });
 
@@ -138,9 +143,194 @@ const Overlays = function Overlays(options) {
     }
   };
 
-  const addLayer = function addLayer(layer, {
-    position
-  } = {}) {
+  const addDragSupport = function addDragSupport(el) {
+    el.addEventListener("drag", function (event) { }, false);
+    el.addEventListener("dragstart", function (event) { draggedElement = event.target; event.target.style.opacity = .3; }, false);
+    el.addEventListener("dragend", function (event) { event.target.style.opacity = ""; }, false);
+  };
+
+  const addDropSupport = function addDropSupport(el) {
+    el.addEventListener("dragover", function (event) { event.preventDefault(); }, false);
+    el.addEventListener("dragenter", function (event) { if (event.target.title === 'drop') { event.target.style.background = "#008FF5"; } }, false);
+    el.addEventListener("dragleave", function (event) { if (event.target.title === 'drop') { event.target.style.background = ""; } }, false);
+    el.addEventListener("drop", function (event) {
+      event.preventDefault();
+      var targetNeighbourTitle = '';
+      event.target.style.background = "";
+      // event.target.style.height ="4px";
+
+      if (event.target.title === 'drop') {
+        var otherLayers = new Array;
+        var parent = draggedElement.parentNode;
+        var moveLayer = true;
+        var dropIndex = Array.prototype.indexOf.call(parent.childNodes, event.target);
+        var layerDragged;
+        var layerTarget;
+        var layerDraggedZIndex;
+        var layerTargetZIndex;
+        var dropBelow = false;
+
+        if (dropIndex === 0) {
+
+          targetNeighbourTitle = event.target.nextSibling.title;
+          if (targetNeighbourTitle === draggedElement.getAttribute("title")) {
+            moveLayer = false;
+          }
+          else {
+            addedOverlays.forEach(function (element) {
+              var l = element.getLayer();
+              if (l.getProperties().title === draggedElement.getAttribute("title")) {
+                layerDragged = l;
+              }
+              else if (l.getProperties().title === targetNeighbourTitle) {
+                layerTarget = l;
+                dropBelow = false;
+              }
+              else {
+                otherLayers.push(l);
+              }
+            })
+          }
+        }
+        else {
+          var nextSiblingTitle = ''
+
+          if (dropIndex !== -1) {
+            targetNeighbourTitle = event.target.previousSibling.title;
+            nextSiblingTitle = event.target.nextSibling.title;
+          }
+          else {
+            dropIndex = Array.prototype.indexOf.call(parent.childNodes, parent.lastElementChild) - 1
+            targetNeighbourTitle = parent.childNodes[dropIndex].previousSibling.title;
+            nextSiblingTitle = parent.childNodes[dropIndex].nextSibling.title;
+          }
+          if (targetNeighbourTitle === draggedElement.getAttribute("title") || nextSiblingTitle === draggedElement.getAttribute("title")) {
+            moveLayer = false;
+          }
+          else {
+            addedOverlays.forEach(function (element) {
+              var l = element.getLayer();
+              if (l.getProperties().title === draggedElement.getAttribute("title")) {
+                layerDragged = l;
+              }
+              else if (l.getProperties().title === targetNeighbourTitle) {
+                layerTarget = l;
+                dropBelow = true;
+              }
+              else {
+                otherLayers.push(l);
+              }
+            })
+          }
+        }
+
+        if (moveLayer) {
+
+          var zIndexList = new Array;
+
+          if (dropBelow) {
+            layerDragged.setZIndex(layerTarget.getZIndex() - 1);
+          }
+          else {
+            layerDragged.setZIndex(layerTarget.getZIndex() + 1);
+          }
+
+          zIndexList.push(layerDragged.getZIndex());
+          zIndexList.push(layerTarget.getZIndex());
+          layerTargetZIndex = layerTarget.getZIndex();
+          layerDraggedZIndex = layerDragged.getZIndex();
+
+          otherLayers.forEach(function (element) {
+
+            if (element.getZIndex() === layerTargetZIndex) {
+              element.setZIndex(element.getZIndex() - 1);
+              zIndexList.push(element.getZIndex());
+            }
+            else if (element.getZIndex() < layerTargetZIndex && !zIndexList.includes(element.getZIndex())) {
+              element.setZIndex(element.getZIndex() - 1);
+              zIndexList.push(element.getZIndex());
+            }
+            else if (element.getZIndex() < layerTargetZIndex && zIndexList.includes(element.getZIndex())) {
+              var z = element.getZIndex() - 1;
+              while (zIndexList.includes(z)) {
+                z--;
+              }
+              element.setZIndex(z);
+              zIndexList.push(element.getZIndex());
+            }
+            else if (element.getZIndex() > layerDraggedZIndex && !zIndexList.includes(element.getZIndex())) {
+              element.setZIndex(element.getZIndex() + 1);
+              zIndexList.push(element.getZIndex());
+            }
+            else if (element.getZIndex() > layerDraggedZIndex && zIndexList.includes(element.getZIndex())) {
+              var z = element.getZIndex() + 1;
+              while (zIndexList.includes(z)) {
+                z++;
+              }
+              element.setZIndex(z);
+              zIndexList.push(element.getZIndex());
+            }
+            else {
+              console.log("Failed to sort z Index on layer: " + element.getProperties().title);
+            }
+          });
+
+          addedOverlays.sort((a, b) => (a.getLayer().getZIndex() < b.getLayer().getZIndex()) ? 1 : ((b.getLayer().getZIndex() < a.getLayer().getZIndex()) ? -1 : 0));
+
+          var childnodes = parent.childNodes;
+          var menu = parent.lastElementChild;
+          parent.removeChild(menu);
+          var menuDropChild = parent.lastElementChild;
+          var dropSlot = parent.firstElementChild;
+          parent.removeChild(menuDropChild);
+
+          var childSorted = new Array;
+          zIndexCounter = 500 + addedOverlays.length;
+
+          addedOverlays.forEach(function (l) {
+            var sortedOverlay = l.getLayer();
+            sortedOverlay.setZIndex(zIndexCounter);
+            zIndexCounter--;
+            // console.log(sortedOverlay.getProperties().title+ " " +sortedOverlay.getZIndex());
+            childnodes.forEach(function (child) {
+
+              if (child.getAttribute("title") === sortedOverlay.getProperties().title) {
+
+                var dropSlotClone = dropSlot.cloneNode(true);
+                addDropSupport(dropSlotClone);
+                childSorted.push(dropSlotClone);
+                childSorted.push(child);
+
+                parent.removeChild(child);
+              }
+              if (child.getAttribute("id") === 'dropSlot') {
+                parent.removeChild(child);
+              }
+              if (child.getAttribute("title") === 'menuDropChild') {
+                parent.removeChild(child);
+              }
+            });
+          });
+          var dropSlotClone = dropSlot.cloneNode(true);
+          addDropSupport(dropSlotClone);
+          childSorted.push(dropSlotClone);
+
+
+          childSorted.forEach(function (child) {
+            parent.appendChild(child);
+          });
+          parent.appendChild(menu);
+          var dropSlotClone = dropSlot.cloneNode(true);
+          addDropSupport(dropSlotClone);
+          parent.insertBefore(dropSlotClone, parent.childNodes[0]);
+
+          zIndexCounter = 500 + addedOverlays.length;
+        }
+      }
+    }, false);
+  };
+
+  const addLayer = function addLayer(layer, { position } = {}) {
     const styleName = layer.get('styleName') || null;
     const layerStyle = styleName ? viewer.getStyle(styleName) : undefined;
     const overlay = Overlay({
@@ -152,7 +342,20 @@ const Overlays = function Overlays(options) {
     } else if (!(nonGroupNames.includes(groupName))) {
       const groupCmp = groupCmps.find(cmp => cmp.name === groupName);
       if (groupCmp) {
+        zIndexCounter++;
+        overlay.getLayer().setZIndex(zIndexCounter);
         groupCmp.addOverlay(overlay);
+        addedOverlays.push(overlay);
+
+        var el = document.getElementById(overlay.getId());
+        var dropSlot = document.getElementById("dropSlot");
+        var menuDropSlot = document.getElementById("menuDropSlot");
+
+        if (menuDropSlot != null) {
+          addDropSupport(menuDropSlot);
+        }
+        addDropSupport(dropSlot);
+        addDragSupport(el);
       }
     }
   };
@@ -191,6 +394,13 @@ const Overlays = function Overlays(options) {
     if (groupName) {
       const groupCmp = groupCmps.find(cmp => cmp.name === groupName);
       if (groupCmp) {
+        var removeIndex;
+        addedOverlays.forEach(function (element) {
+          if (element.getLayer().getProperties().title === layer.get('title')) {
+            removeIndex = addedOverlays.indexOf(element);
+          }
+        })
+        addedOverlays.splice(removeIndex, 1);
         groupCmp.removeOverlay(layerName);
       }
     } else {
