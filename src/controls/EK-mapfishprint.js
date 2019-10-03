@@ -48,84 +48,111 @@ const Mapfishprint = function Mapfishprint(options = {}) {
                 name: ""
             }]
         };
+        let promise = new Promise(function(resolve, reject) {
+            //get name of background map
+            let backgroundLayer = layers.filter(function(layer) {
+                return layer.get('group') === "background";
+            })[0];
 
-        //get name of background map
-        let backgroundLayer = layers.filter(function(layer) {
-            return layer.get('group') === "background";
-        })[0];
-
-        //assemble object to be pushed to layers. backgroundLayer will always contain 1 element
-        if (backgroundLayer) {
-            let url;
-            if (backgroundLayer.getSource() instanceof TileWMS) {
-                url = fetchSourceUrl(backgroundLayer)
-            }else if (backgroundLayer.getSource() instanceof ImageWMS) { //----------------------------ol
-                url = fetchSourceUrl(backgroundLayer)
+            //assemble object to be pushed to layers. backgroundLayer will always contain 1 element
+            if (backgroundLayer) {
+                let url;
+                if (backgroundLayer.getSource() instanceof TileWMS) {
+                    url = fetchSourceUrl(backgroundLayer)
+                }else if (backgroundLayer.getSource() instanceof ImageWMS) { //----------------------------ol
+                    url = fetchSourceUrl(backgroundLayer)
+                } else {
+                    console.warn('Bakgrundslager är av okänd bildtyp: ', backgroundLayer.getSource());
+                }
+                let backgroundLayerObject = {
+                    type: backgroundLayer.get('type'),
+                    baseURL: url,
+                    format: backgroundLayer.getSource().getParams().FORMAT,
+                    layers: [backgroundLayer.getSource().getParams().LAYERS]
+                };
+                mapfishOptions.layers.push(backgroundLayerObject);
             } else {
-                console.log('Bakgrundslager är av okänd bildtyp: ', backgroundLayer.getSource());
+                //tom
             }
-            let backgroundLayerObject = {
-                type: backgroundLayer.get('type'),
-                baseURL: url,
-                format: backgroundLayer.getSource().getParams().FORMAT,
-                layers: [backgroundLayer.getSource().getParams().LAYERS]
-            };
-            mapfishOptions.layers.push(backgroundLayerObject);
-        } else {
-            //tom
-        }
 
-        //filter background map from remaining layers.
-        layers = layers.filter(function(layer) {
-            return layer.get('group') !== "background" && typeof layer.get('name') !== 'undefined';
-        });
-
-        // build legend objects and add to mapfishconfig
-        let legendArray = buildLegend(layers.filter(function(layer) {
-            return (layer.get('name').indexOf("_bk_") == -1 && layer.get('name') != "measure")
-        })); //TODO: Make it more user configurable
-
-        legendArray.forEach(function(obj) {
-            if (obj) mapfishOptions.legends[0].classes.push(obj);
-        });
-
-        //return Object[] filtered by baseURL and/or type
-        let wmsLayers = buildLayersObjects(layers.filter(function(layer) {
-            return typeof layer.get('name') != "undefined"
-        }), "WMS");
-        let wfsLayers = buildLayersObjects(layers.filter(function(layer) {
-            return typeof layer.get('name') != "undefined"
-        }), "WFS");
-
-
-
-
-        if (wmsLayers.length !== 0) {
-            wmsLayers.forEach(function(layer) {
-                mapfishOptions.layers.push(layer);
+            //filter background map from remaining layers.
+            layers = layers.filter(function(layer) {
+                return layer.get('group') !== "background" && typeof layer.get('name') !== 'undefined';
             });
-        }
-        if (wfsLayers.length !== 0) {
-            wfsLayers.forEach(function(layer) {
-                mapfishOptions.layers.push(layer);
+
+            
+            //return Object[] filtered by baseURL and/or type
+            let wmsLayers = buildLayersObjects(layers.filter(function(layer) {
+                return typeof layer.get('name') != "undefined"
+            }), "WMS");
+            let wfsLayers = buildLayersObjects(layers.filter(function(layer) {
+                return typeof layer.get('name') != "undefined"
+            }), "WFS");
+
+            if (wmsLayers.length !== 0) {
+                wmsLayers.forEach(function(layer) {
+                    mapfishOptions.layers.push(layer);
+                });
+            }
+            if (wfsLayers.length !== 0) {
+                wfsLayers.forEach(function(layer) {
+                    mapfishOptions.layers.push(layer);
+                });
+            }
+
+            //Both pin, draw and measure are vector types, mapfish needs other properties for them
+            //Current version is mapfish V2 and the styles are similar to OL2
+            let measureLayer = layers.filter((layer) => layer.get('name') === "measure");
+            if(measureLayer.length > 0) mapfishOptions.layers.push(measureToPrint(measureLayer))
+
+            let pin = viewer.getFeatureinfo().getPin();
+            if (pin) mapfishOptions.layers.push(pinToPrint(pin));
+
+            let draw = viewer.getControlByName('draw')
+            if(draw){
+                draw = JSON.parse(draw.getState().features)
+                if (draw.features.length > 0) mapfishOptions.layers.push(drawToPrint(draw))
+            }
+
+            // build legend objects and add to mapfishconfig
+            let promises = getLegendInfos(layers, scale);
+            Promise.all(promises).then(
+                responses => responses.map((response) => {return response}), 
+                error => {console.error("Error.", error)}
+            ).then(
+                legendInfos => {
+                    layers = appendLegendInfos(layers, legendInfos);
+                },
+                error => {console.error("Error.", error)}
+            ).finally( () => {                
+                let legendArray = buildLegend(layers.filter(function(layer) {
+                    return (layer.get('name').indexOf("_bk_") === -1 && layer.get('name') != "measure")
+                }), scale);
+
+                legendArray.forEach(function(obj) {
+                    if (obj) mapfishOptions.legends[0].classes.push(obj);
+                });
+
+                resolve(mapfishOptions)
             });
-        }
+        })
+        return promise;
+    }
 
-        //Both pin, draw and measure are vector types, mapfish needs other properties for them
-        //Current version is mapfish V2 and the styles are similar to OL2
-        let measureLayer = layers.filter((layer) => layer.get('name') == "measure");
-        if(measureLayer.length > 0) mapfishOptions.layers.push(measureToPrint(measureLayer))
-
-        let pin = viewer.getFeatureinfo().getPin();
-        if (pin) mapfishOptions.layers.push(pinToPrint(pin));
-
-        let draw = viewer.getControlByName('draw')
-        if(draw){
-            draw = JSON.parse(draw.getState().features)
-            if (draw.features.length > 0) mapfishOptions.layers.push(drawToPrint(draw))
-        }
-    
-        return mapfishOptions;
+    function appendLegendInfos (layers, legendInfos) {
+        layers = layers.map((layer) => {
+            //return layer
+            if (!layer.get("sublayers")) {
+                legendInfos.forEach((info => {
+                    if (info.data.Legend[0].layerName === layer.get("name") && info.data.Legend[0].rules.length > 1) {
+                        layer.set("theme", true);
+                        layer.set("sublayers", info.data.Legend[0].rules.map( (ruleInfo) => { return {title: ruleInfo.title, rule: ruleInfo.name}}))
+                    }
+                }));
+            }
+            return layer
+        })
+        return layers
     }
 
     //Builds mapfish-friendly object to from drawn features
@@ -149,7 +176,7 @@ const Mapfishprint = function Mapfishprint(options = {}) {
             feature.properties.style = 'draw'
 
 
-            if(feature.geometry.type == "Point"){
+            if(feature.geometry.type === "Point"){
                 feature.properties.style = 'point'
             }
 
@@ -286,7 +313,41 @@ const Mapfishprint = function Mapfishprint(options = {}) {
         };
     }
 
-    function buildLegend(layers) {
+    function getLegendInfos(layers, scale) {
+        var requests = [];
+        layers.forEach(function (layer) {
+            if (layer.get('type').toUpperCase() === "WMS") {
+                let params;
+                let url = fetchSourceUrl(layer);
+                let requestUrl;
+                if (!layer.get('sublayers')) {
+                    params = {
+                        service: "WMS",
+                        version: "1.1.0",
+                        request: "GetLegendGraphic",
+                        layer: layer.get("name"),
+                        format: "application/json",
+                        scale: scale
+                    }
+                    requestUrl = url + '?' + Object.keys(params).map(function (key) {return key + '=' + params[key]}).join('&')
+                    requests.push(new Promise(function(resolve, reject) {
+                        try {
+                            fetch(requestUrl).then(response => {return response.json()}).then( json => resolve({data: json, layerName: layer.get('name')}))
+                        }
+                        catch(error) {
+                            console.error("Error while getting legend as json: ", error)
+                            reject(error)
+                        }
+                        
+                    }));
+                }
+            }
+        })
+        return requests
+        
+    }
+
+    function buildLegend(layers, scale) {
         let themeLayers = [];
         let legendObjects = layers.reduce(function(result, layer) {
             const type = layer.get('type') || "";
@@ -296,7 +357,7 @@ const Mapfishprint = function Mapfishprint(options = {}) {
                     url = fetchSourceUrl(layer);
                     name = layer.get('name');
                     //special case for theme layers
-                    if (layer.get('theme') == true || layer.get('ArcGIStheme') == true) {
+                    if (layer.get('theme') === true || layer.get('ArcGIStheme') === true) {
                         themeLayers.push({
                             sublayers: layer.get('sublayers'),
                             title: layer.get('title'),
@@ -307,11 +368,11 @@ const Mapfishprint = function Mapfishprint(options = {}) {
                         })
                     }
                     //special case for grouped layers
-                    else if (layer.get('grouplayer') == true) {
+                    else if (layer.get('grouplayer') === true) {
                         let sublayers = layer.get('sublayers');
                         for (let i = 0; i < sublayers.length; i++) {
                             //theme layers might be in grouped layers
-                            if (sublayers[i].theme == true || sublayers[i].ArcGIStheme == true) {
+                            if (sublayers[i].theme === true || sublayers[i].ArcGIStheme === true) {
                                 if (!sublayers[i].url)
                                     sublayers[i].url = url;
                                 themeLayers.push(sublayers[i]);
@@ -322,7 +383,7 @@ const Mapfishprint = function Mapfishprint(options = {}) {
                                 let layername = sublayers[i].name;
                                 result.push({
                                     name: subName,
-                                    icons: [url + '/?REQUEST=GetLegendGraphic&transparent=true&service=WMS&VERSION=1.0.0&FORMAT=image/png&LAYER=' + layername + '&STYLE=' + style + '&RULE=' + rule + '&SCALE=1&legend_options=dpi:400']
+                                    icons: [url + '/?REQUEST=GetLegendGraphic&transparent=true&service=WMS&VERSION=1.0.0&FORMAT=image/png&LAYER=' + layername + '&STYLE=' + style + '&RULE=' + rule + '&SCALE=' + scale + '&legend_options=dpi:400']
                                 })
                             }
                         }
@@ -331,7 +392,7 @@ const Mapfishprint = function Mapfishprint(options = {}) {
                     else {
                         result.push({
                             name: layer.get('title'),
-                            icons: [url + '/?REQUEST=GetLegendGraphic&transparent=true&service=WMS&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name + '&SCALE=1&legend_options=dpi:400']
+                            icons: [url + '/?REQUEST=GetLegendGraphic&transparent=true&service=WMS&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name + '&SCALE=' + scale + '&legend_options=dpi:400']
                         })
                     }
                     return result;
@@ -341,7 +402,7 @@ const Mapfishprint = function Mapfishprint(options = {}) {
                     name = layer.get('name');
                     result.push({
                         name: layer.get('title'),
-                        icons: [url + '/?REQUEST=GetLegendGraphic&transparent=true&service=WMS&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name + '&SCALE=1&legend_options=dpi:400']
+                        icons: [url + '/?REQUEST=GetLegendGraphic&transparent=true&service=WMS&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name + '&SCALE=' + scale + '&legend_options=dpi:400']
                     })
                     return result;
                     break;
@@ -358,20 +419,20 @@ const Mapfishprint = function Mapfishprint(options = {}) {
             legendObjects.push({
                 name: "\n" + layer.title
             });
-            if (layer.theme == true) {
+            if (layer.theme === true) {
                 for (let i = 0; i < sublayers.length; i++) {
                     let subName = sublayers[i].title;
                     let rule = sublayers[i].rule;
                     //handle if another style is specified
                     let url = layer.style ?
-                        layer.url + '/?REQUEST=GetLegendGraphic&transparent=true&service=WMS&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name + '&STYLE=' + layer.style + '&RULE=' + rule + '&SCALE=1&legend_options=dpi:400' :
-                        layer.url + '/?REQUEST=GetLegendGraphic&transparent=true&service=WMS&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name + '&RULE=' + rule + '&SCALE=1&legend_options=dpi:400'
+                        layer.url + '/?REQUEST=GetLegendGraphic&transparent=true&service=WMS&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name + '&STYLE=' + layer.style + '&RULE=' + rule + '&SCALE=' + scale + '&legend_options=dpi:400' :
+                        layer.url + '/?REQUEST=GetLegendGraphic&transparent=true&service=WMS&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name + '&RULE=' + rule + '&SCALE=' + scale + '&legend_options=dpi:400'
                     legendObjects.push({
                         name: subName,
                         icons: [url]
                     });
                 };
-            } else if (layer.ArcGIStheme == true) {
+            } else if (layer.ArcGIStheme === true) {
                 for (let i = 0; i < sublayers.length; i++) {
                     let subName = sublayers[i].title;
                     let subUrl = sublayers[i].url;
@@ -384,6 +445,9 @@ const Mapfishprint = function Mapfishprint(options = {}) {
         });
 
         return legendObjects;
+        
+
+        
     }
 
     // All urls should point to wms service, regardless if layer type is wfs
@@ -396,7 +460,7 @@ const Mapfishprint = function Mapfishprint(options = {}) {
                 } else if (layer.getSource() instanceof ImageWMS) {
                     url = layer.getSource().getUrl();
                 }
-                if (url.charAt(0) == "/") {
+                if (url.charAt(0) === "/") {
                     url = config.localHost + url
                 }
                 return url;
@@ -453,7 +517,7 @@ const Mapfishprint = function Mapfishprint(options = {}) {
                     } else if (layer.getSource() instanceof ImageWMS) {
                         url = fetchSourceUrl(layer)
                     } else {
-                        console.log('Lagertyp stöds ej.');
+                        console.warn('Lagertyp stöds ej.');
                     }
                     printIndex = printableLayers.findIndex(function(l) {
                         return l.baseURL === url
@@ -634,13 +698,12 @@ const Mapfishprint = function Mapfishprint(options = {}) {
             dataType: 'json',
             success: function(data) {
                 let url = newUrl(data.getURL);
-                console.log('SUCCESS', url);
                 progress.style.display = 'none';
                 cancel.style.display = 'none';
                 window.open(url);
             },
             error: function(data) {
-                console.log('Error creating report: ' + data.statusText);
+                console.warn('Error creating report: ' + data.statusText);
             }
         });
         return request;
@@ -659,8 +722,16 @@ const Mapfishprint = function Mapfishprint(options = {}) {
             viewer = evt.target;
         },
         printMap(settings) {
+            
             let url = config.printCreate;
-            return executeMapfishCall(url, convertToMapfishOptions(settings));
+            let promise = new Promise(function(resolve, reject) {
+                convertToMapfishOptions(settings).then(function (data) {
+                    executeMapfishCall(url, data).then(function (resp){
+                        resolve(resp)
+                    });
+                })
+              });
+            return promise
         },
         onInit() {},
         render() {
