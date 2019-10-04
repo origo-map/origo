@@ -7,7 +7,6 @@ export default function getCenter(geometryIn, destination, axisOrientation, map)
     geometry.transform(map.getView().getProjection(), destination);
   }
 
-
   const type = geometry.getType();
   let center;
   switch (type) {
