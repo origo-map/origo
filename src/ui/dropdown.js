@@ -12,7 +12,7 @@ export default function Dropdown(options = {}) {
     buttonIconCls = '',
     buttonContainerCls = '',
     style: styleSettings,
-    direction,
+    direction = 'down',
     text = ' '
   } = options;
 
@@ -118,7 +118,6 @@ export default function Dropdown(options = {}) {
       this.dispatch('render');
     },
     render() {
-      // return `<div id="${this.getId()}" class="${cls} relative inline-block" style="${style}">${containerElement.render()}</div>`;
       return `<div id="${this.getId()}" class="${cls}" style="${style}">${containerElement.render()}</div>`;
     }
   });
