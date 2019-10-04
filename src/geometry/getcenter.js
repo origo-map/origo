@@ -1,5 +1,3 @@
-import viewer from '../viewer';
-
 export default function getCenter(geometryIn, destination, axisOrientation, map) {
   const geometry = geometryIn.clone();
 
