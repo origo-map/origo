@@ -9,7 +9,8 @@ const Legend = function Legend(options = {}) {
     expanded = true,
     contentCls,
     contentStyle,
-    addControl = false,
+    addTurnOffLayersControl = false,
+    addLayermanagerControl = false,
     name = 'legend'
   } = options;
 
@@ -68,6 +69,15 @@ const Legend = function Legend(options = {}) {
     }
   });
 
+  const secondDivider = El({
+    cls: 'divider margin-x-small',
+    style: {
+      'border-width': '2px',
+      'margin-bottom': '5px',
+      'margin-top': '5px'
+    }
+  });
+
   const addButton = Button({
     cls: 'round compact primary icon-small margin-x-smaller',
     click() {
@@ -79,6 +89,20 @@ const Legend = function Legend(options = {}) {
     icon: '#o_add_24px',
     iconStyle: {
       fill: '#fff'
+    }
+  });
+
+  const turnOffLayersButton = Button({
+    cls: 'round compact icon-small margin-x-smaller\'title=\'Släck alla lager',
+    click() {
+      viewer.dispatch('active:turnofflayers');
+    },
+    style: {
+      'align-self': 'center'
+    },
+    icon: '#ic_visibility_off_24px',
+    iconStyle: {
+      fill: '#7a7a7a'
     }
   });
 
@@ -132,7 +156,15 @@ const Legend = function Legend(options = {}) {
       target = document.getElementById(viewer.getMain().getId());
       const maxHeight = calcMaxHeight(getTargetHeight());
       const overlaysCmp = Overlays({ viewer, cls: contentCls, style: contentStyle });
-      const baselayerCmps = addControl ? [toggleGroup, divider, addButton] : [toggleGroup];
+      const baselayerCmps = [toggleGroup];
+      if (addTurnOffLayersControl) {
+        baselayerCmps.push(divider);
+        baselayerCmps.push(turnOffLayersButton);
+      }
+      if (addLayermanagerControl) {
+        baselayerCmps.push(secondDivider);
+        baselayerCmps.push(addButton);
+      }
       const baselayersCmp = El({
         cls: 'flex padding-small no-shrink',
         style: {
