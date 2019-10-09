@@ -2,6 +2,7 @@ import { Component, Button, Element as El, ToggleGroup, dom } from '../ui';
 import imageSource from './legend/imagesource';
 import Overlays from './legend/overlays';
 import GetLegendGraphics from './legend/EK_getLegendGraphic';
+import {getIfThemeLayer} from './legend/EK_getLegendGraphicsUtils';
 
 const Legend = function Legend(options = {}) {
   const {
@@ -135,10 +136,22 @@ const Legend = function Legend(options = {}) {
       });
 
       //Initialize EK_getLegendGraphics component
-      getLegendGraphics = GetLegendGraphics({viewer}); 
 
-      this.render();
-      this.dispatch('render');
+      getLegendGraphics = GetLegendGraphics({viewer});
+      
+      var that = this
+      Promise.all(getIfThemeLayer(viewer, viewer.getLayers())).then(function (themeInfos) {
+
+        viewer.getMap().getLayers().forEach((layer) => {
+            themeInfos.forEach((info) => {
+                if (info.layerName === layer.get('name')) {
+                    layer.set('theme', info.isThemeLayer)
+                }
+            })
+        });
+        that.render();
+        that.dispatch('render');
+      })
     },
     onRender() {
       mainContainerEl = document.getElementById(mainContainerCmp.getId());
