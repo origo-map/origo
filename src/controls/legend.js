@@ -9,8 +9,8 @@ const Legend = function Legend(options = {}) {
     expanded = true,
     contentCls,
     contentStyle,
-    addTurnOffLayersControl = false,
-    addLayermanagerControl = false,
+    turnOffLayersControl = false,
+    layerManagerControl = false,
     name = 'legend'
   } = options;
 
@@ -58,6 +58,15 @@ const Legend = function Legend(options = {}) {
 
   const updateMaxHeight = function updateMaxHeight() {
     mainContainerEl.style.maxHeight = `${calcMaxHeight(getTargetHeight())}px`;
+  };
+
+  const turnOffAllLayers = function turnOffAllLayers() {
+    const layers = viewer.getLayersByProperty('visible', true);
+    layers.forEach((el) => {
+      if (!(['none', 'background'].includes(el.get('group')))) {
+        el.setVisible(false);
+      }
+    });
   };
 
   const divider = El({
@@ -130,6 +139,9 @@ const Legend = function Legend(options = {}) {
     },
     onAdd(evt) {
       viewer = evt.target;
+      if (turnOffLayersControl) {
+        viewer.on('active:turnofflayers', turnOffAllLayers);
+      }
       const backgroundLayers = viewer.getLayersByProperty('group', 'background').reverse();
       addBackgroundButtons(backgroundLayers);
       toggleGroup = ToggleGroup({
@@ -157,11 +169,11 @@ const Legend = function Legend(options = {}) {
       const maxHeight = calcMaxHeight(getTargetHeight());
       const overlaysCmp = Overlays({ viewer, cls: contentCls, style: contentStyle });
       const baselayerCmps = [toggleGroup];
-      if (addTurnOffLayersControl) {
+      if (turnOffLayersControl) {
         baselayerCmps.push(divider);
         baselayerCmps.push(turnOffLayersButton);
       }
-      if (addLayermanagerControl) {
+      if (layerManagerControl) {
         baselayerCmps.push(secondDivider);
         baselayerCmps.push(addButton);
       }
