@@ -38,11 +38,13 @@ const Featureinfo = function Featureinfo(options = {}) {
   let savedPin = savedPinOptions ? maputils.createPointFeature(savedPinOptions, pinStyle) : undefined;
   const savedFeature = savedPin || savedSelection || undefined;
 
-  if (showOverlay) {
-    identifyTarget = 'overlay';
-  } else {
-    sidebar.init();
-    identifyTarget = 'sidebar';
+  function setUIoutput(viewer){
+    if (showOverlay) {
+      identifyTarget = 'overlay';
+    } else {
+      sidebar.init(viewer);
+      identifyTarget = 'sidebar';
+    }
   }
 
   const clear = function clear() {
@@ -58,6 +60,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     if (currentItem !== null) {
       const clone = items[currentItem].feature.clone();
       clone.setId(items[currentItem].feature.getId());
+      clone.layerName = items[currentItem].name;
       selectionLayer.clearAndAdd(
         clone,
         selectionStyles[items[currentItem].feature.getGeometry().getType()]
@@ -123,7 +126,7 @@ const Featureinfo = function Featureinfo(options = {}) {
       selection.coordinates = firstFeature.getGeometry().getCoordinates();
       selection.id = firstFeature.getId() != null ? firstFeature.getId() : firstFeature.ol_uid;
       selection.type = typeof selectionLayer.getSourceLayer() === 'string' ? selectionLayer.getFeatureLayer().type : selectionLayer.getSourceLayer().get('type');
-      if (selection.type === 'GEOJSON' || selection.type === 'AGS_FEATURE') {
+      if (selection.type !== 'WFS') {
         const name = typeof selectionLayer.getSourceLayer() === 'string' ? selectionLayer.getSourceLayer() : selectionLayer.getSourceLayer().get('name');
         const id = firstFeature.getId() || selection.id;
         selection.id = `${name}.${id}`;
@@ -254,6 +257,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     onAdd(e) {
       viewer = e.target;
       const map = viewer.getMap();
+      setUIoutput(viewer);
       selectionLayer = featurelayer(savedFeature, map);
       map.on(clickEvent, onClick);
       viewer.on('toggleClickInteraction', (detail) => {

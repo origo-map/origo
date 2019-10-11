@@ -21,7 +21,7 @@ const Overlays = function Overlays(options) {
   } = options;
 
   const cls = `${clsSettings} o-layerswitcher-overlays flex row overflow-hidden`.trim();
-  const style = dom.createStyle(Object.assign({}, { width: '220px;' }, styleSettings));
+  const style = dom.createStyle(Object.assign({}, { width: '220px', height: '100%', 'min-width': '220px' }, styleSettings));
   const nonGroupNames = ['background', 'none'];
   const rootGroupNames = ['root', '', null, undefined];
   let overlays;
@@ -240,9 +240,13 @@ const Overlays = function Overlays(options) {
       el.addEventListener('overlayproperties', (evt) => {
         if (evt.detail.layer) {
           const layer = evt.detail.layer;
-          const layerProperties = LayerProperties({ layer, viewer });
+          const parent = this;
+          const layerProperties = LayerProperties({ layer, viewer, parent });
           slidenav.setSecondary(layerProperties);
           slidenav.slideToSecondary();
+          slidenav.on('slide', () => {
+            el.classList.remove('width-100');
+          });
         }
         evt.stopPropagation();
       });
