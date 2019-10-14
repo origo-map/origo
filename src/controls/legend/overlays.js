@@ -30,7 +30,8 @@ const Overlays = function Overlays(options) {
   var draggedElement;
   var zIndexCounter = 500;
   var addedOverlays = new Array;
-  
+  var waitingLMlayers = new Array;
+
   const themeGroups = ThemeGroups();
   const rootGroup = GroupList({ viewer });
 
@@ -357,6 +358,9 @@ const Overlays = function Overlays(options) {
         addDropSupport(dropSlot);
         addDragSupport(el);
       }
+      else {
+        waitingLMlayers.push(layer);
+      }
     }
   };
 
@@ -384,6 +388,12 @@ const Overlays = function Overlays(options) {
   const onAddGroup = function onAddGroup(evt) {
     const group = evt.group;
     addGroup(group);
+    if(waitingLMlayers){
+      waitingLMlayers.forEach(function (layer) {
+          addLayer(layer, "bottom");
+      });
+      waitingLMlayers = new Array;
+    } 
   };
 
   const onRemoveLayer = function onRemoveLayer(evt) {

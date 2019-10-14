@@ -377,7 +377,13 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
       const layerProps = mergeSavedLayerProps(layerOptions, urlParams.layers);
       this.addLayers(layerProps);
-
+      if(urlParams.addedLayers){
+        urlParams.addedLayers.reverse().forEach((layerProps) => {
+        this.addSource(layerProps.source, {url: layerProps.source});
+        this.addLayer(layerProps);
+        });
+      }
+  
       mapSize = MapSize(map, {
         breakPoints,
         breakPointsPrefix,
