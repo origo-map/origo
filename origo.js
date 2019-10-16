@@ -29,7 +29,13 @@ const Origo = function Origo(configPath, options = {}) {
       { name: 'zoom' },
       { name: 'rotate' },
       { name: 'attribution' },
-      { name: 'fullscreen' }
+      { name: 'fullscreen' },
+      {
+        name: 'prompt',
+        options: {
+          mode: 'Error'
+        }
+      }
     ]
   };
 
@@ -58,6 +64,12 @@ const Origo = function Origo(configPath, options = {}) {
 
   const getConfig = () => origoConfig;
 
+  const validatePrompt = (controls) => {
+    const ps = controls.filter(c => (c.name === 'prompt' && c.options.mode !== 'Error'));
+    const cs = controls.filter(c => (c.name !== 'prompt'));
+    return controls.filter(c => (c.name === 'prompt')).length > 1 ? cs.concat(ps) : controls;
+  };
+
   return ui.Component({
     getConfig,
     onInit() {
@@ -66,6 +78,7 @@ const Origo = function Origo(configPath, options = {}) {
       if (request) {
         request.then((data) => {
           const viewerOptions = data.options;
+          viewerOptions.controls = validatePrompt(viewerOptions.controls);
           viewerOptions.controls = initControls(viewerOptions.controls);
           const target = viewerOptions.target;
           const viewer = Viewer(target, viewerOptions);

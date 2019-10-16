@@ -3,6 +3,7 @@ import { createXYZ } from 'ol/tilegrid';
 import VectorSource from 'ol/source/Vector';
 import GeoJSONFormat from 'ol/format/GeoJSON';
 import vector from './vector';
+import wfsErrorHelper from '../helpers/alert/wfs';
 
 function createSource(options) {
   const serverUrl = options.url;
@@ -23,15 +24,13 @@ function createSource(options) {
     loader(extent) {
       let url = [`${serverUrl}?service=WFS`,
         `&version=1.1.0&request=GetFeature&typeName=${options.featureType}&outputFormat=application/json`,
-        `&srsname=${options.projectionCode}`].join('');
+        `&srsname=${options.projectionCode}`
+      ].join('');
       url += options.strategy === 'all' ? queryFilter : `${queryFilter + extent.join(',')},${bboxProjectionCode}`;
       url = encodeURI(url);
-
-      fetch(url).then(response => response.json({
-        cache: false
-      })).then((data) => {
-        vectorSource.addFeatures(vectorSource.getFormat().readFeatures(data));
-      });
+      fetch(url)
+        .then(response => wfsErrorHelper.checkJSON(response, { cache: false }))
+        .then(response => wfsErrorHelper.checkResponse(response, vectorSource));
     },
     strategy: options.loadingstrategy
   });
