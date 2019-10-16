@@ -9,14 +9,9 @@ export default function Footer(options = {}) {
   return Component({
     render: function render() {
       let middleContent = '';
-      if (data.img) {
-        middleContent = `<img src="${data.img}">`;
-      } else if (data.url && data.urlText) {
-        middleContent = `<a href="${data.url}">${data.urlText}</a>">`;
-      } else if (data.text) {
-        middleContent = `<p>${data.text}</p>`;
-      }
-
+      middleContent += data.img ? `<img src="${data.img}" />` : '';
+      middleContent += data.text ? `<p>${data.text}</p>` : '';
+      middleContent = data.url ? `<a href="${data.url}" target="_blank">${middleContent}</a>` : middleContent;
       return `<div id=${this.getId()} class="o-footer relative ${cls}">
                 <div id="o-console" class="o-footer-left">&nbsp;</div>
                 <div class="o-footer-middle">
