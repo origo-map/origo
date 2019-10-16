@@ -23,7 +23,6 @@ function getAddedLayers(layers) {
   
   const addedLayers = [];
   layers.forEach((layer) => {
-    console.log(layer)
     const addedLayer = {
     name: layer.get('name'),
     abstract: layer.get('abstract'),
