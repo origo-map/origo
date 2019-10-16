@@ -29,7 +29,8 @@ export default function (feature, layer, map) {
         title = '';
         val = '';
         if (attribute.name) {
-          if (feature.get(attribute.name)) {
+          const featureValue = feature.get(attribute.name) === 0 ? feature.get(attribute.name).toString() : feature.get(attribute.name);
+          if (featureValue) {
             val = feature.get(attribute.name);
             if (attribute.title) {
               title = `<b>${attribute.title}</b>`;
