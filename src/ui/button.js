@@ -51,7 +51,7 @@ export default function Button(options = {}) {
 
   const getInnerHTML = () => {
     if (iconComponent && text) {
-      return `<span class="flex row align-center">
+      return `<span class="flex row align-center justify-space-between">
                 <span class="${textCls} margin-right-small">${text}</span>
                 <span class="icon ${iconCls}">${iconComponent.render()}</span>
               </span>`;

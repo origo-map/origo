@@ -69,7 +69,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
   const footerData = pageSettings.footer || {};
   const main = Main();
   const footer = Footer({
-    footerData
+    data: footerData
   });
   let mapSize;
 
