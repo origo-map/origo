@@ -105,9 +105,12 @@ svg {
   &.primary {
     fill: $icon-primary-color;
   }
+  &.primary-inverse {
+    fill: $icon-primary-inverse-color;
+  }
   &.grey-dark {
     fill: $grey-dark;
-  }  
+  }
   &.grey {
     fill: $grey;
   }
@@ -119,7 +122,10 @@ svg {
   }
   &.grey-lightest {
     fill: $grey-lightest;
-  }       
+  }
+  &.white {
+    fill: $white;
+  }
 }
 
 img.cover {
