@@ -32,7 +32,7 @@ const Home = function Home(options = {}) {
     },
     onInit() {
       homeButton = Button({
-        cls: 'o-home-in padding-small icon-smaller rounded light box-shadow',
+        cls: 'o-home-in padding-small icon-smaller round light box-shadow',
         click() {
           zoomToHome();
         },
