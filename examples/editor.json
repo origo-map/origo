@@ -28,16 +28,14 @@
         "autoSave": false,
         "defaultLayer": "editor_polygon",
         "drawTools": {
-          "Polygon": [
-            "box"
-          ]
+          "Polygon": ["box"]
         }
       }
     },
     {
       "name": "legend",
       "options": {
-        "expanded": false
+          "expanded": false
       }
     }
   ],
@@ -49,11 +47,11 @@
     8775797.92
   ],
   "proj4Defs": [
-    {
-      "code": "EPSG:3010",
-      "alias": "urn:ogc:def:crs:EPSG::3010",
-      "projection": "+proj=tmerc +lat_0=0 +lon_0=16.5 +k=1 +x_0=150000 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
-    }
+      {
+          "code": "EPSG:3010",
+          "alias": "urn:ogc:def:crs:EPSG::3010",
+          "projection": "+proj=tmerc +lat_0=0 +lon_0=16.5 +k=1 +x_0=150000 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
+      }
   ],
   "extent": [
     -1678505.1838360203,
@@ -118,35 +116,35 @@
       "visible": true,
       "offline": true,
       "attributes": [
-        {
-          "name": "name",
-          "title": "Name: ",
-          "type": "text",
-          "maxLength": 50
-        },
-        {
-          "name": "type",
-          "title": "Type: ",
-          "type": "dropdown",
-          "maxLength": 30,
-          "options": [
-            "Appartement",
-            "Villa",
-            "Townhouse",
-            "Mansion"
-          ]
-        },
-        {
-          "name": "comments",
-          "title": "Comments: ",
-          "type": "textarea",
-          "textarea": 254
-        },
-        {
-          "name": "highlight",
-          "title": "Highlight: ",
-          "type": "checkbox"
-        }
+          {
+            "name": "name",
+            "title": "Name: ",
+            "type": "text",
+            "maxLength": 50
+          },
+          {
+            "name": "type",
+            "title": "Type: ",
+            "type": "dropdown",
+            "maxLength": 30,
+            "options": [
+                "Appartement",
+                "Villa",
+                "Townhouse",
+                "Mansion"
+            ]
+          },
+          {
+            "name": "comments",
+            "title": "Comments: ",
+            "type": "textarea",
+            "textarea": 254
+          },
+          {
+            "name": "highlight",
+            "title": "Highlight: ",
+            "type": "checkbox"
+          }
       ]
     },
     {
@@ -161,35 +159,35 @@
       "type": "WFS",
       "visible": true,
       "attributes": [
-        {
-          "name": "name",
-          "title": "Name: ",
-          "type": "text",
-          "maxLength": 50
-        },
-        {
-          "name": "type",
-          "title": "Type: ",
-          "type": "dropdown",
-          "maxLength": 30,
-          "options": [
-            "Path",
-            "Road",
-            "Highway",
-            "Bicycle path"
-          ]
-        },
-        {
-          "name": "comments",
-          "title": "Comments: ",
-          "type": "textarea",
-          "textarea": 254
-        },
-        {
-          "name": "highlight",
-          "title": "Highlight: ",
-          "type": "checkbox"
-        }
+          {
+            "name": "name",
+            "title": "Name: ",
+            "type": "text",
+            "maxLength": 50
+          },
+          {
+            "name": "type",
+            "title": "Type: ",
+            "type": "dropdown",
+            "maxLength": 30,
+            "options": [
+                "Path",
+                "Road",
+                "Highway",
+                "Bicycle path"
+            ]
+          },
+          {
+            "name": "comments",
+            "title": "Comments: ",
+            "type": "textarea",
+            "textarea": 254
+          },
+          {
+            "name": "highlight",
+            "title": "Highlight: ",
+            "type": "checkbox"
+          }
       ]
     },
     {
@@ -204,29 +202,29 @@
       "type": "WFS",
       "visible": true,
       "attributes": [
-        {
-          "name": "name",
-          "title": "Name: ",
-          "type": "text",
-          "maxLength": 50
-        },
-        {
-          "name": "type",
-          "title": "Type: ",
-          "type": "dropdown",
-          "maxLength": 30,
-          "options": [
-            "Restaurant",
-            "Café",
-            "B&B"
-          ]
-        },
-        {
-          "name": "comments",
-          "title": "Comments: ",
-          "type": "textarea",
-          "textarea": 254
-        }
+          {
+            "name": "name",
+            "title": "Name: ",
+            "type": "text",
+            "maxLength": 50
+          },
+          {
+            "name": "type",
+            "title": "Type: ",
+            "type": "dropdown",
+            "maxLength": 30,
+            "options": [
+                "Restaurant",
+                "Café",
+                "B&B"
+            ]
+          },
+          {
+            "name": "comments",
+            "title": "Comments: ",
+            "type": "textarea",
+            "textarea": 254
+          }
       ]
     },
     {
@@ -253,98 +251,98 @@
     }
   ],
   "styles": {
-    "mask": [
-      [
-        {
-          "stroke": {
-            "color": "rgba(0,0,0,1.0)"
-          },
-          "fill": {
-            "color": "rgba(0,0,0,1.0)"
-          }
-        }
-      ]
-    ],
-    "polygon-blue": [
-      [
-        {
-          "stroke": {
-            "color": "rgba(0,122,255,1.0)"
-          },
-          "fill": {
-            "color": "rgba(0,122,255,0.5)"
-          }
-        }
-      ]
-    ],
-    "line-red": [
-      [
-        {
-          "stroke": {
-            "color": "rgba(255,59,48,1.0)",
-            "width": 3
-          }
-        }
-      ]
-    ],
-    "cirkel": [
-      [
-        {
-          "circle": {
-            "radius": 6,
+      "mask": [
+        [
+          {
             "stroke": {
-              "color": "rgba(0,0,0,1)",
-              "width": 2
+              "color": "rgba(0,0,0,1.0)"
             },
             "fill": {
-              "color": "rgba(0,0,0,0.5)"
+              "color": "rgba(0,0,0,1.0)"
             }
           }
-        }
-      ]
-    ],
-    "circle-yellow": [
-      [
-        {
-          "circle": {
-            "radius": 6,
+        ]
+      ],
+      "polygon-blue": [
+        [
+          {
             "stroke": {
-              "color": "rgba(255,204,0,1)",
-              "width": 2
+              "color": "rgba(0,122,255,1.0)"
             },
             "fill": {
-              "color": "rgba(255,204,0,0.5)"
+              "color": "rgba(0,122,255,0.5)"
             }
           }
-        }
-      ]
-    ],
-    "karta_gra": [
-      [
-        {
-          "image": {
-            "src": "img/png/gra.png"
+        ]
+      ],
+      "line-red": [
+        [
+          {
+            "stroke": {
+              "color": "rgba(255,59,48,1.0)",
+              "width": 3
+            }
           }
-        }
-      ]
-    ],
-    "karta_farg": [
-      [
-        {
-          "image": {
-            "src": "img/png/farg.png"
+        ]
+      ],
+      "cirkel": [
+        [
+          {
+            "circle": {
+              "radius": 6,
+              "stroke": {
+                "color": "rgba(0,0,0,1)",
+                "width": 2
+              },
+              "fill": {
+                "color": "rgba(0,0,0,0.5)"
+              }
+            }
           }
-        }
-      ]
-    ],
-    "orto": [
-      [
-        {
-          "image": {
-            "src": "img/png/orto.png"
+        ]
+      ],
+      "circle-yellow": [
+        [
+          {
+            "circle": {
+              "radius": 6,
+              "stroke": {
+                "color": "rgba(255,204,0,1)",
+                "width": 2
+              },
+              "fill": {
+                "color": "rgba(255,204,0,0.5)"
+              }
+            }
           }
-        }
+        ]
+      ],
+      "karta_gra": [
+        [
+          {
+            "image": {
+              "src": "img/png/gra.png"
+            }
+          }
+        ]
+      ],
+      "karta_farg": [
+        [
+          {
+            "image": {
+              "src": "img/png/farg.png"
+            }
+          }
+        ]
+      ],
+      "orto": [
+        [
+          {
+            "image": {
+              "src": "img/png/orto.png"
+            }
+          }
+        ]
       ]
-    ]
   }
 }
