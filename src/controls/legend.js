@@ -174,10 +174,11 @@ const Legend = function Legend(options = {}) {
           }
         }
       });
+      const closeButtonState = isExpanded ? 'initial' : 'hidden';
       closeButton = Button({
-        cls: `control icon-smaller small round absolute margin-bottom-small margin-right-small grey-lightest bottom-right`,
+        cls: `icon-smaller small round absolute margin-bottom margin-right grey-lightest bottom-right z-index-top`,
         icon: '#ic_close_24px',
-        state: 'hidden',
+        state: closeButtonState,
         validStates: ['initial', 'hidden'],
         click() {
           toggleVisibility();
