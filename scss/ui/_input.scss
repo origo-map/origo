@@ -74,7 +74,6 @@ input[type=range]::-webkit-slider-runnable-track {
   height: 4px;
   cursor: pointer;
   animate: 0.2s;
-  box-shadow: 1px 1px 5px $grey-dark;
   background: $primary-color;
   border-radius: 3px;
 }
@@ -96,7 +95,6 @@ input[type=range]::-moz-range-track {
   height: 4px;
   cursor: pointer;
   animate: 0.2s;
-  box-shadow: 1px 1px 5px $grey-dark;
   background: $primary-color;
   border-radius: 3px;
 }
@@ -120,12 +118,10 @@ input[type=range]::-ms-track {
 input[type=range]::-ms-fill-lower {
   background: $primary-color;
   border-radius: 6px;
-  box-shadow: 1px 1px 5px $grey-dark;
 }
 input[type=range]::-ms-fill-upper {
   background: $primary-color;
   border-radius: 6px;
-  box-shadow: 1px 1px 5px $grey-dark;
 }
 input[type=range]::-ms-thumb {
   margin-top: 1px;
