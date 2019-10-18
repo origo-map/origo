@@ -11,7 +11,7 @@ const createElement = function createElement(type, content, options) {
         const style = createStyle(settings.style);
         el.setAttribute('style', style);
       } else if (prop === 'cls') {
-        const clsList = settings.cls.split(' ');
+        const clsList = settings.cls.trim().split(' ');
         clsList.forEach(cls => el.classList.add(cls));
       } else if (prop === 'data') {
         const dataProps = addKeyPrefix('data-', settings.data);

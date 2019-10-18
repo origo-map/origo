@@ -129,6 +129,33 @@ const Overlays = function Overlays(options) {
     return overlays.reverse();
   };
 
+  const emptyGroupCheck = function emptyGroupCheck(groupName) {
+    let isEmpty = true;
+    const group = viewer.getGroups().find(item => item.name === groupName);
+    if (group) {
+      if (viewer.getLayersByProperty('group', groupName).length > 0) {
+        return false;
+      }
+    }
+    const subgroups = viewer.getGroups().filter((item) => {
+      if (item.parent) {
+        return item.parent === groupName;
+      }
+      return false;
+    });
+    if (subgroups.length) {
+      for (let subgroup of subgroups) {
+        const name = subgroup.name;
+        const subgroupEmpty = emptyGroupCheck(name);
+        if (!subgroupEmpty) {
+          isEmpty = false;
+          break;
+        }
+      }
+    }
+    return isEmpty;
+  };
+
   // Hide overlays container when empty
   const onChangeLayer = function onChangeLayer() {
     const oldNrOverlays = overlays.length;
@@ -153,6 +180,7 @@ const Overlays = function Overlays(options) {
       const groupCmp = groupCmps.find(cmp => cmp.name === groupName);
       if (groupCmp) {
         groupCmp.addOverlay(overlay);
+        document.getElementById(groupCmp.getId()).classList.remove('hidden');
       }
     }
   };
@@ -192,6 +220,9 @@ const Overlays = function Overlays(options) {
       const groupCmp = groupCmps.find(cmp => cmp.name === groupName);
       if (groupCmp) {
         groupCmp.removeOverlay(layerName);
+        if (emptyGroupCheck(groupName)) {
+          document.getElementById(groupCmp.getId()).classList.add('hidden');
+        }
       }
     } else {
       rootGroup.removeOverlay(layerName);
