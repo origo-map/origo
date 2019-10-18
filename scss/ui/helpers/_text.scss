@@ -3,6 +3,7 @@ $text-grey-dark: $grey-darker;
 $text-grey: $grey;
 $text-grey-light: $grey-light;
 $text-grey-ligthter: $grey-lighter;
+$text-smallest: $font-size-smallest;
 $text-smaller: $font-size-smaller;
 $text-small: $font-size-small;
 $text-normal: $font-size-normal;
@@ -67,6 +68,10 @@ $text-fade-background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(25
 }
 
 // font size
+.text-smallest {
+  font-size: $text-smallest;
+  line-height: $text-height-smallest;
+}
 .text-smaller {
   font-size: $text-smaller;
   line-height: $text-height-smaller;
@@ -146,7 +151,7 @@ $text-fade-background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(25
   line-height: $text-height-normal;
   &.text-fade:after {
     height: $text-height-normal;
-  }  
+  }
 }
 .text-height-small {
   line-height: $text-height-small;
