@@ -3,7 +3,7 @@ import Point from 'ol/geom/Point';
 import Awesomplete from 'awesomplete';
 import { Component, Element as El, Button, dom } from '../ui';
 import generateUUID from '../utils/generateuuid';
-import getAttributes from '../getattributes';
+import { getAttributes } from '../getattributes';
 import getCenter from '../geometry/getcenter';
 import getFeature from '../getfeature';
 import mapUtils from '../maputils';

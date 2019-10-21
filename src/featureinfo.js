@@ -10,6 +10,7 @@ import Style from './style';
 import StyleTypes from './style/styletypes';
 import getFeatureInfo from './getfeatureinfo';
 import replacer from '../src/utils/replacer';
+import { addAttributeType } from './getattributes';
 
 const styleTypes = StyleTypes();
 
@@ -254,6 +255,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     getPin,
     getSelectionLayer,
     getSelection,
+    addAttributeType,
     onAdd(e) {
       viewer = e.target;
       const map = viewer.getMap();

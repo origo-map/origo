@@ -1,4 +1,9 @@
+import { Feature as olFeature } from 'ol';
+import * as olGeom from 'ol/geom';
 import * as olInteraction from 'ol/interaction';
+import * as olLayer from 'ol/layer';
+import * as olSource from 'ol/source';
+import * as olStyle from 'ol/style';
 import polyfill from './src/utils/polyfill';
 import * as ui from './src/ui';
 import Viewer from './src/viewer';
@@ -9,6 +14,7 @@ import supports from './src/utils/supports';
 import renderError from './src/utils/rendererror';
 import Style from './src/style';
 import featurelayer from './src/featurelayer';
+import * as ol from 'ol';
 
 const Origo = function Origo(configPath, options = {}) {
   const origoConfig = {
@@ -81,6 +87,11 @@ Origo.ui = ui;
 Origo.Style = Style;
 Origo.featurelayer = featurelayer;
 Origo.ol = [];
+Origo.ol.geom = olGeom;
 Origo.ol.interaction = olInteraction;
+Origo.ol.layer = olLayer;
+Origo.ol.source = olSource;
+Origo.ol.style = olStyle;
+Origo.ol.Feature = olFeature;
 
 export default Origo;
