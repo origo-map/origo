@@ -187,6 +187,10 @@ const Featureinfo = function Featureinfo(options = {}) {
           content,
           title: items[0].title
         });
+        const contentDiv = document.getElementById('o-identify-carousel');
+        items.forEach((item) => {
+          contentDiv.appendChild(item.content);
+        });
         sidebar.setVisibility(true);
         initCarousel('#o-identify-carousel');
         break;
