@@ -409,7 +409,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
               const obj = {};
               obj.feature = feature;
               obj.title = layer.get('title');
-              obj.content = getattributes(feature, layer);
+              obj.content = getAttributes(feature, layer);
               obj.layer = layer;
               const centerGeometry = getcenter(feature.getGeometry());
               featureinfo.render([obj], 'overlay', centerGeometry);
