@@ -13,19 +13,19 @@ const getContent = {
     let val = '';
     let title = '';
     if (feature.get(attribute.name)) {
-            const featureValue = feature.get(attribute.name) === 0 ? feature.get(attribute.name).toString() : feature.get(attribute.name);
-            if (featureValue) {
-              val = feature.get(attribute.name);
-              if (attribute.title) {
-        title = `<b>${attribute.title}</b>`;
-      }
-      if (attribute.url) {
-        if (feature.get(attribute.url)) {
-          const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.url), feature.getProperties(), null, map));
-          val = `<a href="${url}" target="_blank">${feature.get(attribute.name)}</a>`;
+      const featureValue = feature.get(attribute.name) === 0 ? feature.get(attribute.name).toString() : feature.get(attribute.name);
+      if (featureValue) {
+        val = feature.get(attribute.name);
+        if (attribute.title) {
+          title = `<b>${attribute.title}</b>`;
+        }
+        if (attribute.url) {
+          if (feature.get(attribute.url)) {
+            const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.url), feature.getProperties(), null, map));
+            val = `<a href="${url}" target="_blank">${feature.get(attribute.name)}</a>`;
+          }
         }
       }
-    }
     }
     const newElement = document.createElement('li');
     newElement.classList.add(attribute.cls);
@@ -56,7 +56,7 @@ const getContent = {
     newElement.innerHTML = val;
     return newElement;
   },
-  html(feature, attribute, attributes, map) {
+  html(feature, attribute, attributes) {
     const val = replacer.replace(attribute.html, attributes, {
       helper: geom,
       helperArg: feature.getGeometry()
@@ -96,8 +96,8 @@ function getAttributes(feature, layer, map) {
     // If attributes is string then use template named with the string
     if (typeof layer.get('attributes') === 'string') {
       // Use attributes with the template
-  const li = featureinfotemplates('attributes', attributes);
-  content = `<div class="o-identify-content"><ul>${li}</ul></div>`;
+      const li = featureinfotemplates('attributes', attributes);
+      content = `<div class="o-identify-content"><ul>${li}</ul></div>`;
     } else {
       for (let i = 0; i < layer.get('attributes').length; i += 1) {
         attribute = layer.get('attributes')[i];
@@ -119,14 +119,14 @@ function getAttributes(feature, layer, map) {
           }
         }
       }
-  content = featureinfoElement;
+      content = featureinfoElement;
     }
   } else {
     // Use attributes with the template
-  const li = featureinfotemplates('default', attributes);
-  content = `<div class="o-identify-content"><ul>${li}</ul></div>`;
+    const li = featureinfotemplates('default', attributes);
+    content = `<div class="o-identify-content"><ul>${li}</ul></div>`;
   }
-  return content.outerHTML;
+  return content;
 }
 
 export { getAttributes, addAttributeType };

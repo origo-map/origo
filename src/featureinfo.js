@@ -39,11 +39,11 @@ const Featureinfo = function Featureinfo(options = {}) {
   let savedPin = savedPinOptions ? maputils.createPointFeature(savedPinOptions, pinStyle) : undefined;
   const savedFeature = savedPin || savedSelection || undefined;
 
-  function setUIoutput(viewer){
+  function setUIoutput(v) {
     if (showOverlay) {
       identifyTarget = 'overlay';
     } else {
-      sidebar.init(viewer);
+      sidebar.init(v);
       identifyTarget = 'sidebar';
     }
   }
@@ -149,7 +149,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     items = identifyItems;
     clear();
     let content = items.map(i => i.content).join('');
-    content = `<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme">${content}</div></div>`;
+    content = '<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme"></div></div>';
     switch (target) {
       case 'overlay':
       {
@@ -157,6 +157,10 @@ const Featureinfo = function Featureinfo(options = {}) {
         popup.setContent({
           content,
           title: items[0].title
+        });
+        const contentDiv = document.getElementById('o-identify-carousel');
+        items.forEach((item) => {
+          contentDiv.appendChild(item.content);
         });
         popup.setVisibility(true);
         initCarousel('#o-identify-carousel');
