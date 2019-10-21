@@ -27,6 +27,10 @@
   width: 100% !important;
 }
 
+.height-125 {
+  height: 1.25rem;
+}
+
 .width-4 {
   @include absolute-width($base-size, 4);
 }

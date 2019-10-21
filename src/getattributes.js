@@ -28,47 +28,48 @@ export default function (feature, layer, map) {
         attribute = layer.get('attributes')[i];
         title = '';
         val = '';
-        if (attribute.name) {
-          if (feature.get(attribute.name)) {
-            val = feature.get(attribute.name);
-            if (attribute.title) {
-              title = `<b>${attribute.title}</b>`;
-            }
-            if (attribute.url) {
-              if (feature.get(attribute.url)) {
-                const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.url), feature.getProperties(), null, map));
-                val = `<a href="${url}" target="_blank">
+        if (attribute.type !== 'hidden') {
+          if (attribute.name) {
+            const featureValue = feature.get(attribute.name) === 0 ? feature.get(attribute.name).toString() : feature.get(attribute.name);
+            if (featureValue) {
+              val = feature.get(attribute.name);
+              if (attribute.title) {
+                title = `<b>${attribute.title}</b>`;
+              }
+              if (attribute.url) {
+                if (feature.get(attribute.url)) {
+                  const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.url), feature.getProperties(), null, map));
+                  val = `<a href="${url}" target="_blank">
                   ${feature.get(attribute.name)}
                   </a>`;
+                }
               }
             }
-          }
-        } else if (attribute.url) {
-          if (feature.get(attribute.url)) {
-            const text = attribute.html || attribute.url;
-            const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.url), attributes, null, map));
-            val = `<a href="${url}" target="_blank">
+          } else if (attribute.url) {
+            if (feature.get(attribute.url)) {
+              const text = attribute.html || attribute.url;
+              const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.url), attributes, null, map));
+              val = `<a href="${url}" target="_blank">
               ${text}
               </a>`;
-          }
-        } else if (attribute.img) {
-          if (feature.get(attribute.img)) {
-            const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.img), attributes, null, map));
-            const attribution = attribute.attribution ? `<div class="o-image-attribution">${attribute.attribution}</div>` : '';
-            val = `<div class="o-image-container">
+            }
+          } else if (attribute.img) {
+            if (feature.get(attribute.img)) {
+              const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.img), attributes, null, map));
+              const attribution = attribute.attribution ? `<div class="o-image-attribution">${attribute.attribution}</div>` : '';
+              val = `<div class="o-image-container">
               <img src="${url}">${attribution}
               </div>`;
+            }
+          } else if (attribute.html) {
+            val = replacer.replace(attribute.html, attributes, {
+              helper: geom,
+              helperArg: feature.getGeometry()
+            }, map);
           }
-        } else if (attribute.html) {
-          val = replacer.replace(attribute.html, attributes, {
-            helper: geom,
-            helperArg: feature.getGeometry()
-          }, map);
+          const cls = ` class="${attribute.cls}" ` || '';
+          li += `<li${cls}>${title}${val}</li>`;
         }
-
-        const cls = ` class="${attribute.cls}" ` || '';
-
-        li += `<li${cls}>${title}${val}</li>`;
       }
     }
   } else {
