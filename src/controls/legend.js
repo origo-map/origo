@@ -26,7 +26,7 @@ const Legend = function Legend(options = {}) {
   let layerButtonEl;
   let isExpanded;
   let getLegendGraphics;
-  let overlaysCmp;
+  let overlaysCmp;  
   const cls = `${clsSettings} control bottom-right box overflow-hidden flex row o-legend`.trim();
   const style = dom.createStyle(Object.assign({}, { width: 'auto' }, styleSettings));
 
@@ -135,11 +135,13 @@ const Legend = function Legend(options = {}) {
         cls: 'spacing-horizontal-small'
       });
 
+      overlaysCmp = Overlays({ viewer, cls: contentCls, style: contentStyle });
       //Initialize EK_getLegendGraphics component
 
       getLegendGraphics = GetLegendGraphics({viewer});
       
       var that = this
+      
       Promise.all(getIfThemeLayer(viewer, viewer.getLayers())).then(function (themeInfos) {
 
         viewer.getMap().getLayers().forEach((layer) => {
@@ -152,8 +154,10 @@ const Legend = function Legend(options = {}) {
         that.render();
         that.dispatch('render');
       }, function (err) {
-        console.error("ERROR: ", err)
-      })
+        console.warn("warn: ", err)
+        that.render();
+        that.dispatch('render');
+      });
     },
     onRender() {
       mainContainerEl = document.getElementById(mainContainerCmp.getId());
@@ -173,7 +177,7 @@ const Legend = function Legend(options = {}) {
       isExpanded = !size && expanded;
       target = document.getElementById(viewer.getMain().getId());
       const maxHeight = calcMaxHeight(getTargetHeight());
-      overlaysCmp = Overlays({ viewer, cls: contentCls, style: contentStyle });
+      
       const baselayerCmps = addControl ? [toggleGroup, divider, turnOffLayersButton] : [toggleGroup];
       const baselayersCmp = El({
         cls: 'flex padding-small no-shrink',
