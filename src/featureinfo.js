@@ -10,7 +10,8 @@ import Style from './style';
 import StyleTypes from './style/styletypes';
 import getFeatureInfo from './getfeatureinfo';
 import replacer from '../src/utils/replacer';
-import { addAttributeType } from './getattributes';
+import { getContent } from './getattributes';
+//import { addAttributeType } from './getattributes';
 
 const styleTypes = StyleTypes();
 
@@ -142,6 +143,11 @@ const Featureinfo = function Featureinfo(options = {}) {
 
   const getHitTolerance = function getHitTolerance() {
     return hitTolerance;
+  };
+
+  const addAttributeType = function addAttributeType(attributeType, fn) {
+    getContent[attributeType] = fn;
+    return getContent;
   };
 
   const render = function render(identifyItems, target, coordinate) {

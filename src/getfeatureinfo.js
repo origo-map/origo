@@ -1,7 +1,7 @@
 import EsriJSON from 'ol/format/EsriJSON';
 import $ from 'jquery';
 import maputils from './maputils';
-import { getAttributes } from './getattributes';
+import getAttributes from './getattributes';
 
 function getGetFeatureInfoUrl({
   coordinate,

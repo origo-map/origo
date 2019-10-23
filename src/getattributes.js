@@ -68,11 +68,6 @@ const getContent = {
   }
 };
 
-function addAttributeType(attributeType, fn) {
-  getContent[attributeType] = fn;
-  return getContent;
-}
-
 function customAttribute(feature, attribute, attributes, map) {
   if (getContent[Object.keys(attribute)[0]]) {
     return getContent[Object.keys(attribute)[0]](feature, attribute, attributes, map);
@@ -97,7 +92,9 @@ function getAttributes(feature, layer, map) {
     if (typeof layer.get('attributes') === 'string') {
       // Use attributes with the template
       const li = featureinfotemplates('attributes', attributes);
-      content = `<div class="o-identify-content"><ul>${li}</ul></div>`;
+      if (li instanceof HTMLLIElement) {
+        ulList.appendChild(li);
+      }
     } else {
       for (let i = 0; i < layer.get('attributes').length; i += 1) {
         attribute = layer.get('attributes')[i];
@@ -124,9 +121,12 @@ function getAttributes(feature, layer, map) {
   } else {
     // Use attributes with the template
     const li = featureinfotemplates('default', attributes);
-    content = `<div class="o-identify-content"><ul>${li}</ul></div>`;
+    if (li instanceof HTMLLIElement) {
+      ulList.appendChild(li);
+    }
   }
+  content = featureinfoElement;
   return content;
 }
 
-export { getAttributes, addAttributeType };
+export { getAttributes as default, addAttributeType, getContent };
