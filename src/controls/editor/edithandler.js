@@ -405,23 +405,21 @@ function addImageListener() {
   const fn = (obj) => {
     const fileReader = new FileReader();
     const containerClass = `.${obj.elId.slice(1)}`;
-    $(obj.elId).on('change', () => {
-      $(`${containerClass} img`).removeClass('o-hidden');
-      $(`${containerClass} input[type=button]`).removeClass('o-hidden');
-
-      if (this.files && this.files[0]) {
+    $(obj.elId).on('change', (ev) => {
+      if (ev.target.files && ev.target.files[0]) {
+        $(`${containerClass} img`).removeClass('o-hidden');
+        $(`${containerClass} input[type=button]`).removeClass('o-hidden');
         fileReader.onload = (e) => {
           $(`${containerClass} img`).attr('src', e.target.result);
         };
-
-        fileReader.readAsDataURL(this.files[0]);
+        fileReader.readAsDataURL(ev.target.files[0]);
       }
     });
 
-    $(`${containerClass} input[type=button]`).on('click', () => {
+    $(`${containerClass} input[type=button]`).on('click', (e) => {
       $(obj.elId).attr('value', '');
       $(`${containerClass} img`).addClass('o-hidden');
-      $(this).addClass('o-hidden');
+      $(e.target).addClass('o-hidden');
     });
   };
 

@@ -21,6 +21,7 @@ const Legend = function Legend(options = {}) {
   const backgroundLayerButtons = [];
   let toggleGroup;
   let layerSwitcherEl;
+  let closeButton;
   let layerButton;
   let layerButtonEl;
   let isExpanded;
@@ -121,11 +122,13 @@ const Legend = function Legend(options = {}) {
       layerSwitcherEl.classList.remove('fade-in');
       layerButtonEl.classList.add('fade-in');
       layerButtonEl.classList.remove('fade-out');
+      closeButton.setState('hidden');
     } else {
       layerSwitcherEl.classList.remove('fade-out');
       layerSwitcherEl.classList.add('fade-in');
       layerButtonEl.classList.remove('fade-out');
       layerButtonEl.classList.add('fade-in');
+      closeButton.setState('initial');
     }
     layerButtonEl.classList.toggle('faded');
     layerSwitcherEl.classList.toggle('faded');
@@ -181,7 +184,8 @@ const Legend = function Legend(options = {}) {
         cls: 'flex padding-small no-shrink',
         style: {
           'background-color': '#fff',
-          height: '50px'
+          height: '50px',
+          'margin-right': '30px'
         },
         components: baselayerCmps
       });
@@ -214,8 +218,21 @@ const Legend = function Legend(options = {}) {
           }
         }
       });
+      const closeButtonState = isExpanded ? 'initial' : 'hidden';
+      closeButton = Button({
+        cls: `icon-smaller small round absolute margin-bottom margin-right grey-lightest bottom-right z-index-top`,
+        icon: '#ic_close_24px',
+        state: closeButtonState,
+        validStates: ['initial', 'hidden'],
+        click() {
+          toggleVisibility();
+        }
+      });
       this.addComponent(layerButton);
-      const el = dom.html(layerButton.render());
+      this.addComponent(closeButton);
+      let el = dom.html(layerButton.render());
+      target.appendChild(el);
+      el = dom.html(closeButton.render());
       target.appendChild(el);
     }
   });
