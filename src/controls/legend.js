@@ -151,6 +151,8 @@ const Legend = function Legend(options = {}) {
         });
         that.render();
         that.dispatch('render');
+      }, function (err) {
+        console.error("ERROR: ", err)
       })
     },
     onRender() {
