@@ -11,7 +11,6 @@ import StyleTypes from './style/styletypes';
 import getFeatureInfo from './getfeatureinfo';
 import replacer from '../src/utils/replacer';
 import { getContent } from './getattributes';
-//import { addAttributeType } from './getattributes';
 
 const styleTypes = StyleTypes();
 

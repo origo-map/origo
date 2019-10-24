@@ -83,23 +83,29 @@ function getAttributes(feature, layer, map) {
   const attributes = feature.getProperties();
   const geometryName = feature.getGeometryName();
   delete attributes[geometryName];
-  let content = '<div class="o-identify-content"><ul>';
+  let content;
   let attribute;
   let val;
+  const layerAttributes = layer.get('attributes');
   // If layer is configured with attributes
-  if (layer.get('attributes')) {
+  if (layerAttributes) {
     // If attributes is string then use template named with the string
-    if (typeof layer.get('attributes') === 'string') {
+    if (typeof layerAttributes === 'string') {
       // Use attributes with the template
-      const li = featureinfotemplates('attributes', attributes);
-      if (li instanceof HTMLLIElement) {
-        ulList.appendChild(li);
-      }
+      const li = featureinfotemplates(layerAttributes, attributes);
+      const templateList = document.createElement('ul');
+      featureinfoElement.appendChild(templateList);
+      templateList.innerHTML = li;
     } else {
-      for (let i = 0; i < layer.get('attributes').length; i += 1) {
+      for (let i = 0; i < layerAttributes.length; i += 1) {
         attribute = layer.get('attributes')[i];
         val = '';
-        if (attribute.type !== 'hidden') {
+        if (attribute.template) {
+          const li = featureinfotemplates(attribute.template, attributes);
+          const templateList = document.createElement('ul');
+          featureinfoElement.appendChild(templateList);
+          templateList.innerHTML = li;
+        } else if (attribute.type !== 'hidden') {
           if (attribute.name) {
             val = getContent.name(feature, attribute, attributes, map);
           } else if (attribute.url) {
@@ -121,12 +127,12 @@ function getAttributes(feature, layer, map) {
   } else {
     // Use attributes with the template
     const li = featureinfotemplates('default', attributes);
-    if (li instanceof HTMLLIElement) {
-      ulList.appendChild(li);
-    }
+    const templateList = document.createElement('ul');
+    featureinfoElement.appendChild(templateList);
+    templateList.innerHTML = li;
   }
   content = featureinfoElement;
   return content;
 }
 
-export { getAttributes as default, addAttributeType, getContent };
+export { getAttributes as default, getContent };
