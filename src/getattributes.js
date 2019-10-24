@@ -46,7 +46,8 @@ const getContent = {
   },
   img(feature, attribute, attributes, map) {
     let val = '';
-    if (feature.get(attribute.img)) {
+    const featGet = attribute.img ? feature.get(attribute.img) : feature.get(attribute.name);
+    if (featGet) {
       const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.img), attributes, null, map));
       const attribution = attribute.attribution ? `<div class="o-image-attribution">${attribute.attribution}</div>` : '';
       val = `<div class="o-image-container"><img src="${url}">${attribution}</div>`;
@@ -110,7 +111,7 @@ function getAttributes(feature, layer, map) {
             val = getContent.name(feature, attribute, attributes, map);
           } else if (attribute.url) {
             val = getContent.url(feature, attribute, attributes, map);
-          } else if (attribute.img) {
+          } else if (attribute.img || attribute.type === 'image') {
             val = getContent.img(feature, attribute, attributes, map);
           } else if (attribute.html) {
             val = getContent.html(feature, attribute, attributes, map);

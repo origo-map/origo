@@ -20,7 +20,7 @@ const Fullscreen = function Fullscreen(options = {}) {
     onAdd(evt) {
       viewer = evt.target;
       fullscreenButton = Button({
-        cls: 'o-home-in padding-small icon-smaller rounded light box-shadow',
+        cls: 'o-home-in padding-small icon-smaller round light box-shadow',
         click() {
           goFullScreen();
         },
