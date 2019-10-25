@@ -108,7 +108,8 @@ const Legend = function Legend(options = {}) {
       viewer.dispatch('active:turnofflayers');
     },
     style: {
-      'align-self': 'center'
+      'align-self': 'center',
+      'padding-right': '6px'
     },
     icon: '#ic_visibility_off_24px',
     iconStyle: {
@@ -172,13 +173,13 @@ const Legend = function Legend(options = {}) {
       const maxHeight = calcMaxHeight(getTargetHeight());
       const overlaysCmp = Overlays({ viewer, cls: contentCls, style: contentStyle });
       const baselayerCmps = [toggleGroup];
-      if (turnOffLayersControl) {
-        baselayerCmps.push(divider);
-        baselayerCmps.push(turnOffLayersButton);
-      }
+      const toolsCmps = [];
       if (layerManagerControl) {
         baselayerCmps.push(secondDivider);
-        baselayerCmps.push(addButton);
+        toolsCmps.push(addButton);
+      }
+      if (turnOffLayersControl) {
+        toolsCmps.push(turnOffLayersButton);
       }
       const baselayersCmp = El({
         cls: 'flex padding-small no-shrink',
@@ -189,9 +190,19 @@ const Legend = function Legend(options = {}) {
         },
         components: baselayerCmps
       });
+      const toolsCmp = El({
+        cls: 'flex padding-small no-shrink',
+        style: {
+          'background-color': '#fff',
+          'justify-content': 'flex-end',
+          height: '40px',
+          'border-bottom': '1px solid #dbdbdb'
+        },
+        components: toolsCmps
+      });
       mainContainerCmp = El({
         cls: 'flex column overflow-hidden relative',
-        components: [overlaysCmp, baselayersCmp],
+        components: [overlaysCmp, toolsCmp, baselayersCmp],
         style: {
           'max-height': `${maxHeight}px`
         }
