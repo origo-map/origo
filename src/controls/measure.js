@@ -298,7 +298,7 @@ const Measure = function Measure({
         });
 
         measureButton = Button({
-          cls: 'o-measure padding-small margin-bottom-smaller icon-smaller rounded light box-shadow',
+          cls: 'o-measure padding-small margin-bottom-smaller icon-smaller round light box-shadow',
           click() {
             toggleMeasure();
           },
@@ -308,7 +308,7 @@ const Measure = function Measure({
 
         if (lengthTool) {
           lengthToolButton = Button({
-            cls: 'o-measure-length padding-small margin-bottom-smaller icon-smaller rounded light box-shadow hidden',
+            cls: 'o-measure-length padding-small margin-bottom-smaller icon-smaller round light box-shadow hidden',
             click() {
               type = 'LineString';
               toggleType(this);
@@ -323,7 +323,7 @@ const Measure = function Measure({
 
         if (areaTool) {
           areaToolButton = Button({
-            cls: 'o-measure-area padding-small icon-smaller rounded light box-shadow hidden',
+            cls: 'o-measure-area padding-small icon-smaller round light box-shadow hidden',
             click() {
               type = 'Polygon';
               toggleType(this);

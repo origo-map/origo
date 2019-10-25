@@ -97,7 +97,7 @@ const Geoposition = function Geoposition(options = {}) {
     },
     onInit() {
       positionButton = Button({
-        cls: 'o-geoposition padding-small icon-smaller rounded light box-shadow',
+        cls: 'o-geoposition padding-small icon-smaller round light box-shadow',
         click() {
           toggleState();
         },
