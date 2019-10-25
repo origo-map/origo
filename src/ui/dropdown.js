@@ -8,6 +8,7 @@ export default function Dropdown(options = {}) {
   const {
     cls = '',
     containerCls = 'bg-white',
+    contentCls = '',
     buttonCls = 'padding-small rounded light box-shadow',
     buttonIconCls = '',
     buttonContainerCls = '',
@@ -67,7 +68,7 @@ export default function Dropdown(options = {}) {
 
       dropdownButton = Button({
         text,
-        cls: `${buttonCls} o-dropdown-button width-100`,
+        cls: `${buttonCls} o-dropdown-button width-100 relative`,
         click() {
           toggle();
         },
@@ -82,7 +83,8 @@ export default function Dropdown(options = {}) {
       if (direction === 'down') {
         position = 'top';
         headerComponent = El({
-          cls: `${buttonContainerCls} collapse-header flex row justify-end`,
+          // cls: `${buttonContainerCls} collapse-header flex row justify-end`,
+          cls: `${buttonContainerCls} collapse-header`,
           components: [dropdownButton]
         });
       }
@@ -90,7 +92,8 @@ export default function Dropdown(options = {}) {
       if (direction === 'up') {
         position = 'bottom';
         footerComponent = El({
-          cls: `${buttonContainerCls} collapse-header flex row justify-end`,
+          // cls: `${buttonContainerCls} collapse-header flex row justify-end`,
+          cls: `${buttonContainerCls} collapse-header`,
           components: [dropdownButton]
         });
       }
@@ -102,9 +105,10 @@ export default function Dropdown(options = {}) {
       });
 
       containerElement = Collapse({
-        cls: `${containerCls} absolute overflow-hidden`,
-        contentCls: '',
-        style: `${position}:0; border-radius: .625rem;`,
+        cls: `${containerCls}`,
+        contentCls: `${contentCls} absolute rounded`,
+        // style: `${position}:0; border-radius: .625rem;`,
+        contentStyle: `${position}:0;`,
         collapseX: false,
         headerComponent,
         contentComponent,

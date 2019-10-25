@@ -54,21 +54,13 @@ const Scalepicker = function Scalepicker() {
       map.getView().on('change:resolution', onZoomChange);
     },
     onInit() {
-      // dropdown = Dropdown({
-      //   direction: 'up',
-      //   cls: 'o-scalepicker text-white',
-      //   containerCls: 'bg-grey-darker',
-      //   buttonContainerCls: 'height-125',
-      //   buttonCls: 'rounded bg-black text-smallest text-white',
-      //   buttonIconCls: 'white'
-      // });
-
       dropdown = Dropdown({
         direction: 'up',
-        cls: 'o-scalepicker text-white text-smallest flex',
-        containerCls: 'bg-grey-darker margin-bottom-smallest',
-        buttonContainerCls: 'height-125',
-        buttonCls: 'rounded bg-black text-smallest text-white',
+        cls: 'o-scalepicker text-white flex relative height-125',
+        containerCls: '',
+        contentCls: 'bg-grey-darker',
+        buttonContainerCls: 'height-100',
+        buttonCls: 'bg-black text-white height-100',
         buttonIconCls: 'white'
       });
     },
