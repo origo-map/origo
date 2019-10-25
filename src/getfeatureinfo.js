@@ -3,12 +3,12 @@ import $ from 'jquery';
 import maputils from './maputils';
 import getAttributes from './getattributes';
 
-function getGetFeatureInfoUrl({
+function getFeatureInfoUrl({
   coordinate,
   resolution,
   projection
 }, layer) {
-  const url = layer.getSource().getGetFeatureInfoUrl(coordinate, resolution, projection, {
+  const url = layer.getSource().getFeatureInfoUrl(coordinate, resolution, projection, {
     INFO_FORMAT: 'application/json',
     FEATURE_COUNT: '20'
   });
@@ -113,7 +113,7 @@ function getGetFeatureInfoRequest({ layer, coordinate }, viewer) {
         return getGetFeatureInfoRequest({ featureinfoLayer, coordinate }, viewer);
       }
       obj.cb = 'GEOJSON';
-      obj.fn = getGetFeatureInfoUrl({ coordinate, resolution, projection }, layer);
+      obj.fn = getFeatureInfoUrl({ coordinate, resolution, projection }, layer);
       return obj;
     case 'AGS_TILE':
       if (layer.get('featureinfoLayer')) {

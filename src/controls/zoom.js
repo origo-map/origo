@@ -15,17 +15,13 @@ const Zoom = function Zoom(options = {}) {
   const zoomByDelta = function zoomByDelta(deltaValue) {
     const map = viewer.getMap();
     const view = map.getView();
-    const currentResolution = view.getResolution();
-    if (currentResolution) {
-      const newResolution = view.constrainResolution(currentResolution, deltaValue);
-      if (view.getAnimating()) {
-        view.cancelAnimations();
-      }
-      view.animate({
-        resolution: newResolution,
-        duration
-      });
+    if (view.getAnimating()) {
+      view.cancelAnimations();
     }
+    view.animate({
+      zoom: view.getZoom() + deltaValue,
+      duration
+    });
   };
 
   return Component({

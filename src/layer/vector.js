@@ -1,5 +1,6 @@
 import VectorLayer from 'ol/layer/Vector';
 import VectorTileLayer from 'ol/layer/VectorTile';
+import VectorImageLayer from 'ol/layer/VectorImage';
 import ClusterSource from 'ol/source/Cluster';
 import Style from '../style';
 
@@ -69,8 +70,7 @@ export default function vector(opt, src, viewer) {
         style: options.style,
         viewer
       });
-      options.renderMode = 'image';
-      vectorLayer = new VectorLayer(options);
+      vectorLayer = new VectorImageLayer(options);
       break;
     }
     case 'vectortile':
