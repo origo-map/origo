@@ -46,7 +46,7 @@ const OverlayProperties = function OverlayProperties(options = {}) {
       if (opacityControl) {
         sliderEl = document.getElementById('opacitySlider');
         sliderEl.addEventListener('input', () => {
-          layer.setOpacity(parseFloat(sliderEl.value));
+          layer.setOpacity(sliderEl.valueAsNumber);
         });
       }
     },
