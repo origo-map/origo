@@ -45,6 +45,9 @@
   margin-left: -11px;
   bottom: -22px;
 }
+.o-popup .icon {
+  pointer-events:none;
+}
 &[class*=#{$media-l-m-s}] {
 #o-popup {
   width: 240px;
