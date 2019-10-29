@@ -29,7 +29,16 @@ export default function (feature, layer, map) {
         title = '';
         val = '';
         if (attribute.type !== 'hidden') {
-          if (attribute.name) {
+          if (attribute.img || attribute.type === 'image') {
+            const featGet = attribute.img ? feature.get(attribute.img) : feature.get(attribute.name);
+            if (featGet) {
+              const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(featGet, attributes, null, map));
+              const attribution = attribute.attribution ? `<div class="o-image-attribution">${attribute.attribution}</div>` : '';
+              val = `<div class="o-image-container">
+                <img src="${url}">${attribution}
+                </div>`;
+            }
+          } else if (attribute.name) {
             const featureValue = feature.get(attribute.name) === 0 ? feature.get(attribute.name).toString() : feature.get(attribute.name);
             if (featureValue) {
               val = feature.get(attribute.name);
