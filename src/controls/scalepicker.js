@@ -34,7 +34,7 @@ const Scalepicker = function Scalepicker(options = {}) {
     const scaleDenominator = parseInt(scale.replace(/\s+/g, '').split(':').pop(), 10);
     const resolution = mapUtils.scaleToResolution(scaleDenominator, projection);
 
-    map.getView().setResolution(resolution);
+    map.getView().animate({ resolution });
   }
 
   function onZoomChange() {
