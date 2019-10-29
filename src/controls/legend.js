@@ -79,15 +79,6 @@ const Legend = function Legend(options = {}) {
     }
   });
 
-  const secondDivider = El({
-    cls: 'divider margin-x-small',
-    style: {
-      'border-width': '2px',
-      'margin-bottom': '5px',
-      'margin-top': '5px'
-    }
-  });
-
   const addButton = Button({
     cls: 'round compact primary icon-small margin-x-smaller',
     click() {
@@ -174,13 +165,33 @@ const Legend = function Legend(options = {}) {
       const overlaysCmp = Overlays({ viewer, cls: contentCls, style: contentStyle });
       const baselayerCmps = [toggleGroup];
       const toolsCmps = [];
-      if (layerManagerControl) {
-        baselayerCmps.push(secondDivider);
-        toolsCmps.push(addButton);
+      let toolsCmp;
+      let toolsCmpsLayoutStrategy;
+      let mainContainerComponents;
+
+      if (layerManagerControl || turnOffLayersControl) {
+        if (layerManagerControl && turnOffLayersControl) {
+          toolsCmps.push(addButton, divider, turnOffLayersButton);
+          toolsCmpsLayoutStrategy = 'space-between';
+        } else if (layerManagerControl && !turnOffLayersControl) {
+          toolsCmps.push(addButton);
+          toolsCmpsLayoutStrategy = 'flex-start';
+        } else if (!layerManagerControl && turnOffLayersControl) {
+          toolsCmps.push(turnOffLayersButton);
+          toolsCmpsLayoutStrategy = 'flex-end';
+        }
+        toolsCmp = El({
+          cls: 'flex padding-small no-shrink',
+          style: {
+            'background-color': '#fff',
+            'justify-content': toolsCmpsLayoutStrategy,
+            height: '40px',
+            'border-bottom': '1px solid #dbdbdb'
+          },
+          components: toolsCmps
+        });
       }
-      if (turnOffLayersControl) {
-        toolsCmps.push(turnOffLayersButton);
-      }
+
       const baselayersCmp = El({
         cls: 'flex padding-small no-shrink',
         style: {
@@ -190,19 +201,16 @@ const Legend = function Legend(options = {}) {
         },
         components: baselayerCmps
       });
-      const toolsCmp = El({
-        cls: 'flex padding-small no-shrink',
-        style: {
-          'background-color': '#fff',
-          'justify-content': 'flex-end',
-          height: '40px',
-          'border-bottom': '1px solid #dbdbdb'
-        },
-        components: toolsCmps
-      });
+
+      if (toolsCmp) {
+        mainContainerComponents = [overlaysCmp, toolsCmp, baselayersCmp]
+      } else {
+        mainContainerComponents = [overlaysCmp, baselayersCmp]
+      }
+
       mainContainerCmp = El({
         cls: 'flex column overflow-hidden relative',
-        components: [overlaysCmp, toolsCmp, baselayersCmp],
+        components: mainContainerComponents,
         style: {
           'max-height': `${maxHeight}px`
         }
