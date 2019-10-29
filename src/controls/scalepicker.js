@@ -1,7 +1,12 @@
 import { Component, Dropdown, dom } from '../ui';
 import mapUtils from '../maputils';
+import numberFormatter from '../utils/numberformatter';
 
-const Scalepicker = function Scalepicker() {
+const Scalepicker = function Scalepicker(options = {}) {
+  const {
+    buttonPrefix = '',
+    listItemPrefix = ''
+  } = options;
   let map;
   let viewer;
   let projection;
@@ -10,7 +15,7 @@ const Scalepicker = function Scalepicker() {
 
   const roundScale = (scale) => {
     let scaleValue = scale;
-    const differens = scaleValue % 10; // is the number not even?
+    const differens = scaleValue % 10;
     if (differens !== 0) {
       scaleValue += (10 - differens);
     }
@@ -22,18 +27,18 @@ const Scalepicker = function Scalepicker() {
   }
 
   function getScales() {
-    return resolutions.map(resolution => `1:${roundScale(mapUtils.resolutionToScale(resolution, projection))}`);
+    return resolutions.map(resolution => `${listItemPrefix}1:${numberFormatter(roundScale(mapUtils.resolutionToScale(resolution, projection)))}`);
   }
 
   function setMapScale(scale) {
-    const scaleDenominator = parseInt(scale.split(':').pop(), 10);
+    const scaleDenominator = parseInt(scale.replace(/\s+/g, '').split(':').pop(), 10);
     const resolution = mapUtils.scaleToResolution(scaleDenominator, projection);
 
     map.getView().setResolution(resolution);
   }
 
   function onZoomChange() {
-    dropdown.setButtonText(`1:${getCurrentMapScale()}`);
+    dropdown.setButtonText(`${buttonPrefix}1:${numberFormatter(getCurrentMapScale())}`);
   }
 
   return Component({
@@ -48,7 +53,7 @@ const Scalepicker = function Scalepicker() {
       this.addComponent(dropdown);
       this.render();
 
-      dropdown.setButtonText(`1:${getCurrentMapScale()}`);
+      dropdown.setButtonText(`${buttonPrefix}1:${numberFormatter(getCurrentMapScale())}`);
       dropdown.setItems(getScales());
 
       map.getView().on('change:resolution', onZoomChange);
@@ -56,24 +61,15 @@ const Scalepicker = function Scalepicker() {
     onInit() {
       dropdown = Dropdown({
         direction: 'up',
-        cls: 'o-scalepicker text-white flex relative height-125',
-        containerCls: '',
-        contentCls: 'bg-grey-darker',
-        buttonContainerCls: 'height-100',
-        buttonCls: 'bg-black text-white height-100',
+        cls: 'o-scalepicker text-white flex',
+        contentCls: 'bg-grey-darker text-smallest rounded',
+        buttonCls: 'bg-black text-white',
         buttonIconCls: 'white'
       });
     },
     render() {
       const el = dom.html(dropdown.render());
       document.getElementById(viewer.getFooter().getId()).firstElementChild.appendChild(el);
-
-      // const parent = document.getElementById(viewer.getFooter().getId()).firstElementChild;
-      // parent.insertBefore(el, parent.firstChild)
-      // document.getElementById(viewer.getFooter().getId()).firstElementChild;
-
-      // document.getElementById(viewer.getMain().getBottomTools().getId()).appendChild(el);
-      // document.getElementById(viewer.getMain().getId()).appendChild(el);
       this.dispatch('render');
 
       document.getElementById(dropdown.getId()).addEventListener('dropdown:select', (evt) => {
