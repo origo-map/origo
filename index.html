@@ -6,14 +6,79 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=Edge;chrome=1">
 	<title>Origo exempel</title>
 	<link href="css/style.css" rel="stylesheet">
+	<link href="plugins/layermanager.css" rel="stylesheet">
 </head>
 <body>
 <div id="app-wrapper">
 </div>
 <script src="js/origo.js"></script>
+<script src="plugins/lm.min.js"></script>
 <script type="text/javascript">
-	//Init origo
-		var origo = Origo('index.json');
+var origo = Origo('index.json');
+origo.on('load', function(viewer) {
+
+var layermanager = Layermanager({
+	types: [
+		"Addresses",
+		"Geology",
+		"Roads",
+		"Buildings",
+		"Oceans",
+	],
+	layersDefaultProps: {
+		group: "mylayers",
+		queryable: true,
+		type: "WMS",
+		visible: true,
+		searchable:"always",
+		infoFormat: "text/html",
+		useLegendGraphics: true,
+		legendGraphicSettings: {
+			transparent: true,
+			service: "WMS"
+		}
+	},
+	group: {
+		name: "mylayers",
+		title: "My layers",
+		expanded: true,
+		position: "bottom"
+	},
+	noSearchResultText: "No results found",
+	url: "http://ksdgisutv.northeurope.cloudapp.azure.com:8080/geonetwork/srv/eng/csw",
+	sourceFields: {
+		description: {
+			"name": "description"
+		},
+		title: {
+			"name": "title"
+		},
+		layerId: {
+			"name": "layerId"
+		},
+		type: {
+			"name": "theme"
+		},
+		tags: {
+			"name": "tags"
+		},
+		src:{
+			"name": "src"
+		}
+	}
+});
+
+var legendControl;
+
+if (viewer.getComponents().filter((c) => {return c.name === 'legend'}).length === 1) {
+	legendControl = viewer.getComponents().filter((c) => {return c.name === 'legend'})[0]
+	legendControl.on('render', (e) => {viewer.addComponent(layermanager)})
+} else {
+	console.error("Could not render LayerManager.. Could not find control named 'legend'")
+}
+});
+
+		
 </script>
 </body>
 </html>
