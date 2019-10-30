@@ -7,7 +7,8 @@ import { html, createStyle } from './dom/dom';
 export default function Dropdown(options = {}) {
   const {
     cls = '',
-    containerCls = 'bg-white',
+    containerCls = '',
+    contentCls = 'bg-white',
     buttonCls = 'padding-small rounded light box-shadow',
     buttonIconCls = '',
     buttonContainerCls = '',
@@ -40,7 +41,6 @@ export default function Dropdown(options = {}) {
     listItems.forEach((listItem) => {
       const itemEl = El({
         tagName: 'li',
-        cls: 'o-dropdown-li',
         innerHTML: `<span>${listItem}</span>`
       });
 
@@ -67,7 +67,7 @@ export default function Dropdown(options = {}) {
 
       dropdownButton = Button({
         text,
-        cls: `${buttonCls} o-dropdown-button width-100`,
+        cls: `${buttonCls}`,
         click() {
           toggle();
         },
@@ -82,7 +82,7 @@ export default function Dropdown(options = {}) {
       if (direction === 'down') {
         position = 'top';
         headerComponent = El({
-          cls: `${buttonContainerCls} collapse-header flex row justify-end`,
+          cls: `${buttonContainerCls} collapse-header`,
           components: [dropdownButton]
         });
       }
@@ -90,21 +90,21 @@ export default function Dropdown(options = {}) {
       if (direction === 'up') {
         position = 'bottom';
         footerComponent = El({
-          cls: `${buttonContainerCls} collapse-header flex row justify-end`,
+          cls: `${buttonContainerCls} collapse-header`,
           components: [dropdownButton]
         });
       }
 
       contentComponent = Component({
         render() {
-          return `<ul class="o-dropdown" id="${this.getId()}"></ul>`;
+          return `<ul id="${this.getId()}"></ul>`;
         }
       });
 
       containerElement = Collapse({
-        cls: `${containerCls} absolute overflow-hidden`,
-        contentCls: '',
-        style: `${position}:0; border-radius: .625rem;`,
+        cls: `${containerCls} dropdown`,
+        contentCls: `${contentCls}`,
+        contentStyle: `${position}:calc(100% + 2px);`,
         collapseX: false,
         headerComponent,
         contentComponent,
@@ -118,7 +118,7 @@ export default function Dropdown(options = {}) {
       this.dispatch('render');
     },
     render() {
-      return `<div id="${this.getId()}" class="${cls}" style="${style}">${containerElement.render()}</div>`;
+      return `<div id="${this.getId()}" class="${cls} relative" style="${style}">${containerElement.render()}</div>`;
     }
   });
 }
