@@ -14,7 +14,6 @@ import supports from './src/utils/supports';
 import renderError from './src/utils/rendererror';
 import Style from './src/style';
 import featurelayer from './src/featurelayer';
-import * as ol from 'ol';
 
 const Origo = function Origo(configPath, options = {}) {
   const origoConfig = {
