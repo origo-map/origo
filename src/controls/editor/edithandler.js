@@ -475,7 +475,7 @@ function editAttributes(feat) {
     }
 
     const formElement = attributeObjects.reduce((prev, next) => prev + next.formElement, '');
-    const form = `<form onkeydown="return event.key != 'Enter';">${formElement}<br><div class="o-form-save"><input id="o-save-button" type="button" value="Ok"></input></div></form>`;
+    const form = `<div id="form">${formElement}<br><div class="o-form-save"><input id="o-save-button" type="button" value="Ok"></input></div></div>`;
 
     modal = Modal({
       title,
