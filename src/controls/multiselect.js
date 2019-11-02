@@ -6,6 +6,8 @@ import PointerInteraction from 'ol/interaction/Pointer';
 import Overlay from 'ol/Overlay';
 import { fromCircle } from 'ol/geom/Polygon';
 import { Circle as CircleStyle, Fill, Stroke, Style } from 'ol/style';
+import Feature from 'ol/Feature';
+import { fromExtent } from 'ol/geom/Polygon';
 import buffer from '@turf/buffer';
 import disjoint from '@turf/boolean-disjoint';
 import { Component, Element as El, Button, dom, Modal } from '../ui';
@@ -463,7 +465,7 @@ const Multiselect = function Multiselect(options = {}) {
     const f = bufferedOLFeature.clone();
     debugLayer.addFeature(f);
 
-    return bufferedOLFeature;
+    return bufferedOLFeature.clone();
   }
 
   // General function that recieves an extent and some layers and returns all features in those layers that intersect the extent.
@@ -483,6 +485,13 @@ const Multiselect = function Multiselect(options = {}) {
         selectionGroupTitle = layer.get('title');
       }
 
+      // We need to check manually if layer is in the visible range considering maxResolution and minResolution for a layer.
+      // For click we do not need this check because the function "forEachFeatureAtPixel" on the map object takes care of that out of the box.
+      // Also we need to check if the layer is "queryable". The reason is that if the layer is a normal layer, this check is already done, but if it is sublayer of a group then the check is needed here.
+      if (shouldSkipLayer(layer)) {
+        return;
+      }
+
       // check if layer supports this method, or basically is some sort of vector layer.
       // Alternatively we can check layer.getType() === 'VECTOR', but a bit unsure if all types of vector layer have 'VECTOR' as type.
       // Basically here we get all vector features from client.
@@ -494,6 +503,19 @@ const Multiselect = function Multiselect(options = {}) {
       } else {
         selectedRemoteItemsPromises.push(getFeaturesFromWfsServer(layer, extent, selectionGroup, selectionGroupTitle));
       }
+    }
+
+    function shouldSkipLayer(layer) {
+      if (!layer.get('queryable')) {
+        return true;
+      }
+
+      const resolution = map.getView().getResolution();
+      if (resolution > layer.getMaxResolution() || resolution < layer.getMinResolution()) {
+        return true;
+      }
+
+      return false;
     }
 
     layers.forEach((layer) => {
@@ -519,7 +541,10 @@ const Multiselect = function Multiselect(options = {}) {
 
   // General function that recieves a list of features and a geometry, then removes all the features that lie outside of the geometry.
   // Do not confuse this function with getFeaturesIntersectingExtent!
-  function getItemsIntersectingGeometry(items, geometry) {
+  function getItemsIntersectingGeometry(items, _geometry) {
+
+    const geometry = _geometry.clone()
+
     const format = new GeoJSON();
     const projection = map.getView().getProjection();
     let turfGeometry;
@@ -553,16 +578,16 @@ const Multiselect = function Multiselect(options = {}) {
     const olFeature = format.readFeature(turfGeometry);
     olFeature.getGeometry().transform('EPSG:4326', projection);
     debugLayer.addFeature(olFeature);
-    console.log(features.length);
-    console.log(intersectingFeatures.length);
-  */
+    console.log(items.length);
+    console.log(intersectingItems.length);
+    */
 
     return intersectingItems;
   }
 
   function getFeaturesFromWfsServer(layer, extent, selectionGroup, selectionGroupTitle) {
     return new Promise(((resolve) => {
-      const req = wfs.request(layer, extent);
+      const req = wfs.request(layer, extent, viewer);
       req.then((data) => {
         const selectedRemoteItems = data.map(feature => new SelectedItem(feature, layer, map, selectionGroup, selectionGroupTitle));
         resolve(selectedRemoteItems);
@@ -604,58 +629,9 @@ const Multiselect = function Multiselect(options = {}) {
     radiusLengthTooltip.setPosition([radiusXPosition, radiusYPosition]);
   }
 
-  // function runpolyfill() {
-  //   if (!Array.prototype.find) {
-  //     Object.defineProperty(Array.prototype, 'find', {
-  //       value(predicate) {
-  //         // 1. Let O be ? ToObject(this value).
-  //         if (this == null) {
-  //           throw new TypeError('"this" is null or not defined');
-  //         }
-
-  //         const o = Object(this);
-
-  //         // 2. Let len be ? ToLength(? Get(O, "length")).
-  //         const len = o.length >>> 0;
-
-  //         // 3. If IsCallable(predicate) is false, throw a TypeError exception.
-  //         if (typeof predicate !== 'function') {
-  //           throw new TypeError('predicate must be a function');
-  //         }
-
-  //         // 4. If thisArg was supplied, let T be thisArg; else let T be undefined.
-  //         const thisArg = arguments[1];
-
-  //         // 5. Let k be 0.
-  //         let k = 0;
-
-  //         // 6. Repeat, while k < len
-  //         while (k < len) {
-  //           // a. Let Pk be ! ToString(k).
-  //           // b. Let kValue be ? Get(O, Pk).
-  //           // c. Let testResult be ToBoolean(? Call(predicate, T, « kValue, k, O »)).
-  //           // d. If testResult is true, return kValue.
-  //           const kValue = o[k];
-  //           if (predicate.call(thisArg, kValue, k, o)) {
-  //             return kValue;
-  //           }
-  //           // e. Increase k by 1.
-  //           k++;
-  //         }
-
-  //         // 7. Return undefined.
-  //         return undefined;
-  //       },
-  //       configurable: true,
-  //       writable: true
-  //     });
-  //   }
-  // }
-
   return Component({
     name: 'multiselection',
     onInit() {
-      // runpolyfill();
 
       if (clickSelection || boxSelection || circleSelection || bufferSelection) {
         multiselectElement = El({

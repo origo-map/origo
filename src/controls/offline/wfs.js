@@ -1,10 +1,10 @@
 import $ from 'jquery';
 import GeoJSONFormat from 'ol/format/GeoJSON';
-import viewer from '../../viewer';
+// import viewer from '../../viewer';
 import wfsTransaction from '../editor/wfstransaction';
 
 const wfs = {};
-wfs.request = function request(layer, extent) {
+wfs.request = function request(layer, extent, viewer) {
   const sourceOptions = viewer.getMapSource()[layer.get('sourceName')];
   sourceOptions.featureType = layer.get('name').split('__').shift();
   sourceOptions.geometryName = layer.get('geometryName');
