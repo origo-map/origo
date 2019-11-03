@@ -17,6 +17,8 @@ export default function Button(options = {}) {
     click,
     style: styleSettings,
     textCls = '',
+    tooltipText,
+    tooltipPlacement = 'east',
     validStates = ['initial', 'active', 'disabled', 'inactive', 'loading']
   } = options;
 
@@ -47,6 +49,13 @@ export default function Button(options = {}) {
         methods[state].call(this, buttonEl);
       }
     }
+  };
+
+  const getTooltip = () => {
+    if (tooltipText) {
+      return `<span data-tooltip="${tooltipText}" data-placement="${tooltipPlacement}"></span>`;
+    }
+    return '';
   };
 
   const getInnerHTML = () => {
@@ -107,8 +116,9 @@ export default function Button(options = {}) {
       }
     },
     render: function render() {
-      return `<button id="${this.getId()}" class="${cls}" style="${style}">
+      return `<button id="${this.getId()}" class="${cls} o-tooltip" style="${style}">
                 ${getInnerHTML()}
+                ${getTooltip()}
               </button>`;
     },
     setIcon(newIcon) {
