@@ -166,7 +166,7 @@ const Legend = function Legend(options = {}) {
       const layerButtonCls = isExpanded ? ' faded' : '';
       layerButton = Button({
         icon: '#ic_layers_24px',
-        cls: `control icon-small medium round absolute bottom-right${layerButtonCls}`,
+        cls: `control icon-small medium round absolute light bottom-right${layerButtonCls}`,
         click() {
           if (!isExpanded) {
             overlaysCmp.dispatch('expand');

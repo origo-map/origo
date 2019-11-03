@@ -77,7 +77,7 @@ const Mapmenu = function Mapmenu({
       const menuButtonCls = isExpanded ? ' faded' : '';
       menuButton = Button({
         icon: menuIcon,
-        cls: `control icon-small medium round absolute top-right${menuButtonCls}`,
+        cls: `control icon-small medium round absolute light top-right${menuButtonCls}`,
         tooltipText: 'Meny',
         tooltipPlacement: 'west',
         click() {
