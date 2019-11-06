@@ -166,7 +166,7 @@ const Legend = function Legend(options = {}) {
       const layerButtonCls = isExpanded ? ' faded' : '';
       layerButton = Button({
         icon: '#ic_layers_24px',
-        cls: `control icon-small medium round absolute bottom-right${layerButtonCls}`,
+        cls: `control icon-small medium round absolute light bottom-right${layerButtonCls}`,
         click() {
           if (!isExpanded) {
             overlaysCmp.dispatch('expand');
@@ -176,7 +176,7 @@ const Legend = function Legend(options = {}) {
       });
       const closeButtonState = isExpanded ? 'initial' : 'hidden';
       closeButton = Button({
-        cls: `icon-smaller small round absolute margin-bottom margin-right grey-lightest bottom-right z-index-top`,
+        cls: 'icon-smaller small round absolute margin-bottom margin-right grey-lightest bottom-right z-index-top',
         icon: '#ic_close_24px',
         state: closeButtonState,
         validStates: ['initial', 'hidden'],
