@@ -185,8 +185,7 @@ const Legend = function Legend(options = {}) {
           style: {
             'background-color': '#fff',
             'justify-content': toolsCmpsLayoutStrategy,
-            height: '40px',
-            'border-bottom': '1px solid #dbdbdb'
+            height: '40px'
           },
           components: toolsCmps
         });
@@ -197,7 +196,8 @@ const Legend = function Legend(options = {}) {
         style: {
           'background-color': '#fff',
           height: '50px',
-          'margin-right': '30px'
+          'padding-right': '30px',
+          'border-top': '1px solid #dbdbdb'
         },
         components: baselayerCmps
       });
