@@ -38,6 +38,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     pageSettings = {},
     projectionCode,
     projectionExtent,
+    startExtent,
     extent = [],
     center: centerOption = [0, 0],
     zoom: zoomOption = 0,
@@ -429,6 +430,9 @@ const Viewer = function Viewer(targetOption, options = {}) {
         featureinfoOptions.savedSelection = new Feature({
           geometry: new geom[urlParams.selection.geometryType](urlParams.selection.coordinates)
         });
+      }
+      if(!urlParams.zoom && startExtent) {
+        map.getView().fit(startExtent, map.getSize());
       }
       featureinfoOptions.viewer = this;
       featureinfo = Featureinfo(featureinfoOptions);
