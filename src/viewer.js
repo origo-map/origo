@@ -431,9 +431,11 @@ const Viewer = function Viewer(targetOption, options = {}) {
           geometry: new geom[urlParams.selection.geometryType](urlParams.selection.coordinates)
         });
       }
-      if(!urlParams.zoom && startExtent) {
+
+      if(!urlParams.zoom && !urlParams.mapStateId && startExtent) {
         map.getView().fit(startExtent, map.getSize());
       }
+
       featureinfoOptions.viewer = this;
       featureinfo = Featureinfo(featureinfoOptions);
       this.addComponent(featureinfo);
