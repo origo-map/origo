@@ -49,7 +49,8 @@ const ExternalurlSingleButton = function ExternalurlSingleButton(options = {}) {
       exUrlBtn = Button({
         cls: 'o-measure padding-small margin-bottom-smaller icon-smaller round light box-shadow',
         icon: buttonImage,
-        tooltip,
+        tooltipText: tooltip,
+        tooltipPlacement: 'east',
         click() {
           onClick();
         }
