@@ -432,8 +432,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
         });
       }
 
-      if(!urlParams.zoom && !urlParams.mapStateId && startExtent) {
-        map.getView().fit(startExtent, map.getSize());
+      if (!urlParams.zoom && !urlParams.mapStateId && startExtent) {
+        map.getView().fit(startExtent, { size: map.getSize() });
       }
 
       featureinfoOptions.viewer = this;
