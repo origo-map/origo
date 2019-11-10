@@ -14,6 +14,7 @@ import editForm from './editform';
 import imageresizer from '../../utils/imageresizer';
 import getImageOrientation from '../../utils/getimageorientation';
 import shapes from './shapes';
+import validate from '../../utils/validate';
 
 const editsStore = store();
 let editLayers = {};
@@ -328,9 +329,67 @@ function attributesSaveHandler(feature, formEl) {
   });
 }
 
+function validateFormInput(inputType, inputValue, valid) {
+  const errorOn = document.querySelector(`input[type="${inputType}"]`);
+  const errorCls = `.o-${inputType}`;
+  const errorMsg = document.querySelector(errorCls);
+
+  if (inputValue === "") {
+    if (errorMsg) {
+      errorMsg.remove();
+    }
+    return inputValue;
+  }
+
+  switch (inputType) {
+    case 'integer':
+      valid.integer = validate.integer(inputValue) ? inputValue : false;
+      if (!valid.integer) {
+        if(!errorMsg) {
+        errorOn.insertAdjacentHTML('afterend', `<div style="color: #FF8C00" class="o-${inputType}">Please enter a proper ${inputType}</div>`);
+        }
+      } else if (errorMsg) {
+        errorMsg.remove();
+      };
+      break;
+    case 'decimal':
+      valid.decimal = validate.decimal(inputValue) ? inputValue : false;
+      if (!valid.decimal) {
+        if(!errorMsg) {
+        errorOn.insertAdjacentHTML('afterend', `<div style="color: #FF8C00" class="o-${inputType}">Please enter a proper ${inputType}</div>`);
+        }
+      } else if (errorMsg) {
+        errorMsg.remove();
+      };
+      break;
+    case 'email':
+      valid.email = validate.email(inputValue) ? inputValue : false;
+      if (!valid.email) {
+        if(!errorMsg) {
+        errorOn.insertAdjacentHTML('afterend', `<div style="color: #FF8C00" class="o-${inputType}">Please enter a proper ${inputType}</div>`);
+        }
+      } else if (errorMsg) {
+        errorMsg.remove();
+      };
+      break;
+    case 'url':
+      valid.url = validate.url(inputValue) ? inputValue : false;
+      if (!valid.url) {
+        if(!errorMsg) {
+        errorOn.insertAdjacentHTML('afterend', `<div style="color: #FF8C00" class="o-${inputType}">Please enter a proper ${inputType}</div>`);
+        }
+      } else if (errorMsg) {
+        errorMsg.remove();
+      };
+      break;
+    default: 
+  }
+}
+
 function onAttributesSave(feature, attrs) {
   $('#o-save-button').on('click', (e) => {
     const editEl = {};
+    const valid = {};
     let fileReader;
     let input;
     let file;
@@ -339,18 +398,20 @@ function onAttributesSave(feature, attrs) {
     attrs.forEach((attribute) => {
       // Get the input container class
       const containerClass = `.${attribute.elId.slice(1)}`;
+      const inputType = $(attribute.elId).attr('type');
+      const inputValue = $(attribute.elId).val();
 
       // If hidden element it should be excluded
       if ($(containerClass).hasClass('o-hidden') === false) {
         // Check if checkbox. If checkbox read state.
-        if ($(attribute.elId).attr('type') === 'checkbox') {
+        if (inputType === 'checkbox') {
           editEl[attribute.name] = $(attribute.elId).is(':checked') ? 1 : 0;
         } else { // Read value from input text, textarea or select
-          editEl[attribute.name] = $(attribute.elId).val();
+          editEl[attribute.name] = inputValue;
         }
       }
       // Check if file. If file, read and trigger resize
-      if ($(attribute.elId).attr('type') === 'file') {
+      if (inputType === 'file') {
         input = $(attribute.elId)[0];
         file = input.files[0];
 
@@ -370,19 +431,24 @@ function onAttributesSave(feature, attrs) {
           editEl[attribute.name] = $(attribute.elId).attr('value');
         }
       }
+      // Validate form input
+      validateFormInput(inputType, inputValue, valid)
     });
 
+    // If valid, continue
+    if (Object.values(valid).indexOf(false) < 0) {
     if (fileReader && fileReader.readyState === 1) {
       $(document).on('imageresized', () => {
         attributesSaveHandler(feature, editEl);
       });
-    } else {
+        } else {
       attributesSaveHandler(feature, editEl);
     }
-
+    
     modal.closeModal();
     $('#o-save-button').blur();
     e.preventDefault();
+    }
   });
 }
 
@@ -398,7 +464,7 @@ function addListener() {
     });
   };
 
-  return fn;
+  return fn; 
 }
 
 function addImageListener() {

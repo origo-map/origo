@@ -22,8 +22,11 @@ const createForm = function createForm(obj) {
     case 'textarea':
       el = `<div><label>${label}</label><br><textarea id="${id}" rows="3"${maxLength}${readonly}>${val}</textarea></div>`;
       break;
-    case 'number':
-      el = `<div><label>${label}</label><br><input type="number" id="${id}" value="${val}"${maxLength}${readonly}></div>`;
+    case 'integer':
+      el = `<div><label>${label}</label><br><input type="integer" id="${id}" value="${val}"${maxLength}${readonly}></div>`;
+      break;
+    case 'decimal':
+      el = `<div><label>${label}</label><br><input type="decimal" id="${id}" value="${val}"${maxLength}${readonly}></div>`;
       break;
     case 'checkbox':
       checked = val ? ' checked' : '';
@@ -94,6 +97,12 @@ const createForm = function createForm(obj) {
       break;
     case 'hidden':
       el = `<input type="hidden" id="${id}" value="${val}">`;
+      break;
+    case 'email':
+      el = `<div><label>${label}</label><br><input type="email" id="${id}" value="${val}"${readonly}></div>`;
+      break;
+    case 'url':
+      el = `<div><label>${label}</label><br><input type="url" id="${id}" value="${val}"${readonly}></div>`;
       break;
     default:
       break;
