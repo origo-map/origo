@@ -334,7 +334,7 @@ function validateFormInput(inputType, inputValue, valid) {
   const errorCls = `.o-${inputType}`;
   const errorMsg = document.querySelector(errorCls);
 
-  if (inputValue === "") {
+  if (inputValue === '') {
     if (errorMsg) {
       errorMsg.remove();
     }
@@ -345,45 +345,46 @@ function validateFormInput(inputType, inputValue, valid) {
     case 'integer':
       valid.integer = validate.integer(inputValue) ? inputValue : false;
       if (!valid.integer) {
-        if(!errorMsg) {
-        errorOn.insertAdjacentHTML('afterend', `<div style="color: #FF8C00" class="o-${inputType}">Please enter a proper ${inputType}</div>`);
+        if (!errorMsg) {
+          errorOn.insertAdjacentHTML('afterend', `<div style="color: #FF8C00" class="o-${inputType}">Please enter a proper ${inputType}</div>`);
         }
       } else if (errorMsg) {
         errorMsg.remove();
-      };
+      }
       break;
     case 'decimal':
       valid.decimal = validate.decimal(inputValue) ? inputValue : false;
       if (!valid.decimal) {
-        if(!errorMsg) {
-        errorOn.insertAdjacentHTML('afterend', `<div style="color: #FF8C00" class="o-${inputType}">Please enter a proper ${inputType}</div>`);
+        if (!errorMsg) {
+          errorOn.insertAdjacentHTML('afterend', `<div style="color: #FF8C00" class="o-${inputType}">Please enter a proper ${inputType}</div>`);
         }
       } else if (errorMsg) {
         errorMsg.remove();
-      };
+      }
       break;
     case 'email':
       valid.email = validate.email(inputValue) ? inputValue : false;
       if (!valid.email) {
-        if(!errorMsg) {
-        errorOn.insertAdjacentHTML('afterend', `<div style="color: #FF8C00" class="o-${inputType}">Please enter a proper ${inputType}</div>`);
+        if (!errorMsg) {
+          errorOn.insertAdjacentHTML('afterend', `<div style="color: #FF8C00" class="o-${inputType}">Please enter a proper ${inputType}</div>`);
         }
       } else if (errorMsg) {
         errorMsg.remove();
-      };
+      }
       break;
     case 'url':
       valid.url = validate.url(inputValue) ? inputValue : false;
       if (!valid.url) {
-        if(!errorMsg) {
-        errorOn.insertAdjacentHTML('afterend', `<div style="color: #FF8C00" class="o-${inputType}">Please enter a proper ${inputType}</div>`);
+        if (!errorMsg) {
+          errorOn.insertAdjacentHTML('afterend', `<div style="color: #FF8C00" class="o-${inputType}">Please enter a proper ${inputType}</div>`);
         }
       } else if (errorMsg) {
         errorMsg.remove();
-      };
+      }
       break;
-    default: 
+    default:
   }
+  return valid;
 }
 
 function onAttributesSave(feature, attrs) {
@@ -432,22 +433,22 @@ function onAttributesSave(feature, attrs) {
         }
       }
       // Validate form input
-      validateFormInput(inputType, inputValue, valid)
+      validateFormInput(inputType, inputValue, valid);
     });
 
     // If valid, continue
     if (Object.values(valid).indexOf(false) < 0) {
-    if (fileReader && fileReader.readyState === 1) {
-      $(document).on('imageresized', () => {
+      if (fileReader && fileReader.readyState === 1) {
+        $(document).on('imageresized', () => {
+          attributesSaveHandler(feature, editEl);
+        });
+      } else {
         attributesSaveHandler(feature, editEl);
-      });
-        } else {
-      attributesSaveHandler(feature, editEl);
-    }
-    
-    modal.closeModal();
-    $('#o-save-button').blur();
-    e.preventDefault();
+      }
+
+      modal.closeModal();
+      $('#o-save-button').blur();
+      e.preventDefault();
     }
   });
 }
@@ -464,7 +465,7 @@ function addListener() {
     });
   };
 
-  return fn; 
+  return fn;
 }
 
 function addImageListener() {
