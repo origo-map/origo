@@ -119,7 +119,7 @@
           {
             "name": "name",
             "title": "Name: ",
-            "type": "url",
+            "type": "text",
             "maxLength": 50
           },
           {
