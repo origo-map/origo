@@ -519,9 +519,12 @@ const Mapfishprint = function Mapfishprint(options = {}) {
                     } else {
                         console.warn('Lagertyp stöds ej.');
                     }
-                    printIndex = printableLayers.findIndex(function(l) {
-                        return l.baseURL === url
+                    printIndex = printableLayers.filter(function(l, idx) {
+                        if (l.baseURL === url) {
+                            return idx
+                        }
                     });
+                    printIndex = printIndex.length > 0 ? printIndex[0] : -1;
                     if (printIndex !== -1) {
                         printableLayers[printIndex].layers.push(layer.get('name'));
                     } else {
