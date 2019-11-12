@@ -5,7 +5,8 @@ import { Component, Button, dom } from '../ui';
 const Geoposition = function Geoposition(options = {}) {
   let {
     target,
-    zoomLevel
+    zoomLevel,
+    active = false
   } = options;
 
   let viewer;
@@ -110,6 +111,9 @@ const Geoposition = function Geoposition(options = {}) {
     },
     render() {
       const htmlString = positionButton.render();
+      if(active) {
+        positionButton.setState('active');
+      }
       const el = dom.html(htmlString);
       document.getElementById(target).appendChild(el);
       this.dispatch('render');
