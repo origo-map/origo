@@ -63,7 +63,8 @@ const Overlays = function Overlays(options) {
   const slidenav = Slidenav({
     mainComponent: groupContainer,
     secondaryComponent: layerProps,
-    cls: 'right flex width-100'
+    cls: 'right flex width-100',
+    style: "width:100%"
   });
 
   const navContainer = Component({
@@ -123,6 +124,7 @@ const Overlays = function Overlays(options) {
     cls: 'flex column overflow-hidden width-100',
     contentCls: 'flex column',
     contentStyle: { height: '100%', 'overflow-y': 'auto' },
+    style: "width:100%",
     expanded,
     contentComponent: navContainer,
     headerComponent: collapseHeader
