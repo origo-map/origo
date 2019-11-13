@@ -70,9 +70,9 @@ var layermanager = Layermanager({
 
 var legendControl;
 
-if (viewer.getComponents().filter((c) => {return c.name === 'legend'}).length === 1) {
-	legendControl = viewer.getComponents().filter((c) => {return c.name === 'legend'})[0]
-	legendControl.on('render', (e) => {viewer.addComponent(layermanager)})
+if (viewer.getComponents().filter(function(c) {return c.name === 'legend'}).length === 1) {
+	legendControl = viewer.getComponents().filter(function(c) {return c.name === 'legend'})[0]
+	legendControl.on('render', function(e) {viewer.addComponent(layermanager)})
 } else {
 	console.error("Could not render LayerManager.. Could not find control named 'legend'")
 }

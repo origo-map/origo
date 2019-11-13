@@ -161,7 +161,7 @@ const OverlayLayer = function OverlayLayer(options) {
       return `<li title="${title}" id="${this.getId()}" class="${cls}">${ButtonsHtml}</li>`;
     },
     renderDraggable() {
-      return `<li draggable=true title="${title}" id="${this.getId()}" class="${cls}">${ButtonsHtml}</li>`;
+      return `<li draggable=true ondragstart="event.dataTransfer.setData('text/plain',null)" title="${title}" id="${this.getId()}" class="${cls}">${ButtonsHtml}</li>`;
     },
     renderDropzone() {
       return `<li title="drop" id="dropSlot" class="dropzone"></li>`;
