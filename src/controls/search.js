@@ -297,6 +297,7 @@ const Search = function Search(options = {}) {
         if (suggestion.value.toLowerCase().includes(input.toLowerCase())) {
           return suggestion.value;
         }
+        return false;
       }
     });
 
