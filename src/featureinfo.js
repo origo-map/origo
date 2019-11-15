@@ -10,6 +10,7 @@ import Style from './style';
 import StyleTypes from './style/styletypes';
 import getFeatureInfo from './getfeatureinfo';
 import replacer from '../src/utils/replacer';
+import { getContent } from './getattributes';
 
 const styleTypes = StyleTypes();
 
@@ -38,11 +39,11 @@ const Featureinfo = function Featureinfo(options = {}) {
   let savedPin = savedPinOptions ? maputils.createPointFeature(savedPinOptions, pinStyle) : undefined;
   const savedFeature = savedPin || savedSelection || undefined;
 
-  function setUIoutput(viewer){
+  function setUIoutput(v) {
     if (showOverlay) {
       identifyTarget = 'overlay';
     } else {
-      sidebar.init(viewer);
+      sidebar.init(v);
       identifyTarget = 'sidebar';
     }
   }
@@ -102,8 +103,8 @@ const Featureinfo = function Featureinfo(options = {}) {
       onChanged: callback,
       items: 1,
       nav: true,
-      navText: ['<svg class="o-icon-fa-chevron-left"><use xlink:href="#fa-chevron-left"></use></svg>',
-        '<svg class="o-icon-fa-chevron-right"><use xlink:href="#fa-chevron-right"></use></svg>'
+      navText: ['<span class="icon"><svg class="o-icon-fa-chevron-left"><use xlink:href="#fa-chevron-left"></use></svg></span>',
+        '<span class="icon"><svg class="o-icon-fa-chevron-right"><use xlink:href="#fa-chevron-right"></use></svg></span>'
       ]
     };
     if (identifyTarget === 'overlay') {
@@ -143,12 +144,17 @@ const Featureinfo = function Featureinfo(options = {}) {
     return hitTolerance;
   };
 
+  const addAttributeType = function addAttributeType(attributeType, fn) {
+    getContent[attributeType] = fn;
+    return getContent;
+  };
+
   const render = function render(identifyItems, target, coordinate) {
     const map = viewer.getMap();
     items = identifyItems;
     clear();
     let content = items.map(i => i.content).join('');
-    content = `<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme">${content}</div></div>`;
+    content = '<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme"></div></div>';
     switch (target) {
       case 'overlay':
       {
@@ -156,6 +162,10 @@ const Featureinfo = function Featureinfo(options = {}) {
         popup.setContent({
           content,
           title: items[0].title
+        });
+        const contentDiv = document.getElementById('o-identify-carousel');
+        items.forEach((item) => {
+          contentDiv.appendChild(item.content);
         });
         popup.setVisibility(true);
         initCarousel('#o-identify-carousel');
@@ -181,6 +191,10 @@ const Featureinfo = function Featureinfo(options = {}) {
         sidebar.setContent({
           content,
           title: items[0].title
+        });
+        const contentDiv = document.getElementById('o-identify-carousel');
+        items.forEach((item) => {
+          contentDiv.appendChild(item.content);
         });
         sidebar.setVisibility(true);
         initCarousel('#o-identify-carousel');
@@ -254,6 +268,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     getPin,
     getSelectionLayer,
     getSelection,
+    addAttributeType,
     onAdd(e) {
       viewer = e.target;
       const map = viewer.getMap();

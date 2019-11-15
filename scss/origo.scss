@@ -27,7 +27,7 @@
   @import 'sidebar.scss';
   @import 'close.scss';
   @import 'icon.scss';
-  // @import 'tooltip.scss';
+  @import 'tooltip.scss';
   @import 'viewer.scss';
   @import 'rotate.scss';
   @import 'mapmenu.scss';
@@ -42,6 +42,7 @@
   @import 'hidden.scss';
   @import 'featureinfo.scss';
   @import 'ui/validate.scss';
+  @import 'scalepicker.scss';
 }
 html,
 body {
