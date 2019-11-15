@@ -329,64 +329,6 @@ function attributesSaveHandler(feature, formEl) {
   });
 }
 
-function validateFormInput(inputType, inputValue, valid) {
-  const errorOn = document.querySelector(`input[type="${inputType}"]`);
-  const errorCls = `.o-${inputType}`;
-  const errorMsg = document.querySelector(errorCls);
-
-  if (inputValue === '') {
-    if (errorMsg) {
-      errorMsg.remove();
-    }
-    return inputValue;
-  }
-
-  switch (inputType) {
-    case 'integer':
-      valid.integer = validate.integer(inputValue) ? inputValue : false;
-      if (!valid.integer) {
-        if (!errorMsg) {
-          errorOn.insertAdjacentHTML('afterend', `<div style="color: #FF8C00" class="o-${inputType}">Please enter a proper ${inputType}</div>`);
-        }
-      } else if (errorMsg) {
-        errorMsg.remove();
-      }
-      break;
-    case 'decimal':
-      valid.decimal = validate.decimal(inputValue) ? inputValue : false;
-      if (!valid.decimal) {
-        if (!errorMsg) {
-          errorOn.insertAdjacentHTML('afterend', `<div style="color: #FF8C00" class="o-${inputType}">Please enter a proper ${inputType}</div>`);
-        }
-      } else if (errorMsg) {
-        errorMsg.remove();
-      }
-      break;
-    case 'email':
-      valid.email = validate.email(inputValue) ? inputValue : false;
-      if (!valid.email) {
-        if (!errorMsg) {
-          errorOn.insertAdjacentHTML('afterend', `<div style="color: #FF8C00" class="o-${inputType}">Please enter a proper ${inputType}</div>`);
-        }
-      } else if (errorMsg) {
-        errorMsg.remove();
-      }
-      break;
-    case 'url':
-      valid.url = validate.url(inputValue) ? inputValue : false;
-      if (!valid.url) {
-        if (!errorMsg) {
-          errorOn.insertAdjacentHTML('afterend', `<div style="color: #FF8C00" class="o-${inputType}">Please enter a proper ${inputType}</div>`);
-        }
-      } else if (errorMsg) {
-        errorMsg.remove();
-      }
-      break;
-    default:
-  }
-  return valid;
-}
-
 function onAttributesSave(feature, attrs) {
   $('#o-save-button').on('click', (e) => {
     const editEl = {};
@@ -399,8 +341,11 @@ function onAttributesSave(feature, attrs) {
     attrs.forEach((attribute) => {
       // Get the input container class
       const containerClass = `.${attribute.elId.slice(1)}`;
+      // Get the input attributes
       const inputType = $(attribute.elId).attr('type');
       const inputValue = $(attribute.elId).val();
+      const inputName = $(attribute.elId).attr('name');
+      const inputDataType = $(attribute.elId).data('validate');
 
       // If hidden element it should be excluded
       if ($(containerClass).hasClass('o-hidden') === false) {
@@ -433,7 +378,62 @@ function onAttributesSave(feature, attrs) {
         }
       }
       // Validate form input
-      validateFormInput(inputType, inputValue, valid);
+      const errorOn = document.querySelector(`input[name="${inputName}"]`);
+      const errorCls = `.o-${inputName}`;
+      const errorMsg = document.querySelector(errorCls);
+      const errorText = `Vänligen ange korrekt ${inputName}`;
+
+      if (inputValue === '') {
+        if (errorMsg) {
+          errorMsg.remove();
+        }
+        return inputValue;
+      }
+
+      switch (inputDataType) {
+        case 'integer':
+          valid.integer = validate.integer(inputValue) ? inputValue : false;
+          if (!valid.integer) {
+            if (!errorMsg) {
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputName} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            }
+          } else if (errorMsg) {
+            errorMsg.remove();
+          }
+          break;
+        case 'decimal':
+          valid.decimal = validate.decimal(inputValue) ? inputValue : false;
+          if (!valid.decimal) {
+            if (!errorMsg) {
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputName} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            }
+          } else if (errorMsg) {
+            errorMsg.remove();
+          }
+          break;
+        case 'email':
+          valid.email = validate.email(inputValue) ? inputValue : false;
+          if (!valid.email) {
+            if (!errorMsg) {
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputName} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            }
+          } else if (errorMsg) {
+            errorMsg.remove();
+          }
+          break;
+        case 'url':
+          valid.url = validate.url(inputValue) ? inputValue : false;
+          if (!valid.url) {
+            if (!errorMsg) {
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputName} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            }
+          } else if (errorMsg) {
+            errorMsg.remove();
+          }
+          break;
+        default:
+      }
+      return valid;
     });
 
     // If valid, continue
@@ -544,7 +544,7 @@ function editAttributes(feat) {
     }
 
     const formElement = attributeObjects.reduce((prev, next) => prev + next.formElement, '');
-    const form = `<form>${formElement}<br><div class="o-form-save"><input id="o-save-button" type="button" value="Ok"></input></div></form>`;
+    const form = `<div id="o-form">${formElement}<br><div class="o-form-save"><input id="o-save-button" type="button" value="Ok"></input></div></div>`;
 
     modal = Modal({
       title,

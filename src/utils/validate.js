@@ -2,7 +2,7 @@ const validate = {};
 
 validate.integer = (integer) => {
   if (integer) {
-    const regex = /^\d+$/;
+    const regex = /^([+-]?[1-9]*|0)$/;
     return regex.test(integer);
   }
   return false;
