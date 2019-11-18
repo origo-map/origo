@@ -16,7 +16,6 @@ function createSource(options) {
     queryFilter = options.filter ? `&CQL_FILTER=${options.filter} AND BBOX(${options.geometryName},` : '&BBOX=';
   }
   const bboxProjectionCode = options.filter ? `'${options.dataProjection}')` : options.dataProjection;
-  console.log(options.dataProjection);
   const vectorSource = new VectorSource({
     attributions: options.attribution,
     format: new GeoJSONFormat({
