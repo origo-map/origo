@@ -38,6 +38,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     pageSettings = {},
     projectionCode,
     projectionExtent,
+    startExtent,
     extent = [],
     center: centerOption = [0, 0],
     zoom: zoomOption = 0,
@@ -430,6 +431,11 @@ const Viewer = function Viewer(targetOption, options = {}) {
           geometry: new geom[urlParams.selection.geometryType](urlParams.selection.coordinates)
         });
       }
+
+      if (!urlParams.zoom && !urlParams.mapStateId && startExtent) {
+        map.getView().fit(startExtent, { size: map.getSize() });
+      }
+
       featureinfoOptions.viewer = this;
       featureinfo = Featureinfo(featureinfoOptions);
       this.addComponent(featureinfo);
