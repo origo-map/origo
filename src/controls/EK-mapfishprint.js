@@ -406,6 +406,8 @@ const Mapfishprint = function Mapfishprint(options = {}) {
                     })
                     return result;
                     break;
+                default:
+                    return result;
             }
         }, []);
 
@@ -519,11 +521,11 @@ const Mapfishprint = function Mapfishprint(options = {}) {
                     } else {
                         console.warn('Lagertyp stöds ej.');
                     }
-                    printIndex = printableLayers.filter(function(l, idx) {
+                    printIndex = printableLayers.map(function(l, idx) {
                         if (l.baseURL === url) {
                             return idx
                         }
-                    });
+                    }).filter(function (l) {return l !=  undefined});
                     printIndex = printIndex.length > 0 ? printIndex[0] : -1;
                     if (printIndex !== -1) {
                         printableLayers[printIndex].layers.push(layer.get('name'));
