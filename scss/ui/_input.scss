@@ -1,4 +1,6 @@
 $button-padding-medium: $padding-small $padding-small * 1.5;
+$placeholder-text-smaller: $font-size-smaller;
+$placeholder-text-small: $font-size-small;
 
 input::-ms-clear {
   display: none;
@@ -7,7 +9,8 @@ input::-ms-clear {
 // form
 textarea,
 select,
-input {
+input[type=text] {
+  resize: vertical;
   border: 1px solid $border-color;
   border-radius: 3px;
   box-sizing: border-box;
@@ -26,8 +29,12 @@ input {
     font-size: $font-size-small;
     line-height: $line-height-small;
   }
+  &.smaller {
+    font-size: $font-size-smaller;;
+    line-height: $line-height-small;
+  }
 }
-input {
+input[type=text] {
   &.search {
     border: none;
     margin: 0;
@@ -141,4 +148,13 @@ input[type=range]:focus::-ms-fill-upper {
 }
 input[type=range]::-ms-tooltip {
     display: none;
+}
+
+input {
+  &.placeholder-text-small::placeholder {
+    font-size: $placeholder-text-small;
+  }
+  &.placeholder-text-smaller::placeholder {
+    font-size: $placeholder-text-smaller;
+  }
 }

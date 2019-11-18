@@ -9,10 +9,12 @@ export default function Element(options = {}) {
     cls = '',
     components = [],
     innerHTML = '',
+    attributes,
     style = {},
     tagName = 'div'
   } = options;
   const renderSettings = {
+    ...attributes,
     cls,
     style
   };

@@ -6,6 +6,7 @@ import 'core-js/fn/array/is-array';
 import 'core-js/fn/object/assign';
 import 'core-js/fn/object/keys';
 import 'core-js/fn/promise';
+import toBlobPolyfill from './toblob-polyfill';
 
 /**
  * Polyfills included in Origo aims to support ie11. Older versions of ie are not supported.
@@ -52,6 +53,9 @@ export default function polyfill() {
   }
   if (!Element.prototype.matches) {
     Element.prototype.matches = Element.prototype.msMatchesSelector;
+  }
+  if (!HTMLCanvasElement.prototype.toBlob) {
+    toBlobPolyfill();
   }
   ElementRemove([Element.prototype, CharacterData.prototype, DocumentType.prototype].filter(Boolean));
 }
