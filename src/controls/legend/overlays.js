@@ -148,7 +148,17 @@ const Overlays = function Overlays(options) {
 
   const addDragSupport = function addDragSupport(el) {
     el.addEventListener("drag", function (event) { }, false);
-    el.addEventListener("dragstart", function (event) { draggedElement = event.target; event.target.style.opacity = .3; }, false);
+    el.addEventListener("dragstart", function (event) { 
+      
+      draggedElement = event.target; 
+      event.target.style.opacity = .3; 
+
+      var menuDropSlot = document.getElementById("menuDropSlot");
+      if (menuDropSlot != null) {
+        addDropSupport(menuDropSlot);
+      }
+    }, false);
+
     el.addEventListener("dragend", function (event) { event.target.style.opacity = ""; }, false);
   };
 
@@ -160,7 +170,6 @@ const Overlays = function Overlays(options) {
       event.preventDefault();
       var targetNeighbourTitle = '';
       event.target.style.background = "";
-      // event.target.style.height ="4px";
 
       if (event.target.title === 'drop') {
         var otherLayers = new Array;
@@ -294,7 +303,12 @@ const Overlays = function Overlays(options) {
             var sortedOverlay = l.getLayer();
             sortedOverlay.setZIndex(zIndexCounter);
             zIndexCounter--;
-            // console.log(sortedOverlay.getProperties().title+ " " +sortedOverlay.getZIndex());
+            
+            //for IE support
+            if (window.NodeList && !NodeList.prototype.forEach) {
+              NodeList.prototype.forEach = Array.prototype.forEach;
+            }
+            //
             childnodes.forEach(function (child) {
 
               if (child.getAttribute("title") === sortedOverlay.getProperties().title) {
@@ -317,7 +331,6 @@ const Overlays = function Overlays(options) {
           var dropSlotClone = dropSlot.cloneNode(true);
           addDropSupport(dropSlotClone);
           childSorted.push(dropSlotClone);
-
 
           childSorted.forEach(function (child) {
             parent.appendChild(child);
@@ -345,22 +358,26 @@ const Overlays = function Overlays(options) {
     } else if (!(nonGroupNames.includes(groupName))) {
       const groupCmp = groupCmps.find(cmp => cmp.name === groupName);
       if (groupCmp) {
-        zIndexCounter++;
-        overlay.getLayer().setZIndex(zIndexCounter);
+     
         groupCmp.addOverlay(overlay);
-        addedOverlays.push(overlay);
 
-        var el = document.getElementById(overlay.getId());
-        var dropSlot = document.getElementById("dropSlot");
-        var menuDropSlot = document.getElementById("menuDropSlot");
-
-        if (menuDropSlot != null) {
-          addDropSupport(menuDropSlot);
+        if (layer.get('group') === 'mylayers') {
+          zIndexCounter++;
+          overlay.getLayer().setZIndex(zIndexCounter);
+          addedOverlays.push(overlay);
+          var el = document.getElementById(overlay.getId());
+          el.style.paddingTop = "0";
+          el.style.paddingBottom = "0";
+          var dropSlot = document.getElementById("dropSlot");
+          var menuDropSlot = document.getElementById("menuDropSlot");
+          if (menuDropSlot != null) {
+            addDropSupport(menuDropSlot);
+          }
+          addDropSupport(dropSlot);
+          addDragSupport(el);
         }
-        addDropSupport(dropSlot);
-        addDragSupport(el);
       }
-      else {
+      else if (layer.get('group') === 'mylayers') {
         waitingLMlayers.push(layer);
       }
     }
@@ -391,8 +408,9 @@ const Overlays = function Overlays(options) {
     const group = evt.group;
     addGroup(group);
     if(waitingLMlayers){
-      waitingLMlayers.forEach(function (layer) {
-          addLayer(layer, "bottom");
+      waitingLMlayers.sort((a, b) => (a.getZIndex() < b.getZIndex()) ? 1 : ((b.getZIndex() < a.getZIndex()) ? -1 : 0));
+      waitingLMlayers.reverse().forEach(function (layer) {
+        addLayer(layer, "bottom");
       });
       waitingLMlayers = new Array;
     } 
