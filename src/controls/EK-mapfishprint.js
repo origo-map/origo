@@ -316,7 +316,7 @@ const Mapfishprint = function Mapfishprint(options = {}) {
     function getLegendInfos(layers, scale) {
         var requests = [];
         layers.forEach(function (layer) {
-            if (layer.get('type').toUpperCase() === "WMS") {
+            if (layer.get('type') && layer.get('type').toUpperCase() === "WMS") {
                 let params;
                 let url = fetchSourceUrl(layer);
                 let requestUrl;
