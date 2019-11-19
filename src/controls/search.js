@@ -293,8 +293,8 @@ const Search = function Search(options = {}) {
       sort: false,
       maxItems: limit,
       item: renderList,
-      filter(suggestion, input) {
-        if (suggestion.value.toLowerCase().includes(input.toLowerCase())) {
+      filter(suggestion, userInput) {
+        if (suggestion.value.toLowerCase().includes(userInput.toLowerCase())) {
           return suggestion.value;
         }
         return false;
