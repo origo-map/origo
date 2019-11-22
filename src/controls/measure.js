@@ -273,7 +273,7 @@ const Measure = function Measure({
         source,
         name: 'measure',
         visible: false,
-        zIndex: 6
+        zIndex: 1000
       });
 
       map.addLayer(vector);
