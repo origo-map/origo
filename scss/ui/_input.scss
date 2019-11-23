@@ -8,6 +8,7 @@ input::-ms-clear {
 textarea,
 select,
 input {
+  resize: vertical;
   border: 1px solid $border-color;
   border-radius: 3px;
   box-sizing: border-box;
