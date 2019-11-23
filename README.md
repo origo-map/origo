@@ -9,7 +9,6 @@ Origo is a web mapping framework. It is based on the [OpenLayers library](https:
 ## Features
 
  * Responsive design
- * Support for older browsers
  * Multiple modules available (among others: an editing interface, geopositioning and map sharing)
  * Ability to read data from multiple different types of sources
  * Very light footprint
