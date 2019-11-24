@@ -389,6 +389,7 @@ function onAttributesSave(feature, attrs) {
         if (errorMsg) {
           errorMsg.remove();
         }
+        return inputValue;
       }
       // Test field input with regex and insert error text if unvalid
       switch (attribute.type) {
