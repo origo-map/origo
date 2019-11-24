@@ -345,7 +345,7 @@ function onAttributesSave(feature, attrs) {
       const inputType = $(attribute.elId).attr('type');
       const inputValue = $(attribute.elId).val();
       const inputName = $(attribute.elId).attr('name');
-      const inputDataType = $(attribute.elId).data('validate');
+      const inputId = $(attribute.elId).attr('id');
 
       // If hidden element it should be excluded
       if ($(containerClass).hasClass('o-hidden') === false) {
@@ -377,25 +377,26 @@ function onAttributesSave(feature, attrs) {
           editEl[attribute.name] = $(attribute.elId).attr('value');
         }
       }
+
       // Validate form input
-      const errorOn = document.querySelector(`input[name="${inputName}"]`);
-      const errorCls = `.o-${inputName}`;
+      const errorOn = document.querySelector(`input[id="${inputId}"]`);
+      const errorCls = `.o-${inputId}`;
       const errorMsg = document.querySelector(errorCls);
       const errorText = `Vänligen ange korrekt ${inputName}`;
 
+      // Field is valid if empty
       if (inputValue === '') {
         if (errorMsg) {
           errorMsg.remove();
         }
-        return inputValue;
       }
-
-      switch (inputDataType) {
+      // Test field input with regex and insert error text if unvalid
+      switch (attribute.type) {
         case 'integer':
           valid.integer = validate.integer(inputValue) ? inputValue : false;
           if (!valid.integer) {
             if (!errorMsg) {
-              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputName} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }
           } else if (errorMsg) {
             errorMsg.remove();
@@ -405,7 +406,7 @@ function onAttributesSave(feature, attrs) {
           valid.decimal = validate.decimal(inputValue) ? inputValue : false;
           if (!valid.decimal) {
             if (!errorMsg) {
-              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputName} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }
           } else if (errorMsg) {
             errorMsg.remove();
@@ -415,7 +416,7 @@ function onAttributesSave(feature, attrs) {
           valid.email = validate.email(inputValue) ? inputValue : false;
           if (!valid.email) {
             if (!errorMsg) {
-              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputName} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }
           } else if (errorMsg) {
             errorMsg.remove();
@@ -425,7 +426,7 @@ function onAttributesSave(feature, attrs) {
           valid.url = validate.url(inputValue) ? inputValue : false;
           if (!valid.url) {
             if (!errorMsg) {
-              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputName} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }
           } else if (errorMsg) {
             errorMsg.remove();
@@ -433,11 +434,11 @@ function onAttributesSave(feature, attrs) {
           break;
         default:
       }
-      return valid;
+      valid.validates = Object.values(valid).includes(false) ? false : valid;
     });
 
     // If valid, continue
-    if (Object.values(valid).indexOf(false) < 0) {
+    if (valid.validates) {
       if (fileReader && fileReader.readyState === 1) {
         $(document).on('imageresized', () => {
           attributesSaveHandler(feature, editEl);

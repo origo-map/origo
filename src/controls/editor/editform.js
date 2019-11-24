@@ -90,16 +90,16 @@ const createForm = function createForm(obj) {
       el = `<div><label>${label}</label><br><input type="color" id="${id}" value="${val}"${readonly}></div>`;
       break;
     case 'email':
-      el = `<div><label>${label}</label><br><input type="email" data-validate="email" name="epost" id="${id}" value="${val}"${readonly}></div>`;
+      el = `<div><label>${label}</label><br><input type="email" name="epost" id="${id}" value="${val}"${readonly}></div>`;
       break;
     case 'url':
-      el = `<div><label>${label}</label><br><input type="url" data-validate="url" name="hemsida" id="${id}" value="${val}"${readonly}></div>`;
+      el = `<div><label>${label}</label><br><input type="url" name="hemsida" id="${id}" value="${val}"${readonly}></div>`;
       break;
     case 'integer':
-      el = `<div><label>${label}</label><br><input type="number" step="1" min="0" data-validate="integer" name="heltal" id="${id}" value="${val}"${readonly}></div>`;
+      el = `<div><label>${label}</label><br><input type="number" step="1" min="0" name="heltal" id="${id}" value="${val}"${readonly}></div>`;
       break;
     case 'decimal':
-      el = `<div><label>${label}</label><br><input type="number" step="0.01" min="0" data-validate="decimal" name="decimaltal" id="${id}" value="${val}"${readonly}></div>`;
+      el = `<div><label>${label}</label><br><input type="number" step="0.01" min="0" name="decimaltal" id="${id}" value="${val}"${readonly}></div>`;
       break;
     case 'hidden':
       el = `<input type="hidden" id="${id}" value="${val}">`;
