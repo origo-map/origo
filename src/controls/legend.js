@@ -9,7 +9,8 @@ const Legend = function Legend(options = {}) {
     expanded = true,
     contentCls,
     contentStyle,
-    addControl = false,
+    turnOffLayersControl = false,
+    layerManagerControl = false,
     name = 'legend'
   } = options;
 
@@ -60,6 +61,15 @@ const Legend = function Legend(options = {}) {
     mainContainerEl.style.maxHeight = `${calcMaxHeight(getTargetHeight())}px`;
   };
 
+  const turnOffAllLayers = function turnOffAllLayers() {
+    const layers = viewer.getLayersByProperty('visible', true);
+    layers.forEach((el) => {
+      if (!(['none', 'background'].includes(el.get('group')))) {
+        el.setVisible(false);
+      }
+    });
+  };
+
   const divider = El({
     cls: 'divider margin-x-small',
     style: {
@@ -80,6 +90,21 @@ const Legend = function Legend(options = {}) {
     icon: '#o_add_24px',
     iconStyle: {
       fill: '#fff'
+    }
+  });
+
+  const turnOffLayersButton = Button({
+    cls: 'round compact icon-small margin-x-smaller\'title=\'Släck alla lager',
+    click() {
+      viewer.dispatch('active:turnofflayers');
+    },
+    style: {
+      'align-self': 'center',
+      'padding-right': '6px'
+    },
+    icon: '#ic_visibility_off_24px',
+    iconStyle: {
+      fill: '#7a7a7a'
     }
   });
 
@@ -109,6 +134,9 @@ const Legend = function Legend(options = {}) {
     },
     onAdd(evt) {
       viewer = evt.target;
+      if (turnOffLayersControl) {
+        viewer.on('active:turnofflayers', turnOffAllLayers);
+      }
       const backgroundLayers = viewer.getLayersByProperty('group', 'background').reverse();
       addBackgroundButtons(backgroundLayers);
       toggleGroup = ToggleGroup({
@@ -135,19 +163,54 @@ const Legend = function Legend(options = {}) {
       target = document.getElementById(viewer.getMain().getId());
       const maxHeight = calcMaxHeight(getTargetHeight());
       const overlaysCmp = Overlays({ viewer, cls: contentCls, style: contentStyle });
-      const baselayerCmps = addControl ? [toggleGroup, divider, addButton] : [toggleGroup];
+      const baselayerCmps = [toggleGroup];
+      const toolsCmps = [];
+      let toolsCmp;
+      let toolsCmpsLayoutStrategy;
+      let mainContainerComponents;
+
+      if (layerManagerControl || turnOffLayersControl) {
+        if (layerManagerControl && turnOffLayersControl) {
+          toolsCmps.push(addButton, divider, turnOffLayersButton);
+          toolsCmpsLayoutStrategy = 'space-between';
+        } else if (layerManagerControl && !turnOffLayersControl) {
+          toolsCmps.push(addButton);
+          toolsCmpsLayoutStrategy = 'flex-start';
+        } else if (!layerManagerControl && turnOffLayersControl) {
+          toolsCmps.push(turnOffLayersButton);
+          toolsCmpsLayoutStrategy = 'flex-end';
+        }
+        toolsCmp = El({
+          cls: 'flex padding-small no-shrink',
+          style: {
+            'background-color': '#fff',
+            'justify-content': toolsCmpsLayoutStrategy,
+            height: '40px'
+          },
+          components: toolsCmps
+        });
+      }
+
       const baselayersCmp = El({
         cls: 'flex padding-small no-shrink',
         style: {
           'background-color': '#fff',
           height: '50px',
-          'margin-right': '30px'
+          'padding-right': '30px',
+          'border-top': '1px solid #dbdbdb'
         },
         components: baselayerCmps
       });
+
+      if (toolsCmp) {
+        mainContainerComponents = [overlaysCmp, toolsCmp, baselayersCmp]
+      } else {
+        mainContainerComponents = [overlaysCmp, baselayersCmp]
+      }
+
       mainContainerCmp = El({
         cls: 'flex column overflow-hidden relative',
-        components: [overlaysCmp, baselayersCmp],
+        components: mainContainerComponents,
         style: {
           'max-height': `${maxHeight}px`
         }
