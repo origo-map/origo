@@ -27,7 +27,7 @@ const Overlays = function Overlays(options) {
   let overlays;
 
   const themeGroups = ThemeGroups();
-  const rootGroup = GroupList({ viewer });
+  const rootGroup = GroupList({ viewer }, true);
 
   const groupCmps = viewer.getGroups().reduce((acc, group) => {
     if (nonGroupNames.includes(group.name)) return acc;
