@@ -5,8 +5,12 @@ import { Component, Button, dom } from '../ui';
 const Geoposition = function Geoposition(options = {}) {
   let {
     target,
-    zoomLevel,
-    active = false
+    zoomLevel
+  } = options;
+
+  const {
+    active = false,
+    panTo = true
   } = options;
 
   let viewer;
@@ -65,7 +69,9 @@ const Geoposition = function Geoposition(options = {}) {
     viewer.getMap().addOverlay(markerOverlay);
 
     geolocation.on('change', updatePosition);
-    geolocation.once('change', centerPosition);
+    if (panTo) {
+      geolocation.once('change', centerPosition);
+    }
     geolocation.setTracking(true);
   };
 
@@ -111,7 +117,7 @@ const Geoposition = function Geoposition(options = {}) {
     },
     render() {
       const htmlString = positionButton.render();
-      if(active) {
+      if (active) {
         positionButton.setState('active');
       }
       const el = dom.html(htmlString);
