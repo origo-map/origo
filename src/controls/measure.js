@@ -302,7 +302,9 @@ const Measure = function Measure({
           click() {
             toggleMeasure();
           },
-          icon: '#ic_straighten_24px'
+          icon: '#ic_straighten_24px',
+          tooltipText: 'Mäta',
+          tooltipPlacement: 'east'
         });
         buttons.push(measureButton);
 
@@ -315,7 +317,7 @@ const Measure = function Measure({
             },
             icon: '#minicons-line-vector',
             tooltipText: 'Linje',
-            tooltipPlacement: 'north'
+            tooltipPlacement: 'east'
           });
           buttons.push(lengthToolButton);
           defaultButton = lengthToolButton;
@@ -330,7 +332,7 @@ const Measure = function Measure({
             },
             icon: '#minicons-square-vector',
             tooltipText: 'Yta',
-            tooltipPlacement: 'north'
+            tooltipPlacement: 'east'
           });
           buttons.push(areaToolButton);
           defaultButton = defaultTool === 'length' ? lengthToolButton : areaToolButton;

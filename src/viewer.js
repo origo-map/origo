@@ -11,7 +11,7 @@ import Layer from './layer';
 import Main from './components/main';
 import Footer from './components/footer';
 import flattenGroups from './utils/flattengroups';
-import getattributes from './getattributes';
+import getAttributes from './getattributes';
 import getcenter from './geometry/getcenter';
 
 const Viewer = function Viewer(targetOption, options = {}) {
@@ -38,6 +38,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     pageSettings = {},
     projectionCode,
     projectionExtent,
+    startExtent,
     extent = [],
     center: centerOption = [0, 0],
     zoom: zoomOption = 0,
@@ -409,7 +410,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
               const obj = {};
               obj.feature = feature;
               obj.title = layer.get('title');
-              obj.content = getattributes(feature, layer);
+              obj.content = getAttributes(feature, layer);
               obj.layer = layer;
               const centerGeometry = getcenter(feature.getGeometry());
               featureinfo.render([obj], 'overlay', centerGeometry);
@@ -430,6 +431,11 @@ const Viewer = function Viewer(targetOption, options = {}) {
           geometry: new geom[urlParams.selection.geometryType](urlParams.selection.coordinates)
         });
       }
+
+      if (!urlParams.zoom && !urlParams.mapStateId && startExtent) {
+        map.getView().fit(startExtent, { size: map.getSize() });
+      }
+
       featureinfoOptions.viewer = this;
       featureinfo = Featureinfo(featureinfoOptions);
       this.addComponent(featureinfo);

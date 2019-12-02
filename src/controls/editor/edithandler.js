@@ -14,6 +14,7 @@ import editForm from './editform';
 import imageresizer from '../../utils/imageresizer';
 import getImageOrientation from '../../utils/getimageorientation';
 import shapes from './shapes';
+import validate from '../../utils/validate';
 
 const editsStore = store();
 let editLayers = {};
@@ -331,6 +332,7 @@ function attributesSaveHandler(feature, formEl) {
 function onAttributesSave(feature, attrs) {
   $('#o-save-button').on('click', (e) => {
     const editEl = {};
+    const valid = {};
     let fileReader;
     let input;
     let file;
@@ -339,18 +341,23 @@ function onAttributesSave(feature, attrs) {
     attrs.forEach((attribute) => {
       // Get the input container class
       const containerClass = `.${attribute.elId.slice(1)}`;
+      // Get the input attributes
+      const inputType = $(attribute.elId).attr('type');
+      const inputValue = $(attribute.elId).val();
+      const inputName = $(attribute.elId).attr('name');
+      const inputId = $(attribute.elId).attr('id');
 
       // If hidden element it should be excluded
       if ($(containerClass).hasClass('o-hidden') === false) {
         // Check if checkbox. If checkbox read state.
-        if ($(attribute.elId).attr('type') === 'checkbox') {
+        if (inputType === 'checkbox') {
           editEl[attribute.name] = $(attribute.elId).is(':checked') ? 1 : 0;
         } else { // Read value from input text, textarea or select
-          editEl[attribute.name] = $(attribute.elId).val();
+          editEl[attribute.name] = inputValue;
         }
       }
       // Check if file. If file, read and trigger resize
-      if ($(attribute.elId).attr('type') === 'file') {
+      if (inputType === 'file') {
         input = $(attribute.elId)[0];
         file = input.files[0];
 
@@ -370,19 +377,81 @@ function onAttributesSave(feature, attrs) {
           editEl[attribute.name] = $(attribute.elId).attr('value');
         }
       }
+
+      // Validate form input
+      const errorOn = document.querySelector(`input[id="${inputId}"]`);
+      const errorCls = `.o-${inputId}`;
+      const errorMsg = document.querySelector(errorCls);
+      const errorText = `Vänligen ange korrekt ${inputName}`;
+
+      // Field is valid if empty
+      if (inputValue === '') {
+        if (errorMsg) {
+          errorMsg.remove();
+        }
+        return inputValue;
+      }
+      // Test field input with regex and insert error text if unvalid
+      switch (attribute.type) {
+        case 'integer':
+          valid.integer = validate.integer(inputValue) ? inputValue : false;
+          if (!valid.integer) {
+            if (!errorMsg) {
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            }
+          } else if (errorMsg) {
+            errorMsg.remove();
+          }
+          break;
+        case 'decimal':
+          valid.decimal = validate.decimal(inputValue) ? inputValue : false;
+          if (!valid.decimal) {
+            if (!errorMsg) {
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            }
+          } else if (errorMsg) {
+            errorMsg.remove();
+          }
+          break;
+        case 'email':
+          valid.email = validate.email(inputValue) ? inputValue : false;
+          if (!valid.email) {
+            if (!errorMsg) {
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            }
+          } else if (errorMsg) {
+            errorMsg.remove();
+          }
+          break;
+        case 'url':
+          valid.url = validate.url(inputValue) ? inputValue : false;
+          if (!valid.url) {
+            if (!errorMsg) {
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            }
+          } else if (errorMsg) {
+            errorMsg.remove();
+          }
+          break;
+        default:
+      }
+      valid.validates = Object.values(valid).includes(false) ? false : valid;
     });
 
-    if (fileReader && fileReader.readyState === 1) {
-      $(document).on('imageresized', () => {
+    // If valid, continue
+    if (valid.validates) {
+      if (fileReader && fileReader.readyState === 1) {
+        $(document).on('imageresized', () => {
+          attributesSaveHandler(feature, editEl);
+        });
+      } else {
         attributesSaveHandler(feature, editEl);
-      });
-    } else {
-      attributesSaveHandler(feature, editEl);
-    }
+      }
 
-    modal.closeModal();
-    $('#o-save-button').blur();
-    e.preventDefault();
+      modal.closeModal();
+      $('#o-save-button').blur();
+      e.preventDefault();
+    }
   });
 }
 
@@ -475,7 +544,7 @@ function editAttributes(feat) {
     }
 
     const formElement = attributeObjects.reduce((prev, next) => prev + next.formElement, '');
-    const form = `<form>${formElement}<br><div class="o-form-save"><input id="o-save-button" type="button" value="Ok"></input></div></form>`;
+    const form = `<div id="o-form">${formElement}<br><div class="o-form-save"><input id="o-save-button" type="button" value="Ok"></input></div></div>`;
 
     modal = Modal({
       title,
