@@ -19,13 +19,6 @@ module.exports = merge(common, {
   devtool: false,
   mode: 'production',
   plugins: [
-    new UglifyJSPlugin({
-      uglifyOptions: {
-        output: {
-          beautify: false
-        }
-      }
-    }),
     new webpack.optimize.AggressiveMergingPlugin()
   ]
 });
