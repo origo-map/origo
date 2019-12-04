@@ -11,7 +11,8 @@ const Map = (options = {}) => {
       center: options.center,
       resolutions: options.resolutions || undefined,
       zoom: options.zoom,
-      enableRotation: options.enableRotation
+      enableRotation: options.enableRotation,
+      constrainResolution: options.constrainResolution
     })
   });
   return map;
