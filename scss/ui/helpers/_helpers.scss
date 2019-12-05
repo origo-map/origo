@@ -56,8 +56,14 @@
 .absolute {
   position: absolute;
 }
+.fixed {
+  position: fixed;
+}
 .relative {
   position: relative;
+}
+.sticky {
+  position: sticky;
 }
 
 // display
@@ -66,6 +72,9 @@
 }
 .inline-block {
   display: inline-block;
+}
+.empty:empty {
+  display: none;
 }
 
 // box-shadow
@@ -83,6 +92,10 @@
 }
 .rounded {
   border-radius: $radius-small;
+  overflow: hidden;
+}
+.rounded-large {
+  border-radius: $radius-large;
   overflow: hidden;
 }
 .rounded-top {
