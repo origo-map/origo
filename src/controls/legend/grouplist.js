@@ -1,11 +1,14 @@
 import { Component } from '../../ui';
 
-const LayerList = function LayerList(options) {
+const LayerList = function LayerList(options, isRootGroup = false) {
   const {
     cls: clsSettings = ''
   } = options;
 
-  const cls = `${clsSettings} list divider-end`.trim();
+  let cls = `${clsSettings} list divider-end`.trim();
+  if (isRootGroup) {
+    cls = `${clsSettings} list divider-end-rootgroup`.trim();
+  }
   const overlaysStore = {};
   const groupStore = {};
   let el;
