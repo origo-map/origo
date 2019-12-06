@@ -42,7 +42,7 @@ const createForm = function createForm(obj) {
       const imageClass = val ? '' : 'o-hidden';
       el = `<div class="${cls}"><label>${label}</label><br>`;
       el += `<img src="${val}" id="image-upload" class="${imageClass}"/>`;
-      el += `<input type="file" id="${id}" value="${val}" accept="image/*"${disabled}>`;
+      el += `<input type="file" name="bildfil" id="${id}" value="${val}" accept="image/*"${disabled}>`;
       el += `<input id="o-delete-image-button" class="${imageClass}" type="button" value="Ta bort bild"${disabled}>`;
       el += '</div>';
       break;
@@ -57,7 +57,7 @@ const createForm = function createForm(obj) {
           val = isoDate.slice(0, 10);
         }
       }
-      el = `<div><label>${label}</label><br><input type="date" id="${id}" placeholder="ÅÅÅÅ-MM-DD" value="${val}"${readonly}></div>`;
+      el = `<div><label>${label}</label><br><input type="date" name="datum" id="${id}" placeholder="ÅÅÅÅ-MM-DD" value="${val}"${readonly}></div>`;
       break;
     case 'time':
       if (!val) {
@@ -69,7 +69,7 @@ const createForm = function createForm(obj) {
           val = isoDate.slice(11, 16);
         }
       }
-      el = `<div><label>${label}</label><br><input type="time" id="${id}" placeholder="tt:mm" value="${val}"${readonly}></div>`;
+      el = `<div><label>${label}</label><br><input type="time" name="timmar och minuter" id="${id}" placeholder="tt:mm" value="${val}"${readonly}></div>`;
       break;
     case 'datetime':
       if (!val) {
@@ -81,13 +81,13 @@ const createForm = function createForm(obj) {
           val = isoDate.slice(0, 16);
         }
       }
-      el = `<div><label>${label}</label><br><input type="datetime-local" id="${id}" placeholder="ÅÅÅÅ-MM-DDTtt:mm" value="${val}"${readonly}></div>`;
+      el = `<div><label>${label}</label><br><input type="datetime-local" name="datum och tid" id="${id}" placeholder="ÅÅÅÅ-MM-DDTtt:mm" value="${val}"${readonly}></div>`;
       break;
     case 'color':
       if (!val) {
         val = obj.defaultColor ? obj.defaultColor : '';
       }
-      el = `<div><label>${label}</label><br><input type="color" id="${id}" value="${val}"${readonly}></div>`;
+      el = `<div><label>${label}</label><br><input type="color" name="hexadecimal" id="${id}" value="${val}"${readonly}></div>`;
       break;
     case 'email':
       el = `<div><label>${label}</label><br><input type="email" name="epost" id="${id}" value="${val}"${readonly}></div>`;

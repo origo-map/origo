@@ -433,6 +433,56 @@ function onAttributesSave(feature, attrs) {
             errorMsg.remove();
           }
           break;
+          case 'datetime':
+          valid.datetime = validate.datetime(inputValue) ? inputValue : false;
+          if (!valid.datetime) {
+            if (!errorMsg) {
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            }
+          } else if (errorMsg) {
+            errorMsg.remove();
+          }
+          break;
+          case 'date':
+          valid.date = validate.date(inputValue) ? inputValue : false;
+          if (!valid.date) {
+            if (!errorMsg) {
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            }
+          } else if (errorMsg) {
+            errorMsg.remove();
+          }
+          break;
+          case 'time':
+          valid.time = validate.time(inputValue) ? inputValue : false;
+          if (!valid.url) {
+            if (!errorMsg) {
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            }
+          } else if (errorMsg) {
+            errorMsg.remove();
+          }
+          break;
+          case 'image':
+          valid.image = validate.image(inputValue) ? inputValue : false;
+          if (!valid.url) {
+            if (!errorMsg) {
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            }
+          } else if (errorMsg) {
+            errorMsg.remove();
+          }
+          break;
+          case 'color':
+          valid.color = validate.color(inputValue) ? inputValue : false;
+          if (!valid.url) {
+            if (!errorMsg) {
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            }
+          } else if (errorMsg) {
+            errorMsg.remove();
+          }
+          break;
         default:
       }
       valid.validates = Object.values(valid).includes(false) ? false : valid;
