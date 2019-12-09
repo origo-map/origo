@@ -31,6 +31,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     consoleId = 'o-console',
     mapCls = 'o-map',
     controls = [],
+    constrainResolution = false,
     enableRotation = true,
     featureinfoOptions = {},
     groups: groupOptions = [],
@@ -372,6 +373,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
         center,
         resolutions,
         zoom,
+        constrainResolution,
         enableRotation,
         target: this.getId()
       }));
