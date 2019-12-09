@@ -433,8 +433,8 @@ function onAttributesSave(feature, attrs) {
             errorMsg.remove();
           }
           break;
-          case 'datetime':
-          valid.datetime = validate.datetime(inputValue) ? inputValue : false;
+        case 'datetime':
+          valid.datetime = validate.datetime(inputValue) && inputValue.length === 16 ? inputValue : false;
           if (!valid.datetime) {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
@@ -443,8 +443,8 @@ function onAttributesSave(feature, attrs) {
             errorMsg.remove();
           }
           break;
-          case 'date':
-          valid.date = validate.date(inputValue) ? inputValue : false;
+        case 'date':
+          valid.date = validate.date(inputValue) && inputValue.length === 10 ? inputValue : false;
           if (!valid.date) {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
@@ -453,9 +453,9 @@ function onAttributesSave(feature, attrs) {
             errorMsg.remove();
           }
           break;
-          case 'time':
-          valid.time = validate.time(inputValue) ? inputValue : false;
-          if (!valid.url) {
+        case 'time':
+          valid.time = validate.time(inputValue) && inputValue.length === 5 ? inputValue : false;
+          if (!valid.time) {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }
@@ -463,9 +463,9 @@ function onAttributesSave(feature, attrs) {
             errorMsg.remove();
           }
           break;
-          case 'image':
+        case 'image':
           valid.image = validate.image(inputValue) ? inputValue : false;
-          if (!valid.url) {
+          if (!valid.image) {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }
@@ -473,9 +473,9 @@ function onAttributesSave(feature, attrs) {
             errorMsg.remove();
           }
           break;
-          case 'color':
+        case 'color':
           valid.color = validate.color(inputValue) ? inputValue : false;
-          if (!valid.url) {
+          if (!valid.color) {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }

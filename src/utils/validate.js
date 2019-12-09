@@ -2,7 +2,7 @@ const validate = {};
 
 validate.integer = (integer) => {
   if (integer) {
-    const regex = /^([+-]?[1-9]*|0)$/;
+    const regex = /^[0-9]*$/;
     return regex.test(integer);
   }
   return false;
@@ -58,7 +58,7 @@ validate.time = (time) => {
 
 validate.image = (image) => {
   if (image) {
-    const regex = /\.(jpe?g|png|gif|bmp)$/i;
+    const regex = /\.(tiff|pjp|pjpeg|jpe?g|jfif|webp|tif|bmp|png|svgz|gif|svg|ico|xbm|dib)$/i;
     return regex.test(image);
   }
   return false;
