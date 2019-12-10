@@ -1,7 +1,7 @@
 import 'owl.carousel';
 import Overlay from 'ol/Overlay';
 import $ from 'jquery';
-import { Component } from './ui';
+import { Component, Modal } from './ui';
 import Popup from './popup';
 import sidebar from './sidebar';
 import maputils from './maputils';
@@ -149,6 +149,32 @@ const Featureinfo = function Featureinfo(options = {}) {
     return getContent;
   };
 
+  const addLinkListener = function addLinkListener(el) {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targ = e.target;
+      let modalStyle = '';
+      switch (targ.target) {
+        case 'modal-full':
+        {
+          modalStyle = 'max-width:unset;width:98%;height:98%;';
+          break;
+        }
+        default:
+        {
+          modalStyle = '';
+          break;
+        }
+      }
+      Modal({
+        title: targ.innerText,
+        content: `<iframe src="${targ.href}" class=""style="width:100%;height:99%;"></iframe>`,
+        target: viewer.getId(),
+        style: modalStyle
+      });
+    });
+  };
+
   const render = function render(identifyItems, target, coordinate) {
     const map = viewer.getMap();
     items = identifyItems;
@@ -204,6 +230,11 @@ const Featureinfo = function Featureinfo(options = {}) {
       {
         break;
       }
+    }
+
+    const modalLinks = document.getElementsByClassName('o-identify-link-modal');
+    for (let i = 0; i < modalLinks.length; i += 1) {
+      addLinkListener(modalLinks[i]);
     }
   };
 
