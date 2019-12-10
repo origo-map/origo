@@ -57,6 +57,14 @@ input[type=checkbox] {
   width: 1rem;
 }
 input[type=button] {
+  border: 1px solid $border-color;
+  border-radius: 3px;
+  box-sizing: border-box;
+  font-family: Arial;
+  font-size: $font-size-normal;
+  line-height: $line-height-base;
+  margin-bottom: .375rem;
+  padding: $button-padding-medium;
   background-color: $white;
   border-radius: 3px;
   cursor: pointer;
