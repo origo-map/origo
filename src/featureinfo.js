@@ -170,7 +170,8 @@ const Featureinfo = function Featureinfo(options = {}) {
         title: targ.innerText,
         content: `<iframe src="${targ.href}" class=""style="width:100%;height:99%;"></iframe>`,
         target: viewer.getId(),
-        style: modalStyle
+        style: modalStyle,
+        newTabUrl: targ.href
       });
     });
   };
