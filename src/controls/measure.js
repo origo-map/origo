@@ -32,6 +32,7 @@ const Measure = function Measure({
   let label;
   let lengthTool;
   let areaTool;
+  let elevationTool;
   let defaultTool;
   let isActive = false;
   const overlayArray = [];
@@ -41,6 +42,7 @@ const Measure = function Measure({
   let measureButton;
   let lengthToolButton;
   let areaToolButton;
+  let elevationToolButton;
   const buttons = [];
   let target;
 
@@ -178,6 +180,9 @@ const Measure = function Measure({
     if (areaTool) {
       document.getElementById(areaToolButton.getId()).classList.add('hidden');
     }
+    if (elevationTool) {
+      document.getElementById(elevationToolButton.getId()).classList.add('hidden');
+    }
     document.getElementById(measureButton.getId()).classList.add('tooltip');
     setActive(false);
 
@@ -197,6 +202,9 @@ const Measure = function Measure({
     }
     if (areaTool) {
       document.getElementById(areaToolButton.getId()).classList.remove('hidden');
+    }
+    if (elevationTool) {
+      document.getElementById(elevationToolButton.getId()).classList.remove('hidden');
     }
     document.getElementById(measureButton.getId()).classList.remove('tooltip');
     setActive(true);
@@ -287,11 +295,12 @@ const Measure = function Measure({
         }
       });
     },
-    onInit() {
+    onInit() { console.log(measureTools)
       lengthTool = measureTools.indexOf('length') >= 0;
       areaTool = measureTools.indexOf('area') >= 0;
+      elevationTool = measureTools.indexOf('elevation') >= 0;
       defaultTool = lengthTool ? defaultMeasureTool : 'area';
-      if (lengthTool || areaTool) {
+      if (lengthTool || areaTool || elevationTool) {
         measureElement = El({
           tagName: 'div',
           cls: 'flex column'
@@ -316,7 +325,7 @@ const Measure = function Measure({
               toggleType(this);
             },
             icon: '#minicons-line-vector',
-            tooltipText: 'Linje',
+            tooltipText: 'Längd',
             tooltipPlacement: 'east'
           });
           buttons.push(lengthToolButton);
@@ -325,7 +334,7 @@ const Measure = function Measure({
 
         if (areaTool) {
           areaToolButton = Button({
-            cls: 'o-measure-area padding-small icon-smaller round light box-shadow hidden',
+            cls: 'o-measure-area padding-small margin-bottom-smaller icon-smaller round light box-shadow hidden',
             click() {
               type = 'Polygon';
               toggleType(this);
@@ -336,6 +345,21 @@ const Measure = function Measure({
           });
           buttons.push(areaToolButton);
           defaultButton = defaultTool === 'length' ? lengthToolButton : areaToolButton;
+        }
+
+        if (elevationTool) {
+          elevationToolButton = Button({
+            cls: 'o-measure-elevation padding-small icon-smaller round light box-shadow hidden',
+            click() {
+              type = 'Point';
+              toggleType(this);
+            },
+            icon: '#ic_height_24px',
+            tooltipText: 'Höjd',
+            tooltipPlacement: 'east'
+          });
+          buttons.push(elevationToolButton);
+          defaultButton = defaultTool === 'length' ? lengthToolButton : elevationToolButton;
         }
       }
     },
@@ -354,6 +378,11 @@ const Measure = function Measure({
       }
       if (areaTool) {
         htmlString = areaToolButton.render();
+        el = dom.html(htmlString);
+        document.getElementById(measureElement.getId()).appendChild(el);
+      }
+      if (elevationTool) {
+        htmlString = elevationToolButton.render();
         el = dom.html(htmlString);
         document.getElementById(measureElement.getId()).appendChild(el);
       }

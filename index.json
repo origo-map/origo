@@ -50,7 +50,15 @@
       }
     },
     {
-      "name": "measure"
+      "name": "measure",
+      "options": {
+        "elevationUrl": "http://localhost:3001/origoserver/lmelevation",
+        "measureTools": [
+          "area",
+          "length",
+          "elevation"
+        ]
+      }
     }
   ],
   "pageSettings": {
@@ -222,7 +230,7 @@
             }
           }
         ]
-      ],      
+      ],
       "karta_gra": [
         [
           {
