@@ -12,6 +12,8 @@
   z-index: 1050;
 }
 .o-modal {
+  resize: both;
+  overflow: auto;
   background-color: white;
   border-radius: 6px;
 	bottom: auto;
