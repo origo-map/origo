@@ -157,18 +157,18 @@ const Featureinfo = function Featureinfo(options = {}) {
       switch (targ.target) {
         case 'modal-full':
         {
-          modalStyle = 'max-width:unset;width:98%;height:98%;';
+          modalStyle = 'max-width:unset;width:98%;height:98%;resize:both;overflow:auto;display:flex;flex-flow:column;';
           break;
         }
         default:
         {
-          modalStyle = '';
+          modalStyle = 'resize:both;overflow:auto;display:flex;flex-flow:column;';
           break;
         }
       }
       Modal({
         title: targ.innerText,
-        content: `<iframe src="${targ.href}" class=""style="width:100%;height:99%;"></iframe>`,
+        content: `<iframe src="${targ.href}" class=""style="width:100%;height:99%"></iframe>`,
         target: viewer.getId(),
         style: modalStyle,
         newTabUrl: targ.href
