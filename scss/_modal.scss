@@ -14,7 +14,7 @@
 .o-modal {
   background-color: white;
   border-radius: 6px;
-	bottom: auto;
+  bottom: auto;
   -webkit-box-shadow: 0 2px 8px 1px rgba(0,0,0,0.45);
   box-shadow: 0 2px 8px 1px rgba(0,0,0,0.45);
   font-family: Arial,sans-serif;
@@ -23,9 +23,9 @@
   -webkit-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
   position: absolute;
-	right: auto;
-	top: 50%;
-	-webkit-transform-style: preserve-3d;
+  right: auto;
+  top: 50%;
+  -webkit-transform-style: preserve-3d;
   -moz-transform-style: preserve-3d;
   transform-style: preserve-3d;
   width: 300px;
@@ -46,10 +46,10 @@
 .o-modal-content {
   font-size: 0.9em;
   line-height: 1.1em;
-	max-height: calc(100vh - 60px);
+  max-height: calc(100vh - 60px);
   height: 100%;
   padding: 10px 15px;
-	overflow-y: auto;
+  overflow-y: auto;
 }
 .o-modal-content .o-share-link {
   padding: 10px 5px;
