@@ -298,24 +298,26 @@ const Measure = function Measure({
         });
 
         measureButton = Button({
-          cls: 'o-measure padding-small margin-bottom-smaller icon-smaller rounded light box-shadow',
+          cls: 'o-measure padding-small margin-bottom-smaller icon-smaller round light box-shadow',
           click() {
             toggleMeasure();
           },
-          icon: '#ic_straighten_24px'
+          icon: '#ic_straighten_24px',
+          tooltipText: 'Mäta',
+          tooltipPlacement: 'east'
         });
         buttons.push(measureButton);
 
         if (lengthTool) {
           lengthToolButton = Button({
-            cls: 'o-measure-length padding-small margin-bottom-smaller icon-smaller rounded light box-shadow hidden',
+            cls: 'o-measure-length padding-small margin-bottom-smaller icon-smaller round light box-shadow hidden',
             click() {
               type = 'LineString';
               toggleType(this);
             },
             icon: '#minicons-line-vector',
             tooltipText: 'Linje',
-            tooltipPlacement: 'north'
+            tooltipPlacement: 'east'
           });
           buttons.push(lengthToolButton);
           defaultButton = lengthToolButton;
@@ -323,14 +325,14 @@ const Measure = function Measure({
 
         if (areaTool) {
           areaToolButton = Button({
-            cls: 'o-measure-area padding-small icon-smaller rounded light box-shadow hidden',
+            cls: 'o-measure-area padding-small icon-smaller round light box-shadow hidden',
             click() {
               type = 'Polygon';
               toggleType(this);
             },
             icon: '#minicons-square-vector',
             tooltipText: 'Yta',
-            tooltipPlacement: 'north'
+            tooltipPlacement: 'east'
           });
           buttons.push(areaToolButton);
           defaultButton = defaultTool === 'length' ? lengthToolButton : areaToolButton;

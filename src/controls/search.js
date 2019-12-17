@@ -297,8 +297,11 @@ const Search = function Search(options = {}) {
       sort: false,
       maxItems: limit,
       item: renderList,
-      filter(suggestion) {
-        return suggestion.value;
+      filter(suggestion, userInput) {
+        if (suggestion.value.toLowerCase().includes(userInput.toLowerCase())) {
+          return suggestion.value;
+        }
+        return false;
       }
     });
 

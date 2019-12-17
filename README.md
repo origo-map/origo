@@ -39,7 +39,7 @@ Not convinced? Or maybe you need some inspiration? Check out these examples of w
  * [Mälardalskartan](http://www.malardalskartan.se)
  * [Sigtunakartan](https://karta.sigtuna.se)
  * [Strängnäskartan](https://karta.strangnas.se)
- * [Västerås Stads samlingskarta](http://kartor.vasteras.se/sam)
+ * [Västerås Stads samlingskarta](https://kartor.vasteras.se/sam)
 
 ## Getting started
 So you have decided to take matters into your own hands and get coding? Great!
@@ -82,4 +82,6 @@ Guidelines for developing in Origo are available in the [`DEVELOPING.md`](https:
 The project is licensed under the BSD 2-clause license. It is specified in the [license file](LICENSE.txt).
 
 ## Contact
-If you want to get in contact with us, please join our chat on slack.com using this invitation: [origo-map.slack.com](https://join.slack.com/t/origo-map/shared_invite/enQtMjU0OTQ5MzcxMDQ3LTA4ZDBlNjI0Mzc2NzI0NTE1ZjAzMGY2ODIxZjdlNDdiNjRkNjhjZTFiNThjNWM0NmM5ZTIyYjBjNmZkM2Y2NTI).
+If you want to get in contact with us, please join our chat on slack.com using this invitation: [origo-map.slack.com](https://join.slack.com/t/origo-map/shared_invite/enQtMjU0OTQ5MzcxMDQ3LTIwYzFiZjdmODJiYmQwZTUxNmIxZWM2NzljOWRiZTUyOWNlMWUxYzQ5ZGQwMTRkYzdkM2IyMGE5ZTQ4MTM4NDM).
+
+On [https://origo-map.github.io/archive/](https://origo-map.github.io/archive/) you can take part of our newsletter and read about our meetups.

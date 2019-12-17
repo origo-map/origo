@@ -2,7 +2,7 @@ import * as LoadingStrategy from 'ol/loadingstrategy';
 import { createXYZ } from 'ol/tilegrid';
 import VectorSource from 'ol/source/Vector';
 import GeoJSONFormat from 'ol/format/GeoJSON';
-import $ from 'jquery';
+import { transformExtent } from 'ol/proj';
 import vector from './vector';
 
 function createSource(options) {
@@ -15,25 +15,32 @@ function createSource(options) {
   } else {
     queryFilter = options.filter ? `&CQL_FILTER=${options.filter} AND BBOX(${options.geometryName},` : '&BBOX=';
   }
-  const bboxProjectionCode = options.filter ? `'${options.projectionCode}')` : options.projectionCode;
+  const bboxProjectionCode = options.filter ? `'${options.dataProjection}')` : options.dataProjection;
   const vectorSource = new VectorSource({
     attributions: options.attribution,
     format: new GeoJSONFormat({
-      geometryName: options.geometryName
+      geometryName: options.geometryName,
+      dataProjection: options.dataProjection,
+      featureProjection: options.projectionCode
     }),
     loader(extent) {
+      let requestExtent;
+      if (options.dataProjection !== options.projectionCode) {
+        requestExtent = transformExtent(extent, options.projectionCode, options.dataProjection);
+      } else {
+        requestExtent = extent;
+      }
       let url = [`${serverUrl}?service=WFS`,
         `&version=1.1.0&request=GetFeature&typeName=${options.featureType}&outputFormat=application/json`,
-        `&srsname=${options.projectionCode}`].join('');
-      url += options.strategy === 'all' ? queryFilter : `${queryFilter + extent.join(',')},${bboxProjectionCode}`;
+        `&srsname=${options.dataProjection}`].join('');
+      url += options.strategy === 'all' ? queryFilter : `${queryFilter + requestExtent.join(',')},${bboxProjectionCode}`;
       url = encodeURI(url);
-      $.ajax({
-        url,
+
+      fetch(url).then(response => response.json({
         cache: false
-      })
-        .done((response) => {
-          vectorSource.addFeatures(vectorSource.getFormat().readFeatures(response));
-        });
+      })).then((data) => {
+        vectorSource.addFeatures(vectorSource.getFormat().readFeatures(data));
+      });
     },
     strategy: options.loadingstrategy
   });
@@ -54,6 +61,13 @@ export default function wfs(layerOptions, viewer) {
   sourceOptions.attribution = wfsOptions.attribution;
   sourceOptions.resolutions = viewer.getResolutions();
   sourceOptions.projectionCode = viewer.getProjectionCode();
+  if (wfsOptions.projection) {
+    sourceOptions.dataProjection = wfsOptions.projection;
+  } else if (sourceOptions.projection) {
+    sourceOptions.dataProjection = sourceOptions.projection;
+  } else {
+    sourceOptions.dataProjection = viewer.getProjectionCode();
+  }
 
   sourceOptions.strategy = layerOptions.strategy ? layerOptions.strategy : sourceOptions.strategy;
   switch (sourceOptions.strategy) {

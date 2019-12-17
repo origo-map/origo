@@ -41,10 +41,10 @@ const externalurlSeveralButtons = function externalurlSeveralButtons(options = {
       });
 
       externalUrlMainButton = Button({
-        cls: 'o-measure padding-small margin-bottom-smaller icon-smaller rounded light box-shadow',
+        cls: 'o-measure padding-small margin-bottom-smaller icon-smaller round light box-shadow',
         icon: '#ic_baseline_link_24px',
         tooltipText: mainbuttonTooltipText,
-        tooltipPlacement: 'north',
+        tooltipPlacement: 'east',
         click() {
           toggleMainButton();
         }
@@ -54,10 +54,10 @@ const externalurlSeveralButtons = function externalurlSeveralButtons(options = {
         const tooltipText = link.tooltipText;
         const buttonImage = link.buttonImage || '#fa-external-link';
         const subButton = Button({
-          cls: 'o-measure-length padding-small margin-bottom-smaller icon-smaller rounded light box-shadow hidden',
+          cls: 'o-measure-length padding-small margin-bottom-smaller icon-smaller round light box-shadow hidden',
           icon: buttonImage,
           tooltipText,
-          tooltipPlacement: 'north',
+          tooltipPlacement: 'east',
           click() {
             const mapView = map.getView();
             const center = mapView.getCenter();

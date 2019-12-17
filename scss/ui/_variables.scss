@@ -58,6 +58,7 @@ $z-top: 100;
 $font-family-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
 $font-size-base: 1rem;
+$font-size-smallest: $font-size-base * .625;
 $font-size-smaller: $font-size-base * .75;
 $font-size-small: $font-size-base * .875;
 $font-size-normal: $font-size-base;
@@ -151,6 +152,7 @@ $spacing-small: $size-0-25;
 // Miscellaneous
 
 $base-scale: 1;
+$radius-large: 1rem;
 $radius-base: .5rem;
 $radius-small: .25rem;
 $radius-round: 50%;

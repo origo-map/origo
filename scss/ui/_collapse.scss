@@ -11,8 +11,9 @@
         transition:  all 0.3s ease;
       }
     }    
-  }  
+  } 
   &.expanded > .collapse-header {
+    border-bottom: none;
     .rotate {
       &.icon {
         transform: rotate(90deg);

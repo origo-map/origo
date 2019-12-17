@@ -13,6 +13,7 @@ export default function Collapse(options = {}) {
     collapseY = true,
     contentComponent,
     headerComponent,
+    footerComponent,
     contentCls = '',
     contentStyle: contentStyleOptions = {},
     data = {},
@@ -37,34 +38,38 @@ export default function Collapse(options = {}) {
   };
 
   const expand = function expand() {
+    if (!expanded) {
+      collapseEl.classList.add('expanded');
+      const newHeight = contentEl.offsetHeight;
+      const newWidth = contentEl.scrollWidth;
+      if (collapseY) containerEl.style.height = `${newHeight}px`;
+      if (collapseX) containerEl.style.width = `${newWidth}px`;
+      containerEl.addEventListener('transitionend', onTransitionEnd);
+    }
     expanded = true;
-    collapseEl.classList.add('expanded');
-    const newHeight = contentEl.offsetHeight;
-    const newWidth = contentEl.scrollWidth;
-    if (collapseY) containerEl.style.height = `${newHeight}px`;
-    if (collapseX) containerEl.style.width = `${newWidth}px`;
-    containerEl.addEventListener('transitionend', onTransitionEnd);
   };
 
   const collapse = function collapse() {
-    expanded = false;
-    const collapseSize = 0;
-    collapseEl.classList.remove('expanded');
-    const currentHeight = contentEl.offsetHeight;
-    const currentWidth = contentEl.scrollWidth;
-    const elementTransition = containerEl.style.transition;
-    containerEl.style.transition = '';
-
-    requestAnimationFrame(() => {
-      if (collapseY) containerEl.style.height = `${currentHeight}px`;
-      if (collapseX) containerEl.style.width = `${currentWidth}px`;
-      containerEl.style.transition = elementTransition;
+    if (expanded) {
+      const collapseSize = 0;
+      collapseEl.classList.remove('expanded');
+      const currentHeight = contentEl.offsetHeight;
+      const currentWidth = contentEl.scrollWidth;
+      const elementTransition = containerEl.style.transition;
+      containerEl.style.transition = '';
 
       requestAnimationFrame(() => {
-        if (collapseY) containerEl.style.height = `${collapseSize}px`;
-        if (collapseX) containerEl.style.width = `${collapseSize}px`;
+        if (collapseY) containerEl.style.height = `${currentHeight}px`;
+        if (collapseX) containerEl.style.width = `${currentWidth}px`;
+        containerEl.style.transition = elementTransition;
+
+        requestAnimationFrame(() => {
+          if (collapseY) containerEl.style.height = `${collapseSize}px`;
+          if (collapseX) containerEl.style.width = `${collapseSize}px`;
+        });
       });
-    });
+    }
+    expanded = false;
   };
 
   const toggle = function toggle(evt) {
@@ -83,8 +88,9 @@ export default function Collapse(options = {}) {
     data,
     expand,
     onInit() {
-      if (headerComponent && contentComponent) {
-        this.addComponent(headerComponent);
+      if ((headerComponent || footerComponent) && contentComponent) {
+        if (headerComponent) { this.addComponent(headerComponent); }
+        if (footerComponent) { this.addComponent(footerComponent); }
         this.addComponent(contentComponent);
       } else {
         throw new Error('Header or content component is missing in collapse');
@@ -102,11 +108,14 @@ export default function Collapse(options = {}) {
       const height = !expanded && collapseY ? 'height: 0;' : '';
       const width = !expanded && collapseX ? 'width: 0;' : '';
       const isExpanded = expanded ? 'expanded' : '';
+      const header = headerComponent ? headerComponent.render() : '';
+      const footer = footerComponent ? footerComponent.render() : '';
       return `<${tagName} id="${this.getId()}" class="collapse ${cls} ${isExpanded}" style="${style}">
-                ${headerComponent.render()}
+                ${header}
                 <div id="${containerId}" class="collapse-container ${contentCls}" style="${height} ${width} ${contentStyle}">
                   ${contentComponent.render()}
                 </div>
+                ${footer}
               </${tagName}>`;
     },
     toggle

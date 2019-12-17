@@ -1,10 +1,9 @@
 import OlMap from 'ol/Map';
 import OlView from 'ol/View';
+import {defaults as defaultInteractions} from 'ol/interaction';
 
 const Map = (options = {}) => {
   const map = new OlMap({
-    loadTilesWhileAnimating: options.loadTilesWhileAnimating ? options.loadTilesWhileAnimating : false,
-    loadTilesWhileInteracting: options.loadTilesWhileInteracting ? options.loadTilesWhileInteracting : true,
     target: options.target,
     controls: [],
     view: new OlView({
@@ -13,7 +12,11 @@ const Map = (options = {}) => {
       center: options.center,
       resolutions: options.resolutions || undefined,
       zoom: options.zoom,
-      enableRotation: options.enableRotation
+      enableRotation: options.enableRotation,
+      constrainResolution: options.constrainResolution
+    }),
+    interactions: defaultInteractions({
+      keyboard: false
     })
   });
   return map;

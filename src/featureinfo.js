@@ -11,6 +11,7 @@ import StyleTypes from './style/styletypes';
 import getFeatureInfo from './getfeatureinfo';
 import replacer from '../src/utils/replacer';
 import SelectedItem from './models/SelectedItem';
+import { getContent } from './getattributes';
 
 const styleTypes = StyleTypes();
 
@@ -43,13 +44,14 @@ const Featureinfo = function Featureinfo(options = {}) {
   const infowindow = 'infowindow' in options ? options.infowindow : 'overlay';
 
   identifyTarget = infowindow;
-  
 
-  // if (showOverlay) {
-  //   identifyTarget = 'overlay';
-  // } else {
-  //   sidebar.init();
-  //   identifyTarget = 'sidebar';
+  // function setUIoutput(v) {
+  //   if (showOverlay) {
+  //     identifyTarget = 'overlay';
+  //   } else {
+  //     sidebar.init(v);
+  //     identifyTarget = 'sidebar';
+  //   }
   // }
 
   const clear = function clear() {
@@ -63,11 +65,12 @@ const Featureinfo = function Featureinfo(options = {}) {
 
   // TODO: direct access to feature and layer should be converted to getFeature and getLayer methods on currentItem
   const callback = function callback(evt) {
-    const currentItemIndex = evt.item.index;
-    if (currentItemIndex !== null) {
-      let currentItem = items[currentItemIndex];
-      const clone = currentItem.feature.clone();
-      clone.setId(currentItem.feature.getId());
+    const currentItem = evt.item.index;
+    if (currentItem !== null) {
+      const clone = items[currentItem].feature.clone();
+      clone.setId(items[currentItem].feature.getId());
+      clone.layerName = items[currentItem].name;
+
       selectionLayer.clearAndAdd(
         clone,
         selectionStyles[currentItem.feature.getGeometry().getType()]
@@ -120,8 +123,8 @@ const Featureinfo = function Featureinfo(options = {}) {
       onChanged: callback,
       items: 1,
       nav: true,
-      navText: ['<svg class="o-icon-fa-chevron-left"><use xlink:href="#fa-chevron-left"></use></svg>',
-        '<svg class="o-icon-fa-chevron-right"><use xlink:href="#fa-chevron-right"></use></svg>'
+      navText: ['<span class="icon"><svg class="o-icon-fa-chevron-left"><use xlink:href="#fa-chevron-left"></use></svg></span>',
+        '<span class="icon"><svg class="o-icon-fa-chevron-right"><use xlink:href="#fa-chevron-right"></use></svg></span>'
       ]
     };
     if (identifyTarget === 'overlay') {
@@ -144,7 +147,7 @@ const Featureinfo = function Featureinfo(options = {}) {
       selection.coordinates = firstFeature.getGeometry().getCoordinates();
       selection.id = firstFeature.getId() != null ? firstFeature.getId() : firstFeature.ol_uid;
       selection.type = typeof selectionLayer.getSourceLayer() === 'string' ? selectionLayer.getFeatureLayer().type : selectionLayer.getSourceLayer().get('type');
-      if (selection.type === 'GEOJSON' || selection.type === 'AGS_FEATURE') {
+      if (selection.type !== 'WFS') {
         const name = typeof selectionLayer.getSourceLayer() === 'string' ? selectionLayer.getSourceLayer() : selectionLayer.getSourceLayer().get('name');
         const id = firstFeature.getId() || selection.id;
         selection.id = `${name}.${id}`;
@@ -161,21 +164,31 @@ const Featureinfo = function Featureinfo(options = {}) {
     return hitTolerance;
   };
 
+  const addAttributeType = function addAttributeType(attributeType, fn) {
+    getContent[attributeType] = fn;
+    return getContent;
+  };
+
   const render = function render(identifyItems, target, coordinate) {
     const map = viewer.getMap();
     items = identifyItems;
     clear();
     let content = items.map(i => i.content).join('');
-//    let content = items.map(i => i.getContent()).join('');
-    content = `<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme">${content}</div></div>`;
+    //    let content = items.map(i => i.getContent()).join('');
+    //content = `<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme">${content}</div></div>`;
+    content = `<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme"></div></div>`;
     switch (target) {
       case 'overlay':
         {
           popup = Popup(`#${viewer.getId()}`);
           popup.setContent({
             content,
-             title: items[0] instanceof SelectedItem ? items[0].getLayer().get('title') : items[0].title
-            //title: items[0].getLayer().get('title')
+            title: items[0] instanceof SelectedItem ? items[0].getLayer().get('title') : items[0].title
+            //title: items[0].getLayer().get('title')	
+          });
+          const contentDiv = document.getElementById('o-identify-carousel');
+          items.forEach((item) => {
+            contentDiv.appendChild(item.content);
           });
           popup.setVisibility(true);
           initCarousel('#o-identify-carousel');
@@ -190,7 +203,7 @@ const Featureinfo = function Featureinfo(options = {}) {
             autoPanMargin: 40,
             positioning: 'bottom-center'
           });
-          //const geometry = items[0].getFeature().getGeometry();
+          //const geometry = items[0].getFeature().getGeometry();	
           const geometry = items[0].feature.getGeometry();
           const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
           map.addOverlay(overlay);
@@ -202,7 +215,11 @@ const Featureinfo = function Featureinfo(options = {}) {
           sidebar.setContent({
             content,
             title: items[0] instanceof SelectedItem ? items[0].getLayer().get('title') : items[0].title
-           // title: items[0].getLayer().get('title')
+            // title: items[0].getLayer().get('title')	
+          });
+          const contentDiv = document.getElementById('o-identify-carousel');
+          items.forEach((item) => {
+            contentDiv.appendChild(item.content);
           });
           sidebar.setVisibility(true);
           initCarousel('#o-identify-carousel');
@@ -217,7 +234,6 @@ const Featureinfo = function Featureinfo(options = {}) {
           }
           break;
         }
-
       default:
         {
           break;
@@ -286,12 +302,14 @@ const Featureinfo = function Featureinfo(options = {}) {
     getPin,
     getSelectionLayer,
     getSelection,
+    addAttributeType,
     onAdd(e) {
       viewer = e.target;
       const map = viewer.getMap();
       if (identifyTarget === 'sidebar') {
         sidebar.init(viewer);
       }
+      // setUIoutput(viewer);
       selectionLayer = featurelayer(savedFeature, map);
       selectionManager = viewer.getSelectionManager();
       map.on(clickEvent, onClick);
