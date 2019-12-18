@@ -16,7 +16,18 @@
       "name": "sharemap"
     },
     {
+      "name": "sharemap",
+      "options": {
+        "title": "Dela karta (avancerad)",
+        "storeMethod": "saveStateToServer",
+        "serviceEndpoint": "URL-to-web-service"
+      }
+    },
+    {
       "name": "geoposition"
+    },
+    {
+      "name": "draganddrop"
     },
     {
       "name": "print"
@@ -37,12 +48,15 @@
       }
     },
     {
-      "name": "legend"
+      "name": "legend",
+      "options": {
+        "turnOffLayersControl": true
+      }
     },
     {
       "name": "position",
       "options": {
-        "title": "Web Mercator",
+        "title": "Sweref99 16.30",
         "projections": {
           "EPSG:4326": "WGS84",
           "EPSG:3006": "Sweref99 TM"
@@ -51,8 +65,25 @@
     },
     {
       "name": "measure"
+    },
+    {
+      "name": "scalepicker"
+    },
+    {
+      "name": "search",
+      "options": {
+        "url": "https://kartserver.vasteras.se/origoserver/ext/singlesearch",
+        "searchAttribute": "NAMN",
+        "geometryAttribute": "GEOM",
+        "title": "Adress",
+        "hintText": "Sök adress..."
+      }
     }
   ],
+  "featureinfoOptions": {
+    "overlay": true,
+    "hitTolerance": 5
+  },
   "pageSettings": {
   "footer": {
     "img": "img/png/logo.png",
@@ -63,57 +94,90 @@
     "visible": true
   }
 },
-  "projectionCode": "EPSG:3857",
+  "projectionCode": "EPSG:3010",
   "projectionExtent": [
-    -20026376.39,
-    -20048966.10,
-    20026376.39,
-    20048966.10
+    -1678505.1838360203,
+    4665380,
+    2431912.7361639794,
+    8775797.92
   ],
   "proj4Defs": [
-      {
-        "code": "EPSG:3006",
-        "projection": "+proj=utm +zone=33 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
-      }
+    {
+      "code": "EPSG:3010",
+      "alias": "urn:ogc:def:crs:EPSG::3010",
+      "projection": "+proj=tmerc +lat_0=0 +lon_0=16.5 +k=1 +x_0=150000 +y_0=0 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
+    },
+    {
+      "code": "EPSG:3006",
+      "projection": "+proj=utm +zone=33 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
+    }
   ],
   "extent": [
-    -20026376.39,
-    -20048966.10,
-    20026376.39,
-    20048966.10
+    -1678505.1838360203,
+    4665380,
+    2431912.7361639794,
+    8775797.92
   ],
   "center": [
-    1770000,
-    8770000
+    153797,
+    6612614
   ],
-  "zoom": 7,
+  "zoom": 4,
   "resolutions": [
-    156543.03,
-    78271.52,
-    39135.76,
-    19567.88,
-    9783.94,
-    4891.97,
-    2445.98,
-    1222.99,
-    611.50,
-    305.75,
-    152.87,
-    76.437,
-    38.219,
-    19.109,
-    9.5546,
-    4.7773,
-    2.3887,
-    1.1943,
-    0.5972
+    1146.8799999999999,
+    573.4399999999999,
+    286.71999999999997,
+    143.35999999999999,
+    71.67999999999999,
+    35.839999999999996,
+    17.919999999999998,
+    8.959999999999999,
+    4.4799999999999995,
+    2.2399999999999998,
+    1.1199999999999999,
+    0.5599999999999999,
+    0.27999999999999997,
+    0.13999999999999999
   ],
   "source": {
-    "local": {
-      "url": "http://localhost/geoserver/wms"
+    "mdk": {
+      "url": "https://www.malardalskartan.se/geoserver/mdk/ows",
+      "version": "1.1.0"
+    },
+    "ags_vasteras": {
+      "url": "https://kartor.vasteras.se/arcgis/rest/services/ext/sk_webbobjekt_dyn/FeatureServer/"
+    },
+    "ags_tile_vasteras": {
+      "url": "https://kartor.vasteras.se/arcgis/rest/services/ext/tk_isbanor_dyn/MapServer/"
+    },
+    "kartserver": {
+      "url": "https://kartserver.vasteras.se/geowebcache/service/wmts"
+    },
+    "vt": {
+      "url": "https://gi.karlstad.se/geoserver/gwc/service/tms/1.0.0/",
+      "tileGrid": {
+        "tileSize": 512,
+        "alignBottomLeft": false,
+        "extent": [
+          -200000,
+          6100000,
+          500000,
+          7600000
+        ]
+
+      }
+
+    },
+    "basemap": {
+      "url": "https://www.malardalskartan.se/geocache/gwc/service/wmts"
     }
   },
   "groups": [
+    {
+      "name": "layers",
+      "title": "Lager",
+      "expanded": true
+    },
     {
       "name": "background",
       "title": "Bakgrundskartor",
@@ -122,133 +186,409 @@
   ],
   "layers": [
     {
-      "name": "origo-cities",
-      "title": "Origokommuner",
-      "group": "root",
-      "source": "data/origo-cities-3857.geojson",
-      "style": "origo-logo",
-      "type": "GEOJSON",
-      "attributes": [
-          {
-            "name": "name"
-          }
+      "name": "forskoleverksamhet-agsfeature",
+      "id": "0",
+      "source": "ags_vasteras",
+      "style": "forskola",
+      "clusterOptions": {
+        "clusterMaxZoom": 10
+      },
+      "clusterStyle": "clusterForskola",
+      "title": "AGS feature service",
+      "group": "layers",
+      "type": "AGS_FEATURE",
+      "layerType": "cluster",
+      "visible": false,
+      "queryable": true,
+      "attributes": [{
+          "name": "NAME",
+          "url": "PAGEID",
+          "urlPrefix": "http://beta.vasteras.se/uppleva-och-gora/bibliotek/"
+        },
+        {
+          "html": "<a href='https://www.google.se/maps/dir//{{@center(EPSG:4326,reverse)}}/@{{@center(EPSG:4326,reverse)}}' target='_blank'>Hitta hit</a>"
+        }
+      ]
+    },
+    {
+      "name": "isbanor",
+      "id": "0",
+      "source": "ags_tile_vasteras",
+      "style": "isbanor",
+      "title": "AGS map service",
+      "group": "layers",
+      "type": "AGS_TILE",
+      "visible": false,
+      "queryable": true,
+      "attributes": [{
+        "name": "PLATS"
+      }, {
+        "html": "<a href='http://www.vasteras.se/uppleva-och-gora/idrott-och-friluftsliv/skridskoakning.html' target='_blank'>Läs mer &raquo;</a>"
+      }]
+    },
+    {
+      "name": "pagaende_detaljplaner",
+      "title": "WMS",
+      "abstract": "Pågående detaljplaner. Tjänst från Mälardalskartan",
+      "group": "layers",
+      "queryable": true,
+      "source": "mdk",
+      "style": "pagaende_detaljplaner",
+      "type": "WMS",
+      "extent": [
+        134966,
+        6593080,
+        176372,
+        6636922
       ],
-      "visible": true
+      "visible": false,
+      "attributes": [{
+        "name": "NAMN",
+        "title": "Namn: "
+      }]
     },
     {
-      "name": "origo-mask",
-      "opacity": 0.25,
-      "title": "origo-mask",
-      "group": "none",
-      "queryable": false,
-      "source": "data/origo-mask-3857.geojson",
-      "style": "mask",
+      "name": "etableringsomraden",
+      "title": "WFS",
+      "group": "layers",
+      "source": "mdk",
+      "style": "etableringsomraden",
+      "type": "WFS",
+      "extent": [
+        134966,
+        6593080,
+        176372,
+        6636922
+      ],
+      "visible": false,
+      "offline": true,
+      "attributes": [{
+        "name": "ETABL_OMR",
+        "title": "Namn: "
+      }]
+    },
+    {
+      "name": "ledig_naringslivsmark",
+      "title": "GeoJSON",
+      "group": "layers",
+      "source": "data/origo/ledig_naringsmark.geojson",
+      "style": "ledig_naringslivsmark",
       "type": "GEOJSON",
+      "extent": [
+        134966,
+        6593080,
+        176372,
+        6636922
+      ],
+      "visible": false,
+      "attributes": [{
+        "name": "TYP",
+        "title": "Markstatus: "
+      }]
+    },
+    {
+      "name": "socken",
+      "title": "TopoJSON",
+      "group": "layers",
+      "source": "data/origo/socken.json",
+      "style": "socken",
+      "type": "TOPOJSON",
+      "visible": false,
+      "attributes": [{
+        "name": "Titel",
+        "title": "Socken: "
+      }]
+    },
+    {
+      "name": "intressepunkt",
+      "title": "GROUP",
+      "group": "layers",
+      "source": "mdk",
+      "style": "cafe",
+      "type": "GROUP",
+      "visible": false,
+      "layers": [{
+          "name": "intressepunkt__1",
+          "title": "group",
+          "group": "layers",
+          "source": "mdk",
+          "style": "cafe",
+          "type": "WFS",
+          "extent": [
+            134966,
+            6593080,
+            176372,
+            6636922
+          ],
+          "visible": true,
+          "attributes": [{
+            "name": "Namn"
+          }],
+          "filter": "Cafe=1"
+        },
+        {
+          "name": "intressepunkt__2",
+          "title": "group",
+          "group": "layers",
+          "source": "mdk",
+          "style": "restaurang",
+          "type": "WFS",
+          "extent": [
+            134966,
+            6593080,
+            176372,
+            6636922
+          ],
+          "visible": true,
+          "attributes": [{
+            "name": "Namn"
+          }],
+          "filter": "Restaurang=1"
+        }
+      ]
+    },
+    {
+      "attribution": "&copy Lantmäteriet Geodatasamverkan",
+      "format": "image/png",
+      "group": "background",
+      "name": "topowebbkartan_nedtonad",
+      "source": "basemap",
+      "title": "Karta, grå",
+      "type": "WMTS",
+      "style": "karta_gra",
       "visible": true
     },
     {
-      "name": "osm",
-      "title": "OpenStreetMap",
+      "attribution": "&copy Lantmäteriet Geodatasamverkan",
+      "format": "image/jpeg",
       "group": "background",
-      "queryable": false,
-      "style": "karta_osm",
-      "type": "OSM",
-      "visible": true
+      "name": "orto",
+      "source": "basemap",
+      "title": "Flygfoto",
+      "type": "WMTS",
+      "style": "orto",
+      "visible": false
     }
   ],
   "styles": {
-      "mask": [
-        [
-          {
-            "stroke": {
-              "color": "rgba(0,0,0,1.0)"
-            },
-            "fill": {
-              "color": "rgba(0,0,0,1.0)"
-            }
+    "mask": [
+      [{
+        "stroke": {
+          "color": "rgba(0,0,0,1.0)"
+        },
+        "fill": {
+          "color": "rgba(0,0,0,1.0)"
+        }
+      }]
+    ],
+    "yta": [
+      [{
+        "stroke": {
+          "color": "rgba(0,0,0,1.0)"
+        },
+        "fill": {
+          "color": "rgba(0,0,0,0.5)"
+        }
+      }]
+    ],
+    "forskola": [
+      [{
+		"label": "Förskola",
+        "icon": {
+          "size": [32, 32],
+          "src": "img/png/Forskoleverksamhet_skugga.png"
+        }
+      }]
+    ],
+    "clusterForskola": [
+      [{
+          "icon": {
+            "size": [32, 32],
+            "src": "img/png/Forskoleverksamhet_skugga.png"
           }
-        ]
-      ],
-      "origo-logo": [
-        [
-          {
-            "label": "Origokommuner",
-            "circle": {
-              "radius": 10,
-              "stroke": {
-                "color": "rgba(0,0,0,1)",
-                "width": 2.5
-              },
-              "fill": {
-                "color": "rgba(255,255,255,0.9)"
-              }
+        },
+        {
+          "text": {
+            "font": "Bold 9px Arial",
+            "textAlign": "center",
+            "offsetX": 10,
+            "offsetY": -10,
+            "text": "size",
+            "fill": {
+              "color": "rgba(255,255,255,1.0)"
             }
           },
-          {
-            "circle": {
-              "radius": 2.5,
-              "stroke": {
-                "color": "rgba(0,0,0,0)",
-                "width": 1
-              },
-              "fill": {
-                "color": "rgba(37,129,196,1)"
-              }
-            }
+          "icon": {
+            "size": [14, 14],
+            "anchor": [17, 17],
+            "anchorXUnits": "pixels",
+            "anchorYUnits": "pixels",
+            "anchorOrigin": "top-right",
+            "src": "img/png/Svart_14.png",
+            "opacity": 0.65
           }
-        ]
-      ],
-      "cirkel": [
-        [
-          {
-            "circle": {
-              "radius": 6,
-              "stroke": {
-                "color": "rgba(0,0,0,1)",
-                "width": 2
-              },
-              "fill": {
-                "color": "rgba(0,0,0,0.5)"
-              }
-            }
-          }
-        ]
-      ],
-      "karta_osm": [
-        [
-          {
-            "image": {
-              "src": "img/png/osm.png"
-            }
-          }
-        ]
-      ],      
-      "karta_gra": [
-        [
-          {
-            "image": {
-              "src": "img/png/gra.png"
-            }
-          }
-        ]
-      ],
-      "karta_farg": [
-        [
-          {
-            "image": {
-              "src": "img/png/farg.png"
-            }
-          }
-        ]
-      ],
-      "orto": [
-        [
-          {
-            "image": {
-              "src": "img/png/orto.png"
-            }
-          }
-        ]
+        }
       ]
+    ],
+    "cirkel": [
+      [{
+        "circle": {
+          "radius": 6,
+          "stroke": {
+            "color": "rgba(0,0,0,1)",
+            "width": 2
+          },
+          "fill": {
+            "color": "rgba(255,255,0,0.5)"
+          }
+        },
+        "text": {
+          "font": "Bold 9px Arial",
+          "textAlign": "center",
+          "offsetX": 10,
+          "offsetY": -10,
+          "text": "{{typ}}",
+          "fill": {
+            "color": "rgba(0,0,0,1.0)"
+          },
+          "stroke": {
+            "color": "rgba(255,255,255,1.0)",
+            "width": 3
+          }
+        }
+      }]
+    ],
+    "cafe": [
+      [{
+        "label": "Cafe",
+        "circle": {
+          "radius": 6,
+          "stroke": {
+            "color": "rgba(0,0,0,1)",
+            "width": 2
+          },
+          "fill": {
+            "color": "rgba(255,0,0,0.5)"
+          }
+        }
+      }],
+      [{
+        "label": "Restuarang",
+        "circle": {
+          "radius": 6,
+          "stroke": {
+            "color": "rgba(0,0,0,1)",
+            "width": 2
+          },
+          "fill": {
+            "color": "rgba(0,0,255,0.5)"
+          }
+        }
+      }]
+    ],
+    "restaurang": [
+      [{
+        "circle": {
+          "radius": 6,
+          "stroke": {
+             "color": "rgba(0,0,0,1)",
+            "width": 2
+          },
+          "fill": {
+            "color": "rgba(0,0,255,0.5)"
+          }
+        }
+      }]
+    ],
+    "isbanor": [
+      [{
+		"label": "Isbanor",
+        "circle": {
+          "radius": 6,
+          "stroke": {
+            "color": "rgba(0,0,0,1)",
+            "width": 2
+          },
+          "fill": {
+            "color": "rgba(101,4,12,1)"
+          }
+        }
+      }]
+    ],
+    "pagaende_detaljplaner": [
+      [{
+		"label": "Pågående Detaljplaner",
+        "fill": {
+          "color": "rgba(255,196,105,0.8)"
+        },
+        "stroke": {
+          "color": "rgba(255,196,105,0.7)",
+          "width": 2,
+          "lineDash": [3, 2]
+        }
+      }]
+    ],
+    "socken": [
+      [{
+		"label": "Socken",
+        "fill": {
+          "color": "rgba(0,122,255,0.5)"
+        },
+        "stroke": {
+          "color": "rgba(0,122,255,1)",
+          "width": 2
+        }
+      }]
+    ],
+    "etableringsomraden": [
+      [{
+		"label": "Etableringsområden",
+        "fill": {
+          "color": "rgba(153,102,204,0.5)"
+        },
+        "stroke": {
+          "color": "rgba(153,102,204,1)",
+          "width": 4
+        }
+      }]
+    ],
+    "ledig_naringslivsmark": [
+      [{
+		"label": "Ledig näringslivsmark",
+        "fill": {
+          "color": "rgba(76,217,100,0.5)"
+        },
+        "stroke": {
+          "color": "rgba(76,217,100,1)",
+          "width": 2
+        }
+      }]
+    ],
+    "vt": [
+      [{
+        "custom": "default"
+      }]
+    ],
+    "karta_gra": [
+      [{
+        "image": {
+          "src": "img/png/gra.png"
+        }
+      }]
+    ],
+    "karta_farg": [
+      [{
+        "image": {
+          "src": "img/png/farg.png"
+        }
+      }]
+    ],
+    "orto": [
+      [{
+        "image": {
+          "src": "img/png/orto.png"
+        }
+      }]
+    ]
   }
 }
