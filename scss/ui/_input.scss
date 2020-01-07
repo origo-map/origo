@@ -9,7 +9,7 @@ input::-ms-clear {
 // form
 textarea,
 select,
-input[type=text] {
+input {
   resize: vertical;
   border: 1px solid $border-color;
   border-radius: 3px;
@@ -32,6 +32,12 @@ input[type=text] {
   &.smaller {
     font-size: $font-size-smaller;;
     line-height: $line-height-small;
+  }
+  &.placeholder-text-small::placeholder {
+    font-size: $placeholder-text-small;
+  }
+  &.placeholder-text-smaller::placeholder {
+    font-size: $placeholder-text-smaller;
   }
 }
 input[type=text] {
@@ -148,13 +154,4 @@ input[type=range]:focus::-ms-fill-upper {
 }
 input[type=range]::-ms-tooltip {
     display: none;
-}
-
-input {
-  &.placeholder-text-small::placeholder {
-    font-size: $placeholder-text-small;
-  }
-  &.placeholder-text-smaller::placeholder {
-    font-size: $placeholder-text-smaller;
-  }
 }

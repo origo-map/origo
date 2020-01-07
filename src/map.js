@@ -1,5 +1,6 @@
 import OlMap from 'ol/Map';
 import OlView from 'ol/View';
+import {defaults as defaultInteractions} from 'ol/interaction';
 
 const Map = (options = {}) => {
   const map = new OlMap({
@@ -13,6 +14,9 @@ const Map = (options = {}) => {
       zoom: options.zoom,
       enableRotation: options.enableRotation,
       constrainResolution: options.constrainResolution
+    }),
+    interactions: defaultInteractions({
+      keyboard: false
     })
   });
   return map;
