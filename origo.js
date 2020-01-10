@@ -14,6 +14,8 @@ import supports from './src/utils/supports';
 import renderError from './src/utils/rendererror';
 import Style from './src/style';
 import featurelayer from './src/featurelayer';
+import * as Utils from './src/utils';
+import dropdown from './src/dropdown';
 
 const Origo = function Origo(configPath, options = {}) {
   const origoConfig = {
@@ -92,5 +94,7 @@ Origo.ol.layer = olLayer;
 Origo.ol.source = olSource;
 Origo.ol.style = olStyle;
 Origo.ol.Feature = olFeature;
+Origo.Utils = Utils;
+Origo.dropdown = dropdown;
 
 export default Origo;
