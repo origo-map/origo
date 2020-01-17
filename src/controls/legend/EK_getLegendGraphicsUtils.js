@@ -5,6 +5,7 @@ import {
     TileWMS,
     OSM
 } from 'ol/source';
+import config from '../../../conf/printSettings';
 
 //Parses an object to a querystring
 function serialize(obj) {
