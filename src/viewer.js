@@ -392,7 +392,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
         const layerName = featureId.split('.')[0];
         const layer = getLayer(layerName);
         if (layer) {
-          layer.once('render', () => {
+          layer.once('postrender', () => {
             let feature;
             const type = layer.get('type');
             feature = layer.getSource().getFeatureById(featureId);
@@ -415,7 +415,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
               obj.content = getAttributes(feature, layer);
               obj.layer = layer;
               const centerGeometry = getcenter(feature.getGeometry());
-              featureinfo.render([obj], 'overlay', centerGeometry);
+              const infowindowType = featureinfoOptions.showOverlay === false ? 'sidebar' : 'overlay';
+              featureinfo.render([obj], infowindowType, centerGeometry);
               map.getView().animate({
                 center: getcenter(feature.getGeometry()),
                 zoom: getResolutions().length - 2
