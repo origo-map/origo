@@ -23,3 +23,4 @@ export { default as Exportmap } from './controls/exportmap';
 export { default as Externalurl } from './controls/externalurl';
 export { default as Multiselect } from './controls/multiselect';
 export { default as Scalepicker } from './controls/scalepicker';
+export { default as Keepexternalsessionalive } from './controls/keepexternalsessionalive';
