@@ -192,7 +192,11 @@ const Featureinfo = function Featureinfo(options = {}) {
         });
         const contentDiv = document.getElementById('o-identify-carousel');
         items.forEach((item) => {
-          contentDiv.appendChild(item.content);
+          if (item.content instanceof Element) {
+            contentDiv.appendChild(item.content);
+          } else {
+            contentDiv.innerHTML = item.content;
+          }
         });
         popup.setVisibility(true);
         initCarousel('#o-identify-carousel');
@@ -221,7 +225,11 @@ const Featureinfo = function Featureinfo(options = {}) {
         });
         const contentDiv = document.getElementById('o-identify-carousel');
         items.forEach((item) => {
-          contentDiv.appendChild(item.content);
+          if (item.content instanceof Element) {
+            contentDiv.appendChild(item.content);
+          } else {
+            contentDiv.innerHTML = item.content;
+          }
         });
         sidebar.setVisibility(true);
         initCarousel('#o-identify-carousel');

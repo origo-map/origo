@@ -48,6 +48,9 @@ const OverlayProperties = function OverlayProperties(options = {}) {
         sliderEl.addEventListener('input', () => {
           layer.setOpacity(sliderEl.valueAsNumber);
         });
+        sliderEl.addEventListener('change', () => {
+          layer.setOpacity(sliderEl.valueAsNumber);
+        });
       }
     },
     render() {
