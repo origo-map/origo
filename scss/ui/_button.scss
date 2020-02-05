@@ -103,7 +103,7 @@ button {
     border-radius: $button-round;
     [class*='icon'] > *,
     [class^='icon'] > * {
-      border-radius: $button-round;
+      border-radius: 0;
       overflow: hidden;
     }         
   }
