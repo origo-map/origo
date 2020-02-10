@@ -60,6 +60,8 @@ const Editor = function Editor(options = {}) {
           toggleState();
         },
         icon: '#ic_edit_24px',
+        tooltipText: 'Redigera',
+        tooltipPlacement: 'east',
         state,
         methods: {
           active: onActive,
