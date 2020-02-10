@@ -229,6 +229,8 @@ const Legend = function Legend(options = {}) {
       const layerButtonCls = isExpanded ? ' faded' : '';
       layerButton = Button({
         icon: '#ic_layers_24px',
+        tooltipText: 'Lagerlista',
+        tooltipPlacement: 'west',
         cls: `control icon-small medium round absolute light bottom-right${layerButtonCls}`,
         click() {
           if (!isExpanded) {
