@@ -112,8 +112,8 @@ export const getIfThemeLayer = function getIfThemeLayer(viewer, layers) {	/*
 					version: "1.1.0",
 					request: "GetLegendGraphic",
 					layer: layer.get("name"),
-					format: "application/json",
-					scale: maputils.resolutionToScale(viewer.getMap().getView().getResolution(), viewer.getProjection())
+					format: "application/json"
+					//scale: maputils.resolutionToScale(viewer.getMap().getView().getResolution(), viewer.getProjection())
 				}
 				requestUrl = url + '?' + Object.keys(params).map(function (key) {return key + '=' + params[key]}).join('&')
 				requests.push(new Promise(function(resolve, reject) {
