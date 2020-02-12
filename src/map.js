@@ -3,10 +3,10 @@ import OlView from 'ol/View';
 import mapInteractions from './mapinteractions';
 
 const Map = (options = {}) => {
-  const interactions = mapInteractions({target: options.target});
+  const interactions = mapInteractions({ target: options.target });
   const map = new OlMap({
     target: options.target,
-    controls: [], 
+    controls: [],
     interactions,
     view: new OlView({
       extent: options.extent || undefined,
