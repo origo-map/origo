@@ -79,7 +79,7 @@ const Overlays = function Overlays(options) {
     },
     render() {
       const headerCls = 'flex row grow no-shrink justify-center align-center collapse-header';
-      return `<div id="${this.getId()}" class="${headerCls}" style="height: 1.5rem;">
+      return `<div id="${this.getId()}" class="${headerCls}" style="height: 0.5rem;">
               </div>`;
     }
   });
