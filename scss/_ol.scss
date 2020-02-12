@@ -2,3 +2,9 @@
 .ol-attribution li a{
   color:#bbb;
 }
+.ol-overlaycontainer, .ol-overlaycontainer-stopevent {
+  pointer-events: none;
+}
+.ol-overlaycontainer > *, .ol-overlaycontainer-stopevent > * {
+  pointer-events: auto;
+}
