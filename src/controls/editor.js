@@ -74,7 +74,7 @@ const Editor = function Editor(options = {}) {
       this.dispatch('render');
       viewer.dispatch('toggleClickInteraction', {
         name: 'editor',
-        active: true
+        active: isActive
       });
     }
   });
