@@ -44,7 +44,7 @@ const MapInteractions = function MapInteractions(options = {}) {
 
     mapEl.appendChild(divEl);
 
-    return defaults({ dragPan: false, mouseWheelZoom: false }).extend([
+    return defaults({ dragPan: false, mouseWheelZoom: false, keyboard: false }).extend([
       new DragPan({
         condition(event) {
           return this.getPointerCount() === 2 || (!touchOnly(event) && noModifierKeys(event));
