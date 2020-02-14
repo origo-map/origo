@@ -1,7 +1,7 @@
 import 'owl.carousel';
 import Overlay from 'ol/Overlay';
 import $ from 'jquery';
-import { Component } from './ui';
+import { Component, Modal } from './ui';
 import Popup from './popup';
 import sidebar from './sidebar';
 import maputils from './maputils';
@@ -149,6 +149,33 @@ const Featureinfo = function Featureinfo(options = {}) {
     return getContent;
   };
 
+  const addLinkListener = function addLinkListener(el) {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targ = e.target;
+      let modalStyle = '';
+      switch (targ.target) {
+        case 'modal-full':
+        {
+          modalStyle = 'max-width:unset;width:98%;height:98%;resize:both;overflow:auto;display:flex;flex-flow:column;';
+          break;
+        }
+        default:
+        {
+          modalStyle = 'resize:both;overflow:auto;display:flex;flex-flow:column;';
+          break;
+        }
+      }
+      Modal({
+        title: targ.href,
+        content: `<iframe src="${targ.href}" class=""style="width:100%;height:99%"></iframe>`,
+        target: viewer.getId(),
+        style: modalStyle,
+        newTabUrl: targ.href
+      });
+    });
+  };
+
   const render = function render(identifyItems, target, coordinate) {
     const map = viewer.getMap();
     items = identifyItems;
@@ -165,7 +192,11 @@ const Featureinfo = function Featureinfo(options = {}) {
         });
         const contentDiv = document.getElementById('o-identify-carousel');
         items.forEach((item) => {
-          contentDiv.appendChild(item.content);
+          if (item.content instanceof Element) {
+            contentDiv.appendChild(item.content);
+          } else {
+            contentDiv.innerHTML = item.content;
+          }
         });
         popup.setVisibility(true);
         initCarousel('#o-identify-carousel');
@@ -194,7 +225,11 @@ const Featureinfo = function Featureinfo(options = {}) {
         });
         const contentDiv = document.getElementById('o-identify-carousel');
         items.forEach((item) => {
-          contentDiv.appendChild(item.content);
+          if (item.content instanceof Element) {
+            contentDiv.appendChild(item.content);
+          } else {
+            contentDiv.innerHTML = item.content;
+          }
         });
         sidebar.setVisibility(true);
         initCarousel('#o-identify-carousel');
@@ -204,6 +239,11 @@ const Featureinfo = function Featureinfo(options = {}) {
       {
         break;
       }
+    }
+
+    const modalLinks = document.getElementsByClassName('o-identify-link-modal');
+    for (let i = 0; i < modalLinks.length; i += 1) {
+      addLinkListener(modalLinks[i]);
     }
   };
 

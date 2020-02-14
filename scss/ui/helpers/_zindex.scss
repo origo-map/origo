@@ -14,3 +14,15 @@
 .z-index-top {
   z-index: $z-top;
 }
+.z-index-ontop-low {
+  z-index: $z-top + $z-low;
+}
+.z-index-ontop-middle {
+  z-index: $z-top + $z-middle;
+}
+.z-index-ontop-high {
+  z-index: $z-top + $z-high;
+}
+.z-index-ontop-top {
+  z-index: $z-top + $z-top;
+}

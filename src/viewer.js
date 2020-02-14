@@ -31,6 +31,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     consoleId = 'o-console',
     mapCls = 'o-map',
     controls = [],
+    constrainResolution = false,
     enableRotation = true,
     featureinfoOptions = {},
     groups: groupOptions = [],
@@ -38,6 +39,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     pageSettings = {},
     projectionCode,
     projectionExtent,
+    startExtent,
     extent = [],
     center: centerOption = [0, 0],
     zoom: zoomOption = 0,
@@ -371,6 +373,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
         center,
         resolutions,
         zoom,
+        constrainResolution,
         enableRotation,
         target: this.getId()
       }));
@@ -389,7 +392,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
         const layerName = featureId.split('.')[0];
         const layer = getLayer(layerName);
         if (layer) {
-          layer.once('render', () => {
+          layer.once('postrender', () => {
             let feature;
             const type = layer.get('type');
             feature = layer.getSource().getFeatureById(featureId);
@@ -412,7 +415,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
               obj.content = getAttributes(feature, layer);
               obj.layer = layer;
               const centerGeometry = getcenter(feature.getGeometry());
-              featureinfo.render([obj], 'overlay', centerGeometry);
+              const infowindowType = featureinfoOptions.showOverlay === false ? 'sidebar' : 'overlay';
+              featureinfo.render([obj], infowindowType, centerGeometry);
               map.getView().animate({
                 center: getcenter(feature.getGeometry()),
                 zoom: getResolutions().length - 2
@@ -430,6 +434,11 @@ const Viewer = function Viewer(targetOption, options = {}) {
           geometry: new geom[urlParams.selection.geometryType](urlParams.selection.coordinates)
         });
       }
+
+      if (!urlParams.zoom && !urlParams.mapStateId && startExtent) {
+        map.getView().fit(startExtent, { size: map.getSize() });
+      }
+
       featureinfoOptions.viewer = this;
       featureinfo = Featureinfo(featureinfoOptions);
       this.addComponent(featureinfo);

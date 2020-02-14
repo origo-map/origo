@@ -6,6 +6,7 @@ $button-padding-smallest: $padding-smallest;
 $button-padding-small: $padding-smaller $padding-smaller * 1.5;
 $button-padding-medium: $padding-small $padding-small * 1.5;
 $button-padding-large: $padding-standard $padding-standard * 1.5;
+$button-divider-color: $grey-lighter;
 
 .button,
 button {
@@ -116,7 +117,7 @@ button,
 button:hover,
 .button:hover {
   &.light:hover {
-    background-color: $grey-lighter;
+    background-color: $grey-lightest;
   }
   &.primary:hover {
     background-color: $primary-color-dark;
@@ -134,3 +135,30 @@ button:hover,
     background-color: $grey-lighter;
   }   
 }
+
+button.active,
+.button.active {
+  &.light:not([class*='icon']) {
+    background-color: $grey-lighter;
+  }
+}
+
+.button-group {
+  &.divider-horizontal > .button,
+  &.divider-horizontal > button {
+    border-right: 1px solid $button-divider-color;
+  }
+  &.divider-horizontal > .button:last-child,
+  &.divider-horizontal > button:last-child {
+    border-right: none;
+  }
+
+  &.divider-vertical > .button,
+  &.divider-vertical > button {
+    border-bottom: 1px solid $button-divider-color;
+  }
+  &.divider-vertical > .button:last-child,
+  &.divider-vertical > button:last-child {
+    border-right: none;
+  }
+ }

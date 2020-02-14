@@ -54,7 +54,7 @@ const drawToolsSelector = function drawToolsSelector(tools, defaultLayer, v) {
     });
     $(`#${target}`).on('changeDropdown', (e) => {
       e.stopImmediatePropagation(e);
-      dispatcher.emitChangeEditorShapes(e.dataAttribute);
+      dispatcher.emitChangeEditorShapes(e.detail.dataAttribute);
       close();
     });
   }

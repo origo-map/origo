@@ -55,7 +55,7 @@ const Editor = function Editor(options = {}) {
     onInit() {
       const state = isActive ? 'active' : 'initial';
       editorButton = Button({
-        cls: 'o-menu-button padding-small icon-smaller rounded light box-shadow',
+        cls: 'o-menu-button padding-small icon-smaller round light box-shadow o-tooltip',
         click() {
           toggleState();
         },
@@ -74,7 +74,7 @@ const Editor = function Editor(options = {}) {
       this.dispatch('render');
       viewer.dispatch('toggleClickInteraction', {
         name: 'editor',
-        active: true
+        active: isActive
       });
     }
   });
