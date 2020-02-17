@@ -72,41 +72,10 @@ const Overlays = function Overlays(options) {
     }
   });
 
-  const initialState = expanded ? 'expanded' : 'collapsed';
-  const collapseButton = Button({
-    icon: '#o_expand_more_24px',
-    iconCls: 'rotate-180 grey',
-    cls: 'icon-smaller compact round',
-    state: initialState,
-    validStates: ['expanded', 'collapsed'],
-    click() {
-      if (this.getState() === 'expanded') {
-        this.setState('collapsed');
-      } else {
-        this.setState('expanded');
-      }
-    }
-  });
-
   const collapseHeader = Component({
-    onInit() {
-      this.addComponent(collapseButton);
-    },
-    onRender() {
-      this.dispatch('render');
-      const el = document.getElementById(this.getId());
-      el.addEventListener('click', () => {
-        const customEvt = new CustomEvent('collapse:toggle', {
-          bubbles: true
-        });
-        collapseButton.dispatch('click');
-        el.dispatchEvent(customEvt);
-      });
-    },
     render() {
-      const headerCls = 'flex row grow no-shrink justify-center align-center pointer collapse-header';
-      return `<div id="${this.getId()}" class="${headerCls}" style="height: 1.5rem;">
-                ${collapseButton.render()}
+      const headerCls = 'flex row grow no-shrink justify-center align-center collapse-header';
+      return `<div id="${this.getId()}" class="${headerCls}" style="height: 0.5rem;">
               </div>`;
     }
   });

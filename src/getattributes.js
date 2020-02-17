@@ -22,7 +22,16 @@ const getContent = {
         if (attribute.url) {
           if (feature.get(attribute.url)) {
             const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.url), feature.getProperties(), null, map));
-            val = `<a href="${url}" target="_blank">${feature.get(attribute.name)}</a>`;
+            let aTarget = '_blank';
+            let aCls = 'o-identify-link';
+            if (attribute.target === 'modal') {
+              aTarget = 'modal';
+              aCls = 'o-identify-link-modal';
+            } else if (attribute.target === 'modal-full') {
+              aTarget = 'modal-full';
+              aCls = 'o-identify-link-modal';
+            }
+            val = `<a class="${aCls}" target="${aTarget}" href="${url}">${feature.get(attribute.name)}</a>`;
           }
         }
       }
@@ -37,7 +46,16 @@ const getContent = {
     if (feature.get(attribute.url)) {
       const text = attribute.html || attribute.url;
       const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.url), attributes, null, map));
-      val = `<a href="${url}" target="_blank">${text}</a>`;
+      let aTarget = '_blank';
+      let aCls = 'o-identify-link';
+      if (attribute.target === 'modal') {
+        aTarget = 'modal';
+        aCls = 'o-identify-link-modal';
+      } else if (attribute.target === 'modal-full') {
+        aTarget = 'modal-full';
+        aCls = 'o-identify-link-modal';
+      }
+      val = `<a class="${aCls}" target="${aTarget}" href="${url}">${text}</a>`;
     }
     const newElement = document.createElement('li');
     newElement.classList.add(attribute.cls);

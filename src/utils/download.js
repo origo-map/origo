@@ -66,7 +66,8 @@ export const html2canvas = function html2canvas(el) {
     backgroundColor: null,
     logging: false,
     height: el.offsetHeight,
-    width: el.offsetWidth
+    width: el.offsetWidth,
+    scale: 4
   });
 };
 

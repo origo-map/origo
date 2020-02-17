@@ -1,6 +1,6 @@
 {
   "name": "origo",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "Framework to build web map apps",
   "keywords": [
     "map",
@@ -35,7 +35,7 @@
     "downloadjs": "^1.4.7",
     "html2canvas": "^1.0.0-rc.5",
     "jquery": "3.4.0",
-    "ol": "6.1.0",
+    "ol": "6.2.1",
     "owl.carousel": "^2.3.4",
     "proj4": "2.3.10",
     "whatwg-fetch": "^2.0.4"

@@ -5,3 +5,9 @@
 .ol-overlaycontainer-stopevent {
   z-index: unset !important;
 }
+.ol-overlaycontainer, .ol-overlaycontainer-stopevent {
+  pointer-events: none;
+}
+.ol-overlaycontainer > *, .ol-overlaycontainer-stopevent > * {
+  pointer-events: auto;
+}
