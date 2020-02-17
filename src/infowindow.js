@@ -464,7 +464,7 @@ function removeListElement(item) {
     /*  
     This loop is needed because when clear() is called it will try to remove ALL elements, but elements 
     for not-selected list are already removed, thus the element found by id becomes null if document.getElementById was used.
-    Also when removing an item by ctrl + click, the item might not be in the active list, but still nerds to be removed.
+    Also when removing an item by ctrl + click, the item might not be in the active list, but still needs to be removed.
     OBS! getElementById works only on document and not on the element.
     */
     let listElement;
