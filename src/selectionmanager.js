@@ -39,8 +39,8 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   let urval;
   let map;
   let infowindow;
-  
-  
+
+
   const isInfowindow = options.hasOwnProperty('infowindow') ? options.infowindow === 'infowindow' : false;
   // const pinStyle = Style.createStyleRule(pinStyleOptions)[0];
   // const selectionStyles = selectionStylesOptions ? Style.createGeometryStyle(selectionStylesOptions) : Style.createEditStyle();
@@ -53,32 +53,30 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     }
     selectedItems.push(item);
   }
-  
+
   function addItems(items) {
     items.forEach(item => {
       addItem(item);
     });
   }
-  
+
   function highlightAndExpandItem(item) {
     const featureId = item.getFeature().getId();
     highlightFeatureById(featureId);
-    // infowindow.showSelectedList(item.getLayer().get('name'));
     infowindow.showSelectedList(item.getSelectionGroup());
     infowindow.expandListElement(featureId);
     infowindow.highlightListElement(featureId);
   }
-  
-  function highlightItem(item) {    
+
+  function highlightItem(item) {
     const featureId = item.getFeature().getId();
     highlightFeatureById(featureId);
-    // infowindow.showSelectedList(item.getLayer().get('name'));
     infowindow.showSelectedList(item.getSelectionGroup());
     infowindow.expandListElement(featureId);
     infowindow.highlightListElement(featureId);
     infowindow.scrollListElementToView(featureId);
   }
-  
+
   function addOrHighlightItem(item) {
     if (alreadyExists(item)) {
       // highlight
@@ -91,17 +89,16 @@ const Selectionmanager = function Selectionmanager(options = {}) {
       }
     }
   }
-  
+
   function getSelectedItemsForASelectionGroup(selectionGroup) {
-    // const items = selectedItems.getArray().filter(i => i.getLayer().get('name') === selectionGroup);
     const items = selectedItems.getArray().filter(i => i.getSelectionGroup() === selectionGroup);
     return items;
   }
-  
+
   function removeItem(item) {
     selectedItems.remove(item);
   }
-  
+
   function removeItems(items) {
     const itemsToBeRemoved = [];
     items.forEach(item => {
@@ -113,7 +110,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     });
     itemsToBeRemoved.forEach(item => selectedItems.remove(item));
   }
-  
+
   function removeItemById(id) {
     selectedItems.forEach(item => {
       if (item.getId() === id) {
@@ -121,15 +118,15 @@ const Selectionmanager = function Selectionmanager(options = {}) {
       }
     });
   }
-  
+
   function clearSelection() {
     selectedItems.clear();
   }
-  
+
   function alreadyExists(item) {
     return selectedItems.getArray().find(i => item.getId() === i.getId());
   }
-  
+
   function featureStyler(feature) {
     if (feature.get('state') === 'selected') {
       return Style.createStyleRule(multiselectStyleOptions.highlighted);
@@ -137,7 +134,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
       return Style.createStyleRule(multiselectStyleOptions.selected);
     }
   }
-  
+
   function onItemAdded(event) {
     const item = event.element;
 
@@ -145,68 +142,72 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     const selectionGroup = event.element.getSelectionGroup();
     // const selectionGroupTitle = event.element.getLayer().get('title');
     const selectionGroupTitle = event.element.getSelectionGroupTitle();
-  
+
     if (!urval.has(selectionGroup)) {
       const urvalLayer = featurelayer(null, map);
       urvalLayer.setStyle(featureStyler);
       urval.set(selectionGroup, urvalLayer);
       infowindow.createUrvalElement(selectionGroup, selectionGroupTitle);
     }
-  
+
     urval.get(selectionGroup).addFeature(item.getFeature());
     infowindow.createListElement(item);
-  
+
     const sum = urval.get(selectionGroup).getFeatures().length;
     infowindow.updateUrvalElementText(selectionGroup, selectionGroupTitle, sum);
-  
+
     if (isInfowindow) {
       infowindow.show();
-    }    
+    }
   }
-  
+
   function onItemRemoved(event) {
-  
+
     const item = event.element;
 
     // const selectionGroup = event.element.getLayer().get('name');
     const selectionGroup = event.element.getSelectionGroup();
     // const selectionGroupTitle = event.element.getLayer().get('title');
     const selectionGroupTitle = event.element.getSelectionGroupTitle();
-    
+
     const feature = item.getFeature();
     feature.unset('state', 'selected');
-  
+
     urval.get(selectionGroup).removeFeature(feature);
     infowindow.removeListElement(item);
-  
+
     const sum = urval.get(selectionGroup).getFeatures().length;
     infowindow.updateUrvalElementText(selectionGroup, selectionGroupTitle, sum);
-  
+
     if (urval.get(selectionGroup).getFeatures().length < 1) {
       infowindow.hideUrvalElement(selectionGroup);
     }
-  
+
     if (selectedItems.getLength() < 1) {
       infowindow.hide();
     }
   }
-  
+
   function highlightFeatureById(id) {
     selectedItems.forEach(item => {
       const feature = item.getFeature();
-      if (item.getId() === id)
+      if (item.getId() === id) {
         feature.set('state', 'selected');
-      else
+      }
+      else {
         feature.unset('state', 'selected');
+      }
     });
     // we need to manually refresh other layers, otherwise unselecting does not take effect until the next layer refresh which is a bit strange!
-    urval.forEach((value, key, map) => value.refresh());
+    // urval.forEach((value, key, map) => {
+    //   value.refresh();
+    // });
   }
-  
+
   function highlightFeature(feature) {
     feature.set('state', 'selected');
   }
-  
+
   function getNumberOfSelectedItems() {
     return selectedItems.getLength();
   }

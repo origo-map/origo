@@ -307,14 +307,13 @@ function createListElement(item) {
     listElement.appendChild(svg);
     const listElementContentContainer = document.createElement('div');
     listElementContentContainer.classList.add('listelement-content-container');
-    const content = createElementFromHTML(item.getContent()); // Content that is created in getattribute module is a template is supposed to be used with jQuery. without jQuery we cannot append it before it is converted to a proper html element.
+    // const content = createElementFromHTML(item.getContent()); // Content that is created in getattribute module is a template is supposed to be used with jQuery. without jQuery we cannot append it before it is converted to a proper html element.
+    const content = (item.getContent());
     listElementContentContainer.appendChild(content);
     listElement.appendChild(listElementContentContainer);
     createExpandableContent(listElementContentContainer, content, item.getId());
-    //const sublist = sublists.get(item.getLayer().get('name'));
     const sublist = sublists.get(item.getSelectionGroup());
     sublist.appendChild(listElement);
-    //showUrvalElement(item.getLayer().get('name'));
     showUrvalElement(item.getSelectionGroup());
 }
 
