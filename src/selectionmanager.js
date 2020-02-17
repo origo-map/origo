@@ -198,10 +198,11 @@ const Selectionmanager = function Selectionmanager(options = {}) {
         feature.unset('state', 'selected');
       }
     });
+
     // we need to manually refresh other layers, otherwise unselecting does not take effect until the next layer refresh which is a bit strange!
-    // urval.forEach((value, key, map) => {
-    //   value.refresh();
-    // });
+    urval.forEach((value, key, map) => {
+      value.getFeatureStore().changed();
+    });
   }
 
   function highlightFeature(feature) {
