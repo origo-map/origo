@@ -65,11 +65,12 @@ const Featureinfo = function Featureinfo(options = {}) {
 
   // TODO: direct access to feature and layer should be converted to getFeature and getLayer methods on currentItem
   const callback = function callback(evt) {
-    const currentItem = evt.item.index;
-    if (currentItem !== null) {
-      const clone = items[currentItem].feature.clone();
-      clone.setId(items[currentItem].feature.getId());
-      clone.layerName = items[currentItem].name;
+    const currentItemIndex = evt.item.index;
+    if (currentItemIndex !== null) {
+      let currentItem = items[currentItemIndex];
+      const clone = currentItem.feature.clone();
+      clone.setId(currentItem.feature.getId());
+      clone.layerName = currentItem.name;
 
       selectionLayer.clearAndAdd(
         clone,
