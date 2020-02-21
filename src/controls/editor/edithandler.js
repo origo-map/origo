@@ -293,7 +293,7 @@ function onDeleteSelected() {
 
 function startDraw() {
   if (!editLayers[currentLayer].get('geometryType')) {
-    alert(`"geometryType" saknas för ${editLayers[currentLayer].get('name')}`);
+    alert(`"geometryType" har inte angivits för ${editLayers[currentLayer].get('name')}`);
   } else if (hasDraw !== true && isActive()) {
     setActive('draw');
     hasDraw = true;
