@@ -294,7 +294,7 @@ const Search = function Search(options = {}) {
       maxItems: limit,
       item: renderList,
       filter(suggestion, userInput) {
-        if (suggestion.value.toLowerCase().includes(userInput.toLowerCase())) {
+        if (suggestion.value.toLowerCase().indexOf(userInput.toLowerCase()) !== -1) {
           return suggestion.value;
         }
         return false;

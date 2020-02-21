@@ -134,15 +134,27 @@ const PrintComponent = function PrintComponent(options = {}) {
       });
     },
     async downloadPDF() {
+      let height;
+      let width;
+      let pdfOrientation;
+      if (sizes[size][1] > sizes[size][0]) {
+        height = sizes[size][0];
+        width = sizes[size][1];
+        pdfOrientation = orientation === 'portrait' ? 'landscape' : 'portrait';
+      } else {
+        height = sizes[size][1];
+        width = sizes[size][0];
+        pdfOrientation = orientation;
+      }
       await downloadPDF({
         afterRender: afterRender(map),
         beforeRender: beforeRender(map),
         el: pageElement,
         filename: name,
-        height: sizes[size][1],
-        orientation,
+        height,
+        orientation: pdfOrientation,
         size,
-        width: sizes[size][0]
+        width
       });
     },
     async onRender() {
@@ -184,8 +196,8 @@ const PrintComponent = function PrintComponent(options = {}) {
           class="flex column no-shrink margin-top-large margin-x-auto box-shadow bg-white border-box"
           style="margin-bottom: 4rem;"
         >
-          <div 
-            id="${pageId}" 
+          <div
+            id="${pageId}"
             class="o-print-page flex column no-shrink no-margin width-full height-full bg-white ${this.printMargin()}"
             style="margin-bottom: 4rem;"
           >
@@ -197,7 +209,7 @@ const PrintComponent = function PrintComponent(options = {}) {
         ${printSettings.render()}
         ${printToolbar.render()}
         ${closeButton.render()}
-      </div>      
+      </div>
       `;
 
       targetElement.appendChild(dom.html(htmlString));

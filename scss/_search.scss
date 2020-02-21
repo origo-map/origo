@@ -18,7 +18,7 @@ $search-width-l: calc(100% - calc(#{$search-menu-button-width} + #{$search-paddi
 @import 'externs/awesomplete.scss';
 
 .o-search-wrapper {
-  max-width: calc(100% - 7rem);
+  max-width: calc(100% - 8rem);
   width: $search-width;
 }
 
