@@ -5,13 +5,18 @@ import DrawInteraction from 'ol/interaction/Draw';
 import Overlay from 'ol/Overlay';
 import Polygon from 'ol/geom/Polygon';
 import LineString from 'ol/geom/LineString';
+import Projection from 'ol/proj/Projection';
 import { Component, Element as El, Button, dom } from '../ui';
 import Style from '../style';
 import StyleTypes from '../style/styletypes';
+import replacer from '../utils/replacer';
 
 const Measure = function Measure({
   default: defaultMeasureTool = 'length',
-  measureTools = ['length', 'area']
+  measureTools = ['length', 'area'],
+  elevationServiceURL,
+  elevationTargetProjection,
+  elevationResponseType = 'feature'
 } = {}) {
   const style = Style;
   const styleTypes = StyleTypes();
@@ -137,6 +142,69 @@ const Measure = function Measure({
     return htmlElem.textContent;
   }
 
+  function getElevation(evt) {
+    const feature = evt.feature;
+    let coordinates;
+    let elevationProjection;
+    const options = {
+      start: '{',
+      end: '}'
+    };
+
+    if (elevationTargetProjection && elevationTargetProjection !== viewer.getProjection().getCode()) {
+      const clone = feature.getGeometry().clone();
+      clone.transform(viewer.getProjection().getCode(), elevationTargetProjection);
+      coordinates = clone.getCoordinates();
+      elevationProjection = new Projection({ code: elevationTargetProjection });
+    } else {
+      coordinates = feature.getGeometry().getCoordinates();
+      elevationProjection = viewer.getProjection();
+    }
+
+    let easting = coordinates[0];
+    let northing = coordinates[1];
+
+    switch (elevationProjection.getAxisOrientation()) {
+      case 'enu':
+        easting = coordinates[0];
+        northing = coordinates[1];
+        break;
+      case 'neu':
+        northing = coordinates[0];
+        easting = coordinates[1];
+        break;
+      default:
+        easting = coordinates[0];
+        northing = coordinates[1];
+        break;
+    }
+
+    const url = replacer.replace(elevationServiceURL, {
+      easting,
+      northing
+    }, options);
+
+    feature.setStyle(createStyle(feature));
+    feature.getStyle()[0].getText().setText('Hämtar höjd...');
+
+    fetch(url).then(response => response.json({
+      cache: false
+    })).then((data) => {
+      let elevation;
+
+      if (elevationResponseType.toLowerCase() === 'feature') {
+        elevation = data.geometry.coordinates[2];
+      } else if (elevationResponseType.toLowerCase() === 'googleelevationapi') {
+        elevation = data.results[0].elevation;
+      } else {
+        elevation = data.elevation;
+      }
+
+      feature.getStyle()[0].getText().setText(`${elevation.toFixed(1)} m`);
+      source.changed();
+    });
+  }
+
   // Display and move tooltips with pointer
   function pointerMoveHandler(evt) {
     if (evt.dragging) {
@@ -243,6 +311,9 @@ const Measure = function Measure({
       measureTooltipElement = null;
       createMeasureTooltip();
       document.getElementsByClassName('o-tooltip-measure')[1].classList.remove('hidden');
+      if (feature.getGeometry().getType() === 'Point') {
+        getElevation(evt);
+      }
     }, this);
   }
 
@@ -295,7 +366,7 @@ const Measure = function Measure({
         }
       });
     },
-    onInit() { console.log(measureTools)
+    onInit() {
       lengthTool = measureTools.indexOf('length') >= 0;
       areaTool = measureTools.indexOf('area') >= 0;
       elevationTool = measureTools.indexOf('elevation') >= 0;
@@ -324,7 +395,7 @@ const Measure = function Measure({
               type = 'LineString';
               toggleType(this);
             },
-            icon: '#minicons-line-vector',
+            icon: '#ic_timeline_24px',
             tooltipText: 'Längd',
             tooltipPlacement: 'east'
           });
@@ -339,7 +410,7 @@ const Measure = function Measure({
               type = 'Polygon';
               toggleType(this);
             },
-            icon: '#minicons-square-vector',
+            icon: '#o_polygon_24px',
             tooltipText: 'Yta',
             tooltipPlacement: 'east'
           });
