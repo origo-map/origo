@@ -16,7 +16,7 @@ const Measure = function Measure({
   measureTools = ['length', 'area'],
   elevationServiceURL,
   elevationTargetProjection,
-  elevationResponseType = 'feature'
+  elevationAttribute
 } = {}) {
   const style = Style;
   const styleTypes = StyleTypes();
@@ -142,6 +142,11 @@ const Measure = function Measure({
     return htmlElem.textContent;
   }
 
+  function getElevationAttribute(path, obj = {}) {
+    const properties = Array.isArray(path) ? path : path.split(/[.[\]]+/).filter(element => element);
+    return properties.reduce((prev, curr) => prev && prev[curr], obj);
+  }
+
   function getElevation(evt) {
     const feature = evt.feature;
     let coordinates;
@@ -190,16 +195,7 @@ const Measure = function Measure({
     fetch(url).then(response => response.json({
       cache: false
     })).then((data) => {
-      let elevation;
-
-      if (elevationResponseType.toLowerCase() === 'feature') {
-        elevation = data.geometry.coordinates[2];
-      } else if (elevationResponseType.toLowerCase() === 'googleelevationapi') {
-        elevation = data.results[0].elevation;
-      } else {
-        elevation = data.elevation;
-      }
-
+      const elevation = getElevationAttribute(elevationAttribute, data);
       feature.getStyle()[0].getText().setText(`${elevation.toFixed(1)} m`);
       source.changed();
     });
