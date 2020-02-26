@@ -50,15 +50,7 @@
       }
     },
     {
-      "name": "measure",
-      "options": {
-        "elevationUrl": "http://localhost:3001/origoserver/lmelevation",
-        "measureTools": [
-          "area",
-          "length",
-          "elevation"
-        ]
-      }
+      "name": "measure"
     }
   ],
   "pageSettings": {
