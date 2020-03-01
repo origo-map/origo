@@ -2,6 +2,7 @@ import EsriJSON from 'ol/format/EsriJSON';
 import $ from 'jquery';
 import maputils from './maputils';
 import getAttributes from './getattributes';
+import SelectedItem from './models/SelectedItem';
 
 function getFeatureInfoUrl({
   coordinate,
@@ -40,14 +41,14 @@ function getAGSIdentifyUrl({ layer, coordinate }, viewer) {
     '/identify?f=json',
     '&returnGeometry=true',
     '&geometryType=esriGeometryPoint',
-    `&sr=${esriSrs}`,
-    `&geometry=${coordinate}`,
+  `&sr=${esriSrs}`,
+  `&geometry=${coordinate}`,
     '&outFields=*',
     '&geometryPrecision=2',
-    `&tolerance=${tolerance}`,
-    `&layers=all:${layerId}`,
-    `&mapExtent=${extent}`,
-    `&imageDisplay=${size},96`].join('');
+  `&tolerance=${tolerance}`,
+  `&layers=all:${layerId}`,
+  `&mapExtent=${extent}`,
+  `&imageDisplay=${size},96`].join('');
 
   return $.ajax({
     url,
@@ -182,15 +183,12 @@ function getFeaturesFromRemote(requestOptions, viewer) {
 
   const requestPromises = getFeatureInfoRequests(requestOptions, viewer).map(request => request.fn.then((features) => {
     const layer = viewer.getLayer(request.layer);
+    const groupLayers = viewer.getGroupLayers();
     const map = viewer.getMap();
     if (features) {
       features.forEach((feature) => {
-        requestResult.push({
-          title: layer.get('title'),
-          feature,
-          content: getAttributes(feature, layer, map),
-          layer: layer.get('name')
-        });
+        const si = createSelectedItem(feature, layer, map, groupLayers);
+        requestResult.push(si);
       });
       return requestResult;
     }
@@ -210,9 +208,10 @@ function getFeaturesAtPixel({
   const result = [];
   let cluster = false;
   const resolutions = map.getView().getResolutions();
+  const groupLayers = viewer.getGroupLayers();
   map.forEachFeatureAtPixel(pixel, (feature, layer) => {
     const l = layer;
-    const map = viewer.getMap();
+    // const map = viewer.getMap();
     let queryable = false;
     if (layer) {
       queryable = layer.get('queryable');
@@ -230,30 +229,16 @@ function getFeaturesAtPixel({
           return true;
         }
         collection.forEach((f) => {
-          const item = {};
-          item.title = l.get('title');
-          item.feature = f;
-          item.content = getAttributes(f, l, map);
-          item.name = l.get('name');
-          result.push(item);
+          const si = createSelectedItem(f, layer, map, groupLayers);
+          result.push(si);
         });
       } else if (collection.length === 1 && queryable) {
-        const item = {};
-        item.title = l.get('title');
-        item.feature = collection[0];
-        item.content = getAttributes(collection[0], l,map);
-        item.name = l.get('name');
-        item.layer = l;
-        result.push(item);
+        const si = createSelectedItem(collection[0], layer, map, groupLayers);
+        result.push(si);
       }
     } else if (queryable) {
-      const item = {};
-      item.title = l.get('title');
-      item.feature = feature;
-      item.content = getAttributes(feature, l,map);
-      item.name = l.get('name');
-      item.layer = l;
-      result.push(item);
+      const si = createSelectedItem(feature, layer, map, groupLayers);
+      result.push(si);
     }
 
     return false;
@@ -265,6 +250,32 @@ function getFeaturesAtPixel({
     return false;
   }
   return result;
+}
+
+function createSelectedItem(feature, layer, map, groupLayers) {
+  // Above functions have no way of knowing whether the layer is part of a LayerGroup or not, therefore we need to check every layer against the groupLayers.
+  const layerName = layer.get('name');
+  let groupLayer;
+  groupLayers.forEach(gl => {
+    const subLayers = gl.getLayers().getArray();
+    const layerBelongsToGroup = subLayers.some(layer => layer.get('name') === layerName);
+    if (layerBelongsToGroup) {
+      groupLayer = gl;
+    }
+  });
+
+  let selectionGroup;
+  let selectionGroupTitle;
+
+  if (groupLayer) {
+    selectionGroup = groupLayer.get('name');
+    selectionGroupTitle = groupLayer.get('title');
+  } else {
+    selectionGroup = layer.get('name');
+    selectionGroupTitle = layer.get('title');
+  }
+
+  return new SelectedItem(feature, layer, map, selectionGroup, selectionGroupTitle);
 }
 
 export default {
