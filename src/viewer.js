@@ -257,13 +257,13 @@ const Viewer = function Viewer(targetOption, options = {}) {
       layerlist.forEach((layer) => {
         const layerSourceOptions = layer.source ? getSource2(layer.source) : undefined;
         if (layerSourceOptions && layerSourceOptions.capabilitiesURL) {
-        
+
           if (capabilitiesLayers[layer.source].indexOf(layer.name) >= 0) {
             layer.secure = false;
           } else {
             layer.secure = true;
           }
-        
+
         } else {
           layer.secure = false;
         }

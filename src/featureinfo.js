@@ -24,9 +24,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     pinsStyle: pinStyleOptions = styleTypes.getStyle('pin'),
     savedPin: savedPinOptions,
     savedSelection,
-    // const selectionStylesOptions = options.selectionStyles
     selectionStyles: selectionStylesOptions,
-    showOverlay = true,
   } = options;
 
   let identifyTarget;
