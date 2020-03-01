@@ -6,6 +6,7 @@ import Map from './map';
 import proj from './projection';
 import MapSize from './utils/mapsize';
 import Featureinfo from './featureinfo';
+import Selectionmanager from './selectionmanager';
 import maputils from './maputils';
 import Layer from './layer';
 import Main from './components/main';
@@ -18,6 +19,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
   let map;
   let tileGrid;
   let featureinfo;
+  let selectionmanager;
 
   let {
     projection
@@ -99,6 +101,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
   const getFeatureinfo = () => featureinfo;
 
+  const getSelectionManager = () => selectionmanager;
+
   const getMapName = () => mapName;
 
   const getTileGrid = () => tileGrid;
@@ -166,6 +170,11 @@ const Viewer = function Viewer(targetOption, options = {}) {
     return queryableLayers;
   };
 
+  const getGroupLayers = function getGroupLayers() {
+    const groupLayers = getLayers().filter(layer => layer.get('type') === "GROUP");
+    return groupLayers;
+  };
+
   const getSearchableLayers = function getSearchableLayers(searchableDefault) {
     const searchableLayers = [];
     map.getLayers().forEach((layer) => {
@@ -188,6 +197,13 @@ const Viewer = function Viewer(targetOption, options = {}) {
       return source[name];
     }
     throw new Error(`There is no source with name: ${name}`);
+  };
+
+  const getSource2 = function getSource2(name) {
+    if (name in source) {
+      return source[name];
+    }
+    return undefined;
   };
 
   const getGroups = () => groups;
@@ -440,8 +456,13 @@ const Viewer = function Viewer(targetOption, options = {}) {
       }
 
       featureinfoOptions.viewer = this;
+
+      selectionmanager = Selectionmanager(featureinfoOptions);
+      this.addComponent(selectionmanager);
+
       featureinfo = Featureinfo(featureinfoOptions);
       this.addComponent(featureinfo);
+
       this.addControls();
     },
     render() {
@@ -478,6 +499,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getMain,
     getMapSource,
     getQueryableLayers,
+    getGroupLayers,
     getResolutions,
     getSearchableLayers,
     getSize,
@@ -499,7 +521,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getUrlParams,
     removeGroup,
     removeOverlays,
-    zoomToExtent
+    zoomToExtent,
+    getSelectionManager
   });
 };
 
