@@ -34,6 +34,7 @@ function render(viewerId) {
             active: false
         };
         viewer.dispatch('toggleClickInteraction', detail);
+        hideInfowindow();
     });
     urvalContainer.appendChild(closeButtonSvg);
     listContainer = document.createElement('div');
