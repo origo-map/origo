@@ -110,7 +110,7 @@ function createUrvalElement(selectionGroup, selectionGroupTitle) {
     const sublistContainter = document.createElement('div');
     sublists.set(selectionGroup, sublistContainter);
 
-    const subexportComponent = createSubexportConponent(selectionGroup);
+    const subexportComponent = createSubexportComponent(selectionGroup);
     subexports.set(selectionGroup, subexportComponent);
 }
 
@@ -142,7 +142,7 @@ function showSelectedList(selectionGroup) {
     });
 }
 
-function createSubexportConponent(selectionGroup) {
+function createSubexportComponent(selectionGroup) {
     // OBS! selectionGroup corresponds to a layer with the same name in most cases, but in case of a group layer it can contain selected items from all the layers in that GroupLayer.
 
     let layerSpecificExportOptions;
@@ -150,6 +150,7 @@ function createSubexportConponent(selectionGroup) {
     const simpleExportLayers = exportOptions.simpleExportLayers ? exportOptions.simpleExportLayers : [];
     const simpleExportUrl = exportOptions.simpleExportUrl;
     const simpleExportButtonText = exportOptions.simpleExportButtonText || 'Exporera alla features i urvalet';
+    const exportedFileName = exportOptions.exportedFileName || 'ExportedFeatures';
     const activeLayer = viewer.getLayer(selectionGroup);
 
     const subexportContainer = document.createElement('div');
@@ -179,7 +180,7 @@ function createSubexportConponent(selectionGroup) {
                 }
                 exportBtn.loadStart();
                 const selectedItems = selectionManager.getSelectedItemsForASelectionGroup(selectionGroup);
-                layerSpecificExportHandler(url, activeLayer, selectedItems, attributesToSendToExport).then((data) => {
+                layerSpecificExportHandler(url, activeLayer, selectedItems, attributesToSendToExport, exportedFileName).then((data) => {
                     if (data) {
                         switch (data.status) {
                             case 'ok':
@@ -220,7 +221,7 @@ function createSubexportConponent(selectionGroup) {
                 }
                 exportBtn.loadStart();
                 const selectedItems = selectionManager.getSelectedItemsForASelectionGroup(selectionGroup);
-                simpleExportHandler(simpleExportUrl, activeLayer, selectedItems).then(data => {
+                simpleExportHandler(simpleExportUrl, activeLayer, selectedItems, exportedFileName).then(data => {
                     exportBtn.loadStop();
                 }).catch((err) => {
                     console.log(err);
@@ -240,7 +241,7 @@ function createSubexportConponent(selectionGroup) {
     return subexportContainer;
 }
 
-function createToaster(status, message) {
+export function createToaster(status, message) {
     const toaster = document.createElement('div');
     toaster.style.fontSize = '12px';
     if (!message) {
