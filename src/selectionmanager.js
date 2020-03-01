@@ -1,16 +1,8 @@
 import 'owl.carousel';
-import Overlay from 'ol/Overlay';
-import $ from 'jquery';
 import { Component } from './ui';
-import Popup from './popup';
-import sidebar from './sidebar';
-import maputils from './maputils';
 import featurelayer from './featurelayer';
-import getFeatureInfo from './getfeatureinfo';
-import replacer from '../src/utils/replacer';
 import infowindowManager from './infowindow';
 import Collection from 'ol/Collection';
-import viewer from './viewer';
 import Style from './style';
 import StyleTypes from './style/styletypes';
 
@@ -18,34 +10,14 @@ const styleTypes = StyleTypes();
 const multiselectStyleOptions = styleTypes.getStyle('multiselection');
 
 const Selectionmanager = function Selectionmanager(options = {}) {
-  const {
-    clickEvent = 'click',
-    clusterFeatureinfoLevel = 1,
-    hitTolerance = 0,
-    pinning = true,
-    pinsStyle: pinStyleOptions = styleTypes.getStyle('pin'),
-    savedPin: savedPinOptions,
-    savedSelection,
-    showOverlay = true
-  } = options;
 
-  let overlay;
-  let items;
-  let popup;
-  let selectionLayer;
   let viewer;
-  let identifyTarget;
   let selectedItems;
   let urval;
   let map;
   let infowindow;
 
-
   const isInfowindow = options.hasOwnProperty('infowindow') ? options.infowindow === 'infowindow' : false;
-  // const pinStyle = Style.createStyleRule(pinStyleOptions)[0];
-  // const selectionStyles = selectionStylesOptions ? Style.createGeometryStyle(selectionStylesOptions) : Style.createEditStyle();
-  // let savedPin = savedPinOptions ? maputils.createPointFeature(savedPinOptions, pinStyle) : undefined;
-  // const savedFeature = savedPin || savedSelection || undefined;
 
   function addItem(item) {
     if (alreadyExists(item)) {
