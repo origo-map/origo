@@ -1,6 +1,6 @@
 import featureinfotemplates from './featureinfotemplates';
-import replacer from '../src/utils/replacer';
-import isUrl from '../src/utils/isurl';
+import replacer from './utils/replacer';
+import isUrl from './utils/isurl';
 import geom from './geom';
 
 function createUrl(prefix, suffix, url) {
@@ -26,7 +26,7 @@ const getContent = {
             url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.url), feature.getProperties(), null, map));
           } else if (isUrl(attribute.url)) {
             url = attribute.url;
-          } else return;
+          } else return false;
           let aTarget = '_blank';
           let aCls = 'o-identify-link';
           if (attribute.target === 'modal') {
@@ -52,7 +52,7 @@ const getContent = {
       url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.url), attributes, null, map));
     } else if (isUrl(attribute.url)) {
       url = attribute.url;
-    } else return;
+    } else return false;
     const text = attribute.html || attribute.title || attribute.url;
     let aTarget = '_blank';
     let aCls = 'o-identify-link';
