@@ -1,5 +1,6 @@
 import featureinfotemplates from './featureinfotemplates';
 import replacer from '../src/utils/replacer';
+import isUrl from '../src/utils/isurl';
 import geom from './geom';
 
 function createUrl(prefix, suffix, url) {
@@ -20,19 +21,22 @@ const getContent = {
           title = `<b>${attribute.title}</b>`;
         }
         if (attribute.url) {
+          let url;
           if (feature.get(attribute.url)) {
-            const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.url), feature.getProperties(), null, map));
-            let aTarget = '_blank';
-            let aCls = 'o-identify-link';
-            if (attribute.target === 'modal') {
-              aTarget = 'modal';
-              aCls = 'o-identify-link-modal';
-            } else if (attribute.target === 'modal-full') {
-              aTarget = 'modal-full';
-              aCls = 'o-identify-link-modal';
-            }
-            val = `<a class="${aCls}" target="${aTarget}" href="${url}">${feature.get(attribute.name)}</a>`;
+            url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.url), feature.getProperties(), null, map));
+          } else if (isUrl(attribute.url)) {
+            url = attribute.url;
+          } else return;
+          let aTarget = '_blank';
+          let aCls = 'o-identify-link';
+          if (attribute.target === 'modal') {
+            aTarget = 'modal';
+            aCls = 'o-identify-link-modal';
+          } else if (attribute.target === 'modal-full') {
+            aTarget = 'modal-full';
+            aCls = 'o-identify-link-modal';
           }
+          val = `<a class="${aCls}" target="${aTarget}" href="${url}">${feature.get(attribute.name)}</a>`;
         }
       }
     }
@@ -43,20 +47,23 @@ const getContent = {
   },
   url(feature, attribute, attributes, map) {
     let val = '';
+    let url;
     if (feature.get(attribute.url)) {
-      const text = attribute.html || attribute.url;
-      const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.url), attributes, null, map));
-      let aTarget = '_blank';
-      let aCls = 'o-identify-link';
-      if (attribute.target === 'modal') {
-        aTarget = 'modal';
-        aCls = 'o-identify-link-modal';
-      } else if (attribute.target === 'modal-full') {
-        aTarget = 'modal-full';
-        aCls = 'o-identify-link-modal';
-      }
-      val = `<a class="${aCls}" target="${aTarget}" href="${url}">${text}</a>`;
+      url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.url), attributes, null, map));
+    } else if (isUrl(attribute.url)) {
+      url = attribute.url;
+    } else return;
+    const text = attribute.html || attribute.title || attribute.url;
+    let aTarget = '_blank';
+    let aCls = 'o-identify-link';
+    if (attribute.target === 'modal') {
+      aTarget = 'modal';
+      aCls = 'o-identify-link-modal';
+    } else if (attribute.target === 'modal-full') {
+      aTarget = 'modal-full';
+      aCls = 'o-identify-link-modal';
     }
+    val = `<a class="${aCls}" target="${aTarget}" href="${url}">${text}</a>`;
     const newElement = document.createElement('li');
     newElement.classList.add(attribute.cls);
     newElement.innerHTML = val;
