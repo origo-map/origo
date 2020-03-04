@@ -1,4 +1,4 @@
-import { Component, Collapse, Element as El, Slidenav, Button, dom } from '../../ui';
+import { Component, Collapse, Element as El, Slidenav, dom } from '../../ui';
 import ThemeGroups from './themegroups';
 import Group from './group';
 import GroupList from './grouplist';
@@ -221,6 +221,7 @@ const Overlays = function Overlays(options) {
   return Component({
     onAddGroup,
     onChangeLayer,
+    slidenav,
     onInit() {
       this.addComponent(overlaysCollapse);
       readOverlays();
