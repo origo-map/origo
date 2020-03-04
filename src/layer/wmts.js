@@ -3,7 +3,7 @@ import Tilegrid from 'ol/tilegrid/WMTS';
 import { getTopLeft } from 'ol/extent';
 import tile from './tile';
 
-function createSource(options) {
+function createSource(options) { console.log(options);
   return new WMTSSource({
     crossOrigin: 'anonymous',
     attributions: options.attribution,
@@ -18,7 +18,7 @@ function createSource(options) {
       matrixIds: options.matrixIds,
       tileSize: options.tileSize
     }),
-    style: 'default'
+    style: options.style || ''
   });
 }
 
@@ -49,6 +49,7 @@ const wmts = function wmts(layerOptions, viewer) {
   });
   sourceOptions.projectionExtent = viewer.getProjection().getExtent();
   sourceOptions.id = wmtsOptions.id;
+  sourceOptions.style = wmtsOptions.wmtsStyle;
 
   const wmtsSource = createSource(sourceOptions);
   return tile(wmtsOptions, wmtsSource, viewer);
