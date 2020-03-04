@@ -6,6 +6,7 @@ const Legend = function Legend(options = {}) {
   const {
     cls: clsSettings = '',
     style: styleSettings = {},
+    autoHide = 'never',
     expanded = true,
     contentCls,
     contentStyle,
@@ -127,6 +128,17 @@ const Legend = function Legend(options = {}) {
     isExpanded = !isExpanded;
   };
 
+  const onMapClick = function onMapClick() {
+    if (autoHide === 'always' && isExpanded) {
+      toggleVisibility();
+    } else if (autoHide === 'mobile' && isExpanded) {
+      const size = viewer.getSize();
+      if (size === 'm' || size === 's' || size === 'xs') {
+        toggleVisibility();
+      }
+    }
+  };
+
   return Component({
     name,
     onInit() {
@@ -146,6 +158,7 @@ const Legend = function Legend(options = {}) {
 
       this.render();
       this.dispatch('render');
+      viewer.getMap().on('click', onMapClick);
     },
     onRender() {
       mainContainerEl = document.getElementById(mainContainerCmp.getId());
