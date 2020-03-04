@@ -1,0 +1,25 @@
+language: node_js
+node_js:
+  - "stable"
+  - 8
+  - 9
+  - 10
+  - 11
+  - 12
+
+os:
+  - windows
+  - linux
+  - osx
+
+cache:
+  directories:
+    - "node_modules"
+
+branches:
+  only:
+  - master
+  - travis-ci-ISSUE-640
+
+before-script: "npm install"
+script: "npm run build"
