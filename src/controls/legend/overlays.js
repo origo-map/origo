@@ -222,6 +222,7 @@ const Overlays = function Overlays(options) {
   return Component({
     onAddGroup,
     onChangeLayer,
+    slidenav,
     onInit() {
       this.addComponent(overlaysCollapse);
       readOverlays();
