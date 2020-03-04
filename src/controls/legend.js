@@ -1,6 +1,7 @@
 import { Component, Button, Element as El, ToggleGroup, dom } from '../ui';
 import imageSource from './legend/imagesource';
 import Overlays from './legend/overlays';
+import LayerProperties from './legend/overlayproperties';
 
 const Legend = function Legend(options = {}) {
   const {
@@ -17,6 +18,7 @@ const Legend = function Legend(options = {}) {
   let viewer;
   let target;
   let mainContainerCmp;
+  let overlaysCmp;
   let mainContainerEl;
   const backgroundLayerButtons = [];
   let toggleGroup;
@@ -38,6 +40,16 @@ const Legend = function Legend(options = {}) {
       methods: {
         active: () => layer.setVisible(true),
         initial: () => layer.setVisible(false)
+      },
+      click() {
+        const slided = document.getElementById(overlaysCmp.slidenav.getId()).classList.contains('slide-secondary');
+        if (this.getState() === 'active' && !slided) {
+          const layerProperties = LayerProperties({ layer, viewer, parent: this });
+          overlaysCmp.slidenav.setSecondary(layerProperties);
+          overlaysCmp.slidenav.slideToSecondary();
+        } else if (slided) {
+          overlaysCmp.slidenav.slideToMain();
+        }
       }
     }));
   };
@@ -162,7 +174,7 @@ const Legend = function Legend(options = {}) {
       isExpanded = !size && expanded;
       target = document.getElementById(viewer.getMain().getId());
       const maxHeight = calcMaxHeight(getTargetHeight());
-      const overlaysCmp = Overlays({ viewer, cls: contentCls, style: contentStyle });
+      overlaysCmp = Overlays({ viewer, cls: contentCls, style: contentStyle });
       const baselayerCmps = [toggleGroup];
       const toolsCmps = [];
       let toolsCmp;
@@ -203,9 +215,9 @@ const Legend = function Legend(options = {}) {
       });
 
       if (toolsCmp) {
-        mainContainerComponents = [overlaysCmp, toolsCmp, baselayersCmp]
+        mainContainerComponents = [overlaysCmp, toolsCmp, baselayersCmp];
       } else {
-        mainContainerComponents = [overlaysCmp, baselayersCmp]
+        mainContainerComponents = [overlaysCmp, baselayersCmp];
       }
 
       mainContainerCmp = El({
