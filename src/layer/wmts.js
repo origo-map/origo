@@ -3,7 +3,7 @@ import Tilegrid from 'ol/tilegrid/WMTS';
 import { getTopLeft } from 'ol/extent';
 import tile from './tile';
 
-function createSource(options) { console.log(options);
+function createSource(options) {
   return new WMTSSource({
     crossOrigin: 'anonymous',
     attributions: options.attribution,
