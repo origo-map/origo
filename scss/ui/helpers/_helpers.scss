@@ -98,6 +98,10 @@
   border-radius: $radius-large;
   overflow: hidden;
 }
+.rounded-larger {
+  border-radius: $radius-larger;
+  overflow: hidden;
+}
 .rounded-top {
   border-radius: $radius-small $radius-small 0 0;
   overflow: hidden;

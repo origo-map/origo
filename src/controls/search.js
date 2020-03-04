@@ -390,7 +390,7 @@ const Search = function Search(options = {}) {
       });
 
       wrapperElement = El({
-        cls: 'o-search-wrapper absolute top-center rounded box-shadow bg-white',
+        cls: 'o-search-wrapper absolute top-center rounded-larger box-shadow bg-white',
         style: {
           'flex-wrap': 'wrap',
           overflow: 'visible'
