@@ -38,7 +38,7 @@ Not convinced? Or maybe you need some inspiration? Check out these examples of w
  * [Karlstadskartan](http://gi.karlstad.se)
  * [Mälardalskartan](http://www.malardalskartan.se)
  * [Sigtunakartan](https://karta.sigtuna.se)
- * [Strängnäskartan](https://karta.strangnas.se)
+ * [Strängnäskartan](https://kartor.strangnas.se)
  * [Västerås Stads samlingskarta](https://kartor.vasteras.se/sam)
 
 ## Getting started
