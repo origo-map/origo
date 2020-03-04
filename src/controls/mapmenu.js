@@ -1,4 +1,4 @@
-import { Component, Button, Element as El, Collapse, dom } from '../ui';
+import { Component, Button, Element as El, dom } from '../ui';
 
 const Mapmenu = function Mapmenu({
   closeIcon = '#ic_close_24px',
@@ -11,28 +11,20 @@ const Mapmenu = function Mapmenu({
   let mapMenu;
   let viewer;
   let target;
+  let isExpanded = false;
+  let mapMenuEl;
+  let menuButtonEl;
 
   const toggle = function toggle() {
-    if (menuButton.getState() === 'hidden') {
-      menuButton.setState('initial');
-      closeButton.setState('hidden');
-    } else {
-      menuButton.setState('hidden');
-      closeButton.setState('initial');
-    }
-    const customEvt = new CustomEvent('collapse:toggle', {
-      bubbles: true
-    });
-    document.getElementById(menuButton.getId()).dispatchEvent(customEvt);
+    mapMenuEl.classList.toggle('faded');
+    menuButtonEl.classList.toggle('faded');
+    isExpanded = !isExpanded;
   };
 
   const close = function close() {
-    menuButton.setState('initial');
-    closeButton.setState('hidden');
-    const customEvt = new CustomEvent('collapse:collapse', {
-      bubbles: true
-    });
-    document.getElementById(menuButton.getId()).dispatchEvent(customEvt);
+    if (isExpanded) {
+      toggle();
+    }
   };
 
   const MenuItem = function MenuItem({
@@ -76,28 +68,25 @@ const Mapmenu = function Mapmenu({
     },
     onAdd(evt) {
       viewer = evt.target;
-      target = `${viewer.getMain().getId()}`;
+      target = document.getElementById(viewer.getMain().getId());
       this.on('render', this.onRender);
-      this.addComponents([mapMenu]);
+      this.addComponents([mapMenu, menuButton]);
       this.render();
     },
     onInit() {
+      const menuButtonCls = isExpanded ? ' faded' : '';
       menuButton = Button({
-        cls: 'padding-small icon-smaller light text-normal',
         icon: menuIcon,
+        cls: `control icon-smaller medium round absolute light top-right${menuButtonCls}`,
         tooltipText: 'Meny',
         tooltipPlacement: 'west',
-        state: 'initial',
-        validStates: ['initial', 'hidden'],
         click() {
           toggle();
         }
       });
       closeButton = Button({
-        cls: 'small round margin-top-small margin-right small icon-smaller grey-lightest',
+        cls: 'small round margin-top-small margin-right-small icon-smaller grey-lightest',
         icon: closeIcon,
-        state: 'hidden',
-        validStates: ['initial', 'hidden'],
         click() {
           toggle();
         }
@@ -105,23 +94,26 @@ const Mapmenu = function Mapmenu({
       headerComponent = El({
         cls: 'flex row justify-end',
         style: { width: '100%' },
-        components: [menuButton, closeButton]
+        components: [closeButton]
       });
       contentComponent = Component({
         render() {
           return `<div class="relative width-12"><ul class="padding-y-small" id="${this.getId()}""></ul></div>`;
         }
       });
-      mapMenu = Collapse({
-        cls: 'absolute flex column top-right rounded box-shadow bg-white overflow-hidden',
+      mapMenu = El({
+        cls: 'absolute flex column top-right control box bg-white overflow-hidden faded',
         collapseX: true,
-        headerComponent,
-        contentComponent
+        components: [headerComponent, contentComponent]
       });
     },
     render() {
       const menuEl = dom.html(mapMenu.render());
-      document.getElementById(target).appendChild(menuEl);
+      target.appendChild(menuEl);
+      mapMenuEl = document.getElementById(mapMenu.getId());
+      const el = dom.html(menuButton.render());
+      target.appendChild(el);
+      menuButtonEl = document.getElementById(menuButton.getId());
       this.dispatch('render');
     }
   });

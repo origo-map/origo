@@ -18,7 +18,7 @@ function createSource(options) {
       matrixIds: options.matrixIds,
       tileSize: options.tileSize
     }),
-    style: 'default'
+    style: options.style || ''
   });
 }
 
@@ -49,6 +49,7 @@ const wmts = function wmts(layerOptions, viewer) {
   });
   sourceOptions.projectionExtent = viewer.getProjection().getExtent();
   sourceOptions.id = wmtsOptions.id;
+  sourceOptions.style = wmtsOptions.wmtsStyle;
 
   const wmtsSource = createSource(sourceOptions);
   return tile(wmtsOptions, wmtsSource, viewer);

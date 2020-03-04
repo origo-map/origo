@@ -44,6 +44,7 @@ const measure = {
       font: 'bold 13px "Helvetica Neue", Helvetica, Arial, sans-serif',
       textBaseline: 'middle',
       textAlign: 'center',
+      overflow: 'true',
       fill: {
         color: [0, 153, 255, 1]
       },

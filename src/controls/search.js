@@ -293,8 +293,11 @@ const Search = function Search(options = {}) {
       sort: false,
       maxItems: limit,
       item: renderList,
-      filter(suggestion) {
-        return suggestion.value;
+      filter(suggestion, userInput) {
+        if (suggestion.value.toLowerCase().indexOf(userInput.toLowerCase()) !== -1) {
+          return suggestion.value;
+        }
+        return false;
       }
     });
 
@@ -387,7 +390,7 @@ const Search = function Search(options = {}) {
       });
 
       wrapperElement = El({
-        cls: 'o-search-wrapper absolute top-center rounded box-shadow bg-white',
+        cls: 'o-search-wrapper absolute top-center rounded-larger box-shadow bg-white',
         style: {
           'flex-wrap': 'wrap',
           overflow: 'visible'

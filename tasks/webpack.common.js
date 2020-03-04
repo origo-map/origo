@@ -18,13 +18,13 @@ module.exports = {
                 browsers: ['chrome >= 39']
               },
               modules: false,
-              useBuiltIns: 'entry'
+              useBuiltIns: 'entry',
+              corejs: 3
             }]
           ],
           plugins: [
             ['@babel/plugin-transform-runtime', {
-              regenerator: true,
-              corejs: 2
+              regenerator: true
             }]
           ]
         }
@@ -42,7 +42,7 @@ module.exports = {
       proj4: 'proj4'
     }),
     new webpack.ProvidePlugin({
-      fetch: 'imports-loader?this=>global!exports-loader?global.fetch!whatwg-fetch'
+      fetch: 'exports-loader?self.fetch!whatwg-fetch/dist/fetch.umd'
     })
   ]
 };

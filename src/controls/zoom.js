@@ -15,17 +15,13 @@ const Zoom = function Zoom(options = {}) {
   const zoomByDelta = function zoomByDelta(deltaValue) {
     const map = viewer.getMap();
     const view = map.getView();
-    const currentResolution = view.getResolution();
-    if (currentResolution) {
-      const newResolution = view.constrainResolution(currentResolution, deltaValue);
-      if (view.getAnimating()) {
-        view.cancelAnimations();
-      }
-      view.animate({
-        resolution: newResolution,
-        duration
-      });
+    if (view.getAnimating()) {
+      view.cancelAnimations();
     }
+    view.animate({
+      zoom: view.getZoom() + deltaValue,
+      duration
+    });
   };
 
   return Component({
@@ -39,14 +35,14 @@ const Zoom = function Zoom(options = {}) {
     },
     onInit() {
       zoomIn = Button({
-        cls: 'o-zoom-in padding-small icon-smaller light',
+        cls: 'o-zoom-in padding-small icon-smaller light round box-shadow',
         click() {
           zoomByDelta(delta);
         },
         icon: '#ic_add_24px'
       });
       zoomOut = Button({
-        cls: 'o-zoom-out padding-small icon-smaller light',
+        cls: 'o-zoom-out padding-small icon-smaller light round box-shadow',
         click() {
           zoomByDelta(-delta);
         },
@@ -54,9 +50,9 @@ const Zoom = function Zoom(options = {}) {
       });
     },
     render() {
-      const htmlString = `<div class="o-zoom flex column rounded box-shadow">
+      const htmlString = `<div class="o-zoom flex column">
                             ${zoomIn.render()}
-                            <div class="divider horizontal"></div>
+                            <div class="padding-smaller"></div>
                             ${zoomOut.render()}
                          </div>`;
       const el = dom.html(htmlString);
