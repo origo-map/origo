@@ -1,0 +1,18 @@
+.o-scrollbar::-webkit-scrollbar {
+  width: $scrollbar-px-width;
+}
+
+.o-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: $scrollbar-thumb $scrollbar-bg;
+}
+
+.o-scrollbar::-webkit-scrollbar-track {
+  background: $scrollbar-bg;
+}
+
+.o-scrollbar::-webkit-scrollbar-thumb {
+  background-color: $scrollbar-thumb;
+  border-radius: 6px;
+  border: 3px solid $scrollbar-bg;
+}

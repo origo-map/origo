@@ -15,11 +15,11 @@ Origo is a web mapping framework. It is based on the [OpenLayers library](https:
 
 ## How to get started
 
-Download the latest [release](https://github.com/origo-map/origo/releases/) and check out the [api documentation](https://origo-map.github.io/api-documentation/latest/#origo-api). Below you will find some live examples and how to get started devoloping with Origo.
+Download the latest [release](https://github.com/origo-map/origo/releases/) and check out the [documentation](https://origo-map.github.io/origo-documentation/latest/#origo-api). Below you will find some live examples and how to get started devoloping with Origo.
 
 ## Documentation
 
-Learn more how to use Origo with the [api documentation](https://origo-map.github.io/api-documentation/latest/#origo-api).
+Learn more how to use Origo with the [documentation](https://origo-map.github.io/origo-documentation/latest/#origo-api).
 
 ## Want to contribute?
 We happily accept contributions of any kind. Guidelines are available in the [`CONTRIBUTING.md`](https://github.com/origo-map/origo/blob/master/CONTRIBUTING.md) and [`DEVELOPING.md`](https://github.com/origo-map/origo/blob/master/DEVELOPING.md) files.
@@ -31,13 +31,14 @@ For all bugs and feature requests please use ["Issues"](https://github.com/origo
 
 ## Live examples
 Not convinced? Or maybe you need some inspiration? Check out these examples of web maps that have been developed using the Origo framework:
+ * [Demo of latest release](http://origo-map.github.io/origo-map-demo/index.html)
  * [Enakartan](http://karta.enkoping.se)
  * [Eskilstunakartan](https://karta.eskilstuna.se)
  * [Hallstakartan](http://karta.hallstahammar.se)
  * [Karlstadskartan](http://gi.karlstad.se)
  * [Mälardalskartan](http://www.malardalskartan.se)
  * [Sigtunakartan](https://karta.sigtuna.se)
- * [Strängnäskartan](https://karta.strangnas.se)
+ * [Strängnäskartan](https://kartor.strangnas.se)
  * [Västerås Stads samlingskarta](https://kartor.vasteras.se/sam)
 
 ## Getting started
