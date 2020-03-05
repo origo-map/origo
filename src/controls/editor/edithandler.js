@@ -1,4 +1,3 @@
-import Awesomplete from 'awesomplete';
 import Draw from 'ol/interaction/Draw';
 import Select from 'ol/interaction/Select';
 import Modify from 'ol/interaction/Modify';
@@ -15,6 +14,7 @@ import editForm from './editform';
 import imageresizer from '../../utils/imageresizer';
 import getImageOrientation from '../../utils/getimageorientation';
 import shapes from './shapes';
+import searchList from './addons/searchList/searchList';
 
 const editsStore = store();
 let editLayers = {};
@@ -36,7 +36,7 @@ let snap;
 let viewer;
 let featureInfo;
 let modal;
-let awesome;
+let sList;
 
 function isActive() {
   if (modify === undefined || select === undefined) {
@@ -498,61 +498,6 @@ function editAttributes(feat) {
   }
 }
 
-function awesomeImage(src, value) {
-  const div = document.createElement('div');
-  const img = document.createElement('img');
-  img.style = 'width: 28px;';
-  img.setAttribute('src', src);
-  const p = document.createElement('p');
-  p.innerHTML = value;
-  div.appendChild(img);
-  div.appendChild(p);
-  return div;
-}
-
-function fetchImg(callback, options) {
-  const dir = options.location;
-  const ext = options.extension;
-  let src;
-  let val;
-  $.ajax({
-    url: dir,
-    type: 'GET',
-    success: (data) => {
-      const images = [];
-      const el = document.createElement('html');
-      el.innerHTML = data;
-      const links = el.querySelectorAll('a');
-      links.forEach((link) => {
-        const candidate = link.href.split('/').pop();
-        const array = candidate.split('.');
-        if (array.length === 2 && array[1] === ext) {
-          src = array.join('.');
-          val = array[0].split('_').join('');
-          images.push({
-            src: `${dir}/${src}`,
-            value: val
-          });
-        }
-      });
-      callback(images);
-    }
-  });
-}
-
-function awesomeParser(list) {
-  return list.map((item) => {
-    if (item.src && item.value) {
-      return {
-        label: awesomeImage(item.src, item.value).outerHTML,
-        value: item.value
-      };
-    }
-    return item.value;
-  });
-}
-
-
 function onToggleEdit(e) {
   e.stopPropagation();
   if (e.tool === 'draw') {
@@ -565,70 +510,8 @@ function onToggleEdit(e) {
   } else if (e.tool === 'attribute') {
     if (hasAttribute === false) {
       editAttributes();
-      const list = [];
-      const searchLists = document.querySelectorAll('#searchList');
-      searchLists.forEach((searchList) => {
-        if (searchList.querySelectorAll('div').length === 0) {
-          const input = searchList.querySelector('input');
-          let olist = JSON.parse(input.getAttribute('o-list'));
-          const hasLocation = olist.reduce(o => Object.keys(o).includes('location'));
-          let hasImages = olist.filter(o => Object.keys(o).includes('src')).length > 0;
-          if (hasLocation) {
-            olist.forEach((oItem) => {
-              fetchImg((images) => {
-                images.map((item) => {
-                  olist.push({
-                    label: awesomeImage(item.src, item.value).outerHTML,
-                    value: item.value
-                  });
-                  return true;
-                });
-              }, oItem);
-            });
-            olist = olist.filter(obj => obj.src);
-            hasImages = true;
-          } else {
-            olist = awesomeParser(olist);
-          }
-          const options = JSON.parse(input.getAttribute('o-config'));
-          let config = {
-            list: olist
-          };
-          if (hasImages) {
-            config.item = text =>
-              Awesomplete.$.create('li', {
-                innerHTML: text,
-                'area-selected': false
-              });
-          }
-          config = options ? $.extend({}, config, options) : config;
-
-          awesome = new Awesomplete(input, config);
-          list.push(awesome);
-          const btn = searchList.querySelector('button');
-
-          Awesomplete.$(btn).addEventListener('click', () => {
-            const hasList = list.map(a => btn.classList.contains(a.input.id));
-            const index = hasList.indexOf(true);
-            awesome = list[index];
-
-            if (awesome.ul.childNodes.length === 0) {
-              awesome.minChars = 0;
-              awesome.evaluate();
-            } else if (awesome.ul.hasAttribute('hidden')) {
-              awesome.open();
-            } else {
-              awesome.close();
-            }
-            list.map((a) => {
-              if (!btn.classList.contains(a.input.id)) {
-                a.close();
-              }
-              return a;
-            });
-          });
-        }
-      });
+      sList = new searchList();
+      sList.init();
     } else {
       cancelAttribute();
     }
