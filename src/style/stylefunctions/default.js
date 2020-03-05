@@ -5,6 +5,7 @@ import Style from 'ol/style/Style';
 import getColor from '../getcolor';
 
 export default function defaultStyle() {
+  let point;
   const fill = new Fill({
     color: ''
   });
@@ -27,14 +28,7 @@ export default function defaultStyle() {
     stroke,
     zIndex: 10
   });
-  const point = new Style({
-    image: new Circle({
-      radius: 5,
-      fill,
-      stroke
-    }),
-    zIndex: 50
-  });
+
   const styles = [];
 
   return function style(feature) {
@@ -70,16 +64,32 @@ export default function defaultStyle() {
         length += 1;
         break;
       case 'Point':
-        stroke.setColor(getColor('yellow'));
+        stroke.setColor(getColor('blue'));
         stroke.setWidth(1);
-        fill.setColor(getColor('yellow', 0.8));
+        fill.setColor(getColor('blue', 0.8));
+        point = new Style({
+          image: new Circle({
+            radius: 5,
+            fill,
+            stroke
+          }),
+          zIndex: 50
+        });
         styles[length] = point;
         length += 1;
         break;
       case 'MultiPoint':
-        stroke.setColor(getColor('yellow'));
+        stroke.setColor(getColor('blue'));
         stroke.setWidth(1);
-        fill.setColor(getColor('yellow', 0.8));
+        fill.setColor(getColor('blue', 0.8));
+        point = new Style({
+          image: new Circle({
+            radius: 5,
+            fill,
+            stroke
+          }),
+          zIndex: 50
+        });
         styles[length] = point;
         length += 1;
         break;

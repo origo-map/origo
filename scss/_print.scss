@@ -1,0 +1,70 @@
+$print-control-position: .5rem;
+$print-control-bg-color: rgba($primary-color-inverse, .7);
+$print-control-border-radius: $radius-small - 0.0625rem;
+$print-control-font-size: $font-size-smallest;
+$print-control-padding: .1875rem;
+$print-control-z-index: $z-middle;
+$print-margin: 10mm 15mm;
+
+$print-scale-line-color: $grey-darker;
+$print-scale-line-inner-border-radius: $print-control-border-radius;
+$print-scale-line-font-size: $font-size-smallest;
+
+// scale-line
+.print-scale-line {
+  background: $print-control-bg-color;
+  border-radius: $print-control-border-radius;
+  padding: $print-control-padding;
+}
+.print-scale-line-inner {
+  border: 2px solid $print-scale-line-color;
+  border-bottom-right-radius: $print-scale-line-inner-border-radius;
+  border-bottom-left-radius: $print-scale-line-inner-border-radius;  
+  border-top: none;
+  color: $print-scale-line-color;
+  font-size: $print-scale-line-font-size;
+  text-align: center;
+  margin: 1px;
+  will-change: contents, width;
+  transition: all 0.25s;
+}
+
+// atrribution
+.print-attribution {
+  &.ol-control {
+    background-color: $print-control-bg-color;
+    border-radius: $print-control-border-radius;
+    box-shadow: none;
+  }
+}
+.print-attribution {
+  background-color: $print-control-bg-color;
+  border-radius: $print-control-border-radius;
+  display: block;
+  font-size: $print-scale-line-font-size;
+  padding: $print-control-padding;
+  text-align: right;
+  z-index: $print-control-z-index;
+}
+.print-attribution a {
+  color: $primary-text-color;
+  font-size: $print-control-font-size;
+  text-decoration: none;
+}
+.print-attribution button {
+  display: none;
+}
+.print-attribution img {
+  display: none;
+}
+
+.print-margin {
+  padding: $print-margin;
+}
+
+// media print settings
+@media print {
+  .no-print {
+    display: none;
+  }
+}

@@ -1,7 +1,7 @@
 import 'owl.carousel';
 import Overlay from 'ol/Overlay';
 import $ from 'jquery';
-import { Component } from './ui';
+import { Component, Modal } from './ui';
 import Popup from './popup';
 import sidebar from './sidebar';
 import maputils from './maputils';
@@ -10,8 +10,10 @@ import Style from './style';
 import StyleTypes from './style/styletypes';
 import getFeatureInfo from './getfeatureinfo';
 import replacer from '../src/utils/replacer';
+import { getContent } from './getattributes';
 
 const styleTypes = StyleTypes();
+let selectionLayer;
 
 const Featureinfo = function Featureinfo(options = {}) {
   const {
@@ -30,7 +32,6 @@ const Featureinfo = function Featureinfo(options = {}) {
   let overlay;
   let items;
   let popup;
-  let selectionLayer;
   let viewer;
 
   const pinStyle = Style.createStyleRule(pinStyleOptions)[0];
@@ -38,11 +39,13 @@ const Featureinfo = function Featureinfo(options = {}) {
   let savedPin = savedPinOptions ? maputils.createPointFeature(savedPinOptions, pinStyle) : undefined;
   const savedFeature = savedPin || savedSelection || undefined;
 
-  if (showOverlay) {
-    identifyTarget = 'overlay';
-  } else {
-    sidebar.init();
-    identifyTarget = 'sidebar';
+  function setUIoutput(v) {
+    if (showOverlay) {
+      identifyTarget = 'overlay';
+    } else {
+      sidebar.init(v);
+      identifyTarget = 'sidebar';
+    }
   }
 
   const clear = function clear() {
@@ -58,6 +61,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     if (currentItem !== null) {
       const clone = items[currentItem].feature.clone();
       clone.setId(items[currentItem].feature.getId());
+      clone.layerName = items[currentItem].name;
       selectionLayer.clearAndAdd(
         clone,
         selectionStyles[items[currentItem].feature.getGeometry().getType()]
@@ -99,8 +103,8 @@ const Featureinfo = function Featureinfo(options = {}) {
       onChanged: callback,
       items: 1,
       nav: true,
-      navText: ['<svg class="o-icon-fa-chevron-left"><use xlink:href="#fa-chevron-left"></use></svg>',
-        '<svg class="o-icon-fa-chevron-right"><use xlink:href="#fa-chevron-right"></use></svg>'
+      navText: ['<span class="icon"><svg class="o-icon-fa-chevron-left"><use xlink:href="#fa-chevron-left"></use></svg></span>',
+        '<span class="icon"><svg class="o-icon-fa-chevron-right"><use xlink:href="#fa-chevron-right"></use></svg></span>'
       ]
     };
     if (identifyTarget === 'overlay') {
@@ -123,7 +127,7 @@ const Featureinfo = function Featureinfo(options = {}) {
       selection.coordinates = firstFeature.getGeometry().getCoordinates();
       selection.id = firstFeature.getId() != null ? firstFeature.getId() : firstFeature.ol_uid;
       selection.type = typeof selectionLayer.getSourceLayer() === 'string' ? selectionLayer.getFeatureLayer().type : selectionLayer.getSourceLayer().get('type');
-      if (selection.type === 'GEOJSON' || selection.type === 'AGS_FEATURE') {
+      if (selection.type !== 'WFS') {
         const name = typeof selectionLayer.getSourceLayer() === 'string' ? selectionLayer.getSourceLayer() : selectionLayer.getSourceLayer().get('name');
         const id = firstFeature.getId() || selection.id;
         selection.id = `${name}.${id}`;
@@ -140,12 +144,44 @@ const Featureinfo = function Featureinfo(options = {}) {
     return hitTolerance;
   };
 
+  const addAttributeType = function addAttributeType(attributeType, fn) {
+    getContent[attributeType] = fn;
+    return getContent;
+  };
+
+  const addLinkListener = function addLinkListener(el) {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targ = e.target;
+      let modalStyle = '';
+      switch (targ.target) {
+        case 'modal-full':
+        {
+          modalStyle = 'max-width:unset;width:98%;height:98%;resize:both;overflow:auto;display:flex;flex-flow:column;';
+          break;
+        }
+        default:
+        {
+          modalStyle = 'resize:both;overflow:auto;display:flex;flex-flow:column;';
+          break;
+        }
+      }
+      Modal({
+        title: targ.href,
+        content: `<iframe src="${targ.href}" class=""style="width:100%;height:99%"></iframe>`,
+        target: viewer.getId(),
+        style: modalStyle,
+        newTabUrl: targ.href
+      });
+    });
+  };
+
   const render = function render(identifyItems, target, coordinate) {
     const map = viewer.getMap();
     items = identifyItems;
     clear();
     let content = items.map(i => i.content).join('');
-    content = `<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme">${content}</div></div>`;
+    content = '<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme"></div></div>';
     switch (target) {
       case 'overlay':
       {
@@ -153,6 +189,14 @@ const Featureinfo = function Featureinfo(options = {}) {
         popup.setContent({
           content,
           title: items[0].title
+        });
+        const contentDiv = document.getElementById('o-identify-carousel');
+        items.forEach((item) => {
+          if (item.content instanceof Element) {
+            contentDiv.appendChild(item.content);
+          } else {
+            contentDiv.innerHTML = item.content;
+          }
         });
         popup.setVisibility(true);
         initCarousel('#o-identify-carousel');
@@ -179,6 +223,14 @@ const Featureinfo = function Featureinfo(options = {}) {
           content,
           title: items[0].title
         });
+        const contentDiv = document.getElementById('o-identify-carousel');
+        items.forEach((item) => {
+          if (item.content instanceof Element) {
+            contentDiv.appendChild(item.content);
+          } else {
+            contentDiv.innerHTML = item.content;
+          }
+        });
         sidebar.setVisibility(true);
         initCarousel('#o-identify-carousel');
         break;
@@ -187,6 +239,11 @@ const Featureinfo = function Featureinfo(options = {}) {
       {
         break;
       }
+    }
+
+    const modalLinks = document.getElementsByClassName('o-identify-link-modal');
+    for (let i = 0; i < modalLinks.length; i += 1) {
+      addLinkListener(modalLinks[i]);
     }
   };
 
@@ -244,24 +301,6 @@ const Featureinfo = function Featureinfo(options = {}) {
     }
   };
 
-  // jQuery Events
-  const onEnableInteraction = function onEnableInteraction(e) {
-    if (e.interaction === 'featureInfo') {
-      setActive(true);
-    } else {
-      setActive(false);
-    }
-  };
-
-  // ES6 Events
-  const onToggleInteraction = function onToggleInteraction(e) {
-    if (e.detail === 'featureInfo') {
-      setActive(true);
-    } else {
-      setActive(false);
-    }
-  };
-
   return Component({
     name: 'featureInfo',
     clear,
@@ -269,13 +308,20 @@ const Featureinfo = function Featureinfo(options = {}) {
     getPin,
     getSelectionLayer,
     getSelection,
+    addAttributeType,
     onAdd(e) {
       viewer = e.target;
       const map = viewer.getMap();
+      setUIoutput(viewer);
       selectionLayer = featurelayer(savedFeature, map);
       map.on(clickEvent, onClick);
-      $(document).on('enableInteraction', onEnableInteraction);
-      document.addEventListener('toggleInteraction', onToggleInteraction);
+      viewer.on('toggleClickInteraction', (detail) => {
+        if ((detail.name === 'featureinfo' && detail.active) || (detail.name !== 'featureinfo' && !detail.active)) {
+          setActive(true);
+        } else {
+          setActive(false);
+        }
+      });
     },
     render
   });

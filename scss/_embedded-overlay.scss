@@ -1,0 +1,28 @@
+.o-embedded-overlay {
+  background-color: rgba(37, 129, 196, 0.5);
+  z-index: 2;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  padding: 0px;
+  border-width: 0px;
+  margin: 0px;
+  left: 0px;
+  top: 0px;
+  opacity: 0;
+  transition: opacity ease-in-out;
+  transition-duration: 0.8s;
+  transition-delay:0.1s;
+  pointer-events:none;
+  text-align: center;
+}
+
+.o-embedded-overlay p {
+  font-size: 20px;
+  color: white;
+  font-family: Roboto,Arial,sans-serif;
+  position: relative;
+  margin: 0 50px;
+  top:50%;
+  transform: translateY(-50%);
+}

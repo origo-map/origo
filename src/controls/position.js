@@ -257,7 +257,7 @@ const Position = function Position(options = {}) {
       });
       coordsElement = El({
         cls: 'o-position-coords',
-        style: 'padding-left: 5px;'
+        style: 'padding-left: 5px; line-height: 1.25rem;'
       });
       coordsFindElement = El({
         cls: 'o-position-find',

@@ -20,11 +20,13 @@ const Fullscreen = function Fullscreen(options = {}) {
     onAdd(evt) {
       viewer = evt.target;
       fullscreenButton = Button({
-        cls: 'o-home-in padding-small icon-smaller rounded light box-shadow',
+        cls: 'o-home-in padding-small icon-smaller round light box-shadow',
         click() {
           goFullScreen();
         },
-        icon: '#ic_fullscreen_24px'
+        icon: '#ic_fullscreen_24px',
+        tooltipText: 'Visa stor karta',
+        tooltipPlacement: 'east'
       });
       if (!target) target = `${viewer.getMain().getNavigation().getId()}`;
       if (isEmbedded(viewer.getTarget())) {

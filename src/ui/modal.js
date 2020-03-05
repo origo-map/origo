@@ -11,7 +11,9 @@ export default function Modal(options = {}) {
     cls = '',
     isStatic = options.static,
     target,
-    closeIcon = '#ic_close_24px'
+    closeIcon = '#ic_close_24px',
+    style = '',
+    newTabUrl = ''
   } = options;
 
   let modal;
@@ -20,6 +22,7 @@ export default function Modal(options = {}) {
   let headerEl;
   let contentEl;
   let closeButton;
+  let newTabButton;
 
   const closeModal = function closeModal() {
     modal.parentNode.removeChild(modal);
@@ -32,11 +35,25 @@ export default function Modal(options = {}) {
         cls: 'o-modal-screen'
       });
 
+      const headerCmps = [];
+
       titleEl = Element({
         cls: 'flex row justify-start margin-top-small margin-left text-weight-bold',
         style: 'width: 100%;',
         innerHTML: `${title}`
       });
+      headerCmps.push(titleEl);
+
+      if (newTabUrl) {
+        newTabButton = Button({
+          cls: 'small round margin-top-small margin-right icon-smaller grey-lightest no-shrink',
+          icon: '#ic_launch_24px',
+          click() {
+            window.open(newTabUrl);
+          }
+        });
+        headerCmps.push(newTabButton);
+      }
 
       closeButton = Button({
         cls: 'small round margin-top-small margin-right icon-smaller grey-lightest no-shrink',
@@ -46,10 +63,11 @@ export default function Modal(options = {}) {
           closeModal();
         }
       });
+      headerCmps.push(closeButton);
 
       headerEl = Element({
         cls: 'flex row justify-end grey-lightest',
-        components: [titleEl, closeButton]
+        components: headerCmps
       });
 
       contentEl = Element({
@@ -60,9 +78,6 @@ export default function Modal(options = {}) {
       this.addComponent(screenEl);
       this.addComponent(headerEl);
       this.addComponent(contentEl);
-
-      headerEl.addComponent(titleEl);
-      headerEl.addComponent(closeButton);
 
       this.on('render', this.onRender);
       document.getElementById(target).appendChild(html(this.render()));
@@ -77,9 +92,15 @@ export default function Modal(options = {}) {
       });
     },
     render() {
+      let addStyle;
+      if (style !== '') {
+        addStyle = `style="${style}"`;
+      } else {
+        addStyle = '';
+      }
       return `<div id="${this.getId()}" class="${cls} flex">
                   ${screenEl.render()}
-                  <div class="o-modal">
+                  <div class="o-modal" ${addStyle}>
                     ${headerEl.render()}
                     ${contentEl.render()}
                   </div>

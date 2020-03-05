@@ -39,6 +39,10 @@ $flex-grow-all: 2;
     flex-grow: $flex-grow-all;
   }
 
+  .no-wrap {
+    flex-wrap: nowrap;
+  }
+
   .justify-start {
     justify-content: flex-start;
   }
