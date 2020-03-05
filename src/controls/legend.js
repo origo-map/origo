@@ -37,6 +37,7 @@ const Legend = function Legend(options = {}) {
     backgroundLayerButtons.push(Button({
       icon,
       cls: 'round smallest border icon-small',
+      title: layer.get('title'),
       state: layer.get('visible') ? 'active' : undefined,
       methods: {
         active: () => layer.setVisible(true),
