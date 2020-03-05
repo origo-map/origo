@@ -39,14 +39,18 @@ const Zoom = function Zoom(options = {}) {
         click() {
           zoomByDelta(delta);
         },
-        icon: '#ic_add_24px'
+        icon: '#ic_add_24px',
+        tooltipText: 'Zooma in i kartan',
+        tooltipPlacement: 'east'
       });
       zoomOut = Button({
         cls: 'o-zoom-out padding-small icon-smaller light round box-shadow',
         click() {
           zoomByDelta(-delta);
         },
-        icon: '#ic_remove_24px'
+        icon: '#ic_remove_24px',
+        tooltipText: 'Zooma ut i kartan',
+        tooltipPlacement: 'east'
       });
     },
     render() {

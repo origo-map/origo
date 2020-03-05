@@ -19,7 +19,8 @@ cache:
 branches:
   only:
   - master
-  - travis-ci-ISSUE-640
 
-before-script: "npm install"
-script: "npm run build"
+before-script:
+  - npm install
+script:
+  - npm run build

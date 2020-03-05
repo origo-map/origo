@@ -1,5 +1,4 @@
-[![Build Status](https://travis-ci.org/daRasmussen/origo-autolinker.svg?branch=master)](https://travis-ci.org/daRasmussen/origo)
-<br />
+[![Build Status](https://travis-ci.org/origo-map/origo-autolinker.svg?branch=master)](https://travis-ci.org/origo-map/origo)
 # Origo
 
 An easy to configure framework for creating your own web mapping applications.
