@@ -99,7 +99,6 @@ export const getLegendGraphicUrlStyle = function getLegendGraphicUrlStyle(layer,
 export const getIfThemeLayer = function getIfThemeLayer(viewer, layers) {	/*
 	Get legend Json and add add theme true to layer if it is a theme layer
 	*/
-
 	var requests = [];
     layers.forEach(function (layer) {
 		if (layer.get('type').toUpperCase() === "WMS") {
@@ -112,8 +111,8 @@ export const getIfThemeLayer = function getIfThemeLayer(viewer, layers) {	/*
 					version: "1.1.0",
 					request: "GetLegendGraphic",
 					layer: layer.get("name"),
-					format: "application/json"
-					//scale: maputils.resolutionToScale(viewer.getMap().getView().getResolution(), viewer.getProjection())
+					format: "application/json",
+					scale: 400 //reasonable scale to check whether layer is a theme layer
 				}
 				requestUrl = url + '?' + Object.keys(params).map(function (key) {return key + '=' + params[key]}).join('&')
 				requests.push(new Promise(function(resolve, reject) {
@@ -146,10 +145,11 @@ export const getIfThemeLayer = function getIfThemeLayer(viewer, layers) {	/*
 }
 
 export const checkIfThemeFromLegend = function checkIfThemeFromLegend (layer, info) {
-	if (!layer.get("sublayers")) {
+	if (!layer.get("sublayers")) { 
 		if (info.Legend[0].layerName === layer.get("name") && info.Legend[0].rules.length > 1) {
 			return true
 		}
 	}
+
 	return false
 }

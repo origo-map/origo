@@ -14,6 +14,8 @@ import Point from 'ol/geom/Point';
 import Feature from 'ol/Feature';
 import PinStyle from '../style/pin';
 
+
+
 const Mapfishprint = function Mapfishprint(options = {}) {
     let {
         target
@@ -80,6 +82,12 @@ const Mapfishprint = function Mapfishprint(options = {}) {
                 return layer.get('group') !== "background" && typeof layer.get('name') !== 'undefined';
             });
 
+            //dissasociate existing theme classification from print as different scale is likely
+            layers.forEach(function(layer) {
+                if (Boolean(layer.get("theme"))) {
+                    layer.set("theme", false)
+                } 
+            });
             
             //return Object[] filtered by baseURL and/or type
             let wmsLayers = buildLayersObjects(layers.filter(function(layer) {
@@ -139,14 +147,17 @@ const Mapfishprint = function Mapfishprint(options = {}) {
         return promise;
     }
 
-    function appendLegendInfos (layers, legendInfos) {
+    function appendLegendInfos (layers, legendInfos) { 
         layers = layers.map((layer) => {
             //return layer
             if (!layer.get("sublayers")) {
                 legendInfos.forEach((info => {
-                    if (info.data.Legend[0].layerName === layer.get("name") && info.data.Legend[0].rules.length > 1) {
-                        layer.set("theme", true);
-                        layer.set("sublayers", info.data.Legend[0].rules.map( (ruleInfo) => { return {title: ruleInfo.title, rule: ruleInfo.name}}))
+                    //layer might be invisible at this scale    
+                    if (info.data.Legend != null) { 
+                        if (info.data.Legend[0].layerName === layer.get("name") && info.data.Legend[0].rules.length > 1) {
+                            layer.set("theme", true);
+                            layer.set("sublayers", info.data.Legend[0].rules.map( (ruleInfo) => { return {title: ruleInfo.title, rule: ruleInfo.name}}))
+                        }
                     }
                 }));
             }
