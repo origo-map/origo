@@ -14,7 +14,12 @@ os:
 
 cache:
   directories:
-    - "node_modules"
+    - node_modules
+
+notifications:
+  email:
+    on_success: never
+    on_failure: always
 
 branches:
   only:
