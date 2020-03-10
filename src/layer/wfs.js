@@ -36,7 +36,7 @@ function createSource(options) {
       url += options.strategy === 'all' ? queryFilter : `${queryFilter + requestExtent.join(',')},${bboxProjectionCode}`;
       url = encodeURI(url);
 
-      fetch(url).then(response => response.json({
+      fetch(url).then((response) => response.json({
         cache: false
       })).then((data) => {
         vectorSource.addFeatures(vectorSource.getFormat().readFeatures(data));
@@ -52,8 +52,8 @@ export default function wfs(layerOptions, viewer) {
     layerType: 'vector'
   };
   const sourceDefault = {};
-  const wfsOptions = Object.assign({}, wfsDefault, layerOptions);
-  const sourceOptions = Object.assign({}, sourceDefault, viewer.getMapSource()[layerOptions.sourceName]);
+  const wfsOptions = { ...wfsDefault, ...layerOptions };
+  const sourceOptions = { ...sourceDefault, ...viewer.getMapSource()[layerOptions.sourceName] };
   sourceOptions.featureType = wfsOptions.id;
   wfsOptions.featureType = wfsOptions.id;
   sourceOptions.geometryName = wfsOptions.geometryName;
