@@ -43,7 +43,7 @@ export function simpleExportHandler(simpleExportUrl, activeLayer, selectedItems,
       return response.blob();
     })
     .then((blob) => {
-      download(blob, exportedFileName, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      download(blob, exportedFileName);
     })
     .catch((err) => {
       // Throwing here cause the whole fetch function be rejected, the same effect as returning Promise.reject();
