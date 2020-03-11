@@ -3,7 +3,7 @@
 ## Language
 Origo uses JavaScript ECMAScript 6, HTML5 and CSS3. Dependencies to other frameworks shall be avoided. Utilizing other libraries and components are however allowed. The ambition is to use smaller libraries as building blocks rather than building Origo into a big and complex framework such as ExtJS or AngularJS. When using third party libraries or components it is important to ensure that the license is compatible with the license for Origo, see the [license file](LICENSE.txt). 
 
-Origo uses OpenLayers as the map component. Development in Origo shall support versions according to package.json at GitHub. Origo shall support the most commonly used web browsers such as Internet Explorer 10-11, Edge, FireFox, Chrome and Safari. 
+Origo uses OpenLayers as the map component. Development in Origo shall support versions according to package.json at GitHub. Origo shall support the most commonly used web browsers such as Internet Explorer 11, Edge, FireFox, Chrome and Safari. 
 
 When developing, progressive enhancement is an encouraged strategy. That means that it is allowed to adopt new technology that may not be widely supported today but enhances the user experience in modern web browsers under the condition that the functionality is not critical.
 

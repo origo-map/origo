@@ -14,6 +14,7 @@ import SelectedItem from './models/SelectedItem';
 import { getContent } from './getattributes';
 
 const styleTypes = StyleTypes();
+let selectionLayer;
 
 const Featureinfo = function Featureinfo(options = {}) {
   const {
@@ -31,7 +32,6 @@ const Featureinfo = function Featureinfo(options = {}) {
   let overlay;
   let items;
   let popup;
-  let selectionLayer;
   let viewer;
   let selectionManager;
 

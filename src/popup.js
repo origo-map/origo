@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import Featureinfo from './featureinfo';
 
 function render(target) {
   const pop = `<div id="o-popup">
@@ -50,6 +51,7 @@ function setContent(config) {
 
 function closePopup() {
   setVisibility(false);
+  Featureinfo().clear();
 }
 
 function bindUIActions() {

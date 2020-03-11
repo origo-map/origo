@@ -1,11 +1,13 @@
 import { Component, Button, Element as El, ToggleGroup, dom } from '../ui';
 import imageSource from './legend/imagesource';
 import Overlays from './legend/overlays';
+import LayerProperties from './legend/overlayproperties';
 
 const Legend = function Legend(options = {}) {
   const {
     cls: clsSettings = '',
     style: styleSettings = {},
+    autoHide = 'never',
     expanded = true,
     contentCls,
     contentStyle,
@@ -17,6 +19,7 @@ const Legend = function Legend(options = {}) {
   let viewer;
   let target;
   let mainContainerCmp;
+  let overlaysCmp;
   let mainContainerEl;
   const backgroundLayerButtons = [];
   let toggleGroup;
@@ -34,10 +37,21 @@ const Legend = function Legend(options = {}) {
     backgroundLayerButtons.push(Button({
       icon,
       cls: 'round smallest border icon-small',
+      title: layer.get('title'),
       state: layer.get('visible') ? 'active' : undefined,
       methods: {
         active: () => layer.setVisible(true),
         initial: () => layer.setVisible(false)
+      },
+      click() {
+        const slided = document.getElementById(overlaysCmp.slidenav.getId()).classList.contains('slide-secondary');
+        if (this.getState() === 'active' && !slided) {
+          const layerProperties = LayerProperties({ layer, viewer, parent: this });
+          overlaysCmp.slidenav.setSecondary(layerProperties);
+          overlaysCmp.slidenav.slideToSecondary();
+        } else if (slided) {
+          overlaysCmp.slidenav.slideToMain();
+        }
       }
     }));
   };
@@ -127,6 +141,17 @@ const Legend = function Legend(options = {}) {
     isExpanded = !isExpanded;
   };
 
+  const onMapClick = function onMapClick() {
+    if (autoHide === 'always' && isExpanded) {
+      toggleVisibility();
+    } else if (autoHide === 'mobile' && isExpanded) {
+      const size = viewer.getSize();
+      if (size === 'm' || size === 's' || size === 'xs') {
+        toggleVisibility();
+      }
+    }
+  };
+
   return Component({
     name,
     onInit() {
@@ -146,6 +171,7 @@ const Legend = function Legend(options = {}) {
 
       this.render();
       this.dispatch('render');
+      viewer.getMap().on('click', onMapClick);
     },
     onRender() {
       mainContainerEl = document.getElementById(mainContainerCmp.getId());
@@ -162,7 +188,7 @@ const Legend = function Legend(options = {}) {
       isExpanded = !size && expanded;
       target = document.getElementById(viewer.getMain().getId());
       const maxHeight = calcMaxHeight(getTargetHeight());
-      const overlaysCmp = Overlays({ viewer, cls: contentCls, style: contentStyle });
+      overlaysCmp = Overlays({ viewer, cls: contentCls, style: contentStyle });
       const baselayerCmps = [toggleGroup];
       const toolsCmps = [];
       let toolsCmp;
@@ -203,9 +229,9 @@ const Legend = function Legend(options = {}) {
       });
 
       if (toolsCmp) {
-        mainContainerComponents = [overlaysCmp, toolsCmp, baselayersCmp]
+        mainContainerComponents = [overlaysCmp, toolsCmp, baselayersCmp];
       } else {
-        mainContainerComponents = [overlaysCmp, baselayersCmp]
+        mainContainerComponents = [overlaysCmp, baselayersCmp];
       }
 
       mainContainerCmp = El({
@@ -229,6 +255,8 @@ const Legend = function Legend(options = {}) {
       const layerButtonCls = isExpanded ? ' faded' : '';
       layerButton = Button({
         icon: '#ic_layers_24px',
+        tooltipText: 'Lager',
+        tooltipPlacement: 'west',
         cls: `control icon-small medium round absolute light bottom-right${layerButtonCls}`,
         click() {
           if (!isExpanded) {

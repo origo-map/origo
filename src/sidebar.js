@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import Featureinfo from './featureinfo';
 
 function setVisibility(visible) {
   if (visible) {
@@ -10,6 +11,7 @@ function setVisibility(visible) {
 
 function closeSidebar() {
   setVisibility(false);
+  Featureinfo().clear();
 }
 
 function bindUIActions() {

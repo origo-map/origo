@@ -1,11 +1,11 @@
-import 'core-js/fn/string/ends-with';
-import 'core-js/fn/string/starts-with';
-import 'core-js/fn/array/find';
-import 'core-js/fn/array/includes';
-import 'core-js/fn/array/is-array';
-import 'core-js/fn/object/assign';
-import 'core-js/fn/object/keys';
-import 'core-js/fn/promise';
+import 'core-js/features/string/ends-with';
+import 'core-js/features/string/starts-with';
+import 'core-js/features/array/find';
+import 'core-js/features/array/includes';
+import 'core-js/features/array/is-array';
+import 'core-js/features/object/assign';
+import 'core-js/features/object/keys';
+import 'core-js/features/promise';
 import toBlobPolyfill from './toblob-polyfill';
 
 /**

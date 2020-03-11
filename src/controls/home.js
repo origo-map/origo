@@ -36,7 +36,9 @@ const Home = function Home(options = {}) {
         click() {
           zoomToHome();
         },
-        icon: '#ic_home_24px'
+        icon: '#ic_home_24px',
+        tooltipText: 'Zooma till hela kartan',
+        tooltipPlacement: 'east'
       });
     },
     render() {

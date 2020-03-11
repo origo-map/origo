@@ -40,6 +40,8 @@ export const findStyleType = function findStyleType(styles) {
     return 'Text';
   } else if (styleTypes.icon) {
     return 'Icon';
+  } else if (styleTypes.image) {
+    return 'Image';
   }
   return null;
 };
@@ -103,6 +105,10 @@ export const renderSvgIcon = function renderSvgIcon(styleRule, {
     } else if (styleType === 'Icon') {
       const iconOption = styleRule.find(style => style.icon.src);
       const icon = renderIcon.Icon(iconOption.icon);
+      return icon;
+    } else if (styleType === 'Image') {
+      const iconOption = styleRule.find(style => style.image.src);
+      const icon = renderIcon.Icon(iconOption.image);
       return icon;
     }
     return '';
