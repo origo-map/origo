@@ -16,7 +16,6 @@ export function simpleExportHandler(simpleExportUrl, activeLayer, selectedItems,
   } */
 
   const features = {};
-  exportedFileName = exportedFileName + '.xlsx'
   selectedItems.forEach((item) => {
     const layerName = item.getLayer().get('name');
     if (!features[layerName]) {
@@ -43,7 +42,7 @@ export function simpleExportHandler(simpleExportUrl, activeLayer, selectedItems,
       return response.blob();
     })
     .then((blob) => {
-      download(blob, exportedFileName, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      download(blob, exportedFileName);
     })
     .catch((err) => {
       // Throwing here cause the whole fetch function be rejected, the same effect as returning Promise.reject();
@@ -56,7 +55,6 @@ export function layerSpecificExportHandler(url, activeLayer, selectedItems, attr
     throw 'Export URL is not specified.';
   }
 
-  exportedFileName = exportedFileName + '.xlsx'
   // let replacedUrl;
   const features = {};
   selectedItems.forEach((item) => {
