@@ -16,7 +16,6 @@ export function simpleExportHandler(simpleExportUrl, activeLayer, selectedItems,
   } */
 
   const features = {};
-  exportedFileName = exportedFileName + '.xlsx'
   selectedItems.forEach((item) => {
     const layerName = item.getLayer().get('name');
     if (!features[layerName]) {
@@ -56,7 +55,6 @@ export function layerSpecificExportHandler(url, activeLayer, selectedItems, attr
     throw 'Export URL is not specified.';
   }
 
-  exportedFileName = exportedFileName + '.xlsx'
   // let replacedUrl;
   const features = {};
   selectedItems.forEach((item) => {
