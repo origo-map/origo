@@ -5,13 +5,18 @@ import DrawInteraction from 'ol/interaction/Draw';
 import Overlay from 'ol/Overlay';
 import Polygon from 'ol/geom/Polygon';
 import LineString from 'ol/geom/LineString';
+import Projection from 'ol/proj/Projection';
 import { Component, Element as El, Button, dom } from '../ui';
 import Style from '../style';
 import StyleTypes from '../style/styletypes';
+import replacer from '../utils/replacer';
 
 const Measure = function Measure({
   default: defaultMeasureTool = 'length',
-  measureTools = ['length', 'area']
+  measureTools = ['length', 'area'],
+  elevationServiceURL,
+  elevationTargetProjection,
+  elevationAttribute
 } = {}) {
   const style = Style;
   const styleTypes = StyleTypes();
@@ -32,6 +37,7 @@ const Measure = function Measure({
   let label;
   let lengthTool;
   let areaTool;
+  let elevationTool;
   let defaultTool;
   let isActive = false;
   const overlayArray = [];
@@ -41,6 +47,7 @@ const Measure = function Measure({
   let measureButton;
   let lengthToolButton;
   let areaToolButton;
+  let elevationToolButton;
   const buttons = [];
   let target;
 
@@ -135,6 +142,65 @@ const Measure = function Measure({
     return htmlElem.textContent;
   }
 
+  function getElevationAttribute(path, obj = {}) {
+    const properties = Array.isArray(path) ? path : path.split(/[.[\]]+/).filter(element => element);
+    return properties.reduce((prev, curr) => prev && prev[curr], obj);
+  }
+
+  function getElevation(evt) {
+    const feature = evt.feature;
+    let coordinates;
+    let elevationProjection;
+    const options = {
+      start: '{',
+      end: '}'
+    };
+
+    if (elevationTargetProjection && elevationTargetProjection !== viewer.getProjection().getCode()) {
+      const clone = feature.getGeometry().clone();
+      clone.transform(viewer.getProjection().getCode(), elevationTargetProjection);
+      coordinates = clone.getCoordinates();
+      elevationProjection = new Projection({ code: elevationTargetProjection });
+    } else {
+      coordinates = feature.getGeometry().getCoordinates();
+      elevationProjection = viewer.getProjection();
+    }
+
+    let easting = coordinates[0];
+    let northing = coordinates[1];
+
+    switch (elevationProjection.getAxisOrientation()) {
+      case 'enu':
+        easting = coordinates[0];
+        northing = coordinates[1];
+        break;
+      case 'neu':
+        northing = coordinates[0];
+        easting = coordinates[1];
+        break;
+      default:
+        easting = coordinates[0];
+        northing = coordinates[1];
+        break;
+    }
+
+    const url = replacer.replace(elevationServiceURL, {
+      easting,
+      northing
+    }, options);
+
+    feature.setStyle(createStyle(feature));
+    feature.getStyle()[0].getText().setText('Hämtar höjd...');
+
+    fetch(url).then(response => response.json({
+      cache: false
+    })).then((data) => {
+      const elevation = getElevationAttribute(elevationAttribute, data);
+      feature.getStyle()[0].getText().setText(`${elevation.toFixed(1)} m`);
+      source.changed();
+    });
+  }
+
   // Display and move tooltips with pointer
   function pointerMoveHandler(evt) {
     if (evt.dragging) {
@@ -178,6 +244,9 @@ const Measure = function Measure({
     if (areaTool) {
       document.getElementById(areaToolButton.getId()).classList.add('hidden');
     }
+    if (elevationTool) {
+      document.getElementById(elevationToolButton.getId()).classList.add('hidden');
+    }
     document.getElementById(measureButton.getId()).classList.add('tooltip');
     setActive(false);
 
@@ -197,6 +266,9 @@ const Measure = function Measure({
     }
     if (areaTool) {
       document.getElementById(areaToolButton.getId()).classList.remove('hidden');
+    }
+    if (elevationTool) {
+      document.getElementById(elevationToolButton.getId()).classList.remove('hidden');
     }
     document.getElementById(measureButton.getId()).classList.remove('tooltip');
     setActive(true);
@@ -235,6 +307,9 @@ const Measure = function Measure({
       measureTooltipElement = null;
       createMeasureTooltip();
       document.getElementsByClassName('o-tooltip-measure')[1].classList.remove('hidden');
+      if (feature.getGeometry().getType() === 'Point') {
+        getElevation(evt);
+      }
     }, this);
   }
 
@@ -290,8 +365,9 @@ const Measure = function Measure({
     onInit() {
       lengthTool = measureTools.indexOf('length') >= 0;
       areaTool = measureTools.indexOf('area') >= 0;
+      elevationTool = measureTools.indexOf('elevation') >= 0;
       defaultTool = lengthTool ? defaultMeasureTool : 'area';
-      if (lengthTool || areaTool) {
+      if (lengthTool || areaTool || elevationTool) {
         measureElement = El({
           tagName: 'div',
           cls: 'flex column'
@@ -315,8 +391,8 @@ const Measure = function Measure({
               type = 'LineString';
               toggleType(this);
             },
-            icon: '#minicons-line-vector',
-            tooltipText: 'Linje',
+            icon: '#ic_timeline_24px',
+            tooltipText: 'Längd',
             tooltipPlacement: 'east'
           });
           buttons.push(lengthToolButton);
@@ -325,17 +401,32 @@ const Measure = function Measure({
 
         if (areaTool) {
           areaToolButton = Button({
-            cls: 'o-measure-area padding-small icon-smaller round light box-shadow hidden',
+            cls: 'o-measure-area padding-small margin-bottom-smaller icon-smaller round light box-shadow hidden',
             click() {
               type = 'Polygon';
               toggleType(this);
             },
-            icon: '#minicons-square-vector',
+            icon: '#o_polygon_24px',
             tooltipText: 'Yta',
             tooltipPlacement: 'east'
           });
           buttons.push(areaToolButton);
           defaultButton = defaultTool === 'length' ? lengthToolButton : areaToolButton;
+        }
+
+        if (elevationTool) {
+          elevationToolButton = Button({
+            cls: 'o-measure-elevation padding-small icon-smaller round light box-shadow hidden',
+            click() {
+              type = 'Point';
+              toggleType(this);
+            },
+            icon: '#ic_height_24px',
+            tooltipText: 'Höjd',
+            tooltipPlacement: 'east'
+          });
+          buttons.push(elevationToolButton);
+          defaultButton = defaultTool === 'length' ? lengthToolButton : elevationToolButton;
         }
       }
     },
@@ -354,6 +445,11 @@ const Measure = function Measure({
       }
       if (areaTool) {
         htmlString = areaToolButton.render();
+        el = dom.html(htmlString);
+        document.getElementById(measureElement.getId()).appendChild(el);
+      }
+      if (elevationTool) {
+        htmlString = elevationToolButton.render();
         el = dom.html(htmlString);
         document.getElementById(measureElement.getId()).appendChild(el);
       }

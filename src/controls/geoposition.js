@@ -109,6 +109,8 @@ const Geoposition = function Geoposition(options = {}) {
           toggleState();
         },
         icon: '#ic_near_me_24px',
+        tooltipText: 'Visa din nuvarande position i kartan',
+        tooltipPlacement: 'east',
         methods: {
           active: onActive,
           initial: onInitial

@@ -1,4 +1,6 @@
-import { Component, Collapse, Element as El, Slidenav, Button, dom } from '../../ui';
+import {
+  Component, Collapse, Element as El, Slidenav, dom
+} from '../../ui';
 import ThemeGroups from './themegroups';
 import Group from './group';
 import GroupList from './grouplist';
@@ -21,7 +23,9 @@ const Overlays = function Overlays(options) {
   } = options;
 
   const cls = `${clsSettings} o-layerswitcher-overlays flex row overflow-hidden`.trim();
-  const style = dom.createStyle(Object.assign({}, { width: '220px', height: '100%', 'min-width': '220px' }, styleSettings));
+  const style = dom.createStyle({
+    width: '220px', height: '100%', 'min-width': '220px', ...styleSettings
+  });
   const nonGroupNames = ['background', 'none'];
   const rootGroupNames = ['root', '', null, undefined];
   let overlays;
@@ -38,7 +42,7 @@ const Overlays = function Overlays(options) {
     if (groupCmp.type === 'group') {
       themeGroups.addComponent(groupCmp);
     } else if (groupCmp.parent) {
-      const parent = groupCmps.find(cmp => cmp.name === groupCmp.parent);
+      const parent = groupCmps.find((cmp) => cmp.name === groupCmp.parent);
       parent.addGroup(groupCmp, viewer);
     } else {
       rootGroup.addGroup(groupCmp);
@@ -84,7 +88,7 @@ const Overlays = function Overlays(options) {
     bubble: true,
     collapseX: false,
     cls: 'flex column overflow-hidden width-100',
-    contentCls: 'flex column',
+    contentCls: 'flex column o-scrollbar',
     contentStyle: { height: '100%', 'overflow-y': 'auto' },
     expanded,
     contentComponent: navContainer,
@@ -94,13 +98,13 @@ const Overlays = function Overlays(options) {
   const hasOverlays = () => overlays.length;
 
   const readOverlays = () => {
-    overlays = viewer.getLayers().filter(layer => layer.get('group') !== 'background' && layer.get('group') !== 'none');
+    overlays = viewer.getLayers().filter((layer) => layer.get('group') !== 'background' && layer.get('group') !== 'none');
     return overlays.reverse();
   };
 
   const emptyGroupCheck = function emptyGroupCheck(groupName) {
     let isEmpty = true;
-    const group = viewer.getGroups().find(item => item.name === groupName);
+    const group = viewer.getGroups().find((item) => item.name === groupName);
     if (group) {
       if (viewer.getLayersByProperty('group', groupName).length > 0) {
         return false;
@@ -113,14 +117,11 @@ const Overlays = function Overlays(options) {
       return false;
     });
     if (subgroups.length) {
-      for (let subgroup of subgroups) {
-        const name = subgroup.name;
+      isEmpty = subgroups.some((subgroup) => {
+        const { name } = subgroup;
         const subgroupEmpty = emptyGroupCheck(name);
-        if (!subgroupEmpty) {
-          isEmpty = false;
-          break;
-        }
-      }
+        return !subgroupEmpty;
+      });
     }
     return isEmpty;
   };
@@ -146,7 +147,7 @@ const Overlays = function Overlays(options) {
     if (rootGroupNames.includes(groupName)) {
       rootGroup.addOverlay(overlay);
     } else if (!(nonGroupNames.includes(groupName))) {
-      const groupCmp = groupCmps.find(cmp => cmp.name === groupName);
+      const groupCmp = groupCmps.find((cmp) => cmp.name === groupName);
       if (groupCmp) {
         groupCmp.addOverlay(overlay);
         document.getElementById(groupCmp.getId()).classList.remove('hidden');
@@ -164,7 +165,7 @@ const Overlays = function Overlays(options) {
     const groupCmp = Group(groupOptions, viewer);
     groupCmps.push(groupCmp);
     if (groupCmp.type === 'grouplayer') {
-      const parent = groupCmps.find(cmp => cmp.name === groupCmp.parent);
+      const parent = groupCmps.find((cmp) => cmp.name === groupCmp.parent);
       if (parent) {
         parent.addGroup(groupCmp, viewer);
       } else {
@@ -186,7 +187,7 @@ const Overlays = function Overlays(options) {
     const layerName = layer.get('name');
     const groupName = layer.get('group');
     if (groupName) {
-      const groupCmp = groupCmps.find(cmp => cmp.name === groupName);
+      const groupCmp = groupCmps.find((cmp) => cmp.name === groupName);
       if (groupCmp) {
         groupCmp.removeOverlay(layerName);
         if (emptyGroupCheck(groupName)) {
@@ -200,12 +201,12 @@ const Overlays = function Overlays(options) {
 
   const onRemoveGroup = function onRemoveGroup(evt) {
     const groupName = evt.group.name;
-    const groupCmp = groupCmps.find(cmp => cmp.name === groupName);
+    const groupCmp = groupCmps.find((cmp) => cmp.name === groupName);
     if (groupCmp) {
       const index = groupCmps.indexOf(groupCmp);
       groupCmps.splice(index, 1);
       if (groupCmp.parent) {
-        const parentCmp = groupCmps.find(cmp => cmp.name === groupCmp.parent);
+        const parentCmp = groupCmps.find((cmp) => cmp.name === groupCmp.parent);
         if (groupCmp.parent === 'root') {
           rootGroup.removeGroup(groupCmp);
         } else if (parentCmp) {
@@ -221,6 +222,7 @@ const Overlays = function Overlays(options) {
   return Component({
     onAddGroup,
     onChangeLayer,
+    slidenav,
     onInit() {
       this.addComponent(overlaysCollapse);
       readOverlays();

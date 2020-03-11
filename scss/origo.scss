@@ -47,6 +47,7 @@
   @import 'multiselect.scss';
   @import 'ui/validate.scss';
   @import 'scalepicker.scss';
+  @import 'embedded-overlay.scss';
 }
 html,
 body {
@@ -58,4 +59,5 @@ body {
 	height: 100%;
 	overflow: hidden;
 	position: relative;
+  touch-action: none;
 }

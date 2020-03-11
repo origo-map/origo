@@ -1,6 +1,9 @@
-import { Component, Button, Element as El, dom } from '../ui';
+import {
+  Component, Button, Element as El, dom
+} from '../ui';
 
 const Mapmenu = function Mapmenu({
+  autoHide = 'never',
   closeIcon = '#ic_close_24px',
   menuIcon = '#ic_menu_24px'
 } = {}) {
@@ -24,6 +27,17 @@ const Mapmenu = function Mapmenu({
   const close = function close() {
     if (isExpanded) {
       toggle();
+    }
+  };
+
+  const onMapClick = function onMapClick() {
+    if (autoHide === 'always') {
+      close();
+    } else if (autoHide === 'mobile') {
+      const size = viewer.getSize();
+      if (size === 'm' || size === 's' || size === 'xs') {
+        close();
+      }
     }
   };
 
@@ -72,6 +86,7 @@ const Mapmenu = function Mapmenu({
       this.on('render', this.onRender);
       this.addComponents([mapMenu, menuButton]);
       this.render();
+      viewer.getMap().on('click', onMapClick);
     },
     onInit() {
       const menuButtonCls = isExpanded ? ' faded' : '';
