@@ -33,7 +33,8 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   }
 
   function highlightAndExpandItem(item) {
-    const featureId = item.getFeature().getId();
+    // const featureId = item.getFeature().getId();
+    const featureId = item.getId();
     highlightFeatureById(featureId);
     infowindow.showSelectedList(item.getSelectionGroup());
     infowindow.expandListElement(featureId);
@@ -41,7 +42,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   }
 
   function highlightItem(item) {
-    const featureId = item.getFeature().getId();
+    const featureId = item.getId();
     highlightFeatureById(featureId);
     infowindow.showSelectedList(item.getSelectionGroup());
     infowindow.expandListElement(featureId);
@@ -96,7 +97,9 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   }
 
   function alreadyExists(item) {
-    return selectedItems.getArray().find(i => item.getId() === i.getId());
+    console.log(selectedItems.getArray());
+    // return selectedItems.getArray().find(i => item.getId() === i.getId());
+    return selectedItems.getArray().some(i => item.getId() === i.getId());
   }
 
   function featureStyler(feature) {

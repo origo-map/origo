@@ -54,7 +54,8 @@ const Featureinfo = function Featureinfo(options = {}) {
 
   const clear = function clear() {
     selectionLayer.clear();
-    selectionManager.clearSelection();
+    // check needed for when sidebar or overlay are selected.     
+    if (selectionManager) selectionManager.clearSelection();
     sidebar.setVisibility(false);
     if (overlay) {
       viewer.removeOverlays(overlay);
