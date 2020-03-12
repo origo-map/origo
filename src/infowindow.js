@@ -14,7 +14,7 @@ let activeSelectionGroup;
 let selectionManager;
 let viewer;
 
-function render(viewerId) {
+function render(viewerId, title) {
     mainContainer = document.createElement('div');
     mainContainer.classList.add('sidebarcontainer');
     mainContainer.id = 'sidebarcontainer';
@@ -24,7 +24,7 @@ function render(viewerId) {
     urvalContainer.id = 'sidebarcontainer-draggable';
     const urvalTextNodeContainer = document.createElement('div');
     urvalTextNodeContainer.classList.add('urval-textnode-container');
-    const urvalTextNode = document.createTextNode('Träffar');
+    const urvalTextNode = document.createTextNode(title || 'Träffar');
     urvalTextNodeContainer.appendChild(urvalTextNode);
     urvalContainer.appendChild(urvalTextNodeContainer);
     const closeButtonSvg = createSvgElement('ic_close_24px', 'closebutton-svg');
@@ -167,6 +167,8 @@ function createSubexportComponent(selectionGroup) {
     if (layerSpecificExportOptions) {
         const exportUrls = layerSpecificExportOptions.exportUrls || [];
         const attributesToSendToExport_per_layer = layerSpecificExportOptions.attributesToSendToExport;
+        const layerSpecificExportedFileName = layerSpecificExportOptions.exportedFileName || exportedFileName;
+
         exportUrls.forEach(obj => {
             const buttonText = obj.buttonText || "External Call";
             const url = obj.url;
@@ -180,7 +182,7 @@ function createSubexportComponent(selectionGroup) {
                 }
                 exportBtn.loadStart();
                 const selectedItems = selectionManager.getSelectedItemsForASelectionGroup(selectionGroup);
-                layerSpecificExportHandler(url, activeLayer, selectedItems, attributesToSendToExport, exportedFileName).then((data) => {
+                layerSpecificExportHandler(url, activeLayer, selectedItems, attributesToSendToExport, layerSpecificExportedFileName).then((data) => {
                     if (data) {
                         switch (data.status) {
                             case 'ok':
@@ -523,7 +525,7 @@ function init(options) {
     urvalElements = new Map();
     expandableContents = new Map();
 
-    render(options.viewer.getId());
+    render(options.viewer.getId(), infowindowOptions.title);
 
     return {
         createListElement: createListElement,
