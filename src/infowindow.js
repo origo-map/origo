@@ -146,7 +146,6 @@ function createSubexportComponent(selectionGroup) {
     // OBS! selectionGroup corresponds to a layer with the same name in most cases, but in case of a group layer it can contain selected items from all the layers in that GroupLayer.
 
     let layerSpecificExportOptions;
-    const simpleExport = exportOptions.enableSimpleExport ? exportOptions.enableSimpleExport : false;
     const simpleExportLayers = exportOptions.simpleExportLayers ? exportOptions.simpleExportLayers : [];
     const simpleExportUrl = exportOptions.simpleExportUrl;
     const simpleExportButtonText = exportOptions.simpleExportButtonText || 'Exporera alla features i urvalet';
@@ -211,7 +210,7 @@ function createSubexportComponent(selectionGroup) {
             subexportContainer.appendChild(exportBtn);
         });
 
-    } else if (simpleExport) {
+    } else if (simpleExportLayers.length) {
         const exportAllowed = simpleExportLayers.find(l => l === selectionGroup);
         if (exportAllowed) {
             const exportBtn = createExportButton(simpleExportButtonText);
