@@ -82,10 +82,11 @@ const Mapfishprint = function Mapfishprint(options = {}) {
                 return layer.get('group') !== "background" && typeof layer.get('name') !== 'undefined';
             });
 
-            //dissasociate existing theme classification from print as different scale is likely
+            //set a positive theme property to negative as new check will be made later in the printing process
+            //ArcGIS WMS layers are handled manually for now
             layers.forEach(function(layer) {
-                if (Boolean(layer.get("theme"))) {
-                    layer.set("theme", false)
+                if (Boolean(layer.get("theme")) && !Boolean(layer.get("ArcGIS"))) {
+                    layer.set("theme", false);
                 } 
             });
             
@@ -327,7 +328,8 @@ const Mapfishprint = function Mapfishprint(options = {}) {
     function getLegendInfos(layers, scale) {
         var requests = [];
         layers.forEach(function (layer) {
-            if (layer.get('type') && layer.get('type').toUpperCase() === "WMS") {
+            //ArcGIS WMS layers are exempt, for now, as not the same format:application/json 
+            if (Boolean(layer.get('type') == 'WMS') && !Boolean(layer.get('ArcGIS'))) {
                 let params;
                 let url = fetchSourceUrl(layer);
                 let requestUrl;
@@ -368,13 +370,14 @@ const Mapfishprint = function Mapfishprint(options = {}) {
                     url = fetchSourceUrl(layer);
                     name = layer.get('name');
                     //special case for theme layers
-                    if (layer.get('theme') === true || layer.get('ArcGIStheme') === true) {
+                    //whether ArcGIS Server WMS layers or not
+                    if (layer.get('theme') === true) {
                         themeLayers.push({
                             sublayers: layer.get('sublayers'),
                             title: layer.get('title'),
                             name: layer.get('name'),
                             theme: layer.get('theme'),
-                            ArcGIStheme: layer.get('ArcGIStheme'),
+                            ArcGIS: layer.get('ArcGIS'),
                             url: url
                         })
                     }
@@ -383,7 +386,7 @@ const Mapfishprint = function Mapfishprint(options = {}) {
                         let sublayers = layer.get('sublayers');
                         for (let i = 0; i < sublayers.length; i++) {
                             //theme layers might be in grouped layers
-                            if (sublayers[i].theme === true || sublayers[i].ArcGIStheme === true) {
+                            if (sublayers[i].theme === true) {
                                 if (!sublayers[i].url)
                                     sublayers[i].url = url;
                                 themeLayers.push(sublayers[i]);
@@ -432,7 +435,7 @@ const Mapfishprint = function Mapfishprint(options = {}) {
             legendObjects.push({
                 name: "\n" + layer.title
             });
-            if (layer.theme === true) {
+            if (layer.theme === true && !Boolean(layer.ArcGIS)) {
                 for (let i = 0; i < sublayers.length; i++) {
                     let subName = sublayers[i].title;
                     let rule = sublayers[i].rule;
@@ -445,7 +448,7 @@ const Mapfishprint = function Mapfishprint(options = {}) {
                         icons: [url]
                     });
                 };
-            } else if (layer.ArcGIStheme === true) {
+            } else if (layer.theme === true && Boolean(layer.ArcGIS)) {
                 for (let i = 0; i < sublayers.length; i++) {
                     let subName = sublayers[i].title;
                     let subUrl = sublayers[i].url;

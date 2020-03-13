@@ -99,9 +99,11 @@ export const getLegendGraphicUrlStyle = function getLegendGraphicUrlStyle(layer,
 export const getIfThemeLayer = function getIfThemeLayer(viewer, layers) {	/*
 	Get legend Json and add add theme true to layer if it is a theme layer
 	*/
+
 	var requests = [];
     layers.forEach(function (layer) {
-		if (layer.get('type').toUpperCase() === "WMS") {
+		//ArcGIS WMS layers are handled manually at the moment as not the same format:application/json getLegendGraphic response as Geoserver's
+		if (layer.get('type').toUpperCase() === "WMS" && !Boolean(layer.get("ArcGIS"))) {
 			let params;
 			let url = fetchSourceUrl(layer);
 			let requestUrl;
