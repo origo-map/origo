@@ -7,7 +7,6 @@ import Style from './style';
 import StyleTypes from './style/styletypes';
 
 const styleTypes = StyleTypes();
-const multiselectStyleOptions = styleTypes.getStyle('multiselection');
 
 const Selectionmanager = function Selectionmanager(options = {}) {
 
@@ -17,6 +16,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   let map;
   let infowindow;
 
+  const multiselectStyleOptions = options.multiSelectionStyles || styleTypes.getStyle('multiselection');
   const isInfowindow = options.hasOwnProperty('infowindow') ? options.infowindow === 'infowindow' : false;
 
   function addItem(item) {
@@ -97,7 +97,6 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   }
 
   function alreadyExists(item) {
-    console.log(selectedItems.getArray());
     // return selectedItems.getArray().find(i => item.getId() === i.getId());
     return selectedItems.getArray().some(i => item.getId() === i.getId());
   }
