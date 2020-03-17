@@ -38,7 +38,7 @@
     "ol": "6.2.1",
     "owl.carousel": "^2.3.4",
     "proj4": "^2.6.0",
-    "regenerator-runtime": "^0.13.3",
+    "regenerator-runtime": "^0.13.5",
     "whatwg-fetch": "^3.0.0"
   },
   "devDependencies": {
@@ -50,7 +50,7 @@
     "compression-webpack-plugin": "^3.1.0",
     "copy-webpack-plugin": "^5.1.1",
     "eslint": "^6.8.0",
-    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-config-airbnb-base": "^14.1.0",
     "eslint-plugin-import": "^2.20.1",
     "exports-loader": "^0.7.0",
     "imports-loader": "^0.8.0",
@@ -60,7 +60,7 @@
     "uglify-js": "^3.8.0",
     "uglifyjs-webpack-plugin": "^2.2.0",
     "webpack": "^4.42.0",
-    "webpack-bundle-analyzer": "^3.3.2",
+    "webpack-bundle-analyzer": "^3.6.1",
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.10.3",
     "webpack-merge": "^4.1.5"
