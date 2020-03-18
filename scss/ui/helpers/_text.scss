@@ -117,17 +117,6 @@ $text-fade-background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(25
   font-weight: $text-weight-bold;
 }
 
-// overflow
-.text-overflow-clip {
-  text-overflow: clip;
-}
-.text-overflow-ellipsis {
-  text-overflow: ellipsis;
-}
-.text-nowrap {
-  white-space: nowrap;
-}
-
 // text fade
 .text-fade:after {
   background: $text-fade-background;
