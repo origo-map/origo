@@ -16,6 +16,9 @@ export default function (features, map) {
     addFeature: function addFeature(feature) {
       featureLayerStore.addFeature(feature);
     },
+    removeFeature: function removeFeature(feature) {
+      featureLayerStore.removeFeature(feature);
+    },
     setSourceLayer: function setSourceLayer(layer) {
       sourceLayer = layer;
     },

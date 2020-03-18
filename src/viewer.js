@@ -6,6 +6,7 @@ import Map from './map';
 import proj from './projection';
 import MapSize from './utils/mapsize';
 import Featureinfo from './featureinfo';
+import Selectionmanager from './selectionmanager';
 import maputils from './maputils';
 import utils from './utils';
 import Layer from './layer';
@@ -19,6 +20,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
   let map;
   let tileGrid;
   let featureinfo;
+  let selectionmanager;
 
   let {
     projection
@@ -100,6 +102,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
   const getFeatureinfo = () => featureinfo;
 
+  const getSelectionManager = () => selectionmanager;
+
   const getCenter = () => getcenter;
 
   const getMapUtils = () => maputils;
@@ -171,6 +175,11 @@ const Viewer = function Viewer(targetOption, options = {}) {
   const getQueryableLayers = function getQueryableLayers() {
     const queryableLayers = getLayers().filter(layer => layer.get('queryable') && layer.getVisible());
     return queryableLayers;
+  };
+
+  const getGroupLayers = function getGroupLayers() {
+    const groupLayers = getLayers().filter(layer => layer.get('type') === "GROUP");
+    return groupLayers;
   };
 
   const getSearchableLayers = function getSearchableLayers(searchableDefault) {
@@ -447,8 +456,13 @@ const Viewer = function Viewer(targetOption, options = {}) {
       }
 
       featureinfoOptions.viewer = this;
+
+      selectionmanager = Selectionmanager(featureinfoOptions);
+      this.addComponent(selectionmanager);
+
       featureinfo = Featureinfo(featureinfoOptions);
       this.addComponent(featureinfo);
+
       this.addControls();
     },
     render() {
@@ -488,6 +502,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getMapUtils,
     getUtils,
     getQueryableLayers,
+    getGroupLayers,
     getResolutions,
     getSearchableLayers,
     getSize,
@@ -509,7 +524,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getUrlParams,
     removeGroup,
     removeOverlays,
-    zoomToExtent
+    zoomToExtent,
+    getSelectionManager
   });
 };
 
