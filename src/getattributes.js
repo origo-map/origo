@@ -143,7 +143,7 @@ function getAttributes(feature, layer, map) {
           } else {
             val = customAttribute(feature, attribute, attributes, map);
           }
-          if (val instanceof HTMLLIElement) {
+          if (val instanceof HTMLLIElement && val.innerHTML.length > 0) {
             ulList.appendChild(val);
           }
         }
