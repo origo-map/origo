@@ -332,7 +332,6 @@ function createExpandableContent(listElementContentContainer, content, elementId
 
     if (items.length > 2) {
         const rightArrowSvg = createSvgElement('fa-chevron-right', 'expandlistelement-svg');
-        console.log(rightArrowSvg);
 
         rightArrowSvg.addEventListener('click', (e) => {
             e.stopPropagation();
