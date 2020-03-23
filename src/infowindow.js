@@ -316,33 +316,16 @@ function createListElement(item) {
     showUrvalElement(item.getSelectionGroup());
 }
 
-function createElementFromHTML(htmlString) {
-    var div = document.createElement('div');
-    div.innerHTML = htmlString.trim();
-    return div.firstChild;
-}
-
 function createExpandableContent(listElementContentContainer, content, elementId) {
 
     const items = content.querySelectorAll('ul > li');
 
     if (items.length > 2) {
         const rightArrowSvg = createSvgElement('fa-chevron-right', 'expandlistelement-svg');
+        console.log(rightArrowSvg);
 
-        listElementContentContainer.appendChild(rightArrowSvg);
-        listElementContentContainer.setAttribute('expanded', 'false');
-
-        const foldedItems = [];
-        for (let i = 2; i < items.length; i++) {
-            const item = items[i];
-            item.classList.add('folded');
-            foldedItems.push(item);
-        }
-
-        listElementContentContainer.addEventListener('click', (e) => {
-
-            if (e.target.tagName.toUpperCase() === "A") return;
-
+        rightArrowSvg.addEventListener('click', (e) => {
+            e.stopPropagation();
             const isExpanded = listElementContentContainer.getAttribute('expanded');
             if (isExpanded === 'true') {
                 rightArrowSvg.classList.remove('rotated');
@@ -358,9 +341,23 @@ function createExpandableContent(listElementContentContainer, content, elementId
                     item.classList.add('unfolded');
                     item.classList.remove('folded');
                 });
-                selectionManager.highlightFeatureById(elementId);
-                highlightListElement(elementId);
             }
+        });
+        listElementContentContainer.appendChild(rightArrowSvg);
+        listElementContentContainer.setAttribute('expanded', 'false');
+
+        const foldedItems = [];
+        for (let i = 2; i < items.length; i++) {
+            const item = items[i];
+            item.classList.add('folded');
+            foldedItems.push(item);
+        }
+
+        listElementContentContainer.addEventListener('click', (e) => {
+            if (e.target.tagName.toUpperCase() === "A") return;
+
+            selectionManager.highlightFeatureById(elementId);
+            highlightListElement(elementId);
         });
 
         listElementContentContainer.expand = function () {
