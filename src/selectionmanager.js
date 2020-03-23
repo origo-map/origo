@@ -1,15 +1,13 @@
-import 'owl.carousel';
+import Collection from 'ol/Collection';
 import { Component } from './ui';
 import featurelayer from './featurelayer';
 import infowindowManager from './infowindow';
-import Collection from 'ol/Collection';
 import Style from './style';
 import StyleTypes from './style/styletypes';
 
 const styleTypes = StyleTypes();
 
 const Selectionmanager = function Selectionmanager(options = {}) {
-
   let viewer;
   let selectedItems;
   let urval;
@@ -17,7 +15,11 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   let infowindow;
 
   const multiselectStyleOptions = options.multiSelectionStyles || styleTypes.getStyle('multiselection');
-  const isInfowindow = options.hasOwnProperty('infowindow') ? options.infowindow === 'infowindow' : false;
+  const isInfowindow = Object.prototype.hasOwnProperty.call(options, 'infowindow') ? options.infowindow === 'infowindow' : false;
+
+  function alreadyExists(item) {
+    return selectedItems.getArray().some((i) => item.getId() === i.getId());
+  }
 
   function addItem(item) {
     if (alreadyExists(item)) {
@@ -27,8 +29,24 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   }
 
   function addItems(items) {
-    items.forEach(item => {
+    items.forEach((item) => {
       addItem(item);
+    });
+  }
+
+  function highlightFeatureById(id) {
+    selectedItems.forEach((item) => {
+      const feature = item.getFeature();
+      if (item.getId() === id) {
+        feature.set('state', 'selected');
+      } else {
+        feature.unset('state', 'selected');
+      }
+    });
+
+    // we need to manually refresh other layers, otherwise unselecting does not take effect until the next layer refresh.
+    urval.forEach((value) => {
+      value.getFeatureStore().changed();
     });
   }
 
@@ -64,7 +82,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   }
 
   function getSelectedItemsForASelectionGroup(selectionGroup) {
-    const items = selectedItems.getArray().filter(i => i.getSelectionGroup() === selectionGroup);
+    const items = selectedItems.getArray().filter((i) => i.getSelectionGroup() === selectionGroup);
     return items;
   }
 
@@ -74,18 +92,18 @@ const Selectionmanager = function Selectionmanager(options = {}) {
 
   function removeItems(items) {
     const itemsToBeRemoved = [];
-    items.forEach(item => {
-      selectedItems.forEach(si => {
+    items.forEach((item) => {
+      selectedItems.forEach((si) => {
         if (item.getId() === si.getId()) {
           itemsToBeRemoved.push(si);
         }
       });
     });
-    itemsToBeRemoved.forEach(item => selectedItems.remove(item));
+    itemsToBeRemoved.forEach((item) => selectedItems.remove(item));
   }
 
   function removeItemById(id) {
-    selectedItems.forEach(item => {
+    selectedItems.forEach((item) => {
       if (item.getId() === id) {
         selectedItems.remove(item);
       }
@@ -96,17 +114,12 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     selectedItems.clear();
   }
 
-  function alreadyExists(item) {
-    // return selectedItems.getArray().find(i => item.getId() === i.getId());
-    return selectedItems.getArray().some(i => item.getId() === i.getId());
-  }
 
   function featureStyler(feature) {
     if (feature.get('state') === 'selected') {
       return Style.createStyleRule(multiselectStyleOptions.highlighted);
-    } else {
-      return Style.createStyleRule(multiselectStyleOptions.selected);
     }
+    return Style.createStyleRule(multiselectStyleOptions.selected);
   }
 
   function onItemAdded(event) {
@@ -136,7 +149,6 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   }
 
   function onItemRemoved(event) {
-
     const item = event.element;
 
     // const selectionGroup = event.element.getLayer().get('name');
@@ -162,77 +174,12 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     }
   }
 
-  function highlightFeatureById(id) {
-    selectedItems.forEach(item => {
-      const feature = item.getFeature();
-      if (item.getId() === id) {
-        feature.set('state', 'selected');
-      }
-      else {
-        feature.unset('state', 'selected');
-      }
-    });
-
-    // we need to manually refresh other layers, otherwise unselecting does not take effect until the next layer refresh which is a bit strange!
-    urval.forEach((value, key, map) => {
-      value.getFeatureStore().changed();
-    });
-  }
-
   function highlightFeature(feature) {
     feature.set('state', 'selected');
   }
 
   function getNumberOfSelectedItems() {
     return selectedItems.getLength();
-  }
-
-  function runPolyfill() {
-    if (!Array.prototype.find) {
-      Object.defineProperty(Array.prototype, 'find', {
-        value: function (predicate) {
-          // 1. Let O be ? ToObject(this value).
-          if (this == null) {
-            throw new TypeError('"this" is null or not defined');
-          }
-
-          var o = Object(this);
-
-          // 2. Let len be ? ToLength(? Get(O, "length")).
-          var len = o.length >>> 0;
-
-          // 3. If IsCallable(predicate) is false, throw a TypeError exception.
-          if (typeof predicate !== 'function') {
-            throw new TypeError('predicate must be a function');
-          }
-
-          // 4. If thisArg was supplied, let T be thisArg; else let T be undefined.
-          var thisArg = arguments[1];
-
-          // 5. Let k be 0.
-          var k = 0;
-
-          // 6. Repeat, while k < len
-          while (k < len) {
-            // a. Let Pk be ! ToString(k).
-            // b. Let kValue be ? Get(O, Pk).
-            // c. Let testResult be ToBoolean(? Call(predicate, T, « kValue, k, O »)).
-            // d. If testResult is true, return kValue.
-            var kValue = o[k];
-            if (predicate.call(thisArg, kValue, k, o)) {
-              return kValue;
-            }
-            // e. Increase k by 1.
-            k++;
-          }
-
-          // 7. Return undefined.
-          return undefined;
-        },
-        configurable: true,
-        writable: true
-      });
-    }
   }
 
   return Component({
@@ -248,7 +195,6 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     getNumberOfSelectedItems,
     getSelectedItemsForASelectionGroup,
     onInit() {
-      runPolyfill();
       selectedItems = new Collection([], { unique: true });
       urval = new Map();
       selectedItems.on('add', onItemAdded);
