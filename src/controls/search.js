@@ -31,6 +31,7 @@ const Search = function Search(options = {}) {
     title,
     titleAttribute,
     contentAttribute,
+    groupSuggestions,
     includeSearchableLayers,
     searchableDefault,
     maxZoomLevel,
@@ -233,13 +234,23 @@ const Search = function Search(options = {}) {
     const group = {};
     const ids = Object.keys(data);
     ids.forEach((id) => {
-      const item = data[id];
-      const type = item[layerNameAttribute];
-      if (type in group === false) {
-        group[type] = [];
-        item.header = viewer.getLayer(type).get('title');
+      const item = data[id];      
+      const typeTitle =
+        (layerNameAttribute && idAttribute) ? viewer.getLayer(item[layerNameAttribute]).get('title') :
+        (geometryAttribute && layerName) ? viewer.getLayer(item[layerName]).get('title') :
+        (titleAttribute && contentAttribute && geometryAttribute) ? item[titleAttribute] :
+        (geometryAttribute && title) ? title :
+        (easting && northing && title) ? title :
+        undefined;
+      if (typeTitle && typeTitle in group === false) {
+        group[typeTitle] = [];
+        item.header = typeTitle;
       }
-      group[type].push(item);
+      if (typeTitle) {
+        group[typeTitle].push(item);
+      } else if (id == 0) {
+        console.log('Search options are missing');
+      }
     });
     return group;
   }
@@ -306,7 +317,7 @@ const Search = function Search(options = {}) {
       searchDb = {};
       if (data.length) {
         setSearchDb(data);
-        if (name && layerNameAttribute) {
+        if (name && groupSuggestions) {
           list = groupToList(groupDb(searchDb));
         } else {
           list = dbToList(data);
@@ -356,6 +367,7 @@ const Search = function Search(options = {}) {
       if (!title) title = '';
       if (!titleAttribute) titleAttribute = undefined;
       if (!contentAttribute) contentAttribute = undefined;
+      groupSuggestions = Object.prototype.hasOwnProperty.call(options, 'groupSuggestions') ? options.groupSuggestions : false;
       includeSearchableLayers = Object.prototype.hasOwnProperty.call(options, 'includeSearchableLayers') ? options.includeSearchableLayers : false;
       searchableDefault = Object.prototype.hasOwnProperty.call(options, 'searchableDefault') ? options.searchableDefault : false;
       if (!maxZoomLevel) maxZoomLevel = viewer.getResolutions().length - 2 || viewer.getResolutions();
