@@ -10,7 +10,8 @@ export default function (features, map) {
   });
   const featureLayer = new VectorLayer({
     source: featureLayerStore,
-    map
+    map,
+    zIndex:1
   });
   return {
     addFeature: function addFeature(feature) {
