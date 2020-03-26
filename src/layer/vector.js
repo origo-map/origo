@@ -60,6 +60,13 @@ export default function vector(opt, src, viewer) {
             }
           }
         });
+        
+        map.getLayers().forEach(layer => {
+          const { values_: { layerType: type } } = layer;
+          if (type === 'cluster') {
+            layer.getSource().refresh()
+          }
+        });
       });
       break;
     }
