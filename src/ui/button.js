@@ -18,6 +18,7 @@ export default function Button(options = {}) {
     style: styleSettings,
     textCls = '',
     tooltipText,
+    title = '',
     tooltipPlacement = 'east',
     validStates = ['initial', 'active', 'disabled', 'inactive', 'loading']
   } = options;
@@ -27,7 +28,8 @@ export default function Button(options = {}) {
   const iconComponent = icon ? Icon({
     icon,
     cls: iconCls,
-    style: iconStyle
+    style: iconStyle,
+    title
   }) : '';
 
   const getState = () => state;

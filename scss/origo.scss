@@ -7,9 +7,7 @@
   flex-direction: column;
   height: 100%;
   overflow: hidden;
-  -ms-touch-action: manipulation;
   position: relative;
-  touch-action: manipulation;
   -webkit-tap-highlight-color: rgba(0,0,0,0);
   @import 'reset.scss';
   @import 'ol.scss';
@@ -44,6 +42,7 @@
   @import 'featureinfo.scss';
   @import 'ui/validate.scss';
   @import 'scalepicker.scss';
+  @import 'embedded-overlay.scss';
 }
 html,
 body {
