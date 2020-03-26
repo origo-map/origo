@@ -32,7 +32,7 @@ function buildGetLegendGraphicUrl(layer,viewer){
 			properties = Object.assign(properties, layer.getProperties().legendGraphicSettings);
 	
 		properties.request = "getLegendGraphic";
-		properties.scale = maputils.resolutionToScale(viewer.getMap().getView().getResolution(), viewer.getProjection());
+		properties.scale = Number(maputils.resolutionToScale(viewer.getMap().getView().getResolution(), viewer.getProjection())) - 1;
 	
 		url += `?` + serialize(properties);
 		return url;
@@ -114,7 +114,7 @@ export const getIfThemeLayer = function getIfThemeLayer(viewer, layers) {	/*
 					request: "GetLegendGraphic",
 					layer: layer.get("name"),
 					format: "application/json",
-					scale: 400 //reasonable scale to check whether layer is a theme layer
+					scale: 401 //reasonable scale to check whether layer is a theme layer
 				}
 				requestUrl = url + '?' + Object.keys(params).map(function (key) {return key + '=' + params[key]}).join('&')
 				requests.push(new Promise(function(resolve, reject) {

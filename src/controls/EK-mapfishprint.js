@@ -328,6 +328,7 @@ const Mapfishprint = function Mapfishprint(options = {}) {
 
     function getLegendInfos(layers, scale) {
         var requests = [];
+        const maxScaleDenomCompensatedScale = Number(scale) - 1;
         layers.forEach(function (layer) {
             //ArcGIS WMS layers are exempt, for now, as not the same format:application/json 
             if (Boolean(layer.get('type') == 'WMS') && !Boolean(layer.get('ArcGIS')) && !Boolean(layer.get('grouplayer')) ) {
@@ -341,7 +342,7 @@ const Mapfishprint = function Mapfishprint(options = {}) {
                         request: "GetLegendGraphic",
                         layer: layer.get("name"),
                         format: "application/json",
-                        scale: scale
+                        scale: maxScaleDenomCompensatedScale
                     }
                     requestUrl = url + '?' + Object.keys(params).map(function (key) {return key + '=' + params[key]}).join('&')
                     requests.push(new Promise(function(resolve, reject) {
@@ -363,6 +364,7 @@ const Mapfishprint = function Mapfishprint(options = {}) {
 
     function buildLegend(layers, scale) {
         let themeLayers = [];
+        const maxScaleDenomCompensatedScale = Number(scale) - 1;
         let legendObjects = layers.reduce(function(result, layer) {
             const type = layer.get('type') || "";
             let url, name;
@@ -398,7 +400,7 @@ const Mapfishprint = function Mapfishprint(options = {}) {
                                 let layername = sublayers[i].name;
                                 result.push({
                                     name: subName,
-                                    icons: [url + '/?REQUEST=GetLegendGraphic&transparent=true&service=WMS&VERSION=1.0.0&FORMAT=image/png&LAYER=' + layername + '&STYLE=' + style + '&RULE=' + rule + '&SCALE=' + scale + '&legend_options=dpi:400']
+                                    icons: [url + '/?REQUEST=GetLegendGraphic&transparent=true&service=WMS&VERSION=1.0.0&FORMAT=image/png&LAYER=' + layername + '&STYLE=' + style + '&RULE=' + rule + '&SCALE=' + maxScaleDenomCompensatedScale + '&legend_options=dpi:400']
                                 })
                             }
                         }
@@ -407,7 +409,7 @@ const Mapfishprint = function Mapfishprint(options = {}) {
                     else {
                         result.push({
                             name: layer.get('title'),
-                            icons: [url + '/?REQUEST=GetLegendGraphic&transparent=true&service=WMS&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name + '&SCALE=' + scale + '&legend_options=dpi:400']
+                            icons: [url + '/?REQUEST=GetLegendGraphic&transparent=true&service=WMS&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name + '&SCALE=' + maxScaleDenomCompensatedScale + '&legend_options=dpi:400']
                         })
                     }
                     return result;
@@ -417,7 +419,7 @@ const Mapfishprint = function Mapfishprint(options = {}) {
                     name = layer.get('name');
                     result.push({
                         name: layer.get('title'),
-                        icons: [url + '/?REQUEST=GetLegendGraphic&transparent=true&service=WMS&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name + '&SCALE=' + scale + '&legend_options=dpi:400']
+                        icons: [url + '/?REQUEST=GetLegendGraphic&transparent=true&service=WMS&VERSION=1.0.0&FORMAT=image/png&LAYER=' + name + '&SCALE=' + maxScaleDenomCompensatedScale + '&legend_options=dpi:400']
                     })
                     return result;
                     break;
