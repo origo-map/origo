@@ -341,9 +341,11 @@ const Multiselect = function Multiselect(options = {}) {
     const featuresList = items.map((item) => {
       const layerAttributes = item.getLayer().get('attributes');
       const bufferAttribute = layerAttributes ? layerAttributes[0].name ? layerAttributes[0].name : undefined : undefined;
+      const layerName = item.getLayer().get('title');
       const feature = item.getFeature();
       const title = feature.get(bufferAttribute) || feature.get('namn') || feature.getId();
-      return `<div class="featureSelectorItem" id="${feature.getId()}"> ${title} </div>`;
+      const titleEl = layerName ? `<span>Feature <b>${title}</b> från lagret <b>${layerName}</b></span>` : `<span>Feature ${title}</span>`;
+      return `<div class="featureSelectorItem" id="${feature.getId()}"> ${titleEl} </div>`;
     });
 
     return new Promise((resolve) => {
@@ -361,9 +363,8 @@ const Multiselect = function Multiselect(options = {}) {
 
       for (let index = 0; index < featureSelectors.length; index++) {
         const f = featureSelectors[index];
-        f.addEventListener('click', (e) => {
-          bufferFeature = features.find(f => f.getId().toString() === e.target.id).clone();
-          console.log(bufferFeature);
+        f.addEventListener('click', function (e) {
+          bufferFeature = features.find(ff => ff.getId().toString() === this.id).clone();
           modal.closeModal();
           resolve();
           e.stopPropagation();
