@@ -1,20 +1,23 @@
 import download from 'downloadjs';
 
 export function simpleExportHandler(simpleExportUrl, activeLayer, selectedItems, exportedFileName) {
-
   if (!simpleExportUrl) {
     // Here we cannot simply throw, because it won't be catched. We need to rejecet it as the calling function expects a promise.
-    return Promise.reject('Export URL is not specified.');
+    return Promise.reject(new Error('Export URL is not specified.'));
   }
 
   const features = {};
   selectedItems.forEach((item) => {
     const layerName = item.getLayer().get('name');
+
     if (!features[layerName]) {
       features[layerName] = [];
     }
     const obj = item.getFeature().getProperties();
-    if (obj.geom) delete obj.geom;
+    const geometryName = item.getFeature().getGeometryName() || 'geom';
+
+    if (obj[geometryName]) delete obj[geometryName];
+
     features[layerName].push(obj);
   });
 
@@ -44,7 +47,7 @@ export function simpleExportHandler(simpleExportUrl, activeLayer, selectedItems,
 
 export function layerSpecificExportHandler(url, activeLayer, selectedItems, attributesToSendToExport, exportedFileName) {
   if (!url) {
-    throw 'Export URL is not specified.';
+    throw new Error('Export URL is not specified.');
   }
 
   const features = {};
@@ -54,6 +57,8 @@ export function layerSpecificExportHandler(url, activeLayer, selectedItems, attr
       features[layerName] = [];
     }
     const properties = item.getFeature().getProperties();
+    const geometryName = item.getFeature().getGeometryName() || 'geom';
+
     let obj = {};
     if (attributesToSendToExport) {
       attributesToSendToExport.forEach((att) => {
@@ -64,7 +69,7 @@ export function layerSpecificExportHandler(url, activeLayer, selectedItems, attr
     } else {
       obj = properties;
     }
-    if (obj.geom) delete obj.geom;
+    if (obj[geometryName]) delete obj[geometryName];
     features[layerName].push(obj);
   });
 
