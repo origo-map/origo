@@ -235,13 +235,18 @@ const Search = function Search(options = {}) {
     const ids = Object.keys(data);
     ids.forEach((id) => {
       const item = data[id];      
-      const typeTitle =
-        (layerNameAttribute && idAttribute) ? viewer.getLayer(item[layerNameAttribute]).get('title') :
-        (geometryAttribute && layerName) ? viewer.getLayer(item[layerName]).get('title') :
-        (titleAttribute && contentAttribute && geometryAttribute) ? item[titleAttribute] :
-        (geometryAttribute && title) ? title :
-        (easting && northing && title) ? title :
-        undefined;
+      const typeTitle = undefined;
+      if (layerNameAttribute && idAttribute) {
+        typeTitle = viewer.getLayer(item[layerNameAttribute]).get('title');
+      } else if (geometryAttribute && layerName) {
+        typeTitle = viewer.getLayer(item[layerName]).get('title');
+      } else if (titleAttribute && contentAttribute && geometryAttribute) {
+        typeTitle = item[titleAttribute];
+      } else if (geometryAttribute && title) {
+        typeTitle = title;
+      } else if (easting && northing && title) {
+        typeTitle = title;
+      }
       if (typeTitle && typeTitle in group === false) {
         group[typeTitle] = [];
         item.header = typeTitle;
