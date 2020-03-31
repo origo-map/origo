@@ -39,18 +39,24 @@ const Featureinfo = function Featureinfo(options = {}) {
   const selectionStyles = selectionStylesOptions ? Style.createGeometryStyle(selectionStylesOptions) : Style.createEditStyle();
   let savedPin = savedPinOptions ? maputils.createPointFeature(savedPinOptions, pinStyle) : undefined;
   const savedFeature = savedPin || savedSelection || undefined;
-  const infowindow = 'infowindow' in options ? options.infowindow : 'overlay';
+  const uiOutput = 'infowindow' in options ? options.infowindow : 'overlay';
 
-  identifyTarget = infowindow;
+  function setUIoutput(v) {
+    switch (uiOutput) {
+      case 'infowindow':
+        identifyTarget = 'infowindow';
+        break;
 
-  // function setUIoutput(v) {
-  //   if (showOverlay) {
-  //     identifyTarget = 'overlay';
-  //   } else {
-  //     sidebar.init(v);
-  //     identifyTarget = 'sidebar';
-  //   }
-  // }
+      case 'sidebar':
+        sidebar.init(v);
+        identifyTarget = 'sidebar';
+        break;
+
+      default:
+        identifyTarget = 'overlay';
+        break;
+    }
+  }
 
   const clear = function clear() {
     selectionLayer.clear();
@@ -201,9 +207,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     items = identifyItems;
     clear();
     let content = items.map(i => i.content).join('');
-    //    let content = items.map(i => i.getContent()).join('');
-    //content = `<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme">${content}</div></div>`;
-    content = `<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme"></div></div>`;
+    content = '<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme"></div></div>';
     switch (target) {
       case 'overlay':
         {
@@ -211,7 +215,6 @@ const Featureinfo = function Featureinfo(options = {}) {
           popup.setContent({
             content,
             title: items[0] instanceof SelectedItem ? items[0].getLayer().get('title') : items[0].title
-            //title: items[0].getLayer().get('title')	
           });
           const contentDiv = document.getElementById('o-identify-carousel');
           items.forEach((item) => {
@@ -234,7 +237,6 @@ const Featureinfo = function Featureinfo(options = {}) {
             autoPanMargin: 40,
             positioning: 'bottom-center'
           });
-          //const geometry = items[0].getFeature().getGeometry();	
           const geometry = items[0].feature.getGeometry();
           const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
           map.addOverlay(overlay);
@@ -246,7 +248,6 @@ const Featureinfo = function Featureinfo(options = {}) {
           sidebar.setContent({
             content,
             title: items[0] instanceof SelectedItem ? items[0].getLayer().get('title') : items[0].title
-            // title: items[0].getLayer().get('title')	
           });
           const contentDiv = document.getElementById('o-identify-carousel');
           items.forEach((item) => {
@@ -346,10 +347,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     onAdd(e) {
       viewer = e.target;
       const map = viewer.getMap();
-      if (identifyTarget === 'sidebar') {
-        sidebar.init(viewer);
-      }
-      // setUIoutput(viewer);
+      setUIoutput(viewer);
       selectionLayer = featurelayer(savedFeature, map);
       selectionManager = viewer.getSelectionManager();
       map.on(clickEvent, onClick);
