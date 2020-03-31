@@ -2,14 +2,16 @@ import 'owl.carousel';
 import Overlay from 'ol/Overlay';
 import $ from 'jquery';
 import { Component, Modal } from './ui';
+// eslint-disable-next-line import/no-cycle
 import Popup from './popup';
+// eslint-disable-next-line import/no-cycle
 import sidebar from './sidebar';
 import maputils from './maputils';
 import featurelayer from './featurelayer';
 import Style from './style';
 import StyleTypes from './style/styletypes';
 import getFeatureInfo from './getfeatureinfo';
-import replacer from '../src/utils/replacer';
+import replacer from './utils/replacer';
 import SelectedItem from './models/SelectedItem';
 import { getContent } from './getattributes';
 
@@ -25,7 +27,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     pinsStyle: pinStyleOptions = styleTypes.getStyle('pin'),
     savedPin: savedPinOptions,
     savedSelection,
-    selectionStyles: selectionStylesOptions,
+    selectionStyles: selectionStylesOptions
   } = options;
 
   let identifyTarget;
@@ -60,7 +62,7 @@ const Featureinfo = function Featureinfo(options = {}) {
 
   const clear = function clear() {
     selectionLayer.clear();
-    // check needed for when sidebar or overlay are selected.     
+    // check needed for when sidebar or overlay are selected.
     if (selectionManager) selectionManager.clearSelection();
     sidebar.setVisibility(false);
     if (overlay) {
@@ -72,7 +74,7 @@ const Featureinfo = function Featureinfo(options = {}) {
   const callback = function callback(evt) {
     const currentItemIndex = evt.item.index;
     if (currentItemIndex !== null) {
-      let currentItem = items[currentItemIndex];
+      const currentItem = items[currentItemIndex];
       const clone = currentItem.feature.clone();
       clone.setId(currentItem.feature.getId());
       clone.layerName = currentItem.name;
@@ -108,12 +110,10 @@ const Featureinfo = function Featureinfo(options = {}) {
             title = currentItem.title ? currentItem.title : currentItem.name;
           }
         }
+      } else if (currentItem instanceof SelectedItem) {
+        title = currentItem.getLayer().get('title') ? currentItem.getLayer().get('title') : currentItem.getLayer().get('name');
       } else {
-        if (currentItem instanceof SelectedItem) {
-          title = currentItem.getLayer().get('title') ? currentItem.getLayer().get('title') : currentItem.getLayer().get('name');
-        } else {
-          title = currentItem.title ? currentItem.title : currentItem.name;
-        }
+        title = currentItem.title ? currentItem.title : currentItem.name;
       }
       selectionLayer.setSourceLayer(currentItem.layer);
       if (identifyTarget === 'overlay') {
@@ -182,15 +182,15 @@ const Featureinfo = function Featureinfo(options = {}) {
       let modalStyle = '';
       switch (targ.target) {
         case 'modal-full':
-          {
-            modalStyle = 'max-width:unset;width:98%;height:98%;resize:both;overflow:auto;display:flex;flex-flow:column;';
-            break;
-          }
+        {
+          modalStyle = 'max-width:unset;width:98%;height:98%;resize:both;overflow:auto;display:flex;flex-flow:column;';
+          break;
+        }
         default:
-          {
-            modalStyle = 'resize:both;overflow:auto;display:flex;flex-flow:column;';
-            break;
-          }
+        {
+          modalStyle = 'resize:both;overflow:auto;display:flex;flex-flow:column;';
+          break;
+        }
       }
       Modal({
         title: targ.href,
@@ -206,74 +206,74 @@ const Featureinfo = function Featureinfo(options = {}) {
     const map = viewer.getMap();
     items = identifyItems;
     clear();
-    let content = items.map(i => i.content).join('');
+    let content = items.map((i) => i.content).join('');
     content = '<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme"></div></div>';
     switch (target) {
       case 'overlay':
-        {
-          popup = Popup(`#${viewer.getId()}`);
-          popup.setContent({
-            content,
-            title: items[0] instanceof SelectedItem ? items[0].getLayer().get('title') : items[0].title
-          });
-          const contentDiv = document.getElementById('o-identify-carousel');
-          items.forEach((item) => {
-            if (item.content instanceof Element) {
-              contentDiv.appendChild(item.content);
-            } else {
-              contentDiv.innerHTML = item.content;
-            }
-          });
-          popup.setVisibility(true);
-          initCarousel('#o-identify-carousel');
-          const popupHeight = $('.o-popup').outerHeight() + 20;
-          $('#o-popup').height(popupHeight);
-          overlay = new Overlay({
-            element: popup.getEl(),
-            autoPan: true,
-            autoPanAnimation: {
-              duration: 500
-            },
-            autoPanMargin: 40,
-            positioning: 'bottom-center'
-          });
-          const geometry = items[0].feature.getGeometry();
-          const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
-          map.addOverlay(overlay);
-          overlay.setPosition(coord);
-          break;
-        }
-      case 'sidebar':
-        {
-          sidebar.setContent({
-            content,
-            title: items[0] instanceof SelectedItem ? items[0].getLayer().get('title') : items[0].title
-          });
-          const contentDiv = document.getElementById('o-identify-carousel');
-          items.forEach((item) => {
-            if (item.content instanceof Element) {
-              contentDiv.appendChild(item.content);
-            } else {
-              contentDiv.innerHTML = item.content;
-            }
-          });
-          sidebar.setVisibility(true);
-          initCarousel('#o-identify-carousel');
-          break;
-        }
-      case 'infowindow':
-        {
-          if (items.length === 1) {
-            selectionManager.addOrHighlightItem(items[0]);
-          } else if (items.length > 1) {
-            selectionManager.addItems(items);
+      {
+        popup = Popup(`#${viewer.getId()}`);
+        popup.setContent({
+          content,
+          title: items[0] instanceof SelectedItem ? items[0].getLayer().get('title') : items[0].title
+        });
+        const contentDiv = document.getElementById('o-identify-carousel');
+        items.forEach((item) => {
+          if (item.content instanceof Element) {
+            contentDiv.appendChild(item.content);
+          } else {
+            contentDiv.innerHTML = item.content;
           }
-          break;
+        });
+        popup.setVisibility(true);
+        initCarousel('#o-identify-carousel');
+        const popupHeight = $('.o-popup').outerHeight() + 20;
+        $('#o-popup').height(popupHeight);
+        overlay = new Overlay({
+          element: popup.getEl(),
+          autoPan: true,
+          autoPanAnimation: {
+            duration: 500
+          },
+          autoPanMargin: 40,
+          positioning: 'bottom-center'
+        });
+        const geometry = items[0].feature.getGeometry();
+        const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
+        map.addOverlay(overlay);
+        overlay.setPosition(coord);
+        break;
+      }
+      case 'sidebar':
+      {
+        sidebar.setContent({
+          content,
+          title: items[0] instanceof SelectedItem ? items[0].getLayer().get('title') : items[0].title
+        });
+        const contentDiv = document.getElementById('o-identify-carousel');
+        items.forEach((item) => {
+          if (item.content instanceof Element) {
+            contentDiv.appendChild(item.content);
+          } else {
+            contentDiv.innerHTML = item.content;
+          }
+        });
+        sidebar.setVisibility(true);
+        initCarousel('#o-identify-carousel');
+        break;
+      }
+      case 'infowindow':
+      {
+        if (items.length === 1) {
+          selectionManager.addOrHighlightItem(items[0]);
+        } else if (items.length > 1) {
+          selectionManager.addItems(items);
         }
+        break;
+      }
       default:
-        {
-          break;
-        }
+      {
+        break;
+      }
     }
 
     const modalLinks = document.getElementsByClassName('o-identify-link-modal');
