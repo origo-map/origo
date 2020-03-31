@@ -36,6 +36,7 @@ function getAddedLayers(layers) {
     style: layer.get('style'),
     title: layer.get('title'),
     type: layer.get('type'),
+    infoFormat: layer.get('infoFormat'),
     format: layer.get('background'),
     group: layer.get('group')
     };
