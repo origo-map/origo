@@ -1,4 +1,6 @@
-import { Component, Button, Element as El, Collapse } from '../../ui';
+import {
+  Component, Button, Element as El, Collapse
+} from '../../ui';
 import printSettingsTemplate from './print-settings.template';
 import CustomSizeControl from './custom-size-control';
 import DescriptionControl from './description-control';
@@ -109,13 +111,13 @@ const PrintSettings = function PrintSettings({
       });
       this.addComponent(printSettingsContainer);
 
-      descriptionControl.on('change', evt => this.dispatch('change:description', evt));
-      marginControl.on('change:check', evt => this.dispatch('change:margin', evt));
-      orientationControl.on('change:orientation', evt => this.dispatch('change:orientation', evt));
-      sizeControl.on('change:size', evt => this.dispatch('change:size', evt));
+      descriptionControl.on('change', (evt) => this.dispatch('change:description', evt));
+      marginControl.on('change:check', (evt) => this.dispatch('change:margin', evt));
+      orientationControl.on('change:orientation', (evt) => this.dispatch('change:orientation', evt));
+      sizeControl.on('change:size', (evt) => this.dispatch('change:size', evt));
       sizeControl.on('change:size', this.onChangeSize.bind(this));
-      customSizeControl.on('change:size', evt => this.dispatch('change:size-custom', evt));
-      titleControl.on('change', evt => this.dispatch('change:title', evt));
+      customSizeControl.on('change:size', (evt) => this.dispatch('change:size-custom', evt));
+      titleControl.on('change', (evt) => this.dispatch('change:title', evt));
     },
     onChangeSize(evt) {
       const visible = evt.size === 'custom';

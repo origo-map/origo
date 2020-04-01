@@ -42,7 +42,7 @@ export default function PrintMap(options = {}) {
       map.addControl(scaleLine);
       map.addControl(attribution);
     },
-    removePrintControls() { mapControls.forEach(mapControl => map.removeControl(mapControl)); },
+    removePrintControls() { mapControls.forEach((mapControl) => map.removeControl(mapControl)); },
     render() {
       return `
       <div class="flex grow relative no-margin width-full height-full">
