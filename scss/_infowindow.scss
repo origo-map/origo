@@ -1,0 +1,265 @@
+
+.sidebarcontainer {
+    position: absolute;
+    font-size: 12px;
+    font-weight: normal;
+    width: 320px;
+    top: 6em;
+    right: 26em;
+    background-color: white;
+    border-radius: 0.5em;
+    box-shadow: 0px 0px 8px #888888; 
+  }
+   
+  /** 
+   * ============ Urval ==============
+   */
+  
+  .urvalcontainer {
+    padding: 1em 1em 1em 2em;
+    font-size: 12px;
+    font-weight: bold;
+    border-bottom: 1px solid #d9d9d9;
+    cursor: move;
+    z-index: 10;
+  }
+  
+  .urval-textnode-container {
+    margin-bottom: 0.5em;
+    font-size: 15px;
+  }
+  
+  .urvalelement {
+    display: inline-block;
+    padding: 0.5em 0;
+    font-weight: normal;
+    cursor: pointer;
+    margin-right: 1em;
+    border-bottom: 3px solid white;
+  }
+  
+  .selectedurvalelement {
+    border-bottom: 3px solid #0099FF;
+    font-weight: normal;
+    color: rgb(0, 0, 0);
+  }
+  
+  .closebutton-svg-container {
+    position: absolute;
+    top: 1em;
+    right: 1em;
+    height: 1.2em;
+    width: 1.2em;
+    cursor: pointer;
+  }
+  
+  .closebutton-svg {
+    height: 100%;
+    width: 100%;
+    fill: rgb(77, 77, 77);
+  }
+  
+  /** 
+   * ============ List ==============
+   */
+  
+  .listcontainer {
+    font-size: 12px;
+    font-weight: normal;
+    max-height: 40em;
+    overflow-y: scroll;
+    margin-right: 0.5em;
+    scroll-behavior: smooth;
+  }
+  
+  .removelistelement-svg-container {
+    display: inline-block;
+    height: 1em;
+    width: 1em;
+    padding: 0.5em;
+    cursor: pointer;
+    vertical-align: top;
+  }
+  
+  .removelistelement-svg {
+    height: 100%;
+    width: 100%;
+    fill: rgb(77, 77, 77);
+  }
+  
+  .listelement-content-container {
+    display: inline-block;
+    width: 85%;
+    border-bottom: 1px solid #d9d9d9;
+    padding: 0.5em;
+    cursor: pointer;
+  }
+  
+  .expandlistelement-svg {
+    height: 100%;
+    width: 100%;
+    fill: rgb(100, 100, 100);
+    &:hover {
+      fill: #0099FF;
+    }
+  }
+  
+  .expandlistelement-svg-container {
+    height: 1em;
+    width: 1em;
+    float: right;
+    transition: 0.5s;
+    // margin-top: 0.5em; 
+    // In case the seceonf attribute is not definded for a feature or takes more than on line setting margin-top cause that it becamoes heterogeneous.
+    // It is better to leave the expand arrow to stay always up top because we never know how much height an element is going to have.
+  }
+  
+  .rotated {
+    -ms-transform: rotate(90deg); /* IE 9 */
+    -webkit-transform: rotate(90deg); /* Safari */
+    transform: rotate(90deg);
+    transition: 0.5s;
+    -webkit-transition: .5s;
+    -moz-transition: .5s;   
+    -ms-transition: .5s;   
+    -o-transition: .5s;
+  }
+  
+  .o-identify-content {
+    display: inline-block;
+  }
+  
+  .folded {
+    max-height: 0px;
+    overflow: hidden;
+    transition: max-height .5s;
+    -webkit-transition: max-height .5s;
+    -moz-transition: max-height .5s;   
+    -ms-transition: max-height .5s;   
+    -o-transition: max-height .5s;
+  }
+  
+  .unfolded {
+    max-height: 20em;
+    overflow: hidden;
+    transition: max-height 1s;
+    -webkit-transition: max-height 1s;
+    -moz-transition: max-height 1s;   
+    -ms-transition: max-height 1s;   
+    -o-transition: max-height 1s;
+  }
+  
+  .highlighted {
+    background-color: whitesmoke;
+    transition: background-color 0.5s;
+    -webkit-transition: background-color 0.5s;
+    -moz-transition: background-color 0.5s;
+    -ms-transition: background-color 0.5s;
+    -o-transition: background-color 0.5s;
+    border-radius: 0 1em 1em 0;
+  }
+  
+  /** 
+   * ============ Export ==============
+   */
+  
+  .exportcontainer {
+    font-size: 12px;
+    font-weight: normal;
+  }
+
+  .export-buttons-container {
+    margin: 0.5em 0.2em;
+  }
+
+  .export-button {
+    font-size: 12px;
+    font-weight: normal;
+    color: black;
+    background-color: whitesmoke;
+    border: 1px solid #cccccc;
+    border-radius: 2em;
+    padding: 2px 8px;
+    text-align: left;
+    max-width: 280px;
+  }
+
+  .toaster {
+    position: fixed;
+    top: 1em;
+    right: 1em;
+    padding: 1em;
+    z-index: 999;
+    box-shadow: 0px 0px 8px #888888;
+    border-radius: 0.5em;
+    transition: .5s;
+    -webkit-transition: .5s;
+    -moz-transition: .5s;   
+    -ms-transition: .5s;   
+    -o-transition: .5s;
+  }
+
+  .toaster-successful {
+    background-color: #d6f5d6;
+  }
+  
+  .toaster-unsuccessful {
+    background-color: #ffcccc;
+  }
+  
+  .disabled {
+    cursor: not-allowed;
+    color: #888888;
+  }
+  .spinner {
+    height: 1.5em;
+    margin: 0 0.3em;
+    transform: translateY(3px);
+  }
+
+  .hidden {
+    display: none;
+  }
+  
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    // box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    // -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+    // border-radius: 4px;
+    // background-color: gray;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: #a6a6a6;
+    // -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+    // box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+  }
+
+  &[class*=#{$media-l}] {
+    .sidebarcontainer {
+      left: 50%;
+      transform: translateX(-50%);
+      width: 280px;
+      top: 5em;
+    }
+    .o-identify-content {
+      width: 94%;
+    }
+  }
+
+  &[class*=#{$media-l-m}] {
+    .sidebarcontainer {
+      width: 250px;
+    }
+  }
+
+  &[class*=#{$media-l-m-s}] {
+    .sidebarcontainer {
+      transform: none;
+      left: 5em;
+    }
+  }

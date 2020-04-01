@@ -33,6 +33,7 @@
     "copyfiles": "^2.2.0",
     "core-js": "^3.6.4",
     "cuid": "^2.1.4",
+    "downloadjs": "^1.4.7",
     "html2canvas": "^1.0.0-rc.5",
     "jquery": "^3.4.1",
     "ol": "6.2.1",
