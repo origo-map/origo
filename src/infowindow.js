@@ -36,7 +36,6 @@ function showInfowindow() {
   mainContainer.classList.remove('hidden');
 }
 
-
 function makeElementDraggable(elmnt) {
   let pos1 = 0;
   let pos2 = 0;
@@ -189,7 +188,9 @@ function createToaster(status, message) {
   const toaster = document.createElement('div');
   toaster.style.fontSize = '12px';
   if (!message) {
-    msg = status === 'ok' ? 'Det gick bra!' : 'Något gick fel, kontakta administratören.';
+    const successMsg = exportOptions.toasterMessages && exportOptions.toasterMessages.success ? exportOptions.toasterMessages.success : 'Det gick bra!';
+    const failMsg = exportOptions.toasterMessages && exportOptions.toasterMessages.fail ? exportOptions.toasterMessages.fail : 'Något gick fel, kontakta administratören.';
+    msg = status === 'ok' ? successMsg : failMsg;
   }
   // It cannot be appended to infowindow bcuz in mobile tranform:translate is used css, and it causes that position: fixed loses its effect.
   parentElement.appendChild(toaster);
