@@ -108,6 +108,9 @@
     1.1943,
     0.5972
   ],
+  "featureinfoOptions": {
+    "infowindow": "infowindow"
+  },
   "source": {
     "local": {
       "url": "http://localhost/geoserver/wms"

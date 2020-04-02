@@ -1,18 +1,10 @@
 import download from 'downloadjs';
-import { createToaster } from './infowindow';
 
 export function simpleExportHandler(simpleExportUrl, activeLayer, selectedItems, exportedFileName) {
   if (!simpleExportUrl) {
     // Here we cannot simply throw, because it won't be catched. We need to rejecet it as the calling function expects a promise.
     return Promise.reject(new Error('Export URL is not specified.'));
   }
-  // console.log('simple Exporting layer ' + activeLayer.get('name'));
-
-  /* if (activeLayer.get('type') === 'GROUP') {
-      const subLayers = activeLayer.getLayers().getArray();
-      const subLayersNames = subLayers.map(l => l.get('name'));
-      console.log(subLayersNames);
-  } */
 
   const features = {};
   selectedItems.forEach((item) => {
@@ -58,7 +50,6 @@ export function layerSpecificExportHandler(url, activeLayer, selectedItems, attr
     throw new Error('Export URL is not specified.');
   }
 
-  // let replacedUrl;
   const features = {};
   selectedItems.forEach((item) => {
     const layerName = item.getLayer().get('name');
@@ -97,22 +88,9 @@ export function layerSpecificExportHandler(url, activeLayer, selectedItems, attr
         case 'application/json':
           return response.json();
 
-        // case 'application/vnd.ms-excel':
-
-        //     if (response.status !== 200) {
-        //         throw response.statusText;
-        //         // return Promise.reject(response.statusText);
-        //     }
-
-        //     response.blob().then(blob => {
-        //         download(blob, exportedFileName, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        //     });
-        //     break;
-
         default:
           if (response.status !== 200) {
             throw response.statusText;
-            // return Promise.reject(response.statusText);
           }
 
           response.blob().then((blob) => {
@@ -122,8 +100,6 @@ export function layerSpecificExportHandler(url, activeLayer, selectedItems, attr
       }
     })
     .catch((err) => {
-      // console.log(err);
       throw err;
-      // return Promise.reject(err);
     });
 }

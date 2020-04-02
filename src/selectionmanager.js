@@ -51,7 +51,6 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   }
 
   function highlightAndExpandItem(item) {
-    // const featureId = item.getFeature().getId();
     const featureId = item.getId();
     highlightFeatureById(featureId);
     infowindow.showSelectedList(item.getSelectionGroup());
@@ -125,9 +124,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   function onItemAdded(event) {
     const item = event.element;
 
-    // const selectionGroup = event.element.getLayer().get('name');
     const selectionGroup = event.element.getSelectionGroup();
-    // const selectionGroupTitle = event.element.getLayer().get('title');
     const selectionGroupTitle = event.element.getSelectionGroupTitle();
 
     if (!urval.has(selectionGroup)) {
@@ -151,9 +148,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   function onItemRemoved(event) {
     const item = event.element;
 
-    // const selectionGroup = event.element.getLayer().get('name');
     const selectionGroup = event.element.getSelectionGroup();
-    // const selectionGroupTitle = event.element.getLayer().get('title');
     const selectionGroupTitle = event.element.getSelectionGroupTitle();
 
     const feature = item.getFeature();

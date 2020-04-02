@@ -193,8 +193,6 @@ const Viewer = function Viewer(targetOption, options = {}) {
     return groupLayers;
   };
 
-  const getLayerGroups = () => getLayers().filter(layer => layer.get('type') === 'GROUP');
-
   const getSearchableLayers = function getSearchableLayers(searchableDefault) {
     const searchableLayers = [];
     map.getLayers().forEach((layer) => {

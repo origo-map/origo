@@ -1,6 +1,8 @@
 import olAttribution from 'ol/control/Attribution';
 import olScaleLine from 'ol/control/ScaleLine';
-import { Button, Component, cuid, dom } from '../../ui';
+import {
+  Button, Component, cuid, dom
+} from '../../ui';
 import pageTemplate from './page.template';
 import PrintMap from './print-map';
 import PrintSettings from './print-settings';
@@ -178,8 +180,8 @@ const PrintComponent = function PrintComponent(options = {}) {
     },
     removeViewerControls() {
       const controls = map.getControls().getArray();
-      const viewerControls = controls.filter(control => control instanceof olAttribution || control instanceof olScaleLine);
-      viewerControls.forEach(control => map.removeControl(control));
+      const viewerControls = controls.filter((control) => control instanceof olAttribution || control instanceof olScaleLine);
+      viewerControls.forEach((control) => map.removeControl(control));
     },
     restoreViewerControls() {
       const attibutionControl = viewer.getControlByName('attribution');
