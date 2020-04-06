@@ -14,7 +14,7 @@ export default function PrintMap(options = {}) {
 
   const bottomLeftMapControls = El({ cls: 'flex column align-start absolute bottom-left transparent z-index-ontop-middle' });
   const bottomRightMapControls = El({ cls: 'flex column align-start absolute bottom-right transparent z-index-ontop-middle' });
-  const logoComponent = Logo({ ...logo, baseUrl });
+  const logoComponent = Logo({ baseUrl, logo });
 
   return Component({
     onInit() {
@@ -42,7 +42,7 @@ export default function PrintMap(options = {}) {
       map.addControl(scaleLine);
       map.addControl(attribution);
     },
-    removePrintControls() { mapControls.forEach(mapControl => map.removeControl(mapControl)); },
+    removePrintControls() { mapControls.forEach((mapControl) => map.removeControl(mapControl)); },
     render() {
       return `
       <div class="flex grow relative no-margin width-full height-full">
