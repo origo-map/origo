@@ -4,6 +4,7 @@ import * as olInteraction from 'ol/interaction';
 import * as olLayer from 'ol/layer';
 import * as olSource from 'ol/source';
 import * as olStyle from 'ol/style';
+import * as olFormat from 'ol/format';
 import polyfill from './src/utils/polyfill';
 import * as ui from './src/ui';
 import Viewer from './src/viewer';
@@ -94,6 +95,7 @@ Origo.ol.layer = olLayer;
 Origo.ol.source = olSource;
 Origo.ol.style = olStyle;
 Origo.ol.Feature = olFeature;
+Origo.ol.format = olFormat;
 Origo.Utils = Utils;
 Origo.dropdown = dropdown;
 
