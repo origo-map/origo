@@ -17,7 +17,11 @@ const OverlayProperties = function OverlayProperties(options = {}) {
   const legend = Legend(style, opacity);
   let overlayEl;
   let sliderEl;
-  const inputRange = opacityControl ? `<div class="padding-smaller"><input id="opacitySlider" type="range" min="0" max="1" value="${opacity}" step="0.1"><span class="text-smaller">0%</span><span style="float:right" class="text-smaller">100%</span></div>` : '';
+  let label = '';
+  if (options.labelTransparency) {
+    label = `<span class="text-smaller">${options.labelTransparency}</span>`;
+  }
+  const inputRange = opacityControl ? `<div class="padding-smaller o-tooltip active">${label}<input id="opacitySlider" type="range" min="0" max="1" value="${opacity}" step="0.1"><span class="text-smaller">0%</span><span style="float:right" class="text-smaller">100%</span></div>` : '';
 
   function extendedLegendZoom(e) {
     const parentOverlay = document.getElementById(options.parent.getId());
