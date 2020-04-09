@@ -38,7 +38,6 @@ const Viewer = function Viewer(targetOption, options = {}) {
     enableRotation = true,
     featureinfoOptions = {},
     groups: groupOptions = [],
-    mapGrid = true,
     pageSettings = {},
     projectionCode,
     projectionExtent,
@@ -69,7 +68,12 @@ const Viewer = function Viewer(targetOption, options = {}) {
     tileSize: [256, 256]
   };
   const tileGridSettings = Object.assign({}, defaultTileGridOptions, tileGridOptions);
-  const mapGridCls = mapGrid ? 'o-mapgrid' : '';
+  let mapGridCls = '';
+  if (pageSettings.mapGrid) {
+    if (pageSettings.mapGrid.visible) {
+      mapGridCls = 'o-map-grid';
+    }
+  }
   const cls = `${clsOptions} ${mapGridCls} ${mapCls} o-ui`.trim();
   const footerData = pageSettings.footer || {};
   const main = Main();
