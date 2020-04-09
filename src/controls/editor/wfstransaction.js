@@ -19,9 +19,10 @@ function readResponse(data) {
 
 function writeWfsTransaction(transObj, options) {
   if (transObj.insert) {
-    transObj.insert.forEach(feature => {
-      Object.keys(feature.values_).forEach((key) => (feature.values_[key] === '') && delete feature.values_[key]);
-    })
+    transObj.insert.forEach((feature) => {
+      const feat = feature;
+      Object.keys(feat.values_).forEach(key => (feat.values_[key] === '') && delete feat.values_[key]);
+    });
   }
   const node = format.writeTransaction(transObj.insert, transObj.update, transObj.delete, options);
   return node;
