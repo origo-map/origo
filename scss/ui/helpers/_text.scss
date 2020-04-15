@@ -103,6 +103,14 @@ $text-fade-background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(25
   text-align: justify;
 }
 
+// float
+.float-left {
+  float: left;
+}
+.float-right {
+  float: right;
+}
+
 // font weight
 .text-weight-light {
   font-weight: $text-weight-light;

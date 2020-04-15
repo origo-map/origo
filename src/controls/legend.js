@@ -16,7 +16,7 @@ const Legend = function Legend(options = {}) {
     turnOffLayersControl = false,
     layerManagerControl = false,
     name = 'legend',
-    labelTransparency = ''
+    labelOpacitySlider = ''
   } = options;
 
   let viewer;
@@ -192,7 +192,7 @@ const Legend = function Legend(options = {}) {
       target = document.getElementById(viewer.getMain().getId());
       const maxHeight = calcMaxHeight(getTargetHeight());
       overlaysCmp = Overlays({
-        viewer, cls: contentCls, style: contentStyle, labelTransparency
+        viewer, cls: contentCls, style: contentStyle, labelOpacitySlider
       });
       const baselayerCmps = [toggleGroup];
       const toolsCmps = [];

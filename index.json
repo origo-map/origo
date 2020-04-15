@@ -39,7 +39,7 @@
     {
       "name": "legend",
       "options": {
-        "labelTransparency": "Transparency"
+        "labelOpacitySlider": "Opacity"
       }
     },
     {
