@@ -1,4 +1,6 @@
-import { Component, Button, Element as El, ToggleGroup, dom } from '../ui';
+import {
+  Component, Button, Element as El, ToggleGroup, dom
+} from '../ui';
 import imageSource from './legend/imagesource';
 import Overlays from './legend/overlays';
 import LayerProperties from './legend/overlayproperties';
@@ -13,7 +15,8 @@ const Legend = function Legend(options = {}) {
     contentStyle,
     turnOffLayersControl = false,
     layerManagerControl = false,
-    name = 'legend'
+    name = 'legend',
+    labelOpacitySlider = ''
   } = options;
 
   let viewer;
@@ -188,7 +191,9 @@ const Legend = function Legend(options = {}) {
       isExpanded = !size && expanded;
       target = document.getElementById(viewer.getMain().getId());
       const maxHeight = calcMaxHeight(getTargetHeight());
-      overlaysCmp = Overlays({ viewer, cls: contentCls, style: contentStyle });
+      overlaysCmp = Overlays({
+        viewer, cls: contentCls, style: contentStyle, labelOpacitySlider
+      });
       const baselayerCmps = [toggleGroup];
       const toolsCmps = [];
       let toolsCmp;

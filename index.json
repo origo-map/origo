@@ -37,7 +37,10 @@
       }
     },
     {
-      "name": "legend"
+      "name": "legend",
+      "options": {
+        "labelOpacitySlider": "Opacity"
+      }
     },
     {
       "name": "position",
