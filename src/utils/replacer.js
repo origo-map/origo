@@ -18,7 +18,7 @@ const replacer = function replacer() {
     const matches = regex.exec(name);
     if (matches) {
       let val = Object.prototype.hasOwnProperty.call(obj, matches[1]) ? obj[matches[1]] : '';
-      if (!val) {
+      if (val === '') {
         const nsIndex = matches[0].indexOf(helperNS);
         if (nsIndex) {
           const helperParts = getArgs(matches[1]);
