@@ -154,7 +154,7 @@ const Search = function Search(options = {}) {
       coord = [data[easting], data[northing]];
       showOverlay(data, coord);
     } else {
-      console.log('Search options are missing');
+      console.error('Search options are missing');
     }
   }
 
@@ -234,7 +234,7 @@ const Search = function Search(options = {}) {
     const group = {};
     const ids = Object.keys(data);
     ids.forEach((id) => {
-      const item = data[id];      
+      const item = data[id];
       let typeTitle = undefined;
       if (layerNameAttribute && idAttribute) {
         typeTitle = viewer.getLayer(item[layerNameAttribute]).get('title');
@@ -254,7 +254,7 @@ const Search = function Search(options = {}) {
       if (typeTitle) {
         group[typeTitle].push(item);
       } else if (id == 0) {
-        console.log('Search options are missing');
+        console.error('Search options are missing');
       }
     });
     return group;

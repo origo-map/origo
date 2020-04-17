@@ -14,7 +14,7 @@ const selection = {
     },
     stroke: {
       color: blue,
-      width: width
+      width
     },
     circle: {
       radius: 5,

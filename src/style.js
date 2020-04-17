@@ -7,7 +7,7 @@ import Style from 'ol/style/Style';
 import Text from 'ol/style/Text';
 import validateurl from './utils/validateurl';
 import stylefunctions from './style/stylefunctions';
-import replacer from '../src/utils/replacer';
+import replacer from './utils/replacer';
 import maputils from './maputils';
 
 const white = [255, 255, 255, 1];
@@ -37,7 +37,7 @@ const editStyleOptions = {
   {
     stroke: {
       color: blue,
-      width
+      width: width
     }
   }
   ],

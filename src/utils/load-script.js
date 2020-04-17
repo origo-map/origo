@@ -47,7 +47,6 @@ const LoadScript = function LoadScript(options = {}) {
             await loadScript();
             resolve(window[global]);
           } catch (err) {
-            // eslint-disable-next-line no-console
             console.error(err);
             reject(err);
           }

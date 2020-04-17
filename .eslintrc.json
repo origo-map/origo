@@ -4,16 +4,38 @@
     "browser": true
   },
   "rules": {
-    "comma-dangle": ["error", "never"],
+    "comma-dangle": [
+      "error",
+      "never"
+    ],
     "import/no-unresolved": "off",
     "new-cap": "off",
     "prefer-destructuring": "off",
     "max-len": "off",
-    "import/no-extraneous-dependencies": ["error", {
-      "devDependencies": [
-        "tasks/**"
-      ],
-      "optionalDependencies": false
-    }]
+    "no-alert": "off",
+    "no-use-before-define": "off",
+    "prefer-object-spread": "off",
+    "object-curly-newline": "off",
+    "arrow-parens": "off",
+    "eqeqeq": "off",
+    "allowElseIf": "off",
+    "no-console": [
+      "error",
+      {
+        "allow": [
+          "warn",
+          "error"
+        ]
+      }
+    ],
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": [
+          "tasks/**"
+        ],
+        "optionalDependencies": false
+      }
+    ]
   }
 }

@@ -278,7 +278,7 @@ function onDeleteSelected() {
   editSource = editLayers[currentLayer].getSource();
   if (features.getLength() === 1) {
     const feature = features.item(0);
-    const r = confirm('Är du säker på att du vill ta bort det här objektet?');
+    const r = window.confirm('Är du säker på att du vill ta bort det här objektet?');
     if (r === true) {
       saveFeature({
         feature,
@@ -488,6 +488,7 @@ function onAttributesSave(feature, attrs) {
         default:
       }
       valid.validates = Object.values(valid).includes(false) ? false : valid;
+      return false;
     });
 
     // If valid, continue
