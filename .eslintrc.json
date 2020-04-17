@@ -18,7 +18,12 @@
     "object-curly-newline": "off",
     "arrow-parens": "off",
     "eqeqeq": "off",
-    "allowElseIf": "off",
+    "no-else-return": [
+      "error",
+      {
+        "allowElseIf": true
+      }
+    ],
     "no-console": [
       "error",
       {
