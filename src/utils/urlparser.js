@@ -25,11 +25,11 @@ urlparser.stringify = function func(obj, opt) {
   const delimeter = options.delimeter || '/';
   const topmost = options.topmost || undefined;
   let objString = topmost ? obj[topmost] : '';
-  for (const key in obj) {
+  Object.keys(obj).forEach(key => {
     if (key !== topmost) {
       objString += delimeter + key + delimeter + obj[key];
     }
-  }
+  });
   return objString;
 };
 urlparser.arrStringify = function func(arr, opt) {

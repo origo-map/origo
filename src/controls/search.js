@@ -235,7 +235,7 @@ const Search = function Search(options = {}) {
     const ids = Object.keys(data);
     ids.forEach((id) => {
       const item = data[id];
-      let typeTitle = undefined;
+      let typeTitle;
       if (layerNameAttribute && idAttribute) {
         typeTitle = viewer.getLayer(item[layerNameAttribute]).get('title');
       } else if (geometryAttribute && layerName) {

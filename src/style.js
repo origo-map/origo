@@ -37,7 +37,7 @@ const editStyleOptions = {
   {
     stroke: {
       color: blue,
-      width: width
+      width
     }
   }
   ],

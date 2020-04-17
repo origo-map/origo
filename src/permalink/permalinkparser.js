@@ -62,9 +62,9 @@ export default {
   },
   controls(controlsStr) {
     const controls = {};
-    for (const key in controlsStr) {
+    Object.keys(controlsStr).forEach(key => {
       controls[key] = parseFunctions[key](controlsStr[key]);
-    }
+    });
     return controls;
   },
   controlDraw(drawState) {

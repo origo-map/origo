@@ -55,9 +55,9 @@ export default (() => ({
       return fetch(`${saveOnServerServiceEndPoint}/${mapStateId}`).then(response => response.json())
         .then((data) => {
           const mapObj = {};
-          for (const key in data) {
+          Object.keys(data).forEach(key => {
             mapObj[key] = permalinkParser[key](data[key]);
-          }
+          });
           return mapObj;
         });
     }
