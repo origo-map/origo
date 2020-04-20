@@ -19,7 +19,8 @@ const Overlays = function Overlays(options) {
     cls: clsSettings = '',
     expanded = true,
     style: styleSettings = {},
-    viewer
+    viewer,
+    labelOpacitySlider
   } = options;
 
   const cls = `${clsSettings} o-layerswitcher-overlays flex row overflow-hidden`.trim();
@@ -243,7 +244,9 @@ const Overlays = function Overlays(options) {
         if (evt.detail.layer) {
           const layer = evt.detail.layer;
           const parent = this;
-          const layerProperties = LayerProperties({ layer, viewer, parent });
+          const layerProperties = LayerProperties({
+            layer, viewer, parent, labelOpacitySlider
+          });
           slidenav.setSecondary(layerProperties);
           slidenav.slideToSecondary();
           slidenav.on('slide', () => {

@@ -1,5 +1,21 @@
 const validate = {};
 
+validate.text = (text) => {
+  if (typeof text === 'string' || text instanceof String) {
+    return text;
+  } else {
+    return false;
+  }
+};
+
+validate.textarea = (textarea) => {
+  if (typeof textarea === 'string' || textarea instanceof String) {
+    return textarea;
+  } else {
+    return false;
+  }
+};
+
 validate.integer = (integer) => {
   if (integer) {
     const regex = /^[0-9]*$/;
