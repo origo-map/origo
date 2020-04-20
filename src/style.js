@@ -167,6 +167,7 @@ function checkOptions(feature, scale, styleSettings, styleList, size) {
           const featMatch = first.get(featAttr);
           expr = typeof featMatch === 'number' ? featMatch + expr : `"${featMatch}"${expr}`;
         }
+        // eslint-disable-next-line no-eval
         if (eval(expr)) {
           styleL = styleList[j];
           return styleL;
