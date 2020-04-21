@@ -512,7 +512,7 @@ function onAttributesSave(feature, attrs) {
           break;
         default:
       }
-      valid.validates = Object.values(valid).includes(false) ? false : true;
+      valid.validates = !Object.keys(valid).map(itm => valid[itm]).includes(false);
     });
 
     // If valid, continue
