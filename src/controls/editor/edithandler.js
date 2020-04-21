@@ -461,8 +461,8 @@ function onAttributesSave(feature, attrs) {
           }
           break;
         case 'datetime':
-          valid.datetime = validate.datetime(inputValue) && inputValue.length === 16 || inputValue === '' ? inputValue : false;
-          if (!valid.datetime && inputValue != '') {
+          valid.datetime = validate.datetime(inputValue) && inputValue.length === 19 ? inputValue : false;
+          if (!valid.datetime) {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }
@@ -481,8 +481,8 @@ function onAttributesSave(feature, attrs) {
           }
           break;
         case 'time':
-          valid.time = validate.time(inputValue) && inputValue.length === 5 || inputValue === '' ? inputValue : false;
-          if (!valid.time && inputValue != '') {
+          valid.time = validate.time(inputValue) && inputValue.length === 8 ? inputValue : false;
+          if (!valid.time) {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }

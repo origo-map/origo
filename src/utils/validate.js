@@ -66,7 +66,7 @@ validate.date = (date) => {
 
 validate.time = (time) => {
   if (time) {
-    const regex = /^(\d{2}):(\d{2})(?::(\d{2}(?:\.\d+)?))?$/;
+    const regex = /^(?:2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]$/;
     return regex.test(time);
   }
   return false;

@@ -68,10 +68,10 @@ const createForm = function createForm(obj) {
         } else if (obj.defaultTime) {
           val = obj.defaultTime;
         } else {
-          val = isoDate.slice(11, 16);
+          val = isoDate.slice(11, 19);
         }
       }
-      el = `<div><label>${label}</label><br><input type="time" name="timmar och minuter" id="${id}" placeholder="tt:mm" value="${val}"${readonly}${required}></div>`;
+      el = `<div><label>${label}</label><br><input type="time" name="timmar, minuter och sekunder" id="${id}" placeholder="tt:mm:ss" value="${val}"${readonly}></div>`;
       break;
     case 'datetime':
       if (!val) {
@@ -80,10 +80,10 @@ const createForm = function createForm(obj) {
         } else if (obj.defaultDatetime) {
           val = obj.defaultDatetime;
         } else {
-          val = isoDate.slice(0, 16);
+          val = isoDate.slice(0, 19);
         }
       }
-      el = `<div><label>${label}</label><br><input type="datetime-local" name="datum och tid" id="${id}" placeholder="ÅÅÅÅ-MM-DDTtt:mm" value="${val}"${readonly}${required}></div>`;
+      el = `<div><label>${label}</label><br><input type="datetime-local" name="datum och tid" id="${id}" placeholder="ÅÅÅÅ-MM-DDTtt:mm:ss" value="${val}"${readonly}></div>`;
       break;
     case 'color':
       if (!val) {
