@@ -1,5 +1,21 @@
 const validate = {};
 
+validate.text = (text) => {
+  if (typeof text === 'string' || text instanceof String) {
+    return text;
+  } else {
+    return false;
+  }
+};
+
+validate.textarea = (textarea) => {
+  if (typeof textarea === 'string' || textarea instanceof String) {
+    return textarea;
+  } else {
+    return false;
+  }
+};
+
 validate.integer = (integer) => {
   if (integer) {
     const regex = /^[0-9]*$/;
@@ -50,7 +66,7 @@ validate.date = (date) => {
 
 validate.time = (time) => {
   if (time) {
-    const regex = /^(\d{2}):(\d{2})(?::(\d{2}(?:\.\d+)?))?$/;
+    const regex = /^(?:2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]$/;
     return regex.test(time);
   }
   return false;
