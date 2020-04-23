@@ -112,7 +112,7 @@
     0.5972
   ],
   "featureinfoOptions": {
-    "infowindow": "infowindow"
+    "infowindow": "overlay"
   },
   "source": {
     "local": {
