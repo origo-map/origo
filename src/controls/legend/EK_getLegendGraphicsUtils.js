@@ -148,7 +148,7 @@ export const getIfThemeLayer = function getIfThemeLayer(viewer, layers) {	/*
 
 export const checkIfThemeFromLegend = function checkIfThemeFromLegend (layer, info) {
 	if (!layer.get("sublayers")) { 
-		if (info.Legend[0].layerName === layer.get("name") && info.Legend[0].rules.length > 1) {
+		if ((info.Legend[0].layerName === layer.get("name") && info.Legend[0].rules.length > 1) || (info.Legend.length > 1)) {
 			return true
 		}
 	}
