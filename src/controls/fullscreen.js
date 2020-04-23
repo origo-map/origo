@@ -1,5 +1,5 @@
 import { Component, Button, dom } from '../ui';
-import permalink from '../permalink/permalink';
+//import permalink from '../permalink/permalink';
 import isEmbedded from '../utils/isembedded';
 
 const Fullscreen = function Fullscreen(options = {}) {
@@ -11,7 +11,7 @@ const Fullscreen = function Fullscreen(options = {}) {
   let fullscreenButton;
 
   const goFullScreen = function goFullScreen() {
-    const url = permalink.getPermalink(viewer);
+    const url = window.location.href;
     window.open(url);
   };
 
