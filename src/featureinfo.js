@@ -77,7 +77,6 @@ const Featureinfo = function Featureinfo(options = {}) {
       const currentItem = items[currentItemIndex];
       const clone = currentItem.feature.clone();
       clone.setId(currentItem.feature.getId());
-      clone.layerName = currentItem.name;
 
       selectionLayer.clearAndAdd(
         clone,

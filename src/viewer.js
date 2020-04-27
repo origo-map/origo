@@ -411,22 +411,17 @@ const Viewer = function Viewer(targetOption, options = {}) {
         const featureId = urlParams.feature;
         const layerName = featureId.split('.')[0];
         const layer = getLayer(layerName);
+        const vectorSource = layer.getSource();
+        const clusterSource = layer.getSource().source;
+
         if (layer) {
           layer.once('postrender', () => {
-            let feature;
             const type = layer.get('type');
-            feature = layer.getSource().getFeatureById(featureId);
-            if (type === 'WFS') {
+            let feature;
+            if (vectorSource.constructor.name === 'Cluster') {
+              feature = clusterSource.getFeatureById(featureId);
+            } else if (vectorSource.constructor.name === 'VectorSource' && type !== 'TOPOJSON') {
               feature = layer.getSource().getFeatureById(featureId);
-            } else {
-              const id = featureId.split('.')[1];
-              let origin = layer.getSource();
-              feature = origin.getFeatureById(id);
-              // feature has no id it is not found it maybe a cluster, therefore try again.
-              if (feature === null && type !== 'TOPOJSON') {
-                origin = origin.getSource();
-                feature = origin.getFeatureById(id);
-              }
             }
             if (feature) {
               const obj = {};
