@@ -13,19 +13,23 @@
       }
     },
     {
-      "name": "sharemap"
+      "name": "sharemap",
+      "options" : {
+        "serviceEndpoint": "http://localhost:3001/mapstate",
+        "storeMethod": "saveStateToServer"
+      }
     },
     {
       "name": "geoposition"
-    },
-    {
-      "name": "print"
     },
     {
       "name": "printmenu"
     },
     {
       "name": "scale"
+    },
+    {
+      "name": "draw"
     },
     {
       "name": "about",
@@ -89,10 +93,10 @@
     20048966.10
   ],
   "center": [
-    1770000,
-    8770000
+    1830000,
+    8255000
   ],
-  "zoom": 7,
+  "zoom": 12,
   "resolutions": [
     156543.03,
     78271.52,
@@ -117,6 +121,15 @@
   "source": {
     "local": {
       "url": "http://localhost/geoserver/wms"
+    },
+    "wms_ksdutv": {
+      "url": "http://ksdgisutv.northeurope.cloudapp.azure.com:8080/geoserver/origo/wms"
+    },
+    "bakgrund": {
+      "url": "/geoserver/wms"
+    },
+    "bakgrund_lmproxy": {
+      "url": "https://cors-anywhere.herokuapp.com/http://ksdgisutv.northeurope.cloudapp.azure.com/lmproxy/wms/topowebb?request=getCapabilities"
     }
   },
   "groups": [
@@ -127,6 +140,47 @@
     }
   ],
   "layers": [
+    {
+      "name": "origo:sokvyx_djupdata_djuppunkter",
+      "title": "Djuppunkter",
+      "queryable": true,
+      "type": "WMS",
+      "group": "root",
+      "visible": true,
+      "source": "wms_ksdutv",
+      "infoFormat": "text/html"
+  },
+  {
+    "name": "origo:sokvyx_krisberedskap_lokal_ytavr_flodes",
+    "title": "Flödesriktning",
+    "queryable": true,
+    "type": "WMS",
+    "group": "root",
+    "visible": false,
+    "source": "wms_ksdutv",
+    "infoFormat": "text/html"
+},
+{
+  "name": "origo:sokvyx_krisberedskap_lokal_ytavr_lagp",
+  "title": "Lågpunkter",
+  "queryable": true,
+  "type": "WMS",
+  "group": "root",
+  "visible": true,
+  "source": "wms_ksdutv",
+  "infoFormat": "text/html",
+  "_theme": true,
+  "_sublayers": [
+    {
+        "title": "Lågpunkt, Djup 0.1-1.0 m",
+        "rule": "lagpunkt_djup_01_10"
+    },
+    {
+        "title": "Lågpunkt, Djup - >1.0 m",
+        "rule": "lagpunkt_djup_1"
+    }
+]
+},
     {
       "name": "origo-cities",
       "title": "Origokommuner",
@@ -139,7 +193,7 @@
             "name": "name"
           }
       ],
-      "visible": true
+      "visible": false
     },
     {
       "name": "origo-mask",
@@ -150,7 +204,7 @@
       "source": "data/origo-mask-3857.geojson",
       "style": "mask",
       "type": "GEOJSON",
-      "visible": true
+      "visible": false
     },
     {
       "name": "osm",
@@ -159,8 +213,20 @@
       "queryable": false,
       "style": "karta_osm",
       "type": "OSM",
+      "visible": false
+    },
+    {
+      "attribution": "&copy Eskilstuna kommun, &copy Lantmäteriet MS2006/1416",
+      "format": "image/png",
+      "group": "background",
+      "name": "origo:topowebbkartan",
+      "source": "wms_ksdutv",
+      "queryable": false,
+      "title": "Bakgrundskarta",
+      "type": "WMS",
+      "style": "karta_gra",
       "visible": true
-    }
+  }
   ],
   "styles": {
       "mask": [

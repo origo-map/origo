@@ -120,6 +120,7 @@ const OverlayLayer = function OverlayLayer(options) {
 
   const onRemove = function onRemove() {
     const el = document.getElementById(this.getId());
+    el.parentNode.removeChild(el.previousSibling);
     el.remove();
   };
 
@@ -134,8 +135,14 @@ const OverlayLayer = function OverlayLayer(options) {
       const parentEl = document.getElementById(evt.target.getId());
       const htmlString = this.render();
       const el = dom.html(htmlString);
+      const htmlDraggable = this.renderDraggable();
+      const elDraggable = dom.html(htmlDraggable);
+      const htmlDropzone = this.renderDropzone();
+      const eldrop = dom.html(htmlDropzone);
+
       if (position === 'top') {
-        parentEl.insertBefore(el, parentEl.firstChild);
+        parentEl.insertBefore(elDraggable, parentEl.firstChild);
+        parentEl.insertBefore(eldrop, parentEl.firstChild);
       } else {
         parentEl.appendChild(el);
       }
@@ -152,6 +159,12 @@ const OverlayLayer = function OverlayLayer(options) {
     },
     render() {
       return `<li title="${title}" id="${this.getId()}" class="${cls}">${ButtonsHtml}</li>`;
+    },
+    renderDraggable() {
+      return `<li draggable=true ondragstart="event.dataTransfer.setData('text/plain',null)" title="${title}" id="${this.getId()}" class="${cls}">${ButtonsHtml}</li>`;
+    },
+    renderDropzone() {
+      return `<li title="drop" id="dropSlot" class="dropzone"></li>`;
     }
   });
 };
