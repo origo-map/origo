@@ -9,6 +9,7 @@ import supports from './src/utils/supports';
 import renderError from './src/utils/rendererror';
 import Style from './src/style';
 import featurelayer from './src/featurelayer';
+import 'drag-drop-touch';
 
 const Origo = function Origo(configPath, options = {}) {
   const origoConfig = {

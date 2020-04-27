@@ -165,11 +165,15 @@ const Search = function Search(options = {}) {
     });
     url = url.replace('wms', 'wfs');
     url += '?';
-    const QueryString = ['service=WFS',
+
+
+    const QueryString = encodeURI(['service=WFS',
             '&version=1.1.0',
             `&request=GetFeature&typeNames=${layer.get('name')}`,
             '&outputFormat=json',
-            `&filter=<ogc:Filter%20xmlns:ogc="http://www.opengis.net/ogc"><ogc:PropertyIsEqualTo><ogc:PropertyName>sokid</ogc:PropertyName><ogc:Literal>${id}</ogc:Literal></ogc:PropertyIsEqualTo></ogc:Filter>`].join('');
+            `&filter=<ogc:Filter xmlns:ogc="http://www.opengis.net/ogc"><ogc:PropertyIsEqualTo><ogc:PropertyName>sokid</ogc:PropertyName><ogc:Literal>${id}</ogc:Literal></ogc:PropertyIsEqualTo></ogc:Filter>`].join(''));
+   
+            
     fetch(url + QueryString)
       .then(resp => resp.json())
       .then(json => {
@@ -190,7 +194,7 @@ const Search = function Search(options = {}) {
             'buffer': 1
           });
 
-          FeatureInfoUrl += `&filter=<ogc:Filter%20xmlns:ogc="http://www.opengis.net/ogc"><ogc:PropertyIsEqualTo><ogc:PropertyName>sokid</ogc:PropertyName><ogc:Literal>${id}</ogc:Literal></ogc:PropertyIsEqualTo></ogc:Filter>`;
+          FeatureInfoUrl += encodeURI(`&filter=<ogc:Filter xmlns:ogc="http://www.opengis.net/ogc"><ogc:PropertyIsEqualTo><ogc:PropertyName>sokid</ogc:PropertyName><ogc:Literal>${id}</ogc:Literal></ogc:PropertyIsEqualTo></ogc:Filter>`);
 
           fetch(FeatureInfoUrl)
             .then(res => res.text())

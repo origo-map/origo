@@ -38,6 +38,9 @@ export default {
     });
     return layerObjects;
   },
+  addedLayers(layersStr) {
+    return layersStr;
+  },
   zoom(zoomStr) {
     return parseInt(zoomStr, 10);
   },

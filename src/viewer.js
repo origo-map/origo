@@ -13,6 +13,7 @@ import Footer from './components/footer';
 import flattenGroups from './utils/flattengroups';
 import getattributes from './getattributes';
 import getcenter from './geometry/getcenter';
+import {getIfThemeLayer} from './controls/legend/EK_getLegendGraphicsUtils';
 
 const Viewer = function Viewer(targetOption, options = {}) {
   let map;
@@ -274,17 +275,47 @@ const Viewer = function Viewer(targetOption, options = {}) {
     return false;
   };
 
-  const addLayer = function addLayer(layerProps) {
+  const addInitialLayer = function addInitialLayer(layerProps) {
     const layer = Layer(layerProps, this);
+    
     map.addLayer(layer);
     this.dispatch('addlayer', {
       layerName: layerProps.name
     });
   };
 
+  const addLayer = function addLayer(layerProps) {
+    const layer = Layer(layerProps, this);
+    
+    
+    var that = this;
+
+
+    // Testa härifrån TODO
+    Promise.all(getIfThemeLayer(that, [layer])).then(function (themeInfos) {
+
+      themeInfos.forEach((info) => {
+          if (info.layerName === layer.get('name')) {
+              layer.set('theme', info.isThemeLayer)
+          }
+      })
+      
+      map.addLayer(layer);
+      that.dispatch('addlayer', {
+        layerName: layerProps.name
+      });
+    }, function (err) {
+      console.warn("warn: ", err)
+      map.addLayer(layer);
+      that.dispatch('addlayer', {
+        layerName: layerProps.name
+      });
+    });
+  };
+
   const addLayers = function addLayers(layersProps) {
     layersProps.reverse().forEach((layerProps) => {
-      this.addLayer(layerProps);
+      this.addInitialLayer(layerProps);
     });
   };
 
@@ -377,7 +408,13 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
       const layerProps = mergeSavedLayerProps(layerOptions, urlParams.layers);
       this.addLayers(layerProps);
-
+      if(urlParams.addedLayers){
+        urlParams.addedLayers.reverse().forEach((layerProps) => {
+        this.addSource(layerProps.source, {url: layerProps.source});
+        this.addInitialLayer(layerProps);
+        });
+      }
+  
       mapSize = MapSize(map, {
         breakPoints,
         breakPointsPrefix,
@@ -452,6 +489,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     addGroups,
     addLayer,
     addLayers,
+    addInitialLayer,
     addSource,
     addStyle,
     getBaseUrl,
