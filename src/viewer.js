@@ -411,16 +411,14 @@ const Viewer = function Viewer(targetOption, options = {}) {
         const featureId = urlParams.feature;
         const layerName = featureId.split('.')[0];
         const layer = getLayer(layerName);
-        const vectorSource = layer.getSource();
         const clusterSource = layer.getSource().source;
 
         if (layer) {
           layer.once('postrender', () => {
-            const type = layer.get('type');
             let feature;
-            if (vectorSource.constructor.name === 'Cluster') {
+            if (clusterSource) {
               feature = clusterSource.getFeatureById(featureId);
-            } else if (vectorSource.constructor.name === 'VectorSource' && type !== 'TOPOJSON') {
+            } else {
               feature = layer.getSource().getFeatureById(featureId);
             }
             if (feature) {
