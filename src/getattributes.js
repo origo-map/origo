@@ -13,31 +13,29 @@ const getContent = {
   name(feature, attribute, attributes, map) {
     let val = '';
     let title = '';
-    if (feature.get(attribute.name)) {
-      const featureValue = feature.get(attribute.name) === 0 ? feature.get(attribute.name).toString() : feature.get(attribute.name);
-      if (featureValue) {
-        val = feature.get(attribute.name);
-        if (attribute.title) {
-          title = `<b>${attribute.title}</b>`;
+    const featureValue = feature.get(attribute.name) === 0 ? feature.get(attribute.name).toString() : feature.get(attribute.name);
+    if (featureValue) {
+      val = featureValue;
+      if (attribute.title) {
+        title = `<b>${attribute.title}</b>`;
+      }
+      if (attribute.url) {
+        let url;
+        if (feature.get(attribute.url)) {
+          url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.url), feature.getProperties(), null, map));
+        } else if (isUrl(attribute.url)) {
+          url = attribute.url;
+        } else return false;
+        let aTarget = '_blank';
+        let aCls = 'o-identify-link';
+        if (attribute.target === 'modal') {
+          aTarget = 'modal';
+          aCls = 'o-identify-link-modal';
+        } else if (attribute.target === 'modal-full') {
+          aTarget = 'modal-full';
+          aCls = 'o-identify-link-modal';
         }
-        if (attribute.url) {
-          let url;
-          if (feature.get(attribute.url)) {
-            url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.url), feature.getProperties(), null, map));
-          } else if (isUrl(attribute.url)) {
-            url = attribute.url;
-          } else return false;
-          let aTarget = '_blank';
-          let aCls = 'o-identify-link';
-          if (attribute.target === 'modal') {
-            aTarget = 'modal';
-            aCls = 'o-identify-link-modal';
-          } else if (attribute.target === 'modal-full') {
-            aTarget = 'modal-full';
-            aCls = 'o-identify-link-modal';
-          }
-          val = `<a class="${aCls}" target="${aTarget}" href="${url}">${feature.get(attribute.name)}</a>`;
-        }
+        val = `<a class="${aCls}" target="${aTarget}" href="${url}">${feature.get(attribute.name)}</a>`;
       }
     }
     const newElement = document.createElement('li');
