@@ -21,19 +21,25 @@ const PrintComponent = function PrintComponent(options = {}) {
 
   let {
     size = 'a4',
-    orientation = 'portrait'
+    orientation = 'portrait',
+    showCreated
   } = options;
 
   let pageElement;
   let pageContainerElement;
+  let printCreatedElement;
   let targetElement;
   const pageContainerId = cuid();
   const pageId = cuid();
+  const pageCreatedId = cuid();
   let title = '';
   let description = '';
   let viewerMapTarget;
   const printMarginClass = 'print-margin';
+  const printCreatedHiddenClass = 'print-created-hidden';
+  const printCreatedNoneClass = 'print-created-none';
   let usePrintMargins = true;
+  let today = new Date(Date.now());
 
   const sizes = {
     a3: [420, 297],
@@ -58,13 +64,18 @@ const PrintComponent = function PrintComponent(options = {}) {
     update() { dom.replace(document.getElementById(this.getId()), this.render()); },
     render() { return `<div id="${this.getId()}" class="o-print-description padding-y text-grey-dark empty">${description}</div>`; }
   });
+  const createdComponent = Component({
+    update() { dom.replace(document.getElementById(this.getId()), this.render()); },
+    render() { return `<div id="${pageCreatedId}" class="o-print-created padding-right text-grey-dark text-align-right text-smaller empty">Created ${today.toLocaleDateString()} ${today.toLocaleTimeString()}</div>`; }
+  });
   const printMapComponent = PrintMap({ baseUrl: viewer.getBaseUrl(), logo, map });
 
   const printSettings = PrintSettings({
     orientation,
     customSize: sizes.custom,
     initialSize: size,
-    sizes: Object.keys(sizes)
+    sizes: Object.keys(sizes),
+    showCreated
   });
   const printToolbar = PrintToolbar();
   const closeButton = Button({
@@ -88,6 +99,7 @@ const PrintComponent = function PrintComponent(options = {}) {
       printSettings.on('change:size', this.changeSize.bind(this));
       printSettings.on('change:size-custom', this.changeCustomSize.bind(this));
       printSettings.on('change:title', this.changeTitle.bind(this));
+      printSettings.on('change:created', this.toggleCreated.bind(this));
       closeButton.on('click', this.close.bind(this));
     },
     changeDescription(evt) {
@@ -118,6 +130,25 @@ const PrintComponent = function PrintComponent(options = {}) {
     toggleMargin() {
       pageElement.classList.toggle(printMarginClass);
       usePrintMargins = !usePrintMargins;
+      if (!usePrintMargins && !showCreated) {
+        printCreatedElement.classList.add(printCreatedNoneClass);
+      } else {
+        printCreatedElement.classList.remove(printCreatedNoneClass);
+      }
+      this.updatePageSize();
+    },
+    toggleCreated() {
+      showCreated = !showCreated;
+      if (!usePrintMargins && !showCreated) {
+        printCreatedElement.classList.add(printCreatedNoneClass);
+      } else {
+        printCreatedElement.classList.remove(printCreatedNoneClass);
+      }
+      if (!showCreated) {
+        printCreatedElement.classList.add(printCreatedHiddenClass);
+      } else {
+        printCreatedElement.classList.remove(printCreatedHiddenClass);
+      }
       this.updatePageSize();
     },
     close() {
@@ -160,13 +191,21 @@ const PrintComponent = function PrintComponent(options = {}) {
       });
     },
     async onRender() {
+      today = new Date(Date.now());
       viewerMapTarget = map.getTarget();
       pageContainerElement = document.getElementById(pageContainerId);
+      printCreatedElement = document.getElementById(pageCreatedId);
       pageElement = document.getElementById(pageId);
       map.setTarget(printMapComponent.getId());
       this.updatePageSize();
       this.removeViewerControls();
       printMapComponent.addPrintControls();
+      if (!showCreated) {
+        printCreatedElement.classList.add(printCreatedHiddenClass);
+      }
+      if (!usePrintMargins) {
+        printCreatedElement.classList.add(printCreatedNoneClass);
+      }
 
       await loadJsPDF();
     },
@@ -196,15 +235,15 @@ const PrintComponent = function PrintComponent(options = {}) {
         <div
           id="${pageContainerId}"
           class="flex column no-shrink margin-top-large margin-x-auto box-shadow bg-white border-box"
-          style="margin-bottom: 4rem;"
-        >
+          style="margin-bottom: 4rem;">
           <div
             id="${pageId}"
             class="o-print-page flex column no-shrink no-margin width-full height-full bg-white ${this.printMargin()}"
-            style="margin-bottom: 4rem;"
-          >
+            style="margin-bottom: 4rem;">
             <div class="flex column no-margin width-full height-full overflow-hidden">
-              ${pageTemplate({ descriptionComponent, printMapComponent, titleComponent })}
+  ${pageTemplate({
+    descriptionComponent, printMapComponent, titleComponent, createdComponent
+  })}
             </div>
           </div>
         </div>
