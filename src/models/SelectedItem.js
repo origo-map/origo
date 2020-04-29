@@ -1,57 +1,56 @@
-import { getUid } from "ol";
+import { getUid } from 'ol';
 import getAttributes from '../getattributes';
 
 export default class SelectedItem {
-    constructor(feature, layer, map, selectionGroup, selectionGroupTitle) {
-
-        this.feature = feature;
-        this.layer = layer;
-        if (layer && map) {
-            this.content = getAttributes(feature, layer, map);
-        }
-
-        selectionGroup ? this.selectionGroup = selectionGroup : this.selectionGroup = layer.get('name');
-        selectionGroupTitle ? this.selectionGroupTitle = selectionGroupTitle : this.selectionGroupTitle = layer.get('title');
+  constructor(feature, layer, map, selectionGroup, selectionGroupTitle) {
+    this.feature = feature;
+    this.layer = layer;
+    if (layer && map) {
+      this.content = getAttributes(feature, layer, map);
     }
 
-    getId() {
-        let id = this.feature.getId() ? this.feature.getId().toString() : undefined;
-        if (!id) {
-            id = getUid(this.feature);
-        }
-        return id;
-    }
+    this.selectionGroup = selectionGroup || layer.get('name');
+    this.selectionGroupTitle = selectionGroupTitle || layer.get('title');
+  }
 
-    getFeature() {
-        return this.feature;
+  getId() {
+    let id = this.feature.getId() ? this.feature.getId().toString() : undefined;
+    if (!id) {
+      id = getUid(this.feature);
     }
+    return id;
+  }
 
-    getLayer() {
-        return this.layer;
-    }
+  getFeature() {
+    return this.feature;
+  }
 
-    getContent() {
-        return this.content;
-    }
+  getLayer() {
+    return this.layer;
+  }
 
-    setFeature(feature) {
-        this.feature = feature;
-    }
+  getContent() {
+    return this.content;
+  }
 
-    setLayer(layer) {
-        this.layer = layer;
-    }
+  setFeature(feature) {
+    this.feature = feature;
+  }
 
-    setContent(content) {
-        this.content = content;
-    }
+  setLayer(layer) {
+    this.layer = layer;
+  }
 
-    getSelectionGroup() {
-        return this.selectionGroup;
-    }
+  setContent(content) {
+    this.content = content;
+  }
 
-    // TODO: Maybe it is better to handle SelectionGroupTitle in selection manager instead.
-    getSelectionGroupTitle() {
-        return this.selectionGroupTitle;
-    }
+  getSelectionGroup() {
+    return this.selectionGroup;
+  }
+
+  // TODO: Maybe it is better to handle SelectionGroupTitle in selection manager instead.
+  getSelectionGroupTitle() {
+    return this.selectionGroupTitle;
+  }
 }
