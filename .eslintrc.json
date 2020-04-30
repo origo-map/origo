@@ -17,7 +17,6 @@
     "prefer-object-spread": "off",
     "object-curly-newline": "off",
     "arrow-parens": "off",
-    "eqeqeq": "off",
     "no-else-return": [
       "error",
       {

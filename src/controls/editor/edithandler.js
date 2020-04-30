@@ -402,7 +402,7 @@ function onAttributesSave(feature, attrs) {
       switch (attribute.type) {
         case 'text':
           valid.text = validate.text(inputValue) || inputValue === '' ? inputValue : false;
-          if (!valid.text && inputValue != '') {
+          if (!valid.text && inputValue !== '') {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }
@@ -412,7 +412,7 @@ function onAttributesSave(feature, attrs) {
           break;
         case 'textarea':
           valid.textarea = validate.textarea(inputValue) || inputValue === '' ? inputValue : false;
-          if (!valid.textarea && inputValue != '') {
+          if (!valid.textarea && inputValue !== '') {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }
@@ -422,7 +422,7 @@ function onAttributesSave(feature, attrs) {
           break;
         case 'integer':
           valid.integer = validate.integer(inputValue) || inputValue === '' ? inputValue : false;
-          if (!valid.integer && inputValue != '') {
+          if (!valid.integer && inputValue !== '') {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }
@@ -432,7 +432,7 @@ function onAttributesSave(feature, attrs) {
           break;
         case 'decimal':
           valid.decimal = validate.decimal(inputValue) || inputValue === '' ? inputValue : false;
-          if (!valid.decimal && inputValue != '') {
+          if (!valid.decimal && inputValue !== '') {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }
@@ -442,7 +442,7 @@ function onAttributesSave(feature, attrs) {
           break;
         case 'email':
           valid.email = validate.email(inputValue) || inputValue === '' ? inputValue : false;
-          if (!valid.email && inputValue != '') {
+          if (!valid.email && inputValue !== '') {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }
@@ -452,7 +452,7 @@ function onAttributesSave(feature, attrs) {
           break;
         case 'url':
           valid.url = validate.url(inputValue) || inputValue === '' ? inputValue : false;
-          if (!valid.url && inputValue != '') {
+          if (!valid.url && inputValue !== '') {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }
@@ -472,7 +472,7 @@ function onAttributesSave(feature, attrs) {
           break;
         case 'date':
           valid.date = validate.date(inputValue) && inputValue.length === 10 ? inputValue : false;
-          if (!valid.date && inputValue != '') {
+          if (!valid.date && inputValue !== '') {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }
@@ -492,7 +492,7 @@ function onAttributesSave(feature, attrs) {
           break;
         case 'image':
           valid.image = validate.image(inputValue) || inputValue === '' ? inputValue : false;
-          if (!valid.image && inputValue != '') {
+          if (!valid.image && inputValue !== '') {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }
@@ -502,7 +502,7 @@ function onAttributesSave(feature, attrs) {
           break;
         case 'color':
           valid.color = validate.color(inputValue) || inputValue === '' ? inputValue : false;
-          if (!valid.color && inputValue != '') {
+          if (!valid.color && inputValue !== '') {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }

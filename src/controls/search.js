@@ -253,7 +253,7 @@ const Search = function Search(options = {}) {
       }
       if (typeTitle) {
         group[typeTitle].push(item);
-      } else if (id == 0) {
+      } else if (id === 0) {
         console.error('Search options are missing');
       }
     });
