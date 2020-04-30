@@ -5,6 +5,12 @@ const Exportmap = function Exportmap(options = {}) {
     buttonText = 'Ladda ner kartan',
     attributionFontSize = options.attributionFontSize = '10',
     attributionFontColor = options.attributionFontColor = 'rgb(64, 64, 64)',
+	logoWidth = options.logoWidth = '150',
+    logoHeight = options.logoHeight = '50',
+    arrowWidth = options.arrowWidth = '100',
+    arrowHeight = options.arrowHeight = '150',
+    logoSrc = options.logoSrc = '..\\img\\png\\sigtuna_logo.png',
+    arrowSrc = options.arrowSrc = '..\\img\\png\\north_arrow.png',
     icon = '#fa-download'
   } = options;
 
@@ -77,6 +83,13 @@ const Exportmap = function Exportmap(options = {}) {
       width: widthNumber
     };
   }
+  
+  function rotateAndPaintImage(canvas, context, image) {
+    context.translate(canvas.width - 150, 20);
+    context.translate(arrowWidth / 2, arrowHeight / 2);
+    context.rotate(map.getView().getRotation());
+    context.drawImage(image, -arrowWidth / 2, -arrowHeight / 2, arrowWidth, arrowHeight);
+  }
 
   function download(format) {
     const attr = getAttributions();
@@ -105,20 +118,35 @@ const Exportmap = function Exportmap(options = {}) {
       ctx.fillText(scaleInfo.innerHTML, canvas.width - 5 - (scaleInfo.width / 2) - (textSize.width / 2), canvas.height - 10);
       ctx.stroke();
 
-      const fileName = format === 'image/png' ? 'map.png' : 'map.jpeg';
-
-      canvas.toBlob((blob) => {
-        if (navigator.msSaveBlob) {
-          navigator.msSaveBlob(blob, fileName);
-        } else {
-          const link = document.createElement('a');
-          const objectURL = URL.createObjectURL(blob);
-          link.setAttribute('download', fileName);
-          link.setAttribute('href', objectURL);
-          link.click();
-          URL.revokeObjectURL(objectURL);
-        }
-      }, format);
+      const logo = new Image();
+      logo.onload = function () {
+        ctx.drawImage(logo, 20, 20, logoWidth, logoHeight);
+        const northArrow = new Image();
+        northArrow.onload = function () {
+          if (map.getView().getRotation() === 0) {
+            ctx.drawImage(northArrow, canvas.width - 150, 20, arrowWidth, arrowHeight);
+          } else {
+            rotateAndPaintImage(canvas, ctx, northArrow);
+          }
+          const fileName = format === 'image/png' ? 'map.png' : 'map.jpeg';
+          canvas.toBlob((blob) => {
+            if (navigator.msSaveBlob) {
+              navigator.msSaveBlob(blob, fileName);
+            } else {
+              const link = document.createElement('a');
+              const objectURL = URL.createObjectURL(blob);
+              link.setAttribute('download', fileName);
+              link.setAttribute('href', objectURL);
+              document.getElementsByTagName('div')[0].appendChild(link);
+              link.click();
+              document.getElementsByTagName('div')[0].removeChild(link);
+              URL.revokeObjectURL(objectURL);
+            }
+          }, format);
+        };
+        northArrow.src = arrowSrc;
+      };
+      logo.src = logoSrc;
     });
     map.renderSync();
   }
