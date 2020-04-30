@@ -35,7 +35,7 @@
     "cuid": "^2.1.4",
     "downloadjs": "^1.4.7",
     "html2canvas": "^1.0.0-rc.5",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "ol": "^6.3.0",
     "owl.carousel": "^2.3.4",
     "proj4": "^2.6.1",
