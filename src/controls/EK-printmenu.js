@@ -10,7 +10,8 @@ import { getCenter } from 'ol/extent';
 const Printmenu = function Printmenu(options = {}) {
     let viewer;
     let {
-        target
+        target,
+        largeScaleRestriction
     } = options;
 
 
@@ -89,6 +90,9 @@ const Printmenu = function Printmenu(options = {}) {
 
         function scaleOptions(scales) {
             let options = '';
+            if (Number.isInteger(largeScaleRestriction)) {
+                scales = scales.filter(function(element, index, arr){return parseInt(element.value) >= largeScaleRestriction});
+            }
             scales.forEach((scale) => {
                 options += `<option value=${scale.value}>${scale.name}</option>`;
             });
