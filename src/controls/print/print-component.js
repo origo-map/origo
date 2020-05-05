@@ -197,16 +197,16 @@ const PrintComponent = function PrintComponent(options = {}) {
       printCreatedElement = document.getElementById(pageCreatedId);
       pageElement = document.getElementById(pageId);
       map.setTarget(printMapComponent.getId());
-      this.updatePageSize();
       this.removeViewerControls();
       printMapComponent.addPrintControls();
       if (!showCreated) {
         printCreatedElement.classList.add(printCreatedHiddenClass);
       }
-      if (!usePrintMargins) {
+      if (!usePrintMargins & !showCreated) {
         printCreatedElement.classList.add(printCreatedNoneClass);
       }
 
+      this.updatePageSize();
       await loadJsPDF();
     },
     updateMapSize() {
