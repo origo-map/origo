@@ -121,6 +121,14 @@ const Featureinfo = function Featureinfo(options = {}) {
       } else if (identifyTarget === 'sidebar') {
         sidebar.setTitle(title);
       }
+
+      const toggleFeatureinfo = new CustomEvent('toggleFeatureinfo', {
+        detail: {
+          type: 'toggleFeatureinfo',
+          currentItem
+        }
+      });
+      document.dispatchEvent(toggleFeatureinfo);
     }
   };
 
