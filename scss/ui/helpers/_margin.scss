@@ -20,10 +20,26 @@
 }
 .margin-y {
   margin-bottom: $margin-standard;
-  margin-top: $margin-standard;  
+  margin-top: $margin-standard;
 }
 .margin-x-auto {
   margin-left: auto;
+  margin-right: auto;
+}
+.margin-y-auto {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+.margin-top-auto {
+  margin-top: auto;
+}
+.margin-bottom-auto {
+  margin-bottom: auto;
+}
+.margin-left-auto {
+  margin-left: auto;
+}
+.margin-right-auto {
   margin-right: auto;
 }
 
@@ -49,7 +65,7 @@
 }
 .margin-y-large {
   margin-bottom: $margin-large;
-  margin-top: $margin-large;  
+  margin-top: $margin-large;
 }
 
 // small margin
@@ -74,7 +90,7 @@
 }
 .margin-y-small {
   margin-bottom: $margin-small;
-  margin-top: $margin-small;  
+  margin-top: $margin-small;
 }
 
 // smaller margin
@@ -99,7 +115,7 @@
 }
 .margin-y-smaller {
   margin-bottom: $margin-smaller;
-  margin-top: $margin-smaller;  
+  margin-top: $margin-smaller;
 }
 
 // smallest margin
@@ -124,5 +140,5 @@
 }
 .margin-y-smallest {
   margin-bottom: $margin-smallest;
-  margin-top: $margin-smallest;  
+  margin-top: $margin-smallest;
 }

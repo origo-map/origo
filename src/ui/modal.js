@@ -56,7 +56,7 @@ export default function Modal(options = {}) {
       }
 
       closeButton = Button({
-        cls: 'small round margin-top-small margin-right icon-smaller grey-lightest no-shrink',
+        cls: 'small round margin-top-smaller margin-bottom-auto margin-right icon-smaller grey-lightest no-shrink',
         icon: closeIcon,
         validStates: ['initial', 'hidden'],
         click() {
