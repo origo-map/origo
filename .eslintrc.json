@@ -13,7 +13,6 @@
     "prefer-destructuring": "off",
     "max-len": "off",
     "no-alert": "off",
-    "no-use-before-define": "off",
     "prefer-object-spread": "off",
     "object-curly-newline": "off",
     "arrow-parens": "off",

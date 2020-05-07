@@ -19,9 +19,8 @@ function readResponse(data) {
 function writeWfsTransaction(transObj, options) {
   if (transObj.insert) {
     transObj.insert.forEach((feature) => {
-      const feat = feature;
-      // eslint-disable-next-line no-underscore-dangle
-      Object.keys(feat.values_).forEach(key => (feat.values_[key] === '') && delete feat.values_[key]);
+      const feat = feature.getProperties();
+      Object.keys(feat).forEach(key => (feat[key] === '') && delete feat[key]);
     });
   }
   const node = format.writeTransaction(transObj.insert, transObj.update, transObj.delete, options);
