@@ -27,7 +27,6 @@ const PrintComponent = function PrintComponent(options = {}) {
 
   let pageElement;
   let pageContainerElement;
-  let printCreatedElement;
   let targetElement;
   const pageContainerId = cuid();
   const pageId = cuid();
@@ -36,8 +35,6 @@ const PrintComponent = function PrintComponent(options = {}) {
   let description = '';
   let viewerMapTarget;
   const printMarginClass = 'print-margin';
-  const printCreatedHiddenClass = 'print-created-hidden';
-  const printCreatedNoneClass = 'print-created-none';
   let usePrintMargins = true;
   let today = new Date(Date.now());
 
@@ -65,8 +62,21 @@ const PrintComponent = function PrintComponent(options = {}) {
     render() { return `<div id="${this.getId()}" class="o-print-description padding-y text-grey-dark empty">${description}</div>`; }
   });
   const createdComponent = Component({
-    update() { dom.replace(document.getElementById(this.getId()), this.render()); },
-    render() { return `<div id="${pageCreatedId}" class="o-print-created padding-right text-grey-dark text-align-right text-smaller empty">Created ${today.toLocaleDateString()} ${today.toLocaleTimeString()}</div>`; }
+    update() { dom.replace(document.getElementById(pageCreatedId), this.render()); },
+    printCreation() {
+      let createdClasses = '';
+      switch (true) {
+        case usePrintMargins && !showCreated:
+          createdClasses = 'print-created-hidden';
+          break;
+        case !usePrintMargins && !showCreated:
+          createdClasses = 'print-created-none print-created-hidden';
+          break;
+        default:
+      }
+      return createdClasses;
+    },
+    render() { return `<div id="${pageCreatedId}" class="o-print-created padding-right text-grey-dark text-align-right text-smaller empty ${this.printCreation()}">Created ${today.toLocaleDateString()} ${today.toLocaleTimeString()}</div>`; }
   });
   const printMapComponent = PrintMap({ baseUrl: viewer.getBaseUrl(), logo, map });
 
@@ -130,25 +140,12 @@ const PrintComponent = function PrintComponent(options = {}) {
     toggleMargin() {
       pageElement.classList.toggle(printMarginClass);
       usePrintMargins = !usePrintMargins;
-      if (!usePrintMargins && !showCreated) {
-        printCreatedElement.classList.add(printCreatedNoneClass);
-      } else {
-        printCreatedElement.classList.remove(printCreatedNoneClass);
-      }
+      createdComponent.update();
       this.updatePageSize();
     },
     toggleCreated() {
       showCreated = !showCreated;
-      if (!usePrintMargins && !showCreated) {
-        printCreatedElement.classList.add(printCreatedNoneClass);
-      } else {
-        printCreatedElement.classList.remove(printCreatedNoneClass);
-      }
-      if (!showCreated) {
-        printCreatedElement.classList.add(printCreatedHiddenClass);
-      } else {
-        printCreatedElement.classList.remove(printCreatedHiddenClass);
-      }
+      createdComponent.update();
       this.updatePageSize();
     },
     close() {
@@ -194,17 +191,10 @@ const PrintComponent = function PrintComponent(options = {}) {
       today = new Date(Date.now());
       viewerMapTarget = map.getTarget();
       pageContainerElement = document.getElementById(pageContainerId);
-      printCreatedElement = document.getElementById(pageCreatedId);
       pageElement = document.getElementById(pageId);
       map.setTarget(printMapComponent.getId());
       this.removeViewerControls();
       printMapComponent.addPrintControls();
-      if (!showCreated) {
-        printCreatedElement.classList.add(printCreatedHiddenClass);
-      }
-      if (!usePrintMargins & !showCreated) {
-        printCreatedElement.classList.add(printCreatedNoneClass);
-      }
 
       this.updatePageSize();
       await loadJsPDF();
