@@ -156,6 +156,7 @@ function onDrawEnd(evt) {
   });
   dispatcher.emitChangeEdit('draw', false);
   if (autoForm) {
+    // eslint-disable-next-line no-use-before-define
     editAttributes(feature);
   }
 }

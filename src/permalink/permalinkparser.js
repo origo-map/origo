@@ -63,6 +63,7 @@ export default {
   controls(controlsStr) {
     const controls = {};
     Object.keys(controlsStr).forEach(key => {
+      // eslint-disable-next-line no-use-before-define
       controls[key] = parseFunctions[key](controlsStr[key]);
     });
     return controls;
