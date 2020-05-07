@@ -1,4 +1,5 @@
 import $ from 'jquery';
+// eslint-disable-next-line import/no-cycle
 import Featureinfo from './featureinfo';
 
 function render(target) {
