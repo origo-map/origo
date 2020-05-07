@@ -9,8 +9,8 @@ export default class SelectedItem {
       this.content = getAttributes(feature, layer, map);
     }
 
-    selectionGroup ? this.selectionGroup = selectionGroup : this.selectionGroup = layer.get('name');
-    selectionGroupTitle ? this.selectionGroupTitle = selectionGroupTitle : this.selectionGroupTitle = layer.get('title');
+    this.selectionGroup = selectionGroup || layer.get('name');
+    this.selectionGroupTitle = selectionGroupTitle || layer.get('title');
   }
 
   getId() {
