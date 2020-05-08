@@ -8,7 +8,6 @@ export default function pageTemplate({
   ${titleComponent.render()}
   ${printMapComponent.render()}
   ${descriptionComponent.render()}
-  ${descriptionComponent.render()}
   ${createdComponent.render()}
 `;
 }
