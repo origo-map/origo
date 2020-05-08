@@ -6,7 +6,8 @@ const Print = function Print(options = {}) {
     icon = '#ic_print_24px',
     logo = {},
     title = 'Skriv ut',
-    showCreated = false
+    showCreated = false,
+    createdPrefix = ''
   } = options;
 
   let viewer;
@@ -22,7 +23,8 @@ const Print = function Print(options = {}) {
         target: viewer.getId(),
         map: viewer.getMap(),
         viewer,
-        showCreated
+        showCreated,
+        createdPrefix
       });
       mapMenu = viewer.getControlByName('mapmenu');
       menuItem = mapMenu.MenuItem({

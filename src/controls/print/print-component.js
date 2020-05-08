@@ -16,7 +16,8 @@ const PrintComponent = function PrintComponent(options = {}) {
     name = 'origo-map',
     map,
     target,
-    viewer
+    viewer,
+    createdPrefix
   } = options;
 
   let {
@@ -30,7 +31,6 @@ const PrintComponent = function PrintComponent(options = {}) {
   let targetElement;
   const pageContainerId = cuid();
   const pageId = cuid();
-  const pageCreatedId = cuid();
   let title = '';
   let description = '';
   let viewerMapTarget;
@@ -53,6 +53,10 @@ const PrintComponent = function PrintComponent(options = {}) {
     }
   };
 
+  const created = function created() {
+    return showCreated ? `${createdPrefix}${today.toLocaleDateString()} ${today.toLocaleTimeString()}` : '';
+  };
+
   const titleComponent = Component({
     update() { dom.replace(document.getElementById(this.getId()), this.render()); },
     render() { return `<div id="${this.getId()}" class="o-print-header h4 text-align-center empty">${title}</div>`; }
@@ -62,21 +66,8 @@ const PrintComponent = function PrintComponent(options = {}) {
     render() { return `<div id="${this.getId()}" class="o-print-description padding-y text-grey-dark empty">${description}</div>`; }
   });
   const createdComponent = Component({
-    update() { dom.replace(document.getElementById(pageCreatedId), this.render()); },
-    printCreation() {
-      let createdClasses = '';
-      switch (true) {
-        case usePrintMargins && !showCreated:
-          createdClasses = 'print-created-hidden';
-          break;
-        case !usePrintMargins && !showCreated:
-          createdClasses = 'print-created-none print-created-hidden';
-          break;
-        default:
-      }
-      return createdClasses;
-    },
-    render() { return `<div id="${pageCreatedId}" class="o-print-created padding-right text-grey-dark text-align-right text-smaller empty ${this.printCreation()}">Created ${today.toLocaleDateString()} ${today.toLocaleTimeString()}</div>`; }
+    update() { dom.replace(document.getElementById(this.getId()), this.render()); },
+    render() { return `<div id="${this.getId()}" class="o-print-created padding-right text-grey-dark text-align-right text-smaller empty">${created()}</div>`; }
   });
   const printMapComponent = PrintMap({ baseUrl: viewer.getBaseUrl(), logo, map });
 
@@ -92,7 +83,6 @@ const PrintComponent = function PrintComponent(options = {}) {
     cls: 'fixed top-right medium round icon-smaller light box-shadow z-index-ontop-high',
     icon: '#ic_close_24px'
   });
-
 
   return Component({
     name: 'printComponent',
@@ -140,7 +130,6 @@ const PrintComponent = function PrintComponent(options = {}) {
     toggleMargin() {
       pageElement.classList.toggle(printMarginClass);
       usePrintMargins = !usePrintMargins;
-      createdComponent.update();
       this.updatePageSize();
     },
     toggleCreated() {
