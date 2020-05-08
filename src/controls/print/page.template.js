@@ -1,11 +1,13 @@
 export default function pageTemplate({
   descriptionComponent,
   printMapComponent,
-  titleComponent
+  titleComponent,
+  createdComponent
 }) {
   return `
   ${titleComponent.render()}
   ${printMapComponent.render()}
   ${descriptionComponent.render()}
+  ${createdComponent.render()}
 `;
 }

@@ -16,12 +16,14 @@ const PrintComponent = function PrintComponent(options = {}) {
     name = 'origo-map',
     map,
     target,
-    viewer
+    viewer,
+    createdPrefix
   } = options;
 
   let {
     size = 'a4',
-    orientation = 'portrait'
+    orientation = 'portrait',
+    showCreated
   } = options;
 
   let pageElement;
@@ -34,6 +36,7 @@ const PrintComponent = function PrintComponent(options = {}) {
   let viewerMapTarget;
   const printMarginClass = 'print-margin';
   let usePrintMargins = true;
+  let today = new Date(Date.now());
 
   const sizes = {
     a3: [420, 297],
@@ -50,6 +53,10 @@ const PrintComponent = function PrintComponent(options = {}) {
     }
   };
 
+  const created = function created() {
+    return showCreated ? `${createdPrefix}${today.toLocaleDateString()} ${today.toLocaleTimeString()}` : '';
+  };
+
   const titleComponent = Component({
     update() { dom.replace(document.getElementById(this.getId()), this.render()); },
     render() { return `<div id="${this.getId()}" class="o-print-header h4 text-align-center empty">${title}</div>`; }
@@ -58,20 +65,24 @@ const PrintComponent = function PrintComponent(options = {}) {
     update() { dom.replace(document.getElementById(this.getId()), this.render()); },
     render() { return `<div id="${this.getId()}" class="o-print-description padding-y text-grey-dark empty">${description}</div>`; }
   });
+  const createdComponent = Component({
+    update() { dom.replace(document.getElementById(this.getId()), this.render()); },
+    render() { return `<div id="${this.getId()}" class="o-print-created padding-right text-grey-dark text-align-right text-smaller empty">${created()}</div>`; }
+  });
   const printMapComponent = PrintMap({ baseUrl: viewer.getBaseUrl(), logo, map });
 
   const printSettings = PrintSettings({
     orientation,
     customSize: sizes.custom,
     initialSize: size,
-    sizes: Object.keys(sizes)
+    sizes: Object.keys(sizes),
+    showCreated
   });
   const printToolbar = PrintToolbar();
   const closeButton = Button({
     cls: 'fixed top-right medium round icon-smaller light box-shadow z-index-ontop-high',
     icon: '#ic_close_24px'
   });
-
 
   return Component({
     name: 'printComponent',
@@ -88,6 +99,7 @@ const PrintComponent = function PrintComponent(options = {}) {
       printSettings.on('change:size', this.changeSize.bind(this));
       printSettings.on('change:size-custom', this.changeCustomSize.bind(this));
       printSettings.on('change:title', this.changeTitle.bind(this));
+      printSettings.on('change:created', this.toggleCreated.bind(this));
       closeButton.on('click', this.close.bind(this));
     },
     changeDescription(evt) {
@@ -118,6 +130,11 @@ const PrintComponent = function PrintComponent(options = {}) {
     toggleMargin() {
       pageElement.classList.toggle(printMarginClass);
       usePrintMargins = !usePrintMargins;
+      this.updatePageSize();
+    },
+    toggleCreated() {
+      showCreated = !showCreated;
+      createdComponent.update();
       this.updatePageSize();
     },
     close() {
@@ -160,14 +177,15 @@ const PrintComponent = function PrintComponent(options = {}) {
       });
     },
     async onRender() {
+      today = new Date(Date.now());
       viewerMapTarget = map.getTarget();
       pageContainerElement = document.getElementById(pageContainerId);
       pageElement = document.getElementById(pageId);
       map.setTarget(printMapComponent.getId());
-      this.updatePageSize();
       this.removeViewerControls();
       printMapComponent.addPrintControls();
 
+      this.updatePageSize();
       await loadJsPDF();
     },
     updateMapSize() {
@@ -196,15 +214,15 @@ const PrintComponent = function PrintComponent(options = {}) {
         <div
           id="${pageContainerId}"
           class="flex column no-shrink margin-top-large margin-x-auto box-shadow bg-white border-box"
-          style="margin-bottom: 4rem;"
-        >
+          style="margin-bottom: 4rem;">
           <div
             id="${pageId}"
             class="o-print-page flex column no-shrink no-margin width-full height-full bg-white ${this.printMargin()}"
-            style="margin-bottom: 4rem;"
-          >
+            style="margin-bottom: 4rem;">
             <div class="flex column no-margin width-full height-full overflow-hidden">
-              ${pageTemplate({ descriptionComponent, printMapComponent, titleComponent })}
+  ${pageTemplate({
+    descriptionComponent, printMapComponent, titleComponent, createdComponent
+  })}
             </div>
           </div>
         </div>
