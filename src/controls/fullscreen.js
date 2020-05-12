@@ -13,8 +13,8 @@ const Fullscreen = function Fullscreen(options = {}) {
   const goFullScreen = function goFullScreen() {
     let url = '';
     if (window.location.href.indexOf('?mapStateId=') > 0) {
-      url =  window.location.href;      
-    } else {url = permalink.getPermalink(viewer); }
+      url = window.location.href;
+    } else { url = permalink.getPermalink(viewer); }
     window.open(url);
   };
 
