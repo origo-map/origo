@@ -5,7 +5,7 @@ function render(target) {
   const pop = `<div id="o-popup">
       <div class="o-popup o-card">
         <div class="flex row justify-end">
-          <div id="o-card-title" class="justify-start margin-top-small margin-left text-weight-bold" style="width:100%;"></div>
+          <div id="o-card-title" class="justify-start margin-y-smaller margin-left text-weight-bold" style="width:100%;"></div>
           <button id="o-close-button" class="small round margin-top-smaller margin-bottom-auto margin-right-small icon-smallest grey-lightest no-shrink">
             <span class="icon ">
               <svg>
