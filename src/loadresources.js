@@ -15,7 +15,7 @@ function getQueryVariable(variable, storeMethod) {
   }
 
   if (storeMethod === 'saveStateToServer') {
-    console.log('Query variable %s not found', variable);
+    console.warn('Query variable %s not found', variable);
   }
   return undefined;
 }

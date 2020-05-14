@@ -92,7 +92,6 @@ export const downloadPNG = async function downloadPNG({
   try {
     await downloadBlob({ blob, filename });
   } catch (err) {
-    // eslint-disable-next-line no-console
     console.error(err);
   }
 };

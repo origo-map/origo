@@ -40,6 +40,7 @@ const LoadScript = function LoadScript(options = {}) {
   return {
 
     load() {
+      // eslint-disable-next-line no-async-promise-executor
       return new Promise(async (resolve, reject) => {
         // check if script already loaded
         if (!isLoaded) {
@@ -47,7 +48,6 @@ const LoadScript = function LoadScript(options = {}) {
             await loadScript();
             resolve(window[global]);
           } catch (err) {
-            // eslint-disable-next-line no-console
             console.error(err);
             reject(err);
           }

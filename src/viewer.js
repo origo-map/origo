@@ -182,7 +182,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
   };
 
   const getGroupLayers = function getGroupLayers() {
-    const groupLayers = getLayers().filter(layer => layer.get('type') === "GROUP");
+    const groupLayers = getLayers().filter(layer => layer.get('type') === 'GROUP');
     return groupLayers;
   };
 

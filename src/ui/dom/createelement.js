@@ -27,6 +27,6 @@ const createElement = function createElement(type, content, options) {
     el.appendChild(content);
   }
   return el;
-}
+};
 
 export default createElement;

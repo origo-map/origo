@@ -12,10 +12,11 @@ const getSource = (style) => {
 const imageSource = (styleRules) => {
   if (styleRules.length === 1) {
     const styleRule = styleRules[0];
-    if (styleRule.length === 1 ) {
+    if (styleRule.length === 1) {
       return getSource(styleRule[0]);
     }
   }
+  return false;
 };
 
-export default imageSource; 
+export default imageSource;

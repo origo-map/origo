@@ -26,7 +26,7 @@ const downloadHandler = function downloadHandler() {
     if (isAlert) {
       alert(error);
     } else {
-      console.log(error);
+      console.error(error);
     }
 
     dispatcher.emitChangeOfflineEnd(layerName, action);

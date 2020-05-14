@@ -36,7 +36,9 @@ function showInfowindow() {
   mainContainer.classList.remove('hidden');
 }
 
-function makeElementDraggable(elmnt) {
+
+function makeElementDraggable(elm) {
+  const elmnt = elm;
   let pos1 = 0;
   let pos2 = 0;
   let pos3 = 0;
@@ -51,9 +53,7 @@ function makeElementDraggable(elmnt) {
     pos3 = e.clientX;
     pos4 = e.clientY;
     // set the element's new position:
-    // eslint-disable-next-line no-param-reassign
     elmnt.style.top = `${elmnt.offsetTop - pos2}px`;
-    // eslint-disable-next-line no-param-reassign
     elmnt.style.left = `${elmnt.offsetLeft - pos1}px`;
   }
 
@@ -79,7 +79,6 @@ function makeElementDraggable(elmnt) {
     document.getElementById(`${elmnt.id}-draggable`).onmousedown = dragMouseDown;
   } else {
     /* otherwise, move the DIV from anywhere inside the DIV: */
-    // eslint-disable-next-line no-param-reassign
     elmnt.onmousedown = dragMouseDown;
   }
 }
@@ -224,7 +223,6 @@ function createSubexportComponent(selectionGroup) {
   subexportContainer.classList.add('export-buttons-container');
 
   if (activeLayer.get('type') === 'GROUP') {
-    // eslint-disable-next-line no-console
     console.warn('The selected layer is a LayerGroup, be careful!');
   }
 
@@ -267,8 +265,7 @@ function createSubexportComponent(selectionGroup) {
           }
           exportBtn.loadStop();
         }).catch((err) => {
-          // eslint-disable-next-line no-console
-          console.log(err);
+          console.error(err);
           createToaster('fail');
           exportBtn.loadStop();
         });
@@ -290,20 +287,17 @@ function createSubexportComponent(selectionGroup) {
         simpleExportHandler(simpleExportUrl, activeLayer, selectedItems, exportedFileName).then(() => {
           exportBtn.loadStop();
         }).catch((err) => {
-          // eslint-disable-next-line no-console
-          console.log(err);
+          console.error(err);
           createToaster('fail');
           exportBtn.loadStop();
         });
       });
       subexportContainer.appendChild(exportBtn);
     } else {
-      // eslint-disable-next-line no-console
-      console.log(`Export is not allowed for selection group: ${selectionGroup}`);
+      console.warn(`Export is not allowed for selection group: ${selectionGroup}`);
     }
   } else {
-    // eslint-disable-next-line no-console
-    console.log(`Neither Specific Export is specified for selection group: ${selectionGroup} nor Simple Export is allowed!`);
+    console.warn(`Neither Specific Export is specified for selection group: ${selectionGroup} nor Simple Export is allowed!`);
   }
 
   return subexportContainer;
