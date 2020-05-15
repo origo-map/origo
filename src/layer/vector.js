@@ -76,11 +76,27 @@ export default function vector(opt, src, viewer) {
     case 'vectortile':
     {
       options.source = source;
-      options.style = Style.createStyle({
-        style: options.style,
-        viewer
-      });
-      vectorLayer = new VectorTileLayer(options);
+      options.declutter = true;
+      const styleSettings = viewer.getStyle(options.styleName);
+      const styleSetting = styleSettings[0][0];
+      const styleOptions = {
+        style: options.styleName,
+        viewer,
+        file: styleSetting.custom.file,
+        source: styleSetting.custom.source,
+        type: styleSetting.custom.type,
+        name: styleSetting.custom.name
+      };
+      if ('custom' in styleSetting) {
+        vectorLayer = new VectorTileLayer(Object.assign(options, { style: undefined }));
+        const layerStyle = Style.createStyle(Object.assign(styleOptions, { layer: vectorLayer }));
+        if (layerStyle) {
+          vectorLayer.setStyle(layerStyle);
+        }
+      } else {
+        options.style = Style.createStyle(styleOptions);
+        vectorLayer = new VectorTileLayer(options);
+      }
       break;
     }
     default:

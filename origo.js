@@ -11,6 +11,7 @@ import Viewer from './src/viewer';
 import loadResources from './src/loadresources';
 import titleCase from './src/utils/titlecase';
 import * as origoControls from './src/controls';
+import * as origoExtensions from './src/extensions';
 import supports from './src/utils/supports';
 import renderError from './src/utils/rendererror';
 import Style from './src/style';
@@ -65,6 +66,21 @@ const Origo = function Origo(configPath, options = {}) {
     return controls;
   };
 
+  const initExtensions = (extensionDefs) => {
+    const extensions = [];
+    extensionDefs.forEach((def) => {
+      if ('name' in def) {
+        const extensionName = titleCase(def.name);
+        const extensionOptions = def.options || {};
+        if (extensionName in origoExtensions) {
+          const extension = origoExtensions[extensionName](extensionOptions);
+          extensions.push(extension);
+        }
+      }
+    });
+    return extensions;
+  };
+
   const getConfig = () => origoConfig;
 
   return ui.Component({
@@ -76,6 +92,7 @@ const Origo = function Origo(configPath, options = {}) {
         request.then((data) => {
           const viewerOptions = data.options;
           viewerOptions.controls = initControls(viewerOptions.controls);
+          viewerOptions.extensions = initExtensions(viewerOptions.extensions || []);
           const target = viewerOptions.target;
           const viewer = Viewer(target, viewerOptions);
           this.dispatch('load', viewer);
@@ -86,6 +103,7 @@ const Origo = function Origo(configPath, options = {}) {
 };
 
 Origo.controls = origoControls;
+Origo.extensions = origoExtensions;
 Origo.ui = ui;
 Origo.Style = Style;
 Origo.featurelayer = featurelayer;

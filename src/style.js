@@ -14,6 +14,23 @@ const white = [255, 255, 255, 1];
 const blue = [0, 153, 255, 1];
 const width = 3;
 
+const styleTypes = {
+  stylefunction({ name, params }) {
+    return stylefunctions(name, params);
+  }
+};
+const addStyleType = function addStyleType(styleType, fn) {
+  styleTypes[styleType] = fn;
+  return styleTypes;
+};
+
+function getCustomStyle(type, options = {}) {
+  if (styleTypes[type]) {
+    return styleTypes[type](options);
+  }
+  return false;
+}
+
 // default edit style options
 const editStyleOptions = {
   Point: [{
@@ -207,7 +224,12 @@ function styleFunction({
 function createStyle({
   style: styleName,
   clusterStyleName,
-  viewer
+  viewer,
+  layer,
+  file,
+  source,
+  type,
+  name
 } = {}) {
   const resolutions = viewer.getResolutions();
   const projection = viewer.getProjection();
@@ -215,12 +237,19 @@ function createStyle({
   const baseUrl = viewer.getBaseUrl();
 
   if (!styleSettings || Object.keys(styleSettings).length === 0) {
-    const style = stylefunctions('default');
+    const style = getCustomStyle('stylefunction', { name: 'default' });
     return style;
   }
   if ('custom' in styleSettings[0][0]) {
-    const style = stylefunctions(styleSettings[0][0].custom, styleSettings[0][0].params);
-    return style;
+    let style;
+    if (typeof styleSettings[0][0].custom === 'string') {
+      style = getCustomStyle('stylefunction', { name: styleSettings[0][0].custom, params: styleSettings[0][0].params });
+    } else if (typeof styleSettings[0][0].custom === 'object') {
+      style = getCustomStyle(type, {
+        layer, file, source, name
+      });
+    }
+    return style || stylefunctions('default');
   }
   const clusterStyleSettings = clusterStyleName ? viewer.getStyle(clusterStyleName) : null;
 
@@ -285,5 +314,6 @@ export default {
   createStyle,
   styleFunction,
   createEditStyle,
-  createGeometryStyle
+  createGeometryStyle,
+  addStyleType
 };
