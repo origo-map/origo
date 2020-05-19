@@ -67,14 +67,14 @@ function getAGSIdentifyUrl({ layer, coordinate }, viewer) {
     '/identify?f=json',
     '&returnGeometry=true',
     '&geometryType=esriGeometryPoint',
-  `&sr=${esriSrs}`,
-  `&geometry=${coordinate}`,
+    `&sr=${esriSrs}`,
+    `&geometry=${coordinate}`,
     '&outFields=*',
     '&geometryPrecision=2',
-  `&tolerance=${tolerance}`,
-  `&layers=all:${layerId}`,
-  `&mapExtent=${extent}`,
-  `&imageDisplay=${size},96`].join('');
+    `&tolerance=${tolerance}`,
+    `&layers=all:${layerId}`,
+    `&mapExtent=${extent}`,
+    `&imageDisplay=${size},96`].join('');
 
   return $.ajax({
     url,
@@ -267,39 +267,13 @@ function getFeaturesAtPixel({
 
     return false;
   }, {
-      hitTolerance
-    });
+    hitTolerance
+  });
 
   if (cluster) {
     return false;
   }
   return result;
-}
-
-function createSelectedItem(feature, layer, map, groupLayers) {
-  // Above functions have no way of knowing whether the layer is part of a LayerGroup or not, therefore we need to check every layer against the groupLayers.
-  const layerName = layer.get('name');
-  let groupLayer;
-  groupLayers.forEach(gl => {
-    const subLayers = gl.getLayers().getArray();
-    const layerBelongsToGroup = subLayers.some(layer => layer.get('name') === layerName);
-    if (layerBelongsToGroup) {
-      groupLayer = gl;
-    }
-  });
-
-  let selectionGroup;
-  let selectionGroupTitle;
-
-  if (groupLayer) {
-    selectionGroup = groupLayer.get('name');
-    selectionGroupTitle = groupLayer.get('title');
-  } else {
-    selectionGroup = layer.get('name');
-    selectionGroupTitle = layer.get('title');
-  }
-
-  return new SelectedItem(feature, layer, map, selectionGroup, selectionGroupTitle);
 }
 
 export default {
