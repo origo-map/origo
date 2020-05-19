@@ -1,0 +1,14 @@
+.o-scalepicker {
+  min-width: 110px;
+  margin-right: 5px;
+  height: 1.25rem;
+}
+.o-scalepicker button {
+  font-family: Arial, "Helvetica Neue", sans-serif;
+  font-size: .625rem;
+  line-height: 1.25rem;
+  border-radius: 10px;
+}
+.o-scalepicker .dropdown li:hover {
+  color: $grey-darker;
+}

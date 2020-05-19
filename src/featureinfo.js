@@ -1,18 +1,22 @@
 import 'owl.carousel';
 import Overlay from 'ol/Overlay';
 import $ from 'jquery';
-import { Component } from './ui';
+import { Component, Modal } from './ui';
+// eslint-disable-next-line import/no-cycle
 import Popup from './popup';
+// eslint-disable-next-line import/no-cycle
 import sidebar from './sidebar';
 import maputils from './maputils';
 import featurelayer from './featurelayer';
 import Style from './style';
 import StyleTypes from './style/styletypes';
 import getFeatureInfo from './getfeatureinfo';
-import replacer from '../src/utils/replacer';
+import replacer from './utils/replacer';
 import SelectedItem from './models/SelectedItem';
+import { getContent } from './getattributes';
 
 const styleTypes = StyleTypes();
+let selectionLayer;
 
 const Featureinfo = function Featureinfo(options = {}) {
   const {
@@ -23,16 +27,13 @@ const Featureinfo = function Featureinfo(options = {}) {
     pinsStyle: pinStyleOptions = styleTypes.getStyle('pin'),
     savedPin: savedPinOptions,
     savedSelection,
-    // const selectionStylesOptions = options.selectionStyles
-    selectionStyles: selectionStylesOptions,
-    showOverlay = true,
+    selectionStyles: selectionStylesOptions
   } = options;
 
   let identifyTarget;
   let overlay;
   let items;
   let popup;
-  let selectionLayer;
   let viewer;
   let selectionManager;
 
@@ -40,10 +41,24 @@ const Featureinfo = function Featureinfo(options = {}) {
   const selectionStyles = selectionStylesOptions ? Style.createGeometryStyle(selectionStylesOptions) : Style.createEditStyle();
   let savedPin = savedPinOptions ? maputils.createPointFeature(savedPinOptions, pinStyle) : undefined;
   const savedFeature = savedPin || savedSelection || undefined;
-  const infowindow = 'infowindow' in options ? options.infowindow : 'overlay';
+  const uiOutput = 'infowindow' in options ? options.infowindow : 'overlay';
 
-  identifyTarget = infowindow;
-  
+  function setUIoutput(v) {
+    switch (uiOutput) {
+      case 'infowindow':
+        identifyTarget = 'infowindow';
+        break;
+
+      case 'sidebar':
+        sidebar.init(v);
+        identifyTarget = 'sidebar';
+        break;
+
+      default:
+        identifyTarget = 'overlay';
+        break;
+    }
+  }
 
   // if (showOverlay) {
   //   identifyTarget = 'overlay';
@@ -54,7 +69,8 @@ const Featureinfo = function Featureinfo(options = {}) {
 
   const clear = function clear() {
     selectionLayer.clear();
-    selectionManager.clearSelection();
+    // check needed for when sidebar or overlay are selected.
+    if (selectionManager) selectionManager.clearSelection();
     sidebar.setVisibility(false);
     if (overlay) {
       viewer.removeOverlays(overlay);
@@ -65,9 +81,11 @@ const Featureinfo = function Featureinfo(options = {}) {
   const callback = function callback(evt) {
     const currentItemIndex = evt.item.index;
     if (currentItemIndex !== null) {
-      let currentItem = items[currentItemIndex];
+      const currentItem = items[currentItemIndex];
       const clone = currentItem.feature.clone();
       clone.setId(currentItem.feature.getId());
+      clone.layerName = currentItem.name;
+
       selectionLayer.clearAndAdd(
         clone,
         selectionStyles[currentItem.feature.getGeometry().getType()]
@@ -99,12 +117,10 @@ const Featureinfo = function Featureinfo(options = {}) {
             title = currentItem.title ? currentItem.title : currentItem.name;
           }
         }
+      } else if (currentItem instanceof SelectedItem) {
+        title = currentItem.getLayer().get('title') ? currentItem.getLayer().get('title') : currentItem.getLayer().get('name');
       } else {
-        if (currentItem instanceof SelectedItem) {
-          title = currentItem.getLayer().get('title') ? currentItem.getLayer().get('title') : currentItem.getLayer().get('name');
-        } else {
-          title = currentItem.title ? currentItem.title : currentItem.name;
-        }
+        title = currentItem.title ? currentItem.title : currentItem.name;
       }
       selectionLayer.setSourceLayer(currentItem.layer);
       if (identifyTarget === 'overlay') {
@@ -112,6 +128,14 @@ const Featureinfo = function Featureinfo(options = {}) {
       } else if (identifyTarget === 'sidebar') {
         sidebar.setTitle(title);
       }
+
+      const toggleFeatureinfo = new CustomEvent('toggleFeatureinfo', {
+        detail: {
+          type: 'toggleFeatureinfo',
+          currentItem
+        }
+      });
+      document.dispatchEvent(toggleFeatureinfo);
     }
   };
 
@@ -120,8 +144,8 @@ const Featureinfo = function Featureinfo(options = {}) {
       onChanged: callback,
       items: 1,
       nav: true,
-      navText: ['<svg class="o-icon-fa-chevron-left"><use xlink:href="#fa-chevron-left"></use></svg>',
-        '<svg class="o-icon-fa-chevron-right"><use xlink:href="#fa-chevron-right"></use></svg>'
+      navText: ['<span class="icon"><svg class="o-icon-fa-chevron-left"><use xlink:href="#fa-chevron-left"></use></svg></span>',
+        '<span class="icon"><svg class="o-icon-fa-chevron-right"><use xlink:href="#fa-chevron-right"></use></svg></span>'
       ]
     };
     if (identifyTarget === 'overlay') {
@@ -144,7 +168,7 @@ const Featureinfo = function Featureinfo(options = {}) {
       selection.coordinates = firstFeature.getGeometry().getCoordinates();
       selection.id = firstFeature.getId() != null ? firstFeature.getId() : firstFeature.ol_uid;
       selection.type = typeof selectionLayer.getSourceLayer() === 'string' ? selectionLayer.getFeatureLayer().type : selectionLayer.getSourceLayer().get('type');
-      if (selection.type === 'GEOJSON' || selection.type === 'AGS_FEATURE') {
+      if (selection.type !== 'WFS') {
         const name = typeof selectionLayer.getSourceLayer() === 'string' ? selectionLayer.getSourceLayer() : selectionLayer.getSourceLayer().get('name');
         const id = firstFeature.getId() || selection.id;
         selection.id = `${name}.${id}`;
@@ -161,67 +185,115 @@ const Featureinfo = function Featureinfo(options = {}) {
     return hitTolerance;
   };
 
+  const addAttributeType = function addAttributeType(attributeType, fn) {
+    getContent[attributeType] = fn;
+    return getContent;
+  };
+
+  const addLinkListener = function addLinkListener(el) {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targ = e.target;
+      let modalStyle = '';
+      switch (targ.target) {
+        case 'modal-full':
+        {
+          modalStyle = 'max-width:unset;width:98%;height:98%;resize:both;overflow:auto;display:flex;flex-flow:column;';
+          break;
+        }
+        default:
+        {
+          modalStyle = 'resize:both;overflow:auto;display:flex;flex-flow:column;';
+          break;
+        }
+      }
+      Modal({
+        title: targ.href,
+        content: `<iframe src="${targ.href}" class=""style="width:100%;height:99%"></iframe>`,
+        target: viewer.getId(),
+        style: modalStyle,
+        newTabUrl: targ.href
+      });
+    });
+  };
+
   const render = function render(identifyItems, target, coordinate) {
     const map = viewer.getMap();
     items = identifyItems;
     clear();
-    let content = items.map(i => i.content).join('');
-//    let content = items.map(i => i.getContent()).join('');
-    content = `<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme">${content}</div></div>`;
+    let content = items.map((i) => i.content).join('');
+    content = '<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme"></div></div>';
     switch (target) {
       case 'overlay':
-        {
-          popup = Popup(`#${viewer.getId()}`);
-          popup.setContent({
-            content,
-             title: items[0] instanceof SelectedItem ? items[0].getLayer().get('title') : items[0].title
-            //title: items[0].getLayer().get('title')
-          });
-          popup.setVisibility(true);
-          initCarousel('#o-identify-carousel');
-          const popupHeight = $('.o-popup').outerHeight() + 20;
-          $('#o-popup').height(popupHeight);
-          overlay = new Overlay({
-            element: popup.getEl(),
-            autoPan: true,
-            autoPanAnimation: {
-              duration: 500
-            },
-            autoPanMargin: 40,
-            positioning: 'bottom-center'
-          });
-          //const geometry = items[0].getFeature().getGeometry();
-          const geometry = items[0].feature.getGeometry();
-          const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
-          map.addOverlay(overlay);
-          overlay.setPosition(coord);
-          break;
-        }
-      case 'sidebar':
-        {
-          sidebar.setContent({
-            content,
-            title: items[0] instanceof SelectedItem ? items[0].getLayer().get('title') : items[0].title
-           // title: items[0].getLayer().get('title')
-          });
-          sidebar.setVisibility(true);
-          initCarousel('#o-identify-carousel');
-          break;
-        }
-      case 'infowindow':
-        {
-          if (items.length === 1) {
-            selectionManager.addOrHighlightItem(items[0]);
-          } else if (items.length > 1) {
-            selectionManager.addItems(items);
+      {
+        popup = Popup(`#${viewer.getId()}`);
+        popup.setContent({
+          content,
+          title: items[0] instanceof SelectedItem ? items[0].getLayer().get('title') : items[0].title
+        });
+        const contentDiv = document.getElementById('o-identify-carousel');
+        items.forEach((item) => {
+          if (item.content instanceof Element) {
+            contentDiv.appendChild(item.content);
+          } else {
+            contentDiv.innerHTML = item.content;
           }
-          break;
+        });
+        popup.setVisibility(true);
+        initCarousel('#o-identify-carousel');
+        const popupHeight = $('.o-popup').outerHeight() + 20;
+        $('#o-popup').height(popupHeight);
+        overlay = new Overlay({
+          element: popup.getEl(),
+          autoPan: true,
+          autoPanAnimation: {
+            duration: 500
+          },
+          autoPanMargin: 40,
+          positioning: 'bottom-center'
+        });
+        const geometry = items[0].feature.getGeometry();
+        const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
+        map.addOverlay(overlay);
+        overlay.setPosition(coord);
+        break;
+      }
+      case 'sidebar':
+      {
+        sidebar.setContent({
+          content,
+          title: items[0] instanceof SelectedItem ? items[0].getLayer().get('title') : items[0].title
+        });
+        const contentDiv = document.getElementById('o-identify-carousel');
+        items.forEach((item) => {
+          if (item.content instanceof Element) {
+            contentDiv.appendChild(item.content);
+          } else {
+            contentDiv.innerHTML = item.content;
+          }
+        });
+        sidebar.setVisibility(true);
+        initCarousel('#o-identify-carousel');
+        break;
+      }
+      case 'infowindow':
+      {
+        if (items.length === 1) {
+          selectionManager.addOrHighlightItem(items[0]);
+        } else if (items.length > 1) {
+          selectionManager.addItems(items);
         }
-
+        break;
+      }
       default:
         {
           break;
         }
+    }
+
+    const modalLinks = document.getElementsByClassName('o-identify-link-modal');
+    for (let i = 0; i < modalLinks.length; i += 1) {
+      addLinkListener(modalLinks[i]);
     }
   };
 
@@ -286,12 +358,11 @@ const Featureinfo = function Featureinfo(options = {}) {
     getPin,
     getSelectionLayer,
     getSelection,
+    addAttributeType,
     onAdd(e) {
       viewer = e.target;
       const map = viewer.getMap();
-      if (identifyTarget === 'sidebar') {
-        sidebar.init(viewer);
-      }
+      setUIoutput(viewer);
       selectionLayer = featurelayer(savedFeature, map);
       selectionManager = viewer.getSelectionManager();
       map.on(clickEvent, onClick);

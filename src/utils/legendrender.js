@@ -87,6 +87,10 @@ export const renderIcon = {
     }
     return `<img class="${fit}" src="${iconStyle.src}" style="${style}"/>`;
   },
+  Image(iconStyle) {
+    const fit = iconStyle.fit ? 'contain' : 'cover';
+    return `<img class="${fit}" src="${iconStyle.src}"/>`;
+  },
   Text(color) {
     const fill = color ? `fill: ${color};` : 'fill: #000;';
     return `<path d="M5 4v3h5.5v12h3V7H19V4z" style="${fill}"/>`;

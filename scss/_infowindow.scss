@@ -99,6 +99,9 @@
     height: 100%;
     width: 100%;
     fill: rgb(100, 100, 100);
+    &:hover {
+      fill: #0099FF;
+    }
   }
   
   .expandlistelement-svg-container {
@@ -124,7 +127,6 @@
   
   .o-identify-content {
     display: inline-block;
-    width: 95%; // bredd måste sättas annars expand ikonen faller ner i ie och edge.
   }
   
   .folded {
@@ -176,7 +178,7 @@
     color: black;
     background-color: whitesmoke;
     border: 1px solid #cccccc;
-    border-radius: 0.4em;
+    border-radius: 2em;
     padding: 2px 8px;
     text-align: left;
     max-width: 280px;

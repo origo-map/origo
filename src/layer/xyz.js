@@ -1,5 +1,4 @@
 import XYZSource from 'ol/source/XYZ';
-import $ from 'jquery';
 import tile from './tile';
 import maputils from '../maputils';
 
@@ -12,10 +11,10 @@ const xyz = function xyz(layerOptions, viewer) {
     layerType: 'tile',
     featureinfoLayer: undefined
   };
-  const sourceDefault = {};
-  const xyzOptions = $.extend(xyzDefault, layerOptions);
+  const sourceDefault = { url: '' };
+  const xyzOptions = Object.assign(xyzDefault, layerOptions);
   xyzOptions.sourceName = xyzOptions.id;
-  const sourceOptions = $.extend(sourceDefault, viewer.getMapSource()[layerOptions.source]);
+  const sourceOptions = Object.assign(sourceDefault, viewer.getMapSource()[layerOptions.source]);
   sourceOptions.attributions = xyzOptions.attribution;
   sourceOptions.projection = viewer.getProjectionCode() || 'EPSG:3857';
 
@@ -33,11 +32,6 @@ const xyz = function xyz(layerOptions, viewer) {
 
   if (xyzOptions.layerURL) {
     sourceOptions.url += xyzOptions.layerURL;
-  } else {
-    const format = sourceOptions.sourceName.split('.')[1];
-    let url = `${sourceOptions.sourceName.split('.')[0]}/{z}/{x}/{y}.`;
-    url += format;
-    sourceOptions.url = url;
   }
   sourceOptions.crossOrigin = 'anonymous';
   const xyzSource = createSource(sourceOptions);

@@ -1,5 +1,3 @@
-import helpers from '../utils/templatehelpers';
-
 export default obj => (`<div id="o-map" class="${obj.mapClass}">
   <div id="o-tools-left" class="o-container-absolute o-tools-left">
     <div id="o-toolbar-navigation" class="o-toolbar-vertical o-toolbar-navigation"></div>

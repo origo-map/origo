@@ -82,7 +82,7 @@ const OverlayLayer = function OverlayLayer(options) {
       });
     },
     render() {
-      const labelCls = 'text-smaller padding-x-small grow pointer no-select text-nowrap overflow-hidden text-overflow-ellipsis';
+      const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
       return `<div id="${this.getId()}" class="${labelCls}">${title}</div>`;
     }
   });

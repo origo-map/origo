@@ -1,16 +1,41 @@
 import EsriJSON from 'ol/format/EsriJSON';
 import $ from 'jquery';
 import maputils from './maputils';
-import getAttributes from './getattributes';
 import SelectedItem from './models/SelectedItem';
 
 
-function getGetFeatureInfoUrl({
+function createSelectedItem(feature, layer, map, groupLayers) {
+  // Above functions have no way of knowing whether the layer is part of a LayerGroup or not, therefore we need to check every layer against the groupLayers.
+  const layerName = layer.get('name');
+  let groupLayer;
+  groupLayers.forEach((gl) => {
+    const subLayers = gl.getLayers().getArray();
+    const layerBelongsToGroup = subLayers.some((lyr) => lyr.get('name') === layerName);
+    if (layerBelongsToGroup) {
+      groupLayer = gl;
+    }
+  });
+
+  let selectionGroup;
+  let selectionGroupTitle;
+
+  if (groupLayer) {
+    selectionGroup = groupLayer.get('name');
+    selectionGroupTitle = groupLayer.get('title');
+  } else {
+    selectionGroup = layer.get('name');
+    selectionGroupTitle = layer.get('title');
+  }
+
+  return new SelectedItem(feature, layer, map, selectionGroup, selectionGroupTitle);
+}
+
+function getFeatureInfoUrl({
   coordinate,
   resolution,
   projection
 }, layer) {
-  const url = layer.getSource().getGetFeatureInfoUrl(coordinate, resolution, projection, {
+  const url = layer.getSource().getFeatureInfoUrl(coordinate, resolution, projection, {
     INFO_FORMAT: 'application/json',
     FEATURE_COUNT: '20'
   });
@@ -75,12 +100,12 @@ function isTainted({
 }) {
   try {
     if (layerFilter) {
-      map.forEachLayerAtPixel(pixel, layer => layerFilter === layer);
+      map.forEachLayerAtPixel(pixel, (layer) => layerFilter === layer);
     }
 
     return false;
   } catch (e) {
-    console.log(e);
+    console.error(e);
     return true;
   }
 }
@@ -90,7 +115,7 @@ function layerAtPixel({
   matchLayer,
   map
 }) {
-  map.forEachLayerAtPixel(pixel, layer => matchLayer === layer);
+  map.forEachLayerAtPixel(pixel, (layer) => matchLayer === layer);
 }
 
 function getGetFeatureInfoRequest({ layer, coordinate }, viewer) {
@@ -115,7 +140,7 @@ function getGetFeatureInfoRequest({ layer, coordinate }, viewer) {
         return getGetFeatureInfoRequest({ featureinfoLayer, coordinate }, viewer);
       }
       obj.cb = 'GEOJSON';
-      obj.fn = getGetFeatureInfoUrl({ coordinate, resolution, projection }, layer);
+      obj.fn = getFeatureInfoUrl({ coordinate, resolution, projection }, layer);
       return obj;
     case 'AGS_TILE':
       if (layer.get('featureinfoLayer')) {
@@ -182,18 +207,12 @@ function getFeatureInfoRequests({
 function getFeaturesFromRemote(requestOptions, viewer) {
   const requestResult = [];
 
-  const requestPromises = getFeatureInfoRequests(requestOptions, viewer).map(request => request.fn.then((features) => {
+  const requestPromises = getFeatureInfoRequests(requestOptions, viewer).map((request) => request.fn.then((features) => {
     const layer = viewer.getLayer(request.layer);
     const groupLayers = viewer.getGroupLayers();
     const map = viewer.getMap();
     if (features) {
       features.forEach((feature) => {
-        /*const item = {
-          title: layer.get('title'),
-          feature,
-          content: getAttributes(feature, layer, map),
-          layer: layer.get('name')
-        } */
         const si = createSelectedItem(feature, layer, map, groupLayers);
         requestResult.push(si);
       });
@@ -217,8 +236,6 @@ function getFeaturesAtPixel({
   const resolutions = map.getView().getResolutions();
   const groupLayers = viewer.getGroupLayers();
   map.forEachFeatureAtPixel(pixel, (feature, layer) => {
-    const l = layer;
-    // const map = viewer.getMap();
     let queryable = false;
     if (layer) {
       queryable = layer.get('queryable');
@@ -238,39 +255,14 @@ function getFeaturesAtPixel({
         collection.forEach((f) => {
           const si = createSelectedItem(f, layer, map, groupLayers);
           result.push(si);
-
-          /* const item = {};
-          item.title = l.get('title');
-          item.feature = f;
-          item.content = getAttributes(f, l, map);
-          item.name = l.get('name');
-          result.push(item); */
         });
       } else if (collection.length === 1 && queryable) {
-
         const si = createSelectedItem(collection[0], layer, map, groupLayers);
         result.push(si);
-
-        /*   const item = {};
-          item.title = l.get('title');
-          item.feature = collection[0];
-          item.content = getAttributes(collection[0], l, map);
-          item.name = l.get('name');
-          item.layer = l;
-          result.push(item); */
       }
     } else if (queryable) {
-
       const si = createSelectedItem(feature, layer, map, groupLayers);
       result.push(si);
-
-      /*   const item = {};
-        item.title = l.get('title');
-        item.feature = feature;
-        item.content = getAttributes(feature, l,map);
-        item.name = l.get('name');
-        item.layer = l;
-        result.push(item); */
     }
 
     return false;

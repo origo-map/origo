@@ -1,5 +1,6 @@
 import featureinfotemplates from './featureinfotemplates';
-import replacer from '../src/utils/replacer';
+import replacer from './utils/replacer';
+import isUrl from './utils/isurl';
 import geom from './geom';
 
 function createUrl(prefix, suffix, url) {
@@ -8,73 +9,154 @@ function createUrl(prefix, suffix, url) {
   return p + url + s;
 }
 
-export default function (feature, layer, map) {
+const getContent = {
+  name(feature, attribute, attributes, map) {
+    let val = '';
+    let title = '';
+    const featureValue = feature.get(attribute.name) === 0 ? feature.get(attribute.name).toString() : feature.get(attribute.name);
+    if (featureValue) {
+      val = featureValue;
+      if (attribute.title) {
+        title = `<b>${attribute.title}</b>`;
+      }
+      if (attribute.url) {
+        let url;
+        if (feature.get(attribute.url)) {
+          url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.url), feature.getProperties(), null, map));
+        } else if (isUrl(attribute.url)) {
+          url = attribute.url;
+        } else return false;
+        let aTarget = '_blank';
+        let aCls = 'o-identify-link';
+        if (attribute.target === 'modal') {
+          aTarget = 'modal';
+          aCls = 'o-identify-link-modal';
+        } else if (attribute.target === 'modal-full') {
+          aTarget = 'modal-full';
+          aCls = 'o-identify-link-modal';
+        }
+        val = `<a class="${aCls}" target="${aTarget}" href="${url}">${feature.get(attribute.name)}</a>`;
+      }
+    }
+    const newElement = document.createElement('li');
+    newElement.classList.add(attribute.cls);
+    newElement.innerHTML = `${title}${val}`;
+    return newElement;
+  },
+  url(feature, attribute, attributes, map) {
+    let val = '';
+    let url;
+    if (feature.get(attribute.url)) {
+      url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.url), attributes, null, map));
+    } else if (isUrl(attribute.url)) {
+      url = attribute.url;
+    } else return false;
+    const text = attribute.html || attribute.title || attribute.url;
+    let aTarget = '_blank';
+    let aCls = 'o-identify-link';
+    if (attribute.target === 'modal') {
+      aTarget = 'modal';
+      aCls = 'o-identify-link-modal';
+    } else if (attribute.target === 'modal-full') {
+      aTarget = 'modal-full';
+      aCls = 'o-identify-link-modal';
+    }
+    val = `<a class="${aCls}" target="${aTarget}" href="${url}">${text}</a>`;
+    const newElement = document.createElement('li');
+    newElement.classList.add(attribute.cls);
+    newElement.innerHTML = val;
+    return newElement;
+  },
+  img(feature, attribute, attributes, map) {
+    let val = '';
+    const featGet = attribute.img ? feature.get(attribute.img) : feature.get(attribute.name);
+    if (featGet) {
+      const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.img), attributes, null, map));
+      const attribution = attribute.attribution ? `<div class="o-image-attribution">${attribute.attribution}</div>` : '';
+      val = `<div class="o-image-container"><img src="${url}">${attribution}</div>`;
+    }
+    const newElement = document.createElement('li');
+    newElement.classList.add(attribute.cls);
+    newElement.innerHTML = val;
+    return newElement;
+  },
+  html(feature, attribute, attributes) {
+    const val = replacer.replace(attribute.html, attributes, {
+      helper: geom,
+      helperArg: feature.getGeometry()
+    });
+    const newElement = document.createElement('li');
+    newElement.classList.add(attribute.cls);
+    newElement.innerHTML = val;
+    return newElement;
+  }
+};
+
+function customAttribute(feature, attribute, attributes, map) {
+  if (getContent[Object.keys(attribute)[0]]) {
+    return getContent[Object.keys(attribute)[0]](feature, attribute, attributes, map);
+  }
+  return false;
+}
+
+function getAttributes(feature, layer, map) {
+  const featureinfoElement = document.createElement('div');
+  featureinfoElement.classList.add('o-identify-content');
+  const ulList = document.createElement('ul');
+  featureinfoElement.appendChild(ulList);
   const attributes = feature.getProperties();
   const geometryName = feature.getGeometryName();
   delete attributes[geometryName];
-  let content = '<div class="o-identify-content"><ul>';
+  let content;
   let attribute;
-  let li = '';
-  let title;
   let val;
+  const layerAttributes = layer.get('attributes');
   // If layer is configured with attributes
-  if (layer.get('attributes')) {
+  if (layerAttributes) {
     // If attributes is string then use template named with the string
-    if (typeof layer.get('attributes') === 'string') {
+    if (typeof layerAttributes === 'string') {
       // Use attributes with the template
-      li = featureinfotemplates(layer.get('attributes'), attributes);
+      const li = featureinfotemplates(layerAttributes, attributes);
+      const templateList = document.createElement('ul');
+      featureinfoElement.appendChild(templateList);
+      templateList.innerHTML = li;
     } else {
-      for (let i = 0; i < layer.get('attributes').length; i += 1) {
+      for (let i = 0; i < layerAttributes.length; i += 1) {
         attribute = layer.get('attributes')[i];
-        title = '';
         val = '';
-        if (attribute.name) {
-          if (feature.get(attribute.name)) {
-            val = feature.get(attribute.name);
-            if (attribute.title) {
-              title = `<b>${attribute.title}</b>`;
-            }
-            if (attribute.url) {
-              if (feature.get(attribute.url)) {
-                const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.url), feature.getProperties(), null, map));
-                val = `<a href="${url}" target="_blank">
-                  ${feature.get(attribute.name)}
-                  </a>`;
-              }
-            }
+        if (attribute.template) {
+          const li = featureinfotemplates(attribute.template, attributes);
+          const templateList = document.createElement('ul');
+          featureinfoElement.appendChild(templateList);
+          templateList.innerHTML = li;
+        } else if (attribute.type !== 'hidden') {
+          if (attribute.name) {
+            val = getContent.name(feature, attribute, attributes, map);
+          } else if (attribute.url) {
+            val = getContent.url(feature, attribute, attributes, map);
+          } else if (attribute.img || attribute.type === 'image') {
+            val = getContent.img(feature, attribute, attributes, map);
+          } else if (attribute.html) {
+            val = getContent.html(feature, attribute, attributes, map);
+          } else {
+            val = customAttribute(feature, attribute, attributes, map);
           }
-        } else if (attribute.url) {
-          if (feature.get(attribute.url)) {
-            const text = attribute.html || attribute.url;
-            const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.url), attributes, null, map));
-            val = `<a href="${url}" target="_blank">
-              ${text}
-              </a>`;
+          if (val instanceof HTMLLIElement && val.innerHTML.length > 0) {
+            ulList.appendChild(val);
           }
-        } else if (attribute.img) {
-          if (feature.get(attribute.img)) {
-            const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.img), attributes, null, map));
-            const attribution = attribute.attribution ? `<div class="o-image-attribution">${attribute.attribution}</div>` : '';
-            val = `<div class="o-image-container">
-              <img src="${url}">${attribution}
-              </div>`;
-          }
-        } else if (attribute.html) {
-          val = replacer.replace(attribute.html, attributes, {
-            helper: geom,
-            helperArg: feature.getGeometry()
-          }, map);
         }
-
-        const cls = ` class="${attribute.cls}" ` || '';
-
-        li += `<li${cls}>${title}${val}</li>`;
       }
+      content = featureinfoElement;
     }
   } else {
     // Use attributes with the template
-    li = featureinfotemplates('default', attributes);
+    const li = featureinfotemplates('default', attributes);
+    const templateList = document.createElement('ul');
+    featureinfoElement.appendChild(templateList);
+    templateList.innerHTML = li;
   }
-  content += `${li}</ul></div>`;
+  content = featureinfoElement;
   return content;
 }
+
+export { getAttributes as default, getContent };

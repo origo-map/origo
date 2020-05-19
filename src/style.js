@@ -7,7 +7,7 @@ import Style from 'ol/style/Style';
 import Text from 'ol/style/Text';
 import validateurl from './utils/validateurl';
 import stylefunctions from './style/stylefunctions';
-import replacer from '../src/utils/replacer';
+import replacer from './utils/replacer';
 import maputils from './maputils';
 
 const white = [255, 255, 255, 1];
@@ -146,6 +146,11 @@ function checkOptions(feature, scale, styleSettings, styleList, size) {
         } else if (Object.prototype.hasOwnProperty.call(element, 'text')) {
           styleList[j][index].getText().setText(replacer.replace(element.text.text, feature.getProperties()));
         }
+        if (element.icon && Object.prototype.hasOwnProperty.call(element.icon, 'rotation')) {
+          const degrees = replacer.replace(element.icon.rotation, feature.getProperties());
+          const radians = degrees * (Math.PI / 180);
+          styleList[j][index].getImage().setRotation(radians);
+        }
         return null;
       });
       if (Object.prototype.hasOwnProperty.call(s[j][0], 'filter')) {
@@ -162,6 +167,7 @@ function checkOptions(feature, scale, styleSettings, styleList, size) {
           const featMatch = first.get(featAttr);
           expr = typeof featMatch === 'number' ? featMatch + expr : `"${featMatch}"${expr}`;
         }
+        // eslint-disable-next-line no-eval
         if (eval(expr)) {
           styleL = styleList[j];
           return styleL;

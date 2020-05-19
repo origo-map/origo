@@ -43,6 +43,7 @@ const drawToolsSelector = function drawToolsSelector(tools, defaultLayer, v) {
 
   function close() {
     if (active) {
+      // eslint-disable-next-line no-use-before-define
       setActive(false);
     }
   }
@@ -54,7 +55,7 @@ const drawToolsSelector = function drawToolsSelector(tools, defaultLayer, v) {
     });
     $(`#${target}`).on('changeDropdown', (e) => {
       e.stopImmediatePropagation(e);
-      dispatcher.emitChangeEditorShapes(e.dataAttribute);
+      dispatcher.emitChangeEditorShapes(e.detail.dataAttribute);
       close();
     });
   }

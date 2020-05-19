@@ -10,7 +10,8 @@ export default function (features, map) {
   });
   const featureLayer = new VectorLayer({
     source: featureLayerStore,
-    map
+    map,
+    zIndex: 1
   });
   return {
     addFeature: function addFeature(feature) {
@@ -35,7 +36,12 @@ export default function (features, map) {
       if (sourceLayer) {
         return sourceLayer;
       }
-      featureLayer.set('name', 'unmanaged');
+      const layerName = featureLayerStore.getFeatures()[0].layerName;
+      if (layerName) {
+        featureLayer.set('name', layerName);
+      } else {
+        featureLayer.set('name', 'unmanaged');
+      }
       return featureLayer;
     },
     clear: function clear() {

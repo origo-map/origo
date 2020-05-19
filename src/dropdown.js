@@ -1,12 +1,13 @@
-import $ from 'jquery';
 import utils from './utils';
+import { dom } from './ui';
 
 export default function dropDown(target, items, options) {
   const dataAttribute = `data-${options.dataAttribute}` || 'default';
-  const $target = $(`#${target}`);
+  const targetEl = document.getElementById(target);
   const activeItem = options.active || undefined;
   const activeCls = 'o-active';
   let ul;
+  let dropdownEvent;
   const li = [];
   const cls = 'o-dropdown-li';
   const icon = utils.createSvg({
@@ -31,22 +32,27 @@ export default function dropDown(target, items, options) {
     ul = utils.createElement('ul', li.join(''), {
       cls: 'o-dropdown'
     });
-    $target.append(ul);
+
+    targetEl.appendChild(dom.html(ul));
   }
 
-  function toggleActive($active) {
-    $target.find('li').removeClass(activeCls);
-    $active.addClass(activeCls);
+  function toggleActive(activeEl) {
+    targetEl.querySelector(`li.${activeCls}`).classList.remove(activeCls);
+    activeEl.classList.add(activeCls);
   }
 
   function addListener() {
-    $target.on('click', 'ul', (e) => {
-      const $active = $(e.target);
-      $target.trigger({
-        type: 'changeDropdown',
-        dataAttribute: $(e.target).data(options.dataAttribute)
+    targetEl.getElementsByTagName('ul').item(0).addEventListener('click', (e) => {
+      const activeEl = e.target;
+      dropdownEvent = new CustomEvent('changeDropdown', {
+        detail: {
+          type: 'changeDropdown',
+          dataAttribute: e.target.dataset[options.dataAttribute]
+        }
       });
-      toggleActive($active);
+      targetEl.dispatchEvent(dropdownEvent);
+
+      toggleActive(activeEl);
     });
   }
 

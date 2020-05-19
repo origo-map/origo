@@ -8,6 +8,7 @@ export default function Icon(options = {}) {
   } = options;
   const {
     cls = '',
+    title = '',
     style: styleOptions
   } = options;
 
@@ -18,7 +19,7 @@ export default function Icon(options = {}) {
     render() {
       if (iconType === 'image') {
         return `
-          <img class="${cls}" style="${style}" src=${icon}>
+          <img class="${cls}" style="${style}" src=${icon} title="${title}" alt="${title}">
         `;
       }
       if (iconType === 'sprite') {

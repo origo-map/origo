@@ -40,12 +40,14 @@ export const findStyleType = function findStyleType(styles) {
     return 'Text';
   } else if (styleTypes.icon) {
     return 'Icon';
+  } else if (styleTypes.image) {
+    return 'Image';
   }
   return null;
 };
 
 // If there is only one styleRule that will be used as header icon, but not if that is extendedLegend. In latter case null is returned  meaning that list_icon will be set as header icon.
-// If there are more than one styleRule the last styleRule flagged as header will be returned. In other words, if there are for example 3 styleRules 
+// If there are more than one styleRule the last styleRule flagged as header will be returned. In other words, if there are for example 3 styleRules
 // an all of them have header=true, then the last one will be returned and set on the icon legend.
 // If there are more than one styleRule but none of them has header flag, then null is returned meaning that list_icon will be set as header icon.
 export const findHeaderStyle = function findHeaderStyle(styleRules) {
@@ -57,9 +59,7 @@ export const findHeaderStyle = function findHeaderStyle(styleRules) {
     return styleRules[0];
   }
   return styleRules.reduce((prev, styleRule) => {
-    const headerItems = styleRule.filter(style => {
-      return style.header
-    });
+    const headerItems = styleRule.filter(style => style.header);
     if (headerItems.length) {
       return styleRule;
     }
@@ -106,6 +106,10 @@ export const renderSvgIcon = function renderSvgIcon(styleRule, {
       const iconOption = styleRule.find(style => style.icon.src);
       const icon = renderIcon.Icon(iconOption.icon);
       return icon;
+    } else if (styleType === 'Image') {
+      const iconOption = styleRule.find(style => style.image.src);
+      const icon = renderIcon.Icon(iconOption.image);
+      return icon;
     }
     return '';
   }
@@ -122,7 +126,7 @@ export const renderLegendItem = function renderLegendItem(svgIcon, label = '') {
 
 export const renderExtendedLegendItem = function renderExtendedLegendItem(extendedLegendItem) {
   return `<li class="flex row align-center padding-y-smallest">
-            <img src=${extendedLegendItem.icon.src} />
+            <img class="extendedlegend pointer" src=${extendedLegendItem.icon.src} />
           </li>`;
 };
 
@@ -137,10 +141,10 @@ export const Legend = function Legend(styleRules, opacity = 1) {
           const label = labelItem.label || '';
           if (extendedLegendItem && extendedLegendItem.icon) {
             return prevRule + renderExtendedLegendItem(extendedLegendItem);
-          } else {
-            const svgIcon = renderSvgIcon(styleRule, { opacity });
-            return prevRule + renderLegendItem(svgIcon, label);
           }
+
+          const svgIcon = renderSvgIcon(styleRule, { opacity });
+          return prevRule + renderLegendItem(svgIcon, label);
         }
       }
       return prevRule;

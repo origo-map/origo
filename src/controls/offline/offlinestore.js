@@ -70,7 +70,7 @@ function offlineStore() {
   function onChangeOffline(e) {
     e.stopImmediatePropagation();
     if (e.action === 'download') {
-      onDownload(e.layerName)
+      onDownload(e.layerName);
     } else if (e.action === 'edits') {
       ondEdits(e.layerName, e.ids);
     } else if (e.action === 'remove') {
@@ -115,7 +115,7 @@ function offlineStore() {
 
   function onRemove(layerName) {
     if (offlineLayers[layerName].edits) {
-      const proceed = confirm('Du har fortfarande offline-ändringar som inte är sparade. Om du fortsätter kommer dessa att försvinna.');
+      const proceed = window.confirm('Du har fortfarande offline-ändringar som inte är sparade. Om du fortsätter kommer dessa att försvinna.');
       if (proceed) {
         removeDownloaded(layerName);
       }
@@ -132,6 +132,7 @@ function offlineStore() {
           dispatcher.emitChangeOfflineEnd(layerName, 'download');
         });
     }
+    return false;
   }
 
   function createOfflineObj() {
@@ -162,7 +163,7 @@ function offlineStore() {
       const features = viewer.getLayer(layerName).getSource().getFeatures();
       setItems(layerName, features);
     } else {
-      console.log(`${layerName} is missing in storage`);
+      console.warn(`${layerName} is missing in storage`);
     }
   }
 
@@ -182,7 +183,7 @@ function offlineStore() {
     const layer = viewer.getLayer(layerName);
     const geometryName = layer.get('geometryName');
     const features = [];
-    return storage[layerName].iterate((value, key, index) => {
+    return storage[layerName].iterate((value /* , key, index */) => {
       const storedFeature = format.readFeature(value);
       const feature = restoreGeometryName(storedFeature, geometryName);
       features.push(feature);
@@ -192,7 +193,7 @@ function offlineStore() {
 
   function getEditsItems(layerName) {
     const items = [];
-    return editsStorage[layerName].iterate((value, key, index) => {
+    return editsStorage[layerName].iterate((value, key /* , index */) => {
       const obj = {};
       obj[key] = value;
       items.push(obj);

@@ -25,3 +25,7 @@
 .o-measure-button-true .o-icon-minicons-line-vector {
   fill: $o-btn-active-color;
 }
+.o-measure-length .icon svg, .o-measure-area .icon svg {
+  overflow: visible;
+  border-radius:0;
+}
