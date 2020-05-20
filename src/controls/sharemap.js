@@ -25,6 +25,7 @@ const ShareMap = function ShareMap(options = {}) {
   const createLink = function createLink(data) {
     const url = permalink.getPermalink(viewer, data);
     const inputElement = document.getElementsByClassName('o-share-link')[0].firstElementChild;
+
     inputElement.value = url;
     inputElement.select();
   };
