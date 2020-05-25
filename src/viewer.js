@@ -411,23 +411,24 @@ const Viewer = function Viewer(targetOption, options = {}) {
         const featureId = urlParams.feature;
         const layerName = featureId.split('.')[0];
         const layer = getLayer(layerName);
+        const clusterSource = layer.getSource().source;
+        const type = layer.get('type');
+        const id = featureId.split('.')[1];
+
         if (layer) {
           layer.once('postrender', () => {
             let feature;
-            const type = layer.get('type');
-            feature = layer.getSource().getFeatureById(featureId);
-            if (type === 'WFS') {
+
+            if (type === 'WFS' && clusterSource) {
+              feature = clusterSource.getFeatureById(featureId);
+            } else if (type === 'WFS') {
               feature = layer.getSource().getFeatureById(featureId);
+            } else if (clusterSource) {
+              feature = clusterSource.getFeatureById(id);
             } else {
-              const id = featureId.split('.')[1];
-              let origin = layer.getSource();
-              feature = origin.getFeatureById(id);
-              // feature has no id it is not found it maybe a cluster, therefore try again.
-              if (feature === null && type !== 'TOPOJSON') {
-                origin = origin.getSource();
-                feature = origin.getFeatureById(id);
-              }
+              feature = layer.getSource().getFeatureById(id);
             }
+
             if (feature) {
               const obj = {};
               obj.feature = feature;
@@ -454,7 +455,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
           geometry: new geom[urlParams.selection.geometryType](urlParams.selection.coordinates)
         });
       }
-
+      
       if (!urlParams.zoom && !urlParams.mapStateId && startExtent) {
         map.getView().fit(startExtent, { size: map.getSize() });
       }
