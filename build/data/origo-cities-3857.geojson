@@ -1,0 +1,23 @@
+{
+"type": "FeatureCollection",
+"name": "origo-cities-3857",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::3857" } },
+"features": [
+{ "type": "Feature", "properties": { "id": 1, "name": "Karlstad" }, "geometry": { "type": "Point", "coordinates": [ 1503136, 8262205 ] } },
+{ "type": "Feature", "properties": { "id": 2, "name": "Hallstahammar" }, "geometry": { "type": "Point", "coordinates": [ 1807133, 8313751 ] } },
+{ "type": "Feature", "properties": { "id": 3, "name": "Västerås" }, "geometry": { "type": "Point", "coordinates": [ 1841462, 8314392 ] } },
+{ "type": "Feature", "properties": { "id": 4, "name": "Eskilstuna" }, "geometry": { "type": "Point", "coordinates": [ 1836807, 8260572 ] } },
+{ "type": "Feature", "properties": { "id": 5, "name": "Strängnäs" }, "geometry": { "type": "Point", "coordinates": [ 1894581, 8261118 ] } },
+{ "type": "Feature", "properties": { "id": 6, "name": "Enköping" }, "geometry": { "type": "Point", "coordinates": [ 1901643, 8320134 ] } },
+{ "type": "Feature", "properties": { "id": 7, "name": "Sigtuna" }, "geometry": { "type": "Point", "coordinates": [ 1986473, 8315061 ] } },
+{ "type": "Feature", "properties": { "id": 8, "name": "Hudiksvall" }, "geometry": { "type": "Point", "coordinates": [ 1904063, 8794995 ] } },
+{ "type": "Feature", "properties": { "id": 9, "name": "Nordanstig" }, "geometry": { "type": "Point", "coordinates": [ 1898886, 8855279 ] } },
+{ "type": "Feature", "properties": { "id": 10, "name": "Ånge" }, "geometry": { "type": "Point", "coordinates": [ 1743306, 8984535 ] } },
+{ "type": "Feature", "properties": { "id": 11, "name": "Sundsvall" }, "geometry": { "type": "Point", "coordinates": [ 1926687, 8952900 ] } },
+{ "type": "Feature", "properties": { "id": 12, "name": "Timrå" }, "geometry": { "type": "Point", "coordinates": [ 1928943, 8976191 ] } },
+{ "type": "Feature", "properties": { "id": 13, "name": "Härnösand" }, "geometry": { "type": "Point", "coordinates": [ 1996548, 9010642 ] } },
+{ "type": "Feature", "properties": { "id": 14, "name": "Kramfors" }, "geometry": { "type": "Point", "coordinates": [ 1979837, 9083261 ] } },
+{ "type": "Feature", "properties": { "id": 15, "name": "Sollefteå" }, "geometry": { "type": "Point", "coordinates": [ 1922083, 9141271 ] } },
+{ "type": "Feature", "properties": { "id": 16, "name": "Örnsköldsvik" }, "geometry": { "type": "Point", "coordinates": [ 2082559, 9171375 ] } }
+]
+}

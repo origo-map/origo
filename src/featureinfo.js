@@ -60,13 +60,6 @@ const Featureinfo = function Featureinfo(options = {}) {
     }
   }
 
-  // if (showOverlay) {
-  //   identifyTarget = 'overlay';
-  // } else {
-  //   sidebar.init();
-  //   identifyTarget = 'sidebar';
-  // }
-
   const clear = function clear() {
     selectionLayer.clear();
     // check needed for when sidebar or overlay are selected.
@@ -286,9 +279,9 @@ const Featureinfo = function Featureinfo(options = {}) {
         break;
       }
       default:
-        {
-          break;
-        }
+      {
+        break;
+      }
     }
 
     const modalLinks = document.getElementsByClassName('o-identify-link-modal');

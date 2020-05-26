@@ -33,8 +33,6 @@
     "copyfiles": "^2.2.0",
     "core-js": "^3.6.4",
     "cuid": "^2.1.4",
-    "@turf/boolean-disjoint": "^6.0.2",
-    "@turf/buffer": "^5.1.5",
     "downloadjs": "^1.4.7",
     "html2canvas": "^1.0.0-rc.5",
     "jquery": "^3.5.0",

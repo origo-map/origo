@@ -1,0 +1,6 @@
+<svg style="display: none;" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <symbol viewBox="0 0 24 24" id="o_centerposition_24px"><path d="M23 11h-2.06A9.01 9.01 0 0 0 13 3.06V1h-2v2.06A9.013 9.013 0 0 0 3.06 11H1v2h2.06A9.01 9.01 0 0 0 11 20.94V23h2v-2.06A9.01 9.01 0 0 0 20.94 13H23v-2zm-10 7.92V17h-2v1.92A7.004 7.004 0 0 1 5.08 13H7v-2H5.08A7.005 7.005 0 0 1 11 5.08V7h2V5.08c3.06.44 5.48 2.86 5.92 5.92H17v2h1.92A7.005 7.005 0 0 1 13 18.92z"/></symbol><symbol viewBox="0 0 24 24" id="ic_gps_not_fixed_24px"><path fill="none" d="M0 0h24v24H0V0z"/><path d="M20.94 11A8.992 8.992 0 0 0 13 3.06V1h-2v2.06A8.994 8.994 0 0 0 3.06 11H1v2h2.06A8.992 8.992 0 0 0 11 20.94V23h2v-2.06A8.99 8.99 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></symbol>
+  <symbol viewBox="-0.5 0.5 24 24" id="o_list_24px"><path d="M4.5 7.5h2v2h-2zM4.5 11.5h2v2h-2zM4.5 15.5h2v2h-2zM8.5 7.5h10v2h-10zM8.5 11.5h10v2h-10zM8.5 15.5h10v2h-10z"/></symbol>
+  <symbol viewBox="0 6 24 12" id="o_expand_more_24px"><path d="M22.393 14L12 8 1.61 14l1 1.732L12 10.31l9.393 5.422z"/></symbol>
+  <symbol viewBox="-0.5 0.5 24 24" id="o_add_24px"><path fill="none" d="M-.5.5h24v24h-24V.5z"/><path d="M16.5 11.5h-4v-4h-2v4h-4v2h4v4h2v-4h4z"/></symbol>
+</svg>

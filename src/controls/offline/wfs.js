@@ -1,22 +1,17 @@
 import $ from 'jquery';
 import GeoJSONFormat from 'ol/format/GeoJSON';
-// import viewer from '../../viewer';
+import viewer from '../../viewer';
 import wfsTransaction from '../editor/wfstransaction';
 
 const wfs = {};
-wfs.request = function request(layer, extent, viewer) {
+wfs.request = function request(layer) {
   const sourceOptions = viewer.getMapSource()[layer.get('sourceName')];
   sourceOptions.featureType = layer.get('name').split('__').shift();
   sourceOptions.geometryName = layer.get('geometryName');
   sourceOptions.filter = layer.get('filter');
   sourceOptions.projectionCode = viewer.getProjectionCode();
-
-  // if extent is sent explicitly then use it, otherwise get the layers's extent. this is needed for multiselection module. 
-  if (extent) {
-    sourceOptions.extent = extent;
-  } else {
-    sourceOptions.extent = layer.get('extent');
-  }
+  sourceOptions.extent = layer.get('extent');
+  sourceOptions.projectionCode = viewer.getProjectionCode();
 
   const req = createRequest(sourceOptions);
   return req;

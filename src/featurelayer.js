@@ -46,9 +46,6 @@ export default function (features, map) {
       featureLayer.setStyle(style);
       featureLayerStore.addFeature(feature);
     },
-    refresh: function refresh() {
-      featureLayerStore.refresh();
-    },
     setStyle: function setStyle(style) {
       featureLayer.setStyle(style);
     }

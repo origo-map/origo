@@ -58,7 +58,7 @@ const Mapmenu = function Mapmenu({
         this.addComponent(button);
       },
       onRender() {
-        // this.dispatch('render');
+        this.dispatch('render');
         document.getElementById(titleCmp.getId()).addEventListener('click', () => {
           button.dispatch('click');
         });
