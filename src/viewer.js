@@ -34,8 +34,6 @@ const Viewer = function Viewer(targetOption, options = {}) {
     consoleId = 'o-console',
     mapCls = 'o-map',
     controls = [],
-    constrainResolution = false,
-    enableRotation = true,
     featureinfoOptions = {},
     groups: groupOptions = [],
     pageSettings = {},
@@ -386,17 +384,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
       tileGrid = maputils.tileGrid(tileGridSettings);
 
-      setMap(Map({
-        extent,
-        getFeatureinfo,
-        projection,
-        center,
-        resolutions,
-        zoom,
-        constrainResolution,
-        enableRotation,
-        target: this.getId()
-      }));
+      setMap(Map(Object.assign(options, { projection, center, zoom, target: this.getId() })));
 
       const layerProps = mergeSavedLayerProps(layerOptions, urlParams.layers);
       this.addLayers(layerProps);
@@ -455,7 +443,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
           geometry: new geom[urlParams.selection.geometryType](urlParams.selection.coordinates)
         });
       }
-      
+
       if (!urlParams.zoom && !urlParams.mapStateId && startExtent) {
         map.getView().fit(startExtent, { size: map.getSize() });
       }
