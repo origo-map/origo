@@ -16,7 +16,8 @@ export default function Slidenav(options = {}) {
     cls: clsOption = 'right',
     mainComponent,
     secondaryComponent,
-    style: styleSettings
+    style: styleSettings,
+    legendSlideNav = false
   } = options;
 
   const style = createStyle(styleSettings);
@@ -35,6 +36,8 @@ export default function Slidenav(options = {}) {
   let header;
   let secondaryContainer;
   let secondaryLabelCls = '';
+  let posMem = 0;
+
 
   /**
    * Toggle position between absolute and relative,
@@ -46,6 +49,9 @@ export default function Slidenav(options = {}) {
     slidenavEl.style.height = null;
     mainEl.classList.toggle('absolute');
     secondaryEl.classList.toggle('absolute');
+    if (legendSlideNav) {
+      document.getElementById('legendCollapse').scrollTop = posMem;
+    }
   };
 
   const animateHeight = function animateHeight(currentSlide, newSlide) {
@@ -95,6 +101,9 @@ export default function Slidenav(options = {}) {
   };
 
   const slideToSecondary = function slideToSecondary() {
+    if (legendSlideNav) {
+      posMem = document.getElementById('legendCollapse').scrollTop;
+    }
     slidenavEl.classList.add('slide-secondary');
     animateHeight(mainEl, secondaryEl);
     slidenavEl.addEventListener('transitionend', onTransitionEnd);

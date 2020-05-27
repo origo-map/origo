@@ -62,7 +62,8 @@ const Overlays = function Overlays(options) {
   const slidenav = Slidenav({
     mainComponent: groupContainer,
     secondaryComponent: layerProps,
-    cls: 'right flex width-100'
+    cls: 'right flex width-100',
+    legendSlideNav: true
   });
 
   const navContainer = Component({
@@ -86,6 +87,7 @@ const Overlays = function Overlays(options) {
   });
 
   const overlaysCollapse = Collapse({
+    legendCollapse: true,
     bubble: true,
     collapseX: false,
     cls: 'flex column overflow-hidden width-100',
