@@ -411,7 +411,6 @@ const Viewer = function Viewer(targetOption, options = {}) {
         const featureId = urlParams.feature;
         const layerName = featureId.split('.')[0];
         const layer = getLayer(layerName);
-        const layer2 = getLayer('intressepunkt');
         const type = layer.get('type');
 
         if (layer && type !== 'GROUP') {
