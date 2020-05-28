@@ -311,7 +311,7 @@ const Search = function Search(options = {}) {
       item: renderList,
       filter(suggestion, userInput) {
         const { value: suggestionValue } = suggestion;
-        return suggestionValue.toLowerCase().indexOf(userInput.toLowerCase()) !== -1 ? suggestionValue : false;
+        return suggestionValue.toLowerCase().includes(userInput.toLowerCase()) ? suggestionValue : false;
       }
     });
 

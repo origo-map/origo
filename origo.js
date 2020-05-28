@@ -18,6 +18,7 @@ import featurelayer from './src/featurelayer';
 import * as Utils from './src/utils';
 import dropdown from './src/dropdown';
 import { renderSvgIcon } from './src/utils/legendmaker';
+import '@babel/polyfill';
 
 const Origo = function Origo(configPath, options = {}) {
   const origoConfig = {
