@@ -411,11 +411,12 @@ const Viewer = function Viewer(targetOption, options = {}) {
         const featureId = urlParams.feature;
         const layerName = featureId.split('.')[0];
         const layer = getLayer(layerName);
-        const clusterSource = layer.getSource().source;
+        const layer2 = getLayer('intressepunkt');
         const type = layer.get('type');
-        const id = featureId.split('.')[1];
 
-        if (layer) {
+        if (layer && type !== 'GROUP') {
+          const clusterSource = layer.getSource().source;
+          const id = featureId.split('.')[1];
           layer.once('postrender', () => {
             let feature;
 
