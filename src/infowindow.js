@@ -216,7 +216,7 @@ function createSubexportComponent(selectionGroup) {
   const simpleExportLayers = exportOptions.simpleExportLayers ? exportOptions.simpleExportLayers : [];
   const simpleExportUrl = exportOptions.simpleExportUrl;
   const simpleExportButtonText = exportOptions.simpleExportButtonText || 'Export';
-  const exportedFileName = exportOptions.exportedFileName || 'ExportedFeatures.xlsx';
+  const exportedFileName = exportOptions.exportedFileName;
   const activeLayer = viewer.getLayer(selectionGroup);
 
   const subexportContainer = document.createElement('div');
