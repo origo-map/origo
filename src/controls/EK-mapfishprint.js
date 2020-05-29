@@ -6,7 +6,6 @@ import {
 import GeoJSON from 'ol/format/GeoJSON';
 import $ from 'jquery';
 import { Component, Button, dom} from '../ui';
-import config from '../../conf/printSettings';
 import { getArea, getLength } from 'ol/sphere';
 import Polygon from 'ol/geom/Polygon';
 import LineString from 'ol/geom/LineString';
@@ -18,7 +17,8 @@ import PinStyle from '../style/pin';
 
 const Mapfishprint = function Mapfishprint(options = {}) {
     let {
-        target
+        target,
+        MapfishCreateUrl,
     } = options;
 
     let viewer = options.viewer;
@@ -335,6 +335,7 @@ const Mapfishprint = function Mapfishprint(options = {}) {
                 let params;
                 let url = fetchSourceUrl(layer);
                 let requestUrl;
+
                 if (!layer.get('sublayers')) { //manually handled theme layers
                     params = {
                         service: "WMS",
@@ -480,7 +481,7 @@ const Mapfishprint = function Mapfishprint(options = {}) {
                     url = layer.getSource().getUrl();
                 }
                 if (url.charAt(0) === "/") {
-                    url = config.localHost + url
+                    url = window.location.protocol + "//" + window.location.hostname + url; 
                 }
                 return url;
                 break;
@@ -733,7 +734,7 @@ const Mapfishprint = function Mapfishprint(options = {}) {
 
     // because mapfish can't return a dang url which isnt localhost
     function newUrl(url) {
-        let basePart = config.printCreate.substr(0, config.printCreate.indexOf('/', 8))
+        let basePart = MapfishCreateUrl.substr(0, MapfishCreateUrl.indexOf('/', 8))
         let mapfishPart = url.substr(url.indexOf('/', 8), url.length - 1)
         return basePart + mapfishPart
     }
@@ -745,7 +746,7 @@ const Mapfishprint = function Mapfishprint(options = {}) {
         },
         printMap(settings) {
             
-            let url = config.printCreate;
+            let url = MapfishCreateUrl;
             let promise = new Promise(function(resolve, reject) {
                 convertToMapfishOptions(settings).then(function (data) {
                     executeMapfishCall(url, data).then(function (resp){

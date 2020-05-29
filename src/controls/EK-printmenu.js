@@ -1,6 +1,4 @@
 import { Component, Button, dom, Element } from '../ui';
-import printoptions from '../../conf/printSettings';
-import printinfo from '../../conf/printinfo';
 import Mapfishprint from './EK-mapfishprint';
 import maputils from '../maputils';
 import Printarea from './EK-printarea';
@@ -11,7 +9,11 @@ const Printmenu = function Printmenu(options = {}) {
     let viewer;
     let {
         target,
-        largeScaleRestriction
+        largeScaleRestriction,
+        orientations,
+        employsArcGISServerWMS,
+        MapfishInfoUrl,
+        MapfishCreateUrl
     } = options;
 
 
@@ -114,8 +116,8 @@ const Printmenu = function Printmenu(options = {}) {
 
         orientationselect = Element({
             tagName: 'select',
-            innerHTML: `<option value='Portrait'> ${printoptions.orientation[0]} </option>
-                        <option value='Landscape'> ${printoptions.orientation[1]} </option>`,
+            innerHTML: `<option value='Portrait'> ${orientations[0]} </option>
+                        <option value='Landscape'> ${orientations[1]} </option>`,
             cls: 'o-dd-input'
         });
 
@@ -491,7 +493,7 @@ const Printmenu = function Printmenu(options = {}) {
 
     function checkPrintability(parameter) {
         //specific printability-check
-        if (printoptions.hasArcGISServerWMS()) {
+        if (employsArcGISServerWMS) {
             if (parameter == 'dpi') {
                 if (htmlResos.value == '300') {
                     for (let i = 0; i < htmlSizes.options.length; i++) {
@@ -573,7 +575,11 @@ const Printmenu = function Printmenu(options = {}) {
                 viewer: viewer
             });
             mapfishPrint = Mapfishprint(({
-                viewer: viewer
+                viewer: viewer,
+                MapfishCreateUrl: MapfishCreateUrl
+
+
+                // relay necessary bits from index.jsons options for the control here
             }));
 
             let thisComp = this;
@@ -587,7 +593,7 @@ const Printmenu = function Printmenu(options = {}) {
                     thisComp.render();
                 }
             };
-            xmlhttp.open("GET", printoptions.printInfo);
+            xmlhttp.open("GET", MapfishInfoUrl);
             xmlhttp.send();
 
             /**** --- used to do some debugging locally --- ****/

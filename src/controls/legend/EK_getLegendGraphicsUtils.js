@@ -5,7 +5,6 @@ import {
     TileWMS,
     OSM
 } from 'ol/source';
-import config from '../../../conf/printSettings';
 
 //Parses an object to a querystring
 function serialize(obj) {
@@ -81,7 +80,7 @@ export const getLegendGraphicUrlStyle = function getLegendGraphicUrlStyle(layer,
 				url = layer.getSource().getUrl();
 			}
 			if (url.charAt(0) === "/") {
-				url = config.localHost + url
+				url = window.location.protocol + "//" + window.location.hostname + url;
 			}
 			return url;
 			break;
