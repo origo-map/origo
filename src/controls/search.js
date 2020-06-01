@@ -200,11 +200,11 @@ const Search = function Search(options = {}) {
 
     document.getElementsByClassName('o-search-field')[0].addEventListener('blur', () => {
       document.getElementById(`${wrapperElement.getId()}`).classList.remove('active');
-      window.dispatchEvent(new Event('resize'));
+      window.dispatchEvent(new CustomEvent('resize'));
     });
     document.getElementsByClassName('o-search-field')[0].addEventListener('focus', () => {
       document.getElementById(`${wrapperElement.getId()}`).classList.add('active');
-      window.dispatchEvent(new Event('resize'));
+      window.dispatchEvent(new CustomEvent('resize'));
     });
   }
 
