@@ -80,11 +80,11 @@ const getContent = {
     newElement.innerHTML = val;
     return newElement;
   },
-  html(feature, attribute, attributes) {
+  html(feature, attribute, attributes, map) {
     const val = replacer.replace(attribute.html, attributes, {
       helper: geom,
       helperArg: feature.getGeometry()
-    });
+    }, map);
     const newElement = document.createElement('li');
     newElement.classList.add(attribute.cls);
     newElement.innerHTML = val;
