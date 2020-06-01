@@ -438,9 +438,10 @@ const Viewer = function Viewer(targetOption, options = {}) {
               const centerGeometry = getcenter(feature.getGeometry());
               const infowindowType = featureinfoOptions.showOverlay === false ? 'sidebar' : 'overlay';
               featureinfo.render([obj], infowindowType, centerGeometry);
-              map.getView().animate({
-                center: getcenter(feature.getGeometry()),
-                zoom: getResolutions().length - 2
+              map.getView().fit(feature.getGeometry(), {
+                maxZoom: getResolutions().length - 2,
+                padding: [15, 15, 40, 15],
+                duration: 1000
               });
             }
           });
