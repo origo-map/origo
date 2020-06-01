@@ -63,6 +63,7 @@ const Overlays = function Overlays(options) {
     mainComponent: groupContainer,
     secondaryComponent: layerProps,
     cls: 'right flex width-100',
+    style: { width: '100%' },
     legendSlideNav: true
   });
 
@@ -92,7 +93,8 @@ const Overlays = function Overlays(options) {
     collapseX: false,
     cls: 'flex column overflow-hidden width-100',
     contentCls: 'flex column o-scrollbar',
-    contentStyle: { height: '100%', 'overflow-y': 'auto' },
+    contentStyle: { height: '100%', 'overflow-y': 'auto', width: '100%'},
+    style: { width: '100%' },
     expanded,
     contentComponent: navContainer,
     headerComponent: collapseHeader
