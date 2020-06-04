@@ -233,7 +233,6 @@ const Featureinfo = function Featureinfo(options = {}) {
           }
         });
         popup.setVisibility(true);
-        initCarousel('#o-identify-carousel');
         const popupHeight = $('.o-popup').outerHeight() + 20;
         $('#o-popup').height(popupHeight);
         overlay = new Overlay({
@@ -249,6 +248,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
         map.addOverlay(overlay);
         overlay.setPosition(coord);
+        initCarousel('#o-identify-carousel');
         break;
       }
       case 'sidebar':
