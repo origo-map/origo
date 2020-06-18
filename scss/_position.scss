@@ -72,6 +72,7 @@
 }
 .o-position-coords,
 .o-position-find {
+  position: fixed;
   background-color: transparent;
   border: none;
   color: #fff;
@@ -82,4 +83,5 @@
 input.o-position-find {
   padding: 0;
   width:95px;
+  line-height: $line-height-large;
 }
