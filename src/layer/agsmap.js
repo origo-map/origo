@@ -14,11 +14,11 @@ const agsMap = function agsMap(layerOptions, viewer) {
   };
   const sourceDefault = {
     crossOrigin: 'anonymous',
-    projection: viewer.getProjection,
+    projection: viewer.getProjection(),
     ratio: 1
   };
-  const layerSettings = Object.assign({}, layerDefault, layerOptions);
-  const sourceSettings = Object.assign({}, sourceDefault, viewer.getSource(layerOptions.source));
+  const layerSettings = { ...layerDefault, ...layerOptions };
+  const sourceSettings = { ...sourceDefault, ...viewer.getSource(layerOptions.source) };
   sourceSettings.params = layerSettings.params || {};
   sourceSettings.params.layers = `show:${layerSettings.id}`;
 

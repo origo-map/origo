@@ -1,5 +1,19 @@
 const validate = {};
 
+validate.text = (text) => {
+  if (typeof text === 'string' || text instanceof String) {
+    return text;
+  }
+  return false;
+};
+
+validate.textarea = (textarea) => {
+  if (typeof textarea === 'string' || textarea instanceof String) {
+    return textarea;
+  }
+  return false;
+};
+
 validate.integer = (integer) => {
   if (integer) {
     const regex = /^[0-9]*$/;
@@ -26,7 +40,7 @@ validate.email = (email) => {
 
 validate.url = (url) => {
   if (url) {
-    const regex = /^(?:www|http(s)?:\/\/)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/i;
+    const regex = /https?:\/\/[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/i;
     return regex.test(url);
   }
   return false;
@@ -50,7 +64,7 @@ validate.date = (date) => {
 
 validate.time = (time) => {
   if (time) {
-    const regex = /^(\d{2}):(\d{2})(?::(\d{2}(?:\.\d+)?))?$/;
+    const regex = /^(?:2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]$/;
     return regex.test(time);
   }
   return false;

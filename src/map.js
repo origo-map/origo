@@ -1,24 +1,16 @@
 import OlMap from 'ol/Map';
 import OlView from 'ol/View';
-import {defaults as defaultInteractions} from 'ol/interaction';
+import mapInteractions from './mapinteractions';
 
 const Map = (options = {}) => {
-  const map = new OlMap({
-    target: options.target,
-    controls: [],
-    view: new OlView({
-      extent: options.extent || undefined,
-      projection: options.projection || undefined,
-      center: options.center,
-      resolutions: options.resolutions || undefined,
-      zoom: options.zoom,
-      enableRotation: options.enableRotation,
-      constrainResolution: options.constrainResolution
-    }),
-    interactions: defaultInteractions({
-      keyboard: false
-    })
-  });
+  const interactions = mapInteractions({ target: options.target });
+  const mapOptions = Object.assign(options, { interactions });
+  delete mapOptions.layers;
+  mapOptions.controls = [];
+
+  const view = new OlView(options);
+  const map = new OlMap(Object.assign(mapOptions, { view }));
+
   return map;
 };
 

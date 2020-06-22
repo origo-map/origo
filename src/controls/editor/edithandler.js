@@ -156,6 +156,7 @@ function onDrawEnd(evt) {
   });
   dispatcher.emitChangeEdit('draw', false);
   if (autoForm) {
+    // eslint-disable-next-line no-use-before-define
     editAttributes(feature);
   }
 }
@@ -278,7 +279,7 @@ function onDeleteSelected() {
   editSource = editLayers[currentLayer].getSource();
   if (features.getLength() === 1) {
     const feature = features.item(0);
-    const r = confirm('Är du säker på att du vill ta bort det här objektet?');
+    const r = window.confirm('Är du säker på att du vill ta bort det här objektet?');
     if (r === true) {
       saveFeature({
         feature,
@@ -292,7 +293,9 @@ function onDeleteSelected() {
 }
 
 function startDraw() {
-  if (hasDraw !== true && isActive()) {
+  if (!editLayers[currentLayer].get('geometryType')) {
+    alert(`"geometryType" har inte angivits för ${editLayers[currentLayer].get('name')}`);
+  } else if (hasDraw !== true && isActive()) {
     setActive('draw');
     hasDraw = true;
     dispatcher.emitChangeEdit('draw', true);
@@ -346,6 +349,7 @@ function onAttributesSave(feature, attrs) {
       const inputValue = $(attribute.elId).val();
       const inputName = $(attribute.elId).attr('name');
       const inputId = $(attribute.elId).attr('id');
+      const inputRequired = $(attribute.elId).attr('required');
 
       // If hidden element it should be excluded
       if ($(containerClass).hasClass('o-hidden') === false) {
@@ -379,23 +383,47 @@ function onAttributesSave(feature, attrs) {
       }
 
       // Validate form input
-      const errorOn = document.querySelector(`input[id="${inputId}"]`);
+      const errorOn = document.querySelector(`[id="${inputId}"]`);
       const errorCls = `.o-${inputId}`;
       const errorMsg = document.querySelector(errorCls);
       const errorText = `Vänligen ange korrekt ${inputName}`;
+      const requiredOn = document.querySelector(`[id="${inputId}"]`);
+      const requiredCls = `.o-${inputId}-requiredMsg`;
+      const requiredMsg = document.querySelector(requiredCls);
 
-      // Field is valid if empty
-      if (inputValue === '') {
-        if (errorMsg) {
-          errorMsg.remove();
+      valid.required = inputRequired && inputValue === '' ? false : inputValue;
+      if (!valid.required && inputRequired && inputValue === '') {
+        if (!requiredMsg) {
+          requiredOn.insertAdjacentHTML('afterend', `<div class="o-${inputId}-requiredMsg errorMsg fade-in padding-bottom-small">Obligatoriskt fält</div>`);
         }
-        return inputValue;
+      } else if (requiredMsg) {
+        requiredMsg.remove();
       }
-      // Test field input with regex and insert error text if unvalid
+
       switch (attribute.type) {
+        case 'text':
+          valid.text = validate.text(inputValue) || inputValue === '' ? inputValue : false;
+          if (!valid.text && inputValue !== '') {
+            if (!errorMsg) {
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            }
+          } else if (errorMsg) {
+            errorMsg.remove();
+          }
+          break;
+        case 'textarea':
+          valid.textarea = validate.textarea(inputValue) || inputValue === '' ? inputValue : false;
+          if (!valid.textarea && inputValue !== '') {
+            if (!errorMsg) {
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            }
+          } else if (errorMsg) {
+            errorMsg.remove();
+          }
+          break;
         case 'integer':
-          valid.integer = validate.integer(inputValue) ? inputValue : false;
-          if (!valid.integer) {
+          valid.integer = validate.integer(inputValue) || inputValue === '' ? inputValue : false;
+          if (!valid.integer && inputValue !== '') {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }
@@ -404,8 +432,8 @@ function onAttributesSave(feature, attrs) {
           }
           break;
         case 'decimal':
-          valid.decimal = validate.decimal(inputValue) ? inputValue : false;
-          if (!valid.decimal) {
+          valid.decimal = validate.decimal(inputValue) || inputValue === '' ? inputValue : false;
+          if (!valid.decimal && inputValue !== '') {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }
@@ -414,8 +442,8 @@ function onAttributesSave(feature, attrs) {
           }
           break;
         case 'email':
-          valid.email = validate.email(inputValue) ? inputValue : false;
-          if (!valid.email) {
+          valid.email = validate.email(inputValue) || inputValue === '' ? inputValue : false;
+          if (!valid.email && inputValue !== '') {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }
@@ -424,8 +452,8 @@ function onAttributesSave(feature, attrs) {
           }
           break;
         case 'url':
-          valid.url = validate.url(inputValue) ? inputValue : false;
-          if (!valid.url) {
+          valid.url = validate.url(inputValue) || inputValue === '' ? inputValue : false;
+          if (!valid.url && inputValue !== '') {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }
@@ -434,7 +462,7 @@ function onAttributesSave(feature, attrs) {
           }
           break;
         case 'datetime':
-          valid.datetime = validate.datetime(inputValue) && inputValue.length === 16 ? inputValue : false;
+          valid.datetime = validate.datetime(inputValue) && inputValue.length === 19 ? inputValue : false;
           if (!valid.datetime) {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
@@ -445,7 +473,7 @@ function onAttributesSave(feature, attrs) {
           break;
         case 'date':
           valid.date = validate.date(inputValue) && inputValue.length === 10 ? inputValue : false;
-          if (!valid.date) {
+          if (!valid.date && inputValue !== '') {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }
@@ -454,7 +482,7 @@ function onAttributesSave(feature, attrs) {
           }
           break;
         case 'time':
-          valid.time = validate.time(inputValue) && inputValue.length === 5 ? inputValue : false;
+          valid.time = validate.time(inputValue) && inputValue.length === 8 ? inputValue : false;
           if (!valid.time) {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
@@ -464,8 +492,8 @@ function onAttributesSave(feature, attrs) {
           }
           break;
         case 'image':
-          valid.image = validate.image(inputValue) ? inputValue : false;
-          if (!valid.image) {
+          valid.image = validate.image(inputValue) || inputValue === '' ? inputValue : false;
+          if (!valid.image && inputValue !== '') {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }
@@ -474,8 +502,8 @@ function onAttributesSave(feature, attrs) {
           }
           break;
         case 'color':
-          valid.color = validate.color(inputValue) ? inputValue : false;
-          if (!valid.color) {
+          valid.color = validate.color(inputValue) || inputValue === '' ? inputValue : false;
+          if (!valid.color && inputValue !== '') {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }
@@ -485,7 +513,7 @@ function onAttributesSave(feature, attrs) {
           break;
         default:
       }
-      valid.validates = Object.values(valid).includes(false) ? false : valid;
+      valid.validates = !Object.values(valid).includes(false);
     });
 
     // If valid, continue

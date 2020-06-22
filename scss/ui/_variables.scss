@@ -150,11 +150,17 @@ $spacing-standard: $size-0;
 $spacing-small: $size-0-25;
 
 // Miscellaneous
-
 $base-scale: 1;
+$radius-larger: 2rem;
 $radius-large: 1rem;
 $radius-base: .5rem;
 $radius-small: .25rem;
 $radius-round: 50%;
 $shadow: 0 4px 6px 0 hsla(0,0%,0%,0.2);
 $shadow-subtle: 0 2px 6px 0 hsla(0,0%,0%,0.2);
+
+// Scrollbar
+$scrollbar-bg: white;
+$scrollbar-thumb: #dcdcdc;
+$scrollbar-px-width: 11px;
+$scrollbar-px-radius: 6px;

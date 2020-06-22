@@ -7,6 +7,7 @@ export default function Collapse(options = {}) {
     expanded = false
   } = options;
   const {
+    legendCollapse = false,
     bubble = false,
     cls = '',
     collapseX = true,
@@ -25,7 +26,7 @@ export default function Collapse(options = {}) {
   const contentStyle = createStyle(contentStyleOptions);
   const toggleEvent = 'collapse:toggle';
   const collapseEvent = 'collapse:collapse';
-  const containerId = cuid();
+  let containerId = cuid();
   let collapseEl;
   let containerEl;
   let contentEl;
@@ -110,6 +111,9 @@ export default function Collapse(options = {}) {
       const isExpanded = expanded ? 'expanded' : '';
       const header = headerComponent ? headerComponent.render() : '';
       const footer = footerComponent ? footerComponent.render() : '';
+      if (legendCollapse) {
+        containerId = 'legendCollapse';
+      }
       return `<${tagName} id="${this.getId()}" class="collapse ${cls} ${isExpanded}" style="${style}">
                 ${header}
                 <div id="${containerId}" class="collapse-container ${contentCls}" style="${height} ${width} ${contentStyle}">

@@ -38,7 +38,7 @@ export default function Modal(options = {}) {
       const headerCmps = [];
 
       titleEl = Element({
-        cls: 'flex row justify-start margin-top-small margin-left text-weight-bold',
+        cls: 'flex row justify-start margin-y-smaller margin-left text-weight-bold',
         style: 'width: 100%;',
         innerHTML: `${title}`
       });
@@ -46,7 +46,7 @@ export default function Modal(options = {}) {
 
       if (newTabUrl) {
         newTabButton = Button({
-          cls: 'small round margin-top-small margin-right icon-smaller grey-lightest no-shrink',
+          cls: 'small round margin-top-smaller margin-bottom-auto margin-right icon-smaller grey-lightest no-shrink',
           icon: '#ic_launch_24px',
           click() {
             window.open(newTabUrl);
@@ -56,7 +56,7 @@ export default function Modal(options = {}) {
       }
 
       closeButton = Button({
-        cls: 'small round margin-top-small margin-right icon-smaller grey-lightest no-shrink',
+        cls: 'small round margin-top-smaller margin-bottom-auto margin-right icon-smaller grey-lightest no-shrink',
         icon: closeIcon,
         validStates: ['initial', 'hidden'],
         click() {
