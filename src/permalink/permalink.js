@@ -56,10 +56,14 @@ export default (() => ({
         .then((data) => {
           const mapObj = {};
           Object.keys(data).forEach(key => {
-            mapObj[key] = permalinkParser[key](data[key]);
+            if (permalinkParser[key]) mapObj[key] = permalinkParser[key](data[key]);
+            else mapObj[key] = data[key];
           });
           return mapObj;
         });
     }
+  },
+  addParamsToGetMapState: function addParamsToGetMapState(key, callback) {
+    permalinkStore.AddExternalParams(key, callback);
   }
 }))();
