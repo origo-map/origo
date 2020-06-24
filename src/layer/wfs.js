@@ -4,18 +4,25 @@ import VectorSource from 'ol/source/Vector';
 import GeoJSONFormat from 'ol/format/GeoJSON';
 import { transformExtent } from 'ol/proj';
 import vector from './vector';
+import replacer from '../utils/replacer';
 
 function createSource(options) {
   const serverUrl = options.url;
   let queryFilter = '';
 
+  let filter = options.filter;
+  if (options.filter) {
+    const filterAttribute = options.filter.split('=');
+    filter = `${filterAttribute[0]}='${replacer.replace(filterAttribute[1].replace(/'/g, ''), window)}'`;
+  }
+
   // If cql filter then bbox must be used in the filter.
   if (options.strategy === 'all') {
-    queryFilter = options.filter ? `&CQL_FILTER=${options.filter}` : '';
+    queryFilter = filter ? `&CQL_FILTER=${filter}` : '';
   } else {
-    queryFilter = options.filter ? `&CQL_FILTER=${options.filter} AND BBOX(${options.geometryName},` : '&BBOX=';
+    queryFilter = filter ? `&CQL_FILTER=${filter} AND BBOX(${options.geometryName},` : '&BBOX=';
   }
-  const bboxProjectionCode = options.filter ? `'${options.dataProjection}')` : options.dataProjection;
+  const bboxProjectionCode = filter ? `'${options.dataProjection}')` : options.dataProjection;
   const vectorSource = new VectorSource({
     attributions: options.attribution,
     format: new GeoJSONFormat({

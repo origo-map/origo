@@ -2,6 +2,7 @@ import EsriJSON from 'ol/format/EsriJSON';
 import VectorSource from 'ol/source/Vector';
 import * as loadingstrategy from 'ol/loadingstrategy';
 import vector from './vector';
+import replacer from '../utils/replacer';
 
 function createSource({
   attribution,
@@ -10,8 +11,14 @@ function createSource({
   projectionCode,
   url: sourceUrl
 } = {}) {
+  let layerFilter;
+  if (filter) {
+    const filterAttribute = filter.split('=');
+    layerFilter = `${filterAttribute[0]}='${replacer.replace(filterAttribute[1].replace(/'/g, ''), window)}'`;
+  }
+
   const esriSrs = projectionCode.split(':').pop();
-  const queryFilter = filter ? `&where=${filter}` : '';
+  const queryFilter = layerFilter ? `&where=${layerFilter}` : '';
   const esrijsonFormat = new EsriJSON();
   const vectorSource = new VectorSource({
     attributions: attribution,
