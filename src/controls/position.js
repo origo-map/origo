@@ -257,12 +257,12 @@ const Position = function Position(options = {}) {
       });
       coordsElement = El({
         cls: 'o-position-coords',
-        style: 'padding-left: 5px; line-height: 1.25rem;'
+        style: 'padding-left: 5px;'
       });
       coordsFindElement = El({
         cls: 'o-position-find',
         tagName: 'input',
-        style: 'padding-left: 5px; margin-left: 5px;'
+        style: 'padding-left: 5px;'
       });
       containerElement = El({
         cls: 'o-position',

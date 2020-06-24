@@ -78,10 +78,11 @@
   color: #fff;
   font-family: Arial, "Helvetica Neue", sans-serif;
   font-size: 0.625rem;
+  line-height: $line-height-larger;
   margin: 0;
 }
 input.o-position-find {
   padding: 0;
   width:95px;
-  line-height: $line-height-large;
+  line-height: $line-height-larger;
 }
