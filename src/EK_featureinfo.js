@@ -159,6 +159,16 @@ const Featureinfo = function Featureinfo(options = {}) {
       case 'overlay':
       {
         popup = Popup(`#${viewer.getId()}`);
+        //Experimental workaround for the default ESRI getFeatureInfo text/html templates returned by LST ArcGIS WMS services
+        //Gets rid of the <h5 large non-enlightening 'featureCollection: layer name '4''
+        //and linkifies any url in the table 
+        const agsNameReplace = /<h5>FeatureInfoCollection - layer name: '[-A-Z0-9+&@#/%?=~_|!:,.;]*'<\/h5>/gim;
+        content = content.replace(agsNameReplace, '');
+        const urlifyReplace = /<td>(\b(https?|ftp):\/\/[-A-Z0-9+&@#/%?=~_|!:,.;]*[-A-Z0-9+&@#/%=~_|])/gim;
+        content = content.replace(urlifyReplace, '<td><a href="$1" target="_blank">$1</a>');
+        const tableTextSizeReplace = /font-size: 80%;/;
+        content = content.replace(tableTextSizeReplace, 'font-size: 85%;');
+
         popup.setContent({
           content,
           title: items[0].title
