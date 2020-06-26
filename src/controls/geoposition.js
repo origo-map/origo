@@ -8,6 +8,11 @@ const Geoposition = function Geoposition(options = {}) {
     zoomLevel
   } = options;
 
+  const {
+    active = false,
+    panTo = true
+  } = options;
+
   let viewer;
   let positionButton;
   let baseUrl;
@@ -64,7 +69,9 @@ const Geoposition = function Geoposition(options = {}) {
     viewer.getMap().addOverlay(markerOverlay);
 
     geolocation.on('change', updatePosition);
-    geolocation.once('change', centerPosition);
+    if (panTo) {
+      geolocation.once('change', centerPosition);
+    }
     geolocation.setTracking(true);
   };
 
@@ -97,11 +104,13 @@ const Geoposition = function Geoposition(options = {}) {
     },
     onInit() {
       positionButton = Button({
-        cls: 'o-geoposition padding-small icon-smaller rounded light box-shadow',
+        cls: 'o-geoposition padding-small icon-smaller round light box-shadow',
         click() {
           toggleState();
         },
         icon: '#ic_near_me_24px',
+        tooltipText: 'Visa din nuvarande position i kartan',
+        tooltipPlacement: 'east',
         methods: {
           active: onActive,
           initial: onInitial
@@ -110,6 +119,9 @@ const Geoposition = function Geoposition(options = {}) {
     },
     render() {
       const htmlString = positionButton.render();
+      if (active) {
+        positionButton.setState('active');
+      }
       const el = dom.html(htmlString);
       document.getElementById(target).appendChild(el);
       this.dispatch('render');

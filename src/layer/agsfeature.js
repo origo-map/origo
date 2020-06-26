@@ -18,8 +18,8 @@ function createSource({
     loader(extent, resolution, projection) {
       const that = this;
       let url = sourceUrl.endsWith('/') ? sourceUrl : `${sourceUrl}/`;
-      url += id +
-        encodeURI(['/query?f=json&',
+      url += id
+        + encodeURI(['/query?f=json&',
           'returnGeometry=true',
           '&spatialRel=esriSpatialRelIntersects',
           `&geometry={"xmin":${extent[0]},"ymin":`,

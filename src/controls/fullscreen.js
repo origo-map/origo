@@ -11,7 +11,10 @@ const Fullscreen = function Fullscreen(options = {}) {
   let fullscreenButton;
 
   const goFullScreen = function goFullScreen() {
-    const url = window.location.href;
+    let url = '';
+    if (window.location.href.indexOf('?mapStateId=') > 0) {
+      url = window.location.href;
+    } else { url = permalink.getPermalink(viewer); }
     window.open(url);
   };
 
@@ -20,11 +23,13 @@ const Fullscreen = function Fullscreen(options = {}) {
     onAdd(evt) {
       viewer = evt.target;
       fullscreenButton = Button({
-        cls: 'o-home-in padding-small icon-smaller rounded light box-shadow',
+        cls: 'o-home-in padding-small icon-smaller round light box-shadow',
         click() {
           goFullScreen();
         },
-        icon: '#ic_fullscreen_24px'
+        icon: '#ic_fullscreen_24px',
+        tooltipText: 'Visa stor karta',
+        tooltipPlacement: 'east'
       });
       if (!target) target = `${viewer.getMain().getNavigation().getId()}`;
       if (isEmbedded(viewer.getTarget())) {

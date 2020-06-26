@@ -137,7 +137,7 @@ function init(options, v) {
 
   if (options.isActive) {
     setActive(true);
-  }  
+  }
 }
 
 export default (function exportInit() {

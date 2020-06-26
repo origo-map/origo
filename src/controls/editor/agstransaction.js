@@ -1,6 +1,5 @@
 import EsriJSON from 'ol/format/EsriJSON';
 import $ from 'jquery';
-import viewer from '../../viewer';
 import dispatcher from './editdispatcher';
 
 const format = new EsriJSON();
@@ -36,7 +35,7 @@ function writeAgsTransaction(features, options) {
   return data;
 }
 
-function agsTransaction(transObj, layerName) {
+function agsTransaction(transObj, layerName, viewer) {
   const projection = viewer.getProjection();
   const layer = viewer.getLayer(layerName);
   const id = layer.get('id');
@@ -45,7 +44,7 @@ function agsTransaction(transObj, layerName) {
 
   function updateSuccess(data) {
     const feature = transObj.update;
-    const result = JSON.parse(data);
+    const result = typeof data !== 'object' ? JSON.parse(data) : data;
     if (result) {
       if (result.updateResults.length > 0) {
         result.updateResults.forEach((update, index) => {
@@ -68,7 +67,7 @@ function agsTransaction(transObj, layerName) {
 
   function insertSuccess(data) {
     const feature = transObj.insert;
-    const result = JSON.parse(data);
+    const result = typeof data !== 'object' ? JSON.parse(data) : data;
     if (result) {
       if (result.addResults.length > 0) {
         result.addResults.forEach((insert, index) => {
@@ -93,7 +92,7 @@ function agsTransaction(transObj, layerName) {
 
   function deleteSuccess(data) {
     const feature = transObj.delete;
-    const result = JSON.parse(data);
+    const result = typeof data !== 'object' ? JSON.parse(data) : data;
     if (result) {
       if (result.deleteResults.length > 0) {
         result.deleteResults.forEach((deleted, index) => {
@@ -124,7 +123,7 @@ function agsTransaction(transObj, layerName) {
       const u = source.url.slice(-1) === '/' ? source.url : `${source.url}/`;
       const i = `${id}`.slice(-1) === '/' ? id : `${id}/`;
       const url = u + i + urlSuffix[type];
-      
+
       const data = writeAgsTransaction(transObj[type], {
         projection,
         type
@@ -141,6 +140,6 @@ function agsTransaction(transObj, layerName) {
   });
 }
 
-export default function (transObj, layerName) {
-  agsTransaction(transObj, layerName);
+export default function (transObj, layerName, viewer) {
+  agsTransaction(transObj, layerName, viewer);
 }

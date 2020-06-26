@@ -13,21 +13,21 @@ const replacer = function replacer() {
     return ['', str];
   }
 
-  function searchAndReplace(name, obj) {
+  function searchAndReplace(name, obj, map) {
     const regex = new RegExp(`${start}(.*?)${end}`, 'g');
     const matches = regex.exec(name);
     if (matches) {
       let val = Object.prototype.hasOwnProperty.call(obj, matches[1]) ? obj[matches[1]] : '';
-      if (!val) {
+      if (val === '') {
         const nsIndex = matches[0].indexOf(helperNS);
         if (nsIndex) {
           const helperParts = getArgs(matches[1]);
           const helperName = helperParts[1].substring(nsIndex - 1);
-          const args = helperArg.concat(helperParts[0]);
+          const args = helperArg.concat(helperParts[0], map);
           val = Object.prototype.hasOwnProperty.call(helper, helperName) ? helper[helperName].apply(null, args).toString() : '';
         }
       }
-      return searchAndReplace(name.replace(matches[0], val), obj);
+      return searchAndReplace(name.replace(matches[0], val), obj, map);
     }
     return name;
   }
@@ -39,7 +39,7 @@ const replacer = function replacer() {
     helperNS = options.helperNS || '@';
     helperArg = [options.helperArg] || [];
 
-    const result = searchAndReplace(name, obj);
+    const result = searchAndReplace(name, obj, map);
     return result;
   }
 

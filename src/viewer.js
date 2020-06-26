@@ -6,19 +6,21 @@ import Map from './map';
 import proj from './projection';
 import MapSize from './utils/mapsize';
 import Featureinfo from './EK_featureinfo';
+import Selectionmanager from './selectionmanager';
 import maputils from './maputils';
+import utils from './utils';
 import Layer from './layer';
 import Main from './components/main';
 import Footer from './components/footer';
 import flattenGroups from './utils/flattengroups';
-import getattributes from './getattributes';
+import getAttributes from './getattributes';
 import getcenter from './geometry/getcenter';
-import {getIfThemeLayer} from './controls/legend/EK_getLegendGraphicsUtils';
 
 const Viewer = function Viewer(targetOption, options = {}) {
   let map;
   let tileGrid;
   let featureinfo;
+  let selectionmanager;
 
   let {
     projection
@@ -32,13 +34,12 @@ const Viewer = function Viewer(targetOption, options = {}) {
     consoleId = 'o-console',
     mapCls = 'o-map',
     controls = [],
-    enableRotation = true,
     featureinfoOptions = {},
     groups: groupOptions = [],
-    mapGrid = true,
     pageSettings = {},
     projectionCode,
     projectionExtent,
+    startExtent,
     extent = [],
     center: centerOption = [0, 0],
     zoom: zoomOption = 0,
@@ -65,12 +66,17 @@ const Viewer = function Viewer(targetOption, options = {}) {
     tileSize: [256, 256]
   };
   const tileGridSettings = Object.assign({}, defaultTileGridOptions, tileGridOptions);
-  const mapGridCls = mapGrid ? 'o-mapgrid' : '';
+  let mapGridCls = '';
+  if (pageSettings.mapGrid) {
+    if (pageSettings.mapGrid.visible) {
+      mapGridCls = 'o-map-grid';
+    }
+  }
   const cls = `${clsOptions} ${mapGridCls} ${mapCls} o-ui`.trim();
   const footerData = pageSettings.footer || {};
   const main = Main();
   const footer = Footer({
-    footerData
+    data: footerData
   });
   let mapSize;
 
@@ -97,6 +103,14 @@ const Viewer = function Viewer(targetOption, options = {}) {
   };
 
   const getFeatureinfo = () => featureinfo;
+
+  const getSelectionManager = () => selectionmanager;
+
+  const getCenter = () => getcenter;
+
+  const getMapUtils = () => maputils;
+
+  const getUtils = () => utils;
 
   const getMapName = () => mapName;
 
@@ -163,6 +177,11 @@ const Viewer = function Viewer(targetOption, options = {}) {
   const getQueryableLayers = function getQueryableLayers() {
     const queryableLayers = getLayers().filter(layer => layer.get('queryable') && layer.getVisible());
     return queryableLayers;
+  };
+
+  const getGroupLayers = function getGroupLayers() {
+    const groupLayers = getLayers().filter(layer => layer.get('type') === 'GROUP');
+    return groupLayers;
   };
 
   const getSearchableLayers = function getSearchableLayers(searchableDefault) {
@@ -275,47 +294,17 @@ const Viewer = function Viewer(targetOption, options = {}) {
     return false;
   };
 
-  const addInitialLayer = function addInitialLayer(layerProps) {
+  const addLayer = function addLayer(layerProps) {
     const layer = Layer(layerProps, this);
-    
     map.addLayer(layer);
     this.dispatch('addlayer', {
       layerName: layerProps.name
     });
   };
 
-  const addLayer = function addLayer(layerProps) {
-    const layer = Layer(layerProps, this);
-    
-    
-    var that = this;
-
-
-    // Testa härifrån TODO
-    Promise.all(getIfThemeLayer(that, [layer])).then(function (themeInfos) {
-
-      themeInfos.forEach((info) => {
-          if (info.layerName === layer.get('name')) {
-              layer.set('theme', info.isThemeLayer)
-          }
-      })
-      
-      map.addLayer(layer);
-      that.dispatch('addlayer', {
-        layerName: layerProps.name
-      });
-    }, function (err) {
-      console.warn("warn: ", err)
-      map.addLayer(layer);
-      that.dispatch('addlayer', {
-        layerName: layerProps.name
-      });
-    });
-  };
-
   const addLayers = function addLayers(layersProps) {
     layersProps.reverse().forEach((layerProps) => {
-      this.addInitialLayer(layerProps);
+      this.addLayer(layerProps);
     });
   };
 
@@ -395,23 +384,14 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
       tileGrid = maputils.tileGrid(tileGridSettings);
 
-      setMap(Map({
-        extent,
-        getFeatureinfo,
-        projection,
-        center,
-        resolutions,
-        zoom,
-        enableRotation,
-        target: this.getId()
-      }));
+      setMap(Map(Object.assign(options, { projection, center, zoom, target: this.getId() })));
 
       const layerProps = mergeSavedLayerProps(layerOptions, urlParams.layers);
       this.addLayers(layerProps);
       if(urlParams.addedLayers){
         urlParams.addedLayers.reverse().forEach((layerProps) => {
         this.addSource(layerProps.source, {url: layerProps.source});
-        this.addInitialLayer(layerProps);
+        this.addLayer(layerProps);
         });
       }
   
@@ -425,34 +405,37 @@ const Viewer = function Viewer(targetOption, options = {}) {
         const featureId = urlParams.feature;
         const layerName = featureId.split('.')[0];
         const layer = getLayer(layerName);
-        if (layer) {
-          layer.once('render', () => {
+        const type = layer.get('type');
+
+        if (layer && type !== 'GROUP') {
+          const clusterSource = layer.getSource().source;
+          const id = featureId.split('.')[1];
+          layer.once('postrender', () => {
             let feature;
-            const type = layer.get('type');
-            feature = layer.getSource().getFeatureById(featureId);
-            if (type === 'WFS') {
+
+            if (type === 'WFS' && clusterSource) {
+              feature = clusterSource.getFeatureById(featureId);
+            } else if (type === 'WFS') {
               feature = layer.getSource().getFeatureById(featureId);
+            } else if (clusterSource) {
+              feature = clusterSource.getFeatureById(id);
             } else {
-              const id = featureId.split('.')[1];
-              let origin = layer.getSource();
-              feature = origin.getFeatureById(id);
-              // feature has no id it is not found it maybe a cluster, therefore try again.
-              if (feature === null && type !== 'TOPOJSON') {
-                origin = origin.getSource();
-                feature = origin.getFeatureById(id);
-              }
+              feature = layer.getSource().getFeatureById(id);
             }
+
             if (feature) {
               const obj = {};
               obj.feature = feature;
               obj.title = layer.get('title');
-              obj.content = getattributes(feature, layer);
+              obj.content = getAttributes(feature, layer);
               obj.layer = layer;
               const centerGeometry = getcenter(feature.getGeometry());
-              featureinfo.render([obj], 'overlay', centerGeometry);
-              map.getView().animate({
-                center: getcenter(feature.getGeometry()),
-                zoom: getResolutions().length - 2
+              const infowindowType = featureinfoOptions.showOverlay === false ? 'sidebar' : 'overlay';
+              featureinfo.render([obj], infowindowType, centerGeometry);
+              map.getView().fit(feature.getGeometry(), {
+                maxZoom: getResolutions().length - 2,
+                padding: [15, 15, 40, 15],
+                duration: 1000
               });
             }
           });
@@ -467,9 +450,19 @@ const Viewer = function Viewer(targetOption, options = {}) {
           geometry: new geom[urlParams.selection.geometryType](urlParams.selection.coordinates)
         });
       }
+
+      if (!urlParams.zoom && !urlParams.mapStateId && startExtent) {
+        map.getView().fit(startExtent, { size: map.getSize() });
+      }
+
       featureinfoOptions.viewer = this;
+
+      selectionmanager = Selectionmanager(featureinfoOptions);
+      this.addComponent(selectionmanager);
+
       featureinfo = Featureinfo(featureinfoOptions);
       this.addComponent(featureinfo);
+
       this.addControls();
     },
     render() {
@@ -489,11 +482,11 @@ const Viewer = function Viewer(targetOption, options = {}) {
     addGroups,
     addLayer,
     addLayers,
-    addInitialLayer,
     addSource,
     addStyle,
     getBaseUrl,
     getBreakPoints,
+    getCenter,
     getClusterOptions,
     getConsoleId,
     getControlByName,
@@ -506,7 +499,10 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getGroups,
     getMain,
     getMapSource,
+    getMapUtils,
+    getUtils,
     getQueryableLayers,
+    getGroupLayers,
     getResolutions,
     getSearchableLayers,
     getSize,
@@ -528,7 +524,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getUrlParams,
     removeGroup,
     removeOverlays,
-    zoomToExtent
+    zoomToExtent,
+    getSelectionManager
   });
 };
 

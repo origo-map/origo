@@ -14,6 +14,7 @@ import editForm from './editform';
 import imageresizer from '../../utils/imageresizer';
 import getImageOrientation from '../../utils/getimageorientation';
 import shapes from './shapes';
+import validate from '../../utils/validate';
 
 const editsStore = store();
 let editLayers = {};
@@ -155,6 +156,7 @@ function onDrawEnd(evt) {
   });
   dispatcher.emitChangeEdit('draw', false);
   if (autoForm) {
+    // eslint-disable-next-line no-use-before-define
     editAttributes(feature);
   }
 }
@@ -277,7 +279,7 @@ function onDeleteSelected() {
   editSource = editLayers[currentLayer].getSource();
   if (features.getLength() === 1) {
     const feature = features.item(0);
-    const r = confirm('Är du säker på att du vill ta bort det här objektet?');
+    const r = window.confirm('Är du säker på att du vill ta bort det här objektet?');
     if (r === true) {
       saveFeature({
         feature,
@@ -291,7 +293,9 @@ function onDeleteSelected() {
 }
 
 function startDraw() {
-  if (hasDraw !== true && isActive()) {
+  if (!editLayers[currentLayer].get('geometryType')) {
+    alert(`"geometryType" har inte angivits för ${editLayers[currentLayer].get('name')}`);
+  } else if (hasDraw !== true && isActive()) {
     setActive('draw');
     hasDraw = true;
     dispatcher.emitChangeEdit('draw', true);
@@ -331,6 +335,7 @@ function attributesSaveHandler(feature, formEl) {
 function onAttributesSave(feature, attrs) {
   $('#o-save-button').on('click', (e) => {
     const editEl = {};
+    const valid = {};
     let fileReader;
     let input;
     let file;
@@ -339,18 +344,24 @@ function onAttributesSave(feature, attrs) {
     attrs.forEach((attribute) => {
       // Get the input container class
       const containerClass = `.${attribute.elId.slice(1)}`;
+      // Get the input attributes
+      const inputType = $(attribute.elId).attr('type');
+      const inputValue = $(attribute.elId).val();
+      const inputName = $(attribute.elId).attr('name');
+      const inputId = $(attribute.elId).attr('id');
+      const inputRequired = $(attribute.elId).attr('required');
 
       // If hidden element it should be excluded
       if ($(containerClass).hasClass('o-hidden') === false) {
         // Check if checkbox. If checkbox read state.
-        if ($(attribute.elId).attr('type') === 'checkbox') {
+        if (inputType === 'checkbox') {
           editEl[attribute.name] = $(attribute.elId).is(':checked') ? 1 : 0;
         } else { // Read value from input text, textarea or select
-          editEl[attribute.name] = $(attribute.elId).val();
+          editEl[attribute.name] = inputValue;
         }
       }
       // Check if file. If file, read and trigger resize
-      if ($(attribute.elId).attr('type') === 'file') {
+      if (inputType === 'file') {
         input = $(attribute.elId)[0];
         file = input.files[0];
 
@@ -370,19 +381,155 @@ function onAttributesSave(feature, attrs) {
           editEl[attribute.name] = $(attribute.elId).attr('value');
         }
       }
+
+      // Validate form input
+      const errorOn = document.querySelector(`[id="${inputId}"]`);
+      const errorCls = `.o-${inputId}`;
+      const errorMsg = document.querySelector(errorCls);
+      const errorText = `Vänligen ange korrekt ${inputName}`;
+      const requiredOn = document.querySelector(`[id="${inputId}"]`);
+      const requiredCls = `.o-${inputId}-requiredMsg`;
+      const requiredMsg = document.querySelector(requiredCls);
+
+      valid.required = inputRequired && inputValue === '' ? false : inputValue;
+      if (!valid.required && inputRequired && inputValue === '') {
+        if (!requiredMsg) {
+          requiredOn.insertAdjacentHTML('afterend', `<div class="o-${inputId}-requiredMsg errorMsg fade-in padding-bottom-small">Obligatoriskt fält</div>`);
+        }
+      } else if (requiredMsg) {
+        requiredMsg.remove();
+      }
+
+      switch (attribute.type) {
+        case 'text':
+          valid.text = validate.text(inputValue) || inputValue === '' ? inputValue : false;
+          if (!valid.text && inputValue !== '') {
+            if (!errorMsg) {
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            }
+          } else if (errorMsg) {
+            errorMsg.remove();
+          }
+          break;
+        case 'textarea':
+          valid.textarea = validate.textarea(inputValue) || inputValue === '' ? inputValue : false;
+          if (!valid.textarea && inputValue !== '') {
+            if (!errorMsg) {
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            }
+          } else if (errorMsg) {
+            errorMsg.remove();
+          }
+          break;
+        case 'integer':
+          valid.integer = validate.integer(inputValue) || inputValue === '' ? inputValue : false;
+          if (!valid.integer && inputValue !== '') {
+            if (!errorMsg) {
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            }
+          } else if (errorMsg) {
+            errorMsg.remove();
+          }
+          break;
+        case 'decimal':
+          valid.decimal = validate.decimal(inputValue) || inputValue === '' ? inputValue : false;
+          if (!valid.decimal && inputValue !== '') {
+            if (!errorMsg) {
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            }
+          } else if (errorMsg) {
+            errorMsg.remove();
+          }
+          break;
+        case 'email':
+          valid.email = validate.email(inputValue) || inputValue === '' ? inputValue : false;
+          if (!valid.email && inputValue !== '') {
+            if (!errorMsg) {
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            }
+          } else if (errorMsg) {
+            errorMsg.remove();
+          }
+          break;
+        case 'url':
+          valid.url = validate.url(inputValue) || inputValue === '' ? inputValue : false;
+          if (!valid.url && inputValue !== '') {
+            if (!errorMsg) {
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            }
+          } else if (errorMsg) {
+            errorMsg.remove();
+          }
+          break;
+        case 'datetime':
+          valid.datetime = validate.datetime(inputValue) && inputValue.length === 19 ? inputValue : false;
+          if (!valid.datetime) {
+            if (!errorMsg) {
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            }
+          } else if (errorMsg) {
+            errorMsg.remove();
+          }
+          break;
+        case 'date':
+          valid.date = validate.date(inputValue) && inputValue.length === 10 ? inputValue : false;
+          if (!valid.date && inputValue !== '') {
+            if (!errorMsg) {
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            }
+          } else if (errorMsg) {
+            errorMsg.remove();
+          }
+          break;
+        case 'time':
+          valid.time = validate.time(inputValue) && inputValue.length === 8 ? inputValue : false;
+          if (!valid.time) {
+            if (!errorMsg) {
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            }
+          } else if (errorMsg) {
+            errorMsg.remove();
+          }
+          break;
+        case 'image':
+          valid.image = validate.image(inputValue) || inputValue === '' ? inputValue : false;
+          if (!valid.image && inputValue !== '') {
+            if (!errorMsg) {
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            }
+          } else if (errorMsg) {
+            errorMsg.remove();
+          }
+          break;
+        case 'color':
+          valid.color = validate.color(inputValue) || inputValue === '' ? inputValue : false;
+          if (!valid.color && inputValue !== '') {
+            if (!errorMsg) {
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            }
+          } else if (errorMsg) {
+            errorMsg.remove();
+          }
+          break;
+        default:
+      }
+      valid.validates = !Object.values(valid).includes(false);
     });
 
-    if (fileReader && fileReader.readyState === 1) {
-      $(document).on('imageresized', () => {
+    // If valid, continue
+    if (valid.validates) {
+      if (fileReader && fileReader.readyState === 1) {
+        $(document).on('imageresized', () => {
+          attributesSaveHandler(feature, editEl);
+        });
+      } else {
         attributesSaveHandler(feature, editEl);
-      });
-    } else {
-      attributesSaveHandler(feature, editEl);
-    }
+      }
 
-    modal.closeModal();
-    $('#o-save-button').blur();
-    e.preventDefault();
+      modal.closeModal();
+      $('#o-save-button').blur();
+      e.preventDefault();
+    }
   });
 }
 
@@ -405,23 +552,21 @@ function addImageListener() {
   const fn = (obj) => {
     const fileReader = new FileReader();
     const containerClass = `.${obj.elId.slice(1)}`;
-    $(obj.elId).on('change', () => {
-      $(`${containerClass} img`).removeClass('o-hidden');
-      $(`${containerClass} input[type=button]`).removeClass('o-hidden');
-
-      if (this.files && this.files[0]) {
+    $(obj.elId).on('change', (ev) => {
+      if (ev.target.files && ev.target.files[0]) {
+        $(`${containerClass} img`).removeClass('o-hidden');
+        $(`${containerClass} input[type=button]`).removeClass('o-hidden');
         fileReader.onload = (e) => {
           $(`${containerClass} img`).attr('src', e.target.result);
         };
-
-        fileReader.readAsDataURL(this.files[0]);
+        fileReader.readAsDataURL(ev.target.files[0]);
       }
     });
 
-    $(`${containerClass} input[type=button]`).on('click', () => {
+    $(`${containerClass} input[type=button]`).on('click', (e) => {
       $(obj.elId).attr('value', '');
       $(`${containerClass} img`).addClass('o-hidden');
-      $(this).addClass('o-hidden');
+      $(e.target).addClass('o-hidden');
     });
   };
 
@@ -477,7 +622,7 @@ function editAttributes(feat) {
     }
 
     const formElement = attributeObjects.reduce((prev, next) => prev + next.formElement, '');
-    const form = `<form>${formElement}<br><div class="o-form-save"><input id="o-save-button" type="button" value="Ok"></input></div></form>`;
+    const form = `<div id="o-form">${formElement}<br><div class="o-form-save"><input id="o-save-button" type="button" value="Ok"></input></div></div>`;
 
     modal = Modal({
       title,

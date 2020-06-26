@@ -30,10 +30,13 @@ $list-spacer-divided: .75rem;
     padding-bottom: $list-spacer-divided;
   }
   &.divider-start > li:first-child {
-    border-top: $list-border;
+    border-top: none;
   }
   &.divider-end > li:last-child {
     border-bottom: $list-border;
+  }
+  &.divider-end-rootgroup > li:last-child {
+    border-bottom: none;
   }
   &.divider-end > li:last-child .divider-end > li:last-child {
     border-bottom: none;

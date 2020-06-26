@@ -10,7 +10,7 @@ function getGetFeatureInfoUrl({
 }, layer) {
 
   const infoFormat = layer.getProperties().infoFormat || 'application/json';
-  const url = layer.getSource().getGetFeatureInfoUrl(coordinate, resolution, projection, {
+  const url = layer.getSource().getFeatureInfoUrl(coordinate, resolution, projection, {
     INFO_FORMAT: infoFormat,
     FEATURE_COUNT: '1'
   });

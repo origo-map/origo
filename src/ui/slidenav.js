@@ -100,6 +100,9 @@ export default function Slidenav(options = {}) {
   };
 
   const slideToSecondary = function slideToSecondary() {
+    if (legendSlideNav) {
+      posMem = document.getElementById('legendCollapse').scrollTop;
+    }
     slidenavEl.classList.add('slide-secondary');
     animateHeight(mainEl, secondaryEl);
     slidenavEl.addEventListener('transitionend', onTransitionEnd);

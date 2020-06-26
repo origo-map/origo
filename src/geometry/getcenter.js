@@ -1,12 +1,9 @@
-import viewer from '../viewer';
-
 export default function getCenter(geometryIn, destination, axisOrientation, map) {
   const geometry = geometryIn.clone();
 
   if (destination && map) {
     geometry.transform(map.getView().getProjection(), destination);
   }
-
 
   const type = geometry.getType();
   let center;

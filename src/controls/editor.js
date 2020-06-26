@@ -9,13 +9,14 @@ const Editor = function Editor(options = {}) {
   } = options;
   let editorButton;
   let target;
+  let viewer;
 
   const toggleState = function toggleState() {
-    if (editorButton.getState() === 'initial') {
-      editorButton.dispatch('change', { state: 'active' });
-    } else {
-      editorButton.dispatch('change', { state: 'initial' });
-    }
+    const detail = {
+      name: 'editor',
+      active: editorButton.getState() === 'initial'
+    };
+    viewer.dispatch('toggleClickInteraction', detail);
   };
 
   const onActive = function onActive() {
@@ -29,7 +30,7 @@ const Editor = function Editor(options = {}) {
   return Component({
     name: 'editor',
     onAdd(evt) {
-      const viewer = evt.target;
+      viewer = evt.target;
       target = `${viewer.getMain().getMapTools().getId()}`;
       const editableLayers = viewer.getLayersByProperty('editable', true, true);
       const currentLayer = options.defaultLayer || editableLayers[0];
@@ -39,6 +40,13 @@ const Editor = function Editor(options = {}) {
         currentLayer,
         editableLayers
       });
+      viewer.on('toggleClickInteraction', (detail) => {
+        if (detail.name === 'editor' && detail.active) {
+          editorButton.dispatch('change', { state: 'active' });
+        } else {
+          editorButton.dispatch('change', { state: 'initial' });
+        }
+      });
       this.addComponent(editorButton);
       this.on('render', this.onRender);
       this.render();
@@ -47,11 +55,13 @@ const Editor = function Editor(options = {}) {
     onInit() {
       const state = isActive ? 'active' : 'initial';
       editorButton = Button({
-        cls: 'o-menu-button padding-small icon-smaller rounded light box-shadow',
+        cls: 'o-menu-button padding-small icon-smaller round light box-shadow o-tooltip',
         click() {
           toggleState();
         },
         icon: '#ic_edit_24px',
+        tooltipText: 'Redigera',
+        tooltipPlacement: 'east',
         state,
         methods: {
           active: onActive,
@@ -64,6 +74,10 @@ const Editor = function Editor(options = {}) {
       const el = dom.html(htmlString);
       document.getElementById(target).appendChild(el);
       this.dispatch('render');
+      viewer.dispatch('toggleClickInteraction', {
+        name: 'editor',
+        active: isActive
+      });
     }
   });
 };

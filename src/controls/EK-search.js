@@ -188,7 +188,7 @@ const Search = function Search(options = {}) {
 
           if(!resolution) resolution = 2.8;
 
-          let FeatureInfoUrl = layer.getSource().getGetFeatureInfoUrl(coord, resolution, proj, {
+          let FeatureInfoUrl = layer.getSource().getFeatureInfoUrl(coord, resolution, proj, {
             'INFO_FORMAT': 'text/html',
             'feature_count': 1,
             'buffer': 1

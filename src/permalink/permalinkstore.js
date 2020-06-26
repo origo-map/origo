@@ -61,6 +61,7 @@ permalinkStore.getState = function getState(viewer, isExtended) {
   })
 
   const featureinfo = viewer.getFeatureinfo();
+  const type = featureinfo.getSelection().type;
   getPin = featureinfo.getPin;
   state.layers = getSaveLayers(layers);
   state.addedLayers = getAddedLayers(addedLayers);
@@ -76,7 +77,7 @@ permalinkStore.getState = function getState(viewer, isExtended) {
     }
   }
 
-  if (featureinfo.getSelection().id) {
+  if (featureinfo.getSelection().id && (type === 'AGS_FEATURE' || type === 'WFS' || type === 'GEOJSON' || type === 'TOPOJSON')) {
     state.feature = featureinfo.getSelection().id;
   }
 

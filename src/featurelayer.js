@@ -10,11 +10,15 @@ export default function (features, map) {
   });
   const featureLayer = new VectorLayer({
     source: featureLayerStore,
-    map
+    map,
+    zIndex: 1
   });
   return {
     addFeature: function addFeature(feature) {
       featureLayerStore.addFeature(feature);
+    },
+    removeFeature: function removeFeature(feature) {
+      featureLayerStore.removeFeature(feature);
     },
     setSourceLayer: function setSourceLayer(layer) {
       sourceLayer = layer;
@@ -31,12 +35,6 @@ export default function (features, map) {
     getSourceLayer: function getSourceLayer() {
       if (sourceLayer) {
         return sourceLayer;
-      }
-      const layerName = featureLayerStore.getFeatures()[0].layerName;
-      if (layerName) {
-        featureLayer.set('name', layerName);
-      } else {
-        featureLayer.set('name', 'unmanaged');
       }
       return featureLayer;
     },

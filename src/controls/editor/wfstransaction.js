@@ -7,8 +7,7 @@ const serializer = new XMLSerializer();
 
 function readResponse(data) {
   let result;
-  if (window.Document && data instanceof Document && data.documentElement &&
-    data.documentElement.localName === 'ExceptionReport') {
+  if (window.Document && data instanceof Document && data.documentElement && data.documentElement.localName === 'ExceptionReport') {
     alert(data.getElementsByTagNameNS('http://www.opengis.net/ows', 'ExceptionText').item(0).textContent);
   } else {
     result = format.readTransactionResponse(data);
@@ -18,6 +17,12 @@ function readResponse(data) {
 }
 
 function writeWfsTransaction(transObj, options) {
+  if (transObj.insert) {
+    transObj.insert.forEach((feature) => {
+      const feat = feature.getProperties();
+      Object.keys(feat).forEach(key => (feat[key] === '') && delete feat[key]);
+    });
+  }
   const node = format.writeTransaction(transObj.insert, transObj.update, transObj.delete, options);
   return node;
 }
