@@ -200,7 +200,7 @@ const Printmenu = function Printmenu(options = {}) {
         });
 
         printButtonTool = Button({
-            cls: 'padding-small rounded box-shadow icon-smaller light',
+            cls: 'padding-small  box-shadow icon-smaller round light box-shadow',
             icon: '#fa-print',
             click() {
                 togglePrintMenu();
