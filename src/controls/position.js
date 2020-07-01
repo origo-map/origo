@@ -7,7 +7,8 @@ import { Component, Icon, Button, Element as El, dom } from '../ui';
 const Position = function Position(options = {}) {
   let {
     title,
-    suffix
+    suffix,
+    noPositionText,
   } = options;
 
   let viewer;
@@ -36,13 +37,25 @@ const Position = function Position(options = {}) {
       coordinateFormat: createStringXY(precision),
       projection: currentProjection,
       target: document.getElementById(`${coordsElement.getId()}`),
-      undefinedHTML: '&nbsp;'
+      undefinedHTML: undefinedhtml(),
     });
 
     map.addControl(mousePositionControl);
     mousePositionActive = true;
     document.getElementById(`${coordsElement.getId()}`).classList.add('o-active');
   }
+
+  function undefinedhtml() {
+    if (!noPositionText) {
+      noPositionText === '&nbsp;';
+    } else if (noPositionText) {
+      noPositionText;
+    } else {
+      noPositionText === '';
+    }
+    return noPositionText;
+  }
+  console.log(noPositionText);
 
   function removeMousePosition() {
     map.removeControl(mousePositionControl);
