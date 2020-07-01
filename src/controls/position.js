@@ -55,7 +55,6 @@ const Position = function Position(options = {}) {
     }
     return noPositionText;
   }
-  console.log(noPositionText);
 
   function removeMousePosition() {
     map.removeControl(mousePositionControl);
