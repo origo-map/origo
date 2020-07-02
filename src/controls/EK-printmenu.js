@@ -160,6 +160,12 @@ const Printmenu = function Printmenu(options = {}) {
                     return layer.getVisible();
                 });
 
+                visibleLayers.sort((a, b) => { 
+                    if(a.getZIndex() < b.getZIndex() || a.getZIndex() === undefined) return -1;
+                    else if (a.getZIndex() > b.getZIndex() || b.getZIndex() === undefined) return 1;
+                    return 0;
+                });
+                
                 let contract = {
                     dpi: htmlResos.value,
                     layers: visibleLayers,
