@@ -54,7 +54,7 @@ const Position = function Position(options = {}) {
     });
   }
 
-  function noCoordsOnPanAdd() {
+  function noCoordsOnPan() {
     const coordsEl = document.getElementById(`${coordsElement.getId()}`);
     const olMousePosEl = document.getElementsByClassName('ol-mouse-position')[0];
 
@@ -89,7 +89,7 @@ const Position = function Position(options = {}) {
     map.addControl(mousePositionControl);
     mousePositionActive = true;
     document.getElementById(`${coordsElement.getId()}`).classList.add('o-active');
-    noCoordsOnPanAdd();
+    noCoordsOnPan();
   }
 
   function removeMousePosition() {
