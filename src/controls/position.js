@@ -10,7 +10,7 @@ const Position = function Position(options = {}) {
     suffix
   } = options;
   const {
-    noPositionText
+    noPositionText = '&nbsp;'
   } = options;
 
 
@@ -37,12 +37,7 @@ const Position = function Position(options = {}) {
 
 
   function undefinedhtml() {
-    if (!noPositionText) {
-      return noPositionText === '&nbsp;';
-    } else if (noPositionText.length === 0) {
-      return noPositionText === '';
-    }
-    return noPositionText;
+    return noPositionText.length === 0 ? noPositionText === false : noPositionText;
   }
 
   function removeNoCoordsEl() {
