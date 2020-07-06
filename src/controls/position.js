@@ -7,9 +7,12 @@ import { Component, Icon, Button, Element as El, dom } from '../ui';
 const Position = function Position(options = {}) {
   let {
     title,
-    suffix,
-    noPositionText,
+    suffix
   } = options;
+  const {
+    noPositionText
+  } = options;
+
 
   let viewer;
   let map;
@@ -32,28 +35,61 @@ const Position = function Position(options = {}) {
   let coordsFindElement;
   let containerElement;
 
+
+  function undefinedhtml() {
+    if (!noPositionText) {
+      return noPositionText === '&nbsp;';
+    } else if (noPositionText.length === 0) {
+      return noPositionText === '';
+    }
+    return noPositionText;
+  }
+
+  function removeNoCoordsEl() {
+    map.on('movestart', () => {
+      const noCoords = document.getElementsByClassName('o-no-coords')[0];
+      if (noCoords) {
+        noCoords.parentNode.removeChild(noCoords);
+      }
+    });
+  }
+
+  function noCoordsOnPanAdd() {
+    const coordsEl = document.getElementById(`${coordsElement.getId()}`);
+    const olMousePosEl = document.getElementsByClassName('ol-mouse-position')[0];
+
+    map.on('movestart', () => {
+      // eslint-disable-next-line no-underscore-dangle
+      const text = mousePositionControl.renderedHTML_;
+      const noCoordsEl = document.createElement('div');
+
+      olMousePosEl.classList.add('o-hidden');
+      noCoordsEl.classList.add('o-no-coords');
+      noCoordsEl.innerHTML = text;
+      coordsEl.appendChild(noCoordsEl);
+    });
+
+    map.on('moveend', () => {
+      olMousePosEl.classList.remove('o-hidden');
+      const noCoords = document.getElementsByClassName('o-no-coords')[0];
+      if (noCoords) {
+        noCoords.parentNode.removeChild(noCoords);
+      }
+    });
+  }
+
   function addMousePosition() {
     mousePositionControl = new MousePosition({
       coordinateFormat: createStringXY(precision),
       projection: currentProjection,
       target: document.getElementById(`${coordsElement.getId()}`),
-      undefinedHTML: undefinedhtml(),
+      undefinedHTML: undefinedhtml()
     });
 
     map.addControl(mousePositionControl);
     mousePositionActive = true;
     document.getElementById(`${coordsElement.getId()}`).classList.add('o-active');
-  }
-
-  function undefinedhtml() {
-    if (!noPositionText) {
-      noPositionText === '&nbsp;';
-    } else if (noPositionText) {
-      noPositionText;
-    } else {
-      noPositionText === '';
-    }
-    return noPositionText;
+    noCoordsOnPanAdd();
   }
 
   function removeMousePosition() {
@@ -181,6 +217,7 @@ const Position = function Position(options = {}) {
   }
 
   function onTogglePosition() {
+    removeNoCoordsEl();
     if (mousePositionActive) {
       removeMousePosition();
       addCenterPosition();
@@ -215,6 +252,7 @@ const Position = function Position(options = {}) {
   }
 
   function onToggleProjection() {
+    removeNoCoordsEl();
     currentProjection = toggleProjectionVal(document.getElementById(`${projButton.getId()}`).value);
     setPrecision();
     writeProjection(currentProjection);
