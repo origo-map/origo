@@ -45,7 +45,6 @@ const OverlayProperties = function OverlayProperties(options = {}) {
       overlayEl = document.getElementById(this.getId());
       overlayEl.addEventListener('click', (e) => {
         this.dispatch('click', e);
-        e.preventDefault();
       });
       if (opacityControl) {
         sliderEl = document.getElementById('opacitySlider');
@@ -60,7 +59,7 @@ const OverlayProperties = function OverlayProperties(options = {}) {
     render() {
       return `<div id="${this.getId()}" class="${cls} border-bottom">
                 <div class="padding-small">${legend}${inputRange}</div>
-                <p class="padding-bottom-small padding-x text-small">${abstract}</p>
+                <div class="padding-small padding-x text-small">${abstract}</div>
               </div>`;
     },
     labelCls: 'text-small text-semibold',
