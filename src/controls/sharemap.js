@@ -32,6 +32,9 @@ const ShareMap = function ShareMap(options = {}) {
 
   return Component({
     name: 'sharemap',
+    addParamsToGetMapState(key, callback) {
+      permalink.addParamsToGetMapState(key, callback);
+    },
     onInit() {
       if (storeMethod && serviceEndpoint) {
         permalink.setSaveOnServerServiceEndpoint(serviceEndpoint);
