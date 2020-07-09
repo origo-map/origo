@@ -86,7 +86,7 @@ input[type=range]:focus {
 input[type=range]::-webkit-slider-runnable-track {
   height: 4px;
   cursor: pointer;
-  animate: 0.2s;
+  animation: 0.2s;
   background: $primary-color;
   border-radius: 3px;
 }
@@ -107,7 +107,7 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 input[type=range]::-moz-range-track {
   height: 4px;
   cursor: pointer;
-  animate: 0.2s;
+  animation: 0.2s;
   background: $primary-color;
   border-radius: 3px;
 }
@@ -123,7 +123,7 @@ input[type=range]::-moz-range-thumb {
 input[type=range]::-ms-track {
   height: 4px;
   cursor: pointer;
-  animate: 0.2s;
+  animation: 0.2s;
   background: transparent;
   border-color: transparent;
   color: transparent;
