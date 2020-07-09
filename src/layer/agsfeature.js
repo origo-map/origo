@@ -11,11 +11,7 @@ function createSource({
   projectionCode,
   url: sourceUrl
 } = {}) {
-  let layerFilter;
-  if (filter) {
-    const filterAttribute = filter.split('=');
-    layerFilter = `${filterAttribute[0]}='${replacer.replace(filterAttribute[1].replace(/'/g, ''), window)}'`;
-  }
+  const layerFilter = replacer.replace(filter, window);
 
   const esriSrs = projectionCode.split(':').pop();
   const queryFilter = layerFilter ? `&where=${layerFilter}` : '';

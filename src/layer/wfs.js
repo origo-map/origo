@@ -10,11 +10,7 @@ function createSource(options) {
   const serverUrl = options.url;
   let queryFilter = '';
 
-  let filter = options.filter;
-  if (options.filter) {
-    const filterAttribute = options.filter.split('=');
-    filter = `${filterAttribute[0]}='${replacer.replace(filterAttribute[1].replace(/'/g, ''), window)}'`;
-  }
+  const filter = replacer.replace(options.filter, window);
 
   // If cql filter then bbox must be used in the filter.
   if (options.strategy === 'all') {
