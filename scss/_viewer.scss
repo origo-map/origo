@@ -29,7 +29,7 @@
   color: white;
   font-size: 0.7em;
   height: 2.5em;
-  line-height: 2em;
+  line-height: $line-height-medium;
   z-index: 1;
   width: 100%;
 }
@@ -40,11 +40,6 @@
 .o-footer a:hover {
   color: white;
   text-decoration: underline;
-}
-.o-footer .o-footer-left {
-  float: left;
-  position: relative;
-  width: 30%;
 }
 .o-footer .o-footer-middle {
   float: left;
@@ -60,7 +55,7 @@
   padding-right: 5px;
 }
 .o-footer .o-footer-middle .o-footer-middle-content p {
-  line-height: 2em;
+  line-height: $line-height-medium;
   vertical-align: top;
   display: inline;
 }

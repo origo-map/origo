@@ -47,6 +47,7 @@ const Scale = function Scale(options = {}) {
     },
     onInit() {
       container = El({
+        cls: 'o-scale',
         style: 'display: inline-block'
       });
     },
