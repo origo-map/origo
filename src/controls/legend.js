@@ -34,6 +34,7 @@ const Legend = function Legend(options = {}) {
   let layerButtonEl;
   let isExpanded;
   let getLegendGraphics;
+  let toolsCmp;
   const cls = `${clsSettings} control bottom-right box overflow-hidden inline-block row o-legend`.trim();
   const style = dom.createStyle(Object.assign({}, { width: 'auto' }, styleSettings));
 
@@ -161,8 +162,18 @@ const Legend = function Legend(options = {}) {
 
   return Component({
     name,
-    getGroups(){
-      return overlaysCmp.getGroups()
+    addButtonToTools(button) {
+      const toolsEl = document.getElementById(toolsCmp.getId());
+      toolsEl.classList.remove('hidden');
+      if (toolsCmp.getComponents().length > 0) {
+        toolsEl.style.justifyContent = 'space-between';
+        toolsEl.insertBefore(dom.html(divider.render()), toolsEl.firstChild);
+        toolsEl.insertBefore(dom.html(button.render()), toolsEl.firstChild);
+      } else {
+        toolsEl.appendChild(dom.html(button.render()));
+      }
+      toolsCmp.addComponent(button);
+      button.onRender();
     },
     onInit() {
       this.on('render', this.onRender);
@@ -195,42 +206,27 @@ const Legend = function Legend(options = {}) {
       
       //Updates legend graphics when zooming in and out in map
       getLegendGraphics.initUpdatingWhenZoom(); 
+      if (turnOffLayersControl) this.addButtonToTools(turnOffLayersButton);
+      if (layerManagerControl) this.addButtonToTools(addButton);
     },
     render() {
       const size = viewer.getSize();
       isExpanded = !size && expanded;
       target = document.getElementById(viewer.getMain().getId());
       const maxHeight = calcMaxHeight(getTargetHeight());
-      const baselayerCmps = [toggleGroup];
       overlaysCmp = Overlays({
         viewer, cls: contentCls, style: contentStyle, labelOpacitySlider
       });
-      const toolsCmps = [];
-      let toolsCmp;
-      let toolsCmpsLayoutStrategy;
-      let mainContainerComponents;
+      const baselayerCmps = [toggleGroup];
 
-      if (layerManagerControl || turnOffLayersControl) {
-        if (layerManagerControl && turnOffLayersControl) {
-          toolsCmps.push(addButton, divider, turnOffLayersButton);
-          toolsCmpsLayoutStrategy = 'space-between';
-        } else if (layerManagerControl && !turnOffLayersControl) {
-          toolsCmps.push(addButton);
-          toolsCmpsLayoutStrategy = 'flex-start';
-        } else if (!layerManagerControl && turnOffLayersControl) {
-          toolsCmps.push(turnOffLayersButton);
-          toolsCmpsLayoutStrategy = 'flex-end';
+      toolsCmp = El({
+        cls: 'flex padding-small no-shrink hidden',
+        style: {
+          'background-color': '#fff',
+          'justify-content': 'flex-end',
+          height: '40px'
         }
-        toolsCmp = El({
-          cls: 'flex padding-small no-shrink',
-          style: {
-            'background-color': '#fff',
-            'justify-content': toolsCmpsLayoutStrategy,
-            height: '40px'
-          },
-          components: toolsCmps
-        });
-      }
+      });
 
       const baselayersCmp = El({
         cls: 'flex padding-small no-shrink',
@@ -243,11 +239,7 @@ const Legend = function Legend(options = {}) {
         components: baselayerCmps
       });
 
-      if (toolsCmp) {
-        mainContainerComponents = [overlaysCmp, toolsCmp, baselayersCmp];
-      } else {
-        mainContainerComponents = [overlaysCmp, baselayersCmp];
-      }
+      const mainContainerComponents = [overlaysCmp, toolsCmp, baselayersCmp];
 
       mainContainerCmp = El({
         cls: 'flex column overflow-hidden relative',
