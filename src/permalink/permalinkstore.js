@@ -20,52 +20,14 @@ function getSaveLayers(layers) {
   return saveLayers;
 }
 
-function getAddedLayers(layers) {
-  
-  const addedLayers = [];
-  layers.forEach((layer) => {
-    const addedLayer = {
-    name: layer.get('name'),
-    abstract: layer.get('abstract'),
-    visible: layer.getVisible(),
-    removable: layer.get('removable'),
-    legend: layer.get('legend'),
-    legendGraphicSettings: {service: layer.get('legendGraphicSettings').service, transparent: layer.get('legendGraphicSettings').transparent },
-    useLegendGraphics: layer.get('useLegendGraphics'),
-    zIndex: layer.getProperties().zIndex,
-    source: layer.get('sourceName'),
-    style: layer.get('style'),
-    title: layer.get('title'),
-    type: layer.get('type'),
-    infoFormat: layer.get('infoFormat'),
-    format: layer.get('background'),
-    group: layer.get('group')
-    };
-    addedLayers.push(addedLayer);
-  });
-  return addedLayers;
-}
-
 permalinkStore.getState = function getState(viewer, isExtended) {
   const state = {};
   const view = viewer.getMap().getView();
-  const allLayers = viewer.getLayers();
-  const addedLayers = new Array;
-  const layers = new Array;
-  allLayers.forEach(function (layer) {
-    if (layer.get('group') === 'mylayers') {
-      addedLayers.push(layer);
-    }
-    else {
-      layers.push(layer);
-    }
-  })
-
+  const layers = viewer.getLayers();
   const featureinfo = viewer.getFeatureinfo();
   const type = featureinfo.getSelection().type;
   getPin = featureinfo.getPin;
   state.layers = getSaveLayers(layers);
-  state.addedLayers = getAddedLayers(addedLayers);
   state.center = view.getCenter().map(coord => Math.round(coord)).join();
   state.zoom = view.getZoom().toString();
 

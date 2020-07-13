@@ -39,10 +39,6 @@ const layers = function layers(layersStr) {
   return layerObjects;
 };
 
-const addedLayers = function addedLayers(layersStr) {
-  return layersStr;
-};
-
 const zoom = function zoom(zoomStr) {
   return parseInt(zoomStr, 10);
 };
@@ -87,7 +83,6 @@ const controlDraw = function controlDraw(drawState) {
 parseFunctions.draw = controlDraw;
 
 export default {
-  addedLayers,
   layers,
   zoom,
   center,

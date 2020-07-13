@@ -31,8 +31,6 @@ const Overlays = function Overlays(options) {
   const rootGroupNames = ['root', '', null, undefined];
   let overlays;
 
-  var waitingLMlayers = new Array;
-
   const themeGroups = ThemeGroups();
   const rootGroup = GroupList({ viewer }, true);
 
@@ -157,9 +155,6 @@ const Overlays = function Overlays(options) {
         groupCmp.addOverlay(overlay);
         document.getElementById(groupCmp.getId()).classList.remove('hidden'); // conflict with this line and following code, potential bugs
       }
-      else if (layer.get('group') === 'mylayers') {
-        waitingLMlayers.push(layer);
-      }
     }
   };
 
@@ -187,13 +182,6 @@ const Overlays = function Overlays(options) {
   const onAddGroup = function onAddGroup(evt) {
     const group = evt.group;
     addGroup(group);
-    if(waitingLMlayers){
-      waitingLMlayers.sort((a, b) => (a.getZIndex() < b.getZIndex()) ? 1 : ((b.getZIndex() < a.getZIndex()) ? -1 : 0));
-      waitingLMlayers.reverse().forEach(function (layer) {
-        addLayer(layer, "bottom");
-      });
-      waitingLMlayers = new Array;
-    } 
   };
 
   const onRemoveLayer = function onRemoveLayer(evt) {
