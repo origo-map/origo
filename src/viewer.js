@@ -5,7 +5,7 @@ import { Component } from './ui';
 import Map from './map';
 import proj from './projection';
 import MapSize from './utils/mapsize';
-import Featureinfo from './EK_featureinfo';
+import Featureinfo from './featureinfo';
 import Selectionmanager from './selectionmanager';
 import maputils from './maputils';
 import utils from './utils';

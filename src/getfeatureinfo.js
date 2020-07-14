@@ -1,3 +1,5 @@
+import Circle from 'ol/geom/Circle';
+import Feature from 'ol/Feature';
 import EsriJSON from 'ol/format/EsriJSON';
 import $ from 'jquery';
 import maputils from './maputils';
@@ -35,6 +37,72 @@ function getFeatureInfoUrl({
   resolution,
   projection
 }, layer) {
+  // #region EK-specific code for FTL
+  if (layer.get('infoFormat') === 'text/html') {
+    const url = layer.getSource().getFeatureInfoUrl(coordinate, resolution, projection, {
+      INFO_FORMAT: 'text/html',
+      FEATURE_COUNT: '20'
+    });
+
+    return fetch(url)
+      .then(Resp => Resp.text())
+      .then(Html => {
+        let FTL = Html;
+        let handleTag = layer.get('ftlseparator') || 'ul';
+        if (FTL.search('http://www.esri.com/wms') !== -1) {
+          handleTag = 'body';
+          let returnString = '';
+          const trs = FTL.split('</tr>');
+          const bottom = FTL.split('</tbody>')[1];
+          const top = trs[0].split('<tr>')[0];
+          const headers = trs[0].split('<th>');
+          headers.shift();
+          trs.shift();
+          trs.pop();
+          let i;
+          for (i = 0; i < trs.length; i += 1) {
+            const tds = trs[i].split('</td>');
+            tds.pop();
+            tds[0] = tds[0].substring(6);
+            let y;
+            returnString = returnString.concat(top);
+            for (y = 0; y < tds.length - 1; y += 1) {
+              tds[y] = tds[y].replace(/^(?!<).*/, '');
+              tds[y] = tds[y].substring(2);
+              returnString = returnString.concat('<tr>\n');
+              returnString = returnString.concat(`<th>${headers[y]}`);
+              returnString = returnString.concat(`${tds[y]}</td>\n`);
+              returnString = returnString.concat('</tr>\n');
+            }
+            returnString = returnString.concat(bottom);
+          }
+          FTL = returnString;
+          // ..then make it legible in Origo
+          const agsNameReplace = /<h5>FeatureInfoCollection - layer name: '[-A-Z0-9+&@#/%?=~_|!:,.;]*'<\/h5>/gim;
+          FTL = FTL.replace(agsNameReplace, '');
+          const urlifyReplace = /<td>(\b(https?|ftp):\/\/[-A-Z0-9+&@#/%?=~_|!:,.;]*[-A-Z0-9+&@#/%=~_|])/gim;
+          FTL = FTL.replace(urlifyReplace, '<td><a href="$1" target="_blank">$1</a>');
+          const tableTextSizeReplace = /font-size: 80%;/;
+          FTL = FTL.replace(tableTextSizeReplace, 'font-size: 90%;');
+        }
+        let body = FTL.substring(FTL.indexOf(`<${handleTag}`), FTL.lastIndexOf(`</${handleTag}>`) + `</${handleTag}>`.length);
+        const head = FTL.substring(0, FTL.indexOf(`<${handleTag}`));
+        const tail = FTL.substring(FTL.lastIndexOf(`</${handleTag}>`) + `</${handleTag}>`.length, FTL.length);
+        const features = [];
+        while (body.indexOf(`<${handleTag}`) !== -1) {
+          const feature = new Feature({
+            geometry: new Circle(coordinate, 10)
+          });
+          const htmlfeat = body.substring(body.indexOf(`<${handleTag}`), body.indexOf(`</${handleTag}>`) + `</${handleTag}>`.length);
+          body = body.replace(htmlfeat, '');
+          feature.set('textHtml', head + htmlfeat + tail);
+          features.push(feature);
+        }
+        layer.set('attributes', 'textHtml');
+        return features;
+      });
+  }
+  // #endregion
   const url = layer.getSource().getFeatureInfoUrl(coordinate, resolution, projection, {
     INFO_FORMAT: 'application/json',
     FEATURE_COUNT: '20'
