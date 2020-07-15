@@ -14,7 +14,6 @@ const Legend = function Legend(options = {}) {
     contentCls,
     contentStyle,
     turnOffLayersControl = false,
-    layerManagerControl = false,
     name = 'legend',
     labelOpacitySlider = ''
   } = options;
@@ -94,20 +93,6 @@ const Legend = function Legend(options = {}) {
       'border-width': '2px',
       'margin-bottom': '5px',
       'margin-top': '5px'
-    }
-  });
-
-  const addButton = Button({
-    cls: 'round compact primary icon-small margin-x-smaller',
-    click() {
-      viewer.dispatch('active:layermanager');
-    },
-    style: {
-      'align-self': 'center'
-    },
-    icon: '#o_add_24px',
-    iconStyle: {
-      fill: '#fff'
     }
   });
 
@@ -200,7 +185,6 @@ const Legend = function Legend(options = {}) {
       });
       window.addEventListener('resize', updateMaxHeight);
       if (turnOffLayersControl) this.addButtonToTools(turnOffLayersButton);
-      if (layerManagerControl) this.addButtonToTools(addButton);
     },
     render() {
       const size = viewer.getSize();
