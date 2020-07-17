@@ -151,12 +151,14 @@ const Group = function Group(options = {}, viewer) {
 
   const updateGroupIndication = function updateGroupIndication() {
     if (groupList.getVisible() === 'none') {
-      groupEl.firstElementChild.style.borderLeft = '';
+      groupEl.firstElementChild.classList.add('no-group-indication');
+      groupEl.firstElementChild.classList.remove('group-indication');
     } else {
-      groupEl.firstElementChild.style.borderLeft = 'solid #008ff5';
+      groupEl.firstElementChild.classList.add('group-indication');
+      groupEl.firstElementChild.classList.remove('no-group-indication');
     }
   };
-  
+
   return Component({
     addOverlay,
     getEl,
