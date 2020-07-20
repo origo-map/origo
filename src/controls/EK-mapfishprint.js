@@ -22,6 +22,14 @@ const Mapfishprint = function Mapfishprint(options = {}) {
     } = options;
 
     let viewer = options.viewer;
+    let progressElementMem = null;
+    const failureSpan = document.createElement('span');
+    failureSpan.setAttribute('id', 'o-dl-progress');
+    failureSpan.setAttribute('style', 'display: inline-block');
+    const failure = document.createElement('img');
+    failure.setAttribute('src', 'img/sms_failed-24px.svg');
+    failureSpan.appendChild(failure);
+    let printStatus = '';
 
 
     function convertToMapfishOptions(options) {
@@ -705,13 +713,22 @@ const Mapfishprint = function Mapfishprint(options = {}) {
         return printableLayers;
     }
 
+
     function executeMapfishCall(url, data) {
+        // disable the print button while printing in progress
+        viewer.getControlByName('printmenu').getComponents()[3].setState('disabled');
+
         let body = JSON.stringify(data);
-        let progress = document.getElementById('o-dl-progress');
-        let cancel = document.getElementById('o-dl-cancel');
         document.getElementById('o-dl-link').style.display = 'none';
+        let progress = document.getElementById('o-dl-progress');
+
+        if (!progressElementMem) {
+            progressElementMem = document.getElementById('o-dl-progress'); 
+        } else {
+            progress.parentNode.replaceChild(progressElementMem, progress);
+            progress= document.getElementById('o-dl-progress'); 
+        }
         progress.style.display = 'inline-block';
-        cancel.style.display = 'inline-block';
 
         let request = $.ajax({
             type: 'POST',
@@ -720,19 +737,27 @@ const Mapfishprint = function Mapfishprint(options = {}) {
             contentType: 'application/json',
             dataType: 'json',
             success: function(data) {
+                printStatus = 'success';
+                viewer.getControlByName('printmenu').getComponents()[3].setState('initial');
                 let url = newUrl(data.getURL);
                 progress.style.display = 'none';
-                cancel.style.display = 'none';
                 window.open(url);
             },
             error: function(data) {
-                console.warn('Error creating report: ' + data.statusText);
+                printStatus = 'failure';
+                viewer.getControlByName('printmenu').getComponents()[3].setState('initial');
+                const response = data.responseText;
+                console.warn(response);
+                progress.parentNode.replaceChild(failureSpan, progress);
+                failureSpan.style.display = 'inline-block';
             }
-        });
-        return request;
-    }
+        
+    });
+    printStatus = '';
+    return request;
+}
 
-    // because mapfish can't return a dang url which isnt localhost
+    // Since mapfish cannot seem to return an url which is not localhost
     function newUrl(url) {
         let basePart = MapfishCreateUrl.substr(0, MapfishCreateUrl.indexOf('/', 8))
         let mapfishPart = url.substr(url.indexOf('/', 8), url.length - 1)
@@ -756,6 +781,7 @@ const Mapfishprint = function Mapfishprint(options = {}) {
               });
             return promise
         },
+        getPrintStatus() {return printStatus},
         onInit() {},
         render() {
             this.dispatch('render');

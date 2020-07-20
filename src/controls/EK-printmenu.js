@@ -151,6 +151,7 @@ const Printmenu = function Printmenu(options = {}) {
         printCreate = Button({
             cls: 'btn',
             text: 'Skapa',
+            methods: { disabled: function disabled(button) { const map = button; map.disabled = true; }, initial: function initial(button) { const fish = button; fish.disabled = false; } },
             click() {
                 let map = viewer.getMap();
                 let layers = map.getLayers();
@@ -178,21 +179,14 @@ const Printmenu = function Printmenu(options = {}) {
                     center: centerPoint
                 };
 
-                // Abort pending ajax request
                 let request = mapfishPrint.printMap(contract);
-                let cancel = document.getElementById('o-dl-cancel');
-                cancel.addEventListener('click', () => {
-                    request.abort();
-                    document.getElementById('o-dl-progress').style.display = "none";
-                    cancel.style.display = "none";
-                });
 
                 return false;
             }
-        })
+        });
 
         clearButton = Button({
-            text: 'Avbryt',
+            text: 'Stäng',
             cls: 'btn',
             style: 'margin:5px',
             click() {
@@ -201,6 +195,9 @@ const Printmenu = function Printmenu(options = {}) {
                 if (vector) {
                     vector.setVisible(false);
                     htmlPrintmenu.classList.remove('o-printmenu-show');
+                };
+                if (mapfishPrint.getPrintStatus() === 'failure') {
+                    document.getElementById('o-dl-progress').style.display = 'none';
                 }
             }
         });
@@ -218,7 +215,12 @@ const Printmenu = function Printmenu(options = {}) {
             icon: '#fa-times',
             style: 'position: absolute; right: .5rem;',
             click() {
+                let vector = printarea.getVector();
+                if (vector) {vector.setVisible(false); }
                 htmlPrintmenu.classList.remove('o-printmenu-show');
+                if (mapfishPrint.getPrintStatus() === 'failure') {
+                    document.getElementById('o-dl-progress').style.display = 'none';
+                }
             }
         });
 
@@ -655,7 +657,7 @@ const Printmenu = function Printmenu(options = {}) {
                             </div> 
                             <br /> 
                             <div class="o-block"> 
-                              <span id="o-dl-progress">Skapar... <img src="img/spinner.svg" /></span><a id="o-dl-link" href="#">Ladda ner</a><img id="o-dl-cancel" src="img/png/cancel.png"/> 
+                              <span id="o-dl-progress">Skapar... <img src="img/spinner.svg" /></span><a id="o-dl-link" href="#">Ladda ner</a>
                             </div> 
                           </div> 
                           </form>`;
