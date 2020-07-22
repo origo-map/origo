@@ -25,10 +25,12 @@ const Mapfishprint = function Mapfishprint(options = {}) {
     let progressElementMem = null;
     const failureSpan = document.createElement('span');
     failureSpan.setAttribute('id', 'o-dl-progress');
-    failureSpan.setAttribute('style', 'display: inline-block');
+    failureSpan.setAttribute('style', 'display: block; padding-right: 4px; padding-left: 5px; padding-bottom: 4px; padding-top: 3px; background-color: rgba(255, 165, 0, 0.31)');
     const failure = document.createElement('img');
     failure.setAttribute('src', 'img/sms_failed-24px.svg');
+    failure.setAttribute('style', 'vertical-align: bottom');
     failureSpan.appendChild(failure);
+    const failureLayerReason = document.createElement('small');
     let printStatus = '';
 
 
@@ -735,12 +737,20 @@ const Mapfishprint = function Mapfishprint(options = {}) {
             error: function(data) {
                 printStatus = 'failure';
                 viewer.getControlByName('printmenu').getComponents()[3].setState('initial');
-                const response = data.responseText;
-                console.warn(response);
                 progress.parentNode.replaceChild(failureSpan, progress);
-                failureSpan.style.display = 'inline-block';
+                failureSpan.style.display = 'block';
+                
+                const response = data.responseText;
+                const layerIndex = response.toLowerCase().search('layer=');
+
+                if (layerIndex != -1) {
+                    const longerstring = response.substring(layerIndex);
+                    const shorterstring = longerstring.split('&')[0].substring(6); //LAYER={allt här}&
+                    let failingLayerTitle = viewer.getLayer(shorterstring).get('title');
+                    failureLayerReason.innerHTML = `  Vi har upptäckt ett fel och jobbar på att lösa det. Under tiden kan du testa att skriva ut på en annan skala eller utan lagret ${failingLayerTitle}.`;
+                    failureSpan.appendChild(failureLayerReason);
+                }                
             }
-        
     });
     printStatus = '';
     return request;
