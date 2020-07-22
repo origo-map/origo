@@ -534,7 +534,6 @@ const Mapfishprint = function Mapfishprint(options = {}) {
         });
 
         let printableLayers = [];
-        let printIndex = null;
         switch (type) {
             case 'WMS':
                 let url;
@@ -547,23 +546,13 @@ const Mapfishprint = function Mapfishprint(options = {}) {
                     } else {
                         console.warn('Lagertyp stöds ej.');
                     }
-                    printIndex = printableLayers.map(function(l, idx) {
-                        if (l.baseURL === url) {
-                            return idx
-                        }
-                    }).filter(function (l) {return l !=  undefined});
-                    printIndex = printIndex.length > 0 ? printIndex[0] : -1;
-                    if (printIndex !== -1) {
-                        printableLayers[printIndex].layers.push(layer.get('name'));
-                    } else {
-                        printableLayers.push({
-                            type: layer.get('type'),
-                            baseURL: url,
-                            format: layer.getSource().getParams().FORMAT,
-                            layers: [layer.getSource().getParams().LAYERS],
-                            opacity: layer.get('opacity')
-                        });
-                    }
+                    printableLayers.push({
+                        type: layer.get('type'),
+                        baseURL: url,
+                        format: layer.getSource().getParams().FORMAT,
+                        layers: [layer.getSource().getParams().LAYERS],
+                        opacity: layer.get('opacity')
+                    });
                 });
                 break;
             case 'WFS':
