@@ -162,8 +162,9 @@ const Printmenu = function Printmenu(options = {}) {
                 });
 
                 visibleLayers.sort((a, b) => { 
-                    if(a.getZIndex() < b.getZIndex() || a.getZIndex() === undefined) return -1;
-                    else if (a.getZIndex() > b.getZIndex() || b.getZIndex() === undefined) return 1;
+                    if(b.getZIndex() === undefined && a.getZIndex() === undefined) return 0;
+                    else if(a.getZIndex() < b.getZIndex()) return -1;
+                    else if (a.getZIndex() > b.getZIndex()) return 1;
                     return 0;
                 });
                 
