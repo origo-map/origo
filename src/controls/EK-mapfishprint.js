@@ -19,6 +19,8 @@ const Mapfishprint = function Mapfishprint(options = {}) {
     let {
         target,
         MapfishCreateUrl,
+        layerErrorMessage,
+        otherErrorMessage
     } = options;
 
     let viewer = options.viewer;
@@ -30,7 +32,7 @@ const Mapfishprint = function Mapfishprint(options = {}) {
     failure.setAttribute('src', 'img/sms_failed-24px.svg');
     failure.setAttribute('style', 'vertical-align: bottom');
     failureSpan.appendChild(failure);
-    const failureLayerReason = document.createElement('small');
+    const failureReason = document.createElement('small');
     let printStatus = '';
 
 
@@ -745,11 +747,14 @@ const Mapfishprint = function Mapfishprint(options = {}) {
 
                 if (layerIndex != -1) {
                     const longerstring = response.substring(layerIndex);
-                    const shorterstring = longerstring.split('&')[0].substring(6); //LAYER={allt här}&
+                    const shorterstring = longerstring.split('&')[0].substring(6); 
                     let failingLayerTitle = viewer.getLayer(shorterstring).get('title');
-                    failureLayerReason.innerHTML = `  Vi har upptäckt ett fel och jobbar på att lösa det. Under tiden kan du testa att skriva ut på en annan skala eller utan lagret ${failingLayerTitle}.`;
-                    failureSpan.appendChild(failureLayerReason);
-                }                
+                    failureReason.innerHTML = `${layerErrorMessage} ${failingLayerTitle}.`;
+                    failureSpan.appendChild(failureReason);
+                } else {
+                    failureReason.innerHTML = `${otherErrorMessage}`;
+                    failureSpan.appendChild(failureReason);
+                }             
             }
     });
     printStatus = '';

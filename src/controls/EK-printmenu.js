@@ -13,7 +13,9 @@ const Printmenu = function Printmenu(options = {}) {
         orientations,
         employsArcGISServerWMS,
         MapfishInfoUrl,
-        MapfishCreateUrl
+        MapfishCreateUrl,
+        layerErrorMessage,
+        otherErrorMessage
     } = options;
 
 
@@ -163,7 +165,7 @@ const Printmenu = function Printmenu(options = {}) {
 
                 visibleLayers.sort((a, b) => { 
                     if(b.getZIndex() === undefined && a.getZIndex() === undefined) return 0;
-                    else if(a.getZIndex() < b.getZIndex()) return -1;
+                    else if (a.getZIndex() < b.getZIndex()) return -1;
                     else if (a.getZIndex() > b.getZIndex()) return 1;
                     return 0;
                 });
@@ -585,10 +587,9 @@ const Printmenu = function Printmenu(options = {}) {
             });
             mapfishPrint = Mapfishprint(({
                 viewer: viewer,
-                MapfishCreateUrl: MapfishCreateUrl
-
-
-                // relay necessary bits from index.jsons options for the control here
+                MapfishCreateUrl: MapfishCreateUrl,
+                layerErrorMessage: layerErrorMessage,
+                otherErrorMessage: otherErrorMessage
             }));
 
             let thisComp = this;
