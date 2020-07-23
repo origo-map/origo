@@ -3,8 +3,6 @@ import {
 } from '../ui';
 import imageSource from './legend/imagesource';
 import Overlays from './legend/overlays';
-import GetLegendGraphics from './legend/EK_getLegendGraphic';
-import {getIfThemeLayer} from './legend/EK_getLegendGraphicsUtils';
 import LayerProperties from './legend/overlayproperties';
 
 const Legend = function Legend(options = {}) {
@@ -33,7 +31,6 @@ const Legend = function Legend(options = {}) {
   let layerButton;
   let layerButtonEl;
   let isExpanded;
-  let getLegendGraphics;
   let toolsCmp;
   const cls = `${clsSettings} control bottom-right box overflow-hidden inline-block row o-legend`.trim();
   const style = dom.createStyle(Object.assign({}, { width: 'auto' }, styleSettings));
@@ -41,7 +38,6 @@ const Legend = function Legend(options = {}) {
   const addBackgroundButton = function addBackgroundButton(layer) {
     const styleName = layer.get('styleName') || 'default';
     const icon = viewer.getStyle(styleName) ? imageSource(viewer.getStyle(styleName)) : 'img/png/farg.png';
-    const title = layer.get('title') || "";
     backgroundLayerButtons.push(Button({
       icon,
       cls: 'round smallest border icon-small',
@@ -189,7 +185,7 @@ const Legend = function Legend(options = {}) {
         components: backgroundLayerButtons,
         cls: 'spacing-horizontal-small'
       });
-      getLegendGraphics = GetLegendGraphics({viewer});
+
       this.render();
       this.dispatch('render');
       viewer.getMap().on('click', onMapClick);
@@ -203,9 +199,7 @@ const Legend = function Legend(options = {}) {
         toggleVisibility();
       });
       window.addEventListener('resize', updateMaxHeight);
-      
-      //Updates legend graphics when zooming in and out in map
-      getLegendGraphics.initUpdatingWhenZoom(); 
+
       if (turnOffLayersControl) this.addButtonToTools(turnOffLayersButton);
       if (layerManagerControl) this.addButtonToTools(addButton);
     },
