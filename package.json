@@ -36,7 +36,7 @@
     "downloadjs": "^1.4.7",
     "html2canvas": "^1.0.0-rc.5",
     "jquery": "^3.5.0",
-    "ol": "^6.3.0",
+    "ol": "6.4.3",
     "owl.carousel": "^2.3.4",
     "proj4": "^2.6.1",
     "regenerator-runtime": "^0.13.5",
