@@ -29,7 +29,7 @@
   color: white;
   font-size: 0.7em;
   height: 2.5em;
-  line-height: 2em;
+  line-height: $line-height-medium;
   z-index: 1;
   width: 100%;
 }
@@ -41,40 +41,35 @@
   color: white;
   text-decoration: underline;
 }
-.o-footer .o-footer-left {
-  float: left;
-  position: relative;
-  width: 30%;
-}
 .o-footer .o-footer-middle {
   float: left;
   position: relative;
   text-align: center;
-  width: 40%;
 }
 .o-footer .o-footer-middle .o-footer-middle-content {
   padding: 0.25em 0;
+  width: max-content;
 }
 .o-footer .o-footer-middle img {
   height: 2em;
   padding-right: 5px;
 }
 .o-footer .o-footer-middle .o-footer-middle-content p {
-  line-height: 2em;
+  line-height: $line-height-medium;
   vertical-align: top;
   display: inline;
 }
 .o-footer .o-footer-right {
   position: relative;
   float: left;
-  width: 30%;
+  width: 50%;
 }
 .o-footer .o-footer-left {
   position: relative;
   float: left;
   padding-left: 5px;
   padding-top: 3px;
-  width: 30%;
+  width: 50%;
 }
 .o-footer .o-footer-right .o-footer-attribution {
   position: relative;
