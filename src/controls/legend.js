@@ -15,7 +15,8 @@ const Legend = function Legend(options = {}) {
     contentStyle,
     turnOffLayersControl = false,
     name = 'legend',
-    labelOpacitySlider = ''
+    labelOpacitySlider = '',
+    useGroupIndication = true
   } = options;
 
   let viewer;
@@ -143,6 +144,7 @@ const Legend = function Legend(options = {}) {
 
   return Component({
     name,
+    getuseGroupIndication() { return useGroupIndication; },
     addButtonToTools(button) {
       const toolsEl = document.getElementById(toolsCmp.getId());
       toolsEl.classList.remove('hidden');
