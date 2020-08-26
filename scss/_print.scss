@@ -19,7 +19,7 @@ $print-scale-line-font-size: $font-size-smallest;
 .print-scale-line-inner {
   border: 2px solid $print-scale-line-color;
   border-bottom-right-radius: $print-scale-line-inner-border-radius;
-  border-bottom-left-radius: $print-scale-line-inner-border-radius;  
+  border-bottom-left-radius: $print-scale-line-inner-border-radius;
   border-top: none;
   color: $print-scale-line-color;
   font-size: $print-scale-line-font-size;
@@ -60,6 +60,14 @@ $print-scale-line-font-size: $font-size-smallest;
 
 .print-margin {
   padding: $print-margin;
+}
+
+.print-created-hidden {
+  visibility: hidden;
+}
+
+.print-created-none {
+  display: none;
 }
 
 // media print settings

@@ -1,5 +1,5 @@
 @import 'no-map.scss';
-// @import 'background-grid.scss';
+@import 'background-grid.scss';
 @import 'variables';
 @import 'ui/ui';
 .o-map {
@@ -7,9 +7,7 @@
   flex-direction: column;
   height: 100%;
   overflow: hidden;
-  -ms-touch-action: manipulation;
   position: relative;
-  touch-action: manipulation;
   -webkit-tap-highlight-color: rgba(0,0,0,0);
   @import 'reset.scss';
   @import 'ol.scss';
@@ -42,7 +40,9 @@
   @import 'search.scss';
   @import 'hidden.scss';
   @import 'featureinfo.scss';
+  @import 'infowindow.scss';
   @import 'ui/validate.scss';
+  @import 'o-scale.scss';
   @import 'scalepicker.scss';
   @import 'embedded-overlay.scss';
 }
@@ -56,5 +56,4 @@ body {
 	height: 100%;
 	overflow: hidden;
 	position: relative;
-  touch-action: none;
 }

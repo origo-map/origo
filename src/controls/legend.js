@@ -1,4 +1,6 @@
-import { Component, Button, Element as El, ToggleGroup, dom } from '../ui';
+import {
+  Component, Button, Element as El, ToggleGroup, dom
+} from '../ui';
 import imageSource from './legend/imagesource';
 import Overlays from './legend/overlays';
 import LayerProperties from './legend/overlayproperties';
@@ -12,8 +14,9 @@ const Legend = function Legend(options = {}) {
     contentCls,
     contentStyle,
     turnOffLayersControl = false,
-    layerManagerControl = false,
-    name = 'legend'
+    name = 'legend',
+    labelOpacitySlider = '',
+    useGroupIndication = true
   } = options;
 
   let viewer;
@@ -28,7 +31,8 @@ const Legend = function Legend(options = {}) {
   let layerButton;
   let layerButtonEl;
   let isExpanded;
-  const cls = `${clsSettings} control bottom-right box overflow-hidden flex row o-legend`.trim();
+  let toolsCmp;
+  const cls = `${clsSettings} control bottom-right box overflow-hidden inline-block row o-legend`.trim();
   const style = dom.createStyle(Object.assign({}, { width: 'auto' }, styleSettings));
 
   const addBackgroundButton = function addBackgroundButton(layer) {
@@ -93,20 +97,6 @@ const Legend = function Legend(options = {}) {
     }
   });
 
-  const addButton = Button({
-    cls: 'round compact primary icon-small margin-x-smaller',
-    click() {
-      viewer.dispatch('active:layermanager');
-    },
-    style: {
-      'align-self': 'center'
-    },
-    icon: '#o_add_24px',
-    iconStyle: {
-      fill: '#fff'
-    }
-  });
-
   const turnOffLayersButton = Button({
     cls: 'round compact icon-small margin-x-smaller\'title=\'Släck alla lager',
     click() {
@@ -154,6 +144,20 @@ const Legend = function Legend(options = {}) {
 
   return Component({
     name,
+    getuseGroupIndication() { return useGroupIndication; },
+    addButtonToTools(button) {
+      const toolsEl = document.getElementById(toolsCmp.getId());
+      toolsEl.classList.remove('hidden');
+      if (toolsCmp.getComponents().length > 0) {
+        toolsEl.style.justifyContent = 'space-between';
+        toolsEl.insertBefore(dom.html(divider.render()), toolsEl.firstChild);
+        toolsEl.insertBefore(dom.html(button.render()), toolsEl.firstChild);
+      } else {
+        toolsEl.appendChild(dom.html(button.render()));
+      }
+      toolsCmp.addComponent(button);
+      button.onRender();
+    },
     onInit() {
       this.on('render', this.onRender);
     },
@@ -182,40 +186,26 @@ const Legend = function Legend(options = {}) {
         toggleVisibility();
       });
       window.addEventListener('resize', updateMaxHeight);
+      if (turnOffLayersControl) this.addButtonToTools(turnOffLayersButton);
     },
     render() {
       const size = viewer.getSize();
       isExpanded = !size && expanded;
       target = document.getElementById(viewer.getMain().getId());
       const maxHeight = calcMaxHeight(getTargetHeight());
-      overlaysCmp = Overlays({ viewer, cls: contentCls, style: contentStyle });
+      overlaysCmp = Overlays({
+        viewer, cls: contentCls, style: contentStyle, labelOpacitySlider
+      });
       const baselayerCmps = [toggleGroup];
-      const toolsCmps = [];
-      let toolsCmp;
-      let toolsCmpsLayoutStrategy;
-      let mainContainerComponents;
 
-      if (layerManagerControl || turnOffLayersControl) {
-        if (layerManagerControl && turnOffLayersControl) {
-          toolsCmps.push(addButton, divider, turnOffLayersButton);
-          toolsCmpsLayoutStrategy = 'space-between';
-        } else if (layerManagerControl && !turnOffLayersControl) {
-          toolsCmps.push(addButton);
-          toolsCmpsLayoutStrategy = 'flex-start';
-        } else if (!layerManagerControl && turnOffLayersControl) {
-          toolsCmps.push(turnOffLayersButton);
-          toolsCmpsLayoutStrategy = 'flex-end';
+      toolsCmp = El({
+        cls: 'flex padding-small no-shrink hidden',
+        style: {
+          'background-color': '#fff',
+          'justify-content': 'flex-end',
+          height: '40px'
         }
-        toolsCmp = El({
-          cls: 'flex padding-small no-shrink',
-          style: {
-            'background-color': '#fff',
-            'justify-content': toolsCmpsLayoutStrategy,
-            height: '40px'
-          },
-          components: toolsCmps
-        });
-      }
+      });
 
       const baselayersCmp = El({
         cls: 'flex padding-small no-shrink',
@@ -228,11 +218,7 @@ const Legend = function Legend(options = {}) {
         components: baselayerCmps
       });
 
-      if (toolsCmp) {
-        mainContainerComponents = [overlaysCmp, toolsCmp, baselayersCmp];
-      } else {
-        mainContainerComponents = [overlaysCmp, baselayersCmp];
-      }
+      const mainContainerComponents = [overlaysCmp, toolsCmp, baselayersCmp];
 
       mainContainerCmp = El({
         cls: 'flex column overflow-hidden relative',

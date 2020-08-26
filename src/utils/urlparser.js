@@ -8,7 +8,7 @@ urlparser.objectify = function func(objString, opt) {
   const obj = {};
   if (options.topmost) {
     if (parts[0] === '') {
-      console.log('Topmost value is missing');
+      console.error('Topmost value is missing');
     } else {
       obj[topmost] = parts[0];
     }
@@ -25,9 +25,11 @@ urlparser.stringify = function func(obj, opt) {
   const delimeter = options.delimeter || '/';
   const topmost = options.topmost || undefined;
   let objString = topmost ? obj[topmost] : '';
-  for (const key in obj) {
-    if (key !== topmost) { objString += delimeter + key + delimeter + obj[key]; }
-  }
+  Object.keys(obj).forEach(key => {
+    if (key !== topmost) {
+      objString += delimeter + key + delimeter + obj[key];
+    }
+  });
   return objString;
 };
 urlparser.arrStringify = function func(arr, opt) {
@@ -72,7 +74,7 @@ urlparser.strBoolean = function func(str) {
   } else if (str === '0') {
     return false;
   }
-  console.log('String is not 1 or 0');
+  console.error('String is not 1 or 0');
   return false;
 };
 urlparser.formatUrl = function func(obj) {

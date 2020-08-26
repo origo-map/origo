@@ -12,15 +12,17 @@ const createForm = function createForm(obj) {
   const isoDate = new Date(today.getTime() - (today.getTimezoneOffset() * 60000)).toISOString();
   const readonly = obj.readonly ? ' readonly' : '';
   const disabled = obj.readonly ? ' disabled' : '';
+  const required = obj.required ? ' required' : '';
   let el;
   let checked;
   let firstOption;
+  const maxLengthText = maxLength ? `, max ${obj.maxLength} tecken` : '';
   switch (type) {
     case 'text':
-      el = `<div><label>${label}</label><br><input type="text" id="${id}" value="${val}"${maxLength}${readonly}></div>`;
+      el = `<div><label>${label}</label><br><input type="text" name="text${maxLengthText}" id="${id}" value="${val}"${maxLength}${readonly}${required}></div>`;
       break;
     case 'textarea':
-      el = `<div><label>${label}</label><br><textarea id="${id}" rows="3"${maxLength}${readonly}>${val}</textarea></div>`;
+      el = `<div><label>${label}</label><br><textarea name="textarea${maxLengthText}" id="${id}" rows="3" ${maxLength}${readonly}${required}>${val}</textarea></div>`;
       break;
     case 'checkbox':
       checked = val ? ' checked' : '';
@@ -57,7 +59,7 @@ const createForm = function createForm(obj) {
           val = isoDate.slice(0, 10);
         }
       }
-      el = `<div><label>${label}</label><br><input type="date" name="datum" id="${id}" placeholder="ÅÅÅÅ-MM-DD" value="${val}"${readonly}></div>`;
+      el = `<div><label>${label}</label><br><input type="date" name="datum" id="${id}" placeholder="ÅÅÅÅ-MM-DD" value="${val}"${readonly}${required}></div>`;
       break;
     case 'time':
       if (!val) {
@@ -66,10 +68,10 @@ const createForm = function createForm(obj) {
         } else if (obj.defaultTime) {
           val = obj.defaultTime;
         } else {
-          val = isoDate.slice(11, 16);
+          val = isoDate.slice(11, 19);
         }
       }
-      el = `<div><label>${label}</label><br><input type="time" name="timmar och minuter" id="${id}" placeholder="tt:mm" value="${val}"${readonly}></div>`;
+      el = `<div><label>${label}</label><br><input type="time" name="timmar, minuter och sekunder" id="${id}" placeholder="tt:mm:ss" value="${val}"${readonly}></div>`;
       break;
     case 'datetime':
       if (!val) {
@@ -78,10 +80,10 @@ const createForm = function createForm(obj) {
         } else if (obj.defaultDatetime) {
           val = obj.defaultDatetime;
         } else {
-          val = isoDate.slice(0, 16);
+          val = isoDate.slice(0, 19);
         }
       }
-      el = `<div><label>${label}</label><br><input type="datetime-local" name="datum och tid" id="${id}" placeholder="ÅÅÅÅ-MM-DDTtt:mm" value="${val}"${readonly}></div>`;
+      el = `<div><label>${label}</label><br><input type="datetime-local" name="datum och tid" id="${id}" placeholder="ÅÅÅÅ-MM-DDTtt:mm:ss" value="${val}"${readonly}></div>`;
       break;
     case 'color':
       if (!val) {
@@ -90,16 +92,16 @@ const createForm = function createForm(obj) {
       el = `<div><label>${label}</label><br><input type="color" name="hexadecimal" id="${id}" value="${val}"${readonly}></div>`;
       break;
     case 'email':
-      el = `<div><label>${label}</label><br><input type="email" name="epost" id="${id}" value="${val}"${readonly}></div>`;
+      el = `<div><label>${label}</label><br><input type="email" name="epost" id="${id}" value="${val}"${readonly}${required}></div>`;
       break;
     case 'url':
-      el = `<div><label>${label}</label><br><input type="url" name="hemsida" id="${id}" value="${val}"${readonly}></div>`;
+      el = `<div><label>${label}</label><br><input type="url" name="hemsida" id="${id}" value="${val}"${readonly}${required}></div>`;
       break;
     case 'integer':
-      el = `<div><label>${label}</label><br><input type="number" step="1" min="0" name="heltal" id="${id}" value="${val}"${readonly}></div>`;
+      el = `<div><label>${label}</label><br><input type="number" step="1" min="0" name="heltal" id="${id}" value="${val}"${readonly}${required}></div>`;
       break;
     case 'decimal':
-      el = `<div><label>${label}</label><br><input type="number" step="0.01" min="0" name="decimaltal" id="${id}" value="${val}"${readonly}></div>`;
+      el = `<div><label>${label}</label><br><input type="number" step="0.01" min="0" name="decimaltal" id="${id}" value="${val}"${readonly}${required}></div>`;
       break;
     case 'hidden':
       el = `<input type="hidden" id="${id}" value="${val}">`;

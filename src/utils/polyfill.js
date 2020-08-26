@@ -59,4 +59,3 @@ export default function polyfill() {
   }
   ElementRemove([Element.prototype, CharacterData.prototype, DocumentType.prototype].filter(Boolean));
 }
-

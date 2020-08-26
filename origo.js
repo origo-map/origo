@@ -1,9 +1,10 @@
-import { Feature as olFeature } from 'ol';
+import { Feature as olFeature, Collection as olCollection } from 'ol';
 import * as olGeom from 'ol/geom';
 import * as olInteraction from 'ol/interaction';
 import * as olLayer from 'ol/layer';
 import * as olSource from 'ol/source';
 import * as olStyle from 'ol/style';
+import * as olFormat from 'ol/format';
 import polyfill from './src/utils/polyfill';
 import * as ui from './src/ui';
 import Viewer from './src/viewer';
@@ -16,6 +17,8 @@ import Style from './src/style';
 import featurelayer from './src/featurelayer';
 import * as Utils from './src/utils';
 import dropdown from './src/dropdown';
+import { renderSvgIcon } from './src/utils/legendmaker';
+import '@babel/polyfill';
 
 const Origo = function Origo(configPath, options = {}) {
   const origoConfig = {
@@ -94,7 +97,10 @@ Origo.ol.layer = olLayer;
 Origo.ol.source = olSource;
 Origo.ol.style = olStyle;
 Origo.ol.Feature = olFeature;
+Origo.ol.Collection = olCollection;
+Origo.ol.format = olFormat;
 Origo.Utils = Utils;
 Origo.dropdown = dropdown;
+Origo.renderSvgIcon = renderSvgIcon;
 
 export default Origo;

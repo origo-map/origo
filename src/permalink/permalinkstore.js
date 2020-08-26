@@ -2,6 +2,7 @@ import urlparser from '../utils/urlparser';
 
 let getPin;
 const permalinkStore = {};
+const additionalMapStateParams = {};
 
 function getSaveLayers(layers) {
   const saveLayers = [];
@@ -24,6 +25,7 @@ permalinkStore.getState = function getState(viewer, isExtended) {
   const view = viewer.getMap().getView();
   const layers = viewer.getLayers();
   const featureinfo = viewer.getFeatureinfo();
+  const type = featureinfo.getSelection().type;
   getPin = featureinfo.getPin;
   state.layers = getSaveLayers(layers);
   state.center = view.getCenter().map(coord => Math.round(coord)).join();
@@ -38,7 +40,7 @@ permalinkStore.getState = function getState(viewer, isExtended) {
     }
   }
 
-  if (featureinfo.getSelection().id) {
+  if (featureinfo.getSelection().id && (type === 'AGS_FEATURE' || type === 'WFS' || type === 'GEOJSON' || type === 'TOPOJSON')) {
     state.feature = featureinfo.getSelection().id;
   }
 
@@ -51,12 +53,18 @@ permalinkStore.getState = function getState(viewer, isExtended) {
     state.map = viewer.getMapName().split('.')[0];
   }
 
+  Object.keys(additionalMapStateParams).forEach((key) => additionalMapStateParams[key](state));
+
   return state;
 };
 
 permalinkStore.getUrl = function getUrl(viewer) {
   const url = viewer.getUrl();
   return url;
+};
+
+permalinkStore.AddExternalParams = function AddExternalParams(key, callback) {
+  if (!additionalMapStateParams[key]) additionalMapStateParams[key] = callback;
 };
 
 export default permalinkStore;

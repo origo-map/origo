@@ -11,7 +11,10 @@ const Fullscreen = function Fullscreen(options = {}) {
   let fullscreenButton;
 
   const goFullScreen = function goFullScreen() {
-    const url = permalink.getPermalink(viewer);
+    let url = '';
+    if (window.location.href.indexOf('?mapStateId=') > 0) {
+      url = window.location.href;
+    } else { url = permalink.getPermalink(viewer); }
     window.open(url);
   };
 

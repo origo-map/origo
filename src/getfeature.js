@@ -17,7 +17,7 @@ export default function (id, layer, source, projCode, proj) {
 
 function fail(response) {
   if (response.error) {
-    console.log(`${response.error.message}
+    console.error(`${response.error.message}
       ${response.error.details.join('\n')}`);
   }
 }
