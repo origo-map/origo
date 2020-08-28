@@ -27,5 +27,6 @@ branches:
 
 before_script:
   - npm install
+  - npm rebuild node-sass
 script:
   - npm run build
