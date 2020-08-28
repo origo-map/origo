@@ -13,14 +13,16 @@ module.exports = merge(common, {
   },
   mode: 'development',
   plugins: [
-    new CopyWebpackPlugin([
-      { from: 'dist/origo.min.js', to: 'js/origo.min.js' },
-      'css/**',
-      'examples/**',
-      'data/*',
-      'index.html',
-      'index.json',
-      'img/**'
-    ])
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: 'dist/origo.min.js', to: 'js/origo.min.js' },
+        'css/**',
+        'examples/**',
+        'data/*',
+        'index.html',
+        'index.json',
+        'img/**'
+      ]
+    })
   ]
 });
