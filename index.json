@@ -39,7 +39,8 @@
     {
       "name": "legend",
       "options": {
-        "labelOpacitySlider": "Opacity"
+        "labelOpacitySlider": "Opacity",
+        "useGroupIndication" : true
       }
     },
     {

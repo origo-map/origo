@@ -14,9 +14,9 @@ const Legend = function Legend(options = {}) {
     contentCls,
     contentStyle,
     turnOffLayersControl = false,
-    layerManagerControl = false,
     name = 'legend',
-    labelOpacitySlider = ''
+    labelOpacitySlider = '',
+    useGroupIndication = true
   } = options;
 
   let viewer;
@@ -97,20 +97,6 @@ const Legend = function Legend(options = {}) {
     }
   });
 
-  const addButton = Button({
-    cls: 'round compact primary icon-small margin-x-smaller',
-    click() {
-      viewer.dispatch('active:layermanager');
-    },
-    style: {
-      'align-self': 'center'
-    },
-    icon: '#o_add_24px',
-    iconStyle: {
-      fill: '#fff'
-    }
-  });
-
   const turnOffLayersButton = Button({
     cls: 'round compact icon-small margin-x-smaller\'title=\'Släck alla lager',
     click() {
@@ -158,6 +144,7 @@ const Legend = function Legend(options = {}) {
 
   return Component({
     name,
+    getuseGroupIndication() { return useGroupIndication; },
     addButtonToTools(button) {
       const toolsEl = document.getElementById(toolsCmp.getId());
       toolsEl.classList.remove('hidden');
@@ -201,7 +188,6 @@ const Legend = function Legend(options = {}) {
       window.addEventListener('resize', updateMaxHeight);
 
       if (turnOffLayersControl) this.addButtonToTools(turnOffLayersButton);
-      if (layerManagerControl) this.addButtonToTools(addButton);
     },
     render() {
       const size = viewer.getSize();
