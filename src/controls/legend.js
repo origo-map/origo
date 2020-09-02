@@ -48,13 +48,15 @@ const Legend = function Legend(options = {}) {
         initial: () => layer.setVisible(false)
       },
       click() {
-        const slided = document.getElementById(overlaysCmp.slidenav.getId()).classList.contains('slide-secondary');
-        if (this.getState() === 'active' && !slided) {
-          const layerProperties = LayerProperties({ layer, viewer, parent: this });
-          overlaysCmp.slidenav.setSecondary(layerProperties);
-          overlaysCmp.slidenav.slideToSecondary();
-        } else if (slided) {
-          overlaysCmp.slidenav.slideToMain();
+        if (overlaysCmp.slidenav.getState() === 'initial') {
+          const slided = document.getElementById(overlaysCmp.slidenav.getId()).classList.contains('slide-secondary');
+          if (this.getState() === 'active' && !slided) {
+            const layerProperties = LayerProperties({ layer, viewer, parent: this });
+            overlaysCmp.slidenav.setSecondary(layerProperties);
+            overlaysCmp.slidenav.slideToSecondary();
+          } else if (slided) {
+            overlaysCmp.slidenav.slideToMain();
+          }
         }
       }
     }));
