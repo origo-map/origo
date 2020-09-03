@@ -30,6 +30,7 @@ export default function Slidenav(options = {}) {
   let mainEl;
   let secondaryEl;
   let secondaryTitle = '';
+  let state = 'initial';
 
   let mainContainer;
   let backButton;
@@ -37,7 +38,6 @@ export default function Slidenav(options = {}) {
   let secondaryContainer;
   let secondaryLabelCls = '';
   let posMem = 0;
-
 
   /**
    * Toggle position between absolute and relative,
@@ -52,6 +52,7 @@ export default function Slidenav(options = {}) {
     if (legendSlideNav) {
       document.getElementById('legendCollapse').scrollTop = posMem;
     }
+    state = 'initial';
   };
 
   const animateHeight = function animateHeight(currentSlide, newSlide) {
@@ -101,6 +102,7 @@ export default function Slidenav(options = {}) {
   };
 
   const slideToSecondary = function slideToSecondary() {
+    state = 'transition';
     if (legendSlideNav) {
       posMem = document.getElementById('legendCollapse').scrollTop;
     }
@@ -111,14 +113,20 @@ export default function Slidenav(options = {}) {
   };
 
   const slideToMain = function slideToMain() {
+    state = 'transition';
     slidenavEl.classList.remove('slide-secondary');
     animateHeight(secondaryEl, mainEl);
     slidenavEl.addEventListener('transitionend', onTransitionEnd);
     this.dispatch(slideEvent);
   };
 
+  const getState = function getState() {
+    return state;
+  };
+
   return Component({
     slideToMain,
+    getState,
     onInit() {
       mainContainer = Element({
         cls: 'main'
