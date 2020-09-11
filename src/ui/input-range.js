@@ -23,6 +23,12 @@ export default function InputRange(options = {}) {
       inputEl.addEventListener('input', this.onInput.bind(this));
       inputEl.addEventListener('change', this.onInput.bind(this)); // ie11
     },
+    setValue(value) {
+      inputEl = document.getElementById(this.getId());
+      if (inputEl !== null) {
+        inputEl.value = value;
+      }
+    },
     render() {
       return `
       <input id="${this.getId()}" type="range" min="${minValue}" max="${maxValue}" value="${initialValue}" step="${step}" class="${cls}" style="${style}">
