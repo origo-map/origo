@@ -1,3 +1,4 @@
+[![License](https://img.shields.io/badge/license-BSD2-blue.svg?style=flat-square)](https://github.com/origo-map/origo/blob/master/LICENSE.txt)
 [![Build Status](https://travis-ci.org/origo-map/origo.svg?branch=master)](https://travis-ci.org/origo-map/origo)
 # Origo
 
