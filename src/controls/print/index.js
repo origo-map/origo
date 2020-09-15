@@ -5,9 +5,13 @@ const Print = function Print(options = {}) {
   const {
     icon = '#ic_print_24px',
     logo = {},
+    northArrow = {},
     title = 'Skriv ut',
     showCreated = false,
     createdPrefix = ''
+  } = options;
+  let {
+    showNorthArrow = true
   } = options;
 
   let viewer;
@@ -16,15 +20,22 @@ const Print = function Print(options = {}) {
 
   return Component({
     name: 'print',
+    onInit() {
+      if ('visible' in northArrow) {
+        showNorthArrow = northArrow.visible;
+      }
+    },
     onAdd(evt) {
       viewer = evt.target;
       const printComponent = PrintComponent({
         logo,
+        northArrow,
         target: viewer.getId(),
         map: viewer.getMap(),
         viewer,
         showCreated,
-        createdPrefix
+        createdPrefix,
+        showNorthArrow
       });
       mapMenu = viewer.getControlByName('mapmenu');
       menuItem = mapMenu.MenuItem({

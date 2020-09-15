@@ -13,6 +13,7 @@ import { afterRender, beforeRender } from './download-callback';
 const PrintComponent = function PrintComponent(options = {}) {
   const {
     logo,
+    northArrow,
     name = 'origo-map',
     map,
     target,
@@ -23,7 +24,8 @@ const PrintComponent = function PrintComponent(options = {}) {
   let {
     size = 'a4',
     orientation = 'portrait',
-    showCreated
+    showCreated,
+    showNorthArrow
   } = options;
 
   let pageElement;
@@ -57,6 +59,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     return showCreated ? `${createdPrefix}${today.toLocaleDateString()} ${today.toLocaleTimeString()}` : '';
   };
 
+
   const titleComponent = Component({
     update() { dom.replace(document.getElementById(this.getId()), this.render()); },
     render() { return `<div id="${this.getId()}" class="o-print-header h4 text-align-center empty">${title}</div>`; }
@@ -69,7 +72,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     update() { dom.replace(document.getElementById(this.getId()), this.render()); },
     render() { return `<div id="${this.getId()}" class="o-print-created padding-right text-grey-dark text-align-right text-smaller empty">${created()}</div>`; }
   });
-  const printMapComponent = PrintMap({ baseUrl: viewer.getBaseUrl(), logo, map });
+  const printMapComponent = PrintMap({ baseUrl: viewer.getBaseUrl(), logo, northArrow, map, viewer, showNorthArrow });
 
   const printSettings = PrintSettings({
     orientation,
@@ -77,7 +80,8 @@ const PrintComponent = function PrintComponent(options = {}) {
     initialSize: size,
     sizes: Object.keys(sizes),
     map,
-    showCreated
+    showCreated,
+    showNorthArrow
   });
   const printToolbar = PrintToolbar();
   const closeButton = Button({
@@ -101,6 +105,7 @@ const PrintComponent = function PrintComponent(options = {}) {
       printSettings.on('change:size-custom', this.changeCustomSize.bind(this));
       printSettings.on('change:title', this.changeTitle.bind(this));
       printSettings.on('change:created', this.toggleCreated.bind(this));
+      printSettings.on('change:northarrow', this.toggleNorthArrow.bind(this));
       closeButton.on('click', this.close.bind(this));
     },
     changeDescription(evt) {
@@ -137,6 +142,10 @@ const PrintComponent = function PrintComponent(options = {}) {
       showCreated = !showCreated;
       createdComponent.update();
       this.updatePageSize();
+    },
+    toggleNorthArrow() {
+      showNorthArrow = !showNorthArrow;
+      printMapComponent.dispatch('change:toggleNorthArrow', { showNorthArrow });
     },
     close() {
       printMapComponent.removePrintControls();
