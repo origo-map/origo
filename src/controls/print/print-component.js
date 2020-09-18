@@ -177,7 +177,7 @@ const PrintComponent = function PrintComponent(options = {}) {
         width
       });
     },
-    async onRender() {
+    onRender() {
       today = new Date(Date.now());
       viewerMapTarget = map.getTarget();
       pageContainerElement = document.getElementById(pageContainerId);

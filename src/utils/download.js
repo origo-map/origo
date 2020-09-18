@@ -1,6 +1,5 @@
 import convertHtml2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
-import LoadScript from './load-script';
 
 let url;
 
