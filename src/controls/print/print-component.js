@@ -7,7 +7,7 @@ import pageTemplate from './page.template';
 import PrintMap from './print-map';
 import PrintSettings from './print-settings';
 import PrintToolbar from './print-toolbar';
-import { downloadPNG, downloadPDF, loadJsPDF } from '../../utils/download';
+import { downloadPNG, downloadPDF } from '../../utils/download';
 import { afterRender, beforeRender } from './download-callback';
 
 const PrintComponent = function PrintComponent(options = {}) {
@@ -177,7 +177,7 @@ const PrintComponent = function PrintComponent(options = {}) {
         width
       });
     },
-    async onRender() {
+    onRender() {
       today = new Date(Date.now());
       viewerMapTarget = map.getTarget();
       pageContainerElement = document.getElementById(pageContainerId);
@@ -187,7 +187,6 @@ const PrintComponent = function PrintComponent(options = {}) {
       printMapComponent.addPrintControls();
 
       this.updatePageSize();
-      await loadJsPDF();
     },
     updateMapSize() {
       map.updateSize();
