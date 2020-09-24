@@ -20,12 +20,17 @@
   -webkit-transition: .1s ease all;
   transition: .1s ease all;
 }
-.o-sidebar,
+.o-sidebar {
+  height: 100%;
+}
 .o-sidebar .o-card-content {
-	height: 100%;
+  height: calc(100% - 46px)!important;
+  .owl-stage {
+    margin-bottom: 10px;
+  }
 }
 #o-sidebar .owl-carousel .owl-wrapper-outer {
-	overflow-y: auto;
+  overflow-y: auto;
 }
 @media screen and (max-width: 320px) {
 #o-sidebar {
