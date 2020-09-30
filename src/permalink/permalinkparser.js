@@ -47,7 +47,7 @@ const layers = function layers(layersStr) {
 };
 
 const zoom = function zoom(zoomStr) {
-  return parseInt(zoomStr, 10);
+  return parseFloat(zoomStr);
 };
 
 const center = function center(centerStr) {
