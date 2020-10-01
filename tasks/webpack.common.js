@@ -2,6 +2,7 @@ const webpack = require('webpack');
 
 module.exports = {
   entry: [
+    'whatwg-fetch',
     './origo.js'
   ],
   module: {
@@ -41,8 +42,5 @@ module.exports = {
       'window.jQuery': 'jquery',
       proj4: 'proj4'
     }),
-    new webpack.ProvidePlugin({
-      fetch: 'exports-loader?self.fetch!whatwg-fetch/dist/fetch.umd'
-    })
   ]
 };

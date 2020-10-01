@@ -16,9 +16,10 @@ const replacer = function replacer() {
   function searchAndReplace(name, obj, map) {
     const regex = new RegExp(`${start}(.*?)${end}`, 'g');
     const matches = regex.exec(name);
+    let object;
     if (matches) {
       let val = Object.prototype.hasOwnProperty.call(obj, matches[1]) ? obj[matches[1]] : '';
-      if (!val) {
+      if (val === '') {
         const nsIndex = matches[0].indexOf(helperNS);
         if (nsIndex) {
           const helperParts = getArgs(matches[1]);
@@ -26,8 +27,15 @@ const replacer = function replacer() {
           const args = helperArg.concat(helperParts[0], map);
           val = Object.prototype.hasOwnProperty.call(helper, helperName) ? helper[helperName].apply(null, args).toString() : '';
         }
+        if (matches[1].indexOf('.') > 0) {
+          const splitMatch = matches[1].split('.');
+          object = obj[splitMatch.shift()];
+          val = `${start}${splitMatch.join('.')}${end}`;
+        } else {
+          object = obj;
+        }
       }
-      return searchAndReplace(name.replace(matches[0], val), obj, map);
+      return searchAndReplace(name.replace(matches[0], val), object, map);
     }
     return name;
   }

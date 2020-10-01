@@ -1,4 +1,5 @@
 import $ from 'jquery';
+// eslint-disable-next-line import/no-cycle
 import Featureinfo from './featureinfo';
 
 function setVisibility(visible) {
@@ -43,8 +44,8 @@ function init(viewer) {
   const el = `<div id="o-sidebar">
     <div class="o-sidebar o-card">
         <div class="flex row justify-end">
-          <div id="o-card-title" class="justify-start margin-top-small margin-left text-weight-bold width-full"></div>
-          <button id="o-close-button" class="small round margin-top-small margin-right-small icon-smallest grey-lightest no-shrink">
+          <div id="o-card-title" class="justify-start margin-y-smaller margin-left text-weight-bold width-full"></div>
+          <button id="o-close-button" class="small round margin-top-smaller margin-bottom-auto margin-right-small icon-smallest grey-lightest no-shrink">
             <span class="icon ">
               <svg>
                 <use xlink:href="#ic_close_24px"></use>

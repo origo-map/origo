@@ -7,7 +7,7 @@ import Style from 'ol/style/Style';
 import Text from 'ol/style/Text';
 import validateurl from './utils/validateurl';
 import stylefunctions from './style/stylefunctions';
-import replacer from '../src/utils/replacer';
+import replacer from './utils/replacer';
 import maputils from './maputils';
 
 const white = [255, 255, 255, 1];
@@ -167,6 +167,7 @@ function checkOptions(feature, scale, styleSettings, styleList, size) {
           const featMatch = first.get(featAttr);
           expr = typeof featMatch === 'number' ? featMatch + expr : `"${featMatch}"${expr}`;
         }
+        // eslint-disable-next-line no-eval
         if (eval(expr)) {
           styleL = styleList[j];
           return styleL;

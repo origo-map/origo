@@ -42,7 +42,7 @@ export default function () {
     let undef;
     while (len--) {
       code = base64.charCodeAt(i++);
-      rank = base64_ranks[code-43];
+      rank = base64_ranks[code - 43];
       if (rank !== 255 && rank !== undef) {
         last[1] = last[0];
         last[0] = code;
@@ -68,51 +68,50 @@ export default function () {
   if (Uint8Array) {
     base64_ranks = new Uint8Array([
       62, -1, -1, -1, 63, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1
-      , -1, -1,  0, -1, -1, -1,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9
+      , -1, -1, 0, -1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
       , 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25
       , -1, -1, -1, -1, -1, -1, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35
       , 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51
     ]);
   }
   if (HTMLCanvasElement && (!canvas_proto.toBlob || !canvas_proto.toBlobHD)) {
-    if (!canvas_proto.toBlob)
-      canvas_proto.toBlob = function (callback, type) {
-        if (!type) {
-          type = 'image/png';
-        } if (this.mozGetAsFile) {
-          callback(this.mozGetAsFile('canvas', type));
-          return;
-        } if (this.msToBlob && /^\s*image\/png\s*(?:$|;)/i.test(type)) {
-          callback(this.msToBlob());
-          return;
-        }
+    if (!canvas_proto.toBlob) canvas_proto.toBlob = function (callback, type) {
+      if (!type) {
+        type = 'image/png';
+      } if (this.mozGetAsFile) {
+        callback(this.mozGetAsFile('canvas', type));
+        return;
+      } if (this.msToBlob && /^\s*image\/png\s*(?:$|;)/i.test(type)) {
+        callback(this.msToBlob());
+        return;
+      }
 
-        const args = Array.prototype.slice.call(arguments, 1);
-        const dataURI = this[to_data_url].apply(this, args);
-        const header_end = dataURI.indexOf(',');
-        const data = dataURI.substring(header_end + 1);
-        const is_base64 = is_base64_regex.test(dataURI.substring(0, header_end));
-        let blob;
+      const args = Array.prototype.slice.call(arguments, 1);
+      const dataURI = this[to_data_url].apply(this, args);
+      const header_end = dataURI.indexOf(',');
+      const data = dataURI.substring(header_end + 1);
+      const is_base64 = is_base64_regex.test(dataURI.substring(0, header_end));
+      let blob;
 
-        if (Blob.fake) {
+      if (Blob.fake) {
         // no reason to decode a data: URI that's just going to become a data URI again
-          blob = new Blob();
-          if (is_base64) {
-            blob.encoding = 'base64';
-          } else {
-            blob.encoding = 'URI';
-          }
-          blob.data = data;
-          blob.size = data.length;
-        } else if (Uint8Array) {
-          if (is_base64) {
-            blob = new Blob([decode_base64(data)], { type: type });
-          } else {
-            blob = new Blob([decodeURIComponent(data)], { type: type });
-          }
+        blob = new Blob();
+        if (is_base64) {
+          blob.encoding = 'base64';
+        } else {
+          blob.encoding = 'URI';
         }
-        callback(blob);
-      };
+        blob.data = data;
+        blob.size = data.length;
+      } else if (Uint8Array) {
+        if (is_base64) {
+          blob = new Blob([decode_base64(data)], { type: type });
+        } else {
+          blob = new Blob([decodeURIComponent(data)], { type: type });
+        }
+      }
+      callback(blob);
+    };
 
     if (!canvas_proto.toBlobHD && canvas_proto.toDataURLHD) {
       canvas_proto.toBlobHD = function () {

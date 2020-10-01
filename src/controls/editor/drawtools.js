@@ -43,6 +43,7 @@ const drawToolsSelector = function drawToolsSelector(tools, defaultLayer, v) {
 
   function close() {
     if (active) {
+      // eslint-disable-next-line no-use-before-define
       setActive(false);
     }
   }

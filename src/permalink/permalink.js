@@ -55,11 +55,15 @@ export default (() => ({
       return fetch(`${saveOnServerServiceEndPoint}/${mapStateId}`).then(response => response.json())
         .then((data) => {
           const mapObj = {};
-          for (const key in data) {
-            mapObj[key] = permalinkParser[key](data[key]);
-          }
+          Object.keys(data).forEach(key => {
+            if (permalinkParser[key]) mapObj[key] = permalinkParser[key](data[key]);
+            else mapObj[key] = data[key];
+          });
           return mapObj;
         });
     }
+  },
+  addParamsToGetMapState: function addParamsToGetMapState(key, callback) {
+    permalinkStore.AddExternalParams(key, callback);
   }
 }))();
