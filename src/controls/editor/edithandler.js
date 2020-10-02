@@ -14,6 +14,7 @@ import editForm from './editform';
 import imageresizer from '../../utils/imageresizer';
 import getImageOrientation from '../../utils/getimageorientation';
 import shapes from './shapes';
+import searchList from './addons/searchList/searchList';
 import validate from '../../utils/validate';
 
 const editsStore = store();
@@ -36,6 +37,7 @@ let snap;
 let viewer;
 let featureInfo;
 let modal;
+let sList;
 
 function isActive() {
   if (modify === undefined || select === undefined) {
@@ -653,6 +655,8 @@ function onToggleEdit(e) {
   } else if (e.tool === 'attribute') {
     if (hasAttribute === false) {
       editAttributes();
+      sList = new searchList();
+      sList.init();
     } else {
       cancelAttribute();
     }
