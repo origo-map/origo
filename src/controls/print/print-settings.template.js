@@ -7,6 +7,7 @@ export default function printTemplate({
   sizeControl,
   titleControl,
   createdControl,
+  northArrowControl,
   rotationControl
 }) {
   return `
@@ -34,7 +35,12 @@ export default function printTemplate({
       <div class="grow text-normal">Visa skapad tid</div>
       ${createdControl.render()}
     </div>
-    ${rotationControl.render()}
+    <div class="padding-top-large"></div>
+    <div class="flex padding-right-small">
+      <div class="grow text-normal">Visa Norrpil</div>
+      ${northArrowControl.render()}
+    </div>
+      ${rotationControl.render()}
     <div class="padding-top"></div>
   </div>`;
 }

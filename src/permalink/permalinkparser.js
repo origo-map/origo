@@ -9,6 +9,10 @@ const layerModel = {
   s: {
     name: 'legend',
     dataType: 'boolean'
+  },
+  o: {
+    name: 'opacity',
+    dataType: 'number'
   }
 };
 
@@ -27,9 +31,12 @@ const layers = function layers(layersStr) {
     });
     Object.getOwnPropertyNames(layerObject).forEach((prop) => {
       const val = layerObject[prop];
-      if (Object.prototype.hasOwnProperty.call(layerModel, prop)) {
+      if (Object.prototype.hasOwnProperty.call(layerModel, prop) && prop !== 'o') {
         const attribute = layerModel[prop];
         obj[attribute.name] = urlparser.strBoolean(val);
+      } else if (prop === 'o') {
+        const attribute = layerModel[prop];
+        obj[attribute.name] = Number(val) / 100;
       } else {
         obj[prop] = val;
       }
@@ -40,7 +47,7 @@ const layers = function layers(layersStr) {
 };
 
 const zoom = function zoom(zoomStr) {
-  return parseInt(zoomStr, 10);
+  return parseFloat(zoomStr);
 };
 
 const center = function center(centerStr) {

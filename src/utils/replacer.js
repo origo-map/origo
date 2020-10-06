@@ -34,6 +34,8 @@ const replacer = function replacer() {
         } else {
           object = obj;
         }
+      } else {
+        object = obj;
       }
       return searchAndReplace(name.replace(matches[0], val), object, map);
     }

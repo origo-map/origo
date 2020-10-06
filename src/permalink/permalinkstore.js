@@ -10,6 +10,7 @@ function getSaveLayers(layers) {
     const saveLayer = {};
     saveLayer.v = layer.getVisible() === true ? 1 : 0;
     saveLayer.s = layer.get('legend') === true ? 1 : 0;
+    saveLayer.o = Number(layer.get('opacity')) * 100;
     if (saveLayer.s || saveLayer.v) {
       saveLayer.name = layer.get('name');
       saveLayers.push(urlparser.stringify(saveLayer, {

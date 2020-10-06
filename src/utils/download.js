@@ -1,18 +1,7 @@
 import convertHtml2canvas from 'html2canvas';
-import LoadScript from './load-script';
+import { jsPDF } from 'jspdf';
 
-const pdfLibUrl = 'https://unpkg.com/jspdf@latest/dist/jspdf.min.js';
-
-const jsPDFLoader = LoadScript({
-  src: pdfLibUrl,
-  global: 'jsPDF'
-});
-let jsPDF;
 let url;
-
-export const loadJsPDF = async function loadJsPDF() {
-  if (!jsPDF) { jsPDF = await jsPDFLoader.load(); }
-};
 
 export const downloadBlob = function downloadBlob({ blob, filename }) {
   return new Promise((resolve) => {
@@ -106,7 +95,6 @@ export const downloadPDF = async function downloadPDF({
   size,
   width
 }) {
-  await loadJsPDF();
   const format = size === 'custom' ? [mm2Pt(width), mm2Pt(height)] : size;
   const pdf = new jsPDF({ orientation, format, unit: 'mm' });
 

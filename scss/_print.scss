@@ -70,6 +70,10 @@ $print-scale-line-font-size: $font-size-smallest;
   display: none;
 }
 
+.printmap-north-arrow {
+  display:block;
+}
+
 // media print settings
 @media print {
   .no-print {
