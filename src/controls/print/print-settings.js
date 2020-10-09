@@ -74,6 +74,7 @@ const PrintSettings = function PrintSettings({
         icon: closeIcon,
         state: 'hidden',
         validStates: ['initial', 'hidden'],
+        ariaLabel: 'Stäng',
         click() {
           toggle();
         }

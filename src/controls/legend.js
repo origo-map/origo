@@ -259,6 +259,7 @@ const Legend = function Legend(options = {}) {
         icon: '#ic_close_24px',
         state: closeButtonState,
         validStates: ['initial', 'hidden'],
+        ariaLabel: 'Stäng',
         click() {
           toggleVisibility();
         }

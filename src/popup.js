@@ -7,7 +7,7 @@ function render(target) {
       <div class="o-popup o-card">
         <div class="flex row justify-end">
           <div id="o-card-title" class="justify-start margin-y-smaller margin-left text-weight-bold" style="width:100%;"></div>
-          <button id="o-close-button" class="small round margin-top-smaller margin-bottom-auto margin-right-small icon-smallest grey-lightest no-shrink">
+          <button id="o-close-button" class="small round margin-top-smaller margin-bottom-auto margin-right-small icon-smallest grey-lightest no-shrink" aria-label="Stäng">
             <span class="icon ">
               <svg>
                 <use xlink:href="#ic_close_24px"></use>
