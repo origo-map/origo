@@ -136,7 +136,7 @@ const Measure = function Measure({
     }
 
     const htmlElem = document.createElement('span');
-    htmlElem.innerHTML = output;
+    htmlElem.textContent = output;
 
     [].forEach.call(htmlElem.children, (element) => {
       const el = element;
