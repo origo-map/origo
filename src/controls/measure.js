@@ -136,12 +136,12 @@ const Measure = function Measure({
     }
 
     const htmlElem = document.createElement('span');
-    htmlElem.textContent = output;
+    htmlElem.innerHTML = output;
 
     [].forEach.call(htmlElem.children, (element) => {
       const el = element;
       if (el.tagName === 'SUP') {
-        el.textContent = String.fromCharCode(el.textContent.charCodeAt(0) + 128);
+        el.innerHTML = String.fromCharCode(el.innerHTML.charCodeAt(0) + 128);
       }
     });
 
@@ -294,6 +294,9 @@ const Measure = function Measure({
         }
         output += `${lengthLastSegment} (Totalt: ${totalLength})`;
         label += totalLength;
+      } else if (area) {
+        output = area;
+        label = area;
       } else {
         output = totalLength;
         label += totalLength;
@@ -381,6 +384,7 @@ const Measure = function Measure({
     measure.on('drawstart', (evt) => {
       sketch = evt.feature;
       sketch.on('change', pointerMoveHandler);
+      pointerMoveHandler(evt);
 
       document.getElementsByClassName('o-tooltip-measure')[1].remove();
 
@@ -391,10 +395,11 @@ const Measure = function Measure({
 
     measure.on('drawend', (evt) => {
       const feature = evt.feature;
+      sketch.un('change', pointerMoveHandler);
+      pointerMoveHandler(evt);
       feature.setStyle(createStyle(feature));
       feature.getStyle()[0].getText().setText(label);
       document.getElementsByClassName('o-tooltip-measure')[0].remove();
-      pointerMoveHandler(evt);
       overlayArray.push(...tempOverlayArray);
       tempOverlayArray = [];
       resetSketch();
@@ -429,6 +434,7 @@ const Measure = function Measure({
     }
 
     document.getElementById(button.getId()).classList.add('active');
+    document.getElementById(undoButton.getId()).classList.add('hidden');
     activeButton = button;
     map.removeInteraction(measure);
     viewer.removeOverlays(tempOverlayArray);
@@ -437,13 +443,13 @@ const Measure = function Measure({
   }
 
   function undoLastPoint() {
-    if (sketch.getGeometry().getCoordinates().length === 2 || sketch.getGeometry().getCoordinates()[0].length <= 3) {
+    if ((type === 'LineString' && sketch.getGeometry().getCoordinates().length === 2) || (type === 'Polygon' && sketch.getGeometry().getCoordinates()[0].length <= 3)) {
       document.getElementsByClassName('o-tooltip-measure')[0].remove();
       document.getElementById(undoButton.getId()).classList.add('hidden');
       abort();
     } else {
+      if (showSegmentLengths) document.getElementsByClassName('o-tooltip-measure')[1].remove();
       measure.removeLastPoint();
-      document.getElementsByClassName('o-tooltip-measure')[1].remove();
     }
   }
 
