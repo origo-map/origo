@@ -101,6 +101,7 @@ const Mapmenu = function Mapmenu({
       });
       closeButton = Button({
         cls: 'small round margin-top-small margin-right-small icon-smaller grey-lightest',
+        ariaLabel: 'Stäng',
         icon: closeIcon,
         click() {
           toggle();
