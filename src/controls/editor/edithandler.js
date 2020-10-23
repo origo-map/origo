@@ -396,7 +396,11 @@ function onAttributesSave(feature, attrs) {
       valid.required = inputRequired && inputValue === '' ? false : inputValue;
       if (!valid.required && inputRequired && inputValue === '') {
         if (!requiredMsg) {
-          requiredOn.insertAdjacentHTML('afterend', `<div class="o-${inputId}-requiredMsg errorMsg fade-in padding-bottom-small">Obligatoriskt fält</div>`);
+          if (requiredOn.getAttribute('class') === 'awesomplete') {
+            requiredOn.parentNode.insertAdjacentHTML('afterend', `<div class="o-${inputId}-requiredMsg errorMsg fade-in padding-bottom-small">Obligatoriskt fält</div>`);
+          } else {
+            requiredOn.insertAdjacentHTML('afterend', `<div class="o-${inputId}-requiredMsg errorMsg fade-in padding-bottom-small">Obligatoriskt fält</div>`);
+          }
         }
       } else if (requiredMsg) {
         requiredMsg.remove();
@@ -511,6 +515,20 @@ function onAttributesSave(feature, attrs) {
             }
           } else if (errorMsg) {
             errorMsg.remove();
+          }
+          break;
+        case 'searchList':
+          const turnOnValidation = attribute.required || false;
+          if (turnOnValidation) {
+            const { list } = attribute;
+            valid.searchList = validate.searchList(inputValue, list) || inputValue === '' ? inputValue : false;
+            if (!valid.searchList && inputValue !== '') {
+              errorOn.parentElement.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            } else if (errorMsg) {
+              errorMsg.remove();
+            }
+          } else {
+            valid.searchList = true;
           }
           break;
         default:
@@ -656,7 +674,6 @@ function onToggleEdit(e) {
     if (hasAttribute === false) {
       editAttributes();
       sList = new searchList();
-      sList.init();
     } else {
       cancelAttribute();
     }

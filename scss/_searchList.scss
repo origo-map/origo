@@ -16,11 +16,14 @@
 
 #searchList .awesomplete .dropdown-btn {
     border-radius: 5px;
-    border: 1px solid #ccc;
     position: absolute;
     right: 0;
     padding: 0.75em 1em;
     line-height: initial;
+}
+
+.dropdown-btn:focus {
+  border: 1px solid rgba(213, 213, 213, 0.6);
 }
 
 #searchList .caret {
@@ -39,13 +42,33 @@
     background-color: white;
 }
 
+#searchList .awesomplete>ul>li:first-child {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
 #searchList .awesomplete>ul>li {
     position: relative;
+    max-width: 100%;
     padding: .4em 1em;
-    left: 1em;
-    border-bottom: none;
+    left: 1.2em;
+    border-bottom: 1px solid rgba(213, 213, 213, 0.2);
     font-size: .875em;
     line-height: 1.5rem;
+}
+
+#searchList .awesomplete>ul>li:last-child {
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+
+#searchList .awesomplete>ul>li:hover {
+  background: rgba(213, 213, 213, 0.7);
+}
+
+#searchList .highlight {
+  background: rgba(213, 213, 213, 0.7);
 }
 
 #searchList .awesomplete mark {

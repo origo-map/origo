@@ -18,6 +18,7 @@ const createForm = function createForm(obj) {
   const readonly = obj.readonly ? ' readonly' : '';
   const disabled = obj.readonly ? ' disabled' : '';
   const required = obj.required ? ' required' : '';
+  const name = obj.name ? obj.name : '';
   let el;
   let checked;
   let firstOption;
@@ -51,13 +52,19 @@ const createForm = function createForm(obj) {
       elLabel.appendChild(document.createElement('br'));
 
       elInput.setAttribute('id', id);
+      elInput.setAttribute('name', name);
+      elInput.setAttribute('type', 'searchList-input');
       elInput.setAttribute('class', 'awesomplete');
       elInput.setAttribute('o-list', `${JSON.stringify(obj.list)}`);
       elInput.setAttribute('o-config', `${JSON.stringify(obj.config || {})}`);
       elInput.setAttribute('maxlength', maxLength || 50);
+      elInput.setAttribute('value', val);
+      if (required) {
+        elInput.setAttribute('required', required);
+      }
 
       elButton.setAttribute('class', `dropdown-btn ${id}`);
-      elButton.setAttribute('type', 'button');
+      elButton.setAttribute('type', 'searchList-button');
       elSpan.setAttribute('class', 'caret');
       elButton.insertAdjacentElement('afterbegin', elSpan);
 
