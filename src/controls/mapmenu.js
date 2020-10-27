@@ -118,7 +118,7 @@ const Mapmenu = function Mapmenu({
         }
       });
       mapMenu = El({
-        cls: 'absolute flex column top-right control box bg-white overflow-hidden faded',
+        cls: 'absolute flex column top-right control box bg-white overflow-hidden z-index-top faded',
         collapseX: true,
         components: [headerComponent, contentComponent]
       });
