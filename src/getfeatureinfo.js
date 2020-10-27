@@ -78,7 +78,7 @@ function getFeatureInfoUrl({
           }
           FTL = returnString;
           // ..then make it legible in Origo
-          const agsNameReplace = /<h5>FeatureInfoCollection - layer name: '[-A-Z0-9+&@#/%?=~_|!:,.;]*'<\/h5>/gim;
+          const agsNameReplace = /<h5>FeatureInfoCollection - layer name: '[-A-Z0-9+&@#/%?=~_ |!:,.;]*'<\/h5>/gim;
           FTL = FTL.replace(agsNameReplace, '');
           const urlifyReplace = /<td>(\b(https?|ftp):\/\/[-A-Z0-9+&@#/%?=~_|!:,.;]*[-A-Z0-9+&@#/%=~_|])/gim;
           FTL = FTL.replace(urlifyReplace, '<td><a href="$1" target="_blank">$1</a>');
