@@ -5,7 +5,9 @@ import DrawInteraction from 'ol/interaction/Draw';
 import Overlay from 'ol/Overlay';
 import Polygon from 'ol/geom/Polygon';
 import LineString from 'ol/geom/LineString';
+import Point from 'ol/geom/Point';
 import Projection from 'ol/proj/Projection';
+import * as Extent from 'ol/extent';
 import { Component, Element as El, Button, dom } from '../ui';
 import Style from '../style';
 import StyleTypes from '../style/styletypes';
@@ -16,7 +18,8 @@ const Measure = function Measure({
   measureTools = ['length', 'area'],
   elevationServiceURL,
   elevationTargetProjection,
-  elevationAttribute
+  elevationAttribute,
+  showSegmentLengths = false
 } = {}) {
   const style = Style;
   const styleTypes = StyleTypes();
@@ -27,6 +30,7 @@ const Measure = function Measure({
   let measure;
   let type;
   let sketch;
+  let prevSketchLength = 0;
   let measureTooltip;
   let measureTooltipElement;
   let measureStyleOptions;
@@ -40,6 +44,7 @@ const Measure = function Measure({
   let elevationTool;
   let defaultTool;
   let isActive = false;
+  let tempOverlayArray = [];
   const overlayArray = [];
 
   let viewer;
@@ -48,6 +53,7 @@ const Measure = function Measure({
   let lengthToolButton;
   let areaToolButton;
   let elevationToolButton;
+  let undoButton;
   const buttons = [];
   let target;
 
@@ -75,7 +81,7 @@ const Measure = function Measure({
       positioning: 'center-left'
     });
 
-    overlayArray.push(helpTooltip);
+    tempOverlayArray.push(helpTooltip);
     map.addOverlay(helpTooltip);
   }
 
@@ -94,7 +100,7 @@ const Measure = function Measure({
       stopEvent: false
     });
 
-    overlayArray.push(measureTooltip);
+    tempOverlayArray.push(measureTooltip);
     map.addOverlay(measureTooltip);
   }
 
@@ -135,7 +141,7 @@ const Measure = function Measure({
     [].forEach.call(htmlElem.children, (element) => {
       const el = element;
       if (el.tagName === 'SUP') {
-        el.textContent = String.fromCharCode(el.textContent.charCodeAt(0) + 128);
+        el.innerHTML = String.fromCharCode(el.innerHTML.charCodeAt(0) + 128);
       }
     });
 
@@ -201,29 +207,102 @@ const Measure = function Measure({
     });
   }
 
+  function placeMeasurementLabel(segment, coords) {
+    const aa = segment.getExtent();
+    const oo = Extent.getCenter(aa);
+    measureElement = document.createElement('div');
+    measureElement.className = 'o-tooltip o-tooltip-measure';
+    measureElement.id = `measure_${coords.length}`;
+    const labelOverlay = new Overlay({
+      element: measureElement,
+      positioning: 'center-center',
+      stopEvent: true
+    });
+
+    tempOverlayArray.push(labelOverlay);
+    labelOverlay.setPosition(oo);
+    measureElement.innerHTML = formatLength(/** @type {LineString} */(segment));
+    map.addOverlay(labelOverlay);
+  }
+
   // Display and move tooltips with pointer
   function pointerMoveHandler(evt) {
-    if (evt.dragging) {
-      return;
-    }
-
     const helpMsg = 'Klicka för att börja mäta';
     let tooltipCoord = evt.coordinate;
 
     if (sketch) {
       const geom = (sketch.getGeometry());
-      let output;
+      let output = '';
+      let coords;
+      let area;
+      let newNode;
+      label = '';
 
       if (geom instanceof Polygon) {
-        output = formatArea((geom));
+        area = formatArea(/** @type {Polygon} */(geom));
         tooltipCoord = geom.getInteriorPoint().getCoordinates();
+        coords = geom.getCoordinates()[0];
+        newNode = coords.length > prevSketchLength && coords.length !== 3;
+        prevSketchLength = coords.length;
       } else if (geom instanceof LineString) {
-        output = formatLength((geom));
         tooltipCoord = geom.getLastCoordinate();
+        coords = geom.getCoordinates();
+        newNode = coords.length > prevSketchLength;
+        prevSketchLength = coords.length;
+      }
+
+      let totalLength = 0;
+      if (!(geom instanceof Point)) {
+        totalLength = formatLength(/** @type {LineString} */(geom));
+      }
+      if (showSegmentLengths && !(geom instanceof Point)) {
+        let lengthLastSegment = 0; // totalLength;
+        let lastSegment;
+        if (coords.length >= 1) {
+          if (geom instanceof Polygon && coords.length > 2) {
+            if (evt.type !== 'drawend') {
+              // If this is a polygon in the progress of being drawn OL creates a extra vertices back to start that we need to ignore
+              lastSegment = new LineString([coords[coords.length - 2], coords[coords.length - 3]]);
+              const polygonAsLineString = /** @type {LineString} */ (geom);
+              const lineStringWithoutLastSegment = new LineString(polygonAsLineString.getCoordinates()[0].slice(0, -1));
+              totalLength = formatLength(lineStringWithoutLastSegment);
+            } else {
+              // Finish the polygon and put a label on the last verticies as well
+              lastSegment = new LineString([coords[coords.length - 1], coords[coords.length - 2]]);
+              placeMeasurementLabel(lastSegment, coords);
+            }
+          } else { // Draw segment while drawing is in progress
+            lastSegment = new LineString([coords[coords.length - 1], coords[coords.length - 2]]);
+          }
+          // Create a label for the last drawn vertices and place it in the middle of it.
+          lengthLastSegment = formatLength(/** @type {LineString} */(lastSegment));
+          if ((newNode && evt.type !== 'drawend') && coords.length > 2) {
+            let secondToLastSegment;
+            if (geom instanceof Polygon && coords.length > 3) {
+              secondToLastSegment = new LineString([coords[coords.length - 3], coords[coords.length - 4]]);
+            } else {
+              secondToLastSegment = new LineString([coords[coords.length - 2], coords[coords.length - 3]]);
+            }
+            if (secondToLastSegment) {
+              placeMeasurementLabel(secondToLastSegment, coords);
+            }
+          }
+        }
+        if (area) {
+          output = `${area}<br/>`;
+          label = `${area}\n`;
+        }
+        output += `${lengthLastSegment} (Totalt: ${totalLength})`;
+        label += totalLength;
+      } else if (area) {
+        output = area;
+        label = area;
+      } else {
+        output = totalLength;
+        label += totalLength;
       }
 
       measureTooltipElement.innerHTML = output;
-      label = output;
       measureTooltip.setPosition(tooltipCoord);
     }
 
@@ -231,6 +310,14 @@ const Measure = function Measure({
       helpTooltipElement.innerHTML = helpMsg;
       helpTooltip.setPosition(evt.coordinate);
     }
+  }
+
+  function resetSketch() {
+    // unset sketch
+    sketch = null;
+    // unset tooltip so that a new one can be created
+    measureTooltipElement = null;
+    helpTooltipElement = null;
   }
 
   function disableInteraction() {
@@ -244,6 +331,9 @@ const Measure = function Measure({
     if (areaTool) {
       document.getElementById(areaToolButton.getId()).classList.add('hidden');
     }
+    if (lengthTool || areaTool) {
+      document.getElementById(undoButton.getId()).classList.add('hidden');
+    }
     if (elevationTool) {
       document.getElementById(elevationToolButton.getId()).classList.add('hidden');
     }
@@ -251,12 +341,13 @@ const Measure = function Measure({
     setActive(false);
 
     map.un('pointermove', pointerMoveHandler);
-    map.un('click', pointerMoveHandler);
     map.removeInteraction(measure);
     vector.setVisible(false);
+    overlayArray.push(...tempOverlayArray);
     viewer.removeOverlays(overlayArray);
     vector.getSource().clear();
     setActive(false);
+    resetSketch();
   }
 
   function enableInteraction() {
@@ -289,28 +380,44 @@ const Measure = function Measure({
     createHelpTooltip();
 
     map.on('pointermove', pointerMoveHandler);
-    map.on('click', pointerMoveHandler);
 
     measure.on('drawstart', (evt) => {
       sketch = evt.feature;
-      document.getElementsByClassName('o-tooltip-measure')[1].classList.add('hidden');
+      sketch.on('change', pointerMoveHandler);
+      pointerMoveHandler(evt);
+
+      document.getElementsByClassName('o-tooltip-measure')[1].remove();
+
+      if (type === 'LineString' || type === 'Polygon') {
+        document.getElementById(undoButton.getId()).classList.remove('hidden');
+      }
     }, this);
 
     measure.on('drawend', (evt) => {
       const feature = evt.feature;
+      sketch.un('change', pointerMoveHandler);
+      pointerMoveHandler(evt);
       feature.setStyle(createStyle(feature));
       feature.getStyle()[0].getText().setText(label);
       document.getElementsByClassName('o-tooltip-measure')[0].remove();
-      // unset sketch
-      sketch = null;
-      // unset tooltip so that a new one can be created
-      measureTooltipElement = null;
+      overlayArray.push(...tempOverlayArray);
+      tempOverlayArray = [];
+      resetSketch();
       createMeasureTooltip();
-      document.getElementsByClassName('o-tooltip-measure')[1].classList.remove('hidden');
+      createHelpTooltip();
+
+      document.getElementById(undoButton.getId()).classList.add('hidden');
       if (feature.getGeometry().getType() === 'Point') {
         getElevation(evt);
       }
     }, this);
+  }
+
+  function abort() {
+    measure.abortDrawing();
+    resetSketch();
+    createMeasureTooltip();
+    createHelpTooltip();
   }
 
   function toggleMeasure() {
@@ -327,9 +434,23 @@ const Measure = function Measure({
     }
 
     document.getElementById(button.getId()).classList.add('active');
+    document.getElementById(undoButton.getId()).classList.add('hidden');
     activeButton = button;
     map.removeInteraction(measure);
+    viewer.removeOverlays(tempOverlayArray);
+    resetSketch();
     addInteraction();
+  }
+
+  function undoLastPoint() {
+    if ((type === 'LineString' && sketch.getGeometry().getCoordinates().length === 2) || (type === 'Polygon' && sketch.getGeometry().getCoordinates()[0].length <= 3)) {
+      document.getElementsByClassName('o-tooltip-measure')[0].remove();
+      document.getElementById(undoButton.getId()).classList.add('hidden');
+      abort();
+    } else {
+      if (showSegmentLengths) document.getElementsByClassName('o-tooltip-measure')[1].remove();
+      measure.removeLastPoint();
+    }
   }
 
   return Component({
@@ -416,7 +537,7 @@ const Measure = function Measure({
 
         if (elevationTool) {
           elevationToolButton = Button({
-            cls: 'o-measure-elevation padding-small icon-smaller round light box-shadow hidden',
+            cls: 'o-measure-elevation padding-small margin-bottom-smaller icon-smaller round light box-shadow hidden',
             click() {
               type = 'Point';
               toggleType(this);
@@ -427,6 +548,19 @@ const Measure = function Measure({
           });
           buttons.push(elevationToolButton);
           defaultButton = defaultTool === 'length' ? lengthToolButton : elevationToolButton;
+        }
+
+        if (lengthTool || areaTool) {
+          undoButton = Button({
+            cls: 'o-measure-undo padding-small margin-bottom-smaller icon-smaller round light box-shadow hidden',
+            click() {
+              undoLastPoint();
+            },
+            icon: '#ic_undo_24px',
+            tooltipText: 'Ångra',
+            tooltipPlacement: 'east'
+          });
+          buttons.push(undoButton);
         }
       }
     },
@@ -450,6 +584,11 @@ const Measure = function Measure({
       }
       if (elevationTool) {
         htmlString = elevationToolButton.render();
+        el = dom.html(htmlString);
+        document.getElementById(measureElement.getId()).appendChild(el);
+      }
+      if (lengthTool || areaTool) {
+        htmlString = undoButton.render();
         el = dom.html(htmlString);
         document.getElementById(measureElement.getId()).appendChild(el);
       }

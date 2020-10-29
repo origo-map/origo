@@ -27,7 +27,8 @@
 
 	.owl-stage-outer {
 		position: relative;
-		overflow: hidden;
+		overflow-x: hidden;
+		overflow-y: auto;
 		/* fix for flashing background */
 		-webkit-transform: translate3d(0px, 0px, 0px);
 	}
@@ -83,7 +84,8 @@
 	}
 
 	&.owl-loaded {
-		display: block;
+		display: flex;
+		flex-direction: column;
 	}
 
 	&.owl-loading {

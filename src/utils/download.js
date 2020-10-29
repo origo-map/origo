@@ -96,7 +96,7 @@ export const downloadPDF = async function downloadPDF({
   width
 }) {
   const format = size === 'custom' ? [mm2Pt(width), mm2Pt(height)] : size;
-  const pdf = new jsPDF({ orientation, format, unit: 'mm' });
+  const pdf = new jsPDF({ orientation, format, unit: 'mm', compress: true });
 
   if (beforeRender) beforeRender(el);
   const canvas = await html2canvas(el);

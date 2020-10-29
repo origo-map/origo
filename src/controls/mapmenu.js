@@ -101,6 +101,7 @@ const Mapmenu = function Mapmenu({
       });
       closeButton = Button({
         cls: 'small round margin-top-small margin-right-small icon-smaller grey-lightest',
+        ariaLabel: 'Stäng',
         icon: closeIcon,
         click() {
           toggle();
@@ -117,7 +118,7 @@ const Mapmenu = function Mapmenu({
         }
       });
       mapMenu = El({
-        cls: 'absolute flex column top-right control box bg-white overflow-hidden faded',
+        cls: 'absolute flex column top-right control box bg-white overflow-hidden z-index-top faded',
         collapseX: true,
         components: [headerComponent, contentComponent]
       });
