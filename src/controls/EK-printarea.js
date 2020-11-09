@@ -60,8 +60,7 @@ const Printarea = function Printarea(options = {}) {
                 source: new VectorSource({
                     features: [],
                     name: 'printarea',
-                    visible: true,
-                    zIndex: 7
+                    visible: true
                 }),
                 style: new Style({
                     stroke: new Stroke({
@@ -74,6 +73,7 @@ const Printarea = function Printarea(options = {}) {
                 })
             });
             map.addLayer(vector);
+			vector.setZIndex(501);
 
             return vector;
         },
