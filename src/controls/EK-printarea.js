@@ -10,7 +10,8 @@ import { Polygon } from 'ol/geom';
 
 const Printarea = function Printarea(options = {}) {
     let {
-        target
+        target,
+        printAreaColor
     } = options;
 
     let viewer = options.viewer;
@@ -68,12 +69,13 @@ const Printarea = function Printarea(options = {}) {
                         width: 2
                     }),
                     fill: new Fill({
-                        color: 'rgba(123,104,238, 0.4)' //https://www.rapidtables.com/web/color/blue-color.html - 'mediumslateblue'. Might make a good config option.
+                        color: `${printAreaColor}`
                     })
                 })
             });
             map.addLayer(vector);
-			vector.setZIndex(501);
+            vector.setZIndex(501);
+            console.log(printAreaColor);
 
             return vector;
         },

@@ -15,7 +15,8 @@ const Printmenu = function Printmenu(options = {}) {
         MapfishInfoUrl,
         MapfishCreateUrl,
         layerErrorMessage,
-        otherErrorMessage
+        otherErrorMessage,
+        printAreaColor
     } = options;
 
 
@@ -583,13 +584,15 @@ const Printmenu = function Printmenu(options = {}) {
         onAdd(evt) {
             viewer = evt.target;
             printarea = Printarea({
-                viewer: viewer
+                viewer: viewer,
+                printAreaColor: printAreaColor
             });
             mapfishPrint = Mapfishprint(({
                 viewer: viewer,
                 MapfishCreateUrl: MapfishCreateUrl,
                 layerErrorMessage: layerErrorMessage,
-                otherErrorMessage: otherErrorMessage
+                otherErrorMessage: otherErrorMessage,
+                printAreaColor: printAreaColor
             }));
 
             let thisComp = this;
