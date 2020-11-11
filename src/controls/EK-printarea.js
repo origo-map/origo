@@ -11,7 +11,7 @@ import { Polygon } from 'ol/geom';
 const Printarea = function Printarea(options = {}) {
     let {
         target,
-        printAreaColor
+        printAreaColor = 'rgba(123,104,238, 0.4' //default color
     } = options;
 
     let viewer = options.viewer;
@@ -69,13 +69,12 @@ const Printarea = function Printarea(options = {}) {
                         width: 2
                     }),
                     fill: new Fill({
-                        color: `${printAreaColor}`
+                        color: `${printAreaColor}`//retrieves value from index.json, if values ​​do not exist it gets default
                     })
                 })
             });
             map.addLayer(vector);
             vector.setZIndex(501);
-            console.log(printAreaColor);
 
             return vector;
         },
