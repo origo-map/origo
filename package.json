@@ -27,6 +27,8 @@
   "dependencies": {
     "@babel/runtime": "^7.11.2",
     "@babel/runtime-corejs3": "^7.11.2",
+    "@turf/boolean-disjoint": "^6.0.2",
+    "@turf/buffer": "^5.1.5",
     "acorn": "^8.0.1",
     "awesomplete": "^1.1.5",
     "copyfiles": "^2.3.0",
