@@ -398,7 +398,10 @@ const Measure = function Measure({
     measure = new DrawInteraction({
       source,
       type,
-      style: style.createStyleRule(measureStyleOptions.interaction)
+      style: style.createStyleRule(measureStyleOptions.interaction),
+      condition(evt) {
+        return evt.originalEvent.pointerType === 'mouse';
+      }
     });
 
     map.addInteraction(measure);
@@ -477,7 +480,8 @@ const Measure = function Measure({
     const eventObject = {
       clientX: pixel[0],
       clientY: pixel[1],
-      bubbles: true
+      bubbles: true,
+      pointerType: 'mouse'
     };
     const down = new PointerEvent('pointerdown', eventObject);
     const up = new PointerEvent('pointerup', eventObject);
@@ -493,6 +497,9 @@ const Measure = function Measure({
     } else {
       if (showSegmentLengths) document.getElementsByClassName('o-tooltip-measure')[1].remove();
       measure.removeLastPoint();
+      if (touchMode) {
+        centerSketch();
+      }
     }
   }
 
