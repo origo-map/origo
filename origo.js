@@ -19,8 +19,10 @@ import featurelayer from './src/featurelayer';
 import * as Utils from './src/utils';
 import dropdown from './src/dropdown';
 import { renderSvgIcon } from './src/utils/legendmaker';
+import '@babel/polyfill';
 
 const Origo = function Origo(configPath, options = {}) {
+  let viewer;
   const origoConfig = {
     controls: [],
     crossDomain: true,
@@ -81,9 +83,11 @@ const Origo = function Origo(configPath, options = {}) {
     return extensions;
   };
 
+  const api = () => viewer;
   const getConfig = () => origoConfig;
 
   return ui.Component({
+    api,
     getConfig,
     onInit() {
       const defaultConfig = Object.assign({}, origoConfig, options);
@@ -94,7 +98,7 @@ const Origo = function Origo(configPath, options = {}) {
           viewerOptions.controls = initControls(viewerOptions.controls);
           viewerOptions.extensions = initExtensions(viewerOptions.extensions || []);
           const target = viewerOptions.target;
-          const viewer = Viewer(target, viewerOptions);
+          viewer = Viewer(target, viewerOptions);
           this.dispatch('load', viewer);
         });
       }

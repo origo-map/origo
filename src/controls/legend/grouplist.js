@@ -2,7 +2,8 @@ import { Component } from '../../ui';
 
 const LayerList = function LayerList(options, isRootGroup = false) {
   const {
-    cls: clsSettings = ''
+    cls: clsSettings = '',
+    abstract
   } = options;
 
   let cls = `${clsSettings} list divider-end`.trim();
@@ -102,6 +103,16 @@ const LayerList = function LayerList(options, isRootGroup = false) {
     removeGroup,
     removeOverlay,
     onInit() {
+      if (abstract) {
+        const groupAbstract = Component({
+          render() {
+            return `<li><div id="${this.getId()}">
+            <div class="padding-small padding-x text-small">${abstract}</div>
+            </div></li>`;
+          }
+        });
+        this.addComponent(groupAbstract);
+      }
       this.on('add', (evt) => {
         if (evt.target) {
           target = evt.target;

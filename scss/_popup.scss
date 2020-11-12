@@ -9,6 +9,7 @@
 .o-popup {
   bottom: 12px;
   width: 100%;
+  max-height: 50vh;
   z-index: 1010;
   padding: 1px;
   position: absolute;
@@ -57,4 +58,16 @@
 #o-popup {
   width: 200px;
 }
+}
+.o-popup .o-card-content {
+  max-height: calc(50vh - 46px)!important;
+  #o-identify {
+    max-height: inherit;
+   #o-identify-carousel {
+      max-height: inherit;
+      .owl-stage {
+        margin-bottom: 10px;
+      }
+    }
+  }
 }

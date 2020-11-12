@@ -37,7 +37,11 @@
       }
     },
     {
-      "name": "legend"
+      "name": "legend",
+      "options": {
+        "labelOpacitySlider": "Opacity",
+        "useGroupIndication" : true
+      }
     },
     {
       "name": "position",
@@ -54,15 +58,15 @@
     }
   ],
   "pageSettings": {
-  "footer": {
-    "img": "img/png/logo.png",
-    "url" : "https://github.com/origo-map/origo",
-    "urlText": "Origo"
+    "footer": {
+      "img": "img/png/logo.png",
+      "url": "https://github.com/origo-map/origo",
+      "text": "Origo"
+    },
+    "mapGrid": {
+      "visible": true
+    }
   },
-  "mapGrid": {
-    "visible": true
-  }
-},
   "projectionCode": "EPSG:3857",
   "projectionExtent": [
     -20026376.39,
@@ -71,10 +75,10 @@
     20048966.10
   ],
   "proj4Defs": [
-      {
-        "code": "EPSG:3006",
-        "projection": "+proj=utm +zone=33 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
-      }
+    {
+      "code": "EPSG:3006",
+      "projection": "+proj=utm +zone=33 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
+    }
   ],
   "extent": [
     -20026376.39,
@@ -108,6 +112,9 @@
     1.1943,
     0.5972
   ],
+  "featureinfoOptions": {
+    "infowindow": "overlay"
+  },
   "source": {
     "local": {
       "url": "http://localhost/geoserver/wms"
@@ -129,9 +136,9 @@
       "style": "origo-logo",
       "type": "GEOJSON",
       "attributes": [
-          {
-            "name": "name"
-          }
+        {
+          "name": "name"
+        }
       ],
       "visible": true
     },
@@ -157,98 +164,98 @@
     }
   ],
   "styles": {
-      "mask": [
-        [
-          {
+    "mask": [
+      [
+        {
+          "stroke": {
+            "color": "rgba(0,0,0,1.0)"
+          },
+          "fill": {
+            "color": "rgba(0,0,0,1.0)"
+          }
+        }
+      ]
+    ],
+    "origo-logo": [
+      [
+        {
+          "label": "Origokommuner",
+          "circle": {
+            "radius": 10,
             "stroke": {
-              "color": "rgba(0,0,0,1.0)"
+              "color": "rgba(0,0,0,1)",
+              "width": 2.5
             },
             "fill": {
-              "color": "rgba(0,0,0,1.0)"
+              "color": "rgba(255,255,255,0.9)"
             }
           }
-        ]
-      ],
-      "origo-logo": [
-        [
-          {
-            "label": "Origokommuner",
-            "circle": {
-              "radius": 10,
-              "stroke": {
-                "color": "rgba(0,0,0,1)",
-                "width": 2.5
-              },
-              "fill": {
-                "color": "rgba(255,255,255,0.9)"
-              }
-            }
-          },
-          {
-            "circle": {
-              "radius": 2.5,
-              "stroke": {
-                "color": "rgba(0,0,0,0)",
-                "width": 1
-              },
-              "fill": {
-                "color": "rgba(37,129,196,1)"
-              }
+        },
+        {
+          "circle": {
+            "radius": 2.5,
+            "stroke": {
+              "color": "rgba(0,0,0,0)",
+              "width": 1
+            },
+            "fill": {
+              "color": "rgba(37,129,196,1)"
             }
           }
-        ]
-      ],
-      "cirkel": [
-        [
-          {
-            "circle": {
-              "radius": 6,
-              "stroke": {
-                "color": "rgba(0,0,0,1)",
-                "width": 2
-              },
-              "fill": {
-                "color": "rgba(0,0,0,0.5)"
-              }
-            }
-          }
-        ]
-      ],
-      "karta_osm": [
-        [
-          {
-            "image": {
-              "src": "img/png/osm.png"
-            }
-          }
-        ]
-      ],      
-      "karta_gra": [
-        [
-          {
-            "image": {
-              "src": "img/png/gra.png"
-            }
-          }
-        ]
-      ],
-      "karta_farg": [
-        [
-          {
-            "image": {
-              "src": "img/png/farg.png"
-            }
-          }
-        ]
-      ],
-      "orto": [
-        [
-          {
-            "image": {
-              "src": "img/png/orto.png"
-            }
-          }
-        ]
+        }
       ]
+    ],
+    "cirkel": [
+      [
+        {
+          "circle": {
+            "radius": 6,
+            "stroke": {
+              "color": "rgba(0,0,0,1)",
+              "width": 2
+            },
+            "fill": {
+              "color": "rgba(0,0,0,0.5)"
+            }
+          }
+        }
+      ]
+    ],
+    "karta_osm": [
+      [
+        {
+          "image": {
+            "src": "img/png/osm.png"
+          }
+        }
+      ]
+    ],
+    "karta_gra": [
+      [
+        {
+          "image": {
+            "src": "img/png/gra.png"
+          }
+        }
+      ]
+    ],
+    "karta_farg": [
+      [
+        {
+          "image": {
+            "src": "img/png/farg.png"
+          }
+        }
+      ]
+    ],
+    "orto": [
+      [
+        {
+          "image": {
+            "src": "img/png/orto.png"
+          }
+        }
+      ]
+    ]
   }
 }

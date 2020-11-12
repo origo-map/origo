@@ -25,12 +25,16 @@ const ShareMap = function ShareMap(options = {}) {
   const createLink = function createLink(data) {
     const url = permalink.getPermalink(viewer, data);
     const inputElement = document.getElementsByClassName('o-share-link')[0].firstElementChild;
+
     inputElement.value = url;
     inputElement.select();
   };
 
   return Component({
     name: 'sharemap',
+    addParamsToGetMapState(key, callback) {
+      permalink.addParamsToGetMapState(key, callback);
+    },
     onInit() {
       if (storeMethod && serviceEndpoint) {
         permalink.setSaveOnServerServiceEndpoint(serviceEndpoint);

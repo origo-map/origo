@@ -15,6 +15,7 @@ const Group = function Group(options = {}, viewer) {
     title,
     name,
     parent,
+    abstract,
     position = 'top',
     type = 'group',
     autoExpand = true
@@ -31,7 +32,7 @@ const Group = function Group(options = {}, viewer) {
   let groupEl;
 
   const listCls = type === 'grouplayer' ? 'divider-start padding-left padding-top-small' : '';
-  const groupList = GroupList({ viewer, cls: listCls });
+  const groupList = GroupList({ viewer, cls: listCls, abstract });
   visibleState = groupList.getVisible();
 
   const getEl = () => groupEl;
@@ -149,6 +150,16 @@ const Group = function Group(options = {}, viewer) {
     groupList.removeGroup(group);
   };
 
+  const updateGroupIndication = function updateGroupIndication() {
+    if (groupList.getVisible() === 'none') {
+      groupEl.firstElementChild.classList.add('no-group-indication');
+      groupEl.firstElementChild.classList.remove('group-indication');
+    } else {
+      groupEl.firstElementChild.classList.add('group-indication');
+      groupEl.firstElementChild.classList.remove('no-group-indication');
+    }
+  };
+
   return Component({
     addOverlay,
     getEl,
@@ -227,7 +238,17 @@ const Group = function Group(options = {}, viewer) {
     },
     onRender() {
       groupEl = document.getElementById(collapse.getId());
-
+      if (viewer.getControlByName('legend').getuseGroupIndication() && type === 'group') {
+        updateGroupIndication();
+        this.on('add:overlay', () => {
+          updateGroupIndication();
+        });
+        groupEl.addEventListener('change:visible', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          updateGroupIndication();
+        });
+      }
       // only listen to tick changes for subgroups
       if (type === 'grouplayer') {
         groupEl.addEventListener('tick:all', (e) => {
