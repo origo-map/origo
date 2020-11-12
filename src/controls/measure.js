@@ -400,21 +400,24 @@ const Measure = function Measure({
       type,
       style: style.createStyleRule(measureStyleOptions.interaction),
       condition(evt) {
-        return evt.originalEvent.pointerType === 'mouse';
+        return evt.originalEvent.pointerType !== 'touch';
       }
     });
 
     map.addInteraction(measure);
     createMeasureTooltip();
     createHelpTooltip();
+    if (!touchMode) {
+      map.on('pointermove', pointerMoveHandler);
+    }
 
-    map.on('pointermove', pointerMoveHandler);
     measure.on('drawstart', (evt) => {
       sketch = evt.feature;
       sketch.on('change', pointerMoveHandler);
-      pointerMoveHandler(evt);
       if (touchMode) {
         map.getView().on('change:center', centerSketch);
+      } else {
+        pointerMoveHandler(evt);
       }
       document.getElementsByClassName('o-tooltip-measure')[1].remove();
 
@@ -480,8 +483,7 @@ const Measure = function Measure({
     const eventObject = {
       clientX: pixel[0],
       clientY: pixel[1],
-      bubbles: true,
-      pointerType: 'mouse'
+      bubbles: true
     };
     const down = new PointerEvent('pointerdown', eventObject);
     const up = new PointerEvent('pointerup', eventObject);
