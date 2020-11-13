@@ -228,15 +228,17 @@ const Measure = function Measure({
   }
 
   function centerSketch() {
-    const geom = (sketch.getGeometry());
-    if (geom instanceof Polygon) {
-      const sketchCoord = geom.getCoordinates()[0];
-      sketchCoord.splice(-1, 1, map.getView().getCenter());
-      sketch.getGeometry().setCoordinates([sketchCoord]);
-    } else if (geom instanceof LineString) {
-      const sketchCoord = geom.getCoordinates();
-      sketchCoord.splice(-1, 1, map.getView().getCenter());
-      sketch.getGeometry().setCoordinates(sketchCoord);
+    if (sketch) {
+      const geom = (sketch.getGeometry());
+      if (geom instanceof Polygon) {
+        const sketchCoord = geom.getCoordinates()[0];
+        sketchCoord.splice(-1, 1, map.getView().getCenter());
+        sketch.getGeometry().setCoordinates([sketchCoord]);
+      } else if (geom instanceof LineString) {
+        const sketchCoord = geom.getCoordinates();
+        sketchCoord.splice(-1, 1, map.getView().getCenter());
+        sketch.getGeometry().setCoordinates(sketchCoord);
+      }
     }
   }
 
