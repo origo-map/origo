@@ -382,6 +382,7 @@ const Measure = function Measure({
     map.on('pointermove', pointerMoveHandler);
 
     measure.on('drawstart', (evt) => {
+      measure.getOverlay().getSource().getFeatures()[1].setStyle([]);
       sketch = evt.feature;
       sketch.on('change', pointerMoveHandler);
       pointerMoveHandler(evt);
