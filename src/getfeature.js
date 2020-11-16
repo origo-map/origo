@@ -65,9 +65,15 @@ sourceType.WFS = function wfsSourceType(id, layer, serverUrl, extent) {
     geometryName
   });
   const filter = replacer.replace(layer.get('filter'), window);
-  const bbox = extent ? extent.toString() : '';
   const layerExtent = layer.get('extent');
-  const queryFilter = filter ? `&CQL_FILTER=${filter} AND BBOX(${layer.get('geometryName')},${layerExtent})` : `&BBOX=${bbox}`;
+  const minExtent = [Math.max(extent[0], layerExtent[0]),
+    Math.max(extent[1], layerExtent[1]),
+    Math.min(extent[2], layerExtent[2]),
+    Math.min(extent[3], layerExtent[3])];
+  if (!(minExtent[0] < minExtent[2] && minExtent[1] < minExtent[3])) {
+    return false;
+  }
+  const queryFilter = filter ? `&CQL_FILTER=${filter} AND BBOX(${layer.get('geometryName')},${minExtent.toString()})` : `&BBOX=${minExtent.toString()}`;
   const url = `${serverUrl}?`;
   const data = ['service=WFS',
     '&version=1.0.0',
@@ -76,6 +82,7 @@ sourceType.WFS = function wfsSourceType(id, layer, serverUrl, extent) {
     extent ? queryFilter : '',
     id ? `&featureId=${id}` : ''
   ].join('');
+
   return $.ajax({
     url,
     data,
