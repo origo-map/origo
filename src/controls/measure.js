@@ -232,7 +232,7 @@ const Measure = function Measure({
       const geom = (sketch.getGeometry());
       if (geom instanceof Polygon) {
         const sketchCoord = geom.getCoordinates()[0];
-        sketchCoord.splice(-1, 1, map.getView().getCenter());
+        sketchCoord.splice(-2, 1, map.getView().getCenter());
         sketch.getGeometry().setCoordinates([sketchCoord]);
       } else if (geom instanceof LineString) {
         const sketchCoord = geom.getCoordinates();
