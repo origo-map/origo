@@ -3,7 +3,6 @@ import $ from 'jquery';
 import maputils from './maputils';
 import SelectedItem from './models/SelectedItem';
 
-
 function createSelectedItem(feature, layer, map, groupLayers) {
   // Above functions have no way of knowing whether the layer is part of a LayerGroup or not, therefore we need to check every layer against the groupLayers.
   const layerName = layer.get('name');
@@ -41,7 +40,7 @@ function getFeatureInfoUrl({
   });
 
   return $.ajax(url, {
-    type: 'post'
+    type: 'get'
   })
     .then((response) => {
       if (response.error) {

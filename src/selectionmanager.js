@@ -8,6 +8,9 @@ import StyleTypes from './style/styletypes';
 const styleTypes = StyleTypes();
 
 const Selectionmanager = function Selectionmanager(options = {}) {
+  const {
+    toggleSelectOnClick = false
+  } = options;
   let viewer;
   let selectedItems;
   let urval;
@@ -15,14 +18,41 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   let infowindow;
 
   const multiselectStyleOptions = options.multiSelectionStyles || styleTypes.getStyle('multiselection');
-  const isInfowindow = Object.prototype.hasOwnProperty.call(options, 'infowindow') ? options.infowindow === 'infowindow' : false;
+  const isInfowindow = options.infowindow === 'infowindow' || false;
 
   function alreadyExists(item) {
     return selectedItems.getArray().some((i) => item.getId() === i.getId());
   }
 
+  function removeItem(item) {
+    selectedItems.remove(item);
+  }
+
+  function removeItems(items) {
+    const itemsToBeRemoved = [];
+    items.forEach((item) => {
+      selectedItems.forEach((si) => {
+        if (item.getId() === si.getId()) {
+          itemsToBeRemoved.push(si);
+        }
+      });
+    });
+    itemsToBeRemoved.forEach((item) => selectedItems.remove(item));
+  }
+
+  function removeItemById(id) {
+    selectedItems.forEach((item) => {
+      if (item.getId() === id) {
+        selectedItems.remove(item);
+      }
+    });
+  }
+
   function addItem(item) {
     if (alreadyExists(item)) {
+      if (toggleSelectOnClick) {
+        removeItems([item]);
+      }
       return;
     }
     selectedItems.push(item);
@@ -69,8 +99,12 @@ const Selectionmanager = function Selectionmanager(options = {}) {
 
   function addOrHighlightItem(item) {
     if (alreadyExists(item)) {
-      // highlight
-      highlightItem(item);
+      if (toggleSelectOnClick) {
+        removeItems([item]);
+      } else {
+        // highlight
+        highlightItem(item);
+      }
     } else {
       // add
       selectedItems.push(item);
@@ -85,34 +119,9 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     return items;
   }
 
-  function removeItem(item) {
-    selectedItems.remove(item);
-  }
-
-  function removeItems(items) {
-    const itemsToBeRemoved = [];
-    items.forEach((item) => {
-      selectedItems.forEach((si) => {
-        if (item.getId() === si.getId()) {
-          itemsToBeRemoved.push(si);
-        }
-      });
-    });
-    itemsToBeRemoved.forEach((item) => selectedItems.remove(item));
-  }
-
-  function removeItemById(id) {
-    selectedItems.forEach((item) => {
-      if (item.getId() === id) {
-        selectedItems.remove(item);
-      }
-    });
-  }
-
   function clearSelection() {
     selectedItems.clear();
   }
-
 
   function featureStyler(feature) {
     if (feature.get('state') === 'selected') {
