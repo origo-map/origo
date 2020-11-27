@@ -38,6 +38,8 @@ const PrintComponent = function PrintComponent(options = {}) {
   const pageContainerId = cuid();
   const pageId = cuid();
   let title = '';
+  let titleSize = 'h4';
+  let titleAlign = 'text-align-center';
   let description = '';
   let viewerMapTarget;
   const printMarginClass = 'print-margin';
@@ -68,7 +70,7 @@ const PrintComponent = function PrintComponent(options = {}) {
 
   const titleComponent = Component({
     update() { dom.replace(document.getElementById(this.getId()), this.render()); },
-    render() { return `<div id="${this.getId()}" class="o-print-header h4 text-align-center empty">${title}</div>`; }
+    render() { return `<div id="${this.getId()}" class="o-print-header ${titleSize} ${titleAlign} empty">${title}</div>`; }
   });
   const descriptionComponent = Component({
     update() { dom.replace(document.getElementById(this.getId()), this.render()); },
@@ -132,6 +134,8 @@ const PrintComponent = function PrintComponent(options = {}) {
       printSettings.on('change:size', this.changeSize.bind(this));
       printSettings.on('change:size-custom', this.changeCustomSize.bind(this));
       printSettings.on('change:title', this.changeTitle.bind(this));
+      printSettings.on('change:titleSize', this.changeTitleSize.bind(this));
+      printSettings.on('change:titleAlign', this.changeTitleAlign.bind(this));
       printSettings.on('change:created', this.toggleCreated.bind(this));
       printSettings.on('change:northarrow', this.toggleNorthArrow.bind(this));
       printSettings.on('change:resolution', this.changeResolution.bind(this));
@@ -161,6 +165,16 @@ const PrintComponent = function PrintComponent(options = {}) {
     },
     changeTitle(evt) {
       title = evt.value;
+      titleComponent.update();
+      this.updatePageSize();
+    },
+    changeTitleSize(evt) {
+      titleSize = evt.class;
+      titleComponent.update();
+      this.updatePageSize();
+    },
+    changeTitleAlign(evt) {
+      titleAlign = evt.class;
       titleComponent.update();
       this.updatePageSize();
     },
@@ -245,6 +259,8 @@ const PrintComponent = function PrintComponent(options = {}) {
         height = sizes[size][1];
         width = sizes[size][0];
       }
+      widthImage = orientation === 'portrait' ? Math.round((sizes[size][1] * resolution) / 25.4) : Math.round((sizes[size][0] * resolution) / 25.4);
+      heightImage = orientation === 'portrait' ? Math.round((sizes[size][0] * resolution) / 25.4) : Math.round((sizes[size][1] * resolution) / 25.4);
       await printToScalePDF({
         el: pageElement,
         filename: name,

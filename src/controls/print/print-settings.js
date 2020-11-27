@@ -145,7 +145,9 @@ const PrintSettings = function PrintSettings({
       sizeControl.on('change:size', (evt) => this.dispatch('change:size', evt));
       sizeControl.on('change:size', this.onChangeSize.bind(this));
       customSizeControl.on('change:size', (evt) => this.dispatch('change:size-custom', evt));
-      titleControl.on('change', (evt) => this.dispatch('change:title', evt));
+      titleControl.on('change:title', (evt) => this.dispatch('change:title', evt));
+      titleControl.on('change:titleSize', (evt) => this.dispatch('change:titleSize', evt));
+      titleControl.on('change:titleAlign', (evt) => this.dispatch('change:titleAlign', evt));
       createdControl.on('change:check', (evt) => this.dispatch('change:created', evt));
       northArrowControl.on('change:check', (evt) => this.dispatch('change:northarrow', evt));
       resolutionControl.on('change:resolution', (evt) => this.dispatch('change:resolution', evt));

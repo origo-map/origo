@@ -15,7 +15,6 @@ export default function printTemplate({
 }) {
   return `
   <div id="${id}" class="flex column no-print padding-large width-16">
-    <h6>Rubrik</h6>
     ${titleControl.render()}
     <div class="padding-top"></div>
     <h6>Beskrivning</h6>
