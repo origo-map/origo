@@ -139,7 +139,9 @@ const PrintSettings = function PrintSettings({
       });
       this.addComponent(printSettingsContainer);
 
-      descriptionControl.on('change', (evt) => this.dispatch('change:description', evt));
+      descriptionControl.on('change:description', (evt) => this.dispatch('change:description', evt));
+      descriptionControl.on('change:descriptionSize', (evt) => this.dispatch('change:descriptionSize', evt));
+      descriptionControl.on('change:descriptionAlign', (evt) => this.dispatch('change:descriptionAlign', evt));
       marginControl.on('change:check', (evt) => this.dispatch('change:margin', evt));
       orientationControl.on('change:orientation', (evt) => this.dispatch('change:orientation', evt));
       sizeControl.on('change:size', (evt) => this.dispatch('change:size', evt));

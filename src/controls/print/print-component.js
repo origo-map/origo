@@ -41,6 +41,8 @@ const PrintComponent = function PrintComponent(options = {}) {
   let titleSize = 'h4';
   let titleAlign = 'text-align-center';
   let description = '';
+  let descriptionSize = 'h4';
+  let descriptionAlign = 'text-align-center';
   let viewerMapTarget;
   const printMarginClass = 'print-margin';
   let usePrintMargins = true;
@@ -74,7 +76,7 @@ const PrintComponent = function PrintComponent(options = {}) {
   });
   const descriptionComponent = Component({
     update() { dom.replace(document.getElementById(this.getId()), this.render()); },
-    render() { return `<div id="${this.getId()}" class="o-print-description padding-y text-grey-dark empty">${description}</div>`; }
+    render() { return `<div id="${this.getId()}" class="o-print-description padding-y text-grey-dark ${descriptionSize} ${descriptionAlign} empty">${description}</div>`; }
   });
   const createdComponent = Component({
     update() { dom.replace(document.getElementById(this.getId()), this.render()); },
@@ -129,6 +131,8 @@ const PrintComponent = function PrintComponent(options = {}) {
       printToolbar.on('PNG', this.downloadPNG.bind(this));
       printToolbar.on('PDF', this.printToScalePDF.bind(this));
       printSettings.on('change:description', this.changeDescription.bind(this));
+      printSettings.on('change:descriptionSize', this.changeDescriptionSize.bind(this));
+      printSettings.on('change:descriptionAlign', this.changeDescriptionAlign.bind(this));
       printSettings.on('change:margin', this.toggleMargin.bind(this));
       printSettings.on('change:orientation', this.changeOrientation.bind(this));
       printSettings.on('change:size', this.changeSize.bind(this));
@@ -145,6 +149,16 @@ const PrintComponent = function PrintComponent(options = {}) {
     },
     changeDescription(evt) {
       description = evt.value;
+      descriptionComponent.update();
+      this.updatePageSize();
+    },
+    changeDescriptionSize(evt) {
+      descriptionSize = evt.class;
+      descriptionComponent.update();
+      this.updatePageSize();
+    },
+    changeDescriptionAlign(evt) {
+      descriptionAlign = evt.class;
       descriptionComponent.update();
       this.updatePageSize();
     },
