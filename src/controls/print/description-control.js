@@ -3,7 +3,8 @@ import { Textarea, cuid, Component, Button, Dropdown, ToggleGroup } from '../../
 export default function DescriptionControl(options = {}) {
   const {
     text = '',
-    alignment = 'center'
+    alignment = 'center',
+    classes = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']
   } = options;
   let {
     size = 'h4'
@@ -12,7 +13,6 @@ export default function DescriptionControl(options = {}) {
   const placeholderText = 'Här kan du skriva en beskrivning';
   const style = { margin: 0 };
   const align = ['text-align-left', 'text-align-center', 'text-align-right'];
-  const sizes = ['h1', 'h2', 'h3', 'h4', 'h5'];
   const formatId = cuid();
   let isVisible = false;
   let formatEl;
@@ -93,7 +93,8 @@ export default function DescriptionControl(options = {}) {
       formatEl = document.getElementById(formatId);
       this.dispatch('render');
       selectSize.setButtonText(size);
-      selectSize.setItems(sizes);
+      selectSize.setItems(classes);
+      this.onChangeSize(size);
       document.getElementById(selectSize.getId()).addEventListener('dropdown:select', (evt) => {
         this.onChangeSize(evt.target.textContent);
       });
@@ -124,7 +125,7 @@ export default function DescriptionControl(options = {}) {
       <div class="hidden" id="${formatId}">
         <h6>Justering beskrivning</h6>
         ${alignControl.render()}
-        <h6>Fontstorlek beskrivning</h6>
+        <h6>Storlek beskrivning</h6>
         ${selectSize.render()}
       </div>
       `;

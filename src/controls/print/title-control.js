@@ -3,7 +3,8 @@ import { Input, cuid, Component, Button, Dropdown, ToggleGroup } from '../../ui'
 export default function TitleControl(options = {}) {
   const {
     title = '',
-    alignment = 'center'
+    alignment = 'center',
+    classes = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']
   } = options;
   let {
     size = 'h4'
@@ -12,7 +13,6 @@ export default function TitleControl(options = {}) {
   const placeholderText = 'Här kan du skriva en rubrik';
   const style = { height: '2rem', margin: 0 };
   const align = ['text-align-left', 'text-align-center', 'text-align-right'];
-  const sizes = ['h1', 'h2', 'h3', 'h4', 'h5'];
   const formatId = cuid();
   let isVisible = false;
   let formatEl;
@@ -93,7 +93,8 @@ export default function TitleControl(options = {}) {
       formatEl = document.getElementById(formatId);
       this.dispatch('render');
       selectSize.setButtonText(size);
-      selectSize.setItems(sizes);
+      selectSize.setItems(classes);
+      this.onChangeSize(size);
       document.getElementById(selectSize.getId()).addEventListener('dropdown:select', (evt) => {
         this.onChangeSize(evt.target.textContent);
       });
@@ -124,7 +125,7 @@ export default function TitleControl(options = {}) {
       <div class="hidden" id="${formatId}">
         <h6>Justering titel</h6>
         ${alignControl.render()}
-        <h6>Fontstorlek titel</h6>
+        <h6>Storlek titel</h6>
         ${selectSize.render()}
       </div>
       `;

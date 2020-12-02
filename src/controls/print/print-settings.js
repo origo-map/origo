@@ -27,7 +27,9 @@ const PrintSettings = function PrintSettings({
   showNorthArrow,
   scales,
   resolution = 150,
-  showScale
+  showScale,
+  classes,
+  defaultClass
 } = {}) {
   let headerComponent;
   let contentComponent;
@@ -94,8 +96,8 @@ const PrintSettings = function PrintSettings({
 
       const orientationControl = OrientationControl({ orientation });
       const sizeControl = SizeControl({ initialSize, sizes });
-      const titleControl = TitleControl({});
-      const descriptionControl = DescriptionControl();
+      const titleControl = TitleControl({ classes, size: defaultClass });
+      const descriptionControl = DescriptionControl({ classes, size: defaultClass });
       const marginControl = MarginControl({ checked: true });
       const createdControl = CreatedControl({ checked: showCreated });
       const resolutionControl = ResolutionControl({ resolution });

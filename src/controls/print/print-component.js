@@ -20,7 +20,9 @@ const PrintComponent = function PrintComponent(options = {}) {
     target,
     viewer,
     createdPrefix,
-    scales
+    scales,
+    classes,
+    defaultClass
   } = options;
 
   let {
@@ -113,7 +115,9 @@ const PrintComponent = function PrintComponent(options = {}) {
     showNorthArrow,
     scales,
     resolution,
-    showScale
+    showScale,
+    classes,
+    defaultClass
   });
   const printToolbar = PrintToolbar();
   const closeButton = Button({
