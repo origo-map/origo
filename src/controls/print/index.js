@@ -10,7 +10,9 @@ const Print = function Print(options = {}) {
     showCreated = false,
     createdPrefix = '',
     scales = [],
-    showScale = true
+    showScale = true,
+    classes,
+    defaultClass
   } = options;
   let {
     showNorthArrow = true
@@ -39,7 +41,9 @@ const Print = function Print(options = {}) {
         createdPrefix,
         showNorthArrow,
         scales,
-        showScale
+        showScale,
+        classes,
+        defaultClass
       });
       mapMenu = viewer.getControlByName('mapmenu');
       menuItem = mapMenu.MenuItem({

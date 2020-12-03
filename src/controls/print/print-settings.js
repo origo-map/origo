@@ -27,7 +27,9 @@ const PrintSettings = function PrintSettings({
   showNorthArrow,
   scales,
   resolution = 150,
-  showScale
+  showScale,
+  classes,
+  defaultClass
 } = {}) {
   let headerComponent;
   let contentComponent;
@@ -94,8 +96,8 @@ const PrintSettings = function PrintSettings({
 
       const orientationControl = OrientationControl({ orientation });
       const sizeControl = SizeControl({ initialSize, sizes });
-      const titleControl = TitleControl({});
-      const descriptionControl = DescriptionControl();
+      const titleControl = TitleControl({ classes, size: defaultClass });
+      const descriptionControl = DescriptionControl({ classes, size: defaultClass });
       const marginControl = MarginControl({ checked: true });
       const createdControl = CreatedControl({ checked: showCreated });
       const resolutionControl = ResolutionControl({ resolution });
@@ -139,13 +141,17 @@ const PrintSettings = function PrintSettings({
       });
       this.addComponent(printSettingsContainer);
 
-      descriptionControl.on('change', (evt) => this.dispatch('change:description', evt));
+      descriptionControl.on('change:description', (evt) => this.dispatch('change:description', evt));
+      descriptionControl.on('change:descriptionSize', (evt) => this.dispatch('change:descriptionSize', evt));
+      descriptionControl.on('change:descriptionAlign', (evt) => this.dispatch('change:descriptionAlign', evt));
       marginControl.on('change:check', (evt) => this.dispatch('change:margin', evt));
       orientationControl.on('change:orientation', (evt) => this.dispatch('change:orientation', evt));
       sizeControl.on('change:size', (evt) => this.dispatch('change:size', evt));
       sizeControl.on('change:size', this.onChangeSize.bind(this));
       customSizeControl.on('change:size', (evt) => this.dispatch('change:size-custom', evt));
-      titleControl.on('change', (evt) => this.dispatch('change:title', evt));
+      titleControl.on('change:title', (evt) => this.dispatch('change:title', evt));
+      titleControl.on('change:titleSize', (evt) => this.dispatch('change:titleSize', evt));
+      titleControl.on('change:titleAlign', (evt) => this.dispatch('change:titleAlign', evt));
       createdControl.on('change:check', (evt) => this.dispatch('change:created', evt));
       northArrowControl.on('change:check', (evt) => this.dispatch('change:northarrow', evt));
       resolutionControl.on('change:resolution', (evt) => this.dispatch('change:resolution', evt));
