@@ -45,9 +45,9 @@ const ToggleGroup = function ToggleGroup(options = {}) {
       this.dispatch('render');
     },
     render() {
-      return `<${tagName} id="${this.getId()}" class="${cls}" style="${style}">
+      return `<div><${tagName} id="${this.getId()}" class="${cls}" style="${style}">
                   ${renderToggleItems(this.getComponents())}
-              </${tagName}>`;
+              </${tagName}></div>`;
     }
   });
 };
