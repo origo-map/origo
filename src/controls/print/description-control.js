@@ -123,10 +123,15 @@ export default function DescriptionControl(options = {}) {
         </div>
       </div>
       <div class="hidden" id="${formatId}">
+      <div class="padding-smaller">
         <h6>Justering beskrivning</h6>
         ${alignControl.render()}
+      </div>
+      <div class="padding-smaller">
         <h6>Storlek beskrivning</h6>
         ${selectSize.render()}
+      </div>
+      <hr class="divider horizontal"/>
       </div>
       `;
     }

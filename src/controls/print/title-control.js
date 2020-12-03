@@ -123,10 +123,15 @@ export default function TitleControl(options = {}) {
         </div>
       </div>
       <div class="hidden" id="${formatId}">
-        <h6>Justering titel</h6>
-        ${alignControl.render()}
-        <h6>Storlek titel</h6>
-        ${selectSize.render()}
+        <div class="padding-smaller">
+          <h6>Justering titel</h6>
+          ${alignControl.render()}
+        </div>
+        <div class="padding-smaller">
+          <h6>Storlek titel</h6>
+          ${selectSize.render()}
+        </div>
+        <hr class="divider horizontal"/>
       </div>
       `;
     }
