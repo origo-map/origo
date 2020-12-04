@@ -52,6 +52,6 @@ export default function printTemplate({
       ${northArrowControl.render()}
     </div>
     ${rotationControl.render()}
-  <div class="padding-top"></div>
+    <div class="padding-bottom-large">&nbsp;</div>
   </div>`;
 }
