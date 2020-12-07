@@ -19,7 +19,8 @@ export default function Collapse(options = {}) {
     contentStyle: contentStyleOptions = {},
     data = {},
     style: styleSettings,
-    tagName = 'div'
+    tagName = 'div',
+    containerCls = 'collapse-container'
   } = options;
 
   const style = createStyle(styleSettings);
@@ -58,7 +59,6 @@ export default function Collapse(options = {}) {
       const currentWidth = contentEl.scrollWidth;
       const elementTransition = containerEl.style.transition;
       containerEl.style.transition = '';
-
       requestAnimationFrame(() => {
         if (collapseY) containerEl.style.height = `${currentHeight}px`;
         if (collapseX) containerEl.style.width = `${currentWidth}px`;
@@ -116,7 +116,7 @@ export default function Collapse(options = {}) {
       }
       return `<${tagName} id="${this.getId()}" class="collapse ${cls} ${isExpanded}" style="${style}">
                 ${header}
-                <div id="${containerId}" class="collapse-container ${contentCls}" style="${height} ${width} ${contentStyle}">
+                <div id="${containerId}" class="${containerCls} ${contentCls}" style="${height} ${width} ${contentStyle}">
                   ${contentComponent.render()}
                 </div>
                 ${footer}
