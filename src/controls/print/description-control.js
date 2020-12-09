@@ -31,6 +31,7 @@ export default function DescriptionControl(options = {}) {
         cls,
         placeholderText,
         style,
+        cols: 32,
         value: text
       });
       formatButton = Button({

@@ -14,7 +14,7 @@ export default function printTemplate({
   showScaleControl
 }) {
   return `
-  <div id="${id}" class="flex column no-print padding-large width-16">
+  <div id="${id}" class="flex column no-print padding-large overflow-auto max-height-100 width-20">
     ${titleControl.render()}
     <div class="padding-top"></div>
     ${descriptionControl.render()}
@@ -52,6 +52,6 @@ export default function printTemplate({
       ${northArrowControl.render()}
     </div>
     ${rotationControl.render()}
-  <div class="padding-top"></div>
+    <div class="padding-bottom-large">&nbsp;</div>
   </div>`;
 }

@@ -133,7 +133,7 @@ const PrintSettings = function PrintSettings({
       });
       contentComponent.addComponents([customSizeControl, marginControl, orientationControl, sizeControl, titleControl, descriptionControl, createdControl, northArrowControl, rotationControl, setScaleControl, resolutionControl, showScaleControl]);
       printSettingsContainer = Collapse({
-        cls: 'no-print fixed flex column top-left rounded box-shadow bg-white overflow-hidden z-index-ontop-high',
+        cls: 'no-print fixed flex column top-left rounded box-shadow bg-white overflow-hidden z-index-ontop-top',
         collapseX: true,
         collapseY: true,
         headerComponent,
