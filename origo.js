@@ -1,6 +1,8 @@
-import { Feature as olFeature, Collection as olCollection } from 'ol';
+import { Feature as olFeature, Collection as olCollection, Overlay as olOverlay } from 'ol';
 import * as olGeom from 'ol/geom';
+import { fromCircle, fromExtent } from 'ol/geom/Polygon';
 import * as olInteraction from 'ol/interaction';
+import { createBox } from 'ol/interaction/Draw';
 import * as olLayer from 'ol/layer';
 import * as olSource from 'ol/source';
 import * as olStyle from 'ol/style';
@@ -15,9 +17,12 @@ import supports from './src/utils/supports';
 import renderError from './src/utils/rendererror';
 import Style from './src/style';
 import featurelayer from './src/featurelayer';
+import getFeatureInfo from './src/getfeatureinfo';
+import getFeature from './src/getfeature';
 import * as Utils from './src/utils';
 import dropdown from './src/dropdown';
 import { renderSvgIcon } from './src/utils/legendmaker';
+import SelectedItem from './src/models/SelectedItem';
 import '@babel/polyfill';
 
 const Origo = function Origo(configPath, options = {}) {
@@ -89,10 +94,15 @@ const Origo = function Origo(configPath, options = {}) {
   });
 };
 
+olInteraction.Draw.createBox = createBox;
+olGeom.Polygon.fromCircle = fromCircle;
+olGeom.Polygon.fromExtent = fromExtent;
 Origo.controls = origoControls;
 Origo.ui = ui;
 Origo.Style = Style;
 Origo.featurelayer = featurelayer;
+Origo.getFeatureInfo = getFeatureInfo;
+Origo.getFeature = getFeature;
 Origo.ol = [];
 Origo.ol.geom = olGeom;
 Origo.ol.interaction = olInteraction;
@@ -101,9 +111,11 @@ Origo.ol.source = olSource;
 Origo.ol.style = olStyle;
 Origo.ol.Feature = olFeature;
 Origo.ol.Collection = olCollection;
+Origo.ol.Overlay = olOverlay;
 Origo.ol.format = olFormat;
 Origo.Utils = Utils;
 Origo.dropdown = dropdown;
 Origo.renderSvgIcon = renderSvgIcon;
+Origo.SelectedItem = SelectedItem;
 
 export default Origo;

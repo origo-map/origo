@@ -14,6 +14,7 @@ import editForm from './editform';
 import imageresizer from '../../utils/imageresizer';
 import getImageOrientation from '../../utils/getimageorientation';
 import shapes from './shapes';
+import searchList from './addons/searchList/searchList';
 import validate from '../../utils/validate';
 
 const editsStore = store();
@@ -36,6 +37,7 @@ let snap;
 let viewer;
 let featureInfo;
 let modal;
+let sList;
 
 function isActive() {
   if (modify === undefined || select === undefined) {
@@ -394,7 +396,11 @@ function onAttributesSave(feature, attrs) {
       valid.required = inputRequired && inputValue === '' ? false : inputValue;
       if (!valid.required && inputRequired && inputValue === '') {
         if (!requiredMsg) {
-          requiredOn.insertAdjacentHTML('afterend', `<div class="o-${inputId}-requiredMsg errorMsg fade-in padding-bottom-small">Obligatoriskt fält</div>`);
+          if (requiredOn.getAttribute('class') === 'awesomplete') {
+            requiredOn.parentNode.insertAdjacentHTML('afterend', `<div class="o-${inputId}-requiredMsg errorMsg fade-in padding-bottom-small">Obligatoriskt fält</div>`);
+          } else {
+            requiredOn.insertAdjacentHTML('afterend', `<div class="o-${inputId}-requiredMsg errorMsg fade-in padding-bottom-small">Obligatoriskt fält</div>`);
+          }
         }
       } else if (requiredMsg) {
         requiredMsg.remove();
@@ -509,6 +515,20 @@ function onAttributesSave(feature, attrs) {
             }
           } else if (errorMsg) {
             errorMsg.remove();
+          }
+          break;
+        case 'searchList':
+          const turnOnValidation = attribute.required || false;
+          if (turnOnValidation) {
+            const { list } = attribute;
+            valid.searchList = validate.searchList(inputValue, list) || inputValue === '' ? inputValue : false;
+            if (!valid.searchList && inputValue !== '') {
+              errorOn.parentElement.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            } else if (errorMsg) {
+              errorMsg.remove();
+            }
+          } else {
+            valid.searchList = true;
           }
           break;
         default:
@@ -653,6 +673,7 @@ function onToggleEdit(e) {
   } else if (e.tool === 'attribute') {
     if (hasAttribute === false) {
       editAttributes();
+      sList = new searchList();
     } else {
       cancelAttribute();
     }
