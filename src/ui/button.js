@@ -20,7 +20,7 @@ export default function Button(options = {}) {
     tooltipText,
     title = '',
     tooltipPlacement = 'east',
-    validStates = ['initial', 'active', 'disabled', 'inactive', 'loading'],
+    validStates = ['initial', 'active', 'disabled', 'inactive', 'loading', 'tracking'],
     ariaLabel = tooltipText || title || ''
   } = options;
 

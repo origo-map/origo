@@ -83,6 +83,10 @@ button svg {
 button.active svg {
   fill: $icon-active-color;
 }
+.button.tracking svg,
+button.tracking svg {
+  fill: $icon-active-color;
+}
 .button.inactive svg,
 button.inactive svg {
   fill: $icon-inactive-color;
