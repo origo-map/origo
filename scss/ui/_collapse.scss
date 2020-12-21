@@ -32,6 +32,10 @@
       }
     }
   }
+}
+
+.collapse-scroll {
+  @extend .collapse;
   &.expanded {
     height: calc(100% - 2rem);
   }
