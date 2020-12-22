@@ -30,7 +30,7 @@
     "acorn": "^8.0.4",
     "awesomplete": "^1.1.5",
     "copyfiles": "^2.4.1",
-    "core-js": "^3.7.0",
+    "core-js": "^3.8.1",
     "cuid": "^2.1.4",
     "dom-to-image-more": "^2.8.0",
     "downloadjs": "^1.4.7",
