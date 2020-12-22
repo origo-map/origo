@@ -50,8 +50,7 @@ module.exports = {
     }),
     new ESLintPlugin({
       fix: true,
-      emitError: true,
-      failOnError: true
+      emitError: true
     })
   ]
 };
