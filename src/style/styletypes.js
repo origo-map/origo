@@ -2,7 +2,7 @@ import pin from './pin';
 import measure from './measure';
 import multiselection from './multiselection';
 
-export default function () {
+export default function styletypes() {
   const styleTypes = {};
 
   styleTypes.pin = pin;

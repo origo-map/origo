@@ -518,8 +518,7 @@ function onAttributesSave(feature, attrs) {
           }
           break;
         case 'searchList':
-          const turnOnValidation = attribute.required || false;
-          if (turnOnValidation) {
+          if (attribute.required || false) {
             const { list } = attribute;
             valid.searchList = validate.searchList(inputValue, list) || inputValue === '' ? inputValue : false;
             if (!valid.searchList && inputValue !== '') {
@@ -673,7 +672,7 @@ function onToggleEdit(e) {
   } else if (e.tool === 'attribute') {
     if (hasAttribute === false) {
       editAttributes();
-      sList = new searchList();
+      sList = sList || new searchList();
     } else {
       cancelAttribute();
     }

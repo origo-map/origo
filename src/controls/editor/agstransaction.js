@@ -140,6 +140,6 @@ function agsTransaction(transObj, layerName, viewer) {
   });
 }
 
-export default function (transObj, layerName, viewer) {
+export default function agstransaction(transObj, layerName, viewer) {
   agsTransaction(transObj, layerName, viewer);
 }

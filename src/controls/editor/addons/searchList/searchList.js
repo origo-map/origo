@@ -1,3 +1,7 @@
+/* eslint-disable operator-assignment */
+/* eslint-disable no-shadow */
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-param-reassign */
 import Awesomplete from 'awesomplete';
 import $ from 'jquery';
 
@@ -15,7 +19,7 @@ let awesome;
 let options = {};
 
 function createEmptyLists() {
-  list.forEach((a, i) => {
+  list.forEach((a) => {
     const container = a.container;
     makeEmptyList(container);
   });
@@ -37,22 +41,22 @@ function loadSearchLists() {
   searchLists = document.querySelectorAll('#searchList');
 }
 
-function openMenu(btn, awe, list) {
-  const hasList = list.map(a => btn.classList.contains(a.input.id));
+function openMenu(btn, awe, menuList) {
+  const hasList = menuList.map(a => btn.classList.contains(a.input.id));
   const index = hasList.indexOf(true);
   const { ul: { childNodes: { length: childNodesLength } } } = awe;
-  const awesome = list[index];
+  const local = list[index];
 
   if (childNodesLength === 0) {
-    awesome.minChars = 0;
-    awesome.evaluate();
+    local.minChars = 0;
+    local.evaluate();
   } else if (awesome.ul.hasAttribute('hidden')) {
-    awesome.open();
+    local.open();
   } else {
-    awesome.close();
+    local.close();
   }
 
-  list.map((a) => {
+  menuList.map((a) => {
     if (!btn.classList.contains(a.input.id)) {
       a.close();
     }
@@ -90,23 +94,24 @@ function render() {
         list: olist
       };
       if (hasImages) {
-        config.item = function (text, input) {
-          if (text.value.includes(input) && input !== "") {
+        config.item = function assign(text, itemInput) {
+          if (text.value.includes(itemInput) && itemInput !== '') {
             const test = text.label;
-            const lastIndex = test.lastIndexOf(text.value)
+            const lastIndex = test.lastIndexOf(text.value);
             const firstPart = text.label.substring(0, lastIndex);
             const lastPart = text.label.substring(lastIndex, text.label.length);
-            const arr = text.value.split(input);
-            let mark = `<mark>${input}</mark>`;
+            const arr = text.value.split(itemInput);
+            let mark = `<mark>${itemInput}</mark>`;
             if (arr[0].length > arr[1].length) {
               mark = arr[0] + mark;
             } else {
-              mark = mark + arr[1];
+              mark += arr[1];
             }
             const marked = lastPart.replace(text.value, mark);
+            // eslint-disable-next-line no-param-reassign
             text.label = firstPart + marked;
-
           } else {
+            // eslint-disable-next-line no-param-reassign
             text.label = text.label.replace(text.value, text.value);
           }
           const item = Awesomplete.$.create('li', {
@@ -114,7 +119,7 @@ function render() {
             'area-selected': true
           });
           return item;
-        }
+        };
       }
       config = origoConfigOptions ? $.extend({}, config, origoConfigOptions) : config;
       awesome = new Awesomplete(input, config);
@@ -126,46 +131,45 @@ function render() {
       attachInputEvent(input);
       moveBtn(btn);
 
-
-      input.addEventListener('awesomplete-select', function (e) {
+      input.addEventListener('awesomplete-select', (e) => {
         const { target: { nextSibling: { childNodes } } } = e;
-        childNodes.forEach(function (child) {
+        childNodes.forEach((child) => {
           if (child.classList.contains('highlight')) {
             child.classList.toggle('highlight');
           }
         });
-        currentIndex.forEach(function (item) {
+        currentIndex.forEach((item) => {
           item = -1;
         });
       });
 
-      input.addEventListener('awesomplete-selectcomplete', function (e) {
+      input.addEventListener('awesomplete-selectcomplete', () => {
         currentIndex[index] = -1;
         input.blur();
       });
 
-      input.addEventListener('input', function (e) {
+      input.addEventListener('input', (e) => {
         const { target: { nextSibling } } = e;
         if (nextSibling.getElementsByTagName('li').length === 0) {
-          nextSibling.hidden = "";
+          nextSibling.hidden = '';
         }
       });
 
-      input.addEventListener('click', function (e) {
+      input.addEventListener('click', () => {
         currentIndex[index] = -1;
       });
 
-      btn.addEventListener('click', function (e) {
+      btn.addEventListener('click', () => {
         const awe = list[index];
         const { ul: { childNodes } } = awe;
-        childNodes.forEach(function (child) {
+        childNodes.forEach((child) => {
           if (child.classList.contains('highlight')) {
             child.classList.toggle('highlight');
           }
         });
         currentIndex[index] = -1;
       });
-      input.addEventListener('keyup', function (e) {
+      input.addEventListener('keyup', (e) => {
         const { keyCode } = e;
         const arrowUp = 38;
         const arrowDown = 40;
@@ -202,13 +206,13 @@ function render() {
               childNodes[currentIndex[index]].classList.toggle('highlight');
               currentIndex[index] = -1;
             }
-
           } else if (keyCode === enter) {
             currentIndex[index] = -1;
             openMenu(btn, awesome, list);
           }
         } catch (error) {
-          console.log('error: ', error)
+          // eslint-disable-next-line no-console
+          console.log('error: ', error);
         }
       });
     }

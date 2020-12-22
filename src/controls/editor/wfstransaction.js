@@ -107,6 +107,6 @@ function wfsTransaction(transObj, layerName, viewer) {
     });
 }
 
-export default function (transObj, layerName, viewer) {
+export default function wfstransaction(transObj, layerName, viewer) {
   return wfsTransaction(transObj, layerName, viewer);
 }

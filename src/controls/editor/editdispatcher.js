@@ -57,7 +57,6 @@ function emitChangeOfflineEdits(edits, layerName) {
   });
 }
 
-
 export default {
   emitChangeEdit,
   emitChangeFeature,

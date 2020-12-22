@@ -36,7 +36,6 @@ function showInfowindow() {
   mainContainer.classList.remove('hidden');
 }
 
-
 function makeElementDraggable(elm) {
   const elmnt = elm;
   let pos1 = 0;

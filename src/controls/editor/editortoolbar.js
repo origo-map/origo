@@ -1,4 +1,3 @@
-
 import $ from 'jquery';
 import editortemplate from './editortemplate';
 import dispatcher from './editdispatcher';

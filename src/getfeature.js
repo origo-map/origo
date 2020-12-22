@@ -7,7 +7,7 @@ let projectionCode;
 let projection;
 const sourceType = {};
 
-export default function (id, layer, source, projCode, proj, extent) {
+export default function getfeature(id, layer, source, projCode, proj, extent) {
   projectionCode = projCode;
   projection = proj;
   const serverUrl = source[layer.get('sourceName')].url;

@@ -22,6 +22,5 @@ export default function attachBtnEvent(btn, awe, list) {
       }
       return a;
     });
-
   });
 }

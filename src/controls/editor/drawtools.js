@@ -85,7 +85,6 @@ const drawToolsSelector = function drawToolsSelector(tools, defaultLayer, v) {
     setActive(false);
   }
 
-
   function setDrawTools(layerName) {
     const layer = viewer.getLayer(layerName);
     let geometryType;
