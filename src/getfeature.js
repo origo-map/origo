@@ -1,6 +1,5 @@
 import EsriJSONFormat from 'ol/format/EsriJSON';
 import GeoJSONFormat from 'ol/format/GeoJSON';
-import $ from 'jquery';
 import replacer from './utils/replacer';
 
 let projectionCode;
@@ -16,7 +15,6 @@ export default function getfeature(id, layer, source, projCode, proj, extent) {
   console.log('layer type: ', type);
   // returns a promise with features as result
   if (type === 'AGS_FEATURE') {
-    // TODO: CREATE TEST
     return sourceType.AGS_FEATURE(id, layer, serverUrl);
   }
   return sourceType.WFS(id, layer, serverUrl, extent);
@@ -46,20 +44,15 @@ sourceType.AGS_FEATURE = function agsFeature(id, layer, serverUrl) {
     `&outSR=${esriSrs}`
   ].join('');
 
-  return $.ajax({
-    url,
-    dataType: 'jsonp'
-  })
-    .then((response) => {
-      if (response.error) {
-        fail(response);
-        return [];
-      }
-      const features = esrijsonFormat.readFeatures(response, {
-        featureProjection: projection
-      });
-      return features;
-    }, fail);
+  return fetch(url, { type: 'GET', dataType: 'jsonp' }).then((res) => {
+    if (res.error) {
+      fail(res);
+      return [];
+    }
+    return res.json();
+  }).then(json => esrijsonFormat.readFeatures(json, {
+    featureProjection: projection
+  })).catch(error => console.error(error));
 };
 
 sourceType.WFS = function wfsSourceType(id, layer, serverUrl, extent) {
