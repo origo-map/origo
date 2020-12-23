@@ -8,12 +8,15 @@ let projection;
 const sourceType = {};
 
 export default function getfeature(id, layer, source, projCode, proj, extent) {
+  console.log('getfeature, id: ', id, 'layer: ', layer, 'source: ', source);
   projectionCode = projCode;
   projection = proj;
   const serverUrl = source[layer.get('sourceName')].url;
   const type = layer.get('type');
+  console.log('layer type: ', type);
   // returns a promise with features as result
   if (type === 'AGS_FEATURE') {
+    // TODO: CREATE TEST
     return sourceType.AGS_FEATURE(id, layer, serverUrl);
   }
   return sourceType.WFS(id, layer, serverUrl, extent);
@@ -102,11 +105,5 @@ sourceType.WFS = function wfsSourceType(id, layer, serverUrl, extent) {
     queryFilter
   ].join('');
 
-  return $.ajax({
-    url,
-    data,
-    type: 'GET',
-    dataType: 'json'
-  })
-    .then(response => format.readFeatures(response));
+  return fetch(url + data, { type: 'GET', dataType: 'json' }).then(res => res.json()).then(json => format.readFeatures(json)).catch(error => console.error(error));
 };
