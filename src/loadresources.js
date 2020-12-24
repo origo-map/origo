@@ -102,12 +102,12 @@ const loadResources = async function loadResources(mapOptions, config) {
       }
 
       return $.when(loadSvgSprites(baseUrl, config))
-        .then(() => $.ajax({
-          url,
+        .then(() => fetch(url, {
           dataType: format
         })
+          .then(res => res.json())
           .then((data) => {
-            map.options = $.extend(config, data);
+            map.options = Object.assign(config, data);
             if (data.controls) {
               map.options.controls = config.defaultControls.concat(data.controls);
             } else {
