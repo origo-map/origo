@@ -1,5 +1,4 @@
 import EsriJSON from 'ol/format/EsriJSON';
-import $ from 'jquery';
 import dispatcher from './editdispatcher';
 
 const format = new EsriJSON();
@@ -128,14 +127,15 @@ function agsTransaction(transObj, layerName, viewer) {
         projection,
         type
       });
-      $.ajax({
-        type: 'POST',
-        url,
-        data,
-        success: cb[type],
-        error,
-        context: this
-      });
+      fetch(url, {
+        method: 'POST',
+        body: data
+      }, cb[type])
+        .then(res => res.json())
+        .then(json => {
+          console.log('json: ', json);
+        })
+        .catch(err => error(err));
     }
   });
 }
