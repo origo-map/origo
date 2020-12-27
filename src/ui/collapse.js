@@ -20,7 +20,8 @@ export default function Collapse(options = {}) {
     data = {},
     style: styleSettings,
     tagName = 'div',
-    containerCls = 'collapse-container'
+    containerCls = 'collapse-container',
+    mainCls = 'collapse'
   } = options;
 
   const style = createStyle(styleSettings);
@@ -114,7 +115,7 @@ export default function Collapse(options = {}) {
       if (legendCollapse) {
         containerId = 'legendCollapse';
       }
-      return `<${tagName} id="${this.getId()}" class="collapse ${cls} ${isExpanded}" style="${style}">
+      return `<${tagName} id="${this.getId()}" class="${mainCls} ${cls} ${isExpanded}" style="${style}">
                 ${header}
                 <div id="${containerId}" class="${containerCls} ${contentCls}" style="${height} ${width} ${contentStyle}">
                   ${contentComponent.render()}
