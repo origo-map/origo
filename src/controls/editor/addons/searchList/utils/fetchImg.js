@@ -4,7 +4,7 @@ export default function fetchImg(callback, options) {
   let src;
   let val;
   fetch(dir, {
-    type: 'GET'
+    method: 'GET'
   })
     .then(res => res.text())
     .then((data) => {
