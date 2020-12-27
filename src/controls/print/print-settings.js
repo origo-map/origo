@@ -137,7 +137,8 @@ const PrintSettings = function PrintSettings({
         collapseX: true,
         collapseY: true,
         headerComponent,
-        contentComponent
+        contentComponent,
+        mainCls: 'collapse-scroll'
       });
       this.addComponent(printSettingsContainer);
 

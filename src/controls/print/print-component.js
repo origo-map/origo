@@ -133,7 +133,13 @@ const PrintComponent = function PrintComponent(options = {}) {
       this.addComponent(printToolbar);
       this.addComponent(closeButton);
       printToolbar.on('PNG', this.downloadPNG.bind(this));
-      printToolbar.on('PDF', this.printToScalePDF.bind(this));
+      const ua = navigator.userAgent;
+      // Don't use printToScale PDF download for IE and Edge pre Edge Chromium because it don't work for those browsers
+      if (ua.indexOf('MSIE') > -1 || ua.indexOf('Trident') > -1 || ua.indexOf('Edge') > -1) {
+        printToolbar.on('PDF', this.downloadPDF.bind(this));
+      } else {
+        printToolbar.on('PDF', this.printToScalePDF.bind(this));
+      }
       printSettings.on('change:description', this.changeDescription.bind(this));
       printSettings.on('change:descriptionSize', this.changeDescriptionSize.bind(this));
       printSettings.on('change:descriptionAlign', this.changeDescriptionAlign.bind(this));

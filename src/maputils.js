@@ -64,6 +64,9 @@ const maputils = {
     });
     return vectorSource.getFeatures();
   },
+  geojsonToWkt: function geojsonToWkt(obj) {
+    return (new WKT()).writeFeatures((new GeoJSON()).readFeatures(obj));
+  },
   wktToFeature: function wktToFeature(wkt, srsName) {
     const format = new WKT();
     const feature = format.readFeature(wkt, {
