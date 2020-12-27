@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import GeoJSONFormat from 'ol/format/GeoJSON';
 import verifyFeatureIds from './verifyfeatureids';
 
@@ -12,15 +11,17 @@ geojson.request = function request(layer) {
     const format = new GeoJSONFormat();
     const url = source;
 
-    return $.ajax({
-      url,
+    return fetch(url, {
+      method: 'GET',
       cache: false
     })
+      .then(res => res.json())
       .then((response) => {
         let features = format.readFeatures(response);
         features = verifyFeatureIds(features);
         return features;
-      });
+      })
+      .catch(error => console.error(error));
   }
 };
 
