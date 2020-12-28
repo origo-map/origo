@@ -11,8 +11,9 @@
   "license": "BSD-2-Clause",
   "main": "origo.js",
   "scripts": {
-    "start": "npm run lint | npm run prebuild-sass | run-p watch-js watch-sass",
-    "lint": "eslint -c .eslintrc.json src/* --fix",
+    "start": "npm run prebuild-sass | run-p watch-js watch-sass",
+    "lint": "eslint -c .eslintrc.json src/*",
+    "lint:fix": "npm run lint -- --fix",
     "watch-js": "webpack-dev-server --config ./tasks/webpack.dev.js --mode development",
     "watch-sass": "node-sass -w --include-path scss scss/origo.scss css/style.css",
     "prebuild-sass": "node-sass --include-path scss scss/origo.scss css/style.css",
