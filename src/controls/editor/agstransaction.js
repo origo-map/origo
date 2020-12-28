@@ -132,9 +132,7 @@ function agsTransaction(transObj, layerName, viewer) {
         body: data
       }, cb[type])
         .then(res => res.json())
-        .then(json => {
-          console.log('json: ', json);
-        })
+        .then(json => json)
         .catch(err => error(err));
     }
   });
