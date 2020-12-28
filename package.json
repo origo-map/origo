@@ -16,7 +16,7 @@
     "watch-js": "webpack-dev-server --config ./tasks/webpack.dev.js --mode development",
     "watch-sass": "node-sass -w --include-path scss scss/origo.scss css/style.css",
     "prebuild-sass": "node-sass --include-path scss scss/origo.scss css/style.css",
-    "build": "npm run build-js ; npm run build-sass | npm run copy-plugins | npm run copy",
+    "build": "npm run build-js && npm run build-sass | npm run copy-plugins | npm run copy",
     "build-dev": "npm run build-js && npm run build-sass | npm run copy-dev",
     "build-sass": "node-sass --include-path scss scss/origo.scss dist/style.css",
     "build-js": "webpack --config ./tasks/webpack.prod.js",
