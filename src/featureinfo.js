@@ -2,9 +2,7 @@ import 'owl.carousel';
 import Overlay from 'ol/Overlay';
 import $ from 'jquery';
 import { Component, Modal } from './ui';
-// eslint-disable-next-line import/no-cycle
 import Popup from './popup';
-// eslint-disable-next-line import/no-cycle
 import sidebar from './sidebar';
 import maputils from './maputils';
 import featurelayer from './featurelayer';
@@ -311,7 +309,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         map,
         pixel
       }, viewer)
-        .done((data) => {
+        .then((data) => {
           const serverResult = data || [];
           const result = serverResult.concat(clientResult);
           if (result.length > 0) {

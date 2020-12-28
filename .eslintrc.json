@@ -9,6 +9,7 @@
       "never"
     ],
     "import/no-unresolved": "off",
+    "import/no-cycle": "off",
     "new-cap": "off",
     "prefer-destructuring": "off",
     "max-len": "off",
