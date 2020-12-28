@@ -142,10 +142,9 @@ const Featureinfo = function Featureinfo(options = {}) {
       ]
     };
     if (identifyTarget === 'overlay') {
-      const popupHeight = $('.o-popup').outerHeight() + 20;
-      $('#o-popup').height(popupHeight);
+      const popupHeight = document.querySelector('.o-popup').offsetHeight + 20;
+      document.querySelector('#o-popup').style.height = `${popupHeight} px`;
     }
-
     return $(id).owlCarousel(carouselOptions);
   };
 
@@ -233,8 +232,8 @@ const Featureinfo = function Featureinfo(options = {}) {
           }
         });
         popup.setVisibility(true);
-        const popupHeight = $('.o-popup').outerHeight() + 20;
-        $('#o-popup').height(popupHeight);
+        const popupHeight = document.querySelector('.o-popup').offsetHeight + 20;
+        document.querySelector('#o-popup').style.height = `${popupHeight} px`;
         overlay = new Overlay({
           element: popup.getEl(),
           autoPan: true,

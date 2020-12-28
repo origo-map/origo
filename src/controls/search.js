@@ -57,7 +57,6 @@ const Search = function Search(options = {}) {
   let containerElement;
   let wrapperElement;
 
-
   function clear() {
     featureInfo.clear();
     if (overlay) {

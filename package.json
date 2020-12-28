@@ -11,7 +11,8 @@
   "license": "BSD-2-Clause",
   "main": "origo.js",
   "scripts": {
-    "start": "npm run prebuild-sass | run-p watch-js watch-sass",
+    "start": "npm run lint | npm run prebuild-sass | run-p watch-js watch-sass",
+    "lint": "eslint -c .eslintrc.json src/* --fix",
     "watch-js": "webpack-dev-server --config ./tasks/webpack.dev.js --mode development",
     "watch-sass": "node-sass -w --include-path scss scss/origo.scss css/style.css",
     "prebuild-sass": "node-sass --include-path scss scss/origo.scss css/style.css",
@@ -55,6 +56,7 @@
     "eslint": "^7.16.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1",
+    "eslint-webpack-plugin": "^2.4.1",
     "exports-loader": "^1.1.1",
     "imports-loader": "^1.2.0",
     "node-sass": "^5.0.0",

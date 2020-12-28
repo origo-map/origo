@@ -1,14 +1,13 @@
-import $ from 'jquery';
-
 export default function fetchImg(callback, options) {
   const dir = options.location;
   const ext = options.extension;
   let src;
   let val;
-  $.ajax({
-    url: dir,
-    type: 'GET',
-    success: (data) => {
+  fetch(dir, {
+    method: 'GET'
+  })
+    .then(res => res.text())
+    .then((data) => {
       const images = [];
       const el = document.createElement('html');
       el.innerHTML = data;
@@ -26,6 +25,6 @@ export default function fetchImg(callback, options) {
         }
       });
       callback(images);
-    }
-  });
+    })
+    .catch(error => console.error(error));
 }

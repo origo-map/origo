@@ -4,7 +4,6 @@ import Modify from 'ol/interaction/Modify';
 import Snap from 'ol/interaction/Snap';
 import Collection from 'ol/Collection';
 import Feature from 'ol/Feature';
-import $ from 'jquery';
 import { Modal } from '../../ui';
 import store from './editsstore';
 import generateUUID from '../../utils/generateuuid';
@@ -204,7 +203,7 @@ function setInteractions(drawType) {
     geometryName: editLayer.get('geometryName')
   };
   if (drawType) {
-    $.extend(drawOptions, shapes(drawType));
+    Object.assign(drawOptions, shapes(drawType));
   }
   removeInteractions();
   draw = new Draw(drawOptions);
@@ -335,7 +334,7 @@ function attributesSaveHandler(feature, formEl) {
 }
 
 function onAttributesSave(feature, attrs) {
-  $('#o-save-button').on('click', (e) => {
+  document.getElementById('o-save-button').addEventListener('click', (e) => {
     const editEl = {};
     const valid = {};
     let fileReader;
@@ -347,24 +346,24 @@ function onAttributesSave(feature, attrs) {
       // Get the input container class
       const containerClass = `.${attribute.elId.slice(1)}`;
       // Get the input attributes
-      const inputType = $(attribute.elId).attr('type');
-      const inputValue = $(attribute.elId).val();
-      const inputName = $(attribute.elId).attr('name');
-      const inputId = $(attribute.elId).attr('id');
-      const inputRequired = $(attribute.elId).attr('required');
+      const inputType = document.getElementById(attribute.elId).attr('type');
+      const inputValue = document.getElementById(attribute.elId).val();
+      const inputName = document.getElementById(attribute.elId).attr('name');
+      const inputId = document.getElementById(attribute.elId).attr('id');
+      const inputRequired = document.getElementById(attribute.elId).attr('required');
 
       // If hidden element it should be excluded
-      if ($(containerClass).hasClass('o-hidden') === false) {
+      if (document.querySelector(containerClass)[0].includes('o-hidden') === false) {
         // Check if checkbox. If checkbox read state.
         if (inputType === 'checkbox') {
-          editEl[attribute.name] = $(attribute.elId).is(':checked') ? 1 : 0;
+          editEl[attribute.name] = document.getElementById(attribute.elId).is(':checked') ? 1 : 0;
         } else { // Read value from input text, textarea or select
           editEl[attribute.name] = inputValue;
         }
       }
       // Check if file. If file, read and trigger resize
       if (inputType === 'file') {
-        input = $(attribute.elId)[0];
+        input = document.getElementById(attribute.elId)[0];
         file = input.files[0];
 
         if (file) {
@@ -373,14 +372,15 @@ function onAttributesSave(feature, attrs) {
             getImageOrientation(file, (orientation) => {
               imageresizer(fileReader.result, attribute, orientation, (resized) => {
                 editEl[attribute.name] = resized;
-                $(document).trigger('imageresized');
+                const imageresized = new CustomEvent('imageresized');
+                document.dispatchEvent(imageresized);
               });
             });
           };
 
           fileReader.readAsDataURL(file);
         } else {
-          editEl[attribute.name] = $(attribute.elId).attr('value');
+          editEl[attribute.name] = document.getElementById(attribute.elId).getAttribute('value');
         }
       }
 
@@ -518,8 +518,7 @@ function onAttributesSave(feature, attrs) {
           }
           break;
         case 'searchList':
-          const turnOnValidation = attribute.required || false;
-          if (turnOnValidation) {
+          if (attribute.required || false) {
             const { list } = attribute;
             valid.searchList = validate.searchList(inputValue, list) || inputValue === '' ? inputValue : false;
             if (!valid.searchList && inputValue !== '') {
@@ -539,7 +538,7 @@ function onAttributesSave(feature, attrs) {
     // If valid, continue
     if (valid.validates) {
       if (fileReader && fileReader.readyState === 1) {
-        $(document).on('imageresized', () => {
+        document.addEventListener('imageresized', () => {
           attributesSaveHandler(feature, editEl);
         });
       } else {
@@ -547,7 +546,7 @@ function onAttributesSave(feature, attrs) {
       }
 
       modal.closeModal();
-      $('#o-save-button').blur();
+      document.getElementById('o-save-button').blur();
       e.preventDefault();
     }
   });
@@ -555,12 +554,12 @@ function onAttributesSave(feature, attrs) {
 
 function addListener() {
   const fn = (obj) => {
-    $(obj.elDependencyId).on(obj.eventType, () => {
+    document.getElementById(obj.elDependencyId).addEventListener(obj.eventType, () => {
       const containerClass = `.${obj.elId.slice(1)}`;
-      if ($(`${obj.elDependencyId} option:selected`).text() === obj.requiredVal) {
-        $(containerClass).removeClass('o-hidden');
+      if (document.getElementById(`${obj.elDependencyId} option:selected`).textContent === obj.requiredVal) {
+        document.querySelector(containerClass).classList.remove('o-hidden');
       } else {
-        $(containerClass).addClass('o-hidden');
+        document.querySelector(containerClass).classList.add('o-hidden');
       }
     });
   };
@@ -572,21 +571,24 @@ function addImageListener() {
   const fn = (obj) => {
     const fileReader = new FileReader();
     const containerClass = `.${obj.elId.slice(1)}`;
-    $(obj.elId).on('change', (ev) => {
-      if (ev.target.files && ev.target.files[0]) {
-        $(`${containerClass} img`).removeClass('o-hidden');
-        $(`${containerClass} input[type=button]`).removeClass('o-hidden');
+    document.querySelector(obj.elId).addEventListener('change', (ev) => {
+      const { detail: { target: { files } } } = ev;
+      if (files && files[0]) {
+        document.querySelector(`${containerClass} img`).classList.remove('o-hidden');
+        document.querySelector(`${containerClass} input[type=button]`).classList.remove('o-hidden');
         fileReader.onload = (e) => {
-          $(`${containerClass} img`).attr('src', e.target.result);
+          const { detail: { target: result } } = e;
+          document.querySelector(`${containerClass} img`).setAttribute('src', result);
         };
-        fileReader.readAsDataURL(ev.target.files[0]);
+        fileReader.readAsDataURL(files[0]);
       }
     });
 
-    $(`${containerClass} input[type=button]`).on('click', (e) => {
-      $(obj.elId).attr('value', '');
-      $(`${containerClass} img`).addClass('o-hidden');
-      $(e.target).addClass('o-hidden');
+    document.querySelector(`${containerClass} input[type=button]`).addEventListener('click', (e) => {
+      const { detail: { target } } = e;
+      document.getElementById(obj.elId).setAttribute('value', '');
+      document.querySelector(`${containerClass} img`).classList.add('o-hidden');
+      document.querySelector(target).classList.add('o-hidden');
     });
   };
 
@@ -612,7 +614,7 @@ function editAttributes(feat) {
       // Create an array of defined attributes and corresponding values from selected feature
       attributeObjects = attributes.map((attributeObject) => {
         const obj = {};
-        $.extend(obj, attributeObject);
+        Object.assign(obj, attributeObject);
         obj.val = feature.get(obj.name) !== undefined ? feature.get(obj.name) : '';
         if ('constraint' in obj) {
           const constraintProps = obj.constraint.split(':');
@@ -662,34 +664,36 @@ function editAttributes(feat) {
 }
 
 function onToggleEdit(e) {
+  const { detail: { tool } } = e;
   e.stopPropagation();
-  if (e.tool === 'draw') {
+  if (tool === 'draw') {
     if (hasDraw === false) {
       setInteractions();
       startDraw();
     } else {
       cancelDraw();
     }
-  } else if (e.tool === 'attribute') {
+  } else if (tool === 'attribute') {
     if (hasAttribute === false) {
       editAttributes();
-      sList = new searchList();
+      sList = sList || new searchList();
     } else {
       cancelAttribute();
     }
-  } else if (e.tool === 'delete') {
+  } else if (tool === 'delete') {
     onDeleteSelected();
-  } else if (e.tool === 'edit') {
+  } else if (tool === 'edit') {
     setEditLayer(e.currentLayer);
-  } else if (e.tool === 'cancel') {
+  } else if (tool === 'cancel') {
     removeInteractions();
-  } else if (e.tool === 'save') {
+  } else if (tool === 'save') {
     saveFeatures();
   }
 }
 
 function onChangeEdit(e) {
-  if (e.tool !== 'draw' && e.active) {
+  const { detail: { tool, active } } = e;
+  if (tool !== 'draw' && active) {
     cancelDraw();
   }
 }
@@ -713,7 +717,7 @@ export default function editHandler(options, v) {
 
   autoSave = options.autoSave;
   autoForm = options.autoForm;
-  $(document).on('toggleEdit', onToggleEdit);
-  $(document).on('changeEdit', onChangeEdit);
-  $(document).on('editorShapes', onChangeShape);
+  document.addEventListener('toggleEdit', onToggleEdit);
+  document.addEventListener('changeEdit', onChangeEdit);
+  document.addEventListener('editorShapes', onChangeShape);
 }

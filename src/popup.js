@@ -62,7 +62,7 @@ function bindUIActions() {
   });
 }
 
-export default function (target) {
+export default function popup(target) {
   render(target);
   bindUIActions();
   return {

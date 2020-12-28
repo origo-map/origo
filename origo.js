@@ -81,16 +81,15 @@ const Origo = function Origo(configPath, options = {}) {
     getConfig,
     onInit() {
       const defaultConfig = Object.assign({}, origoConfig, options);
-      const request = loadResources(configPath, defaultConfig);
-      if (request) {
-        request.then((data) => {
+      loadResources(configPath, defaultConfig)
+        .then((data) => {
           const viewerOptions = data.options;
           viewerOptions.controls = initControls(viewerOptions.controls);
           const target = viewerOptions.target;
           viewer = Viewer(target, viewerOptions);
           this.dispatch('load', viewer);
-        });
-      }
+        })
+        .catch(error => console.error(error));
     }
   });
 };

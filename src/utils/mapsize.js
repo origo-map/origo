@@ -8,7 +8,7 @@ function arrToObj(arr, start) {
   return obj;
 }
 
-export default function (map, {
+export default function mapsize(map, {
   breakPoints,
   breakPointsPrefix: prefix,
   mapId
