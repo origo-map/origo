@@ -311,7 +311,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         map,
         pixel
       }, viewer)
-        .done((data) => {
+        .then((data) => {
           const serverResult = data || [];
           const result = serverResult.concat(clientResult);
           if (result.length > 0) {
