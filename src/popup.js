@@ -1,5 +1,4 @@
-import $ from 'jquery';
-// eslint-disable-next-line import/no-cycle
+import { dom } from './ui';
 import Featureinfo from './featureinfo';
 
 function render(target) {
@@ -18,35 +17,44 @@ function render(target) {
         <div class="o-card-content"></div>
       </div>
     </div>`;
-  $(target).append(pop);
+  document.getElementById(target.substring(1)).appendChild(dom.html(pop));
 }
 
 function getEl() {
-  return $('#o-popup').get(0);
+  return document.getElementById('o-popup');
 }
 
 function setVisibility(visible) {
+  const popel = document.getElementById('o-popup');
+  const { style } = popel;
   if (visible) {
-    $('#o-popup').css('display', 'block');
+    style.display = 'block';
   } else {
-    $('#o-popup').css('display', 'none');
+    style.display = 'none';
   }
 }
 
 function setTitle(title) {
-  $('#o-popup #o-card-title').html(title);
+  const popel = document.getElementById('o-card-title');
+  popel.innerHTML = title;
+}
+
+function insertContent(content) {
+  const popel = document.getElementById('o-popup').getElementsByClassName('o-card-content')[0];
+  popel.innerHTML = content;
 }
 
 function setContent(config) {
-  if (config.title) {
-    $('#o-popup .o-popup #o-card-title').html(config.title);
+  const { title, content } = config;
+  if (title) {
+    setTitle(title);
   } else {
-    $('#o-popup .o-popup #o-card-title').html('');
+    setTitle('');
   }
-  if (config.content) {
-    $('#o-popup .o-popup .o-card-content').html(config.content);
+  if (content) {
+    insertContent(content);
   } else {
-    $('#o-popup .o-popup .o-card-content').html('');
+    insertContent('');
   }
 }
 
@@ -56,7 +64,8 @@ function closePopup() {
 }
 
 function bindUIActions() {
-  $('#o-popup .o-popup #o-close-button').on('click', (evt) => {
+  const closeel = document.querySelector('#o-popup .o-popup #o-close-button');
+  closeel.addEventListener('click', (evt) => {
     closePopup();
     evt.preventDefault();
   });
