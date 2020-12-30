@@ -1,5 +1,4 @@
 const webpack = require('webpack');
-const ESLintPlugin = require('eslint-webpack-plugin');
 
 module.exports = {
   entry: [
@@ -47,10 +46,6 @@ module.exports = {
       jQuery: 'jquery',
       'window.jQuery': 'jquery',
       proj4: 'proj4'
-    }),
-    new ESLintPlugin({
-      fix: true,
-      emitError: true
     })
   ]
 };
