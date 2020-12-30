@@ -13,9 +13,11 @@ function getSaveLayers(layers) {
     saveLayer.o = Number(layer.get('opacity')) * 100;
     if (saveLayer.s || saveLayer.v) {
       saveLayer.name = layer.get('name');
-      saveLayers.push(urlparser.stringify(saveLayer, {
-        topmost: 'name'
-      }));
+      if (saveLayer.name !== 'measure') {
+        saveLayers.push(urlparser.stringify(saveLayer, {
+          topmost: 'name'
+        }));
+      }
     }
   });
   return saveLayers;
@@ -49,7 +51,6 @@ permalinkStore.getState = function getState(viewer, isExtended) {
     state.pin = getPin().getGeometry().getCoordinates().map(coord => Math.round(coord))
       .join();
   }
-
   if (viewer.getMapName()) {
     state.map = viewer.getMapName().split('.')[0];
   }
