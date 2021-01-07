@@ -1,4 +1,5 @@
 @import './variables';
+
 .o-ui {
   @import './utils/mixins';
   @import './base/base';
@@ -29,7 +30,7 @@
 }
 
 .app {
-  background-color: rgba(0,0,0,0.1);
+  background-color: rgba(0, 0, 0, 0.1);
   height: 100%;
   width: 100%;
 }
