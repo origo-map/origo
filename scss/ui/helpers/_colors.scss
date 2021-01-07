@@ -2,48 +2,63 @@
 .bg-primary {
   background-color: $primary-color;
 }
+
 .bg-black {
   background-color: $black;
 }
+
 .bg-white {
   background-color: $white;
 }
+
 .bg-red {
   background-color: $red;
 }
+
 .bg-orange {
   background-color: $orange;
 }
+
 .bg-yellow {
   background-color: $yellow;
 }
+
 .bg-green {
   background-color: $green;
 }
+
 .bg-blue {
   background-color: $blue;
 }
+
 .bg-purple {
   background-color: $purple;
 }
+
 .bg-pink {
   background-color: $pink;
 }
+
 .bg-grey-darker {
   background-color: $grey-darker;
 }
+
 .bg-grey-dark {
   background-color: $grey-dark;
 }
+
 .bg-grey {
   background-color: $grey;
 }
+
 .bg-grey-light {
   background-color: $grey-light;
 }
+
 .bg-grey-lighter {
   background-color: $grey-lighter;
 }
+
 .bg-grey-lightest {
   background-color: $grey-lightest;
 }
@@ -52,21 +67,27 @@
   &:hover {
     background-color: $grey-lighter;
   }
+
   &.light:hover {
     background-color: $grey-lighter;
   }
+
   &.primary:hover {
     background-color: $primary-color-dark;
   }
+
   &.danger:hover {
     background-color: $danger-color-dark;
   }
+
   &.grey-light:hover {
     background-color: $grey-light;
   }
+
   &.grey-lighter:hover {
     background-color: $grey-lighter;
   }     
+
   &.grey-lightest:hover {
     background-color: $grey-lightest;
   }
