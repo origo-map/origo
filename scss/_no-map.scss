@@ -1,11 +1,12 @@
 .o-no-map {
-  background-color: #EEEEEE;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background-color: #eee;
   display: block;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   height: 100%;
   width: 100%;
   z-index: 100000;
 }
+
 .o-no-map-message {
   margin: auto;
   position: relative;

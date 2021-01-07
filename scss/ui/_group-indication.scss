@@ -1,9 +1,9 @@
 .group-indication {
-	border-left: medium solid $primary-color;
-	transition: border-left 0.3s linear;
+  border-left: medium solid $primary-color;
+  transition: border-left 0.3s linear;
 }
 
 .no-group-indication {
-	border-left: 0px solid $primary-color;
-	transition: border-left 0.3s linear;
+  border-left: 0 solid $primary-color;
+  transition: border-left 0.3s linear;
 }

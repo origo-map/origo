@@ -16,44 +16,49 @@ $print-scale-line-font-size: $font-size-smallest;
   border-radius: $print-control-border-radius;
   padding: $print-control-padding;
 }
+
 .print-scale-line-inner {
   border: 2px solid $print-scale-line-color;
-  border-bottom-right-radius: $print-scale-line-inner-border-radius;
   border-bottom-left-radius: $print-scale-line-inner-border-radius;
-  border-top: none;
+  border-bottom-right-radius: $print-scale-line-inner-border-radius;
+  border-top: 0;
   color: $print-scale-line-color;
   font-size: $print-scale-line-font-size;
-  text-align: center;
   margin: 1px;
-  will-change: contents, width;
+  text-align: center;
   transition: all 0.25s;
+  will-change: contents, width;
 }
+
 .ol-scale-text {
-    position: absolute;
-    font-size: 14px;
-    text-align: center;
-    bottom: 25px;
-    color: #000000;
-}
-.ol-scale-step-text {
-  position: absolute;
-  bottom: -5px;
-  font-size: 12px;
-  z-Index: 11;
+  bottom: 25px;
   color: #000;
- }
+  font-size: 14px;
+  position: absolute;
+  text-align: center;
+}
+
+.ol-scale-step-text {
+  bottom: -5px;
+  color: #000;
+  font-size: 12px;
+  position: absolute;
+  z-Index: 11;
+}
+
 .ol-scale-step-marker {
-  width: 1px;
-  height: 15px;
   background-color: #000;
   float: right;
-  z-Index: 10
+  height: 15px;
+  width: 1px;
+  z-Index: 10;
 }
+
 .ol-scale-singlebar {
-  position: relative;
+  border: 1px solid #000;
   height: 10px;
+  position: relative;
   z-Index: 9;
-  border: 1px solid #000
 }
 
 // atrribution
@@ -64,6 +69,7 @@ $print-scale-line-font-size: $font-size-smallest;
     box-shadow: none;
   }
 }
+
 .print-attribution {
   background-color: $print-control-bg-color;
   border-radius: $print-control-border-radius;
@@ -73,14 +79,17 @@ $print-scale-line-font-size: $font-size-smallest;
   text-align: right;
   z-index: $print-control-z-index;
 }
+
 .print-attribution a {
   color: $primary-text-color;
   font-size: $print-control-font-size;
   text-decoration: none;
 }
+
 .print-attribution button {
   display: none;
 }
+
 .print-attribution img {
   display: none;
 }
@@ -98,7 +107,7 @@ $print-scale-line-font-size: $font-size-smallest;
 }
 
 .printmap-north-arrow {
-  display:block;
+  display: block;
 }
 
 // media print settings
