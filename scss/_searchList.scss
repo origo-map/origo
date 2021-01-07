@@ -1,25 +1,25 @@
 #searchList .awesomplete {
-    width: 100%;
+  width: 100%;
 }
 
 #searchList .awesomplete>input {
-    width: 100%;
-    height: 100%;
+  height: 100%;
+  width: 100%;
 }
 
 #searchList .button {
-    padding: 0.5em 5em;
-    border-radius: 0.3em;
-    background: linear-gradient(hsl(40, 70%, 80%), hsl(40, 70%, 70%));
-    border: 1px solid rgba(0, 0, 0, 0.3);
+  background: linear-gradient(hsl(40, 70%, 80%), hsl(40, 70%, 70%));
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  border-radius: 0.3em;
+  padding: 0.5em 5em;
 }
 
 #searchList .awesomplete .dropdown-btn {
-    border-radius: 5px;
-    position: absolute;
-    right: 0;
-    padding: 0.75em 1em;
-    line-height: initial;
+  border-radius: 5px;
+  line-height: initial;
+  padding: 0.75em 1em;
+  position: absolute;
+  right: 0;
 }
 
 .dropdown-btn:focus {
@@ -27,39 +27,39 @@
 }
 
 #searchList .caret {
-    display: inline-block;
-    width: 0;
-    height: 0;
-    margin-left: 2px;
-    vertical-align: middle;
-    border-top: 4px solid;
-    border-right: 4px solid transparent;
-    border-left: 4px solid transparent;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid;
+  display: inline-block;
+  height: 0;
+  margin-left: 2px;
+  vertical-align: middle;
+  width: 0;
 }
 
 #searchList .awesomplete>ul {
-    min-width: 85%;
-    background-color: white;
+  background-color: $white;
+  min-width: 85%;
 }
 
 #searchList .awesomplete>ul>li:first-child {
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
 }
 
 #searchList .awesomplete>ul>li {
-    position: relative;
-    max-width: 100%;
-    padding: .4em 1em;
-    left: 1.2em;
-    border-bottom: 1px solid rgba(213, 213, 213, 0.2);
-    font-size: .875em;
-    line-height: 1.5rem;
+  border-bottom: 1px solid rgba(213, 213, 213, 0.2);
+  font-size: .875em;
+  left: 1.2em;
+  line-height: 1.5rem;
+  max-width: 100%;
+  padding: .4em 1em;
+  position: relative;
 }
 
 #searchList .awesomplete>ul>li:last-child {
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
 }
 
 
@@ -72,7 +72,7 @@
 }
 
 #searchList .awesomplete mark {
-    background: hsl(65, 100%, 50%);
+  background: hsl(65, 100%, 50%);
 }
 
 
