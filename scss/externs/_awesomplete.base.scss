@@ -1,37 +1,37 @@
 .awesomplete [hidden] {
-    display: none;
+  display: none;
 }
 
 .awesomplete .visually-hidden {
-    position: absolute;
-    clip: rect(0, 0, 0, 0);
+  clip: rect(0, 0, 0, 0);
+  position: absolute;
 }
 
 .awesomplete {
-    display: flex;
-    flex-direction: row;
-    flex-grow: 1;
-    position: relative;
-    width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  position: relative;
+  width: 100%;
 }
 
 .awesomplete > input {
-    display: block;
+  display: block;
 }
 
 .awesomplete > ul {
-    position: absolute;
-    left: 0;
-    z-index: 1;
-    min-width: 100%;
-    box-sizing: border-box;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    background: #fff;
-    top: 40px;
+  background: #fff;
+  box-sizing: border-box;
+  left: 0;
+  list-style: none;
+  margin: 0;
+  min-width: 100%;
+  padding: 0;
+  position: absolute;
+  top: 40px;
+  z-index: 1;
 }
 
 .awesomplete > ul:empty {
-    display: none;
+  display: none;
 }
