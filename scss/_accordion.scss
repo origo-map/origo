@@ -48,10 +48,9 @@
   }
 
   .card-header {
-    background-color: #fff;
+    background-color: $white;
     border: 0;
     border-radius: 0;
-    // color: #fff;
     padding: 0;
   }
 
@@ -92,7 +91,6 @@
     right: 10px;
     top: 15px;
     transform: scale(1);
-    // font-size: 24px;
     transition: all 0.5s;
   }
 
