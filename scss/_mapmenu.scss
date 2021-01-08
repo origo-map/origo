@@ -1,11 +1,11 @@
 &[class*=#{$media-l-m-s}] {
-#o-sidebar{
-  max-width: 230px;
-  width: 100%;
-}
+  #o-sidebar {
+    max-width: 230px;
+    width: 100%;
+  }
 }
 &[class*=#{$media-l-m-s-xs}] {
-#o-sidebar {
-  display: none;
-}
+  #o-sidebar {
+    display: none;
+  }
 }

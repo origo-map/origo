@@ -24,45 +24,59 @@ $text-fade-background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(25
 .text-primary {
   color: $primary-text-color;
 }
+
 .text-inverse {
   color: $primary-text-color-inverse;
 }
+
 .text-black {
   color: $text-black;
 }
+
 .text-white {
   color: $white;
 }
+
 .text-grey-dark {
   color: $text-grey-dark;
 }
+
 .text-grey {
   color: $text-grey;
 }
+
 .text-grey-light {
   color: $text-grey-light;
 }
+
 .text-grey-lighter {
   color: $text-grey-ligthter;
 }
+
 .text-red {
   color: $red;
 }
+
 .text-orange {
   color: $orange;
 }
+
 .text-yellow {
   color: $yellow;
 }
+
 .text-green {
   color: $green;
 }
+
 .text-blue {
   color: $blue;
 }
+
 .text-purple {
   color: $purple;
 }
+
 .text-pink {
   color: $pink;
 }
@@ -72,18 +86,22 @@ $text-fade-background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(25
   font-size: $text-smallest;
   line-height: $text-height-smallest;
 }
+
 .text-smaller {
   font-size: $text-smaller;
   line-height: $text-height-smaller;
 }
+
 .text-small {
   font-size: $text-small;
   line-height: $text-height-small;
 }
+
 .text-normal {
   font-size: $text-normal;
   line-height: $text-height-normal;
 }
+
 .text-large {
   font-size: $text-large;
   line-height: $text-height-large;
@@ -93,12 +111,15 @@ $text-fade-background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(25
 .text-align-center {
   text-align: center;
 }
+
 .text-align-left {
   text-align: left;
 }
+
 .text-align-right {
   text-align: right;
 }
+
 .text-align-justify {
   text-align: justify;
 }
@@ -107,6 +128,7 @@ $text-fade-background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(25
 .float-left {
   float: left;
 }
+
 .float-right {
   float: right;
 }
@@ -115,21 +137,24 @@ $text-fade-background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(25
 .text-weight-light {
   font-weight: $text-weight-light;
 }
+
 .text-weight-normal {
   font-weight: $text-weight-normal;
 }
+
 .text-weight-semibold {
   font-weight: $text-weight-semibold;
 }
+
 .text-weight-bold {
   font-weight: $text-weight-bold;
 }
 
 // text fade
-.text-fade:after {
+.text-fade::after {
   background: $text-fade-background;
   bottom: 0;
-  content: "";
+  content: '';
   height: $text-height-normal;
   position: absolute;
   right: 0;
@@ -140,31 +165,40 @@ $text-fade-background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(25
 // line-height
 .text-height-large {
   line-height: $text-height-large;
-  &.text-fade:after {
+
+  &.text-fade::after {
     height: $text-height-large;
   }
 }
+
 .text-height-normal {
   line-height: $text-height-normal;
-  &.text-fade:after {
+
+  &.text-fade::after {
     height: $text-height-normal;
   }
 }
+
 .text-height-small {
   line-height: $text-height-small;
-  &.text-fade:after {
+
+  &.text-fade::after {
     height: $text-height-small;
   }
 }
+
 .text-height-smaller {
   line-height: $text-height-smaller;
-  &.text-fade:after {
+
+  &.text-fade::after {
     height: $text-height-smaller;
   }
 }
+
 .text-height-smallest {
   line-height: $text-height-smallest;
-  &.text-fade:after {
+
+  &.text-fade::after {
     height: $text-height-smallest;
   }
 }

@@ -1,31 +1,36 @@
 .o-icon-minicons-square-vector {
-  padding: .3em;
   height: 1.4em;
+  padding: .3em;
   width: 1.4em;
 }
+
 .o-icon-minicons-line-vector {
-  padding: .3em;
   height: 1.4em;
+  padding: .3em;
   width: 1.4em;
 }
+
 .o-tooltip-measure {
-  position: relative;
   background: rgba(0, 0, 0, 0.5);
   border-radius: 4px;
-  color: white;
-  padding: 4px 8px;
-  white-space: nowrap;
-  opacity: 0.8;
+  color: $white;
   font: 80% normal, sans-serif;
+  opacity: 0.8;
+  padding: 4px 8px;
   pointer-events: none;
+  position: relative;
+  white-space: nowrap;
 }
+
 .o-measure-button-true .o-icon-fa-pencil,
 .o-measure-button-true .o-icon-steady-measure,
 .o-measure-button-true .o-icon-minicons-square-vector,
 .o-measure-button-true .o-icon-minicons-line-vector {
   fill: $o-btn-active-color;
 }
-.o-measure-length .icon svg, .o-measure-area .icon svg {
+
+.o-measure-length .icon svg,
+.o-measure-area .icon svg {
+  border-radius: 0;
   overflow: visible;
-  border-radius:0;
 }

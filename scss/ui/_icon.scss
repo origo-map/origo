@@ -14,18 +14,22 @@ $icon-primary-inverse-color: $primary-color-inverse;
   height: $icon-size-smallest;
   width: $icon-size-smallest;
 }
+
 .icon-smaller:not(.button):not(button) {
   height: $icon-size-smaller;
   width: $icon-size-smaller;
 }
+
 .icon-small:not(.button):not(button) {
   height: $icon-size-small;
   width: $icon-size-small;
 }
+
 .icon-medium:not(.button):not(button) {
   height: $icon-size-medium;
   width: $icon-size-medium;
 }
+
 .icon-large:not(.button):not(button) {
   height: $icon-size-large;
   width: $icon-size-large;
@@ -37,29 +41,35 @@ button {
     margin: 0;
     padding: 0;
   }
+
   .icon {
     display: inline-block;
   }
+
   &.icon-smallest .icon,
   &.icon-smallest .icon > * {
     height: $icon-size-smallest;
     width: $icon-size-smallest;
   }
+
   &.icon-smaller .icon,
   &.icon-smaller .icon > * {
     height: $icon-size-smaller;
     width: $icon-size-smaller;
   }
+
   &.icon-small .icon,
   &.icon-small .icon > * {
     height: $icon-size-small;
     width: $icon-size-small;
   }
+
   &.icon-medium .icon,
   &.icon-medium .icon > * {
     height: $icon-size-medium;
     width: $icon-size-medium;
   }
+
   &.icon-large .icon,
   &.icon-large .icon > * {
     height: $icon-size-large;
@@ -67,66 +77,81 @@ button {
   }
 }
 
-.button[class^="icon"],
-.button[class*="icon"],
-button[class^="icon"],
-button[class*="icon"] {
+.button[class^='icon'],
+.button[class*='icon'],
+button[class^='icon'],
+button[class*='icon'] {
   line-height: 0;
 }
+
 .button svg,
 button svg {
   fill: $icon-default-color;
   height: inherit;
   width: inherit;
 }
+
 .button.active svg,
 button.active svg {
   fill: $icon-active-color;
 }
+
 .button.tracking svg,
 button.tracking svg {
   fill: $icon-active-color;
 }
+
 .button.inactive svg,
 button.inactive svg {
   fill: $icon-inactive-color;
 }
+
 .button.disabled svg,
 button.disabled svg {
   fill: $icon-disabled-color;
 }
+
 .button.primary svg,
 button.primary svg {
   fill: $icon-primary-inverse-color;
 }
+
 button.grey-light svg,
 .button.grey-light svg,
 .button.grey svg,
 button.grey svg {
   fill: $white;
 }
+
 svg {
   &.primary {
     fill: $icon-primary-color;
   }
+
   &.primary-inverse {
     fill: $icon-primary-inverse-color;
   }
+
   &.grey-dark {
     fill: $grey-dark;
   }
+
   &.grey {
     fill: $grey;
   }
+
   &.grey-light {
     fill: $grey-light;
   }
+
   &.grey-lighter {
     fill: $grey-lighter;
   }
+
   &.grey-lightest {
     fill: $grey-lightest;
   }
+
   &.white {
     fill: $white;
   }
@@ -135,9 +160,11 @@ svg {
 img.cover {
   object-fit: cover;
 }
+
 img.contain {
   object-fit: contain;
 }
+
 img.scale-down {
   object-fit: scale-down;
 }

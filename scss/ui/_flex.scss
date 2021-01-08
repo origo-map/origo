@@ -12,12 +12,15 @@ $flex-grow-all: 2;
   &.row {
     flex-direction: row;
   }
+
   &.row-reverse {
     flex-direction: row-reverse;
   }
+
   &.column {
     flex-direction: column;
   }   
+
   &.column-reverse {
     flex-direction: column-reverse;
   }
@@ -26,15 +29,19 @@ $flex-grow-all: 2;
   .shrink {
     flex-shrink: $flex-shrink;
   }
+
   .grow {
     flex-grow: $flex-grow;
   }   
+
   .no-shrink {
     flex-shrink: $flex-no-shrink;
   }
+
   .no-grow {
     flex-grow: $flex-no-grow;
   }
+
   .grow-all {
     flex-grow: $flex-grow-all;
   }
@@ -46,30 +53,39 @@ $flex-grow-all: 2;
   .justify-start {
     justify-content: flex-start;
   }
+
   .justify-end {
     justify-content: flex-end;
   }
+
   .justify-center {
     justify-content: center;
   }
+
   .justify-space-between {
     justify-content: space-between;
   }
+
   .justify-space-evenly {
     justify-content: space-evenly;
   }   
+
   .align-start {
     align-items: flex-start;
   }
+
   .align-end {
     align-items: flex-end;
   }
+
   .align-center {
     align-items: center;
   }
+
   .align-baseline {
     align-items: baseline;
   }
+
   .align-stretch {
     align-items: stretch;
   }     

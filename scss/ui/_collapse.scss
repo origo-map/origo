@@ -1,8 +1,8 @@
 .collapse-container {
+  height: 100%;
   overflow: hidden;
   position: relative;
   transition: all 0.3s;
-  height: 100%;
 }
 
 .collapse-container-no-height {
@@ -11,21 +11,24 @@
   transition: all 0.3s;
 }
 
-.collapse {
+%collapse {
   > .collapse-header {
     .rotate {
       &.icon {
-        transition:  all 0.3s ease;
+        transition: all 0.3s ease;
       }
     }
   }
+
   &.expanded > .collapse-header {
-    border-bottom: none;
+    border-bottom: 'none';
+
     .rotate {
       &.icon {
         transform: rotate(90deg);
       }
     }
+
     .rotate-180 {
       &.icon {
         transform: rotate(180deg);
@@ -35,7 +38,8 @@
 }
 
 .collapse-scroll {
-  @extend .collapse;
+  @extend %collapse;
+
   &.expanded {
     height: calc(100% - 2rem);
   }
