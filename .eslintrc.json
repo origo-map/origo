@@ -8,6 +8,7 @@
       "error",
       "never"
     ],
+    "global-require": 0,
     "import/no-unresolved": "off",
     "import/no-cycle": "off",
     "new-cap": "off",
@@ -28,7 +29,8 @@
       {
         "allow": [
           "warn",
-          "error"
+          "error",
+          "log"
         ]
       }
     ],
