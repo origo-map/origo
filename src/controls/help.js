@@ -25,16 +25,16 @@ const Help = function Help(options = {}) {
   const DraganddropText = 'Du har möjlighet att dra in lager från din dator till kartan. Möjliga format är: GPX, GeoJSON, IGC, KML och TopoJSON';
   const EditorText = 'Öppnar redigeringsverktyget';
   const FullscreenText = 'Öppnar kartan i helskärmsläge';
-  const LegendText = 'Kartlegenden. Här tänder/släcker, ändrar transparensen och finner information om kartlagret';
+  const LegendText = 'Innehållsförteckning och teckenförklaring - visa eller dölj kartlager, klicka på rubriker och kartlager för information, ändra lagers genomskinlighet mm';
   const PositionText = 'Klicka på denna om du vill ha positionen från kartans centrum och kan definiera egna koordinater direkt i koordinattexten. Byt system genom att klicka på koordinatsystemet';
   const ProgressbarText = 'Den blå linjen i nedre delan av kartan visar på hämtning av information';
-  const RotateText = 'Rotera kartan med två fingrar på pekskärm, håll ned shift+alt på pc. Klicka på symbolen för att återgå';
+  const RotateText = 'Rotera kartan med två fingrar på pekskärm, håll ned Shift+Alt på PC. Klicka på symbolen för att återgå';
   const ScaleText = '';
   const ScalelineText = '';
   const SearchText = 'Sök i kartan';
   const SplashText = '';
   const ExternalurlText = 'Öppnar fler knappar där du kan välja att öppna din kartposition i annan applikation';
-  const ScalepickerText = '';
+  const ScalepickerText = 'Visar kartans nuvarande skala. Klicka för att välja skala manuellt';
 
   const AboutIcon = '#ic_info_outline_24px';
   const ZoomInIcon = '#ic_add_24px';
