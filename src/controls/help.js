@@ -3,6 +3,7 @@ import { Component, Modal, Icon } from '../ui';
 
 const Help = function Help(options = {}) {
   const { icon = '#ic_help_outline_24px', title = 'Hjälp', controlList } = options;
+  const cls = 'o-help';
   let { buttonText, target } = options;
   let viewer;
   let mapMenu;
@@ -69,7 +70,7 @@ const Help = function Help(options = {}) {
       const controlIcons = Icon({
         icon: ikon
       });
-      const list = `<li class="flex" style="align-items: center;"><span class="flex icon icon-medium padding-x-large" style="max-width:25px;min-width:25px;">${controlIcons.render()}</span>${text}</li>`;
+      const list = `<li class="flex ${cls}"><span class="flex icon icon-medium padding-x-large">${controlIcons.render()}</span>${text}</li>`;
       contentItems.push(list);
     });
   };
