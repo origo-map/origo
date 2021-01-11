@@ -35,7 +35,6 @@ const Help = function Help(options = {}) {
   const SplashText = '';
   const ExternalurlText = 'Öppnar fler knappar där du kan välja att öppna din kartposition i annan applikation';
   const ScalepickerText = 'Visar kartans nuvarande skala. Klicka för att välja skala manuellt';
-
   const AboutIcon = '#ic_info_outline_24px';
   const ZoomInIcon = '#ic_add_24px';
   const ZoomOutIcon = '#ic_remove_24px';
