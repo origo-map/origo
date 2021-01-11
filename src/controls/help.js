@@ -63,12 +63,12 @@ const Help = function Help(options = {}) {
 
   const modalContent = () => {
     options.controlList.forEach((el) => {
-      const iconValue = `${el}Icon`;
-      const textValue = `${el}Text`;
-      const ikon = eval(iconValue);
-      const text = eval(textValue);
+      const text = el.text || eval(`${el}Text`) || '';
+      const icon = el.icon || eval(`${el}Icon`) || '';
+      const iconStyle = el.iconStyle || '';
       const controlIcons = Icon({
-        icon: ikon
+        icon: icon,
+        style: iconStyle
       });
       const list = `<li class="flex ${cls}"><span class="flex icon icon-medium padding-x-large">${controlIcons.render()}</span>${text}</li>`;
       contentItems.push(list);
