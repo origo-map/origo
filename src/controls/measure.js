@@ -55,6 +55,7 @@ const Measure = function Measure({
   let elevationToolButton;
   let addNodeButton;
   let undoButton;
+  let clearButton;
   const buttons = [];
   let target;
   let touchMode;
@@ -355,6 +356,7 @@ const Measure = function Measure({
       document.getElementById(elevationToolButton.getId()).classList.add('hidden');
     }
     document.getElementById(measureButton.getId()).classList.add('tooltip');
+    document.getElementById(clearButton.getId()).classList.add('hidden');
     if (touchMode) {
       document.getElementById(addNodeButton.getId()).classList.add('hidden');
       if (!viewer.getControlByName('position').isMousePositionActive()) {
@@ -365,10 +367,8 @@ const Measure = function Measure({
 
     map.un('pointermove', pointerMoveHandler);
     map.removeInteraction(measure);
-    vector.setVisible(false);
     overlayArray.push(...tempOverlayArray);
     viewer.removeOverlays(overlayArray);
-    vector.getSource().clear();
     setActive(false);
     resetSketch();
   }
@@ -385,6 +385,7 @@ const Measure = function Measure({
       document.getElementById(elevationToolButton.getId()).classList.remove('hidden');
     }
     document.getElementById(measureButton.getId()).classList.remove('tooltip');
+    document.getElementById(clearButton.getId()).classList.remove('hidden');
     document.getElementById(defaultButton.getId()).click();
     if (touchMode) {
       document.getElementById(addNodeButton.getId()).classList.remove('hidden');
@@ -396,7 +397,6 @@ const Measure = function Measure({
   }
 
   function addInteraction() {
-    vector.setVisible(true);
     measure = new DrawInteraction({
       source,
       type,
@@ -536,7 +536,7 @@ const Measure = function Measure({
         group: 'none',
         source,
         name: 'measure',
-        visible: false,
+        visible: true,
         zIndex: 6
       });
 
@@ -629,6 +629,16 @@ const Measure = function Measure({
             tooltipPlacement: 'east'
           });
           buttons.push(undoButton);
+          clearButton = Button({
+            cls: 'o-measure-clear padding-small margin-bottom-smaller icon-smaller round light box-shadow hidden',
+            click() {
+              vector.getSource().clear();
+            },
+            icon: '#ic_delete_24px',
+            tooltipText: 'Rensa',
+            tooltipPlacement: 'east'
+          });
+          buttons.push(clearButton);
         }
       }
     },
@@ -662,6 +672,9 @@ const Measure = function Measure({
       }
       if (lengthTool || areaTool) {
         htmlString = undoButton.render();
+        el = dom.html(htmlString);
+        document.getElementById(measureElement.getId()).appendChild(el);
+        htmlString = clearButton.render();
         el = dom.html(htmlString);
         document.getElementById(measureElement.getId()).appendChild(el);
       }
