@@ -62,8 +62,8 @@ const Help = function Help(options = {}) {
 
   const modalContent = () => {
     options.controlList.forEach((el) => {
-      const text = el.text || eval(`${el}Text`) || '';
-      const icon = el.icon || eval(`${el}Icon`) || '';
+      const text = el.text || eval(`${el.name}Text`) || '';
+      const icon = el.icon || eval(`${el.name}Icon`) || '';
       const iconStyle = el.iconStyle || '';
       const controlIcons = Icon({
         icon: icon,
