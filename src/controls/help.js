@@ -4,11 +4,6 @@ import { Component, Modal, Icon } from '../ui';
 const Help = function Help(options = {}) {
   const { icon = '#ic_help_outline_24px', title = 'Hjälp', controlList } = options;
   const cls = 'o-help';
-  let { buttonText, target } = options;
-  let viewer;
-  let mapMenu;
-  let menuItem;
-  let modal;
   const contentItems = [];
   const defaultOptions = {
     'About': {
@@ -122,6 +117,12 @@ const Help = function Help(options = {}) {
       contentItems.push(list);
     });
   };
+  
+  let { buttonText, target } = options;
+  let viewer;
+  let mapMenu;
+  let menuItem;
+  let modal;
 
   return Component({
     name: 'help',
