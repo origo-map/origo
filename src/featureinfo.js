@@ -1,6 +1,5 @@
-import 'owl.carousel';
 import Overlay from 'ol/Overlay';
-import $ from 'jquery';
+import OGlide from './oglide';
 import { Component, Modal } from './ui';
 import Popup from './popup';
 import sidebar from './sidebar';
@@ -130,20 +129,19 @@ const Featureinfo = function Featureinfo(options = {}) {
     }
   };
 
-  const initCarousel = function initCarousel(id, opt) {
-    const carouselOptions = opt || {
-      onChanged: callback,
-      items: 1,
-      nav: true,
-      navText: ['<span class="icon"><svg class="o-icon-fa-chevron-left"><use xlink:href="#fa-chevron-left"></use></svg></span>',
-        '<span class="icon"><svg class="o-icon-fa-chevron-right"><use xlink:href="#fa-chevron-right"></use></svg></span>'
-      ]
-    };
+  const initCarousel = function initCarousel(id) {
     if (identifyTarget === 'overlay') {
       const popupHeight = document.querySelector('.o-popup').offsetHeight + 20;
       document.querySelector('#o-popup').style.height = `${popupHeight} px`;
     }
-    return $(id).owlCarousel(carouselOptions);
+
+    const { length } = Array.from(document.querySelectorAll('.o-identify-content'));
+    if (!document.querySelector('.glide') && length > 1) {
+      OGlide({
+        id,
+        callback
+      });
+    }
   };
 
   function getSelectionLayer() {
@@ -212,7 +210,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     items = identifyItems;
     clear();
     let content = items.map((i) => i.content).join('');
-    content = '<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme"></div></div>';
+    content = '<div id="o-identify"><div id="o-identify-carousel"></div></div>';
     switch (target) {
       case 'overlay':
       {
