@@ -1,3 +1,12 @@
  @import './variables';
  @import './controls';
  @import './bullets';
+ .glide {
+   &__track {
+    overflow-y: scroll;
+  }
+   &--carousel {
+    display:flex;
+    flex-direction:column;
+  }
+ }

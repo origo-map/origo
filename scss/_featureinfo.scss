@@ -2,3 +2,7 @@
   width: 240px;
   word-wrap: break-word;
 }
+
+#o-identify-carousel > .o-identify-content {
+  overflow-y:scroll;
+}

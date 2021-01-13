@@ -2,7 +2,7 @@
   &_arrows {
     padding: $o-glide-button-padding;
     position: relative;
-    padding-bottom: 0.1em;
+    padding-bottom: 0.2em;
   }
    &__arrow {
     padding: .3em;
@@ -22,5 +22,5 @@
     &--right {
       right: $o-glide-button-spsce;
     }
-  } 
+  }
 }

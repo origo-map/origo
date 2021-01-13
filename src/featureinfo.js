@@ -210,7 +210,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     items = identifyItems;
     clear();
     let content = items.map((i) => i.content).join('');
-    content = '<div id="o-identify"><div id="o-identify-carousel"></div></div>';
+    content = '<div id="o-identify"><div id="o-identify-carousel" class="flex"></div></div>';
     switch (target) {
       case 'overlay':
       {
