@@ -1,5 +1,4 @@
 import WFSFormat from 'ol/format/WFS';
-import $ from 'jquery';
 import dispatcher from './editdispatcher';
 
 const format = new WFSFormat();
@@ -86,16 +85,18 @@ function wfsTransaction(transObj, layerName, viewer) {
     }
   }
 
-  return $.ajax({
-    type: 'POST',
-    url: source.url,
-    data: serializer.serializeToString(node),
-    contentType: 'text/xml',
-    success,
-    error,
-    context: this
+  const header = new Headers();
+  header.append('Content-Type', 'text/plain');
+  return fetch(source.url, {
+    method: 'POST',
+    body: serializer.serializeToString(node),
+    headers: header,
+    redirect: 'follow'
   })
+    .then(res => res.text())
+    .then(str => (new window.DOMParser()).parseFromString(str, 'text/xml'))
     .then((data) => {
+      success(data);
       const result = readResponse(data);
       let nr = 0;
       if (result) {
@@ -104,9 +105,10 @@ function wfsTransaction(transObj, layerName, viewer) {
         nr += result.transactionSummary.totalInserted;
       }
       return nr;
-    });
+    })
+    .catch(err => error(err));
 }
 
-export default function (transObj, layerName, viewer) {
+export default function wfstransaction(transObj, layerName, viewer) {
   return wfsTransaction(transObj, layerName, viewer);
 }

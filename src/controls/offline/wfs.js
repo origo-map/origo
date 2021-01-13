@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import GeoJSONFormat from 'ol/format/GeoJSON';
 import viewer from '../../viewer';
 import wfsTransaction from '../editor/wfstransaction';
@@ -17,6 +16,7 @@ wfs.request = function request(layer) {
   return req;
 
   function createRequest(options) {
+    console.log('createRequest')
     const format = new GeoJSONFormat({
       geometryName: options.geometryName
     });
@@ -40,11 +40,11 @@ wfs.request = function request(layer) {
       `${queryFilter}`
     ].join('');
 
-    return $.ajax({
-      url,
+    return fetch(url,{
       cache: false
     })
-      .then(response => format.readFeatures(response));
+      .then(res => res.json())
+      .then(data => format.readFeatures(data));
   }
 };
 

@@ -24,4 +24,15 @@
 	<path id="path3011-7" fill="#FFFFFF" d="M252.286,491v-9.485l-3.103-34.295l-3.947-43.43
 		l-4.329-31.177l-16.439-118.37h32.878h32.88l-16.439,118.37l-4.186,30.19l-3.805,41.949l-3.404,37.494V491H252.286z"/>
   </symbol>
+
+  <!--multiselect-->
+  <symbol viewBox="0 0 24 24" id="baseline-select-all-24px">
+    <path d="M0 0h24v24H0z" fill="none"/>
+    <path d="M3 5h2V3c-1.1 0-2 .9-2 2zm0 8h2v-2H3v2zm4 8h2v-2H7v2zM3 9h2V7H3v2zm10-6h-2v2h2V3zm6 0v2h2c0-1.1-.9-2-2-2zM5 21v-2H3c0 1.1.9 2 2 2zm-2-4h2v-2H3v2zM9 3H7v2h2V3zm2 18h2v-2h-2v2zm8-8h2v-2h-2v2zm0 8c1.1 0 2-.9 2-2h-2v2zm0-12h2V7h-2v2zm0 8h2v-2h-2v2zm-4 4h2v-2h-2v2zm0-16h2V3h-2v2zM7 17h10V7H7v10zm2-8h6v6H9V9z"/>
+  </symbol>
+
+  <symbol viewBox="0 0 24 24" id="baseline-crop_square-24px">
+    <path d="M0 0h24v24H0z" fill="none"/>
+    <path d="M18 4H6c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H6V6h12v12z"/>
+  </symbol>
 </svg>

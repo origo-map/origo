@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import dropDown from '../../dropdown';
 import dispatcher from './editdispatcher';
 import utils from '../../utils';
@@ -53,7 +52,7 @@ const drawToolsSelector = function drawToolsSelector(tools, defaultLayer, v) {
       dataAttribute: 'shape',
       active: options.activeTool
     });
-    $(`#${target}`).on('changeDropdown', (e) => {
+    document.getElementById(target).addEventListener('changeDropdown', (e) => {
       e.stopImmediatePropagation(e);
       dispatcher.emitChangeEditorShapes(e.detail.dataAttribute);
       close();
@@ -64,14 +63,14 @@ const drawToolsSelector = function drawToolsSelector(tools, defaultLayer, v) {
     if (state) {
       if (drawTools.length > 1) {
         active = true;
-        $(`#${target} ul`).remove();
+        document.getElementById(target).getElementsByTagName('ul')[0].parentNode.removeChild(document.getElementById(target).getElementsByTagName('ul')[0]);
         addDropDown(createDropDownOptions());
-        $(`#${target}`).addClass(activeCls);
+        document.getElementById(target).classList.add(activeCls);
         map.once('click', close);
       }
     } else {
       active = false;
-      $(`#${target}`).removeClass(activeCls);
+      document.getElementById(target).classList.remove(activeCls);
       map.un('click', close);
     }
   }
@@ -81,10 +80,10 @@ const drawToolsSelector = function drawToolsSelector(tools, defaultLayer, v) {
       id: target,
       cls: 'o-popover'
     });
-    $('#o-editor-draw').after(popover);
+    const { body: popoverHTML } = new DOMParser().parseFromString(popover, 'text/html');
+    document.getElementById('o-editor-draw').insertAdjacentElement('afterend', popoverHTML);
     setActive(false);
   }
-
 
   function setDrawTools(layerName) {
     const layer = viewer.getLayer(layerName);
@@ -100,25 +99,27 @@ const drawToolsSelector = function drawToolsSelector(tools, defaultLayer, v) {
   }
 
   function onChangeEdit(e) {
-    if (e.tool === 'draw' && e.active === true) {
+    const { detail: { tool, active: state } } = e;
+    if (tool === 'draw' && state === true) {
       setDrawTools(currentLayer);
       setActive(true);
-    } else if (e.tool === 'draw' && e.active === false) {
+    } else if (tool === 'draw' && state === false) {
       setActive(false);
     }
     e.stopPropagation();
   }
 
   function onToggleEdit(e) {
-    if (e.tool === 'edit' && e.currentLayer) {
-      currentLayer = e.currentLayer;
+    const { detail: { tool } } = e;
+    if (tool === 'edit' && e.detail.currentLayer) {
+      currentLayer = e.detail.currentLayer;
     }
     e.stopPropagation();
   }
 
   function addListener() {
-    $(document).on('changeEdit', onChangeEdit);
-    $(document).on('toggleEdit', onToggleEdit);
+    document.addEventListener('changeEdit', onChangeEdit);
+    document.addEventListener('toggleEdit', onToggleEdit);
   }
 
   function init() {

@@ -2,7 +2,7 @@ import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 
 // create unmanaged layer
-export default function (features, map) {
+export default function featurelayer(features, map) {
   let sourceLayer;
   const collection = features ? [features] : [];
   const featureLayerStore = new VectorSource({

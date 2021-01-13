@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import utils from '../utils';
 
 export default function renderError(type, el) {
@@ -10,9 +9,7 @@ export default function renderError(type, el) {
     const container = utils.createElement('div', elMessage, {
       cls: 'o-no-map'
     });
-    $(() => {
-      $(element).append(container);
-    });
+    element.appendChild(container);
   }
 
   if (type === 'browser') {

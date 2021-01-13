@@ -36,7 +36,6 @@ function createImageSource(options) {
   }));
 }
 
-
 const wms = function wms(layerOptions, viewer) {
   const wmsDefault = {
     featureinfoLayer: null

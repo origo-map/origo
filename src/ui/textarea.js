@@ -6,6 +6,7 @@ export default function Textarea(options = {}) {
     cls = '',
     placeholderText,
     rows = 3,
+    cols = 30,
     style: styleSettings = {}
   } = options;
   let {
@@ -25,7 +26,7 @@ export default function Textarea(options = {}) {
     },
     render() {
       return `
-      <textarea id="${this.getId()}" placeholder="${placeholderText}" rows="${rows}" class="${cls}" style=""${style}>${value}</textarea>
+      <textarea id="${this.getId()}" placeholder="${placeholderText}" rows="${rows}" cols="${cols}" class="${cls}" style=""${style}>${value}</textarea>
       `;
     }
   });

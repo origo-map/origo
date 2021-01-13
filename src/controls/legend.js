@@ -32,7 +32,7 @@ const Legend = function Legend(options = {}) {
   let layerButtonEl;
   let isExpanded;
   let toolsCmp;
-  const cls = `${clsSettings} control bottom-right box overflow-hidden inline-block row o-legend`.trim();
+  const cls = `${clsSettings} control bottom-right box overflow-hidden flex row o-legend`.trim();
   const style = dom.createStyle(Object.assign({}, { width: 'auto' }, styleSettings));
 
   const addBackgroundButton = function addBackgroundButton(layer) {

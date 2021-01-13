@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import GeoJSONFormat from 'ol/format/GeoJSON';
 import localforage from 'localforage';
 import viewer from '../../viewer';
@@ -26,8 +25,8 @@ function offlineStore() {
     editsStorage = createInstances(layerNames, editsStorageName);
     initLayers();
 
-    $(document).on('changeOffline', onChangeOffline);
-    $(document).on('changeOfflineEdits', onChangeOfflineEdits);
+    document.addEventListener('changeOffline', onChangeOffline);
+    document.addEventListener('changeOfflineEdits', onChangeOfflineEdits);
   }
 
   function createInstances(layerNames, name) {
@@ -68,32 +67,34 @@ function offlineStore() {
   }
 
   function onChangeOffline(e) {
+    const { detail: { ids, action, layerName }} = e;
     e.stopImmediatePropagation();
-    if (e.action === 'download') {
-      onDownload(e.layerName);
-    } else if (e.action === 'edits') {
-      ondEdits(e.layerName, e.ids);
-    } else if (e.action === 'remove') {
-      onRemove(e.layerName);
+    if (action === 'download') {
+      onDownload(layerName);
+    } else if (action === 'edits') {
+      ondEdits(layerName, ids);
+    } else if (action === 'remove') {
+      onRemove(layerName);
     }
   }
 
   function onChangeOfflineEdits(e) {
+    const { detail: { layerName, edits: { update, insert, delete: del } }} = e;
     e.stopImmediatePropagation();
-    if (editsStorage[e.layerName] === undefined) {
-      editsStorage[e.layerName] = localforage.createInstance({
+    if (editsStorage[layerName] === undefined) {
+      editsStorage[layerName] = localforage.createInstance({
         name: editsStorageName,
-        storeName: e.layerName
+        storeName: layerName
       });
     }
-    if (e.edits.update) {
-      saveUpdate(e.edits.update, e.layerName);
+    if (update) {
+      saveUpdate(update, layerName);
     }
-    if (e.edits.insert) {
-      saveInsert(e.edits.insert, e.layerName);
+    if (insert) {
+      saveInsert(insert, layerName);
     }
-    if (e.edits.delete) {
-      saveDelete(e.edits.delete, e.layerName);
+    if (del) {
+      saveDelete(del, layerName);
     }
   }
 
