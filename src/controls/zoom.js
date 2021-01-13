@@ -11,7 +11,6 @@ const Zoom = function Zoom(options = {}) {
   let zoomIn;
   let zoomOut;
 
-
   const zoomByDelta = function zoomByDelta(deltaValue) {
     const map = viewer.getMap();
     const view = map.getView();

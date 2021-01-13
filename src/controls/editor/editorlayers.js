@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import dropDown from '../../dropdown';
 import dispatcher from './editdispatcher';
 import utils from '../../utils';
@@ -27,14 +26,15 @@ export default function editorLayers(editableLayers, optOptions = {}, v) {
     selectOptions: selectionModel(editableLayers),
     activeLayer: editableLayers[0]
   };
-  const renderOptions = $.extend(defaultOptions, optOptions);
+  const renderOptions = Object.assign(defaultOptions, optOptions);
 
   function render(options) {
     const popover = createElement('div', '', {
       id: options.target,
       cls: 'o-popover'
     });
-    $('#o-editor-layers').after(popover);
+    const { body: popoverHTML } = new DOMParser().parseFromString(popover, 'text/html');
+    document.getElementById('o-editor-layers').insertAdjacentElement('afterend', popoverHTML);
     dropDown(options.target, options.selectOptions, {
       dataAttribute: 'layer',
       active: options.activeLayer
@@ -44,16 +44,17 @@ export default function editorLayers(editableLayers, optOptions = {}, v) {
   function setActive(state) {
     if (state) {
       active = true;
-      $(`#${target}`).addClass(activeCls);
+      document.getElementById(target).classList.add(activeCls);
     } else {
       active = false;
-      $(`#${target}`).removeClass(activeCls);
+      document.getElementById(target).classList.remove(activeCls);
     }
     dispatcher.emitChangeEdit('layers', active);
   }
 
   function onToggleEdit(e) {
-    if (e.tool === 'layers') {
+    const { detail: { tool } } = e;
+    if (tool === 'layers') {
       if (active) {
         setActive(false);
       } else {
@@ -71,15 +72,15 @@ export default function editorLayers(editableLayers, optOptions = {}, v) {
   }
 
   function addListener() {
-    $(`#${target}`).on('changeDropdown', (e) => {
+    document.getElementById(target).addEventListener('changeDropdown', (e) => {
       e.stopImmediatePropagation(e);
       setActive(false);
       dispatcher.emitToggleEdit('edit', {
         currentLayer: e.detail.dataAttribute
       });
     });
-    $(document).on('toggleEdit', onToggleEdit);
-    $(document).on('changeEdit', onChangeEdit);
+    document.addEventListener('toggleEdit', onToggleEdit);
+    document.addEventListener('changeEdit', onChangeEdit);
   }
 
   render(renderOptions);

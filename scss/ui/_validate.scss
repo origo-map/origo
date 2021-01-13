@@ -1,12 +1,15 @@
-.errorMsg {
+.errormsg {
   color: $orange;
 }
+
 :optional {
   border-color: $grey-lightest;
 }
+
 :required:invalid {
   border-color: $orange;
 }
+
 :invalid {
   border-color: $orange;
 }

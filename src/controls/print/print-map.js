@@ -16,6 +16,7 @@ export default function PrintMap(options = {}) {
   } = options;
 
   let mapControls;
+  let scaleLine;
 
   const topRightMapControls = El({ cls: 'flex column align-start absolute top-right transparent z-index-ontop-middle' });
   const bottomLeftMapControls = El({ cls: 'flex column align-start absolute bottom-left transparent z-index-ontop-middle' });
@@ -28,13 +29,26 @@ export default function PrintMap(options = {}) {
       this.addComponent(bottomLeftMapControls);
       this.addComponent(bottomRightMapControls);
       this.on('change:toggleNorthArrow', this.toggleNorthArrow.bind(this));
+      this.on('change:toggleScale', this.toggleScale.bind(this));
+      this.on('change:setDPI', this.setDpi.bind(this));
     },
     onRender() {
       this.dispatch('render');
     },
+    setDpi(resolution) {
+      scaleLine.setDpi(resolution.resolution);
+    },
     toggleNorthArrow(display) {
       showNorthArrow = !showNorthArrow;
       northArrowComponent.setVisible(display);
+    },
+    toggleScale(display) {
+      const elScale = document.getElementById(bottomRightMapControls.getId());
+      if (display.showScale === false) {
+        elScale.style.display = 'none';
+      } else {
+        elScale.style.display = 'block';
+      }
     },
     addPrintControls() {
       const el = document.getElementById(bottomLeftMapControls.getId());
@@ -44,9 +58,11 @@ export default function PrintMap(options = {}) {
       northArrowComponent.onRotationChanged();
       northArrowComponent.setVisible({ showNorthArrow });
 
-      const scaleLine = new olScaleLine({
-        className: 'print-scale-line',
-        target: bottomRightMapControls.getId()
+      scaleLine = new olScaleLine({
+        target: bottomRightMapControls.getId(),
+        bar: true,
+        text: true,
+        steps: 2
       });
       const attribution = new olAttribution({
         className: 'print-attribution',

@@ -23,7 +23,7 @@ export default function Logo(options = {}) {
   }
 
   return El({
-    attributes: { src: `${baseUrl}${src}` },
+    attributes: { src: `${baseUrl}${src}`, alt: 'logo' },
     cls,
     tagName: 'img',
     style

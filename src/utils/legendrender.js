@@ -11,7 +11,6 @@ export const renderSvg = function renderSvg(content, {
   return `<svg ${style} height="${sizeOption}" width="${sizeOption}" ${opacity} viewBox="0 0 ${sizeOption} ${sizeOption}">${content}</svg>`;
 };
 
-
 export const renderIcon = {
   Line({
     color,

@@ -1,5 +1,6 @@
 import olAttribution from 'ol/control/Attribution';
 import olScaleLine from 'ol/control/ScaleLine';
+import { getPointResolution } from 'ol/proj';
 import {
   Button, Component, cuid, dom
 } from '../../ui';
@@ -7,7 +8,7 @@ import pageTemplate from './page.template';
 import PrintMap from './print-map';
 import PrintSettings from './print-settings';
 import PrintToolbar from './print-toolbar';
-import { downloadPNG, downloadPDF } from '../../utils/download';
+import { downloadPNG, downloadPDF, printToScalePDF } from '../../utils/download';
 import { afterRender, beforeRender } from './download-callback';
 
 const PrintComponent = function PrintComponent(options = {}) {
@@ -18,14 +19,19 @@ const PrintComponent = function PrintComponent(options = {}) {
     map,
     target,
     viewer,
-    createdPrefix
+    createdPrefix,
+    scales,
+    classes,
+    defaultClass
   } = options;
 
   let {
     size = 'a4',
     orientation = 'portrait',
     showCreated,
-    showNorthArrow
+    showNorthArrow,
+    resolution = 150,
+    showScale
   } = options;
 
   let pageElement;
@@ -34,11 +40,18 @@ const PrintComponent = function PrintComponent(options = {}) {
   const pageContainerId = cuid();
   const pageId = cuid();
   let title = '';
+  let titleSize = 'h4';
+  let titleAlign = 'text-align-center';
   let description = '';
+  let descriptionSize = 'h4';
+  let descriptionAlign = 'text-align-center';
   let viewerMapTarget;
   const printMarginClass = 'print-margin';
   let usePrintMargins = true;
   let today = new Date(Date.now());
+  let printScale = 0;
+  let widthImage = 0;
+  let heightImage = 0;
 
   const sizes = {
     a3: [420, 297],
@@ -59,20 +72,38 @@ const PrintComponent = function PrintComponent(options = {}) {
     return showCreated ? `${createdPrefix}${today.toLocaleDateString()} ${today.toLocaleTimeString()}` : '';
   };
 
-
   const titleComponent = Component({
     update() { dom.replace(document.getElementById(this.getId()), this.render()); },
-    render() { return `<div id="${this.getId()}" class="o-print-header h4 text-align-center empty">${title}</div>`; }
+    render() { return `<div id="${this.getId()}" class="o-print-header ${titleSize} ${titleAlign} empty">${title}</div>`; }
   });
   const descriptionComponent = Component({
     update() { dom.replace(document.getElementById(this.getId()), this.render()); },
-    render() { return `<div id="${this.getId()}" class="o-print-description padding-y text-grey-dark empty">${description}</div>`; }
+    render() { return `<div id="${this.getId()}" class="o-print-description padding-y text-grey-dark ${descriptionSize} ${descriptionAlign} empty">${description}</div>`; }
   });
   const createdComponent = Component({
     update() { dom.replace(document.getElementById(this.getId()), this.render()); },
     render() { return `<div id="${this.getId()}" class="o-print-created padding-right text-grey-dark text-align-right text-smaller empty">${created()}</div>`; }
   });
   const printMapComponent = PrintMap({ baseUrl: viewer.getBaseUrl(), logo, northArrow, map, viewer, showNorthArrow });
+
+  const setScale = function setScale(scale) {
+    printScale = scale;
+    const widthInMm = orientation === 'portrait' ? sizes[size][1] : sizes[size][0];
+    widthImage = orientation === 'portrait' ? Math.round((sizes[size][1] * resolution) / 25.4) : Math.round((sizes[size][0] * resolution) / 25.4);
+    heightImage = orientation === 'portrait' ? Math.round((sizes[size][0] * resolution) / 25.4) : Math.round((sizes[size][1] * resolution) / 25.4);
+    const scaleResolution = scale / getPointResolution(map.getView().getProjection(),
+      resolution / 25.4,
+      map.getView().getCenter());
+    printMapComponent.dispatch('change:setDPI', { resolution });
+    pageElement.style.width = `${widthImage}px`;
+    pageElement.style.height = `${heightImage}px`;
+    // Scale the printed map to make it fit in the preview
+    const scaleWidth = orientation === 'portrait' ? widthImage : heightImage;
+    const scaleFactor = `;transform: scale(${((widthInMm * 3.779527559055) / scaleWidth)});transform-origin: top left;`;
+    pageElement.setAttribute('style', pageElement.getAttribute('style') + scaleFactor);
+    map.updateSize();
+    map.getView().setResolution(scaleResolution);
+  };
 
   const printSettings = PrintSettings({
     orientation,
@@ -81,7 +112,12 @@ const PrintComponent = function PrintComponent(options = {}) {
     sizes: Object.keys(sizes),
     map,
     showCreated,
-    showNorthArrow
+    showNorthArrow,
+    scales,
+    resolution,
+    showScale,
+    classes,
+    defaultClass
   });
   const printToolbar = PrintToolbar();
   const closeButton = Button({
@@ -97,19 +133,42 @@ const PrintComponent = function PrintComponent(options = {}) {
       this.addComponent(printToolbar);
       this.addComponent(closeButton);
       printToolbar.on('PNG', this.downloadPNG.bind(this));
-      printToolbar.on('PDF', this.downloadPDF.bind(this));
+      const ua = navigator.userAgent;
+      // Don't use printToScale PDF download for IE and Edge pre Edge Chromium because it don't work for those browsers
+      if (ua.indexOf('MSIE') > -1 || ua.indexOf('Trident') > -1 || ua.indexOf('Edge') > -1) {
+        printToolbar.on('PDF', this.downloadPDF.bind(this));
+      } else {
+        printToolbar.on('PDF', this.printToScalePDF.bind(this));
+      }
       printSettings.on('change:description', this.changeDescription.bind(this));
+      printSettings.on('change:descriptionSize', this.changeDescriptionSize.bind(this));
+      printSettings.on('change:descriptionAlign', this.changeDescriptionAlign.bind(this));
       printSettings.on('change:margin', this.toggleMargin.bind(this));
       printSettings.on('change:orientation', this.changeOrientation.bind(this));
       printSettings.on('change:size', this.changeSize.bind(this));
       printSettings.on('change:size-custom', this.changeCustomSize.bind(this));
       printSettings.on('change:title', this.changeTitle.bind(this));
+      printSettings.on('change:titleSize', this.changeTitleSize.bind(this));
+      printSettings.on('change:titleAlign', this.changeTitleAlign.bind(this));
       printSettings.on('change:created', this.toggleCreated.bind(this));
       printSettings.on('change:northarrow', this.toggleNorthArrow.bind(this));
+      printSettings.on('change:resolution', this.changeResolution.bind(this));
+      printSettings.on('change:scale', this.changeScale.bind(this));
+      printSettings.on('change:showscale', this.toggleScale.bind(this));
       closeButton.on('click', this.close.bind(this));
     },
     changeDescription(evt) {
       description = evt.value;
+      descriptionComponent.update();
+      this.updatePageSize();
+    },
+    changeDescriptionSize(evt) {
+      descriptionSize = evt.class;
+      descriptionComponent.update();
+      this.updatePageSize();
+    },
+    changeDescriptionAlign(evt) {
+      descriptionAlign = evt.class;
       descriptionComponent.update();
       this.updatePageSize();
     },
@@ -124,11 +183,34 @@ const PrintComponent = function PrintComponent(options = {}) {
     changeOrientation(evt) {
       orientation = evt.orientation;
       this.updatePageSize();
+      if (printScale > 0) {
+        this.changeScale({ scale: printScale });
+      }
     },
     changeTitle(evt) {
       title = evt.value;
       titleComponent.update();
       this.updatePageSize();
+    },
+    changeTitleSize(evt) {
+      titleSize = evt.class;
+      titleComponent.update();
+      this.updatePageSize();
+    },
+    changeTitleAlign(evt) {
+      titleAlign = evt.class;
+      titleComponent.update();
+      this.updatePageSize();
+    },
+    changeResolution(evt) {
+      resolution = evt.resolution;
+      this.updatePageSize();
+      if (printScale > 0) {
+        this.changeScale({ scale: printScale });
+      }
+    },
+    changeScale(evt) {
+      setScale(evt.scale);
     },
     printMargin() {
       return usePrintMargins ? 'print-margin' : '';
@@ -142,6 +224,10 @@ const PrintComponent = function PrintComponent(options = {}) {
       showCreated = !showCreated;
       createdComponent.update();
       this.updatePageSize();
+    },
+    toggleScale() {
+      showScale = !showScale;
+      printMapComponent.dispatch('change:toggleScale', { showScale });
     },
     toggleNorthArrow() {
       showNorthArrow = !showNorthArrow;
@@ -186,6 +272,31 @@ const PrintComponent = function PrintComponent(options = {}) {
         width
       });
     },
+    async printToScalePDF() {
+      let height;
+      let width;
+      const pdfOrientation = orientation === 'portrait' ? 'portrait' : 'landscape';
+      if (sizes[size][1] > sizes[size][0]) {
+        height = sizes[size][0];
+        width = sizes[size][1];
+      } else {
+        height = sizes[size][1];
+        width = sizes[size][0];
+      }
+      widthImage = orientation === 'portrait' ? Math.round((sizes[size][1] * resolution) / 25.4) : Math.round((sizes[size][0] * resolution) / 25.4);
+      heightImage = orientation === 'portrait' ? Math.round((sizes[size][0] * resolution) / 25.4) : Math.round((sizes[size][1] * resolution) / 25.4);
+      await printToScalePDF({
+        el: pageElement,
+        filename: name,
+        height,
+        orientation: pdfOrientation,
+        size,
+        width,
+        printScale,
+        widthImage,
+        heightImage
+      });
+    },
     onRender() {
       today = new Date(Date.now());
       viewerMapTarget = map.getTarget();
@@ -194,7 +305,7 @@ const PrintComponent = function PrintComponent(options = {}) {
       map.setTarget(printMapComponent.getId());
       this.removeViewerControls();
       printMapComponent.addPrintControls();
-
+      printMapComponent.dispatch('change:toggleScale', { showScale });
       this.updatePageSize();
     },
     updateMapSize() {
@@ -204,6 +315,9 @@ const PrintComponent = function PrintComponent(options = {}) {
       pageContainerElement.style.height = orientation === 'portrait' ? `${sizes[size][0]}mm` : `${sizes[size][1]}mm`;
       pageContainerElement.style.width = orientation === 'portrait' ? `${sizes[size][1]}mm` : `${sizes[size][0]}mm`;
       this.updateMapSize();
+      if (printScale > 0) {
+        this.changeScale({ scale: printScale });
+      }
     },
     removeViewerControls() {
       const controls = map.getControls().getArray();

@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import dispatcher from './editdispatcher';
 
 export default function editsStore() {
@@ -107,14 +106,15 @@ export default function editsStore() {
   }
 
   function featureChange(e) {
-    if (e.status === 'pending') {
+    const { detail: { status } } = e;
+    if (status === 'pending') {
       addEdit(e);
-    } else if (e.status === 'finished') {
+    } else if (status === 'finished') {
       removeEdit(e);
     }
   }
 
-  $(document).on('changeFeature', featureChange);
+  document.addEventListener('changeFeature', featureChange);
 
   return {
     getEdits,

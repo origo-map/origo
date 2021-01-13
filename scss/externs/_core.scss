@@ -2,128 +2,129 @@
  *  Owl Carousel - Core
  */
 .owl-carousel {
-	display: none;
-	width: 100%;
-	-webkit-tap-highlight-color: transparent;
-	/* position relative and z-index fix webkit rendering fonts issue */
-	position: relative;
-	z-index: 1;
+  display: none;
+  /* position relative and z-index fix webkit rendering fonts issue */
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+  width: 100%;
+  z-index: 1;
 
-	.owl-stage {
-		position: relative;
-		-ms-touch-action: pan-Y;
-		touch-action: manipulation;
-		-moz-backface-visibility: hidden; /* fix firefox animation glitch */
-	}
+  .owl-stage {
+    backface-visibility: hidden; /* fix firefox animation glitch */
+    position: relative;
+    touch-action: pan-Y;
+    touch-action: manipulation;
+  }
 
-	.owl-stage:after {
-		content: ".";
-		display: block;
-		clear: both;
-		visibility: hidden;
-		line-height: 0;
-		height: 0;
-	}
+  .owl-stage::after {
+    clear: both;
+    content: '.';
+    display: block;
+    height: 0;
+    line-height: 0;
+    visibility: hidden;
+  }
 
-	.owl-stage-outer {
-		position: relative;
-		overflow-x: hidden;
-		overflow-y: auto;
-		/* fix for flashing background */
-		-webkit-transform: translate3d(0px, 0px, 0px);
-	}
+  .owl-stage-outer {
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: relative;
+    /* fix for flashing background */
+    transform: translate3d(0, 0, 0);
+  }
 
-	.owl-wrapper,
-	.owl-item{
-		-webkit-backface-visibility: hidden;
-		-moz-backface-visibility: hidden;
-		-ms-backface-visibility: hidden;
-		-webkit-transform: translate3d(0,0,0);
-		-moz-transform: translate3d(0,0,0);
-		-ms-transform: translate3d(0,0,0);
-	}
+  .owl-wrapper,
+  .owl-item {
+    backface-visibility: hidden;
+    backface-visibility: hidden;
+    backface-visibility: hidden;
+    transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
 
-	.owl-item {
-		position: relative;
-		min-height: 1px;
-		float: left;
-		-webkit-backface-visibility: hidden;
-		-webkit-tap-highlight-color: transparent;
-		-webkit-touch-callout: none;
-	}
-	.owl-item img {
-		display: block;
-		width: 100%;
-	}
+  .owl-item {
+    backface-visibility: hidden;
+    float: left;
+    min-height: 1px;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
 
-	.owl-nav.disabled,
-	.owl-dots.disabled {
-		display: none;
-	}
+  .owl-item img {
+    display: block;
+    width: 100%;
+  }
 
-	.owl-nav .owl-prev,
-	.owl-nav .owl-next,
-	.owl-dot {
-		cursor: pointer;
-		-webkit-user-select: none;
-		-khtml-user-select: none;
-		-moz-user-select: none;
-		-ms-user-select: none;
-		user-select: none;
-		box-sizing:content-box;
-	}
+  .owl-nav.disabled,
+  .owl-dots.disabled {
+    display: none;
+  }
 
-	.owl-nav button.owl-prev,
-	.owl-nav button.owl-next,
-	button.owl-dot {
-		background: none;
-		color: inherit;
-		border: none;
-		padding:0!important;
-		font: inherit;
-	}
+  .owl-nav .owl-prev,
+  .owl-nav .owl-next,
+  .owl-dot {
+    box-sizing: content-box;
+    cursor: pointer;
+    user-select: none;
+    user-select: none;
+    user-select: none;
+    user-select: none;
+    user-select: none;
+  }
 
-	&.owl-loaded {
-		display: flex;
-		flex-direction: column;
-	}
+  .owl-nav button.owl-prev,
+  .owl-nav button.owl-next,
+  button.owl-dot {
+    background: none;
+    border: 0;
+    color: inherit;
+    font: inherit;
+    padding: 0 !important;
+  }
 
-	&.owl-loading {
-		opacity: 0;
-		display: block;
-	}
+  &.owl-loaded {
+    display: flex;
+    flex-direction: column;
+  }
 
-	&.owl-hidden {
-		opacity: 0;
-	}
+  &.owl-loading {
+    display: block;
+    opacity: 0;
+  }
 
-	&.owl-refresh .owl-item {
-		visibility: hidden;
-	}
+  &.owl-hidden {
+    opacity: 0;
+  }
 
-	&.owl-drag .owl-item {
-		touch-action: pan-y;
-		-webkit-user-select: none;
-		-moz-user-select: none;
-		-ms-user-select: none;
-		user-select: none;
-	}
+  &.owl-refresh .owl-item {
+    visibility: hidden;
+  }
 
-	&.owl-grab {
-		cursor: move;
-		cursor: grab;
-	}
+  &.owl-drag .owl-item {
+    touch-action: pan-y;
+    user-select: none;
+    user-select: none;
+    user-select: none;
+    user-select: none;
+  }
 
-	&.owl-rtl {
-		direction: rtl;
-	}
+  &.owl-grab {
+    cursor: move;
+    cursor: grab;
+  }
 
-	&.owl-rtl .owl-item {
-		float: right;
-	}
+  &.owl-rtl {
+    direction: rtl;
+  }
+
+  &.owl-rtl .owl-item {
+    float: right;
+  }
 }
 
 /* No Js */
 .no-js .owl-carousel {
-	display: block;
+  display: block;
 }

@@ -1,47 +1,54 @@
-[class^="o-icon-"],
-[class*=" o-icon-"] {
-  padding: .35em;
-  height: 1.3em;
-  width: 1.3em;
+[class^='o-icon-'],
+[class*=' o-icon-'] {
+  fill: $o-btn-color;
   float: right;
-  fill: $o-btn-color;
+  height: 1.3em;
+  padding: .35em;
+  width: 1.3em;
 }
-[class^="o-icon-24"],
-[class*=" o-icon-24"] {
-  padding: 0;
+
+[class^='o-icon-24'],
+[class*=' o-icon-24'] {
+  fill: $o-btn-color;
   height: 1.5rem;
+  padding: 0;
   width: 1.5rem;
-  fill: $o-btn-color;
 }
-.o-menu-button [class^="o-icon-"],
-.o-menu-button [class*=" o-icon-"] {
-	padding: 0.25em;
-	height: 1em;
-	width: 1em;
+
+.o-menu-button [class^='o-icon-'],
+.o-menu-button [class*=' o-icon-'] {
+  height: 1em;
+  padding: 0.25em;
+  width: 1em;
 }
-.ol-control>button:hover [class^="o-icon-"],
-.ol-control>button:hover [class*=" o-icon-"],
-.o-button:hover [class^="o-icon-"],
-.o-button:hover [class*="o-icon-"] {
-	fill: $o-btn-bg;
+
+.ol-control>button:hover [class^='o-icon-'],
+.ol-control>button:hover [class*=' o-icon-'],
+.o-button:hover [class^='o-icon-'],
+.o-button:hover [class*='o-icon-'] {
+  fill: $o-btn-bg;
 }
-.o-toolbar button:hover [class^="o-icon-"],
-.o-toolbar button:hover [class*="o-icon-"] {
-	fill: $o-btn-active-color;
+
+.o-toolbar button:hover [class^='o-icon-'],
+.o-toolbar button:hover [class*='o-icon-'] {
+  fill: $o-btn-active-color;
 }
-button.o-disabled:hover [class^="o-icon-"],
-button.o-disabled:hover [class*=" o-icon-"],
-.o-disabled [class^="o-icon-"],
-.o-disabled [class*=" o-icon-"] {
-    fill: rgba(0,0,0,0.26);
+
+button.o-disabled:hover [class^='o-icon-'],
+button.o-disabled:hover [class*=' o-icon-'],
+.o-disabled [class^='o-icon-'],
+.o-disabled [class*=' o-icon-'] {
+  fill: rgba(0, 0, 0, 0.26);
 }
+
 .owl-prev .o-icon-fa-chevron-left,
 .owl-next .o-icon-fa-chevron-right {
-	fill: #424242;
-	height: 1em;
-	padding: .3em;
-	width: 1em;
+  fill: #424242;
+  height: 1em;
+  padding: .3em;
+  width: 1em;
 }
+
 .o-subicon-expand-false .o-icon-fa-chevron-down,
 .o-subicon-expand-true .o-icon-fa-chevron-right,
 .ol-collapsed .o-icon-fa-angle-double-right,
@@ -55,5 +62,5 @@ button.o-disabled:hover [class*=" o-icon-"],
 .o-icon-expand-true .o-icon-fa-chevron-right,
 .o-search-true .o-search-button,
 .o-search-false .o-search-button-close {
-	display: none
+  display: none;
 }

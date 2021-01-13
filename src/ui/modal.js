@@ -1,4 +1,3 @@
-// import $ from 'jquery';
 import Component from './component';
 import Element from './element';
 import Button from './button';

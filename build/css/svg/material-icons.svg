@@ -18,6 +18,7 @@
   <symbol viewBox="0 0 24 24" id="ic_mode_edit_24px"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></symbol>
   <!-- maps-symbol -->
   <symbol viewBox="0 0 24 24" id="ic_layers_24px"><path d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z"/></symbol>
+  <symbol viewBox="0 0 24 24" id="ic_navigation_24px"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></symbol>
   <symbol viewBox="0 0 24 24" id="ic_near_me_24px"><path d="M21 3L3 10.53v.98l6.84 2.65L12.48 21h.98L21 3z"/></symbol>
   <symbol viewBox="0 0 24 24" id="ic_place_24px"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></symbol>
   <!-- navigation-symbol -->
@@ -35,6 +36,7 @@
   <symbol viewBox="0 0 24 24" id="ic_add_24px"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></symbol>
   <symbol viewBox="0 0 24 24" id="ic_remove_24px"><path d="M19 13H5v-2h14v2z"/></symbol>
   <symbol viewBox="0 0 24 24" id="ic_clear_24px"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
+  <symbol viewBox="0 0 24 24" id="ic_undo_24px"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></symbol>
   <!-- toggle-symbol -->
   <symbol viewBox="0 0 24 24" id="ic_radio_button_unchecked_24px"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/></symbol>
   <!-- image-symbol -->
