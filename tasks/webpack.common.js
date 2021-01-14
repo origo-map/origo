@@ -2,37 +2,29 @@ const webpack = require('webpack');
 
 module.exports = {
   entry: [
+    'babel-polyfill',
+    'core-js/stable',
     'whatwg-fetch',
     './origo.js'
   ],
   module: {
     rules: [
       {
-        test: /\.js$/,
+        test: /\.m?js$/,
         enforce: 'pre',
         use: ['source-map-loader']
       },
       {
         test: /\.(js)$/,
-        exclude: /node_modules/,
-        loader: 'babel-loader',
-        query: {
-          cacheDirectory: false,
-          presets: [
-            ['@babel/preset-env', {
-              targets: {
-                browsers: ['chrome >= 39']
-              },
-              modules: false,
-              useBuiltIns: 'entry',
-              corejs: 3
-            }]
-          ],
-          plugins: [
-            ['@babel/plugin-transform-runtime', {
-              regenerator: true
-            }]
+        exclude: {
+          test: /node_modules/,
+          not: [
+            /@mapbox/,
+            /@glidejs/
           ]
+        },
+        use: {
+          loader: 'babel-loader'
         }
       }
     ]
