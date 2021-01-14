@@ -325,7 +325,8 @@ const Featureinfo = function Featureinfo(options = {}) {
               }
             }, 250);
           }
-        });
+        })
+        .catch((error) => console.error(error));
     }
   };
 
