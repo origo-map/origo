@@ -1,4 +1,5 @@
 import { Component, Button, Modal } from '../ui';
+import isEmbedded from '../utils/isembedded';
 
 const Splash = function Splash(options = {}) {
   const defaultTitle = 'Om kartan';
@@ -20,7 +21,8 @@ const Splash = function Splash(options = {}) {
   } = options;
 
   const {
-    url
+    url,
+    hideWhenEmbedded = false
   } = options;
 
   const addButton = function addButton() {
@@ -99,19 +101,21 @@ const Splash = function Splash(options = {}) {
       if (!title) title = defaultTitle;
       if (!content) content = defaultContent;
 
-      if (url) {
-        const fullUrl = viewer.getBaseUrl() + url;
-        const req = new Request(`${fullUrl}`);
-        fetch(req).then(response => response.text().then((text) => {
-          createModal(text);
+      if (!hideWhenEmbedded || !isEmbedded(viewer.getTarget())) {
+        if (url) {
+          const fullUrl = viewer.getBaseUrl() + url;
+          const req = new Request(`${fullUrl}`);
+          fetch(req).then(response => response.text().then((text) => {
+            createModal(text);
+            if (modal) {
+              this.addComponent(modal);
+            }
+          }));
+        } else {
+          createModal(content);
           if (modal) {
             this.addComponent(modal);
           }
-        }));
-      } else {
-        createModal(content);
-        if (modal) {
-          this.addComponent(modal);
         }
       }
     }
