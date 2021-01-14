@@ -196,7 +196,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         }
       }
       Modal({
-        title: targ.href,
+        title: targ.title,
         content: `<iframe src="${targ.href}" class=""style="width:100%;height:99%"></iframe>`,
         target: viewer.getId(),
         style: modalStyle,

@@ -16,6 +16,7 @@ function createSource(opt, vectortileOptions) {
       format = new GeoJSONFormat();
       break;
     case 'pbf':
+    case 'mvt':
       format = new MVTFormat();
       break;
     default:
