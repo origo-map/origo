@@ -683,7 +683,7 @@ function onToggleEdit(e) {
   } else if (tool === 'delete') {
     onDeleteSelected();
   } else if (tool === 'edit') {
-    setEditLayer(e.currentLayer);
+    setEditLayer(e.detail.currentLayer);
   } else if (tool === 'cancel') {
     removeInteractions();
   } else if (tool === 'save') {
