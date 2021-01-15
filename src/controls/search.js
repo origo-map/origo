@@ -90,7 +90,7 @@ const Search = function Search(options = {}) {
       title
     });
     newPopup.setVisibility(true);
-    mapUtils.zoomToExent(new Point(coord), maxZoomLevel);
+    viewer.zoomToExtent(new Point(coord), maxZoomLevel);
   }
 
   /** There are several different ways to handle selected search result.
