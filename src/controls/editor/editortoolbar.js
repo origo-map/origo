@@ -118,7 +118,7 @@ function onChangeEdit(e) {
 function toggleSave(e) {
   const { detail: { edits } } = e;
   if (edits) {
-    if ($editSave.classList.includes(disableClass)) {
+    if ($editSave.classList.contains(disableClass)) {
       $editSave.classList.remove(disableClass);
     }
   } else {

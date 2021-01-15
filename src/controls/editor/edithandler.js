@@ -344,26 +344,26 @@ function onAttributesSave(feature, attrs) {
     // Read values from form
     attrs.forEach((attribute) => {
       // Get the input container class
-      const containerClass = `.${attribute.elId.slice(1)}`;
+      const containerClass = `.${attribute.elId}`;
       // Get the input attributes
-      const inputType = document.getElementById(attribute.elId).attr('type');
-      const inputValue = document.getElementById(attribute.elId).val();
-      const inputName = document.getElementById(attribute.elId).attr('name');
-      const inputId = document.getElementById(attribute.elId).attr('id');
-      const inputRequired = document.getElementById(attribute.elId).attr('required');
+      const inputType = document.getElementById(attribute.elId).getAttribute('type');
+      const inputValue = document.getElementById(attribute.elId).value;
+      const inputName = document.getElementById(attribute.elId).getAttribute('name');
+      const inputId = document.getElementById(attribute.elId).getAttribute('id');
+      const inputRequired = document.getElementById(attribute.elId).getAttribute('required');
 
       // If hidden element it should be excluded
-      if (document.querySelector(containerClass)[0].includes('o-hidden') === false) {
+      if (!document.querySelector(containerClass) || document.querySelector(containerClass).classList.contains('o-hidden') === false) {
         // Check if checkbox. If checkbox read state.
         if (inputType === 'checkbox') {
-          editEl[attribute.name] = document.getElementById(attribute.elId).is(':checked') ? 1 : 0;
+          editEl[attribute.name] = document.getElementById(attribute.elId).checked ? 1 : 0;
         } else { // Read value from input text, textarea or select
           editEl[attribute.name] = inputValue;
         }
       }
       // Check if file. If file, read and trigger resize
       if (inputType === 'file') {
-        input = document.getElementById(attribute.elId)[0];
+        input = document.getElementById(attribute.elId);
         file = input.files[0];
 
         if (file) {
@@ -545,8 +545,8 @@ function onAttributesSave(feature, attrs) {
         attributesSaveHandler(feature, editEl);
       }
 
-      modal.closeModal();
       document.getElementById('o-save-button').blur();
+      modal.closeModal();
       e.preventDefault();
     }
   });
@@ -555,7 +555,7 @@ function onAttributesSave(feature, attrs) {
 function addListener() {
   const fn = (obj) => {
     document.getElementById(obj.elDependencyId).addEventListener(obj.eventType, () => {
-      const containerClass = `.${obj.elId.slice(1)}`;
+      const containerClass = `.${obj.elId}`;
       if (document.getElementById(`${obj.elDependencyId} option:selected`).textContent === obj.requiredVal) {
         document.querySelector(containerClass).classList.remove('o-hidden');
       } else {
@@ -570,25 +570,22 @@ function addListener() {
 function addImageListener() {
   const fn = (obj) => {
     const fileReader = new FileReader();
-    const containerClass = `.${obj.elId.slice(1)}`;
-    document.querySelector(obj.elId).addEventListener('change', (ev) => {
-      const { detail: { target: { files } } } = ev;
-      if (files && files[0]) {
+    const containerClass = `.${obj.elId}`;
+    document.querySelector(`#${obj.elId}`).addEventListener('change', (ev) => {
+      if (ev.target.files && ev.target.files[0]) {
         document.querySelector(`${containerClass} img`).classList.remove('o-hidden');
         document.querySelector(`${containerClass} input[type=button]`).classList.remove('o-hidden');
         fileReader.onload = (e) => {
-          const { detail: { target: result } } = e;
-          document.querySelector(`${containerClass} img`).setAttribute('src', result);
+          document.querySelector(`${containerClass} img`).setAttribute('src', e.target.result);
         };
-        fileReader.readAsDataURL(files[0]);
+        fileReader.readAsDataURL(ev.target.files[0]);
       }
     });
 
     document.querySelector(`${containerClass} input[type=button]`).addEventListener('click', (e) => {
-      const { detail: { target } } = e;
-      document.getElementById(obj.elId).setAttribute('value', '');
+      document.getElementById(obj.elId).value = '';
       document.querySelector(`${containerClass} img`).classList.add('o-hidden');
-      document.querySelector(target).classList.add('o-hidden');
+      e.target.classList.add('o-hidden');
     });
   };
 
@@ -624,18 +621,18 @@ function editAttributes(feat) {
             obj.requiredVal = constraintProps[2];
             obj.isVisible = obj.dependencyVal === obj.requiredVal;
             obj.addListener = addListener();
-            obj.elId = `#input-${obj.name}-${obj.requiredVal}`;
-            obj.elDependencyId = `#input-${constraintProps[1]}`;
+            obj.elId = `input-${obj.name}-${obj.requiredVal}`;
+            obj.elDependencyId = `input-${constraintProps[1]}`;
           } else {
             alert('Villkor verkar inte vara rätt formulerat. Villkor formuleras enligt principen change:attribute:value');
           }
         } else if (obj.type === 'image') {
           obj.isVisible = true;
-          obj.elId = `#input-${obj.name}`;
+          obj.elId = `input-${obj.name}`;
           obj.addListener = addImageListener();
         } else {
           obj.isVisible = true;
-          obj.elId = `#input-${obj.name}`;
+          obj.elId = `input-${obj.name}`;
         }
 
         obj.formElement = editForm(obj);
