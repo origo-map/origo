@@ -1,5 +1,5 @@
 const createForm = function createForm(obj) {
-  const id = obj.elId.slice(1);
+  const id = obj.elId;
   let cls = obj.cls || '';
   cls += id;
   cls += obj.isVisible ? '' : ' o-hidden';
