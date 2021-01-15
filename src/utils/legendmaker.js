@@ -68,7 +68,8 @@ export const findHeaderStyle = function findHeaderStyle(styleRules) {
 };
 
 export const renderSvgIcon = function renderSvgIcon(styleRule, {
-  opacity
+  opacity,
+  baseUrl
 } = {}) {
   const styleType = findStyleType(styleRule);
   if (styleType in renderIcon) {
@@ -108,7 +109,7 @@ export const renderSvgIcon = function renderSvgIcon(styleRule, {
       return icon;
     } else if (styleType === 'Image') {
       const iconOption = styleRule.find(style => style.image.src);
-      const icon = renderIcon.Icon(iconOption.image);
+      const icon = renderIcon.Icon(iconOption.image, baseUrl);
       return icon;
     }
     return '';
@@ -130,7 +131,7 @@ export const renderExtendedLegendItem = function renderExtendedLegendItem(extend
           </li>`;
 };
 
-export const Legend = function Legend(styleRules, opacity = 1) {
+export const Legend = function Legend(styleRules, opacity = 1, baseUrl) {
   const noLegend = 'Legend saknas';
   if (Array.isArray(styleRules)) {
     const legend = styleRules.reduce((prevRule, styleRule) => {
@@ -143,7 +144,7 @@ export const Legend = function Legend(styleRules, opacity = 1) {
             return prevRule + renderExtendedLegendItem(extendedLegendItem);
           }
 
-          const svgIcon = renderSvgIcon(styleRule, { opacity });
+          const svgIcon = renderSvgIcon(styleRule, { opacity, baseUrl });
           return prevRule + renderLegendItem(svgIcon, label);
         }
       }
@@ -154,11 +155,11 @@ export const Legend = function Legend(styleRules, opacity = 1) {
   return `<ul><li class="padding-small">${noLegend}</li></ul>`;
 };
 
-export const HeaderIcon = function HeaderIcon(styleRules, opacity = 1) {
+export const HeaderIcon = function HeaderIcon(styleRules, opacity = 1, baseUrl) {
   if (Array.isArray(styleRules)) {
     const headerStyle = findHeaderStyle(styleRules);
     if (headerStyle) {
-      return renderSvgIcon(headerStyle, { opacity, header: true });
+      return renderSvgIcon(headerStyle, { opacity, header: true, baseUrl });
     }
     return null;
   }

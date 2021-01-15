@@ -69,7 +69,7 @@ export const renderIcon = {
 
     return `<circle cx="${centerDistance}" cy="${centerDistance}" r="${radius}" style="${fill} ${stroke}"/>`;
   },
-  Icon(iconStyle) {
+  Icon(iconStyle, baseUrl) {
     const fit = iconStyle.fit ? 'contain' : 'cover';
     const iconSize = iconStyle.size || iconStyle.imgSize || [size, size];
 
@@ -83,6 +83,9 @@ export const renderIcon = {
         width: `${iconSize[1]}px`,
         'margin-top': marginTop
       });
+    }
+    if (baseUrl) {
+      return `<img class="${fit}" src="${baseUrl}${iconStyle.src}" style="${style}"/>`;
     }
     return `<img class="${fit}" src="${iconStyle.src}" style="${style}"/>`;
   },

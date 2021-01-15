@@ -14,7 +14,7 @@ const OverlayProperties = function OverlayProperties(options = {}) {
   const opacity = layer.getOpacity();
   const opacityControl = layer.get('opacityControl') !== false;
   const style = viewer.getStyle(layer.get('styleName'));
-  const legend = Legend(style, opacity);
+  const legend = Legend(style, opacity, viewer.getBaseUrl());
   let overlayEl;
   let sliderEl;
   let label = '';

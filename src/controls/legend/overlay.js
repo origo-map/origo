@@ -29,7 +29,7 @@ const OverlayLayer = function OverlayLayer(options) {
 
   const opacity = layer.getOpacity();
 
-  let headerIcon = HeaderIcon(style, opacity);
+  let headerIcon = HeaderIcon(style, opacity, viewer.getBaseUrl());
   if (!headerIcon) {
     headerIcon = icon;
     headerIconCls = iconCls;
