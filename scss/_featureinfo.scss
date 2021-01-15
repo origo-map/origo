@@ -4,5 +4,6 @@
 }
 
 #o-identify-carousel > .o-identify-content {
-  overflow-y:scroll;
+  max-height: calc(70vh - 46px);
+  overflow-y: auto;
 }
