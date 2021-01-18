@@ -212,7 +212,7 @@ function getFeaturesFromRemote(requestOptions, viewer) {
 
     return false;
   }));
-  return Promise.all([...requestPromises]).then(() => requestResult);
+  return Promise.all([...requestPromises]).then(() => requestResult).catch(error => console.log(error));
 }
 
 function getFeaturesAtPixel({

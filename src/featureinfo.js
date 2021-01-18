@@ -1,10 +1,7 @@
-import 'owl.carousel';
 import Overlay from 'ol/Overlay';
-import $ from 'jquery';
+import OGlide from './oglide';
 import { Component, Modal } from './ui';
-// eslint-disable-next-line import/no-cycle
 import Popup from './popup';
-// eslint-disable-next-line import/no-cycle
 import sidebar from './sidebar';
 import maputils from './maputils';
 import featurelayer from './featurelayer';
@@ -78,7 +75,6 @@ const Featureinfo = function Featureinfo(options = {}) {
       const clone = currentItem.feature.clone();
       clone.setId(currentItem.feature.getId());
       clone.layerName = currentItem.name;
-
       selectionLayer.clearAndAdd(
         clone,
         selectionStyles[currentItem.feature.getGeometry().getType()]
@@ -132,20 +128,14 @@ const Featureinfo = function Featureinfo(options = {}) {
     }
   };
 
-  const initCarousel = function initCarousel(id, opt) {
-    const carouselOptions = opt || {
-      onChanged: callback,
-      items: 1,
-      nav: true,
-      navText: ['<span class="icon"><svg class="o-icon-fa-chevron-left"><use xlink:href="#fa-chevron-left"></use></svg></span>',
-        '<span class="icon"><svg class="o-icon-fa-chevron-right"><use xlink:href="#fa-chevron-right"></use></svg></span>'
-      ]
-    };
-    if (identifyTarget === 'overlay') {
-      const popupHeight = document.querySelector('.o-popup').offsetHeight + 20;
-      document.querySelector('#o-popup').style.height = `${popupHeight} px`;
+  const initCarousel = function initCarousel(id) {
+    const { length } = Array.from(document.querySelectorAll('.o-identify-content'));
+    if (!document.querySelector('.glide') && length > 1) {
+      OGlide({
+        id,
+        callback
+      });
     }
-    return $(id).owlCarousel(carouselOptions);
   };
 
   function getSelectionLayer() {
@@ -214,7 +204,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     items = identifyItems;
     clear();
     let content = items.map((i) => i.content).join('');
-    content = '<div id="o-identify"><div id="o-identify-carousel" class="owl-carousel owl-theme"></div></div>';
+    content = '<div id="o-identify"><div id="o-identify-carousel" class="flex"></div></div>';
     switch (target) {
       case 'overlay':
       {
@@ -233,7 +223,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         });
         popup.setVisibility(true);
         const popupHeight = document.querySelector('.o-popup').offsetHeight + 20;
-        document.querySelector('#o-popup').style.height = `${popupHeight} px`;
+        document.querySelector('#o-popup').style.height = `${popupHeight}px`;
         overlay = new Overlay({
           element: popup.getEl(),
           autoPan: true,
@@ -243,7 +233,16 @@ const Featureinfo = function Featureinfo(options = {}) {
           autoPanMargin: 40,
           positioning: 'bottom-center'
         });
-        const geometry = items[0].feature.getGeometry();
+        const firstFeature = items[0].feature;
+        const geometry = firstFeature.getGeometry();
+        const clone = firstFeature.clone();
+        clone.setId(firstFeature.getId());
+        clone.layerName = firstFeature.name;
+        selectionLayer.clearAndAdd(
+          clone,
+          selectionStyles[geometry.getType()]
+        );
+		selectionLayer.setSourceLayer(items[0].layer);
         const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
         map.addOverlay(overlay);
         overlay.setPosition(coord);
@@ -265,6 +264,16 @@ const Featureinfo = function Featureinfo(options = {}) {
           }
         });
         sidebar.setVisibility(true);
+        const firstFeature = items[0].feature;
+        const geometry = firstFeature.getGeometry();
+        const clone = firstFeature.clone();
+        clone.setId(firstFeature.getId());
+        clone.layerName = firstFeature.name;
+        selectionLayer.clearAndAdd(
+          clone,
+          selectionStyles[geometry.getType()]
+        );
+		selectionLayer.setSourceLayer(items[0].layer);
         initCarousel('#o-identify-carousel');
         break;
       }
@@ -329,7 +338,8 @@ const Featureinfo = function Featureinfo(options = {}) {
               }
             }, 250);
           }
-        });
+        })
+        .catch((error) => console.error(error));
     }
   };
 

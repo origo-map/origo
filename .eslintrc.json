@@ -8,7 +8,9 @@
       "error",
       "never"
     ],
+    "global-require": 0,
     "import/no-unresolved": "off",
+    "import/no-cycle": "off",
     "new-cap": "off",
     "prefer-destructuring": "off",
     "max-len": "off",
@@ -27,7 +29,8 @@
       {
         "allow": [
           "warn",
-          "error"
+          "error",
+          "log"
         ]
       }
     ],

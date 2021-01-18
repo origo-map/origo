@@ -28,12 +28,11 @@
     "copy-plugins": "copyfiles plugins/* build"
   },
   "dependencies": {
-    "@babel/runtime": "^7.12.5",
-    "@babel/runtime-corejs3": "^7.12.5",
+    "@glidejs/glide": "^3.4.1",
     "acorn": "^8.0.4",
     "awesomplete": "^1.1.5",
     "copyfiles": "^2.4.1",
-    "core-js": "^3.8.1",
+    "core-js": "^3.8.2",
     "cuid": "^2.1.4",
     "dom-to-image-more": "^2.8.0",
     "downloadjs": "^1.4.7",
@@ -42,7 +41,6 @@
     "ol-mapbox-style": "6.3.0",
     "jspdf": "^2.2.0",
     "ol": "^6.5.0",
-    "owl.carousel": "^2.3.4",
     "proj4": "^2.6.3",
     "regenerator-runtime": "^0.13.7",
     "whatwg-fetch": "^3.5.0"
@@ -50,13 +48,15 @@
   "devDependencies": {
     "@babel/core": "^7.12.10",
     "@babel/plugin-transform-runtime": "^7.12.10",
-    "@babel/polyfill": "^7.12.1",
     "@babel/preset-env": "^7.12.11",
+    "@babel/runtime": "^7.12.5",
+    "@babel/runtime-corejs3": "^7.12.5",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.2.2",
-    "compression-webpack-plugin": "^7.1.1",
+    "babel-polyfill": "^6.26.0",
+    "compression-webpack-plugin": "^7.1.2",
     "copy-webpack-plugin": "^6.3.2",
-    "eslint": "^7.16.0",
+    "eslint": "^7.17.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1",
     "eslint-webpack-plugin": "^2.4.1",
@@ -67,10 +67,10 @@
     "run-sequence": "^2.1.0",
     "source-map-loader": "^1.1.3",
     "terser-webpack-plugin": "^4.2.3",
-    "webpack": "^4.44.2",
+    "webpack": "^4.46.0",
     "webpack-bundle-analyzer": "^4.3.0",
     "webpack-cli": "^3.3.12",
-    "webpack-dev-server": "^3.11.0",
+    "webpack-dev-server": "^3.11.2",
     "webpack-merge": "^5.7.3"
   }
 }

@@ -1,0 +1,26 @@
+ .glide {
+  &_arrows {
+    padding: $o-glide-button-padding;
+    position: relative;
+    padding-bottom: 0.2em;
+  }
+   &__arrow {
+    padding: .3em;
+    border: 1px solid $o-glide-border-color;
+    color: $o-glide-arrow-color;
+    border-radius: 50%;
+  }
+ }
+
+ button.glide {
+   color: $o-glide-border-color;
+  &__arrow {
+    &--left {
+      left: $o-glide-button-spsce;
+    }
+
+    &--right {
+      right: $o-glide-button-spsce;
+    }
+  }
+}
