@@ -100,7 +100,8 @@ const Legend = function Legend(options = {}) {
   });
 
   const turnOffLayersButton = Button({
-    cls: 'round compact icon-small margin-x-smaller\'title=\'Släck alla lager',
+    cls: 'round compact icon-small margin-x-smaller',
+    title: 'Släck alla lager',
     click() {
       viewer.dispatch('active:turnofflayers');
     },

@@ -23,8 +23,14 @@ export default function Icon(options = {}) {
         `;
       }
       if (iconType === 'sprite') {
+        let titleEl = '';
+        if (title) {
+          titleEl = `
+            <title>${title}</title>
+            `;
+        }
         return `
-          <svg id="${this.getId()}" class="${cls}" style="${style}">
+          <svg id="${this.getId()}" class="${cls}" style="${style}">${titleEl}
             <use xlink:href=${icon}></use>
           </svg>
         `;
