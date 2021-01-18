@@ -38,7 +38,7 @@
 }
 
 .collapse-scroll {
-  @extend %collapse;
+  @extend .collapse;
 
   &.expanded {
     height: calc(100% - 2rem);
