@@ -3,7 +3,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-param-reassign */
 import Awesomplete from 'awesomplete';
-import $ from 'jquery';
 
 import fetchImg from './utils/fetchImg';
 import awesomeImage from './utils/awesomeImage';
@@ -121,7 +120,7 @@ function render() {
           return item;
         };
       }
-      config = origoConfigOptions ? $.extend({}, config, origoConfigOptions) : config;
+      config = origoConfigOptions ? Object.assign({}, config, origoConfigOptions) : config;
       awesome = new Awesomplete(input, config);
       list[index] = awesome;
       awesome.currentIndex = -1;
