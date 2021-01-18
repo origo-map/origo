@@ -2,12 +2,12 @@ export default function pageTemplate({
   descriptionComponent,
   printMapComponent,
   titleComponent,
-  createdComponent
+  footerComponent
 }) {
   return `
   ${titleComponent.render()}
   ${printMapComponent.render()}
   ${descriptionComponent.render()}
-  ${createdComponent.render()}
+  ${footerComponent.render()}
 `;
 }
