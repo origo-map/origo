@@ -83,7 +83,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
   const addControl = function addControl(control) {
     if (control.onAdd && control.dispatch) {
-      if (!control.hideWhenEmbedded || !isEmbedded(this.getTarget())) {
+      if (!control.options.hideWhenEmbedded || !isEmbedded(this.getTarget())) {
         this.addComponent(control);
       }
     } else {

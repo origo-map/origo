@@ -20,8 +20,7 @@ const Splash = function Splash(options = {}) {
   } = options;
 
   const {
-    url,
-    hideWhenEmbedded = false
+    url
   } = options;
 
   const addButton = function addButton() {
@@ -70,7 +69,6 @@ const Splash = function Splash(options = {}) {
 
   return Component({
     name: 'splash',
-    hideWhenEmbedded,
     onInit() {
       if (!title) title = defaultTitle;
       if (!content) content = defaultContent;
