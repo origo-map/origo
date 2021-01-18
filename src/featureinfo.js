@@ -229,7 +229,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         });
         popup.setVisibility(true);
         const popupHeight = document.querySelector('.o-popup').offsetHeight + 20;
-        document.querySelector('#o-popup').style.height = `${popupHeight} px`;
+        document.querySelector('#o-popup').style.height = `${popupHeight}px`;
         overlay = new Overlay({
           element: popup.getEl(),
           autoPan: true,
