@@ -75,7 +75,6 @@ const Featureinfo = function Featureinfo(options = {}) {
       const clone = currentItem.feature.clone();
       clone.setId(currentItem.feature.getId());
       clone.layerName = currentItem.name;
-
       selectionLayer.clearAndAdd(
         clone,
         selectionStyles[currentItem.feature.getGeometry().getType()]
@@ -130,11 +129,6 @@ const Featureinfo = function Featureinfo(options = {}) {
   };
 
   const initCarousel = function initCarousel(id) {
-    if (identifyTarget === 'overlay') {
-      const popupHeight = document.querySelector('.o-popup').offsetHeight + 20;
-      document.querySelector('#o-popup').style.height = `${popupHeight} px`;
-    }
-
     const { length } = Array.from(document.querySelectorAll('.o-identify-content'));
     if (!document.querySelector('.glide') && length > 1) {
       OGlide({
@@ -239,7 +233,16 @@ const Featureinfo = function Featureinfo(options = {}) {
           autoPanMargin: 40,
           positioning: 'bottom-center'
         });
-        const geometry = items[0].feature.getGeometry();
+        const firstFeature = items[0].feature;
+        const geometry = firstFeature.getGeometry();
+        const clone = firstFeature.clone();
+        clone.setId(firstFeature.getId());
+        clone.layerName = firstFeature.name;
+        selectionLayer.clearAndAdd(
+          clone,
+          selectionStyles[geometry.getType()]
+        );
+		selectionLayer.setSourceLayer(items[0].layer);
         const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
         map.addOverlay(overlay);
         overlay.setPosition(coord);
@@ -261,6 +264,16 @@ const Featureinfo = function Featureinfo(options = {}) {
           }
         });
         sidebar.setVisibility(true);
+        const firstFeature = items[0].feature;
+        const geometry = firstFeature.getGeometry();
+        const clone = firstFeature.clone();
+        clone.setId(firstFeature.getId());
+        clone.layerName = firstFeature.name;
+        selectionLayer.clearAndAdd(
+          clone,
+          selectionStyles[geometry.getType()]
+        );
+		selectionLayer.setSourceLayer(items[0].layer);
         initCarousel('#o-identify-carousel');
         break;
       }
