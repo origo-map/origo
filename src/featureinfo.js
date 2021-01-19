@@ -222,7 +222,8 @@ const Featureinfo = function Featureinfo(options = {}) {
           }
         });
         popup.setVisibility(true);
-        const popupHeight = document.querySelector('.o-popup').offsetHeight + 20;
+        const offset = viewer.getControlByName('search') ? 70 : 20;
+        const popupHeight = document.querySelector('.o-popup').offsetHeight + offset;
         document.querySelector('#o-popup').style.height = `${popupHeight}px`;
         overlay = new Overlay({
           element: popup.getEl(),
@@ -230,7 +231,7 @@ const Featureinfo = function Featureinfo(options = {}) {
           autoPanAnimation: {
             duration: 500
           },
-          autoPanMargin: 40,
+          autoPanMargin: 60,
           positioning: 'bottom-center'
         });
         const firstFeature = items[0].feature;
