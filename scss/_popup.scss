@@ -54,6 +54,7 @@
 
 .o-popup .icon {
   pointer-events: none;
+  display: block;
 }
 &[class*=#{$media-l-m-s}] {
   #o-popup {
