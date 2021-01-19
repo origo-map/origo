@@ -223,11 +223,12 @@ const Featureinfo = function Featureinfo(options = {}) {
         });
         popup.setVisibility(true);
         initCarousel('#o-identify-carousel');
-        const offset = viewer.getControlByName('search') ? 25 : 5;
+        const offset = viewer.getControlByName('search') ? 45 : 20;
         const popupHeight = document.querySelector('.o-popup').offsetHeight + offset;
-        document.getElementById('o-popup').style.height = `${popupHeight}px`;
+        const popupEl = popup.getEl();
+        popupEl.style.height = `${popupHeight}px`;
         overlay = new Overlay({
-          element: popup.getEl(),
+          element: popupEl,
           autoPan: {
             margin: 55,
             animation: {
