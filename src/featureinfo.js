@@ -222,16 +222,18 @@ const Featureinfo = function Featureinfo(options = {}) {
           }
         });
         popup.setVisibility(true);
-        const offset = viewer.getControlByName('search') ? 70 : 20;
+        initCarousel('#o-identify-carousel');
+        const offset = viewer.getControlByName('search') ? 25 : 5;
         const popupHeight = document.querySelector('.o-popup').offsetHeight + offset;
-        document.querySelector('#o-popup').style.height = `${popupHeight}px`;
+        document.getElementById('o-popup').style.height = `${popupHeight}px`;
         overlay = new Overlay({
           element: popup.getEl(),
-          autoPan: true,
-          autoPanAnimation: {
-            duration: 500
+          autoPan: {
+            margin: 55,
+            animation: {
+              duration: 500
+            }
           },
-          autoPanMargin: 60,
           positioning: 'bottom-center'
         });
         const firstFeature = items[0].feature;
@@ -247,7 +249,6 @@ const Featureinfo = function Featureinfo(options = {}) {
         const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
         map.addOverlay(overlay);
         overlay.setPosition(coord);
-        initCarousel('#o-identify-carousel');
         break;
       }
       case 'sidebar':
