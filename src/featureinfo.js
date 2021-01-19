@@ -223,8 +223,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         });
         popup.setVisibility(true);
         initCarousel('#o-identify-carousel');
-        const offset = viewer.getControlByName('search') ? 45 : 20;
-        const popupHeight = document.querySelector('.o-popup').offsetHeight + offset;
+        const popupHeight = document.querySelector('.o-popup').offsetHeight + 10;
         const popupEl = popup.getEl();
         popupEl.style.height = `${popupHeight}px`;
         overlay = new Overlay({
