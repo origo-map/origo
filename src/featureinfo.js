@@ -245,7 +245,7 @@ const Featureinfo = function Featureinfo(options = {}) {
           clone,
           selectionStyles[geometry.getType()]
         );
-		selectionLayer.setSourceLayer(items[0].layer);
+        selectionLayer.setSourceLayer(items[0].layer);
         const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
         map.addOverlay(overlay);
         overlay.setPosition(coord);
@@ -275,7 +275,7 @@ const Featureinfo = function Featureinfo(options = {}) {
           clone,
           selectionStyles[geometry.getType()]
         );
-		selectionLayer.setSourceLayer(items[0].layer);
+        selectionLayer.setSourceLayer(items[0].layer);
         initCarousel('#o-identify-carousel');
         break;
       }
