@@ -90,7 +90,7 @@ const Search = function Search(options = {}) {
       title
     });
     newPopup.setVisibility(true);
-    mapUtils.zoomToExent(new Point(coord), maxZoomLevel);
+    viewer.zoomToExtent(new Point(coord), maxZoomLevel);
   }
 
   /** There are several different ways to handle selected search result.
@@ -123,7 +123,7 @@ const Search = function Search(options = {}) {
       layer = viewer.getLayer(data[layerNameAttribute]);
       id = data[idAttribute];
       getFeature(id, layer, source, projCode, proj)
-        .done((res) => {
+        .then((res) => {
           let featureWkt;
           let coordWkt;
           if (res.length > 0) {

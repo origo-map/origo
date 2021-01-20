@@ -2,3 +2,8 @@
   width: 240px;
   word-wrap: break-word;
 }
+
+#o-identify-carousel > .o-identify-content {
+  max-height: calc(70vh - 46px);
+  overflow-y: auto;
+}

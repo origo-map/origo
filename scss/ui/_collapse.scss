@@ -11,7 +11,7 @@
   transition: all 0.3s;
 }
 
-%collapse {
+.collapse {
   > .collapse-header {
     .rotate {
       &.icon {
@@ -38,7 +38,7 @@
 }
 
 .collapse-scroll {
-  @extend %collapse;
+  @extend .collapse;
 
   &.expanded {
     height: calc(100% - 2rem);

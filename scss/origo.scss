@@ -12,8 +12,8 @@
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   @import 'reset';
   @import 'ol';
-  @import 'externs/owl.carousel';
-  @import 'externs/owl.theme.default';
+  @import 'externs/glidejs/import.scss';
+  @import 'glide/custom';
   @import 'card';
   @import 'container';
   @import 'toolbar';

@@ -27,6 +27,7 @@ function render() {
 function toggleToolbar(state) {
   if (state) {
     const enableInteraction = new CustomEvent('enableInteraction', {
+      bubbles: true,
       detail: {
         interaction: 'editor'
       }
@@ -34,6 +35,7 @@ function toggleToolbar(state) {
     document.querySelectorAll('.o-map')[0].dispatchEvent(enableInteraction);
   } else {
     const enableInteraction = new CustomEvent('enableInteraction', {
+      bubbles: true,
       detail: {
         interaction: 'featureInfo'
       }
@@ -116,7 +118,7 @@ function onChangeEdit(e) {
 function toggleSave(e) {
   const { detail: { edits } } = e;
   if (edits) {
-    if ($editSave.classList.includes(disableClass)) {
+    if ($editSave.classList.contains(disableClass)) {
       $editSave.classList.remove(disableClass);
     }
   } else {
