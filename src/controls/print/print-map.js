@@ -6,7 +6,7 @@ import NorthArrow from './north-arrow';
 
 export default function PrintMap(options = {}) {
   const {
-    baseUrl,
+    // baseUrl,
     logo,
     northArrow,
     map
@@ -21,8 +21,10 @@ export default function PrintMap(options = {}) {
   const topRightMapControls = El({ cls: 'flex column align-start absolute top-right transparent z-index-ontop-middle' });
   const bottomLeftMapControls = El({ cls: 'flex column align-start absolute bottom-left transparent z-index-ontop-middle' });
   const bottomRightMapControls = El({ cls: 'flex column align-start absolute bottom-right transparent z-index-ontop-middle' });
-  const logoComponent = Logo({ baseUrl, logo });
-  const northArrowComponent = NorthArrow({ baseUrl, northArrow, map });
+  // const logoComponent = Logo({ baseUrl, logo });
+  const logoComponent = Logo({ logo });
+  // const northArrowComponent = NorthArrow({ baseUrl, northArrow, map });
+  const northArrowComponent = NorthArrow({ northArrow, map });
 
   return Component({
     onInit() {

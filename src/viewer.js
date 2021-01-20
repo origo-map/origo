@@ -27,7 +27,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
   } = options;
 
   const {
-    baseUrl = '',
+    // baseUrl = '',
     breakPoints,
     breakPointsPrefix,
     clsOptions = '',
@@ -96,7 +96,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
   const getExtent = () => extent;
 
-  const getBaseUrl = () => baseUrl;
+  // const getBaseUrl = () => baseUrl;
 
   const getBreakPoints = function getBreakPoints(size) {
     return size && size in breakPoints ? breakPoints[size] : breakPoints;
@@ -478,7 +478,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     addLayers,
     addSource,
     addStyle,
-    getBaseUrl,
+    // getBaseUrl,
     getBreakPoints,
     getCenter,
     getClusterOptions,

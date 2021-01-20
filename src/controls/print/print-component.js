@@ -92,7 +92,8 @@ const PrintComponent = function PrintComponent(options = {}) {
   ${createdComponent.render()}
 </div>`; }
   });
-  const printMapComponent = PrintMap({ baseUrl: viewer.getBaseUrl(), logo, northArrow, map, viewer, showNorthArrow });
+  // const printMapComponent = PrintMap({ baseUrl: viewer.getBaseUrl(), logo, northArrow, map, viewer, showNorthArrow });
+  const printMapComponent = PrintMap({ logo, northArrow, map, viewer, showNorthArrow });
 
   const setScale = function setScale(scale) {
     printScale = scale;
