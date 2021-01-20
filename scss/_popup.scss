@@ -21,7 +21,7 @@
   position: absolute;
   text-align: left;
   white-space: normal;
-  width: 100%;
+  width: 270px;
   z-index: 1010;
 }
 
@@ -57,12 +57,12 @@
   display: block;
 }
 &[class*=#{$media-l-m-s}] {
-  #o-popup {
+  #o-popup, .o-popup {
     width: 240px;
   }
 }
 &[class*=#{$media-l-m-s-xs}] {
-  #o-popup {
+  #o-popup, .o-popup {
     width: 200px;
   }
 }
