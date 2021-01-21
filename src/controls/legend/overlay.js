@@ -44,7 +44,7 @@ const OverlayLayer = function OverlayLayer(options) {
 
   const toggleVisible = function toggleVisible(visible) {
     const layerGroup = layer.get('group');
-    const groupExclusive = viewer.getGroup(layerGroup).exclusive;
+    const groupExclusive = (viewer.getGroup(layerGroup) && viewer.getGroup(layerGroup).exclusive);
     if (!visible && groupExclusive) {
       const layers = viewer.getLayersByProperty('group', layerGroup);
       layers.forEach(l => l.setVisible(false));
