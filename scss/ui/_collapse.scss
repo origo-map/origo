@@ -1,11 +1,4 @@
 .collapse-container {
-  height: 100%;
-  overflow: hidden;
-  position: relative;
-  transition: all 0.3s;
-}
-
-.collapse-container-no-height {
   overflow: hidden;
   position: relative;
   transition: all 0.3s;
@@ -21,7 +14,7 @@
   }
 
   &.expanded > .collapse-header {
-    border-bottom: 'none';
+    border-bottom: none;
 
     .rotate {
       &.icon {
