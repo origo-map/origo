@@ -136,6 +136,7 @@ const OverlayLayer = function OverlayLayer(options) {
       const parentEl = document.getElementById(evt.target.getId());
       const htmlString = this.render();
       const el = dom.html(htmlString);
+      const map = viewer.getMap();
       if (position === 'top') {
         parentEl.insertBefore(el, parentEl.firstChild);
       } else {
@@ -144,6 +145,17 @@ const OverlayLayer = function OverlayLayer(options) {
       this.addComponents(buttons);
       this.addComponent(label);
       this.dispatch('render');
+
+      if (layer.getMaxResolution() !== Infinity || layer.getMinResolution() !== 0) {
+        const elId = this.getId();
+        map.on('moveend', () => {
+          if (map.getView().getResolution() > layer.getMinResolution() && map.getView().getResolution() < layer.getMaxResolution()) {
+            document.getElementById(elId).classList.remove('semifaded');
+          } else {
+            document.getElementById(elId).classList.add('semifaded');
+          }
+        });
+      }
       layer.on('change:visible', (e) => {
         toggleButton.dispatch('change', { icon: getCheckIcon(!e.oldValue) });
         const visibleEvent = new CustomEvent('change:visible', {
