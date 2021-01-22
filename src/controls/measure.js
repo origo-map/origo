@@ -368,7 +368,6 @@ const Measure = function Measure({
     map.un('pointermove', pointerMoveHandler);
     map.removeInteraction(measure);
     overlayArray.push(...tempOverlayArray);
-    viewer.removeOverlays(overlayArray);
     setActive(false);
     resetSketch();
   }
@@ -633,6 +632,7 @@ const Measure = function Measure({
             cls: 'o-measure-clear padding-small margin-bottom-smaller icon-smaller round light box-shadow hidden',
             click() {
               vector.getSource().clear();
+              viewer.removeOverlays(overlayArray);
             },
             icon: '#ic_delete_24px',
             tooltipText: 'Rensa',
