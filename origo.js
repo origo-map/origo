@@ -67,6 +67,7 @@ const Origo = function Origo(configPath, options = {}) {
         const controlOptions = def.options || {};
         if (controlName in origoControls) {
           const control = origoControls[controlName](controlOptions);
+          control.options = Object.assign(control.options || {}, controlOptions);
           controls.push(control);
         }
       }

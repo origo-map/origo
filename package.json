@@ -1,6 +1,10 @@
 {
   "name": "origo",
   "version": "2.2.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/origo-map/origo.git"
+  },
   "description": "Framework to build web map apps",
   "keywords": [
     "map",
@@ -53,7 +57,7 @@
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.2.2",
     "babel-polyfill": "^6.26.0",
-    "compression-webpack-plugin": "^7.1.2",
+    "compression-webpack-plugin": "^6.1.1",
     "copy-webpack-plugin": "^6.3.2",
     "eslint": "^7.17.0",
     "eslint-config-airbnb-base": "^14.2.1",

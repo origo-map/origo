@@ -222,15 +222,18 @@ const Featureinfo = function Featureinfo(options = {}) {
           }
         });
         popup.setVisibility(true);
-        const popupHeight = document.querySelector('.o-popup').offsetHeight + 20;
-        document.querySelector('#o-popup').style.height = `${popupHeight}px`;
+        initCarousel('#o-identify-carousel');
+        const popupHeight = document.querySelector('.o-popup').offsetHeight + 10;
+        const popupEl = popup.getEl();
+        popupEl.style.height = `${popupHeight}px`;
         overlay = new Overlay({
-          element: popup.getEl(),
-          autoPan: true,
-          autoPanAnimation: {
-            duration: 500
+          element: popupEl,
+          autoPan: {
+            margin: 55,
+            animation: {
+              duration: 500
+            }
           },
-          autoPanMargin: 40,
           positioning: 'bottom-center'
         });
         const firstFeature = items[0].feature;
@@ -242,11 +245,10 @@ const Featureinfo = function Featureinfo(options = {}) {
           clone,
           selectionStyles[geometry.getType()]
         );
-		selectionLayer.setSourceLayer(items[0].layer);
+        selectionLayer.setSourceLayer(items[0].layer);
         const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
         map.addOverlay(overlay);
         overlay.setPosition(coord);
-        initCarousel('#o-identify-carousel');
         break;
       }
       case 'sidebar':
@@ -273,7 +275,7 @@ const Featureinfo = function Featureinfo(options = {}) {
           clone,
           selectionStyles[geometry.getType()]
         );
-		selectionLayer.setSourceLayer(items[0].layer);
+        selectionLayer.setSourceLayer(items[0].layer);
         initCarousel('#o-identify-carousel');
         break;
       }

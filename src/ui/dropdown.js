@@ -7,7 +7,7 @@ import { html, createStyle } from './dom/dom';
 export default function Dropdown(options = {}) {
   const {
     cls = '',
-    containerCls = 'collapse-container-no-height',
+    containerCls = 'collapse-container',
     contentCls = 'bg-white',
     buttonCls = 'padding-small rounded light box-shadow',
     buttonIconCls = '',
