@@ -19,7 +19,8 @@ const Measure = function Measure({
   elevationServiceURL,
   elevationTargetProjection,
   elevationAttribute,
-  showSegmentLengths = false
+  showSegmentLengths = false,
+  useHectare = true
 } = {}) {
   const style = Style;
   const styleTypes = StyleTypes();
@@ -132,7 +133,7 @@ const Measure = function Measure({
 
     if (area > 10000000) {
       output = `${Math.round((area / 1000000) * 100) / 100} km<sup>2</sup>`;
-    } else if (area > 10000) {
+    } else if (area > 10000 && useHectare) {
       output = `${Math.round((area / 10000) * 100) / 100} ha`;
     } else {
       output = `${Math.round(area * 100) / 100} m<sup>2</sup>`;
