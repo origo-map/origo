@@ -583,6 +583,7 @@ function addImageListener() {
     });
 
     document.querySelector(`${containerClass} input[type=button]`).addEventListener('click', (e) => {
+      document.getElementById(obj.elId).setAttribute('value', '');
       document.getElementById(obj.elId).value = '';
       document.querySelector(`${containerClass} img`).classList.add('o-hidden');
       e.target.classList.add('o-hidden');
