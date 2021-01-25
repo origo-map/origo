@@ -84,98 +84,9 @@ input[type=button]:hover {
 
 // range
 input[type=range] {
-  appearance: none;
   border: 0;
-  height: 24px;
   margin: 0;
   padding: 0;
   width: 100%;
-}
-
-input[type=range]:focus {
-  outline: none;
-}
-
-input[type=range]::-webkit-slider-runnable-track {
-  animation: 0.2s;
-  background: $primary-color;
-  border-radius: 3px;
-  cursor: pointer;
-  height: 4px;
-}
-
-input[type=range]::-webkit-slider-thumb {
-  appearance: none;
-  background: $white;
-  border: 1px solid $grey-lightest;
-  border-radius: 25px;
-  box-shadow: 1px 1px 4px $grey-dark;
-  cursor: pointer;
-  height: 16px;
-  margin-top: -6.5px;
-  width: 16px;
-}
-
-input[type=range]:focus::-webkit-slider-runnable-track {
-  background: $primary-color;
-}
-
-input[type=range]::-moz-range-track {
-  animation: 0.2s;
-  background: $primary-color;
-  border-radius: 3px;
-  cursor: pointer;
-  height: 4px;
-}
-
-input[type=range]::-moz-range-thumb {
-  background: $white;
-  border: 1px solid $grey-lightest;
-  border-radius: 25px;
-  box-shadow: 1px 1px 4px $grey-dark;
-  cursor: pointer;
-  height: 16px;
-  width: 16px;
-}
-
-input[type=range]::-ms-track {
-  animation: 0.2s;
-  background: transparent;
-  border-color: transparent;
-  color: transparent;
-  cursor: pointer;
-  height: 4px;
-}
-
-input[type=range]::-ms-fill-lower {
-  background: $primary-color;
-  border-radius: 6px;
-}
-
-input[type=range]::-ms-fill-upper {
-  background: $primary-color;
-  border-radius: 6px;
-}
-
-input[type=range]::-ms-thumb {
-  background: $white;
-  border: 1px solid $grey-lightest;
-  border-radius: 25px;
-  box-shadow: 1px 1px 4px $grey-dark;
-  cursor: pointer;
-  height: 16px;
-  margin-top: 1px;
-  width: 16px;
-}
-
-input[type=range]:focus::-ms-fill-lower {
-  background: $primary-color;
-}
-
-input[type=range]:focus::-ms-fill-upper {
-  background: $primary-color;
-}
-
-input[type=range]::-ms-tooltip {
-  display: none;
+  min-width: 0;
 }
