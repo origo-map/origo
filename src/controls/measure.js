@@ -365,9 +365,11 @@ const Measure = function Measure({
       }
     }
     setActive(false);
-
     map.un('pointermove', pointerMoveHandler);
     map.removeInteraction(measure);
+    if (typeof helpTooltipElement !== 'undefined') {
+      helpTooltipElement.outerHTML = '';
+    }
     overlayArray.push(...tempOverlayArray);
     setActive(false);
     resetSketch();
