@@ -367,11 +367,15 @@ const Measure = function Measure({
     setActive(false);
     map.un('pointermove', pointerMoveHandler);
     map.removeInteraction(measure);
-    if (typeof helpTooltipElement !== 'undefined' && helpTooltipElement.parentNode !== null) {
-      helpTooltipElement.outerHTML = '';
+    if (typeof helpTooltipElement !== 'undefined') {
+      if (helpTooltipElement.parentNode !== null) {
+        helpTooltipElement.outerHTML = '';
+      }
     }
-    if (typeof measureTooltipElement !== 'undefined' && measureTooltipElement.parentNode !== null) {
-      measureTooltipElement.outerHTML = '';
+    if (typeof measureTooltipElement !== 'undefined') {
+      if (measureTooltipElement.parentNode !== null) {
+        measureTooltipElement.outerHTML = '';
+      }
     }
     overlayArray.push(...tempOverlayArray);
     setActive(false);
