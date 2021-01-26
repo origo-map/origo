@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import TopoJSONFormat from 'ol/format/TopoJSON';
 import verifyFeatureIds from './verifyfeatureids';
 
@@ -12,15 +11,17 @@ topoJson.request = function request(layer) {
     const format = new TopoJSONFormat();
     const url = source;
 
-    return $.ajax({
-      url,
-      cache: false
+    return fetch(url, {
+      cache: false,
+      method: 'GET'
     })
+      .then(res => res.json())
       .then((response) => {
         let features = format.readFeatures(response);
         features = verifyFeatureIds(features);
         return features;
-      });
+      })
+      .catch(error => console.error(error));
   }
 };
 

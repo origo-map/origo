@@ -7,8 +7,13 @@ const Print = function Print(options = {}) {
     logo = {},
     northArrow = {},
     title = 'Skriv ut',
+    leftFooterText = '',
     showCreated = false,
-    createdPrefix = ''
+    createdPrefix = '',
+    scales = [],
+    showScale = true,
+    classes,
+    defaultClass
   } = options;
   let {
     showNorthArrow = true
@@ -33,9 +38,14 @@ const Print = function Print(options = {}) {
         target: viewer.getId(),
         map: viewer.getMap(),
         viewer,
+        leftFooterText,
         showCreated,
         createdPrefix,
-        showNorthArrow
+        showNorthArrow,
+        scales,
+        showScale,
+        classes,
+        defaultClass
       });
       mapMenu = viewer.getControlByName('mapmenu');
       menuItem = mapMenu.MenuItem({

@@ -1,65 +1,72 @@
 .o-button-container {
-  -webkit-box-shadow: 0 2px 5px rgba(0,0,0,0.45);
   border-radius: 4px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.45);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
   display: inline-block;
-  position: absolute;
   height: 2rem;
+  position: absolute;
   width: 2rem;
 }
+
 .o-button {
-  border-radius: 4px;
   background-color: $o-btn-bg;
-  border: none;
+  border: 0;
+  border-radius: 4px;
   color: $o-btn-color;
-	cursor: pointer;
+  cursor: pointer;
   display: inline-block;
   font-size: 1rem;
-  position: relative;
   height: 2em;
   line-height: 1em;
   padding: 0;
+  position: relative;
   text-align: center;
   text-decoration: none;
   width: 2em;
 }
+
 .o-no-boxshadow {
   box-shadow: none;
 }
+
 .o-button:hover,
 .o-button:focus {
   background-color: $o-btn-hover-bg;
   color: $o-btn-hover-color;
   text-decoration: none;
 }
+
 .o-button span.o-button-text {
-	height: 2em;
-	left: 0;
-	line-height: 1em;
-	padding-left: 0.625em;
-	position: absolute;
-	top: .5em;
+  height: 2em;
+  left: 0;
+  line-height: 1em;
+  padding-left: 0.625em;
+  position: absolute;
+  top: .5em;
 }
+
 .o-btn-2 {
-		height: 2rem;
-		width: 2rem;
+  height: 2rem;
+  width: 2rem;
 }
+
 .o-btn-3 {
-		height: 3rem;
-		width: 3rem;
+  height: 3rem;
+  width: 3rem;
 }
+
 .o-button-lg {
-  border-radius: 50%;
   background-color: $o-btn-bg;
-  border: none;
-  -webkit-box-shadow: 0 2px 5px rgba(0,0,0,0.45);
-  box-shadow: 0 2px 5px rgba(0,0,0,0.45);
+  border: 0;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
   color: $o-btn-color;
-	cursor: pointer;
+  cursor: pointer;
   display: inline-block;
   height: 2.5rem;
-  position: relative;
   padding: .5rem;
+  position: relative;
   text-align: center;
   text-decoration: none;
   width: 2.5rem;

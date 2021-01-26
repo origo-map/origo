@@ -1,7 +1,7 @@
 .o-card {
+  background-color: #fff;
   font-size: 0.875em;
   line-height: 1.42857143;
-  background-color: #fff;
 
   .o-card-header {
     background-color: #f7f7f7;
@@ -19,48 +19,53 @@
     margin-top: -.28125rem;
   }
 }
+
 .o-card .o-header1 {
-  font-weight: bold;
   font-size: 1.2em;
+  font-weight: bold;
 }
 
 .o-card-title {
   background-color: #f7f7f7;
   border-bottom: 1px solid #ebebeb;
-  margin: 0;
-  padding: 8px 14px;
   font-size: 14px;
   font-weight: bold;
   line-height: 18px;
+  margin: 0;
+  padding: 8px 14px;
 }
 
 .o-card a {
   color: #428bca;
   text-decoration: none;
 }
+
 .o-card a:hover,
 .o-card a:focus {
   color: #2a6496;
   text-decoration: underline;
 }
+
 .o-card a:active,
 .o-card a:hover {
   outline: 0;
 }
-.o-card .o-image-attribution{
-  background-color: rgba(0,0,0,0.5);
+
+.o-card .o-image-attribution {
+  background-color: rgba(0, 0, 0, 0.5);
+  bottom: 0;
   box-sizing: border-box;
-  color: rgb(220,220,220);
-  text-align: right;
+  color: rgb(220, 220, 220);
   font-size: 0.7em;
   font-style: italic;
   height: 15px;
   line-height: 15px;
   padding-right: 5px;
   position: absolute;
-  bottom: 0;
+  text-align: right;
   width: 100%;
 }
+
 .o-card-content {
   padding: 9px 14px;
 }

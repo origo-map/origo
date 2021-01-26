@@ -221,7 +221,6 @@ const Overlays = function Overlays(options) {
     }
   };
 
-
   return Component({
     onAddGroup,
     onChangeLayer,

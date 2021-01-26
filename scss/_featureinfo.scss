@@ -3,3 +3,8 @@
   word-wrap: break-word;
   overflow-x:auto
 }
+
+#o-identify-carousel > .o-identify-content {
+  max-height: calc(70vh - 46px);
+  overflow-y: auto;
+}

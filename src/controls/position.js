@@ -13,7 +13,6 @@ const Position = function Position(options = {}) {
     noPositionText = '&nbsp;'
   } = options;
 
-
   let viewer;
   let map;
   let view;
@@ -34,7 +33,6 @@ const Position = function Position(options = {}) {
   let coordsElement;
   let coordsFindElement;
   let containerElement;
-
 
   function undefinedhtml() {
     return noPositionText.length === 0 ? noPositionText === false : noPositionText;
@@ -195,7 +193,6 @@ const Position = function Position(options = {}) {
     document.getElementById(`${coordsFindElement.getId()}`).addEventListener('keypress', onFind);
   }
 
-
   function clear() {
     writeCoords('');
   }
@@ -261,6 +258,8 @@ const Position = function Position(options = {}) {
 
   return Component({
     name: 'position',
+    onTogglePosition,
+    isMousePositionActive() { return mousePositionActive; },
     onAdd(evt) {
       viewer = evt.target;
       map = viewer.getMap();

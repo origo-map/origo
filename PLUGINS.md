@@ -24,3 +24,6 @@ A layer manager plugin.
 
 **[LM search plugin](https://github.com/origo-map/lmsearch-plugin)**
 Search for Lantmäteriet Direct services via Origoserver API.
+
+**[Multiselect plugin](https://github.com/origo-map/multiselect-plugin)**
+Plugin to select features with different methods such as circle, polygon and buffer.

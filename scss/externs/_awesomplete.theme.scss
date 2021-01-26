@@ -1,86 +1,86 @@
 .awesomplete > ul {
-	border-radius: 0.3rem;
-	margin: 0.2em 0 0;
-	background: hsla(0,0%,100%,.9);
-	background: linear-gradient(to bottom right, white, hsla(0,0%,100%,.8));
-	box-shadow: $shadow;
-	text-shadow: none;
-	min-width: $search-width;
+  background: hsla(0, 0%, 100%, .9);
+  background: linear-gradient(to bottom right, $white, hsla(0, 0%, 100%, .8));
+  border-radius: 0.3rem;
+  box-shadow: $shadow;
+  margin: 0.2em 0 0;
+  min-width: $search-width;
+  text-shadow: none;
 }
 @supports (transform: scale(0)) {
-	.awesomplete > ul {
-		transition: 0.3s cubic-bezier(.4,.2,.5,1.4);
-		transform-origin: 1.43em -.43em;
-	}
+  .awesomplete > ul {
+    transform-origin: 1.43em -.43em;
+    transition: 0.3s cubic-bezier(.4, .2, .5, 1.4);
+  }
 
-	.awesomplete > ul:empty,
-	.awesomplete > ul[hidden] {
-		opacity: 0;
-		transform: scale(0);
-		display: block;
-		transition-timing-function: ease;
-	}
+  .awesomplete > ul:empty,
+  .awesomplete > ul[hidden] {
+    display: block;
+    opacity: 0;
+    transform: scale(0);
+    transition-timing-function: ease;
+  }
 }
 
 .awesomplete > ul > li {
-	border-bottom: 1px solid $search-border-color;
-	font-size: 0.75rem;
-	position: relative;
-	padding: 0;
-	cursor: pointer;
+  border-bottom: 1px solid $search-border-color;
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 0;
+  position: relative;
 }
 
 .awesomplete > ul > li > .suggestion {
-	padding: 0.75rem;
+  padding: 0.75rem;
 }
 
 .awesomplete > ul > li:last-child {
-	border-bottom: none;
+  border-bottom: 'none';
 }
 
 .awesomplete > ul > li.header {
-	margin-top: 1.75rem;
+  margin-top: 1.75rem;
 }
 
 .awesomplete > ul > li > .heading {
-	background-color: $search-heading-backround;
-	cursor: default;
-	display: block;
-	font-size: .75rem;
-	font-weight: bold;
-	line-height: .75rem;
-	margin: 0;
-	margin-top: -1.75rem;
-	padding: .5rem .75rem;
+  background-color: $search-heading-backround;
+  cursor: default;
+  display: block;
+  font-size: .75rem;
+  font-weight: bold;
+  line-height: .75rem;
+  margin: 0;
+  margin-top: -1.75rem;
+  padding: .5rem .75rem;
 }
 
 .awesomplete > ul > li .suggestion:hover {
-	background-color: $search-hover-backround;
-	color: #000;
+  background-color: $search-hover-backround;
+  color: #000;
 }
 
-.awesomplete > ul > li[aria-selected="true"] > .suggestion {
-	background-color: $search-hover-backround;
-	color: #000;
+.awesomplete > ul > li[aria-selected='true'] > .suggestion {
+  background-color: $search-hover-backround;
+  color: #000;
 }
 
 .awesomplete mark {
-	background: none;
-	font-weight: bold;
+  background: none;
+  font-weight: bold;
 }
 
 .awesomplete li .suggestion:hover mark {
-	background-color: $search-hover-backround;
+  background-color: $search-hover-backround;
 }
 
-.awesomplete li[aria-selected="true"] mark {
-	background-color: $search-hover-backround;
+.awesomplete li[aria-selected='true'] mark {
+  background-color: $search-hover-backround;
 }
 
 &[class*=#{$media-l-m}] {
-	.awesomplete > ul {
-		min-width: calc(100% + 2rem);
-		max-width: calc(100% + 2rem);
-		top: 2.25rem;
-	}
+  .awesomplete > ul {
+    max-width: calc(100% + 2rem);
+    min-width: calc(100% + 2rem);
+    top: 2.25rem;
+  }
 }

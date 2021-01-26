@@ -1,4 +1,5 @@
 $divider-color: $grey-lighter;
+
 .divider {
   border-right: 1px solid $divider-color;
   display: inline-block;
@@ -6,7 +7,7 @@ $divider-color: $grey-lighter;
 
   &.horizontal {
     border-bottom: 1px solid $divider-color;
-    border-right: none;
+    border-right: 'none';
     line-height: 0;
     width: 100%;
   }

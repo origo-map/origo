@@ -1,5 +1,5 @@
-$search-heading-backround: rgba(238,238,238,0.5);
-$search-hover-backround: rgba(238,238,238,1);
+$search-heading-backround: rgba(238, 238, 238, 0.5);
+$search-hover-backround: rgba(238, 238, 238, 1);
 $search-border-color: $search-hover-backround;
 $search-width: 310px;
 $search-padding: .5rem;
@@ -15,7 +15,7 @@ $search-field-width-l-focus: calc(100% - #{$search-button-s-full});
 $search-field-width-m: $search-field-width-l-focus;
 $search-menu-button-width: 2.5rem;
 $search-width-l: calc(100% - calc(#{$search-menu-button-width} + #{$search-padding} * 2));
-@import 'externs/awesomplete.scss';
+@import 'externs/awesomplete';
 
 .o-search-wrapper {
   max-width: calc(100% - 8rem);
@@ -28,36 +28,40 @@ $search-width-l: calc(100% - calc(#{$search-menu-button-width} + #{$search-paddi
 }
 
 .o-search-field {
-  border: none;
+  border: 0;
   border-radius: 4px;
   box-sizing: border-box;
-	height: 1.5rem;
+  height: 1.5rem;
   margin: 0 0 0 1em;
   overflow: hidden;
-  padding: .5rem 0 .5rem 0;
+  padding: .5rem 0;
   width: 100%;
 }
+
 input.o-search-field:focus {
   outline: none;
 }
+
 input.o-search-field::-ms-clear {
   display: none;
 }
 &[class*=#{$media-l}] {
-.o-search-field {
-	font-size: 1rem;
-	height: 18px;
-  line-height: 1rem;
-}
+  .o-search-field {
+    font-size: 1rem;
+    height: 18px;
+    line-height: 1rem;
+  }
 }
 &[class*=#{$media-l-m-s-xs}] {
   .o-search-wrapper {
     display: none;
   }
+
   .o-search-wrapper.active {
-  	display: inline-block;
+    display: inline-block;
   }
 }
+
 .o-search-wrapper {
   z-index: -1;
 }

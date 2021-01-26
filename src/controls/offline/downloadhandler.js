@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import Feature from 'ol/Feature';
 import viewer from '../../viewer';
 import layerCreator from '../../layercreator';
@@ -112,16 +111,17 @@ const downloadHandler = function downloadHandler() {
 
   function onChangeDownload(e) {
     e.stopImmediatePropagation();
-    if (e.action === 'download') {
+    const { detail: { action, layerName }} = e;
+    if (action === 'download') {
       download(e.layerName);
-    } else if (e.action === 'sync') {
+    } else if (action === 'sync') {
       sync(e.layerName);
-    } else if (e.action === 'remove') {
-      removeDownloaded(e.layerName);
+    } else if (action === 'remove') {
+      removeDownloaded(layerName);
     }
   }
 
-  $(document).on('changeDownload', onChangeDownload);
+  document.addEventListener('changeDownload', onChangeDownload);
   offlineStore.init();
 };
 

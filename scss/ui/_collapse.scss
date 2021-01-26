@@ -8,21 +8,32 @@
   > .collapse-header {
     .rotate {
       &.icon {
-        transition:  all 0.3s ease;
+        transition: all 0.3s ease;
       }
-    }    
-  } 
+    }
+  }
+
   &.expanded > .collapse-header {
     border-bottom: none;
+
     .rotate {
       &.icon {
         transform: rotate(90deg);
-      }     
+      }
     }
+
     .rotate-180 {
       &.icon {
         transform: rotate(180deg);
-      }     
-    }    
+      }
+    }
+  }
+}
+
+.collapse-scroll {
+  @extend .collapse;
+
+  &.expanded {
+    height: calc(100% - 2rem);
   }
 }

@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import dispatcher from './editdispatcher';
 
 export default function editsStore() {
@@ -74,16 +73,16 @@ export default function editsStore() {
   }
 
   function addEdit(e) {
-    if (e.action === 'insert') {
-      addFeature('insert', e.feature, e.layerName);
-    } else if (e.action === 'update') {
-      if (hasFeature('insert', e.feature, e.layerName) === false) {
-        addFeature('update', e.feature, e.layerName);
+    if (e.detail.action === 'insert') {
+      addFeature('insert', e.detail.feature, e.detail.layerName);
+    } else if (e.detail.action === 'update') {
+      if (hasFeature('insert', e.detail.feature, e.detail.layerName) === false) {
+        addFeature('update', e.detail.feature, e.detail.layerName);
       }
-    } else if (e.action === 'delete') {
-      if (removeFeature('insert', e.feature, e.layerName) === false) {
-        removeFeature('update', e.feature, e.layerName);
-        addFeature('delete', e.feature, e.layerName);
+    } else if (e.detail.action === 'delete') {
+      if (removeFeature('insert', e.detail.feature, e.detail.layerName) === false) {
+        removeFeature('update', e.detail.feature, e.detail.layerName);
+        addFeature('delete', e.detail.feature, e.detail.layerName);
       }
     }
     if (hasEdits() === true) {
@@ -94,8 +93,8 @@ export default function editsStore() {
   }
 
   function removeEdit(e) {
-    if (e.feature.length) {
-      e.feature.forEach(feature => removeFeature(e.action, feature, e.layerName));
+    if (e.detail.feature.length) {
+      e.detail.feature.forEach(feature => removeFeature(e.detail.action, feature, e.detail.layerName));
     }
     if (hasEdits() === false) {
       dispatcher.emitEditsChange(0);
@@ -107,14 +106,15 @@ export default function editsStore() {
   }
 
   function featureChange(e) {
-    if (e.status === 'pending') {
+    const { detail: { status } } = e;
+    if (status === 'pending') {
       addEdit(e);
-    } else if (e.status === 'finished') {
+    } else if (status === 'finished') {
       removeEdit(e);
     }
   }
 
-  $(document).on('changeFeature', featureChange);
+  document.addEventListener('changeFeature', featureChange);
 
   return {
     getEdits,

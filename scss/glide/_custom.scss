@@ -1,0 +1,13 @@
+@import './variables';
+@import './controls';
+@import './bullets';
+.glide {
+  &__track {
+    overflow-y: auto;
+  }
+  &--carousel {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(70vh - 46px);
+  }
+}

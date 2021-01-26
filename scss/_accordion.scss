@@ -1,7 +1,7 @@
 .o-accordion {
+  font-size: 14px;
   margin: 0;
   padding: 0;
-  font-size: 14px;
 
   .collapse {
     display: block;
@@ -21,18 +21,18 @@
   }
 
   .card {
-    border-width: 0 0 1px 0;
-    border-style: solid;
-    border-color: rgba(0,0,0,0.12);
     background: none;
+    border-color: rgba(0, 0, 0, 0.12);
+    border-style: solid;
+    border-width: 0 0 1px;
     box-shadow: none;
-    color: rgba(0,0,0,.87);
+    color: rgba(0, 0, 0, .87);
     margin: 0;
     padding: 0;
   }
 
   .card:last-child {
-    border-bottom: none;
+    border-bottom: 0;
   }
 
   .card-group > .card:first-child .card-header {
@@ -48,20 +48,19 @@
   }
 
   .card-header {
-    background-color: #fff;
+    background-color: $white;
+    border: 0;
     border-radius: 0;
-    border: none;
-    // color: #fff;
     padding: 0;
   }
 
   .card-title a {
-    color: rgba(0,0,0,.87);
+    color: rgba(0, 0, 0, .87);
     display: block;
-    padding: 15px;
-    position: relative;
     font-size: 16px;
     font-weight: 400;
+    padding: 15px;
+    position: relative;
   }
 
   .card-body {
@@ -83,7 +82,7 @@
   }
 
   .o-icon-fa-chevron-down {
-    fill: rgba(0,0,0,.54);
+    fill: rgba(0, 0, 0, .54);
   }
 
   .card-header .o-accordion-icon {
@@ -91,14 +90,13 @@
     position: absolute;
     right: 10px;
     top: 15px;
-    // font-size: 24px;
-    transition: all 0.5s;
     transform: scale(1);
+    transition: all 0.5s;
   }
 
   .card-header.active .o-accordion-icon {
-    transition: all 0.5s;
     transform: scale(0);
+    transition: all 0.5s;
   }
 
   .card-header .o-accordion-icon {
