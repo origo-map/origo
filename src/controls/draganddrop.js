@@ -6,6 +6,7 @@ import KMLFormat from 'ol/format/KML';
 import TopoJSONFormat from 'ol/format/TopoJSON';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
+import Style from '../style';
 import { Component } from '../ui';
 
 const DragAndDrop = function DragAndDrop(options = {}) {
@@ -18,8 +19,29 @@ const DragAndDrop = function DragAndDrop(options = {}) {
       const map = viewer.getMap();
       const groupName = options.groupName || 'egna-lager';
       const groupTitle = options.groupTitle || 'Egna lager';
+      const featureStyles = options.featureStyles || {
+        stroke: {
+          color: [100, 149, 237, 1],
+          width: 4,
+          lineDash: null
+        },
+        fill: {
+          color: [100, 149, 237, 0.2]
+        },
+        circle: {
+          radius: 7,
+          stroke: {
+            color: [100, 149, 237, 1],
+            width: 2
+          },
+          fill: {
+            color: [255, 255, 255, 1]
+          }
+        }
+      };
       let vectorSource;
       let vectorLayer;
+      const vectorStyles = Style.createStyleRule(featureStyles);
 
       const dragAndDrop = new olDragAndDrop({
         formatConstructors: [
@@ -46,7 +68,8 @@ const DragAndDrop = function DragAndDrop(options = {}) {
           group: groupName,
           title: event.file.name.split('.')[0],
           queryable: true,
-          removable: true
+          removable: true,
+          style: vectorStyles
         });
 
         map.addLayer(vectorLayer);
