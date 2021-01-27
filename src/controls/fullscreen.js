@@ -1,5 +1,5 @@
 import { Component, Button, dom } from '../ui';
-//import permalink from '../permalink/permalink';
+import permalink from '../permalink/permalink';
 import isEmbedded from '../utils/isembedded';
 
 const Fullscreen = function Fullscreen(options = {}) {
