@@ -1,15 +1,15 @@
-.errormsg {
+.errorMsg {
   color: $orange;
 }
 
-:optional {
+input:optional {
   border-color: $grey-lightest;
 }
 
-:required:invalid {
+input:required:invalid {
   border-color: $orange;
 }
 
-:invalid {
+input:invalid {
   border-color: $orange;
 }
