@@ -367,12 +367,12 @@ const Measure = function Measure({
     setActive(false);
     map.un('pointermove', pointerMoveHandler);
     map.removeInteraction(measure);
-    if (typeof helpTooltipElement !== 'undefined') {
+    if (typeof helpTooltipElement !== 'undefined' && helpTooltipElement !== null) {
       if (helpTooltipElement.parentNode !== null) {
         helpTooltipElement.outerHTML = '';
       }
     }
-    if (typeof measureTooltipElement !== 'undefined') {
+    if (typeof measureTooltipElement !== 'undefined' && measureTooltipElement !== null) {
       if (measureTooltipElement.parentNode !== null) {
         measureTooltipElement.outerHTML = '';
       }
