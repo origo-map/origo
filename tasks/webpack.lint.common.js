@@ -1,4 +1,5 @@
 const webpack = require('webpack');
+const nodeSass = require('node-sass');
 const ESLintPlugin = require('eslint-webpack-plugin');
 
 module.exports = {
@@ -25,6 +26,22 @@ module.exports = {
         use: {
           loader: 'babel-loader'
         }
+      },
+      {
+        test: /\.s[ac]ss$/i,
+        use: [
+          'style-loader',
+          'css-loader',
+          {
+            loader: 'sass-loader',
+            options: {
+              implementation: nodeSass,
+              sassOptions: {
+                fiber: false
+              }
+            }
+          }
+        ]
       }
     ]
   },
@@ -38,6 +55,9 @@ module.exports = {
     new ESLintPlugin({
       fix: true,
       emitError: true
+    }),
+    new webpack.DefinePlugin({
+      'process.env.import_sass': 'true'
     })
   ]
 };
