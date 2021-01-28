@@ -13,5 +13,12 @@ module.exports = merge(common, {
   devServer: {
     contentBase: './',
     port: 9966
+  },
+  optimization: {
+    nodeEnv: 'development',
+    runtimeChunk: false,
+    removeAvailableModules: false,
+    removeEmptyChunks: false,
+    splitChunks: false
   }
 });
