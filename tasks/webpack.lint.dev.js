@@ -12,6 +12,7 @@ module.exports = merge(common, {
   devtool: 'source-map',
   devServer: {
     contentBase: './',
-    port: 9966
+    port: 9966,
+    compress: true
   }
 });
