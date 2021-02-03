@@ -41,6 +41,7 @@
     "dom-to-image-more": "^2.8.0",
     "downloadjs": "^1.4.7",
     "html2canvas": "^1.0.0-rc.7",
+    "jquery": "^3.5.1",
     "ol-mapbox-style": "6.3.0",
     "jspdf": "^2.2.0",
     "ol": "^6.5.0",
