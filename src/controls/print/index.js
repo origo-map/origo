@@ -47,7 +47,7 @@ const Print = function Print(options = {}) {
         showScale,
         classes,
         defaultClass,
-        name: filename
+        filename
       });
       mapMenu = viewer.getControlByName('mapmenu');
       menuItem = mapMenu.MenuItem({
