@@ -8,7 +8,7 @@ import LineString from 'ol/geom/LineString';
 import Point from 'ol/geom/Point';
 import Projection from 'ol/proj/Projection';
 import * as Extent from 'ol/extent';
-import { Component, Element as El, Button, dom } from '../ui';
+import { Component, Icon, Element as El, Button, dom } from '../ui';
 import Style from '../style';
 import StyleTypes from '../style/styletypes';
 import replacer from '../utils/replacer';
@@ -37,6 +37,8 @@ const Measure = function Measure({
   let measureStyleOptions;
   let helpTooltip;
   let helpTooltipElement;
+  let markerIcon;
+  let markerElement;
   let vector;
   let source;
   let label;
@@ -338,6 +340,16 @@ const Measure = function Measure({
     measureTooltipElement = null;
     helpTooltipElement = null;
   }
+  
+  function renderMarker() {
+    markerIcon = Icon({
+      icon: '#o_centerposition_24px',
+      cls: 'o-position-marker'
+    });
+
+    markerElement = dom.html(markerIcon.render());
+    document.getElementById(`${viewer.getId()}`).appendChild(markerElement);
+  }
 
   function disableInteraction() {
     if (activeButton) {
@@ -360,9 +372,8 @@ const Measure = function Measure({
     document.getElementById(clearButton.getId()).classList.add('hidden');
     if (touchMode) {
       document.getElementById(addNodeButton.getId()).classList.add('hidden');
-      if (!viewer.getControlByName('position').isMousePositionActive()) {
-        viewer.getControlByName('position').onTogglePosition();
-      }
+      const markerIconElement = document.getElementById(`${markerIcon.getId()}`);
+      markerIconElement.parentNode.removeChild(markerIconElement);
     }
     setActive(false);
     map.un('pointermove', pointerMoveHandler);
@@ -398,9 +409,7 @@ const Measure = function Measure({
     document.getElementById(defaultButton.getId()).click();
     if (touchMode) {
       document.getElementById(addNodeButton.getId()).classList.remove('hidden');
-      if (viewer.getControlByName('position').isMousePositionActive()) {
-        viewer.getControlByName('position').onTogglePosition();
-      }
+      renderMarker();
     }
     setActive(true);
   }
@@ -521,7 +530,7 @@ const Measure = function Measure({
     name: 'measure',
     onAdd(evt) {
       viewer = evt.target;
-      touchMode = 'ontouchstart' in document.documentElement && viewer.getControlByName('position');
+      touchMode = 'ontouchstart' in document.documentElement;
       if (touchMode) {
         addNodeButton = Button({
           cls: 'o-measure-undo padding-small margin-bottom-smaller icon-smaller round light box-shadow hidden',
