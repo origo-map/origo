@@ -339,8 +339,9 @@ const Measure = function Measure({
     // unset tooltip so that a new one can be created
     measureTooltipElement = null;
     helpTooltipElement = null;
+    viewer.removeOverlays(tempOverlayArray);
   }
-  
+
   function renderMarker() {
     markerIcon = Icon({
       icon: '#o_centerposition_24px',
@@ -388,7 +389,6 @@ const Measure = function Measure({
         measureTooltipElement.outerHTML = '';
       }
     }
-    viewer.removeOverlays(tempOverlayArray);
     setActive(false);
     resetSketch();
   }
@@ -489,12 +489,10 @@ const Measure = function Measure({
     if (activeButton) {
       document.getElementById(activeButton.getId()).classList.remove('active');
     }
-
     document.getElementById(button.getId()).classList.add('active');
     document.getElementById(undoButton.getId()).classList.add('hidden');
     activeButton = button;
     map.removeInteraction(measure);
-    viewer.removeOverlays(tempOverlayArray);
     resetSketch();
     addInteraction();
   }
@@ -650,6 +648,7 @@ const Measure = function Measure({
           clearButton = Button({
             cls: 'o-measure-clear padding-small margin-bottom-smaller icon-smaller round light box-shadow hidden',
             click() {
+              abort();
               vector.getSource().clear();
               viewer.removeOverlays(overlayArray);
             },
