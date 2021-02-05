@@ -388,7 +388,7 @@ const Measure = function Measure({
         measureTooltipElement.outerHTML = '';
       }
     }
-    overlayArray.push(...tempOverlayArray);
+    viewer.removeOverlays(tempOverlayArray);
     setActive(false);
     resetSketch();
   }
