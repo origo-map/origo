@@ -62,10 +62,18 @@ const loadResources = async function loadResources(mapOptions, config) {
       }
       baseUrl = config.baseUrl || '';
       map.options = Object.assign(config, mapOptions);
+      map.options.controls = config.defaultControls || [];
       if (mapOptions.controls) {
-        map.options.controls = config.defaultControls.concat(mapOptions.controls);
-      } else {
-        map.options.controls = config.defaultControls;
+        mapOptions.controls.forEach((control) => {
+          const matchingControlIndex = map.options.controls.findIndex(
+            (defaultControl) => (defaultControl.name === control.name)
+          );
+          if (matchingControlIndex !== -1) {
+            Object.assign(map.options.controls[matchingControlIndex], control);
+          } else {
+            map.options.controls.push(control);
+          }
+        });
       }
       map.options.url = getUrl();
       map.options.map = undefined;
@@ -107,10 +115,18 @@ const loadResources = async function loadResources(mapOptions, config) {
           .then(res => res.json())
           .then((data) => {
             map.options = Object.assign(config, data);
+            map.options.controls = config.defaultControls || [];
             if (data.controls) {
-              map.options.controls = config.defaultControls.concat(data.controls);
-            } else {
-              map.options.controls = config.defaultControls;
+              data.controls.forEach((control) => {
+                const matchingControlIndex = map.options.controls.findIndex(
+                  (defaultControl) => (defaultControl.name === control.name)
+                );
+                if (matchingControlIndex !== -1) {
+                  Object.assign(map.options.controls[matchingControlIndex], control);
+                } else {
+                  map.options.controls.push(control);
+                }
+              });
             }
             map.options.url = mapUrl;
             map.options.map = json;
