@@ -14,7 +14,7 @@ const Zoom = function Zoom(options = {}) {
   const zoomByDelta = function zoomByDelta(deltaValue) {
     const map = viewer.getMap();
     const view = map.getView();
-    if (view.options_.constrainResolution === true) {
+    if (view.getConstrainResolution() === true) {
       view.setZoom(view.getZoom() + deltaValue);
     } else {
       if (view.getAnimating()) {
