@@ -37,12 +37,12 @@ Not convinced? Or maybe you need some inspiration? Check out these examples of w
  * [Enakartan](http://karta.enkoping.se)
  * [Eskilstunakartan](https://karta.eskilstuna.se)
  * [Hallstakartan](http://karta.hallstahammar.se)
+ * [Haninge kommun webbkarta](https://karta.haninge.se/)
  * [Karlstadskartan](http://gi.karlstad.se)
  * [Mälardalskartan](http://www.malardalskartan.se)
  * [Sigtunakartan](https://karta.sigtuna.se)
  * [Strängnäskartan](https://kartor.strangnas.se)
  * [Västerås Stads samlingskarta](https://kartor.vasteras.se/sam)
- * [Haninge kommun webbkarta](https://karta.haninge.se/)
 
 ## Getting started
 So you have decided to take matters into your own hands and get coding? Great!
