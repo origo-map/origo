@@ -37,6 +37,7 @@ Not convinced? Or maybe you need some inspiration? Check out these examples of w
  * [Enakartan](http://karta.enkoping.se)
  * [Eskilstunakartan](https://karta.eskilstuna.se)
  * [Hallstakartan](http://karta.hallstahammar.se)
+ * [Haninge kommun webbkarta](https://karta.haninge.se/)
  * [Karlstadskartan](http://gi.karlstad.se)
  * [Mälardalskartan](http://www.malardalskartan.se)
  * [Sigtunakartan](https://karta.sigtuna.se)
