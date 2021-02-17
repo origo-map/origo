@@ -2,7 +2,6 @@ import { Component } from '../../ui';
 
 export default function NorthArrow(options = {}) {
   const {
-    baseUrl,
     northArrow,
     map
   } = options;
@@ -64,7 +63,7 @@ export default function NorthArrow(options = {}) {
       this.dispatch('render');
     },
     render() {
-      return `<img src="${baseUrl}${src}" class="${cls}" style="${styleString}" id="${this.getId()}" alt="NorthArrow" />`;
+      return `<img src="${src}" class="${cls}" style="${styleString}" id="${this.getId()}" alt="NorthArrow" />`;
     }
   });
 }

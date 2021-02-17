@@ -19,7 +19,6 @@ const Geoposition = function Geoposition(options = {}) {
 
   let viewer;
   let positionButton;
-  let baseUrl;
   let markerOverlay;
   let geolocation;
 
@@ -78,7 +77,7 @@ const Geoposition = function Geoposition(options = {}) {
   const onActive = function onActive() {
     if (!geolocation.getTracking()) {
       const markerEl = dom.createElement('img', '', {
-        src: `${baseUrl}img/geolocation_marker.png`
+        src: 'img/geolocation_marker.png'
       });
       viewer.getMap().getTargetElement().appendChild(markerEl);
       markerOverlay = new Overlay({
@@ -117,7 +116,6 @@ const Geoposition = function Geoposition(options = {}) {
       viewer = evt.target;
       if (!target) target = `${viewer.getMain().getNavigation().getId()}`;
       if (!zoomLevel) zoomLevel = viewer.getResolutions().length - 3 || 0;
-      baseUrl = viewer.getBaseUrl();
       this.on('render', this.onRender);
       this.addComponents([positionButton]);
 
