@@ -19,6 +19,9 @@ const PrintComponent = function PrintComponent(options = {}) {
     map,
     target,
     viewer,
+    titlePlaceholderText,
+    titleAlignment,
+    titleSizes,
     leftFooterText,
     createdPrefix,
     scales,
@@ -27,6 +30,9 @@ const PrintComponent = function PrintComponent(options = {}) {
   } = options;
 
   let {
+    title,
+    titleSize,
+    titleFormatIsVisible,
     size = 'a4',
     orientation = 'portrait',
     showCreated,
@@ -40,9 +46,7 @@ const PrintComponent = function PrintComponent(options = {}) {
   let targetElement;
   const pageContainerId = cuid();
   const pageId = cuid();
-  let title = '';
-  let titleSize = 'h4';
-  let titleAlign = 'text-align-center';
+  let titleAlign = `text-align-${titleAlignment}`;
   let description = '';
   let descriptionSize = 'h4';
   let descriptionAlign = 'text-align-center';
@@ -117,11 +121,17 @@ const PrintComponent = function PrintComponent(options = {}) {
   };
 
   const printSettings = PrintSettings({
+    map,
+    title,
+    titlePlaceholderText,
+    titleAlignment,
+    titleSizes,
+    titleSize,
+    titleFormatIsVisible,
     orientation,
     customSize: sizes.custom,
     initialSize: size,
     sizes: Object.keys(sizes),
-    map,
     showCreated,
     showNorthArrow,
     scales,

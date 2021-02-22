@@ -7,6 +7,10 @@ const Print = function Print(options = {}) {
     logo = {},
     northArrow = {},
     title = 'Skriv ut',
+    headerText = '',
+    headerPlaceholderText = 'Här kan du skriva en rubrik',
+    headerAlignment = 'center',
+    headerSizes = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
     leftFooterText = '',
     showCreated = false,
     createdPrefix = '',
@@ -17,6 +21,8 @@ const Print = function Print(options = {}) {
     filename
   } = options;
   let {
+    headerSize = 'h4',
+    headerFormatIsVisible = false,
     showNorthArrow = true
   } = options;
 
@@ -36,9 +42,16 @@ const Print = function Print(options = {}) {
       const printComponent = PrintComponent({
         logo,
         northArrow,
-        target: viewer.getId(),
+        filename,
         map: viewer.getMap(),
+        target: viewer.getId(),
         viewer,
+        title: headerText,
+        titlePlaceholderText: headerPlaceholderText,
+        titleAlignment: headerAlignment,
+        titleSizes: headerSizes,
+        titleSize: headerSize,
+        titleFormatIsVisible: headerFormatIsVisible,
         leftFooterText,
         showCreated,
         createdPrefix,
@@ -46,8 +59,7 @@ const Print = function Print(options = {}) {
         scales,
         showScale,
         classes,
-        defaultClass,
-        filename
+        defaultClass
       });
       mapMenu = viewer.getControlByName('mapmenu');
       menuItem = mapMenu.MenuItem({

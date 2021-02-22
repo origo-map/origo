@@ -15,22 +15,33 @@ import SetScaleControl from './set-scale-control';
 import ResolutionControl from './resolution-control';
 import ShowScaleControl from './show-scale-control';
 
-const PrintSettings = function PrintSettings({
-  closeIcon = '#ic_close_24px',
-  initialSize,
-  openIcon = '#ic_tune_24px',
-  orientation = 'portrait',
-  customSize,
-  sizes,
-  map,
-  showCreated,
-  showNorthArrow,
-  scales,
-  resolution = 150,
-  showScale,
-  classes,
-  defaultClass
-} = {}) {
+const PrintSettings = function PrintSettings(options = {}) {
+  const {
+    closeIcon = '#ic_close_24px',
+    openIcon = '#ic_tune_24px',
+    map,
+    title,
+    titlePlaceholderText,
+    titleAlignment,
+    titleSizes,
+    initialSize,
+    customSize,
+    sizes,
+    orientation = 'portrait',
+    showCreated,
+    showNorthArrow,
+    scales,
+    resolution = 150,
+    showScale,
+    classes,
+    defaultClass
+  } = options;
+
+  let {
+    titleSize,
+    titleFormatIsVisible
+  } = options;
+
   let headerComponent;
   let contentComponent;
   let openButton;
@@ -96,7 +107,14 @@ const PrintSettings = function PrintSettings({
 
       const orientationControl = OrientationControl({ orientation });
       const sizeControl = SizeControl({ initialSize, sizes });
-      const titleControl = TitleControl({ classes, size: defaultClass });
+      const titleControl = TitleControl({
+        title,
+        titlePlaceholderText,
+        titleAlignment,
+        titleSizes,
+        titleSize,
+        titleFormatIsVisible
+      });
       const descriptionControl = DescriptionControl({ classes, size: defaultClass });
       const marginControl = MarginControl({ checked: true });
       const createdControl = CreatedControl({ checked: showCreated });
