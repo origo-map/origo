@@ -1,9 +1,6 @@
 import { Button, ToggleGroup } from '../../ui';
 import round2 from '../../utils/round';
-
-const titleCase = function titleCase(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-};
+import titleCase from '../../utils/titlecase';
 
 export default function SizeControl({ initialSize, sizes }) {
   const sizeButtons = sizes.map((size) => {
