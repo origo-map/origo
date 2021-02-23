@@ -15,6 +15,15 @@ const Print = function Print(options = {}) {
     descriptionPlaceholderText = 'Här kan du skriva en beskrivning',
     descriptionAlignment = 'center',
     descriptionSizes = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+    sizes = {
+      a3: [420, 297],
+      a4: [297, 210],
+      custom: [297, 210]
+    },
+    sizeCustomMinHeight = 50,
+    sizeCustomMaxHeight = 420,
+    sizeCustomMinWidth = 50,
+    sizeCustomMaxWidth = 420,
     leftFooterText = '',
     showCreated = false,
     createdPrefix = '',
@@ -27,6 +36,7 @@ const Print = function Print(options = {}) {
     headerFormatIsVisible = false,
     descriptionSize = 'h4',
     descriptionFormatIsVisible = false,
+    sizeInitial = 'a4',
     showNorthArrow = true
   } = options;
 
@@ -62,6 +72,12 @@ const Print = function Print(options = {}) {
         descriptionSizes,
         descriptionSize,
         descriptionFormatIsVisible,
+        sizes,
+        size: sizeInitial,
+        sizeCustomMinHeight,
+        sizeCustomMaxHeight,
+        sizeCustomMinWidth,
+        sizeCustomMaxWidth,
         leftFooterText,
         showCreated,
         createdPrefix,

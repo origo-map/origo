@@ -25,6 +25,11 @@ const PrintComponent = function PrintComponent(options = {}) {
     descriptionPlaceholderText,
     descriptionAlignment,
     descriptionSizes,
+    sizes,
+    sizeCustomMinHeight,
+    sizeCustomMaxHeight,
+    sizeCustomMinWidth,
+    sizeCustomMaxWidth,
     leftFooterText,
     createdPrefix,
     scales
@@ -37,7 +42,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     description,
     descriptionSize,
     descriptionFormatIsVisible,
-    size = 'a4',
+    size,
     orientation = 'portrait',
     showCreated,
     showNorthArrow,
@@ -59,12 +64,6 @@ const PrintComponent = function PrintComponent(options = {}) {
   let printScale = 0;
   let widthImage = 0;
   let heightImage = 0;
-
-  const sizes = {
-    a3: [420, 297],
-    a4: [297, 210],
-    custom: [297, 210]
-  };
 
   const setCustomSize = function setCustomSize(sizeObj) {
     if ('width' in sizeObj) {
@@ -136,10 +135,13 @@ const PrintComponent = function PrintComponent(options = {}) {
     descriptionSizes,
     descriptionSize,
     descriptionFormatIsVisible,
+    sizes,
+    size,
+    sizeCustomMinHeight,
+    sizeCustomMaxHeight,
+    sizeCustomMinWidth,
+    sizeCustomMaxWidth,
     orientation,
-    customSize: sizes.custom,
-    initialSize: size,
-    sizes: Object.keys(sizes),
     showCreated,
     showNorthArrow,
     scales,

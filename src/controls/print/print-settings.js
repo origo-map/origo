@@ -28,9 +28,12 @@ const PrintSettings = function PrintSettings(options = {}) {
     descriptionPlaceholderText,
     descriptionAlignment,
     descriptionSizes,
-    initialSize,
-    customSize,
     sizes,
+    size,
+    sizeCustomMinHeight,
+    sizeCustomMaxHeight,
+    sizeCustomMinWidth,
+    sizeCustomMaxWidth,
     orientation = 'portrait',
     showCreated,
     showNorthArrow,
@@ -110,7 +113,10 @@ const PrintSettings = function PrintSettings(options = {}) {
       });
 
       const orientationControl = OrientationControl({ orientation });
-      const sizeControl = SizeControl({ initialSize, sizes });
+      const sizeControl = SizeControl({
+        initialSize: size,
+        sizes: Object.keys(sizes)
+      });
       const titleControl = TitleControl({
         title,
         titlePlaceholderText,
@@ -134,9 +140,13 @@ const PrintSettings = function PrintSettings(options = {}) {
       northArrowControl = NorthArrowControl({ showNorthArrow });
       rotationControl = RotationControl({ rotation: 0, map });
       customSizeControl = CustomSizeControl({
-        state: initialSize === 'custom' ? 'active' : 'inital',
-        height: customSize[0],
-        width: customSize[1]
+        minHeight: sizeCustomMinHeight,
+        maxHeight: sizeCustomMaxHeight,
+        minWidth: sizeCustomMinWidth,
+        maxWidth: sizeCustomMaxWidth,
+        height: sizes.custom ? sizes.custom[0] : sizeCustomMinHeight,
+        width: sizes.custom ? sizes.custom[1] : sizeCustomMinWidth,
+        state: size === 'custom' ? 'active' : 'initial'
       });
       setScaleControl = SetScaleControl({ scales }, map);
 

@@ -1,6 +1,13 @@
 import { Component, cuid, InputRange } from '../../ui';
 
 export default function CustomSizeControl(options = {}) {
+  const {
+    minHeight,
+    maxHeight,
+    minWidth,
+    maxWidth
+  } = options;
+
   let {
     height,
     width,
@@ -21,15 +28,15 @@ export default function CustomSizeControl(options = {}) {
       rangeHeightComponent = InputRange({
         cls: 'grey',
         initialValue: height,
-        maxValue: 420,
-        minValue: 50,
+        maxValue: maxHeight,
+        minValue: minHeight,
         style: { width: '100%' }
       });
       rangeWidthComponent = InputRange({
         cls: 'grey',
         initialValue: width,
-        maxValue: 420,
-        minValue: 50,
+        maxValue: maxWidth,
+        minValue: minWidth,
         style: { width: '100%' }
       });
       this.addComponents([rangeHeightComponent, rangeWidthComponent]);
