@@ -11,6 +11,7 @@ import * as Extent from 'ol/extent';
 import { Snap } from 'ol/interaction';
 import { Collection } from 'ol';
 import LayerGroup from 'ol/layer/Group';
+import { unByKey } from 'ol/Observable';
 import { Component, Icon, Element as El, Button, dom } from '../ui';
 import Style from '../style';
 import StyleTypes from '../style/styletypes';
@@ -69,6 +70,7 @@ const Measure = function Measure({
   let target;
   let touchMode;
   let snapCollection;
+  let snapEventListenerKeys;
 
   function createStyle(feature) {
     const featureType = feature.getGeometry().getType();
@@ -237,6 +239,13 @@ const Measure = function Measure({
           .setText(`${elevation.toFixed(1)} m`);
         source.changed();
       });
+  }
+
+  function clearSnapInteractions() {
+    snapCollection.forEach((s) => map.removeInteraction(s));
+    snapCollection.clear();
+    snapEventListenerKeys.forEach((k) => unByKey(k));
+    snapEventListenerKeys.clear();
   }
 
   function placeMeasurementLabel(segment, coords) {
@@ -432,9 +441,7 @@ const Measure = function Measure({
     map.un('pointermove', pointerMoveHandler);
     map.removeInteraction(measure);
     if (snap) {
-      snapCollection.forEach((s) => {
-        map.removeInteraction(s);
-      });
+      clearSnapInteractions();
     }
 
     if (
@@ -484,20 +491,47 @@ const Measure = function Measure({
     setActive(true);
   }
 
-  function createSnapInteractionsRecursive(layer) {
-    const snaps = [];
-    if (layer instanceof VectorLayer) {
-      const state = layer.getLayerState();
-      const sn = new Snap({
+  function createSnapInteractionForVectorLayer(layer) {
+    const state = layer.getLayerState();
+    // Using ol_uid because the Origo layer id is unreliable
+    const layerId = layer.ol_uid;
+    let sn;
+    if (state.visible) {
+      sn = new Snap({
         source: layer.getSource(),
         pixelTolerance: snapRadius
       });
       sn.setActive(!!state.visible);
-      layer.on('change:visible', (visibilityChangeEvent) => {
-        sn.setActive(!visibilityChangeEvent.oldValue);
-        console.log('visibility changed');
-      });
-      snaps.push(sn);
+      sn.set('layerId', layerId);
+    }
+    const eventKey = layer.on('change:visible', (visibilityChangeEvent) => {
+      if (!visibilityChangeEvent.oldValue) {
+        const s = new Snap({
+          source: layer.getSource(),
+          pixelTolerance: snapRadius
+        });
+        s.setActive(!visibilityChangeEvent.oldValue);
+        s.set('layerId', layerId);
+        map.addInteraction(s);
+        snapCollection.push(s);
+      } else {
+        const int = map
+          .getInteractions()
+          .getArray()
+          .find((i) => (i instanceof Snap ? i.get('layerId') === layerId : false));
+        map.removeInteraction(int);
+        snapCollection.remove(int);
+      }
+    });
+    snapEventListenerKeys.push(eventKey);
+    return sn;
+  }
+
+  function createSnapInteractionsRecursive(layer) {
+    const snaps = [];
+    if (layer instanceof VectorLayer) {
+      const sn = createSnapInteractionForVectorLayer(layer);
+      if (sn) snaps.push(sn);
     } else if (layer instanceof LayerGroup) {
       layer.getLayers().forEach((l) => {
         snaps.concat(createSnapInteractionsRecursive(l));
@@ -507,14 +541,8 @@ const Measure = function Measure({
   }
 
   function addSnapInteractions() {
-    console.log('adding interaction');
-    snapCollection = new Collection([], {
-      unique: true
-    });
     if (snapLayers === undefined) {
-      console.log('snapLayers undefined');
       const allLayers = viewer.getLayers();
-      // console.log(allLayers);
       allLayers.forEach((l) => {
         snapCollection.extend(createSnapInteractionsRecursive(l));
       });
@@ -522,23 +550,19 @@ const Measure = function Measure({
       snapLayers.forEach((sl) => {
         const l = viewer.getLayer(sl);
         if (l instanceof VectorLayer) {
-          const s = new Snap({
-            source: l.getSource(),
-            pixelTolerance: snapRadius
-          });
-          snapCollection.push(s);
+          const sn = createSnapInteractionForVectorLayer(l);
+          if (sn) snapCollection.push(sn);
         }
       });
+      const sn = createSnapInteractionForVectorLayer(vector);
+      if (sn) snapCollection.push(sn);
     }
     snapCollection.forEach((s) => {
       map.addInteraction(s);
     });
-    console.log(map.getInteractions());
-    console.log(map.getLayers());
   }
 
   function addInteraction() {
-    console.log('Adds interaction');
     measure = new DrawInteraction({
       source,
       type,
@@ -625,7 +649,6 @@ const Measure = function Measure({
   }
 
   function toggleType(button) {
-    console.log('Toggle type');
     if (activeButton) {
       document.getElementById(activeButton.getId()).classList.remove('active');
     }
@@ -714,15 +737,16 @@ const Measure = function Measure({
           disableInteraction();
         }
       });
-      viewer.on('change:visible', () => {
-        console.log('visibilityChange');
-      });
     },
     onInit() {
       lengthTool = measureTools.indexOf('length') >= 0;
       areaTool = measureTools.indexOf('area') >= 0;
       elevationTool = measureTools.indexOf('elevation') >= 0;
       defaultTool = lengthTool ? defaultMeasureTool : 'area';
+      snapCollection = new Collection([], {
+        unique: true
+      });
+      snapEventListenerKeys = new Collection([], { unique: true });
       if (lengthTool || areaTool || elevationTool) {
         measureElement = El({
           tagName: 'div',
