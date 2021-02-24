@@ -43,7 +43,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     descriptionSize,
     descriptionFormatIsVisible,
     size,
-    orientation = 'portrait',
+    orientation,
     showCreated,
     showNorthArrow,
     resolution = 150,

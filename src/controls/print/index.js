@@ -37,6 +37,7 @@ const Print = function Print(options = {}) {
     descriptionSize = 'h4',
     descriptionFormatIsVisible = false,
     sizeInitial = 'a4',
+    orientation = 'portrait',
     showNorthArrow = true
   } = options;
 
@@ -78,6 +79,7 @@ const Print = function Print(options = {}) {
         sizeCustomMaxHeight,
         sizeCustomMinWidth,
         sizeCustomMaxWidth,
+        orientation,
         leftFooterText,
         showCreated,
         createdPrefix,

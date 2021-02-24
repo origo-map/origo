@@ -34,7 +34,7 @@ const PrintSettings = function PrintSettings(options = {}) {
     sizeCustomMaxHeight,
     sizeCustomMinWidth,
     sizeCustomMaxWidth,
-    orientation = 'portrait',
+    orientation,
     showCreated,
     showNorthArrow,
     scales,
