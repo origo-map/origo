@@ -70,7 +70,7 @@ const OverlayProperties = function OverlayProperties(options = {}) {
     render() {
       return `<div id="${this.getId()}" class="${cls} border-bottom">
                 <div class="padding-small">${legend}${transparencySlider.render()}</div>
-                <div class="padding-small padding-x text-small">${abstract}</div>
+                ${abstract ? `<div class="padding-small padding-x text-small">${abstract}</div>` : ''}
               </div>`;
     },
     labelCls: 'text-small text-semibold',
