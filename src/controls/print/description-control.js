@@ -125,7 +125,7 @@ export default function DescriptionControl(options = {}) {
           ${formatButton.render()}
         </div>
       </div>
-      <div class="${descriptionFormatIsVisible ? "" : "hidden"}" id="${formatId}">
+      <div class="${descriptionFormatIsVisible ? '' : 'hidden'}" id="${formatId}">
       <div class="padding-smaller">
         <h6>Justering beskrivning</h6>
         ${alignControl.render()}

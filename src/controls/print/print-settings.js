@@ -24,10 +24,14 @@ const PrintSettings = function PrintSettings(options = {}) {
     titlePlaceholderText,
     titleAlignment,
     titleSizes,
+    titleSize,
+    titleFormatIsVisible,
     description,
     descriptionPlaceholderText,
     descriptionAlignment,
     descriptionSizes,
+    descriptionSize,
+    descriptionFormatIsVisible,
     sizes,
     size,
     sizeCustomMinHeight,
@@ -45,13 +49,6 @@ const PrintSettings = function PrintSettings(options = {}) {
     showNorthArrow,
     rotation,
     rotationStep
-  } = options;
-
-  let {
-    titleSize,
-    titleFormatIsVisible,
-    descriptionSize,
-    descriptionFormatIsVisible
   } = options;
 
   let headerComponent;

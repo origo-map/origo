@@ -11,24 +11,31 @@ const Print = function Print(options = {}) {
     headerPlaceholderText = 'Här kan du skriva en rubrik',
     headerAlignment = 'center',
     headerSizes = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+    headerSize = 'h4',
+    headerFormatIsVisible = false,
     descriptionText = '',
     descriptionPlaceholderText = 'Här kan du skriva en beskrivning',
     descriptionAlignment = 'center',
     descriptionSizes = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+    descriptionSize = 'h4',
+    descriptionFormatIsVisible = false,
     sizes = {
       a3: [420, 297],
       a4: [297, 210],
       custom: [297, 210]
     },
+    sizeInitial = 'a4',
     sizeCustomMinHeight = 50,
     sizeCustomMaxHeight = 420,
     sizeCustomMinWidth = 50,
     sizeCustomMaxWidth = 420,
+    orientation = 'portrait',
     resolutions = [
-      { label: 'Låg', value: '75'},
-      { label: 'Mellan', value: '150'},
-      { label: 'Hög', value: '300'}
+      { label: 'Låg', value: '75' },
+      { label: 'Mellan', value: '150' },
+      { label: 'Hög', value: '300' }
     ],
+    resolution = 150,
     scales = [],
     scaleInitial,
     showMargins = true,
@@ -41,13 +48,6 @@ const Print = function Print(options = {}) {
     filename
   } = options;
   let {
-    headerSize = 'h4',
-    headerFormatIsVisible = false,
-    descriptionSize = 'h4',
-    descriptionFormatIsVisible = false,
-    sizeInitial = 'a4',
-    orientation = 'portrait',
-    resolution = 150,
     showNorthArrow = true
   } = options;
 

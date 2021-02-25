@@ -124,7 +124,7 @@ export default function TitleControl(options = {}) {
           ${formatButton.render()}
         </div>
       </div>
-      <div class="${titleFormatIsVisible ? "" : "hidden"}" id="${formatId}">
+      <div class="${titleFormatIsVisible ? '' : 'hidden'}" id="${formatId}">
         <div class="padding-smaller">
           <h6>Justering titel</h6>
           ${alignControl.render()}
