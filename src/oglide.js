@@ -21,11 +21,11 @@ const generateBullets = function generateBullets(o) {
 
 function OGlide(options) {
   // Polyfill for IE11 to set class on svg element
-  if (!Object.getOwnPropertyDescriptor(Element.prototype,'classList')){
-    if (HTMLElement&&Object.getOwnPropertyDescriptor(HTMLElement.prototype,'classList')){
-      Object.defineProperty(Element.prototype,'classList',Object.getOwnPropertyDescriptor(HTMLElement.prototype,'classList'));
+  if (!Object.getOwnPropertyDescriptor(Element.prototype, 'classList')) {
+    if (HTMLElement && Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'classList')) {
+      Object.defineProperty(Element.prototype, 'classList', Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'classList'));
     }
-  } 
+  }
   const { id, callback } = options;
   const oiContent = Array.from(document.querySelectorAll('.o-identify-content'));
   const target = document.querySelector(id);
@@ -89,7 +89,8 @@ function OGlide(options) {
     perView: 1,
     direction: 'ltr',
     gap: 0,
-    perTouch: 1
+    perTouch: 1,
+    animationDuration: 0
   });
   el.mount();
   el.on('move', () => {
