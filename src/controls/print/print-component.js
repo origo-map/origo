@@ -30,6 +30,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     sizeCustomMaxHeight,
     sizeCustomMinWidth,
     sizeCustomMaxWidth,
+    resolutions,
     leftFooterText,
     createdPrefix,
     scales
@@ -46,7 +47,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     orientation,
     showCreated,
     showNorthArrow,
-    resolution = 150,
+    resolution,
     showScale
   } = options;
 
@@ -142,10 +143,11 @@ const PrintComponent = function PrintComponent(options = {}) {
     sizeCustomMinWidth,
     sizeCustomMaxWidth,
     orientation,
+    resolutions,
+    resolution,
     showCreated,
     showNorthArrow,
     scales,
-    resolution,
     showScale
   });
   const printToolbar = PrintToolbar();

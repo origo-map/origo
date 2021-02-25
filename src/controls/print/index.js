@@ -24,6 +24,11 @@ const Print = function Print(options = {}) {
     sizeCustomMaxHeight = 420,
     sizeCustomMinWidth = 50,
     sizeCustomMaxWidth = 420,
+    resolutions = [
+      { label: 'Låg', value: '75'},
+      { label: 'Mellan', value: '150'},
+      { label: 'Hög', value: '300'}
+    ],
     leftFooterText = '',
     showCreated = false,
     createdPrefix = '',
@@ -38,6 +43,7 @@ const Print = function Print(options = {}) {
     descriptionFormatIsVisible = false,
     sizeInitial = 'a4',
     orientation = 'portrait',
+    resolution = 150,
     showNorthArrow = true
   } = options;
 
@@ -80,6 +86,8 @@ const Print = function Print(options = {}) {
         sizeCustomMinWidth,
         sizeCustomMaxWidth,
         orientation,
+        resolutions,
+        resolution,
         leftFooterText,
         showCreated,
         createdPrefix,

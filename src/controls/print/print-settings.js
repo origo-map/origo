@@ -35,10 +35,11 @@ const PrintSettings = function PrintSettings(options = {}) {
     sizeCustomMinWidth,
     sizeCustomMaxWidth,
     orientation,
+    resolutions,
+    resolution,
     showCreated,
     showNorthArrow,
     scales,
-    resolution = 150,
     showScale
   } = options;
 
@@ -135,7 +136,10 @@ const PrintSettings = function PrintSettings(options = {}) {
       });
       const marginControl = MarginControl({ checked: true });
       const createdControl = CreatedControl({ checked: showCreated });
-      const resolutionControl = ResolutionControl({ resolution });
+      const resolutionControl = ResolutionControl({
+        initialResolution: resolution,
+        resolutions
+      });
       const showScaleControl = ShowScaleControl({ checked: showScale });
       northArrowControl = NorthArrowControl({ showNorthArrow });
       rotationControl = RotationControl({ rotation: 0, map });
