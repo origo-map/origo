@@ -29,10 +29,11 @@ const Print = function Print(options = {}) {
       { label: 'Mellan', value: '150'},
       { label: 'Hög', value: '300'}
     ],
+    scales = [],
+    scaleInitial,
     leftFooterText = '',
     showCreated = false,
     createdPrefix = '',
-    scales = [],
     showScale = true,
     filename
   } = options;
@@ -88,11 +89,12 @@ const Print = function Print(options = {}) {
         orientation,
         resolutions,
         resolution,
+        scales,
+        scaleInitial,
         leftFooterText,
         showCreated,
         createdPrefix,
         showNorthArrow,
-        scales,
         showScale
       });
       mapMenu = viewer.getControlByName('mapmenu');

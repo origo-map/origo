@@ -37,9 +37,10 @@ const PrintSettings = function PrintSettings(options = {}) {
     orientation,
     resolutions,
     resolution,
+    scales,
+    scaleInitial,
     showCreated,
     showNorthArrow,
-    scales,
     showScale
   } = options;
 
@@ -152,7 +153,10 @@ const PrintSettings = function PrintSettings(options = {}) {
         width: sizes.custom ? sizes.custom[1] : sizeCustomMinWidth,
         state: size === 'custom' ? 'active' : 'initial'
       });
-      setScaleControl = SetScaleControl({ scales }, map);
+      setScaleControl = SetScaleControl({
+        scales,
+        initialScale: scaleInitial
+      }, map);
 
       contentComponent = Component({
         onRender() { this.dispatch('render'); },
