@@ -19,7 +19,7 @@ export default function CustomSizeControl(options = {}) {
         maxValue: 420,
         minValue: 50,
         style: { width: '100%' },
-        unit: ' mm',
+        unit: 'mm',
         label: 'Höjd'
       });
       rangeWidthComponent = InputRange({
@@ -28,7 +28,7 @@ export default function CustomSizeControl(options = {}) {
         maxValue: 420,
         minValue: 50,
         style: { width: '100%' },
-        unit: ' mm',
+        unit: 'mm',
         label: 'Bredd'
       });
       this.addComponents([rangeHeightComponent, rangeWidthComponent]);
