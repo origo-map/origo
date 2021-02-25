@@ -11,18 +11,22 @@ const Print = function Print(options = {}) {
     headerPlaceholderText = 'Här kan du skriva en rubrik',
     headerAlignment = 'center',
     headerSizes = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+    descriptionText = '',
+    descriptionPlaceholderText = 'Här kan du skriva en beskrivning',
+    descriptionAlignment = 'center',
+    descriptionSizes = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
     leftFooterText = '',
     showCreated = false,
     createdPrefix = '',
     scales = [],
     showScale = true,
-    classes,
-    defaultClass,
     filename
   } = options;
   let {
     headerSize = 'h4',
     headerFormatIsVisible = false,
+    descriptionSize = 'h4',
+    descriptionFormatIsVisible = false,
     showNorthArrow = true
   } = options;
 
@@ -52,14 +56,18 @@ const Print = function Print(options = {}) {
         titleSizes: headerSizes,
         titleSize: headerSize,
         titleFormatIsVisible: headerFormatIsVisible,
+        description: descriptionText,
+        descriptionPlaceholderText,
+        descriptionAlignment,
+        descriptionSizes,
+        descriptionSize,
+        descriptionFormatIsVisible,
         leftFooterText,
         showCreated,
         createdPrefix,
         showNorthArrow,
         scales,
-        showScale,
-        classes,
-        defaultClass
+        showScale
       });
       mapMenu = viewer.getControlByName('mapmenu');
       menuItem = mapMenu.MenuItem({

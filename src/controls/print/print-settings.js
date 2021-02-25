@@ -24,6 +24,10 @@ const PrintSettings = function PrintSettings(options = {}) {
     titlePlaceholderText,
     titleAlignment,
     titleSizes,
+    description,
+    descriptionPlaceholderText,
+    descriptionAlignment,
+    descriptionSizes,
     initialSize,
     customSize,
     sizes,
@@ -32,14 +36,14 @@ const PrintSettings = function PrintSettings(options = {}) {
     showNorthArrow,
     scales,
     resolution = 150,
-    showScale,
-    classes,
-    defaultClass
+    showScale
   } = options;
 
   let {
     titleSize,
-    titleFormatIsVisible
+    titleFormatIsVisible,
+    descriptionSize,
+    descriptionFormatIsVisible
   } = options;
 
   let headerComponent;
@@ -115,7 +119,14 @@ const PrintSettings = function PrintSettings(options = {}) {
         titleSize,
         titleFormatIsVisible
       });
-      const descriptionControl = DescriptionControl({ classes, size: defaultClass });
+      const descriptionControl = DescriptionControl({
+        description,
+        descriptionPlaceholderText,
+        descriptionAlignment,
+        descriptionSizes,
+        descriptionSize,
+        descriptionFormatIsVisible
+      });
       const marginControl = MarginControl({ checked: true });
       const createdControl = CreatedControl({ checked: showCreated });
       const resolutionControl = ResolutionControl({ resolution });
