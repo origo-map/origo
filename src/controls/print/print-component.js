@@ -33,8 +33,8 @@ const PrintComponent = function PrintComponent(options = {}) {
     resolutions,
     scales,
     scaleInitial,
-    leftFooterText,
-    createdPrefix
+    createdPrefix,
+    leftFooterText
   } = options;
 
   let {
@@ -46,10 +46,11 @@ const PrintComponent = function PrintComponent(options = {}) {
     descriptionFormatIsVisible,
     size,
     orientation,
-    showCreated,
-    showNorthArrow,
     resolution,
-    showScale
+    showMargins,
+    showCreated,
+    showScale,
+    showNorthArrow
   } = options;
 
   let pageElement;
@@ -61,7 +62,6 @@ const PrintComponent = function PrintComponent(options = {}) {
   let descriptionAlign = `text-align-${descriptionAlignment}`;
   let viewerMapTarget;
   const printMarginClass = 'print-margin';
-  let usePrintMargins = true;
   let today = new Date(Date.now());
   let printScale = 0;
   let widthImage = 0;
@@ -148,9 +148,10 @@ const PrintComponent = function PrintComponent(options = {}) {
     resolution,
     scales,
     scaleInitial,
+    showMargins,
     showCreated,
-    showNorthArrow,
-    showScale
+    showScale,
+    showNorthArrow
   });
   const printToolbar = PrintToolbar();
   const closeButton = Button({
@@ -246,11 +247,11 @@ const PrintComponent = function PrintComponent(options = {}) {
       setScale(evt.scale);
     },
     printMargin() {
-      return usePrintMargins ? 'print-margin' : '';
+      return showMargins ? 'print-margin' : '';
     },
     toggleMargin() {
       pageElement.classList.toggle(printMarginClass);
-      usePrintMargins = !usePrintMargins;
+      showMargins = !showMargins;
       this.updatePageSize();
     },
     toggleCreated() {

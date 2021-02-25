@@ -31,10 +31,11 @@ const Print = function Print(options = {}) {
     ],
     scales = [],
     scaleInitial,
-    leftFooterText = '',
+    showMargins = true,
     showCreated = false,
     createdPrefix = '',
     showScale = true,
+    leftFooterText = '',
     filename
   } = options;
   let {
@@ -91,11 +92,12 @@ const Print = function Print(options = {}) {
         resolution,
         scales,
         scaleInitial,
-        leftFooterText,
+        showMargins,
         showCreated,
         createdPrefix,
+        showScale,
         showNorthArrow,
-        showScale
+        leftFooterText
       });
       mapMenu = viewer.getControlByName('mapmenu');
       menuItem = mapMenu.MenuItem({

@@ -39,9 +39,10 @@ const PrintSettings = function PrintSettings(options = {}) {
     resolution,
     scales,
     scaleInitial,
+    showMargins,
     showCreated,
-    showNorthArrow,
-    showScale
+    showScale,
+    showNorthArrow
   } = options;
 
   let {
@@ -135,7 +136,7 @@ const PrintSettings = function PrintSettings(options = {}) {
         descriptionSize,
         descriptionFormatIsVisible
       });
-      const marginControl = MarginControl({ checked: true });
+      const marginControl = MarginControl({ checked: showMargins });
       const createdControl = CreatedControl({ checked: showCreated });
       const resolutionControl = ResolutionControl({
         initialResolution: resolution,
