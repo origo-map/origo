@@ -14,7 +14,6 @@ function createSource(options) {
 }
 
 const topojson = function topojson(layerOptions, viewer) {
-  const baseUrl = viewer.getBaseUrl();
   const topojsonDefault = {
     layerType: 'vector'
   };
@@ -28,7 +27,7 @@ const topojson = function topojson(layerOptions, viewer) {
     sourceOptions.url = topojsonOptions.source;
   } else {
     topojsonOptions.sourceName = topojsonOptions.source;
-    sourceOptions.url = baseUrl + topojsonOptions.source;
+    sourceOptions.url = topojsonOptions.source;
   }
 
   const topojsonSource = createSource(sourceOptions);

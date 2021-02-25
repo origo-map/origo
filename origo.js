@@ -98,6 +98,9 @@ const Origo = function Origo(configPath, options = {}) {
     getConfig,
     onInit() {
       const defaultConfig = Object.assign({}, origoConfig, options);
+      const base = document.createElement('base');
+      base.href = defaultConfig.baseUrl;
+      document.getElementsByTagName('head')[0].appendChild(base);
       loadResources(configPath, defaultConfig)
         .then((data) => {
           const viewerOptions = data.options;

@@ -14,13 +14,17 @@ const Zoom = function Zoom(options = {}) {
   const zoomByDelta = function zoomByDelta(deltaValue) {
     const map = viewer.getMap();
     const view = map.getView();
-    if (view.getAnimating()) {
-      view.cancelAnimations();
+    if (view.getConstrainResolution() === true) {
+      view.setZoom(view.getZoom() + deltaValue);
+    } else {
+      if (view.getAnimating()) {
+        view.cancelAnimations();
+      }
+      view.animate({
+        zoom: view.getZoom() + deltaValue,
+        duration
+      });
     }
-    view.animate({
-      zoom: view.getZoom() + deltaValue,
-      duration
-    });
   };
 
   return Component({
