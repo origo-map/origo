@@ -35,6 +35,8 @@ const Print = function Print(options = {}) {
     showCreated = false,
     createdPrefix = '',
     showScale = true,
+    rotation = 0,
+    rotationStep = 1,
     leftFooterText = '',
     filename
   } = options;
@@ -97,6 +99,8 @@ const Print = function Print(options = {}) {
         createdPrefix,
         showScale,
         showNorthArrow,
+        rotation,
+        rotationStep,
         leftFooterText
       });
       mapMenu = viewer.getControlByName('mapmenu');

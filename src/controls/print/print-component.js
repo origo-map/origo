@@ -34,6 +34,8 @@ const PrintComponent = function PrintComponent(options = {}) {
     scales,
     scaleInitial,
     createdPrefix,
+    rotation,
+    rotationStep,
     leftFooterText
   } = options;
 
@@ -151,7 +153,9 @@ const PrintComponent = function PrintComponent(options = {}) {
     showMargins,
     showCreated,
     showScale,
-    showNorthArrow
+    showNorthArrow,
+    rotation,
+    rotationStep
   });
   const printToolbar = PrintToolbar();
   const closeButton = Button({
@@ -269,6 +273,9 @@ const PrintComponent = function PrintComponent(options = {}) {
     },
     close() {
       printMapComponent.removePrintControls();
+      if (map.getView().getRotation() !== 0) {
+        map.getView().setRotation(0);
+      }
       const printElement = document.getElementById(this.getId());
       map.setTarget(viewerMapTarget);
       this.restoreViewerControls();

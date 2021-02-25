@@ -42,7 +42,9 @@ const PrintSettings = function PrintSettings(options = {}) {
     showMargins,
     showCreated,
     showScale,
-    showNorthArrow
+    showNorthArrow,
+    rotation,
+    rotationStep
   } = options;
 
   let {
@@ -144,7 +146,11 @@ const PrintSettings = function PrintSettings(options = {}) {
       });
       const showScaleControl = ShowScaleControl({ checked: showScale });
       northArrowControl = NorthArrowControl({ showNorthArrow });
-      rotationControl = RotationControl({ rotation: 0, map });
+      rotationControl = RotationControl({
+        rotation,
+        rotationStep,
+        map
+      });
       customSizeControl = CustomSizeControl({
         minHeight: sizeCustomMinHeight,
         maxHeight: sizeCustomMaxHeight,
