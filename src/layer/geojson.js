@@ -27,7 +27,6 @@ function createSource(options) {
 }
 
 const geojson = function geojson(layerOptions, viewer) {
-  const baseUrl = viewer.getBaseUrl();
   const geojsonDefault = {
     layerType: 'vector'
   };
@@ -47,7 +46,7 @@ const geojson = function geojson(layerOptions, viewer) {
     sourceOptions.url = geojsonOptions.source;
   } else {
     geojsonOptions.sourceName = geojsonOptions.source;
-    sourceOptions.url = baseUrl + geojsonOptions.source;
+    sourceOptions.url = geojsonOptions.source;
   }
 
   const geojsonSource = createSource(sourceOptions);

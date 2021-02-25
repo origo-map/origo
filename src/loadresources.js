@@ -27,12 +27,12 @@ function restorePermalink(storeMethod) {
   return Promise.resolve();
 }
 
-const loadSvgSprites = function loadSvgSprites(baseUrl, config) {
+const loadSvgSprites = function loadSvgSprites(config) {
   const svgSprites = config.svgSprites;
   const svgPath = config.svgSpritePath;
   const svgPromises = [];
   svgSprites.forEach((sprite) => {
-    const promise = fetch(baseUrl + svgPath + sprite).then(res => res.text()).then((data) => {
+    const promise = fetch(svgPath + sprite).then(res => res.text()).then((data) => {
       const div = document.createElement('div');
       div.innerHTML = data;
       document.body.insertBefore(div, document.body.childNodes[0]);
@@ -50,7 +50,6 @@ const loadResources = async function loadResources(mapOptions, config) {
   let urlParams;
   let url;
   let mapUrl;
-  let baseUrl;
   let json;
 
   map.el = mapEl;
@@ -60,7 +59,6 @@ const loadResources = async function loadResources(mapOptions, config) {
       if (window.location.hash) {
         urlParams = permalink.parsePermalink(window.location.href);
       }
-      baseUrl = config.baseUrl || '';
       map.options = Object.assign(config, mapOptions);
       map.options.controls = config.defaultControls || [];
       if (mapOptions.controls) {
@@ -78,9 +76,8 @@ const loadResources = async function loadResources(mapOptions, config) {
       map.options.url = getUrl();
       map.options.map = undefined;
       map.options.params = urlParams;
-      map.options.baseUrl = baseUrl;
 
-      return Promise.all(loadSvgSprites(baseUrl, config) || [])
+      return Promise.all(loadSvgSprites(config) || [])
         .then(() => map);
     } else if (typeof (mapOptions) === 'string') {
       if (isUrl(mapOptions)) {
@@ -90,8 +87,6 @@ const loadResources = async function loadResources(mapOptions, config) {
 
         // remove file name if included in
         url = trimUrl(url);
-
-        baseUrl = config.baseUrl || url;
 
         json = `${urlParams.map}.json`;
         url += json;
@@ -103,12 +98,11 @@ const loadResources = async function loadResources(mapOptions, config) {
             json = `${urlParams.map}.json`;
           }
         }
-        baseUrl = config.baseUrl || '';
-        url = baseUrl + json;
+        url = json;
         mapUrl = getUrl();
       }
 
-      return Promise.all(loadSvgSprites(baseUrl, config) || [])
+      return Promise.all(loadSvgSprites(config) || [])
         .then(() => fetch(url, {
           dataType: format
         })
@@ -131,7 +125,6 @@ const loadResources = async function loadResources(mapOptions, config) {
             map.options.url = mapUrl;
             map.options.map = json;
             map.options.params = urlParams;
-            map.options.baseUrl = baseUrl;
 
             for (let i = 0; i < map.options.controls.length; i += 1) {
               if (map.options.controls[i].name === 'sharemap') {
