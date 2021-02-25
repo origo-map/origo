@@ -33,11 +33,11 @@ export default function InputRange(options = {}) {
     },
     render() {
       return `
-      <div class="flex no-wrap text-small align-middle">
+      <div class="flex no-wrap text-smaller align-center">
         <input id="${this.getId()}" type="range" min="${minValue}" max="${maxValue}" value="${initialValue}" step="${step}" class="${cls}" style="${style}" oninput="this.nextElementSibling.value = this.value">
-        <output class="padding-left-small">${initialValue}</output><div>${unit}</div>
+        <output class="padding-left-small text-align-center">${initialValue}</output><div>&nbsp;${unit}</div>
       </div>
-      <div class="text-small text-align-center padding-smallpadding-top-smallest width-full">${label}</div>
+      <div class="text-smaller text-align-center padding-smallpadding-top-smallest width-full">${label}</div>
       `;
     }
   });
