@@ -89,7 +89,8 @@ function OGlide(options) {
     perView: 1,
     direction: 'ltr',
     gap: 0,
-    perTouch: 1
+    perTouch: 1,
+    animationDuration: 0
   });
   el.mount();
   el.on('move', () => {
