@@ -149,7 +149,8 @@ export const printToScalePDF = async function printToScalePDF({
   const pdf = new jsPDF({ orientation, format, unit: 'mm', compress: true });
   const styleAttributes = el.getAttribute('style');
   el.setAttribute('style', styleAttributes.split('transform: scale')[0]); // Remove scaling to get correct print size of image
-  const image = await dom2image(el, exportOptions);
+  let image = await dom2image(el, exportOptions);
+  image = await dom2image(el, exportOptions); // Fix for iPhone
   pdf.addImage(image, 'JPEG', 0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
   el.setAttribute('style', styleAttributes); // Restore scaling
   pdf.save(`${filename}.pdf`);
