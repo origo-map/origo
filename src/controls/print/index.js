@@ -31,9 +31,9 @@ const Print = function Print(options = {}) {
     sizeCustomMaxWidth = 420,
     orientation = 'portrait',
     resolutions = [
-      { label: 'Låg', value: '75' },
-      { label: 'Mellan', value: '150' },
-      { label: 'Hög', value: '300' }
+      { label: 'Låg', value: 75 },
+      { label: 'Mellan', value: 150 },
+      { label: 'Hög', value: 300 }
     ],
     resolution = 150,
     scales = [],
