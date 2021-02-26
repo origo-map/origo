@@ -1,5 +1,6 @@
 import Point from 'ol/geom/Point';
 import { Component, Button, Element as El, dom } from '../ui';
+import utils from '../utils';
 
 const Bookmarks = function Bookmarks(options = {}) {
   const {
@@ -11,15 +12,14 @@ const Bookmarks = function Bookmarks(options = {}) {
   let {
     isActive = false
   } = options;
-  let containerElement;
   let headerComponent;
   let listComponent;
   let contentComponent;
   let bookmarksButton;
-  let closeButton;
-  let bookmarksEl;
   let bookmarksButtonEl;
   let bookmarks;
+  let bookmarksEl;
+  let closeButton;
   let viewer;
   let target;
 
@@ -75,63 +75,6 @@ const Bookmarks = function Bookmarks(options = {}) {
     });
   };
 
-  function makeElementDraggable(elm) {
-    const touchMode = 'ontouchstart' in document.documentElement;
-    const elmnt = elm;
-    let pos1 = 0;
-    let pos2 = 0;
-    let pos3 = 0;
-    let pos4 = 0;
-
-    function elementDrag(evt) {
-      const e = evt || window.event;
-      e.preventDefault();
-
-      const clientX = e.clientX === undefined ? e.touches[0].clientX : e.clientX;
-      const clientY = e.clientY === undefined ? e.touches[0].clientY : e.clientY;
-      pos1 = pos3 - clientX;
-      pos2 = pos4 - clientY;
-      pos3 = clientX;
-      pos4 = clientY;
-
-      elmnt.style.top = `${elmnt.offsetTop - pos2}px`;
-      elmnt.style.left = `${elmnt.offsetLeft - pos1}px`;
-    }
-
-    function closeDragElement() {
-      elmnt.classList.toggle('grabbing');
-
-      if (touchMode) {
-        elmnt.ontouchend = null;
-        elmnt.ontouchmove = null;
-      } else {
-        document.onmouseup = null;
-        document.onmousemove = null;
-      }
-    }
-
-    function dragMouseDown(evt) {
-      const e = evt || window.event;
-      elmnt.classList.toggle('grabbing');
-      pos3 = e.clientX;
-      pos4 = e.clientY;
-
-      if (touchMode) {
-        elmnt.ontouchend = closeDragElement;
-        elmnt.ontouchmove = elementDrag;
-      } else {
-        document.onmouseup = closeDragElement;
-        document.onmousemove = elementDrag;
-      }
-    }
-
-    if (touchMode) {
-      elmnt.ontouchstart = dragMouseDown;
-    } else {
-      elmnt.onmousedown = dragMouseDown;
-    }
-  }
-
   return Component({
     name: 'bookmarks',
     close,
@@ -148,14 +91,9 @@ const Bookmarks = function Bookmarks(options = {}) {
       const bookmarksElCls = isActive ? '' : ' faded';
       const items = [];
 
-      containerElement = El({
-        tagName: 'div',
-        cls: 'flex column'
-      });
-
       bookmarksButton = Button({
         icon: bookmarksIcon,
-        cls: `control icon-smaller medium round absolute light${bookmarksButtonCls}`,
+        cls: `control icon-smaller medium round light${bookmarksButtonCls}`,
         tooltipText: 'Bokmärken',
         tooltipPlacement: 'east',
         click() {
@@ -207,17 +145,15 @@ const Bookmarks = function Bookmarks(options = {}) {
       });
     },
     render() {
-      const containerEl = dom.html(containerElement.render());
-      target.appendChild(containerEl);
       const bmEl = dom.html(bookmarks.render());
       document.getElementById(viewer.getMain().getId()).appendChild(bmEl);
       bookmarksEl = document.getElementById(bookmarks.getId());
       const el = dom.html(bookmarksButton.render());
-      document.getElementById(containerElement.getId()).appendChild(el);
+      target.appendChild(el);
       bookmarksButtonEl = document.getElementById(bookmarksButton.getId());
       this.dispatch('render');
 
-      makeElementDraggable(bookmarksEl);
+      utils.makeElementDraggable(bookmarksEl);
     }
   });
 };
