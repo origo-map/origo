@@ -103,7 +103,7 @@ const PrintSettings = function PrintSettings({
       const resolutionControl = ResolutionControl({ resolution });
       const showScaleControl = ShowScaleControl({ checked: showScale });
       northArrowControl = NorthArrowControl({ showNorthArrow });
-      rotationControl = RotationControl({ rotation: 0, map });
+      rotationControl = map.getView().getConstraints().rotation(180) === 180 ? RotationControl({ rotation: 0, map }) : undefined;
       customSizeControl = CustomSizeControl({
         state: initialSize === 'custom' ? 'active' : 'inital',
         height: customSize[0],
@@ -131,7 +131,9 @@ const PrintSettings = function PrintSettings({
           });
         }
       });
-      contentComponent.addComponents([customSizeControl, marginControl, orientationControl, sizeControl, titleControl, descriptionControl, createdControl, northArrowControl, rotationControl, setScaleControl, resolutionControl, showScaleControl]);
+      const components = [customSizeControl, marginControl, orientationControl, sizeControl, titleControl, descriptionControl, createdControl, northArrowControl, setScaleControl, resolutionControl, showScaleControl];
+      if (rotationControl) { components.push(rotationControl); }
+      contentComponent.addComponents(components);
       printSettingsContainer = Collapse({
         cls: 'no-print fixed flex column top-left rounded box-shadow bg-white overflow-hidden z-index-ontop-top',
         containerCls: 'collapse-container no-margin height-full',
@@ -165,7 +167,7 @@ const PrintSettings = function PrintSettings({
       customSizeControl.dispatch('change:visible', { visible });
     },
     onRender() {
-      rotationControl.setRotation();
+      if (rotationControl) { rotationControl.setRotation(); }
       this.dispatch('render');
     },
     render() {
