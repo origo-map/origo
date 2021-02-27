@@ -143,11 +143,7 @@ const PrintSettings = function PrintSettings(options = {}) {
       });
       const showScaleControl = ShowScaleControl({ checked: showScale });
       northArrowControl = NorthArrowControl({ showNorthArrow });
-      rotationControl = RotationControl({
-        rotation,
-        rotationStep,
-        map
-      });
+      rotationControl = map.getView().getConstraints().rotation(180) === 180 ? RotationControl({ rotation, rotationStep, map }) : undefined;
       customSizeControl = CustomSizeControl({
         minHeight: sizeCustomMinHeight,
         maxHeight: sizeCustomMaxHeight,
@@ -182,7 +178,9 @@ const PrintSettings = function PrintSettings(options = {}) {
           });
         }
       });
-      contentComponent.addComponents([customSizeControl, marginControl, orientationControl, sizeControl, titleControl, descriptionControl, createdControl, northArrowControl, rotationControl, setScaleControl, resolutionControl, showScaleControl]);
+      const components = [customSizeControl, marginControl, orientationControl, sizeControl, titleControl, descriptionControl, createdControl, northArrowControl, setScaleControl, resolutionControl, showScaleControl];
+      if (rotationControl) { components.push(rotationControl); }
+      contentComponent.addComponents(components);
       printSettingsContainer = Collapse({
         cls: 'no-print fixed flex column top-left rounded box-shadow bg-white overflow-hidden z-index-ontop-top',
         containerCls: 'collapse-container no-margin height-full',
@@ -216,7 +214,7 @@ const PrintSettings = function PrintSettings(options = {}) {
       customSizeControl.dispatch('change:visible', { visible });
     },
     onRender() {
-      rotationControl.setRotation();
+      if (rotationControl) { rotationControl.setRotation(); }
       this.dispatch('render');
     },
     render() {

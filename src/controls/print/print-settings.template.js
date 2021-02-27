@@ -51,7 +51,7 @@ export default function printTemplate({
       <div class="grow text-normal">Visa norrpil</div>
       ${northArrowControl.render()}
     </div>
-    ${rotationControl.render()}
+    ${rotationControl ? rotationControl.render() : ''}
     <div class="padding-bottom-large">&nbsp;</div>
   </div>`;
 }
