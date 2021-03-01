@@ -7,12 +7,14 @@ const Bookmarks = function Bookmarks(options = {}) {
     maxZoom = 15,
     duration = 300,
     closeIcon = '#ic_close_24px',
-    bookmarksIcon = '#ic_bookmark_24px'
+    bookmarksIcon = '#ic_bookmark_24px',
+    title = 'Bokmärken'
   } = options;
   let {
     isActive = false
   } = options;
   let headerComponent;
+  let titleComponent;
   let listComponent;
   let contentComponent;
   let bookmarksButton;
@@ -46,9 +48,9 @@ const Bookmarks = function Bookmarks(options = {}) {
   const Bookmark = function Bookmark({
     icon = '#ic_play_arrow_24px',
     click,
-    title = ''
+    bookmarkTitle = ''
   } = {}) {
-    const titleCmp = El({ cls: 'grow padding-left', innerHTML: title });
+    const titleCmp = El({ cls: 'grow padding-left', innerHTML: bookmarkTitle });
     const button = Button({
       cls: 'icon-smallest compact no-grow',
       click,
@@ -67,7 +69,7 @@ const Bookmarks = function Bookmarks(options = {}) {
         });
       },
       render() {
-        return `<li class="flex row align-center padding-x padding-y-smaller hover pointer">
+        return `<li class="flex row text-smaller align-center padding-x padding-y-smaller hover pointer">
                   ${button.render()}
                   ${titleCmp.render()}
                 </li>`;
@@ -102,7 +104,7 @@ const Bookmarks = function Bookmarks(options = {}) {
       });
 
       closeButton = Button({
-        cls: 'small round margin-top-small margin-right-small margin-left-small icon-smallest grey-lightest',
+        cls: 'small round margin-top-smaller margin-bottom-auto margin-right-small icon-smallest grey-lightest',
         ariaLabel: 'Stäng',
         icon: closeIcon,
         click() {
@@ -110,15 +112,21 @@ const Bookmarks = function Bookmarks(options = {}) {
         }
       });
 
-      headerComponent = El({
-        cls: 'flex row justify-start',
+      titleComponent = El({
+        cls: 'justify-start margin-y-smaller margin-left text-weight-bold',
         style: { width: '100%' },
-        components: [closeButton]
+        innerHTML: title
+      });
+
+      headerComponent = El({
+        cls: 'flex row justify-end',
+        style: { width: '100%' },
+        components: [titleComponent, closeButton]
       });
 
       options.items.forEach((item) => {
         const bm = this.Bookmark({
-          title: item.name,
+          bookmarkTitle: item.name,
           click() {
             goToBookmark(item);
           }
@@ -138,7 +146,7 @@ const Bookmarks = function Bookmarks(options = {}) {
       });
 
       bookmarks = El({
-        cls: `absolute flex column control bg-white text-smaller overflow-hidden z-index-top no-select grab${bookmarksElCls}`,
+        cls: `absolute flex column control bg-white text-small overflow-hidden z-index-top no-select grab${bookmarksElCls}`,
         style: 'top: 1rem; left: 4rem;',
         collapseX: true,
         components: [headerComponent, contentComponent]
