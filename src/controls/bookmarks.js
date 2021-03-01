@@ -96,7 +96,7 @@ const Bookmarks = function Bookmarks(options = {}) {
       bookmarksButton = Button({
         icon: bookmarksIcon,
         cls: `control icon-smaller medium round light${bookmarksButtonCls}`,
-        tooltipText: 'Bokmärken',
+        tooltipText: title,
         tooltipPlacement: 'east',
         click() {
           toggle();
