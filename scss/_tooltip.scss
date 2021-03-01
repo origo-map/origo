@@ -18,15 +18,13 @@
 }
 
 .o-tooltip:hover span[data-tooltip] {
-  display: block;
+  display: inline-block;
   opacity: 1;
   visibility: visible;
 }
 
 .o-tooltip:hover span[data-tooltip]::after {
   background: rgba(51, 51, 51, 0.85);
-  border-radius: 4px;
-  border-radius: 4px;
   border-radius: 4px;
   border-width: 10px;
   color: #fff;
@@ -49,7 +47,7 @@
 
 .o-tooltip:hover span[data-tooltip][data-placement='east'] {
   border-color: transparent rgba(51, 51, 51, 0.85) transparent transparent;
-  margin-top: -13px;
+  margin-top: 5px;
   right: -10px;
 }
 
@@ -60,7 +58,7 @@
 .o-tooltip span[data-tooltip][data-placement='west'] {
   border-color: transparent transparent transparent rgba(51, 51, 51, 0.85);
   left: -10px;
-  margin-top: -13px;
+  margin-top: 5px;
 }
 
 .o-tooltip:hover span[data-tooltip][data-placement='west']::after {
@@ -78,8 +76,6 @@
   margin-left: 0;
   margin-top: -24px;
   transform: translate(-50%, 0);
-  transform: translate(-50%, 0);
-  transform: translate(-50%, 0);
 }
 
 .o-tooltip span[data-tooltip][data-placement='south'] {
@@ -91,7 +87,5 @@
 .o-tooltip:hover span[data-tooltip][data-placement='south']::after {
   margin-left: 0;
   margin-top: 4px;
-  transform: translate(-50%, 0);
-  transform: translate(-50%, 0);
   transform: translate(-50%, 0);
 }
