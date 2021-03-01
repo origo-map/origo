@@ -90,6 +90,7 @@ input[type=range] {
   margin: 0;
   padding: 0;
   width: 100%;
+  min-width: 0;
 }
 
 input[type=range]:focus {
@@ -163,7 +164,7 @@ input[type=range]::-ms-thumb {
   border-radius: 25px;
   box-shadow: 1px 1px 4px $grey-dark;
   cursor: pointer;
-  height: 16px;
+  height: 14px;
   margin-top: 1px;
   width: 16px;
 }
