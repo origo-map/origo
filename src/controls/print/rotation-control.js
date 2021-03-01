@@ -14,7 +14,9 @@ export default function RotationControl(options = {}) {
     step: 1,
     style: {
       'align-self': 'center'
-    }
+    },
+    unit: '&deg;',
+    label: 'Rotera karta'
   });
 
   return Component({
@@ -52,10 +54,8 @@ export default function RotationControl(options = {}) {
     render() {
       return `
       <div class="padding-top-large"></div>
-      <h6>Rotera karta</h6>
-      <div class="padding-smaller o-tooltip active">
+      <div class="padding-right-small o-tooltip active">
         ${rotationSlider.render()}
-      <div class="text-align-center"><span class="text-smaller float-left">0&deg;</span><span class="text-smaller float-right">360&deg;</span></div>
       </div>`;
     }
   });

@@ -371,7 +371,7 @@ const Measure = function Measure({
     }
     document.getElementById(measureButton.getId()).classList.add('tooltip');
     document.getElementById(clearButton.getId()).classList.add('hidden');
-    if (touchMode) {
+    if (touchMode && isActive) {
       document.getElementById(addNodeButton.getId()).classList.add('hidden');
       const markerIconElement = document.getElementById(`${markerIcon.getId()}`);
       markerIconElement.parentNode.removeChild(markerIconElement);
