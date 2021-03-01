@@ -1,4 +1,4 @@
-import { Component, cuid, InputRange } from '../../ui';
+import { Component, InputRange } from '../../ui';
 
 export default function CustomSizeControl(options = {}) {
   let {
@@ -9,28 +9,27 @@ export default function CustomSizeControl(options = {}) {
 
   let rangeHeightComponent;
   let rangeWidthComponent;
-
-  const heightId = cuid();
-  const widthId = cuid();
-  let heightEl;
-  let widthEl;
   let customSizeEl;
 
   return Component({
     onInit() {
       rangeHeightComponent = InputRange({
-        cls: 'grey',
+        cls: '',
         initialValue: height,
         maxValue: 420,
         minValue: 50,
-        style: { width: '100%' }
+        style: { width: '100%' },
+        unit: 'mm',
+        label: 'Höjd'
       });
       rangeWidthComponent = InputRange({
-        cls: 'grey',
+        cls: '',
         initialValue: width,
         maxValue: 420,
         minValue: 50,
-        style: { width: '100%' }
+        style: { width: '100%' },
+        unit: 'mm',
+        label: 'Bredd'
       });
       this.addComponents([rangeHeightComponent, rangeWidthComponent]);
       rangeHeightComponent.on('change', this.onChangeHeight.bind(this));
@@ -39,12 +38,10 @@ export default function CustomSizeControl(options = {}) {
     },
     onChangeHeight(evt) {
       height = evt.value;
-      heightEl.innerHTML = height;
       this.dispatch('change:size', { size: 'custom', height: evt.value });
     },
     onChangeWidth(evt) {
       width = evt.value;
-      widthEl.innerHTML = width;
       this.dispatch('change:size', { size: 'custom', width: evt.value });
     },
     onChangeVisible(evt) {
@@ -57,8 +54,6 @@ export default function CustomSizeControl(options = {}) {
     },
     onRender() {
       this.dispatch('render');
-      heightEl = document.getElementById(heightId);
-      widthEl = document.getElementById(widthId);
       customSizeEl = document.getElementById(this.getId());
     },
     isActive() {
@@ -67,9 +62,7 @@ export default function CustomSizeControl(options = {}) {
     render() {
       return `
       <div id="${this.getId()}" class="${this.isActive() ? '' : 'hidden'}">
-        <div class="grow text-smaller">Bredd: <span id="${widthId}">${width}</span> mm</div>
         ${rangeWidthComponent.render()}
-        <div class="grow text-smaller">Höjd: <span id="${heightId}">${height}</span> mm</div>
         ${rangeHeightComponent.render()}
       </div>
       `;
