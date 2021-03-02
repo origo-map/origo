@@ -7,7 +7,7 @@ export default function PrintInteractionToggle(options = {}) {
   const {
     map,
     target,
-    toggleIcon = '#fa-pencil-square',
+    toggleIcon = '#fa-map',
     mapInteractionsActive
   } = options;
 
