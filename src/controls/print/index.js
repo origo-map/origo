@@ -14,7 +14,8 @@ const Print = function Print(options = {}) {
     showScale = true,
     classes,
     defaultClass,
-    filename
+    filename,
+    mapInteractionsActive = false
   } = options;
   let {
     showNorthArrow = true
@@ -47,7 +48,8 @@ const Print = function Print(options = {}) {
         showScale,
         classes,
         defaultClass,
-        filename
+        filename,
+        mapInteractionsActive
       });
       mapMenu = viewer.getControlByName('mapmenu');
       menuItem = mapMenu.MenuItem({

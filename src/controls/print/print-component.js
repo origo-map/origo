@@ -24,7 +24,8 @@ const PrintComponent = function PrintComponent(options = {}) {
     createdPrefix,
     scales,
     classes,
-    defaultClass
+    defaultClass,
+    mapInteractionsActive
   } = options;
 
   let {
@@ -131,7 +132,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     classes,
     defaultClass
   });
-  const printInteractionToggle = PrintInteractionToggle({ map, target });
+  const printInteractionToggle = PrintInteractionToggle({ map, target, mapInteractionsActive });
   const printToolbar = PrintToolbar();
   const closeButton = Button({
     cls: 'fixed top-right medium round icon-smaller light box-shadow z-index-ontop-high',

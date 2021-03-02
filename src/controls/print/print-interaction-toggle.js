@@ -7,7 +7,8 @@ export default function PrintInteractionToggle(options = {}) {
   const {
     map,
     target,
-    toggleIcon = '#fa-pencil-square'
+    toggleIcon = '#fa-pencil-square',
+    mapInteractionsActive
   } = options;
 
   const interactions = mapInteractions({ target });
@@ -62,8 +63,10 @@ export default function PrintInteractionToggle(options = {}) {
       this.dispatch('render');
     },
     render() {
-      onInitial();
-      mapInteractionToggleButton.setState('initial');
+      if (!mapInteractionsActive) {
+        onInitial();
+        mapInteractionToggleButton.setState('initial');
+      }
       return mapInteractionToggleButton.render();
     },
     restoreInteractions
