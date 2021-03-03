@@ -19,20 +19,40 @@ const PrintComponent = function PrintComponent(options = {}) {
     map,
     target,
     viewer,
-    leftFooterText,
-    createdPrefix,
+    titlePlaceholderText,
+    titleAlignment,
+    titleSizes,
+    titleFormatIsVisible,
+    descriptionPlaceholderText,
+    descriptionAlignment,
+    descriptionSizes,
+    descriptionFormatIsVisible,
+    sizes,
+    sizeCustomMinHeight,
+    sizeCustomMaxHeight,
+    sizeCustomMinWidth,
+    sizeCustomMaxWidth,
+    resolutions,
     scales,
-    classes,
-    defaultClass
+    scaleInitial,
+    createdPrefix,
+    rotation,
+    rotationStep,
+    leftFooterText
   } = options;
 
   let {
-    size = 'a4',
-    orientation = 'portrait',
+    title,
+    titleSize,
+    description,
+    descriptionSize,
+    size,
+    orientation,
+    resolution,
+    showMargins,
     showCreated,
-    showNorthArrow,
-    resolution = 150,
-    showScale
+    showScale,
+    showNorthArrow
   } = options;
 
   let pageElement;
@@ -40,25 +60,14 @@ const PrintComponent = function PrintComponent(options = {}) {
   let targetElement;
   const pageContainerId = cuid();
   const pageId = cuid();
-  let title = '';
-  let titleSize = 'h4';
-  let titleAlign = 'text-align-center';
-  let description = '';
-  let descriptionSize = 'h4';
-  let descriptionAlign = 'text-align-center';
+  let titleAlign = `text-align-${titleAlignment}`;
+  let descriptionAlign = `text-align-${descriptionAlignment}`;
   let viewerMapTarget;
   const printMarginClass = 'print-margin';
-  let usePrintMargins = true;
   let today = new Date(Date.now());
   let printScale = 0;
   let widthImage = 0;
   let heightImage = 0;
-
-  const sizes = {
-    a3: [420, 297],
-    a4: [297, 210],
-    custom: [297, 210]
-  };
 
   const setCustomSize = function setCustomSize(sizeObj) {
     if ('width' in sizeObj) {
@@ -117,18 +126,36 @@ const PrintComponent = function PrintComponent(options = {}) {
   };
 
   const printSettings = PrintSettings({
-    orientation,
-    customSize: sizes.custom,
-    initialSize: size,
-    sizes: Object.keys(sizes),
     map,
-    showCreated,
-    showNorthArrow,
-    scales,
+    title,
+    titlePlaceholderText,
+    titleAlignment,
+    titleSizes,
+    titleSize,
+    titleFormatIsVisible,
+    description,
+    descriptionPlaceholderText,
+    descriptionAlignment,
+    descriptionSizes,
+    descriptionSize,
+    descriptionFormatIsVisible,
+    sizes,
+    size,
+    sizeCustomMinHeight,
+    sizeCustomMaxHeight,
+    sizeCustomMinWidth,
+    sizeCustomMaxWidth,
+    orientation,
+    resolutions,
     resolution,
+    scales,
+    scaleInitial,
+    showMargins,
+    showCreated,
     showScale,
-    classes,
-    defaultClass
+    showNorthArrow,
+    rotation,
+    rotationStep
   });
   const printToolbar = PrintToolbar();
   const closeButton = Button({
@@ -224,11 +251,11 @@ const PrintComponent = function PrintComponent(options = {}) {
       setScale(evt.scale);
     },
     printMargin() {
-      return usePrintMargins ? 'print-margin' : '';
+      return showMargins ? 'print-margin' : '';
     },
     toggleMargin() {
       pageElement.classList.toggle(printMarginClass);
-      usePrintMargins = !usePrintMargins;
+      showMargins = !showMargins;
       this.updatePageSize();
     },
     toggleCreated() {
@@ -246,6 +273,9 @@ const PrintComponent = function PrintComponent(options = {}) {
     },
     close() {
       printMapComponent.removePrintControls();
+      if (map.getView().getRotation() !== 0) {
+        map.getView().setRotation(0);
+      }
       const printElement = document.getElementById(this.getId());
       map.setTarget(viewerMapTarget);
       this.restoreViewerControls();
