@@ -4,7 +4,8 @@ import numberFormatter from '../../utils/numberformatter';
 
 export default function SetScaleControl(options = {}, map) {
   const {
-    scales = []
+    scales = [],
+    initialScale
   } = options;
 
   let projection;
@@ -14,9 +15,9 @@ export default function SetScaleControl(options = {}, map) {
 
   const roundScale = (scale) => {
     let scaleValue = scale;
-    const differens = scaleValue % 10;
-    if (differens !== 0) {
-      scaleValue += (10 - differens);
+    const difference = scaleValue % 10;
+    if (difference !== 0) {
+      scaleValue += (10 - difference);
     }
     return scaleValue;
   };
@@ -32,7 +33,8 @@ export default function SetScaleControl(options = {}, map) {
         cls: 'o-scalepicker text-black flex',
         contentCls: 'bg-grey-lighter text-smallest rounded',
         buttonCls: 'bg-white border text-black',
-        buttonIconCls: 'black'
+        buttonIconCls: 'black',
+        text: 'Välj skala'
       });
       this.addComponents([selectScale]);
       projection = map.getView().getProjection();
@@ -45,7 +47,6 @@ export default function SetScaleControl(options = {}, map) {
     },
     onRender() {
       this.dispatch('render');
-      selectScale.setButtonText('Välj skala');
       if (Array.isArray(scales) && scales.length) {
         selectScale.setItems(scales);
       } else {
@@ -54,6 +55,9 @@ export default function SetScaleControl(options = {}, map) {
       document.getElementById(selectScale.getId()).addEventListener('dropdown:select', (evt) => {
         this.onChangeScale(evt.target.textContent);
       });
+      if (initialScale) {
+        this.onChangeScale(initialScale);
+      }
     },
     render() {
       return `
