@@ -36,9 +36,9 @@ const createForm = function createForm(obj) {
       break;
     case 'dropdown':
       if (val) {
-        firstOption = `<option value="${val}" selected>${val}</option>`;
+        firstOption = `<option value="${val}">${val}</option>`;
       } else {
-        firstOption = '<option value="" selected>Välj</option>';
+        firstOption = '<option value="">Välj</option>';
       }
       el = `<div class="${cls}"><label>${label}</label><br><select id=${id}${disabled}>${firstOption}`;
       for (let i = 0; i < dropdownOptions.length; i += 1) {

@@ -555,7 +555,7 @@ function addListener() {
   const fn = (obj) => {
     document.getElementById(obj.elDependencyId).addEventListener(obj.eventType, () => {
       const containerClass = `.${obj.elId}`;
-      if (document.getElementById(`${obj.elDependencyId} option:selected`).textContent === obj.requiredVal) {
+      if (document.getElementById(obj.elDependencyId).value === obj.requiredVal) {
         document.querySelector(containerClass).classList.remove('o-hidden');
       } else {
         document.querySelector(containerClass).classList.add('o-hidden');
