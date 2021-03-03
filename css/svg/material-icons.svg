@@ -19,6 +19,7 @@
   <symbol viewBox="0 0 24 24" id="ic_mode_edit_24px"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a.996.996 0 0 0 0-1.41l-2.34-2.34a.996.996 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></symbol>
   <!-- maps-symbol -->
   <symbol viewBox="0 0 24 24" id="ic_layers_24px"><path d="M11.99 18.54l-7.37-5.73L3 14.07l9 7 9-7-1.63-1.27-7.38 5.74zM12 16l7.36-5.73L21 9l-9-7-9 7 1.63 1.27L12 16z"/></symbol>
+  <symbol viewBox="0 0 24 24" id="ic_map_24px"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></symbol>
   <symbol viewBox="0 0 24 24" id="ic_navigation_24px"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></symbol>
   <symbol viewBox="0 0 24 24" id="ic_near_me_24px"><path d="M21 3L3 10.53v.98l6.84 2.65L12.48 21h.98L21 3z"/></symbol>
   <symbol viewBox="0 0 24 24" id="ic_place_24px"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></symbol>
