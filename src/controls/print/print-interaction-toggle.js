@@ -44,7 +44,7 @@ export default function PrintInteractionToggle(options = {}) {
       mapInteractionToggleButton = Button({
         cls: 'padding-small icon-smaller rounded light box-shadow',
         icon: toggleIcon,
-        tooltipText: 'Aktivera kartvyn',
+        tooltipText: 'Ändra kartans läge',
         tooltipPlacement: 'east',
         state: 'initial',
         validStates: ['initial', 'active'],
