@@ -57,5 +57,61 @@ export default {
     return this.createElement('svg', use, {
       cls: props.cls
     });
+  },
+  makeElementDraggable(el) {
+    const touchMode = 'ontouchstart' in document.documentElement;
+    const elmnt = el;
+    let pos1 = 0;
+    let pos2 = 0;
+    let pos3 = 0;
+    let pos4 = 0;
+
+    function elementDrag(evt) {
+      const e = evt || window.event;
+      e.preventDefault();
+
+      const clientX = e.clientX === undefined ? e.touches[0].clientX : e.clientX;
+      const clientY = e.clientY === undefined ? e.touches[0].clientY : e.clientY;
+      pos1 = pos3 - clientX;
+      pos2 = pos4 - clientY;
+      pos3 = clientX;
+      pos4 = clientY;
+
+      elmnt.style.top = `${elmnt.offsetTop - pos2}px`;
+      elmnt.style.left = `${elmnt.offsetLeft - pos1}px`;
+    }
+
+    function closeDragElement() {
+      elmnt.classList.toggle('grabbing');
+
+      if (touchMode) {
+        elmnt.ontouchend = null;
+        elmnt.ontouchmove = null;
+      } else {
+        document.onmouseup = null;
+        document.onmousemove = null;
+      }
+    }
+
+    function dragMouseDown(evt) {
+      const e = evt || window.event;
+      elmnt.classList.toggle('grabbing');
+      pos3 = e.clientX;
+      pos4 = e.clientY;
+
+      if (touchMode) {
+        elmnt.ontouchend = closeDragElement;
+        elmnt.ontouchmove = elementDrag;
+      } else {
+        document.onmouseup = closeDragElement;
+        document.onmousemove = elementDrag;
+      }
+    }
+
+    if (touchMode) {
+      elmnt.ontouchstart = dragMouseDown;
+    } else {
+      elmnt.onmousedown = dragMouseDown;
+    }
   }
 };

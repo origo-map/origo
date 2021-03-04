@@ -2,19 +2,21 @@ import { Input, cuid, Component, Button, Dropdown, ToggleGroup } from '../../ui'
 
 export default function TitleControl(options = {}) {
   const {
-    title = '',
-    alignment = 'center',
-    classes = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']
+    title,
+    titlePlaceholderText,
+    titleAlignment,
+    titleSizes
   } = options;
+
   let {
-    size = 'h4'
+    titleSize,
+    titleFormatIsVisible
   } = options;
+
   const cls = 'placeholder-text-smaller smaller';
-  const placeholderText = 'Här kan du skriva en rubrik';
   const style = { height: '2rem', margin: 0, width: '16rem' };
   const align = ['text-align-left', 'text-align-center', 'text-align-right'];
   const formatId = cuid();
-  let isVisible = false;
   let formatEl;
   let inputTitle;
   let formatButton;
@@ -30,7 +32,7 @@ export default function TitleControl(options = {}) {
       inputTitle = Input({
         cls,
         style,
-        placeholderText,
+        placeholderText: titlePlaceholderText,
         value: title
       });
       formatButton = Button({
@@ -42,19 +44,19 @@ export default function TitleControl(options = {}) {
       alignLeftComponent = Button({
         cls: 'grow light text-smaller',
         text: 'Vänster',
-        state: alignment === 'left' ? 'active' : 'initial',
+        state: titleAlignment === 'left' ? 'active' : 'initial',
         style: { width: '34%' }
       });
       alignCenterComponent = Button({
         cls: 'grow light text-smaller',
         text: 'Mitten',
-        state: alignment === 'center' ? 'active' : 'initial',
+        state: titleAlignment === 'center' ? 'active' : 'initial',
         style: { width: '34%' }
       });
       alignRightComponent = Button({
         cls: 'grow light text-smaller',
         text: 'Höger',
-        state: alignment === 'right' ? 'active' : 'initial',
+        state: titleAlignment === 'right' ? 'active' : 'initial',
         style: { width: '33%' }
       });
       alignButtons = [alignLeftComponent, alignCenterComponent, alignRightComponent];
@@ -87,25 +89,25 @@ export default function TitleControl(options = {}) {
     onChangeSize(evt) {
       this.dispatch('change:titleSize', { class: evt });
       selectSize.setButtonText(evt);
-      size = evt;
+      titleSize = evt;
     },
     onRender() {
       formatEl = document.getElementById(formatId);
       this.dispatch('render');
-      selectSize.setButtonText(size);
-      selectSize.setItems(classes);
-      this.onChangeSize(size);
+      selectSize.setButtonText(titleSize);
+      selectSize.setItems(titleSizes);
+      this.onChangeSize(titleSize);
       document.getElementById(selectSize.getId()).addEventListener('dropdown:select', (evt) => {
         this.onChangeSize(evt.target.textContent);
       });
     },
     onChangeVisible() {
-      if (isVisible) {
+      if (titleFormatIsVisible) {
         formatEl.classList.add('hidden');
       } else {
         formatEl.classList.remove('hidden');
       }
-      isVisible = !isVisible;
+      titleFormatIsVisible = !titleFormatIsVisible;
     },
     onChangeTitle(evt) {
       this.dispatch('change:title', evt);
@@ -122,7 +124,7 @@ export default function TitleControl(options = {}) {
           ${formatButton.render()}
         </div>
       </div>
-      <div class="hidden" id="${formatId}">
+      <div class="${titleFormatIsVisible ? '' : 'hidden'}" id="${formatId}">
         <div class="padding-smaller">
           <h6>Justering titel</h6>
           ${alignControl.render()}
