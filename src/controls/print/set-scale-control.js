@@ -59,7 +59,7 @@ export default function SetScaleControl(options = {}, map) {
         this.onChangeScale(initialScale);
       } else {
         const viewResolution = map.getView().getResolution();
-        const closest = resolutions.reduce((prev, curr) => Math.abs(curr - viewResolution) < Math.abs(prev - viewResolution) ? curr : prev);
+        const closest = resolutions.reduce((prev, curr) => (Math.abs(curr - viewResolution) < Math.abs(prev - viewResolution) ? curr : prev));
         this.onChangeScale(`1:${numberFormatter(roundScale(mapUtils.resolutionToScale(closest, projection)))}`);
       }
     },
