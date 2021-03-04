@@ -9,6 +9,29 @@ function createUrl(prefix, suffix, url) {
   return p + url + s;
 }
 
+function parseUrl(urlattr, feature, attribute, attributes, map) {
+  let val = '';
+  let url;
+  if (urlattr) {
+    url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(urlattr, attributes, null, map));
+  } else if (isUrl(attribute.url)) {
+    url = attribute.url;
+  } else return false;
+  const text = attribute.html || attribute.title || urlattr;
+  const aTargetTitle = replacer.replace(attribute.targetTitle, attributes) || url;
+  let aTarget = '_blank';
+  let aCls = 'o-identify-link';
+  if (attribute.target === 'modal') {
+    aTarget = 'modal';
+    aCls = 'o-identify-link-modal';
+  } else if (attribute.target === 'modal-full') {
+    aTarget = 'modal-full';
+    aCls = 'o-identify-link-modal';
+  }
+  val = `<a class="${aCls}" target="${aTarget}" href="${url}" title="${aTargetTitle}">${text}</a>`;
+  return val;
+}
+
 const getContent = {
   name(feature, attribute, attributes, map) {
     let val = '';
@@ -20,23 +43,14 @@ const getContent = {
         title = `<b>${attribute.title}</b>`;
       }
       if (attribute.url) {
-        let url;
-        if (feature.get(attribute.url)) {
-          url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.url), feature.getProperties(), null, map));
-        } else if (isUrl(attribute.url)) {
-          url = attribute.url;
-        } else return false;
-        const aTargetTitle = replacer.replace(attribute.targetTitle, attributes) || url;
-        let aTarget = '_blank';
-        let aCls = 'o-identify-link';
-        if (attribute.target === 'modal') {
-          aTarget = 'modal';
-          aCls = 'o-identify-link-modal';
-        } else if (attribute.target === 'modal-full') {
-          aTarget = 'modal-full';
-          aCls = 'o-identify-link-modal';
+        if (attribute.splitter) {
+          const urlArr = feature.get(attribute.url).split(attribute.splitter);
+          urlArr.forEach((url) => {
+            val += `<p>${parseUrl(url, feature, attribute, attributes, map)}</p>`;
+          });
+        } else {
+          val = parseUrl(feature.get(attribute.url), feature, attribute, attributes, map);
         }
-        val = `<a class="${aCls}" target="${aTarget}" href="${url}" title="${aTargetTitle}">${feature.get(attribute.name)}</a>`;
       }
     }
     const newElement = document.createElement('li');
@@ -46,24 +60,14 @@ const getContent = {
   },
   url(feature, attribute, attributes, map) {
     let val = '';
-    let url;
-    if (feature.get(attribute.url)) {
-      url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.url), attributes, null, map));
-    } else if (isUrl(attribute.url)) {
-      url = attribute.url;
-    } else return false;
-    const text = attribute.html || attribute.title || attribute.url;
-    const aTargetTitle = replacer.replace(attribute.targetTitle, attributes) || url;
-    let aTarget = '_blank';
-    let aCls = 'o-identify-link';
-    if (attribute.target === 'modal') {
-      aTarget = 'modal';
-      aCls = 'o-identify-link-modal';
-    } else if (attribute.target === 'modal-full') {
-      aTarget = 'modal-full';
-      aCls = 'o-identify-link-modal';
+    if (attribute.splitter) {
+      const urlArr = feature.get(attribute.url).split(attribute.splitter);
+      urlArr.forEach((url) => {
+        val += `<p>${parseUrl(url, feature, attribute, attributes, map)}</p>`;
+      });
+    } else {
+      val = parseUrl(feature.get(attribute.url), feature, attribute, attributes, map);
     }
-    val = `<a class="${aCls}" target="${aTarget}" href="${url}" title="${aTargetTitle}">${text}</a>`;
     const newElement = document.createElement('li');
     newElement.classList.add(attribute.cls);
     newElement.innerHTML = val;
@@ -71,11 +75,20 @@ const getContent = {
   },
   img(feature, attribute, attributes, map) {
     let val = '';
-    const featGet = attribute.img ? feature.get(attribute.img) : feature.get(attribute.name);
-    if (featGet) {
-      const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.img), attributes, null, map));
-      const attribution = attribute.attribution ? `<div class="o-image-attribution">${attribute.attribution}</div>` : '';
-      val = `<div class="o-image-container"><img src="${url}">${attribution}</div>`;
+    if (attribute.splitter) {
+      const imgArr = feature.get(attribute.img).split(attribute.splitter);
+      imgArr.forEach((img) => {
+        const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(img, attributes, null, map));
+        const attribution = attribute.attribution ? `<div class="o-image-attribution">${attribute.attribution}</div>` : '';
+        val += `<div class="o-image-container"><img src="${url}">${attribution}</div>`;
+      });
+    } else {
+      const featGet = attribute.img ? feature.get(attribute.img) : feature.get(attribute.name);
+      if (featGet) {
+        const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.img), attributes, null, map));
+        const attribution = attribute.attribution ? `<div class="o-image-attribution">${attribute.attribution}</div>` : '';
+        val = `<div class="o-image-container"><img src="${url}">${attribution}</div>`;
+      }
     }
     const newElement = document.createElement('li');
     newElement.classList.add(attribute.cls);
