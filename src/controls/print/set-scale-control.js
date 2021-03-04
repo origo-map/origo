@@ -22,8 +22,12 @@ export default function SetScaleControl(options = {}, map) {
     return scaleValue;
   };
 
+  function resolutionToScale(res, proj = projection) {
+    return `1:${numberFormatter(roundScale(mapUtils.resolutionToScale(res, proj)))}`;
+  }
+
   function getScales() {
-    return resolutions.map(resolution => `1:${numberFormatter(roundScale(mapUtils.resolutionToScale(resolution, projection)))}`);
+    return resolutions.map(resolution => resolutionToScale(resolution));
   }
 
   return Component({
@@ -60,7 +64,7 @@ export default function SetScaleControl(options = {}, map) {
       } else {
         const viewResolution = map.getView().getResolution();
         const closest = resolutions.reduce((prev, curr) => (Math.abs(curr - viewResolution) < Math.abs(prev - viewResolution) ? curr : prev));
-        this.onChangeScale(`1:${numberFormatter(roundScale(mapUtils.resolutionToScale(closest, projection)))}`);
+        this.onChangeScale(resolutionToScale(closest));
       }
     },
     render() {
