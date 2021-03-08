@@ -339,6 +339,7 @@ const PrintComponent = function PrintComponent(options = {}) {
       });
     },
     onRender() {
+      printScale = 0;
       today = new Date(Date.now());
       viewerMapTarget = map.getTarget();
       pageContainerElement = document.getElementById(pageContainerId);
@@ -356,6 +357,9 @@ const PrintComponent = function PrintComponent(options = {}) {
       pageContainerElement.style.height = orientation === 'portrait' ? `${sizes[size][0]}mm` : `${sizes[size][1]}mm`;
       pageContainerElement.style.width = orientation === 'portrait' ? `${sizes[size][1]}mm` : `${sizes[size][0]}mm`;
       this.updateMapSize();
+      if (printScale > 0) {
+        this.changeScale({ scale: printScale });
+      }
     },
     removeViewerControls() {
       const controls = map.getControls().getArray();
