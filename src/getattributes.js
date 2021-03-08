@@ -95,6 +95,30 @@ const getContent = {
     newElement.innerHTML = val;
     return newElement;
   },
+  carousel(feature, attribute, attributes, map) {
+    let val = '';
+    let slides = '';
+    if (attribute.splitter) {
+      const imgArr = feature.get(attribute.carousel).split(attribute.splitter);
+      imgArr.forEach((img) => {
+        const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(img, attributes, null, map));
+        const attribution = attribute.attribution ? `<div class="o-image-attribution">${attribute.attribution}</div>` : '';
+        slides += `<div class="o-image-content"><img src="${url}">${attribution}</div>`;
+      });
+      val = `<div id="o-image-carousel"><div>${slides}</div></div>`;
+    } else {
+      const featGet = attribute.carousel ? feature.get(attribute.carousel) : feature.get(attribute.name);
+      if (featGet) {
+        const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.carousel), attributes, null, map));
+        const attribution = attribute.attribution ? `<div class="o-image-attribution">${attribute.attribution}</div>` : '';
+        val = `<div class="o-image-container"><img src="${url}">${attribution}</div>`;
+      }
+    }
+    const newElement = document.createElement('li');
+    newElement.classList.add(attribute.cls);
+    newElement.innerHTML = val;
+    return newElement;
+  },
   html(feature, attribute, attributes, map) {
     const val = replacer.replace(attribute.html, attributes, {
       helper: geom,

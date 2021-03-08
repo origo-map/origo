@@ -7,3 +7,12 @@
   max-height: calc(70vh - 46px);
   overflow-y: auto;
 }
+
+.o-image-content {
+  width: 240px;
+}
+
+#o-image-carousel > .o-image-content {
+  max-height: calc(70vh - 46px);
+  overflow-y: auto;
+}

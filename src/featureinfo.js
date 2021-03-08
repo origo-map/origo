@@ -24,7 +24,8 @@ const Featureinfo = function Featureinfo(options = {}) {
     pinsStyle: pinStyleOptions = styleTypes.getStyle('pin'),
     savedPin: savedPinOptions,
     savedSelection,
-    selectionStyles: selectionStylesOptions
+    selectionStyles: selectionStylesOptions,
+    autoplay = false
   } = options;
 
   let identifyTarget;
@@ -130,10 +131,31 @@ const Featureinfo = function Featureinfo(options = {}) {
 
   const initCarousel = function initCarousel(id) {
     const { length } = Array.from(document.querySelectorAll('.o-identify-content'));
-    if (!document.querySelector('.glide') && length > 1) {
+    if (!document.querySelector('.glide-content') && length > 1) {
       OGlide({
         id,
         callback
+      });
+    }
+  };
+
+  // TODO: should there be anything done?
+  const callbackImage = function callbackImage(evt) {
+    const currentItemIndex = evt.item.index;
+    if (currentItemIndex !== null) {
+      // should there be anything done?
+    }
+  };
+
+  const initImageCarousel = function initImageCarousel(id) {
+    const { length } = Array.from(document.querySelectorAll('.o-image-content'));
+    if (!document.querySelector('.glide-image') && length > 1) {
+      OGlide({
+        id,
+        callback: callbackImage,
+        oClass: '.o-image-content',
+        glideClass: 'glide-image',
+        autoplay
       });
     }
   };
@@ -249,6 +271,10 @@ const Featureinfo = function Featureinfo(options = {}) {
         const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
         map.addOverlay(overlay);
         overlay.setPosition(coord);
+        const imageCarouselDiv = document.getElementById('o-image-carousel');
+        if (imageCarouselDiv !== null) {
+          initImageCarousel('#o-image-carousel');
+        }
         break;
       }
       case 'sidebar':

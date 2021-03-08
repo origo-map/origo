@@ -130,6 +130,10 @@
   display: inline-block;
 }
 
+.o-image-content {
+  display: inline-block;
+}
+
 .folded {
   max-height: 0;
   overflow: hidden;
@@ -241,6 +245,10 @@
   }
 
   .o-identify-content {
+    width: 100%;
+  }
+
+  .o-image-content {
     width: 100%;
   }
 }
