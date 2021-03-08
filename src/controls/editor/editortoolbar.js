@@ -37,7 +37,7 @@ function toggleToolbar(state) {
     const enableInteraction = new CustomEvent('enableInteraction', {
       bubbles: true,
       detail: {
-        interaction: 'featureInfo'
+        interaction: 'featureinfo'
       }
     });
     document.querySelectorAll('.o-map')[0].dispatchEvent(enableInteraction);
