@@ -339,6 +339,7 @@ const PrintComponent = function PrintComponent(options = {}) {
       });
     },
     onRender() {
+      printScale = 0;
       today = new Date(Date.now());
       viewerMapTarget = map.getTarget();
       pageContainerElement = document.getElementById(pageContainerId);
