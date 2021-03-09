@@ -17,7 +17,7 @@ function parseUrl(urlattr, feature, attribute, attributes, map) {
   } else if (isUrl(attribute.url)) {
     url = attribute.url;
   } else return false;
-  const text = attribute.html || attribute.title || urlattr;
+  const text = feature.get(attribute.name) || attribute.html || attribute.title || urlattr;
   const aTargetTitle = replacer.replace(attribute.targetTitle, attributes) || url;
   let aTarget = '_blank';
   let aCls = 'o-identify-link';
