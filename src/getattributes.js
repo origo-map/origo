@@ -16,7 +16,7 @@ function parseUrl(urlattr, feature, attribute, attributes, map) {
     url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(urlattr, attributes, null, map));
   } else if (isUrl(attribute.url)) {
     url = attribute.url;
-  } else return false;
+  } else return '';
   const text = feature.get(attribute.name) || attribute.html || attribute.title || urlattr;
   const aTargetTitle = replacer.replace(attribute.targetTitle, attributes) || url;
   let aTarget = '_blank';
@@ -45,9 +45,11 @@ const getContent = {
       if (attribute.url) {
         if (attribute.splitter) {
           const urlArr = feature.get(attribute.url).split(attribute.splitter);
-          urlArr.forEach((url) => {
-            val += `<p>${parseUrl(url, feature, attribute, attributes, map)}</p>`;
-          });
+          if (urlArr[0] !== '') {
+            urlArr.forEach((url) => {
+              val += `<p>${parseUrl(url, feature, attribute, attributes, map)}</p>`;
+            });
+          }
         } else {
           val = parseUrl(feature.get(attribute.url), feature, attribute, attributes, map);
         }
@@ -62,9 +64,11 @@ const getContent = {
     let val = '';
     if (attribute.splitter) {
       const urlArr = feature.get(attribute.url).split(attribute.splitter);
-      urlArr.forEach((url) => {
-        val += `<p>${parseUrl(url, feature, attribute, attributes, map)}</p>`;
-      });
+      if (urlArr[0] !== '') {
+        urlArr.forEach((url) => {
+          val += `<p>${parseUrl(url, feature, attribute, attributes, map)}</p>`;
+        });
+      }
     } else {
       val = parseUrl(feature.get(attribute.url), feature, attribute, attributes, map);
     }
