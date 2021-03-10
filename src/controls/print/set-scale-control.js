@@ -1,6 +1,5 @@
 import { Dropdown, Component } from '../../ui';
 import mapUtils from '../../maputils';
-import numberFormatter from '../../utils/numberformatter';
 
 export default function SetScaleControl(options = {}, map) {
   const {
@@ -10,20 +9,10 @@ export default function SetScaleControl(options = {}, map) {
 
   let projection;
   let resolutions;
-
   let selectScale;
 
-  const roundScale = (scale) => {
-    let scaleValue = scale;
-    const difference = scaleValue % 10;
-    if (difference !== 0) {
-      scaleValue += (10 - difference);
-    }
-    return scaleValue;
-  };
-
   function getScales() {
-    return resolutions.map(resolution => `1:${numberFormatter(roundScale(mapUtils.resolutionToScale(resolution, projection)))}`);
+    return resolutions.map(resolution => mapUtils.resolutionToFormattedScale(resolution, projection));
   }
 
   return Component({
@@ -57,6 +46,10 @@ export default function SetScaleControl(options = {}, map) {
       });
       if (initialScale) {
         this.onChangeScale(initialScale);
+      } else {
+        const viewResolution = map.getView().getResolution();
+        const closest = resolutions.reduce((prev, curr) => (Math.abs(curr - viewResolution) < Math.abs(prev - viewResolution) ? curr : prev));
+        this.onChangeScale(mapUtils.resolutionToFormattedScale(closest, projection));
       }
     },
     render() {

@@ -16,7 +16,7 @@ function parseUrl(urlattr, feature, attribute, attributes, map) {
     url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(urlattr, attributes, null, map));
   } else if (isUrl(attribute.url)) {
     url = attribute.url;
-  } else return false;
+  } else return '';
   const text = feature.get(attribute.name) || attribute.html || attribute.title || urlattr;
   const aTargetTitle = replacer.replace(attribute.targetTitle, attributes) || url;
   let aTarget = '_blank';
@@ -45,9 +45,11 @@ const getContent = {
       if (attribute.url) {
         if (attribute.splitter) {
           const urlArr = feature.get(attribute.url).split(attribute.splitter);
-          urlArr.forEach((url) => {
-            val += `<p>${parseUrl(url, feature, attribute, attributes, map)}</p>`;
-          });
+          if (urlArr[0] !== '') {
+            urlArr.forEach((url) => {
+              val += `<p>${parseUrl(url, feature, attribute, attributes, map)}</p>`;
+            });
+          }
         } else {
           val = parseUrl(feature.get(attribute.url), feature, attribute, attributes, map);
         }
@@ -62,9 +64,11 @@ const getContent = {
     let val = '';
     if (attribute.splitter) {
       const urlArr = feature.get(attribute.url).split(attribute.splitter);
-      urlArr.forEach((url) => {
-        val += `<p>${parseUrl(url, feature, attribute, attributes, map)}</p>`;
-      });
+      if (urlArr[0] !== '') {
+        urlArr.forEach((url) => {
+          val += `<p>${parseUrl(url, feature, attribute, attributes, map)}</p>`;
+        });
+      }
     } else {
       val = parseUrl(feature.get(attribute.url), feature, attribute, attributes, map);
     }
@@ -86,30 +90,6 @@ const getContent = {
       const featGet = attribute.img ? feature.get(attribute.img) : feature.get(attribute.name);
       if (featGet) {
         const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.img), attributes, null, map));
-        const attribution = attribute.attribution ? `<div class="o-image-attribution">${attribute.attribution}</div>` : '';
-        val = `<div class="o-image-container"><img src="${url}">${attribution}</div>`;
-      }
-    }
-    const newElement = document.createElement('li');
-    newElement.classList.add(attribute.cls);
-    newElement.innerHTML = val;
-    return newElement;
-  },
-  carousel(feature, attribute, attributes, map) {
-    let val = '';
-    let slides = '';
-    if (attribute.splitter) {
-      const imgArr = feature.get(attribute.carousel).split(attribute.splitter);
-      imgArr.forEach((img) => {
-        const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(img, attributes, null, map));
-        const attribution = attribute.attribution ? `<div class="o-image-attribution">${attribute.attribution}</div>` : '';
-        slides += `<div class="o-image-content"><img src="${url}">${attribution}</div>`;
-      });
-      val = `<div id="o-image-carousel"><div>${slides}</div></div>`;
-    } else {
-      const featGet = attribute.carousel ? feature.get(attribute.carousel) : feature.get(attribute.name);
-      if (featGet) {
-        const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.carousel), attributes, null, map));
         const attribution = attribute.attribution ? `<div class="o-image-attribution">${attribute.attribution}</div>` : '';
         val = `<div class="o-image-container"><img src="${url}">${attribution}</div>`;
       }
