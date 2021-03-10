@@ -165,7 +165,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     const arr = [];
     const layerArray = map.getLayers().getArray();
     layerArray.forEach((element) => {
-      if (element.get('layerType') === 'group') {
+      if (element.get('type') === 'GROUP') {
         element.getLayers().getArray().forEach((layerInGroup) => {
           arr.push(layerInGroup);
         });
