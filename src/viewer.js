@@ -161,7 +161,20 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
   const getMap = () => map;
 
-  const getLayers = () => map.getLayers().getArray();
+  const getLayers = function getLayers() {
+    const arr = [];
+    const layerArray = map.getLayers().getArray();
+    layerArray.forEach((element) => {
+      if (element.get('layerType') === 'group') {
+        element.getLayers().getArray().forEach((layerInGroup) => {
+          arr.push(layerInGroup);
+        });
+      } else {
+        arr.push(element);
+      }
+    });
+    return arr;
+  };
 
   const getLayersByProperty = function getLayersByProperty(key, val, byName) {
     const layers = map.getLayers().getArray().filter(layer => layer.get(key) && layer.get(key) === val);
