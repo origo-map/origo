@@ -421,6 +421,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
               feature = clusterSource.getFeatureById(featureId);
             } else if (type === 'WFS') {
               feature = layer.getSource().getFeatureById(featureId);
+              const newfeatureId = featureId.replace(featureId.substring(featureId.lastIndexOf('__'), featureId.lastIndexOf('.')), '');
+              feature = layer.getSource().getFeatureById(newfeatureId);
             } else if (clusterSource) {
               feature = clusterSource.getFeatureById(id);
             } else {
