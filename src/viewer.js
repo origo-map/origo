@@ -172,7 +172,17 @@ const Viewer = function Viewer(targetOption, options = {}) {
     return layers;
   };
 
-  const getLayer = layerName => getLayers().filter(layer => layer.get('name') === layerName)[0];
+  const getLayer = function getLayer(layerName) {
+    const layerArray = getLayers();
+    if (layerArray.some(layer => layer.get('name') === layerName)) {
+      return layerArray.find(layer => layer.get('name') === layerName);
+    } else if (layerArray.some(layer => layer.get('type') === 'GROUP')) {
+      const groupLayerArray = layerArray.filter(layer => layer.get('type') === 'GROUP');
+      const layersFromGroupLayersArray = groupLayerArray.map(groupLayer => groupLayer.getLayers().getArray());
+      return layersFromGroupLayersArray.flat().find(layer => layer.get('name') === layerName);
+    }
+    return undefined;
+  };
 
   const getQueryableLayers = function getQueryableLayers() {
     const queryableLayers = getLayers().filter(layer => layer.get('queryable') && layer.getVisible());
