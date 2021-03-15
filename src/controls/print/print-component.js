@@ -7,6 +7,7 @@ import {
 import pageTemplate from './page.template';
 import PrintMap from './print-map';
 import PrintSettings from './print-settings';
+import PrintInteractionToggle from './print-interaction-toggle';
 import PrintToolbar from './print-toolbar';
 import { downloadPNG, downloadPDF, printToScalePDF } from '../../utils/download';
 import { afterRender, beforeRender } from './download-callback';
@@ -38,7 +39,8 @@ const PrintComponent = function PrintComponent(options = {}) {
     createdPrefix,
     rotation,
     rotationStep,
-    leftFooterText
+    leftFooterText,
+    mapInteractionsActive
   } = options;
 
   let {
@@ -157,6 +159,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     rotation,
     rotationStep
   });
+  const printInteractionToggle = PrintInteractionToggle({ map, target, mapInteractionsActive });
   const printToolbar = PrintToolbar();
   const closeButton = Button({
     cls: 'fixed top-right medium round icon-smaller light box-shadow z-index-ontop-high',
@@ -168,6 +171,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     onInit() {
       this.on('render', this.onRender);
       this.addComponent(printSettings);
+      this.addComponent(printInteractionToggle);
       this.addComponent(printToolbar);
       this.addComponent(closeButton);
       printToolbar.on('PNG', this.downloadPNG.bind(this));
@@ -278,6 +282,9 @@ const PrintComponent = function PrintComponent(options = {}) {
       }
       const printElement = document.getElementById(this.getId());
       map.setTarget(viewerMapTarget);
+      if (printInteractionToggle) {
+        printInteractionToggle.restoreInteractions();
+      }
       this.restoreViewerControls();
       printElement.remove();
     },
@@ -391,7 +398,10 @@ const PrintComponent = function PrintComponent(options = {}) {
             </div>
           </div>
         </div>
-        ${printSettings.render()}
+        <div id="o-print-tools-left" class="top-left fixed no-print flex column spacing-vertical-small z-index-ontop-top height-full">
+          ${printSettings.render()}
+          ${printInteractionToggle.render()}
+        </div>
         ${printToolbar.render()}
         ${closeButton.render()}
       </div>

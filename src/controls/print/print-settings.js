@@ -182,7 +182,7 @@ const PrintSettings = function PrintSettings(options = {}) {
       if (rotationControl) { components.push(rotationControl); }
       contentComponent.addComponents(components);
       printSettingsContainer = Collapse({
-        cls: 'no-print fixed flex column top-left rounded box-shadow bg-white overflow-hidden z-index-ontop-top',
+        cls: 'flex column rounded box-shadow bg-white',
         containerCls: 'collapse-container no-margin height-full',
         collapseX: true,
         collapseY: true,
