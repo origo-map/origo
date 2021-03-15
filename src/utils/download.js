@@ -67,9 +67,10 @@ export const dom2image = function dom2image(el, exportOptions) {
 export const getImageBlob = async function getImageBlob(el) {
   if (el) {
     const transformScale = el.style.transform;
-    el.style.transform = 'scale(1)';
-    const canvas = await html2canvas(el);
-    el.style.transform = transformScale;
+    const printEl = el;
+    printEl.style.transform = 'scale(1)';
+    const canvas = await html2canvas(printEl);
+    printEl.style.transform = transformScale;
     const blob = await canvasToBlob(canvas);
     return blob;
   }
