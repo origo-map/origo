@@ -56,8 +56,7 @@ export const html2canvas = function html2canvas(el) {
     backgroundColor: null,
     logging: false,
     height: el.offsetHeight,
-    width: el.offsetWidth,
-    scale: 4
+    width: el.offsetWidth
   });
 };
 
@@ -67,7 +66,10 @@ export const dom2image = function dom2image(el, exportOptions) {
 
 export const getImageBlob = async function getImageBlob(el) {
   if (el) {
+    const transformScale = el.style.transform;
+    el.style.transform = 'scale(1)';
     const canvas = await html2canvas(el);
+    el.style.transform = transformScale;
     const blob = await canvasToBlob(canvas);
     return blob;
   }
