@@ -150,6 +150,10 @@ const Featureinfo = function Featureinfo(options = {}) {
       selection.coordinates = firstFeature.getGeometry().getCoordinates();
       selection.id = firstFeature.getId() != null ? firstFeature.getId() : firstFeature.ol_uid;
       selection.type = typeof selectionLayer.getSourceLayer() === 'string' ? selectionLayer.getFeatureLayer().type : selectionLayer.getSourceLayer().get('type');
+      if (selection.type === 'WFS') {
+        const idSuffix = selection.id.substring(selection.id.lastIndexOf('.') + 1, selection.id.length);
+        selection.id = `${selectionLayer.getSourceLayer().get('name')}.${idSuffix}`;
+      }
       if (selection.type !== 'WFS') {
         const name = typeof selectionLayer.getSourceLayer() === 'string' ? selectionLayer.getSourceLayer() : selectionLayer.getSourceLayer().get('name');
         const id = firstFeature.getId() || selection.id;
