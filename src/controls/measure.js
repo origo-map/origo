@@ -63,6 +63,7 @@ const Measure = function Measure({
   let lengthToolButton;
   let areaToolButton;
   let elevationToolButton;
+  let toggleSnapButton;
   let addNodeButton;
   let undoButton;
   let clearButton;
@@ -71,6 +72,7 @@ const Measure = function Measure({
   let touchMode;
   let snapCollection;
   let snapEventListenerKeys;
+  let snapActive;
 
   function createStyle(feature) {
     const featureType = feature.getGeometry().getType();
@@ -428,6 +430,11 @@ const Measure = function Measure({
         .getElementById(elevationToolButton.getId())
         .classList.add('hidden');
     }
+    if (snap) {
+      document
+        .getElementById(toggleSnapButton.getId())
+        .classList.add('hidden');
+    }
     document.getElementById(measureButton.getId()).classList.add('tooltip');
     document.getElementById(clearButton.getId()).classList.add('hidden');
     if (touchMode) {
@@ -479,6 +486,11 @@ const Measure = function Measure({
     if (elevationTool) {
       document
         .getElementById(elevationToolButton.getId())
+        .classList.remove('hidden');
+    }
+    if (snap) {
+      document
+        .getElementById(toggleSnapButton.getId())
         .classList.remove('hidden');
     }
     document.getElementById(measureButton.getId()).classList.remove('tooltip');
@@ -575,6 +587,7 @@ const Measure = function Measure({
     map.addInteraction(measure);
 
     if (snap) {
+      snapActive = true;
       addSnapInteractions();
     }
 
@@ -691,6 +704,16 @@ const Measure = function Measure({
       if (touchMode) {
         centerSketch();
       }
+    }
+  }
+
+  function toggleSnap() {
+    snapCollection.forEach(s => s.setActive(!snapActive));
+    snapActive = !snapActive;
+    if (snapActive) {
+      document.getElementById(toggleSnapButton.getId()).classList.add('active');
+    } else {
+      document.getElementById(toggleSnapButton.getId()).classList.remove('active');
     }
   }
 
@@ -839,6 +862,21 @@ const Measure = function Measure({
           });
           buttons.push(clearButton);
         }
+
+        if (snap) {
+          console.log('creating togglesnapbutton');
+          toggleSnapButton = Button({
+            cls:
+              'o-measure-elevation padding-small margin-bottom-smaller icon-smaller round light box-shadow hidden active',
+            click() {
+              toggleSnap();
+            },
+            icon: '#ic_height_24px',
+            tooltipText: 'Sätt på/stäng av snap',
+            tooltipPlacement: 'east'
+          });
+          buttons.push(toggleSnapButton);
+        }
       }
     },
     render() {
@@ -874,6 +912,11 @@ const Measure = function Measure({
         el = dom.html(htmlString);
         document.getElementById(measureElement.getId()).appendChild(el);
         htmlString = clearButton.render();
+        el = dom.html(htmlString);
+        document.getElementById(measureElement.getId()).appendChild(el);
+      }
+      if (toggleSnapButton) {
+        htmlString = toggleSnapButton.render();
         el = dom.html(htmlString);
         document.getElementById(measureElement.getId()).appendChild(el);
       }
