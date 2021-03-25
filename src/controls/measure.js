@@ -864,7 +864,6 @@ const Measure = function Measure({
         }
 
         if (snap) {
-          console.log('creating togglesnapbutton');
           toggleSnapButton = Button({
             cls:
               'o-measure-elevation padding-small margin-bottom-smaller icon-smaller round light box-shadow hidden active',
