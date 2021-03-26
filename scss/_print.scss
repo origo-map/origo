@@ -10,6 +10,12 @@ $print-scale-line-color: $grey-darker;
 $print-scale-line-inner-border-radius: $print-control-border-radius;
 $print-scale-line-font-size: $font-size-smallest;
 
+#o-print-tools-left > .collapse-scroll.expanded {
+  background-color: white;
+  border-radius: 0.25rem;
+  overflow: hidden;
+}
+
 // scale-line
 .print-scale-line {
   background: $print-control-bg-color;

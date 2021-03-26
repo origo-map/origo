@@ -63,7 +63,10 @@ const drawToolsSelector = function drawToolsSelector(tools, defaultLayer, v) {
     if (state) {
       if (drawTools.length > 1) {
         active = true;
-        document.getElementById(target).getElementsByTagName('ul')[0].parentNode.removeChild(document.getElementById(target).getElementsByTagName('ul')[0]);
+        const ul = document.getElementById(target).getElementsByTagName('ul');
+        if (ul.length > 0) {
+          ul[0].parentNode.removeChild(document.getElementById(target).getElementsByTagName('ul')[0]);
+        }
         addDropDown(createDropDownOptions());
         document.getElementById(target).classList.add(activeCls);
         map.once('click', close);
@@ -81,7 +84,7 @@ const drawToolsSelector = function drawToolsSelector(tools, defaultLayer, v) {
       cls: 'o-popover'
     });
     const { body: popoverHTML } = new DOMParser().parseFromString(popover, 'text/html');
-    document.getElementById('o-editor-draw').insertAdjacentElement('afterend', popoverHTML);
+    document.getElementById('o-editor-draw').insertAdjacentElement('afterend', popoverHTML.firstElementChild);
     setActive(false);
   }
 

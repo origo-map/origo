@@ -97,7 +97,7 @@ function OGlide(options) {
     direction: 'ltr',
     gap: 0,
     perTouch: 1,
-    animationDuration: 0,
+    animationDuration: 150,
     autoplay
   });
   el.mount();
