@@ -88,7 +88,7 @@ const PrintSettings = function PrintSettings(options = {}) {
     close,
     onInit() {
       openButton = Button({
-        cls: 'padding-small icon-smaller light text-normal',
+        cls: 'padding-small icon-smaller round light box-shadow',
         icon: openIcon,
         tooltipText: 'Visa inställningar',
         tooltipPlacement: 'east',
@@ -182,7 +182,7 @@ const PrintSettings = function PrintSettings(options = {}) {
       if (rotationControl) { components.push(rotationControl); }
       contentComponent.addComponents(components);
       printSettingsContainer = Collapse({
-        cls: 'flex column rounded box-shadow bg-white',
+        cls: 'flex column',
         containerCls: 'collapse-container no-margin height-full',
         collapseX: true,
         collapseY: true,

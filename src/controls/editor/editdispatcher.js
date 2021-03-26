@@ -1,5 +1,5 @@
 function emitChangeEdit(tool, state) {
-  const changeEdit = new CustomEvent('', {
+  const changeEdit = new CustomEvent('changeEdit', {
     detail: {
       tool,
       active: state
