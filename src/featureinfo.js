@@ -141,21 +141,20 @@ const Featureinfo = function Featureinfo(options = {}) {
 
   // TODO: should there be anything done?
   const callbackImage = function callbackImage(evt) {
-    console.log(evt);
     const currentItemIndex = evt.item.index;
     if (currentItemIndex !== null) {
       // should there be anything done?
     }
   };
 
-  const initImageCarousel = function initImageCarousel(id, oClass) {
+  const initImageCarousel = function initImageCarousel(id, oClass, carouselId) {
     const { length } = Array.from(document.querySelectorAll(oClass));
-    if (!document.querySelector('.glide-image') && length > 1) {
+    if (!document.querySelector(`.glide-image${carouselId}`) && length > 1) {
       OGlide({
         id,
         callback: callbackImage,
         oClass,
-        glideClass: 'glide-image',
+        glideClass: `glide-image${carouselId}`,
         autoplay
       });
     }
@@ -279,7 +278,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         carouselIds.forEach((carouselId) => {
           const imageCarouselDiv = document.getElementById(`o-image-carousel${carouselId}`);
           if (imageCarouselDiv !== null) {
-            initImageCarousel(`#o-image-carousel${carouselId}`, `#o-image-content${carouselId}`);
+            initImageCarousel(`#o-image-carousel${carouselId}`, `#o-image-content${carouselId}`, carouselId);
           }
         });
         const popupHeight = document.querySelector('.o-popup').offsetHeight + 10;
