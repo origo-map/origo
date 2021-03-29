@@ -141,19 +141,20 @@ const Featureinfo = function Featureinfo(options = {}) {
 
   // TODO: should there be anything done?
   const callbackImage = function callbackImage(evt) {
+    console.log(evt);
     const currentItemIndex = evt.item.index;
     if (currentItemIndex !== null) {
       // should there be anything done?
     }
   };
 
-  const initImageCarousel = function initImageCarousel(id) {
-    const { length } = Array.from(document.querySelectorAll('.o-image-content'));
+  const initImageCarousel = function initImageCarousel(id, oClass) {
+    const { length } = Array.from(document.querySelectorAll(oClass));
     if (!document.querySelector('.glide-image') && length > 1) {
       OGlide({
         id,
         callback: callbackImage,
-        oClass: '.o-image-content',
+        oClass,
         glideClass: 'glide-image',
         autoplay
       });
@@ -236,7 +237,9 @@ const Featureinfo = function Featureinfo(options = {}) {
           title: items[0] instanceof SelectedItem ? items[0].getLayer().get('title') : items[0].title
         });
         const contentDiv = document.getElementById('o-identify-carousel');
+        const carouselIds = [];
         items.forEach((item) => {
+          carouselIds.push(item.feature.ol_uid);
           if (item.content instanceof Element) {
             contentDiv.appendChild(item.content);
           } else {
@@ -245,9 +248,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         });
         popup.setVisibility(true);
         initCarousel('#o-identify-carousel');
-        const popupHeight = document.querySelector('.o-popup').offsetHeight + 10;
         const popupEl = popup.getEl();
-        popupEl.style.height = `${popupHeight}px`;
         overlay = new Overlay({
           element: popupEl,
           autoPan: {
@@ -271,10 +272,14 @@ const Featureinfo = function Featureinfo(options = {}) {
         const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
         map.addOverlay(overlay);
         overlay.setPosition(coord);
-        const imageCarouselDiv = document.getElementById('o-image-carousel');
-        if (imageCarouselDiv !== null) {
-          initImageCarousel('#o-image-carousel');
-        }
+        carouselIds.forEach((carouselId) => {
+          const imageCarouselDiv = document.getElementById(`o-image-carousel${carouselId}`);
+          if (imageCarouselDiv !== null) {
+            initImageCarousel(`#o-image-carousel${carouselId}`, `#o-image-content${carouselId}`);
+          }
+        });
+        const popupHeight = document.querySelector('.o-popup').offsetHeight + 10;
+        popupEl.style.height = `${popupHeight}px`;
         break;
       }
       case 'sidebar':

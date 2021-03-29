@@ -56,7 +56,9 @@ const getContent = {
       }
     }
     const newElement = document.createElement('li');
-    newElement.classList.add(attribute.cls);
+    if (typeof (attribute.cls) !== 'undefined') {
+      newElement.classList.add(attribute.cls);
+    }
     newElement.innerHTML = `${title}${val}`;
     return newElement;
   },
@@ -73,7 +75,9 @@ const getContent = {
       val = parseUrl(feature.get(attribute.url), feature, attribute, attributes, map);
     }
     const newElement = document.createElement('li');
-    newElement.classList.add(attribute.cls);
+    if (typeof (attribute.cls) !== 'undefined') {
+      newElement.classList.add(attribute.cls);
+    }
     newElement.innerHTML = val;
     return newElement;
   },
@@ -95,7 +99,9 @@ const getContent = {
       }
     }
     const newElement = document.createElement('li');
-    newElement.classList.add(attribute.cls);
+    if (typeof (attribute.cls) !== 'undefined') {
+      newElement.classList.add(attribute.cls);
+    }
     newElement.innerHTML = val;
     return newElement;
   },
@@ -108,9 +114,9 @@ const getContent = {
         imgArr.forEach((img) => {
           const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(img, attributes, null, map));
           const attribution = attribute.attribution ? `<div class="o-image-attribution">${attribute.attribution}</div>` : '';
-          slides += `<div class="o-image-content"><img src="${url}">${attribution}</div>`;
+          slides += `<div class="o-image-content" id="o-image-content${feature.ol_uid}"><img src="${url}">${attribution}</div>`;
         });
-        val = `<div id="o-image-carousel">${slides}</div>`;
+        val = `<div id="o-image-carousel${feature.ol_uid}" class="o-image-carousel">${slides}</div>`;
       }
     } else {
       const featGet = attribute.carousel ? feature.get(attribute.carousel) : feature.get(attribute.name);
@@ -121,7 +127,9 @@ const getContent = {
       }
     }
     const newElement = document.createElement('li');
-    newElement.classList.add(attribute.cls);
+    if (typeof (attribute.cls) !== 'undefined') {
+      newElement.classList.add(attribute.cls);
+    }
     newElement.innerHTML = val;
     return newElement;
   },
@@ -131,7 +139,9 @@ const getContent = {
       helperArg: feature.getGeometry()
     }, map);
     const newElement = document.createElement('li');
-    newElement.classList.add(attribute.cls);
+    if (typeof (attribute.cls) !== 'undefined') {
+      newElement.classList.add(attribute.cls);
+    }
     newElement.innerHTML = val;
     return newElement;
   }
