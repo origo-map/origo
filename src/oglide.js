@@ -31,10 +31,18 @@ function OGlide(options) {
     callback,
     oClass = '.o-identify-content',
     glideClass = 'glide-content',
-    autoplay = false
+    autoplay = false,
+    targetElement
   } = options;
-  const oiContent = Array.from(document.querySelectorAll(oClass));
-  const target = document.querySelector(id);
+  let oiContent;
+  let target;
+  if (targetElement) {
+    target = targetElement;
+    oiContent = Array.from(targetElement.querySelectorAll(oClass));
+  } else {
+    target = document.querySelector(id);
+    oiContent = Array.from(document.querySelectorAll(oClass));
+  }
   const glide = document.createElement('div');
   glide.classList.add('glide');
   glide.classList.add(glideClass);
@@ -100,10 +108,13 @@ function OGlide(options) {
     animationDuration: 150,
     autoplay
   });
-  el.mount();
-  el.on('move', () => {
-    callback({ item: { index: el.index, count: oiContent.length } });
-  });
+
+  if (oiContent.length > 0) {
+    el.mount();
+    el.on('move', () => {
+      callback({ item: { index: el.index, count: oiContent.length } });
+    });
+  }
 }
 
 export default OGlide;

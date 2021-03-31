@@ -147,15 +147,17 @@ const Featureinfo = function Featureinfo(options = {}) {
     }
   };
 
-  const initImageCarousel = function initImageCarousel(id, oClass, carouselId) {
-    const { length } = Array.from(document.querySelectorAll(oClass));
+  const initImageCarousel = function initImageCarousel(id, oClass, carouselId, targetElement) {
+    const carousel = document.getElementsByClassName(id.substring(1));
+    const { length } = Array.from(carousel[0].querySelectorAll('div.o-image-content > img'));
     if (!document.querySelector(`.glide-image${carouselId}`) && length > 1) {
       OGlide({
         id,
         callback: callbackImage,
         oClass,
         glideClass: `glide-image${carouselId}`,
-        autoplay
+        autoplay,
+        targetElement
       });
     }
   };
@@ -276,9 +278,16 @@ const Featureinfo = function Featureinfo(options = {}) {
         map.addOverlay(overlay);
         overlay.setPosition(coord);
         carouselIds.forEach((carouselId) => {
-          const imageCarouselDiv = document.getElementById(`o-image-carousel${carouselId}`);
-          if (imageCarouselDiv !== null) {
-            initImageCarousel(`#o-image-carousel${carouselId}`, `#o-image-content${carouselId}`, carouselId);
+          let targetElement;
+          const elements = document.getElementsByClassName(`o-image-carousel${carouselId}`);
+          elements.forEach(element => {
+            if (!element.closest('.glide__slide--clone')) {
+              targetElement = element;
+            }
+          });
+          const imageCarouselEl = document.getElementsByClassName(`o-image-carousel${carouselId}`);
+          if (imageCarouselEl.length > 0) {
+            initImageCarousel(`#o-image-carousel${carouselId}`, `.o-image-content${carouselId}`, carouselId, targetElement);
           }
         });
         const popupHeight = document.querySelector('.o-popup').offsetHeight + 10;

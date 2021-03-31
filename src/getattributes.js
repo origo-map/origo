@@ -114,9 +114,9 @@ const getContent = {
         imgArr.forEach((img) => {
           const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(img, attributes, null, map));
           const attribution = attribute.attribution ? `<div class="o-image-attribution">${attribute.attribution}</div>` : '';
-          slides += `<div class="o-image-content" id="o-image-content${feature.ol_uid}"><img src="${url}">${attribution}</div>`;
+          slides += `<div class="o-image-content o-image-content${feature.ol_uid}"><img src="${url}">${attribution}</div>`;
         });
-        val = `<div id="o-image-carousel${feature.ol_uid}" class="o-image-carousel">${slides}</div>`;
+        val = `<div class="o-image-carousel o-image-carousel${feature.ol_uid}">${slides}</div>`;
       }
     } else {
       const featGet = attribute.carousel ? feature.get(attribute.carousel) : feature.get(attribute.name);

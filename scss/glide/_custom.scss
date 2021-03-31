@@ -10,6 +10,9 @@
     flex-direction: column;
     max-height: calc(70vh - 46px);
   }
+  &__slide--clone {
+    height:0;
+  }
 }
 @media (hover: none) {
   .glide__arrow:hover {
