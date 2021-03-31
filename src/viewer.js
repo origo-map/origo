@@ -4,6 +4,7 @@ import geom from 'ol/geom/Geometry';
 import { Component } from './ui';
 import Map from './map';
 import proj from './projection';
+import getCapabilities from './getCapabilities';
 import MapSize from './utils/mapsize';
 import Featureinfo from './featureinfo';
 import Selectionmanager from './selectionmanager';
@@ -44,6 +45,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     center: centerOption = [0, 0],
     zoom: zoomOption = 0,
     resolutions = null,
+    capabilitiesURL = null,
     layers: layerOptions = [],
     map: mapName,
     params: urlParams = {},
@@ -59,6 +61,15 @@ const Viewer = function Viewer(targetOption, options = {}) {
   const center = urlParams.center || centerOption;
   const zoom = urlParams.zoom || zoomOption;
   const groups = flattenGroups(groupOptions);
+
+  const getCapabilitiesLayers = {};
+  (Object.keys(source)).forEach(sourceName => {
+    const sourceOptions = source[sourceName];
+    if (sourceOptions && sourceOptions.capabilitiesURL) {
+      getCapabilitiesLayers[sourceName] = getCapabilities(sourceOptions.capabilitiesURL);
+    }
+  });
+
   const defaultTileGridOptions = {
     alignBottomLeft: true,
     extent,
@@ -251,9 +262,35 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
   const getMain = () => main;
 
-  const mergeSavedLayerProps = (initialLayerProps, savedLayerProps) => {
+  const mergeSecuredLayer = (layerlist, capabilitiesLayers) => {
+    if (capabilitiesLayers && Object.keys(capabilitiesLayers).length > 0) {
+      layerlist.forEach((layer) => {
+        // remove double underscore plus a suffix from layer name
+        let layername = '';
+        if (layer.name.includes('__')) {
+          layername = layer.name.substring(0,layer.name.lastIndexOf('__'));
+        }else{
+          layername = layer.name
+        }
+        const layerSourceOptions = layer.source ? getSource2(layer.source) : undefined;
+        if (layerSourceOptions && layerSourceOptions.capabilitiesURL) {
+          if (capabilitiesLayers[layer.source].indexOf(layername) >= 0) {
+            layer.secure = false;
+          } else {
+            layer.secure = true;
+          }
+        } else {
+          layer.secure = false;
+        }
+      });
+    }
+    return layerlist;
+  };
+
+  const mergeSavedLayerProps = (initialLayerProps, savedLayerProps, capabilitiesLayers) => {
+    let mergedLayerProps;
     if (savedLayerProps) {
-      const mergedLayerProps = initialLayerProps.reduce((acc, initialProps) => {
+      mergedLayerProps = initialLayerProps.reduce((acc, initialProps) => {
         const layerName = initialProps.name.split(':').pop();
         const savedProps = savedLayerProps[layerName] || {
           visible: false,
@@ -264,9 +301,9 @@ const Viewer = function Viewer(targetOption, options = {}) {
         acc.push(mergedProps);
         return acc;
       }, []);
-      return mergedLayerProps;
+      return mergeSecuredLayer(mergedLayerProps, capabilitiesLayers);
     }
-    return initialLayerProps;
+    return mergeSecuredLayer(initialLayerProps, capabilitiesLayers);
   };
 
   const removeOverlays = function removeOverlays(overlays) {
