@@ -178,11 +178,19 @@ function onDrawEnd(evt) {
 // if no feature is provided action is aborted.
 function onCustomDrawEnd(e) {
   // Check if a feature has been created, or tool canceled
-  if (e.detail.feature) {
-    if (e.detail.feature.getGeometry().getType() !== editLayers[currentLayer].get('geometryType')) {
+  const feature = e.detail.feature;
+  if (feature) {
+    if (feature.getGeometry().getType() !== editLayers[currentLayer].get('geometryType')) {
       alert('Kan inte lägga till en geometri av den typen i det lagret');
+    } else {
+      // Must move geometry to correct property. Setting geometryName is not enough.
+      if (editLayers[currentLayer].get('geometryName') !== feature.getGeometryName()) {
+        feature.set(editLayers[currentLayer].get('geometryName'), feature.getGeometry());
+        feature.unset(feature.getGeometryName());
+        e.detail.feature.setGeometryName(editLayers[currentLayer].get('geometryName'));
+      }
+      addFeature(e.detail.feature);
     }
-    addFeature(e.detail.feature);
   }
   setActive();
 }

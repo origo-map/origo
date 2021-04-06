@@ -6,6 +6,7 @@ import copyTool from './copyTool';
 const createElement = utils.createElement;
 
 let viewer;
+let layer;
 
 const drawToolsSelector = function drawToolsSelector(tools, defaultLayer, v) {
   const toolNames = {
@@ -72,7 +73,7 @@ const drawToolsSelector = function drawToolsSelector(tools, defaultLayer, v) {
           // Copy tool is handled entirely in copyTool. Only notify edithandler to back off
           // and call copyTool to do its stuff.
           dispatcher.emitChangeEditorShapes('custom');
-          copyTool(viewer, drawTools.find((tool) => tool.toolName === 'Copy'));
+          copyTool(viewer, layer, drawTools.find((tool) => tool.toolName === 'Copy'));
           break;
         default:
           // This is an OL shape tool. Let edithandler handle it
@@ -112,7 +113,7 @@ const drawToolsSelector = function drawToolsSelector(tools, defaultLayer, v) {
   }
 
   function setDrawTools(layerName) {
-    const layer = viewer.getLayer(layerName);
+    layer = viewer.getLayer(layerName);
     let geometryType;
     drawTools = layer.get('drawTools') || [];
     if (layer.get('drawTools')) {
