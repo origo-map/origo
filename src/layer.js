@@ -2,6 +2,15 @@ import mapUtils from './maputils';
 import group from './layer/group';
 import type from './layer/layertype';
 
+function onChangeVisible(e) {
+  const layer = e.target;
+  setTimeout(() => {
+    if (layer.get('css')) {
+      Object.assign(document.getElementsByClassName(layer.getClassName())[0].style, layer.get('css'));
+    }
+  });
+}
+
 const Layer = function Layer(optOptions, viewer) {
   const defaultOptions = {
     name: undefined,
@@ -45,8 +54,14 @@ const Layer = function Layer(optOptions, viewer) {
 
   layerOptions.name = name.split(':').pop();
 
+  if (layerOptions.css) {
+    layerOptions.className = layerOptions.cls || `o-layer-${layerOptions.name}`;
+  }
+
   if (layerOptions.type) {
-    return type[layerOptions.type](layerOptions, viewer);
+    const layer = type[layerOptions.type](layerOptions, viewer);
+    layer.once('postrender', onChangeVisible);
+    return layer;
   }
 
   throw new Error(`Layer type is missing or layer type is not correct. Check your layer definition: ${layerOptions}`);
