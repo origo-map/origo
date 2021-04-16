@@ -12,7 +12,13 @@ function createSource(options) {
         const numFeatures = vectorSource.getFeatures().length;
         for (let i = 0; i < numFeatures; i += 1) {
           vectorSource.forEachFeature((feature) => {
-            feature.setId(i);
+            if (!feature.getId()) {
+              if (feature.get(options.idField)) {
+                feature.setId(feature.get(options.idField));
+              } else {
+                feature.setId(1000000 + i);
+              }
+            }
             i += 1;
           });
         }
@@ -34,6 +40,7 @@ const geojson = function geojson(layerOptions, viewer) {
   const sourceOptions = {};
   sourceOptions.attribution = geojsonOptions.attribution;
   sourceOptions.projectionCode = viewer.getProjectionCode();
+  sourceOptions.idField = layerOptions.idField || 'id';
   if (geojsonOptions.projection) {
     sourceOptions.dataProjection = geojsonOptions.projection;
   } else if (sourceOptions.projection) {
