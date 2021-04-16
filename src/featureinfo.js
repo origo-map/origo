@@ -67,6 +67,40 @@ const Featureinfo = function Featureinfo(options = {}) {
     }
   };
 
+  const getTitle = function getTitle(item) {
+    let featureinfoTitle;
+    let title;
+    let layer;
+    if (item.layer) {
+      if (typeof item.layer === 'string') {
+        // bcuz in getfeatureinfo -> getFeaturesFromRemote only name of the layer is set on the object! (old version before using SelectedItems class)
+        layer = viewer.getLayer(item.layer);
+      } else {
+        layer = viewer.getLayer(item.layer.get('name'));
+      }
+    }
+    // This is very strange: layer above is only a string, could not possibly have method.
+    if (layer) {
+      featureinfoTitle = layer.getProperties().featureinfoTitle;
+    }
+    if (featureinfoTitle) {
+      const featureProps = item.feature.getProperties();
+      title = replacer.replace(featureinfoTitle, featureProps);
+      if (!title) {
+        if (item instanceof SelectedItem) {
+          title = item.getLayer().get('title') ? item.getLayer().get('title') : item.getLayer().get('name');
+        } else {
+          title = item.title ? item.title : item.name;
+        }
+      }
+    } else if (item instanceof SelectedItem) {
+      title = item.getLayer().get('title') ? item.getLayer().get('title') : item.getLayer().get('name');
+    } else {
+      title = item.title ? item.title : item.name;
+    }
+    return title;
+  };
+
   // TODO: direct access to feature and layer should be converted to getFeature and getLayer methods on currentItem
   const callback = function callback(evt) {
     const currentItemIndex = evt.item.index;
@@ -79,38 +113,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         clone,
         selectionStyles[currentItem.feature.getGeometry().getType()]
       );
-      let featureinfoTitle;
-      let title;
-      let layer;
-
-      if (currentItem.layer) {
-        if (typeof currentItem.layer === 'string') {
-          // bcuz in getfeatureinfo -> getFeaturesFromRemote only name of the layer is set on the object! (old version before using SelectedItems class)
-          layer = viewer.getLayer(currentItem.layer);
-        } else {
-          layer = viewer.getLayer(currentItem.layer.get('name'));
-        }
-      }
-      // This is very strange: layer above is only a string, could not possibly have method.
-      if (layer) {
-        featureinfoTitle = layer.getProperties().featureinfoTitle;
-      }
-
-      if (featureinfoTitle) {
-        const featureProps = currentItem.feature.getProperties();
-        title = replacer.replace(featureinfoTitle, featureProps);
-        if (!title) {
-          if (currentItem instanceof SelectedItem) {
-            title = currentItem.getLayer().get('title') ? currentItem.getLayer().get('title') : currentItem.getLayer().get('name');
-          } else {
-            title = currentItem.title ? currentItem.title : currentItem.name;
-          }
-        }
-      } else if (currentItem instanceof SelectedItem) {
-        title = currentItem.getLayer().get('title') ? currentItem.getLayer().get('title') : currentItem.getLayer().get('name');
-      } else {
-        title = currentItem.title ? currentItem.title : currentItem.name;
-      }
+      const title = getTitle(currentItem);
       selectionLayer.setSourceLayer(currentItem.layer);
       if (identifyTarget === 'overlay') {
         popup.setTitle(title);
@@ -215,7 +218,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         popup = Popup(`#${viewer.getId()}`);
         popup.setContent({
           content,
-          title: items[0] instanceof SelectedItem ? items[0].getLayer().get('title') : items[0].title
+          title: getTitle(items[0])
         });
         const contentDiv = document.getElementById('o-identify-carousel');
         items.forEach((item) => {
@@ -259,7 +262,7 @@ const Featureinfo = function Featureinfo(options = {}) {
       {
         sidebar.setContent({
           content,
-          title: items[0] instanceof SelectedItem ? items[0].getLayer().get('title') : items[0].title
+          title: getTitle(items[0])
         });
         const contentDiv = document.getElementById('o-identify-carousel');
         items.forEach((item) => {
