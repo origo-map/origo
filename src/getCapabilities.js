@@ -1,7 +1,7 @@
 let getCapabilitiesLayers;
 
 function xmlToArray(xmlDoc) {
-getCapabilitiesLayers = Array.prototype.map.call(xmlDoc.querySelectorAll('Layer > Name'), (el) => el.textContent);
+  getCapabilitiesLayers = Array.prototype.map.call(xmlDoc.querySelectorAll('Layer > Name'), el => el.textContent);
 
   getCapabilitiesLayers.forEach((getCapabilitiesLayer, i) => {
     const data = getCapabilitiesLayer.split(':');

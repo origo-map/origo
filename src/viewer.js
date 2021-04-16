@@ -45,7 +45,6 @@ const Viewer = function Viewer(targetOption, options = {}) {
     center: centerOption = [0, 0],
     zoom: zoomOption = 0,
     resolutions = null,
-    capabilitiesURL = null,
     layers: layerOptions = [],
     map: mapName,
     params: urlParams = {},
@@ -271,24 +270,26 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
   const mergeSecuredLayer = (layerlist, capabilitiesLayers) => {
     if (capabilitiesLayers && Object.keys(capabilitiesLayers).length > 0) {
-      layerlist.forEach((layer) => {
+      return layerlist.map(layer => {
+        let secure;
         // remove double underscore plus a suffix from layer name
         let layername = '';
         if (layer.name.includes('__')) {
-          layername = layer.name.substring(0,layer.name.lastIndexOf('__'));
-        }else{
-          layername = layer.name
+          layername = layer.name.substring(0, layer.name.lastIndexOf('__'));
+        } else {
+          layername = layer.name;
         }
         const layerSourceOptions = layer.source ? getSource2(layer.source) : undefined;
         if (layerSourceOptions && layerSourceOptions.capabilitiesURL) {
           if (capabilitiesLayers[layer.source].indexOf(layername) >= 0) {
-            layer.secure = false;
+            secure = false;
           } else {
-            layer.secure = true;
+            secure = true;
           }
         } else {
-          layer.secure = false;
+          secure = false;
         }
+        return { ...layer, secure };
       });
     }
     return layerlist;
