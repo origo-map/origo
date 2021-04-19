@@ -7,7 +7,7 @@ function createSource(options) {
   const vectorSource = new VectorSource({
     attributions: options.attribution,
     loader() {
-      fetch(options.url).then(response => response.json()).then((data) => {
+      fetch(options.url, { headers: options.headers }).then(response => response.json()).then((data) => {
         vectorSource.addFeatures(vectorSource.getFormat().readFeatures(data));
         const numFeatures = vectorSource.getFeatures().length;
         for (let i = 0; i < numFeatures; i += 1) {
@@ -48,6 +48,7 @@ const geojson = function geojson(layerOptions, viewer) {
     geojsonOptions.sourceName = geojsonOptions.source;
     sourceOptions.url = geojsonOptions.source;
   }
+  sourceOptions.headers = layerOptions.headers;
 
   const geojsonSource = createSource(sourceOptions);
   return vector(geojsonOptions, geojsonSource, viewer);

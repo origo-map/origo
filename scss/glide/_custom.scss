@@ -11,3 +11,8 @@
     max-height: calc(70vh - 46px);
   }
 }
+@media (hover: none) {
+  .glide__arrow:hover {
+    border-color: $o-glide-border-color; 
+  }
+}
