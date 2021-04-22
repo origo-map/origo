@@ -20,29 +20,51 @@ const DragAndDrop = function DragAndDrop(options = {}) {
       const groupName = options.groupName || 'egna-lager';
       const groupTitle = options.groupTitle || 'Egna lager';
       const featureStyles = options.featureStyles || {
-        stroke: {
-          color: [100, 149, 237, 1],
-          width: 4,
-          lineDash: null
-        },
-        fill: {
-          color: [100, 149, 237, 0.2]
-        },
-        circle: {
-          radius: 7,
-          stroke: {
-            color: [100, 149, 237, 1],
-            width: 2
-          },
-          fill: {
-            color: [255, 255, 255, 1]
+        Point: [{
+          circle: {
+            radius: 5,
+            stroke: {
+              color: [0, 255, 255, 1],
+              width: 0
+            },
+            fill: {
+              color: [0, 255, 255, 1]
+            }
           }
-        }
+        }],
+        LineString: [{
+          stroke: {
+            color: [255, 255, 255, 1],
+            width: 5
+          }
+        },
+        {
+          stroke: {
+            color: [0, 255, 255, 0.5],
+            width: 3
+          }
+        }],
+        Polygon: [{
+          stroke: {
+            color: [255, 255, 255, 1],
+            width: 5
+          }
+        },
+        {
+          stroke: {
+            color: [0, 255, 255, 1],
+            width: 3
+          }
+        },
+        {
+          fill: {
+            color: [0, 255, 255, 0.1]
+          }
+        }]
       };
       let vectorSource;
       let vectorLayer;
-      const vectorStyles = Style.createStyleRule(featureStyles);
-
+      const vectorStyles = Style.createGeometryStyle(featureStyles);
       const dragAndDrop = new olDragAndDrop({
         formatConstructors: [
           GPXFormat,
@@ -69,7 +91,7 @@ const DragAndDrop = function DragAndDrop(options = {}) {
           title: event.file.name.split('.')[0],
           queryable: true,
           removable: true,
-          style: vectorStyles
+          style: vectorStyles[event.features[0].getGeometry().getType()]
         });
 
         map.addLayer(vectorLayer);

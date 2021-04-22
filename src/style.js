@@ -5,7 +5,6 @@ import Icon from 'ol/style/Icon';
 import Stroke from 'ol/style/Stroke';
 import Style from 'ol/style/Style';
 import Text from 'ol/style/Text';
-import validateurl from './utils/validateurl';
 import stylefunctions from './style/stylefunctions';
 import replacer from './utils/replacer';
 import maputils from './maputils';
@@ -73,7 +72,7 @@ const editStyleOptions = {
   ]
 };
 
-function createStyleOptions(styleParams, baseUrl) {
+function createStyleOptions(styleParams) {
   const styleOptions = {};
   if (Object.prototype.hasOwnProperty.call(styleParams, 'geometry')) {
     switch (styleParams.geometry) {
@@ -115,9 +114,6 @@ function createStyleOptions(styleParams, baseUrl) {
   }
   if ('icon' in styleParams) {
     const styleIcon = styleParams.icon;
-    if ('src' in styleIcon) {
-      styleIcon.src = validateurl(styleIcon.src, baseUrl);
-    }
     styleOptions.image = new Icon(styleIcon);
   }
   if ('circle' in styleParams) {
@@ -130,7 +126,7 @@ function createStyleOptions(styleParams, baseUrl) {
   return styleOptions;
 }
 
-function createStyleList(styleOptions, baseUrl) {
+function createStyleList(styleOptions) {
   const styleList = [];
   // Create style for each rule
   for (let i = 0; i < styleOptions.length; i += 1) {
@@ -139,11 +135,11 @@ function createStyleList(styleOptions, baseUrl) {
     // Check if rule is array, ie multiple styles for the rule
     if (styleOptions[i].constructor === Array) {
       for (let j = 0; j < styleOptions[i].length; j += 1) {
-        styleOption = createStyleOptions(styleOptions[i][j], baseUrl);
+        styleOption = createStyleOptions(styleOptions[i][j]);
         styleRule.push(new Style(styleOption));
       }
     } else {
-      styleOption = createStyleOptions(styleOptions[i], baseUrl);
+      styleOption = createStyleOptions(styleOptions[i]);
       styleRule = [new Style(styleOption)];
     }
 
@@ -234,7 +230,6 @@ function createStyle({
   const resolutions = viewer.getResolutions();
   const projection = viewer.getProjection();
   const styleSettings = viewer.getStyle(styleName);
-  const baseUrl = viewer.getBaseUrl();
 
   if (!styleSettings || Object.keys(styleSettings).length === 0) {
     const style = getCustomStyle('stylefunction', { name: 'default' });
@@ -255,9 +250,9 @@ function createStyle({
 
   const style = (function style() {
     // Create style for each rule
-    const styleList = createStyleList(styleSettings, baseUrl);
+    const styleList = createStyleList(styleSettings);
     if (clusterStyleSettings) {
-      const clusterStyleList = createStyleList(clusterStyleSettings, baseUrl);
+      const clusterStyleList = createStyleList(clusterStyleSettings);
       return styleFunction({
         styleSettings,
         styleList,
@@ -277,18 +272,33 @@ function createStyle({
   return style;
 }
 
-function createStyleRule(options, baseUrl = '') {
+function createStyleRule(options) {
   let styleRule = [];
   let styleOption;
   if (options.constructor === Array) {
     for (let i = 0; i < options.length; i += 1) {
-      styleOption = createStyleOptions(options[i], baseUrl);
+      styleOption = createStyleOptions(options[i]);
       styleRule.push(new Style(styleOption));
     }
   } else {
-    styleOption = createStyleOptions(options, baseUrl);
+    styleOption = createStyleOptions(options);
     styleRule = [new Style(styleOption)];
   }
+  return styleRule;
+}
+
+function createGeometryCollectionStyle(options) {
+  const styleRule = [];
+
+  createStyleRule(options.Point).forEach((item) => {
+    styleRule.push(item);
+  });
+  createStyleRule(options.LineString).forEach((item) => {
+    styleRule.push(item);
+  });
+  createStyleRule(options.Polygon).forEach((item) => {
+    styleRule.push(item);
+  });
   return styleRule;
 }
 
@@ -299,7 +309,8 @@ function createGeometryStyle(geometryStyleOptions) {
     LineString: createStyleRule(geometryStyleOptions.LineString),
     MultiLineString: createStyleRule(geometryStyleOptions.LineString),
     Polygon: createStyleRule(geometryStyleOptions.Polygon),
-    MultiPolygon: createStyleRule(geometryStyleOptions.Polygon)
+    MultiPolygon: createStyleRule(geometryStyleOptions.Polygon),
+    GeometryCollection: createGeometryCollectionStyle(geometryStyleOptions)
   };
 }
 
