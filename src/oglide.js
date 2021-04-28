@@ -26,11 +26,26 @@ function OGlide(options) {
       Object.defineProperty(Element.prototype, 'classList', Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'classList'));
     }
   }
-  const { id, callback } = options;
-  const oiContent = Array.from(document.querySelectorAll('.o-identify-content'));
-  const target = document.querySelector(id);
+  const {
+    id,
+    callback,
+    oClass = '.o-identify-content',
+    glideClass = 'glide-content',
+    autoplay = false,
+    targetElement
+  } = options;
+  let oiContent;
+  let target;
+  if (targetElement) {
+    target = targetElement;
+    oiContent = Array.from(targetElement.querySelectorAll(oClass));
+  } else {
+    target = document.querySelector(id);
+    oiContent = Array.from(document.querySelectorAll(oClass));
+  }
   const glide = document.createElement('div');
   glide.classList.add('glide');
+  glide.classList.add(glideClass);
   target.appendChild(glide);
   const track = document.createElement('div');
   track.classList.add('glide__track');
@@ -82,7 +97,7 @@ function OGlide(options) {
   generateBullets({ bullets, oiItems: oiContent });
   glide.appendChild(bullets);
 
-  const el = new Glide('.glide', {
+  const el = new Glide(`.${glideClass}`, {
     type: 'carousel',
     ocusAt: '1',
     startAt: 0,
@@ -90,12 +105,16 @@ function OGlide(options) {
     direction: 'ltr',
     gap: 0,
     perTouch: 1,
-    animationDuration: 150
+    animationDuration: 150,
+    autoplay
   });
-  el.mount();
-  el.on('move', () => {
-    callback({ item: { index: el.index, count: oiContent.length } });
-  });
+
+  if (oiContent.length > 0) {
+    el.mount();
+    el.on('move', () => {
+      callback({ item: { index: el.index, count: oiContent.length } });
+    });
+  }
 }
 
 export default OGlide;

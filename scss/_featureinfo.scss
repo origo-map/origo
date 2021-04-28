@@ -4,6 +4,40 @@
 }
 
 #o-identify-carousel > .o-identify-content {
-  max-height: calc(70vh - 46px);
-  overflow-y: auto;
+  overflow-y:scroll;
+}
+
+.o-image-content {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 5px;
+  margin: 5px;
+  height: 160px;
+}
+
+.o-image-content img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+  #o-identify-carousel > .o-identify-content {
+    max-height: calc(70vh - 46px);
+    overflow-y: auto;
+  }
+  .o-image-content {
+    width: calc(100% - 12px);
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+    margin: 5px;
+    overflow: hidden;
+  }
 }
