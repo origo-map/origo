@@ -4,6 +4,7 @@ import geom from 'ol/geom/Geometry';
 import { Component } from './ui';
 import Map from './map';
 import proj from './projection';
+import getCapabilities from './getCapabilities';
 import MapSize from './utils/mapsize';
 import Featureinfo from './featureinfo';
 import Selectionmanager from './selectionmanager';
@@ -60,6 +61,15 @@ const Viewer = function Viewer(targetOption, options = {}) {
   const center = urlParams.center || centerOption;
   const zoom = urlParams.zoom || zoomOption;
   const groups = flattenGroups(groupOptions);
+
+  const getCapabilitiesLayers = {};
+  (Object.keys(source)).forEach(sourceName => {
+    const sourceOptions = source[sourceName];
+    if (sourceOptions && sourceOptions.capabilitiesURL) {
+      getCapabilitiesLayers[sourceName] = getCapabilities(sourceOptions.capabilitiesURL);
+    }
+  });
+
   const defaultTileGridOptions = {
     alignBottomLeft: true,
     extent,
@@ -221,6 +231,13 @@ const Viewer = function Viewer(targetOption, options = {}) {
     throw new Error(`There is no source with name: ${name}`);
   };
 
+  const getSource2 = function getSource2(name) {
+    if (name in source) {
+      return source[name];
+    }
+    return undefined;
+  };
+
   const getGroups = () => groups;
 
   const getProjectionCode = () => projectionCode;
@@ -254,9 +271,37 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
   const getMain = () => main;
 
-  const mergeSavedLayerProps = (initialLayerProps, savedLayerProps) => {
+  const mergeSecuredLayer = (layerlist, capabilitiesLayers) => {
+    if (capabilitiesLayers && Object.keys(capabilitiesLayers).length > 0) {
+      return layerlist.map(layer => {
+        let secure;
+        // remove double underscore plus a suffix from layer name
+        let layername = '';
+        if (layer.name.includes('__')) {
+          layername = layer.name.substring(0, layer.name.lastIndexOf('__'));
+        } else {
+          layername = layer.name;
+        }
+        const layerSourceOptions = layer.source ? getSource2(layer.source) : undefined;
+        if (layerSourceOptions && layerSourceOptions.capabilitiesURL) {
+          if (capabilitiesLayers[layer.source].indexOf(layername) >= 0) {
+            secure = false;
+          } else {
+            secure = true;
+          }
+        } else {
+          secure = false;
+        }
+        return { ...layer, secure };
+      });
+    }
+    return layerlist;
+  };
+
+  const mergeSavedLayerProps = (initialLayerProps, savedLayerProps, capabilitiesLayers) => {
+    let mergedLayerProps;
     if (savedLayerProps) {
-      const mergedLayerProps = initialLayerProps.reduce((acc, initialProps) => {
+      mergedLayerProps = initialLayerProps.reduce((acc, initialProps) => {
         const layerName = initialProps.name.split(':').pop();
         const savedProps = savedLayerProps[layerName] || {
           visible: false,
@@ -267,9 +312,9 @@ const Viewer = function Viewer(targetOption, options = {}) {
         acc.push(mergedProps);
         return acc;
       }, []);
-      return mergedLayerProps;
+      return mergeSecuredLayer(mergedLayerProps, capabilitiesLayers);
     }
-    return initialLayerProps;
+    return mergeSecuredLayer(initialLayerProps, capabilitiesLayers);
   };
 
   const removeOverlays = function removeOverlays(overlays) {
@@ -399,7 +444,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
       setMap(Map(Object.assign(options, { projection, center, zoom, target: this.getId() })));
 
-      const layerProps = mergeSavedLayerProps(layerOptions, urlParams.layers);
+      const layerProps = mergeSavedLayerProps(layerOptions, urlParams.layers, getCapabilitiesLayers);
       this.addLayers(layerProps);
 
       mapSize = MapSize(map, {
