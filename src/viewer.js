@@ -254,8 +254,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
   const getMain = () => main;
 
-  const isNotEmbedded = function isNotEmbedded() {
-    return !isEmbedded(this.getTarget());
+  const getEmbedded = function getEmbedded() {
+    return isEmbedded(this.getTarget());
   };
 
   const mergeSavedLayerProps = (initialLayerProps, savedLayerProps) => {
@@ -540,7 +540,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     removeOverlays,
     zoomToExtent,
     getSelectionManager,
-    isNotEmbedded
+    getEmbedded
   });
 };
 
