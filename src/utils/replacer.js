@@ -33,10 +33,10 @@ const replacer = function replacer() {
           // Drill down to the end of the nested attribute and return the value
           do {
             const key = splitMatch.shift();
-            if (key in obj) {
+            if (key in objectTemp) {
               objectTemp = objectTemp[key];
             }
-          } while (splitMatch.length < 1);
+          } while (splitMatch.length > 1);
           if (typeof objectTemp[splitMatch[0]] !== 'undefined') {
             val = objectTemp[splitMatch[0]];
           } else {
