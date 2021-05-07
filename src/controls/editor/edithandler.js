@@ -15,6 +15,7 @@ import getImageOrientation from '../../utils/getimageorientation';
 import shapes from './shapes';
 import searchList from './addons/searchList/searchList';
 import validate from '../../utils/validate';
+import slugify from '../../utils/slugify';
 
 const editsStore = store();
 let editLayers = {};
@@ -660,7 +661,7 @@ function editAttributes(feat) {
             obj.requiredVal = constraintProps[2];
             obj.isVisible = obj.dependencyVal === obj.requiredVal;
             obj.addListener = addListener();
-            obj.elId = `input-${obj.name}-${obj.requiredVal}`;
+            obj.elId = `input-${obj.name}-${slugify(obj.requiredVal)}`;
             obj.elDependencyId = `input-${constraintProps[1]}`;
           } else {
             alert('Villkor verkar inte vara rätt formulerat. Villkor formuleras enligt principen change:attribute:value');
