@@ -22,6 +22,11 @@
   width: 1em;
 }
 
+.o-image-carousel [class^='o-icon-'],
+.o-image-carousel [class*=' o-icon-'] {
+  fill: $o-btn-color;
+}
+
 .ol-control>button:hover [class^='o-icon-'],
 .ol-control>button:hover [class*=' o-icon-'],
 .o-button:hover [class^='o-icon-'],
