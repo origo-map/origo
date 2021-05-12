@@ -1,6 +1,7 @@
 @import './variables';
 @import './controls';
 @import './bullets';
+
 .glide {
   &__track {
     overflow-y: auto;
@@ -10,9 +11,66 @@
     flex-direction: column;
     max-height: calc(70vh - 46px);
   }
+  &__slide--clone {
+    height:0;
+  }
 }
+
+.o-image-carousel .glide {
+  &_arrows {
+    position: absolute;
+    width: 100%;
+    top: 50%;
+  }
+  &__arrow {
+    transform: translateY(-100%);
+    box-shadow: none;
+    border: 1px solid $o-glide-border-color;
+    padding: .2em;
+    background-color: rgba(255,255,255,0.6);
+    transition: background-color 0.5s;
+    &:hover {
+      background-color: rgba(255,255,255,0.8);
+    }
+  }
+  &__bullets {
+    display: flex;
+    justify-content: center;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+  &__bullet {
+    width: 100%;
+    height: 3px;
+    border: none;
+    padding: 0;
+    border-radius: 0;
+    &--active {
+      background-color: $o-btn-active-color;
+    }
+    &:hover {
+      background-color: $o-glide-bullets-color-hover
+    }
+  }
+}
+
+.o-image-carousel button.glide {
+  color: $o-glide-border-color;
+  &__arrow {
+    &--left {
+      left: 1rem;
+      border-radius: 50%;
+    }
+
+    &--right {
+      right: 1rem;
+      border-radius: 50%;
+    }
+  }
+}
+
 @media (hover: none) {
   .glide__arrow:hover {
-    border-color: $o-glide-border-color; 
+    border-color: $o-glide-border-color;
   }
 }

@@ -15,6 +15,7 @@ import getImageOrientation from '../../utils/getimageorientation';
 import shapes from './shapes';
 import searchList from './addons/searchList/searchList';
 import validate from '../../utils/validate';
+import slugify from '../../utils/slugify';
 
 const editsStore = store();
 let editLayers = {};
@@ -594,7 +595,14 @@ function addListener() {
   const fn = (obj) => {
     document.getElementById(obj.elDependencyId).addEventListener(obj.eventType, () => {
       const containerClass = `.${obj.elId}`;
-      if (document.getElementById(obj.elDependencyId).value === obj.requiredVal) {
+      if (obj.requiredVal.startsWith('[')) {
+        const tmpArray = obj.requiredVal.replace('[', '').replace(']', '').split(',');
+        if (tmpArray.includes(document.getElementById(obj.elDependencyId).value)) {
+          document.querySelector(containerClass).classList.remove('o-hidden');
+        } else {
+          document.querySelector(containerClass).classList.add('o-hidden');
+        }
+      } else if (document.getElementById(obj.elDependencyId).value === obj.requiredVal) {
         document.querySelector(containerClass).classList.remove('o-hidden');
       } else {
         document.querySelector(containerClass).classList.add('o-hidden');
@@ -658,9 +666,16 @@ function editAttributes(feat) {
             obj.eventType = constraintProps[0];
             obj.dependencyVal = feature.get(constraintProps[1]);
             obj.requiredVal = constraintProps[2];
-            obj.isVisible = obj.dependencyVal === obj.requiredVal;
+            if (constraintProps[2].startsWith('[')) {
+              const tmpArray = constraintProps[2].replace('[', '').replace(']', '').split(',');
+              if (tmpArray.includes(obj.dependencyVal)) {
+                obj.isVisible = true;
+              }
+            } else {
+              obj.isVisible = obj.dependencyVal === obj.requiredVal;
+            }
             obj.addListener = addListener();
-            obj.elId = `input-${obj.name}-${obj.requiredVal}`;
+            obj.elId = `input-${obj.name}-${slugify(obj.requiredVal)}`;
             obj.elDependencyId = `input-${constraintProps[1]}`;
           } else {
             alert('Villkor verkar inte vara rätt formulerat. Villkor formuleras enligt principen change:attribute:value');
