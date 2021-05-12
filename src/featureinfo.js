@@ -24,7 +24,8 @@ const Featureinfo = function Featureinfo(options = {}) {
     pinsStyle: pinStyleOptions = styleTypes.getStyle('pin'),
     savedPin: savedPinOptions,
     savedSelection,
-    selectionStyles: selectionStylesOptions
+    selectionStyles: selectionStylesOptions,
+    autoplay = false
   } = options;
 
   let identifyTarget;
@@ -133,10 +134,33 @@ const Featureinfo = function Featureinfo(options = {}) {
 
   const initCarousel = function initCarousel(id) {
     const { length } = Array.from(document.querySelectorAll('.o-identify-content'));
-    if (!document.querySelector('.glide') && length > 1) {
+    if (!document.querySelector('.glide-content') && length > 1) {
       OGlide({
         id,
         callback
+      });
+    }
+  };
+
+  // TODO: should there be anything done?
+  const callbackImage = function callbackImage(evt) {
+    const currentItemIndex = evt.item.index;
+    if (currentItemIndex !== null) {
+      // should there be anything done?
+    }
+  };
+
+  const initImageCarousel = function initImageCarousel(id, oClass, carouselId, targetElement) {
+    const carousel = document.getElementsByClassName(id.substring(1));
+    const { length } = Array.from(carousel[0].querySelectorAll('div.o-image-content > img'));
+    if (!document.querySelector(`.glide-image${carouselId}`) && length > 1) {
+      OGlide({
+        id,
+        callback: callbackImage,
+        oClass,
+        glideClass: `glide-image${carouselId}`,
+        autoplay,
+        targetElement
       });
     }
   };
@@ -221,7 +245,9 @@ const Featureinfo = function Featureinfo(options = {}) {
           title: getTitle(items[0])
         });
         const contentDiv = document.getElementById('o-identify-carousel');
+        const carouselIds = [];
         items.forEach((item) => {
+          carouselIds.push(item.feature.ol_uid);
           if (item.content instanceof Element) {
             contentDiv.appendChild(item.content);
           } else {
@@ -230,9 +256,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         });
         popup.setVisibility(true);
         initCarousel('#o-identify-carousel');
-        const popupHeight = document.querySelector('.o-popup').offsetHeight + 10;
         const popupEl = popup.getEl();
-        popupEl.style.height = `${popupHeight}px`;
         overlay = new Overlay({
           element: popupEl,
           autoPan: {
@@ -256,6 +280,21 @@ const Featureinfo = function Featureinfo(options = {}) {
         const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
         map.addOverlay(overlay);
         overlay.setPosition(coord);
+        carouselIds.forEach((carouselId) => {
+          let targetElement;
+          const elements = document.getElementsByClassName(`o-image-carousel${carouselId}`);
+          elements.forEach(element => {
+            if (!element.closest('.glide__slide--clone')) {
+              targetElement = element;
+            }
+          });
+          const imageCarouselEl = document.getElementsByClassName(`o-image-carousel${carouselId}`);
+          if (imageCarouselEl.length > 0) {
+            initImageCarousel(`#o-image-carousel${carouselId}`, `.o-image-content${carouselId}`, carouselId, targetElement);
+          }
+        });
+        const popupHeight = document.querySelector('.o-popup').offsetHeight + 10;
+        popupEl.style.height = `${popupHeight}px`;
         break;
       }
       case 'sidebar':
