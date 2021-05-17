@@ -11,7 +11,7 @@ export default function PrintInteractionToggle(options = {}) {
     mapInteractionsActive
   } = options;
 
-  const interactions = mapInteractions({ target });
+  const interactions = mapInteractions({ target, mapInteractions: {} });
   let mapInteractionToggleButton;
 
   const toggleState = function toggleState() {
