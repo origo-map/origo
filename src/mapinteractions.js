@@ -3,7 +3,8 @@ import { noModifierKeys, platformModifierKeyOnly, touchOnly } from 'ol/events/co
 import isEmbedded from './utils/isembedded';
 
 const MapInteractions = function MapInteractions(options = {}) {
-  if (isEmbedded(`#${options.target}`)) {
+  const mapInteractions = options.mapInteractions ? options.mapInteractions : { embedded: true };
+  if (isEmbedded(`#${options.target}`) && mapInteractions.embedded) {
     let timeout;
     const mapEl = document.getElementById(options.target);
     const divID = `${options.target}-embedded-overlay`;
