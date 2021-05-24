@@ -4,6 +4,8 @@ import Modify from 'ol/interaction/Modify';
 import Snap from 'ol/interaction/Snap';
 import Collection from 'ol/Collection';
 import Feature from 'ol/Feature';
+import { LineString } from 'ol/geom';
+import { noModifierKeys } from 'ol/events/condition';
 import { Modal } from '../../ui';
 import store from './editsstore';
 import generateUUID from '../../utils/generateuuid';
@@ -16,6 +18,7 @@ import shapes from './shapes';
 import searchList from './addons/searchList/searchList';
 import validate from '../../utils/validate';
 import slugify from '../../utils/slugify';
+import topology from '../../utils/topology';
 
 const editsStore = store();
 let editLayers = {};
@@ -38,6 +41,12 @@ let viewer;
 let featureInfo;
 let modal;
 let sList;
+/** Roll back copy of geometry that is currently being modified (if any) */
+let modifyGeometry;
+/** The feature that is currently being drawn (if any). Must be reset when draw is finished or abandoned as OL resuses its feature and
+ *  we must detect when a new drawing is started */
+let drawFeature;
+let validateOnDraw;
 
 function isActive() {
   if (modify === undefined || select === undefined) {
@@ -140,14 +149,31 @@ function saveFeature(change) {
 
 function onModifyEnd(evt) {
   const feature = evt.features.item(0);
-  saveFeature({
-    feature,
-    layerName: currentLayer,
-    action: 'update'
-  });
+  // Roll back modification if the resulting geometry was invalid
+  if (validateOnDraw && !topology.isGeometryValid(feature.getGeometry())) {
+    feature.setGeometry(modifyGeometry);
+  } else {
+    saveFeature({
+      feature,
+      layerName: currentLayer,
+      action: 'update'
+    });
+  }
 }
 
-// Helper for adding new features. Typically called from various eventhandlers
+function onModifyStart(evt) {
+  // Get a copy of the geometry before modification
+  if (validateOnDraw) {
+    modifyGeometry = evt.features.item(0).getGeometry().clone();
+  }
+}
+
+//
+
+/**
+ * Helper for adding new features. Typically called from various eventhandlers
+ * @param {Feature} feature The feature to add.
+ */
 function addFeature(feature) {
   const layer = viewer.getLayer(currentLayer);
   const defaultAttributes = getDefaultValues(layer.get('attributes'));
@@ -170,7 +196,135 @@ function addFeature(feature) {
 
 // Handler for OL Draw interaction
 function onDrawEnd(evt) {
-  addFeature(evt.feature);
+  const f = evt.feature;
+
+  // Reset pointer to drawFeature, OL resuses the same feature
+  drawFeature = null;
+
+  // WORKAROUND OL 6.5.0: OL have two identical vertices in the beginning of a LineString or Polygon when drawing freehand, and that would
+  // be considered as an invalid geometry.
+  // Also when drawing freehand (epsecially using touch screen) there may be identical vertices
+  // Remove identical vertices by doing a simplify using a small tolerance. Not the most efficient, but it's only one row for me to write and
+  // freehand produces so many vertices that a clean up is still a good idea.
+  f.setGeometry(f.getGeometry().simplify(0.00001));
+
+  // If live validation did its job, we should not have to validate here, but freehand bypasses all controls and we can't tell if freehand was used.
+  if (validateOnDraw && !topology.isGeometryValid(f.getGeometry())) {
+    alert('Kan ej spara, geometrin är ogiltig');
+  } else {
+    addFeature(evt.feature);
+  }
+}
+
+/**
+ * Called when the startdraw-event fires.
+ * @param {any} evt
+ */
+function onDrawStart(evt) {
+  // Stash a pointer to the feature being drawn for later use
+  // It is constantly being updated when drawing using a mouse.
+  drawFeature = evt.feature;
+}
+
+/**
+ * Called when draw is aborted from OL
+ * */
+function onDrawAbort() {
+  drawFeature = null;
+}
+/**
+ * Called by OL on mouse down to check if a vertex should be added
+ * @param {any} evt The MapBrowserEvent as received by Draw
+ * @returns true if the point should be added, false otherwise
+ */
+function conditionCallback(evt) {
+  // Check modifiers
+  if (!noModifierKeys(evt)) {
+    return false;
+  }
+  // This function is called before onDrawStart, so first time there is no drawFeature as no point has been allowed
+  // Second time there will be two points (first click and second click)
+  // Third time there will be three points for line and four points for poly as a poly is auto closed.
+  // When using touch, the current point is a copy of the previous, as it has not been moved yet. Clicked position comes in the event.
+  // when using mouse, the current point is updated continously on mousemove, so it is the same as the click event
+  // If this function returns true, the action is allowed and the clicked point is added t the draw.
+  // If it returns false, the click is regarded as never happened, which will affect the possibility to stop drawing as well.
+  if (!drawFeature) {
+    // First call. Here we could check event to see if it is possible to start a new geometry here (overlapping rules, holes, multipolygon self overlap etc)
+    return true;
+  }
+
+  const isTouch = evt.originalEvent.pointerType === 'touch';
+  let coords;
+  let minPointsToClose = 3;
+  // Strangely enough, we don't get what has actually been drawn in the event. Pick up pointer to sketch from our own state
+  // The sketch feature is what is drawn on the screen, not the actual feature, so It can only be poly, line or point. No multi-variant as
+  // draw interaction can't make them.
+  if (drawFeature.getGeometry().getType() === 'Polygon') {
+    // OL adds a closing vertex when more than two points. Remove it in validation
+    const polyCoords = drawFeature.getGeometry().getCoordinates()[0];
+    const arrayend = polyCoords.length > 2 ? -1 : polyCoords.length;
+    coords = polyCoords.slice(0, arrayend);
+  }
+  if (drawFeature.getGeometry().getType() === 'LineString') {
+    minPointsToClose = 2;
+    coords = drawFeature.getGeometry().getCoordinates().slice();
+  }
+  if (coords) {
+    if (isTouch) {
+      // Touch has a duplicate vertex as placeholder for clicked coordinate. Remove that and add the clicked coordinate, as it is not included in geom for touch
+      coords.pop();
+      coords.push(evt.coordinate);
+    }
+
+    // When trying to self auto close there can be two identical coords in the end if clicked on the exact same pixel. Allow that and make finishCondition fail instead of checking if we will succeed
+    // This has the drawback that it is not possible to finish with an invalid last point that will be removed anyway.
+    // Otherwise we have to implement the same clickTolerance as draw to distinguish between a new point and auto close or always try to autoclose and save that
+    // result as a state to check in finishCondition.
+    // If we got here we have at least two coords, so indexing -2 is safe
+    if (coords[coords.length - 1][0] === coords[coords.length - 2][0] && coords[coords.length - 1][1] === coords[coords.length - 2][1]) {
+      if (coords.length <= minPointsToClose) {
+        // Cant' put second point on first, and finishCondition will not be called on too few points
+        return false;
+      }
+      // No need to validate, it was valid before and no new point is added, we just for sure will try to finish.
+      return true;
+    }
+    // Validate only last added segment
+    return !topology.isSelfIntersecting(new LineString(coords), true);
+  }
+
+  return true;
+}
+
+/**
+ * Called by OL on mouse down to check if a sketch could be finished
+ * @param {any} evt The MapBrowserEvent as received by Draw
+ * @returns true if the feature can be completed , false otherwise
+ */
+function finishConditionCallback() {
+  // Only necessary to check polygons. Lines do not auto close, so all points are already checked.
+  if (validateOnDraw && drawFeature && drawFeature.getGeometry().getType() === 'Polygon') {
+    const coords = drawFeature.getGeometry().getCoordinates()[0];
+    // remove second last coord. It is the last clicked position. If this function got called, OL deemed it close enough to either start or last point
+    // to finish sketch and will not be a part of the final geometry, so remove it.
+    const last = coords.pop();
+    coords.pop();
+    coords.push(last);
+    const line = new LineString(coords);
+    const isValid = !topology.isSelfIntersecting(line);
+
+    if (!isValid) {
+      // Topology can only be invalid if trying to auto close, but to not mess with the logic in Draw for clickTolerance,
+      // we allow the click events and try to deal with it later.
+      // The only way to become invalid here is because auto close, and if that failed remove last point as it will be double there.
+      // Non auto close are blocked in conditionCallback.
+      // Must schedule to make draw finish execution first.
+      setTimeout(() => draw.removeLastPoint(), 0);
+    }
+    return isValid;
+  }
+  return true;
 }
 
 // Handler for external draw. It just adds a new feature to the layer, no questions asked.
@@ -232,12 +386,15 @@ function setInteractions(drawType) {
   attributes = editLayer.get('attributes');
   title = editLayer.get('title') || 'Information';
   const drawOptions = {
-    source: editSource,
     type: editLayer.get('geometryType'),
     geometryName: editLayer.get('geometryName')
   };
   if (drawType) {
     Object.assign(drawOptions, shapes(drawType));
+  }
+  if (validateOnDraw) {
+    drawOptions.condition = conditionCallback;
+    drawOptions.finishCondition = finishConditionCallback;
   }
   removeInteractions();
   draw = new Draw(drawOptions);
@@ -253,7 +410,10 @@ function setInteractions(drawType) {
   map.addInteraction(modify);
   map.addInteraction(draw);
   modify.on('modifyend', onModifyEnd, this);
+  modify.on('modifystart', onModifyStart, this);
   draw.on('drawend', onDrawEnd, this);
+  draw.on('drawstart', onDrawStart, this);
+  draw.on('drawabort', onDrawAbort, this);
   setActive();
 
   // If snap should be active then add snap internactions for all snap layers
@@ -339,6 +499,11 @@ function startDraw() {
 
 function cancelDraw() {
   setActive();
+  if (hasDraw) {
+    draw.abortDrawing();
+  }
+
+  drawFeature = null;
   hasDraw = false;
   dispatcher.emitChangeEdit('draw', false);
 }
@@ -768,6 +933,7 @@ export default function editHandler(options, v) {
 
   autoSave = options.autoSave;
   autoForm = options.autoForm;
+  validateOnDraw = options.validateOnDraw;
   document.addEventListener('toggleEdit', onToggleEdit);
   document.addEventListener('changeEdit', onChangeEdit);
   document.addEventListener('editorShapes', onChangeShape);
