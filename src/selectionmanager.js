@@ -131,10 +131,10 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   }
 
   function createSelectionGroup(selectionGroup, selectionGroupTitle) {
-      const urvalLayer = featurelayer(null, map);
-      urvalLayer.setStyle(featureStyler);
-      urval.set(selectionGroup, urvalLayer);
-      infowindow.createUrvalElement(selectionGroup, selectionGroupTitle);
+    const urvalLayer = featurelayer(null, map);
+    urvalLayer.setStyle(featureStyler);
+    urval.set(selectionGroup, urvalLayer);
+    infowindow.createUrvalElement(selectionGroup, selectionGroupTitle);
   }
 
   function onItemAdded(event) {
@@ -144,7 +144,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     const selectionGroupTitle = event.element.getSelectionGroupTitle();
 
     if (!urval.has(selectionGroup)) {
-      createSelectionGroup(selectionGroup, selectionGroupTitle)
+      createSelectionGroup(selectionGroup, selectionGroupTitle);
     }
 
     urval.get(selectionGroup).addFeature(item.getFeature());
@@ -202,12 +202,12 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     addOrHighlightItem,
     removeItemById,
     clearSelection,
-	createSelectionGroup,
+    createSelectionGroup,
     highlightFeature,
     highlightFeatureById,
     getNumberOfSelectedItems,
     getSelectedItemsForASelectionGroup,
-	getUrval,
+    getUrval,
     onInit() {
       selectedItems = new Collection([], { unique: true });
       urval = new Map();
