@@ -8,10 +8,11 @@ export default function PrintInteractionToggle(options = {}) {
     map,
     target,
     toggleIcon = '#ic_map_24px',
-    mapInteractionsActive
+    mapInteractionsActive,
+    pageSettings
   } = options;
 
-  const interactions = mapInteractions({ target, mapInteractions: {} });
+  const interactions = mapInteractions({ target, mapInteractions: pageSettings && pageSettings.mapInteractions ? pageSettings.mapInteractions : {} });
   let mapInteractionToggleButton;
 
   const toggleState = function toggleState() {

@@ -159,7 +159,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     rotation,
     rotationStep
   });
-  const printInteractionToggle = PrintInteractionToggle({ map, target, mapInteractionsActive });
+  const printInteractionToggle = PrintInteractionToggle({ map, target, mapInteractionsActive, pageSettings: viewer.getViewerOptions().pageSettings });
   const printToolbar = PrintToolbar();
   const closeButton = Button({
     cls: 'fixed top-right medium round icon-smaller light box-shadow z-index-ontop-high',

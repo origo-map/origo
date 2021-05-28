@@ -3,7 +3,10 @@ import { noModifierKeys, platformModifierKeyOnly, touchOnly } from 'ol/events/co
 import isEmbedded from './utils/isembedded';
 
 const MapInteractions = function MapInteractions(options = {}) {
-  const mapInteractions = options.mapInteractions ? options.mapInteractions : { embedded: true };
+  let mapInteractions = { embedded: true };
+  if (Object.keys(options.mapInteractions).length !== 0) {
+    mapInteractions = options.mapInteractions;
+  }
   if (isEmbedded(`#${options.target}`) && mapInteractions.embedded) {
     let timeout;
     const mapEl = document.getElementById(options.target);
