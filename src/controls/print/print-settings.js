@@ -15,22 +15,42 @@ import SetScaleControl from './set-scale-control';
 import ResolutionControl from './resolution-control';
 import ShowScaleControl from './show-scale-control';
 
-const PrintSettings = function PrintSettings({
-  closeIcon = '#ic_close_24px',
-  initialSize,
-  openIcon = '#ic_tune_24px',
-  orientation = 'portrait',
-  customSize,
-  sizes,
-  map,
-  showCreated,
-  showNorthArrow,
-  scales,
-  resolution = 150,
-  showScale,
-  classes,
-  defaultClass
-} = {}) {
+const PrintSettings = function PrintSettings(options = {}) {
+  const {
+    closeIcon = '#ic_close_24px',
+    openIcon = '#ic_tune_24px',
+    map,
+    title,
+    titlePlaceholderText,
+    titleAlignment,
+    titleSizes,
+    titleSize,
+    titleFormatIsVisible,
+    description,
+    descriptionPlaceholderText,
+    descriptionAlignment,
+    descriptionSizes,
+    descriptionSize,
+    descriptionFormatIsVisible,
+    sizes,
+    size,
+    sizeCustomMinHeight,
+    sizeCustomMaxHeight,
+    sizeCustomMinWidth,
+    sizeCustomMaxWidth,
+    orientation,
+    resolutions,
+    resolution,
+    scales,
+    scaleInitial,
+    showMargins,
+    showCreated,
+    showScale,
+    showNorthArrow,
+    rotation,
+    rotationStep
+  } = options;
+
   let headerComponent;
   let contentComponent;
   let openButton;
@@ -68,7 +88,7 @@ const PrintSettings = function PrintSettings({
     close,
     onInit() {
       openButton = Button({
-        cls: 'padding-small icon-smaller light text-normal',
+        cls: 'padding-small icon-smaller round light box-shadow',
         icon: openIcon,
         tooltipText: 'Visa inställningar',
         tooltipPlacement: 'east',
@@ -95,21 +115,48 @@ const PrintSettings = function PrintSettings({
       });
 
       const orientationControl = OrientationControl({ orientation });
-      const sizeControl = SizeControl({ initialSize, sizes });
-      const titleControl = TitleControl({ classes, size: defaultClass });
-      const descriptionControl = DescriptionControl({ classes, size: defaultClass });
-      const marginControl = MarginControl({ checked: true });
+      const sizeControl = SizeControl({
+        initialSize: size,
+        sizes: Object.keys(sizes)
+      });
+      const titleControl = TitleControl({
+        title,
+        titlePlaceholderText,
+        titleAlignment,
+        titleSizes,
+        titleSize,
+        titleFormatIsVisible
+      });
+      const descriptionControl = DescriptionControl({
+        description,
+        descriptionPlaceholderText,
+        descriptionAlignment,
+        descriptionSizes,
+        descriptionSize,
+        descriptionFormatIsVisible
+      });
+      const marginControl = MarginControl({ checked: showMargins });
       const createdControl = CreatedControl({ checked: showCreated });
-      const resolutionControl = ResolutionControl({ resolution });
+      const resolutionControl = ResolutionControl({
+        initialResolution: resolution,
+        resolutions
+      });
       const showScaleControl = ShowScaleControl({ checked: showScale });
       northArrowControl = NorthArrowControl({ showNorthArrow });
-      rotationControl = map.getView().getConstraints().rotation(180) === 180 ? RotationControl({ rotation: 0, map }) : undefined;
+      rotationControl = map.getView().getConstraints().rotation(180) === 180 ? RotationControl({ rotation, rotationStep, map }) : undefined;
       customSizeControl = CustomSizeControl({
-        state: initialSize === 'custom' ? 'active' : 'inital',
-        height: customSize[0],
-        width: customSize[1]
+        minHeight: sizeCustomMinHeight,
+        maxHeight: sizeCustomMaxHeight,
+        minWidth: sizeCustomMinWidth,
+        maxWidth: sizeCustomMaxWidth,
+        height: sizes.custom ? sizes.custom[0] : sizeCustomMinHeight,
+        width: sizes.custom ? sizes.custom[1] : sizeCustomMinWidth,
+        state: size === 'custom' ? 'active' : 'initial'
       });
-      setScaleControl = SetScaleControl({ scales }, map);
+      setScaleControl = SetScaleControl({
+        scales,
+        initialScale: scaleInitial
+      }, map);
 
       contentComponent = Component({
         onRender() { this.dispatch('render'); },
@@ -135,7 +182,7 @@ const PrintSettings = function PrintSettings({
       if (rotationControl) { components.push(rotationControl); }
       contentComponent.addComponents(components);
       printSettingsContainer = Collapse({
-        cls: 'no-print fixed flex column top-left rounded box-shadow bg-white overflow-hidden z-index-ontop-top',
+        cls: 'flex column',
         containerCls: 'collapse-container no-margin height-full',
         collapseX: true,
         collapseY: true,

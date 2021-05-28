@@ -1,28 +1,18 @@
 import { Dropdown, Component } from '../../ui';
 import mapUtils from '../../maputils';
-import numberFormatter from '../../utils/numberformatter';
 
 export default function SetScaleControl(options = {}, map) {
   const {
-    scales = []
+    scales = [],
+    initialScale
   } = options;
 
   let projection;
   let resolutions;
-
   let selectScale;
 
-  const roundScale = (scale) => {
-    let scaleValue = scale;
-    const differens = scaleValue % 10;
-    if (differens !== 0) {
-      scaleValue += (10 - differens);
-    }
-    return scaleValue;
-  };
-
   function getScales() {
-    return resolutions.map(resolution => `1:${numberFormatter(roundScale(mapUtils.resolutionToScale(resolution, projection)))}`);
+    return resolutions.map(resolution => mapUtils.resolutionToFormattedScale(resolution, projection));
   }
 
   return Component({
@@ -32,7 +22,8 @@ export default function SetScaleControl(options = {}, map) {
         cls: 'o-scalepicker text-black flex',
         contentCls: 'bg-grey-lighter text-smallest rounded',
         buttonCls: 'bg-white border text-black',
-        buttonIconCls: 'black'
+        buttonIconCls: 'black',
+        text: 'Välj skala'
       });
       this.addComponents([selectScale]);
       projection = map.getView().getProjection();
@@ -45,7 +36,6 @@ export default function SetScaleControl(options = {}, map) {
     },
     onRender() {
       this.dispatch('render');
-      selectScale.setButtonText('Välj skala');
       if (Array.isArray(scales) && scales.length) {
         selectScale.setItems(scales);
       } else {
@@ -54,6 +44,13 @@ export default function SetScaleControl(options = {}, map) {
       document.getElementById(selectScale.getId()).addEventListener('dropdown:select', (evt) => {
         this.onChangeScale(evt.target.textContent);
       });
+      if (initialScale) {
+        this.onChangeScale(initialScale);
+      } else {
+        const viewResolution = map.getView().getResolution();
+        const closest = resolutions.reduce((prev, curr) => (Math.abs(curr - viewResolution) < Math.abs(prev - viewResolution) ? curr : prev));
+        this.onChangeScale(mapUtils.resolutionToFormattedScale(closest, projection));
+      }
     },
     render() {
       return `

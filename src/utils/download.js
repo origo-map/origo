@@ -56,8 +56,7 @@ export const html2canvas = function html2canvas(el) {
     backgroundColor: null,
     logging: false,
     height: el.offsetHeight,
-    width: el.offsetWidth,
-    scale: 4
+    width: el.offsetWidth
   });
 };
 
@@ -67,7 +66,11 @@ export const dom2image = function dom2image(el, exportOptions) {
 
 export const getImageBlob = async function getImageBlob(el) {
   if (el) {
-    const canvas = await html2canvas(el);
+    const transformScale = el.style.transform;
+    const printEl = el;
+    printEl.style.transform = 'scale(1)';
+    const canvas = await html2canvas(printEl);
+    printEl.style.transform = transformScale;
     const blob = await canvasToBlob(canvas);
     return blob;
   }
@@ -149,7 +152,8 @@ export const printToScalePDF = async function printToScalePDF({
   const pdf = new jsPDF({ orientation, format, unit: 'mm', compress: true });
   const styleAttributes = el.getAttribute('style');
   el.setAttribute('style', styleAttributes.split('transform: scale')[0]); // Remove scaling to get correct print size of image
-  const image = await dom2image(el, exportOptions);
+  let image = await dom2image(el, exportOptions);
+  image = await dom2image(el, exportOptions); // Fix for iPhone
   pdf.addImage(image, 'JPEG', 0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
   el.setAttribute('style', styleAttributes); // Restore scaling
   pdf.save(`${filename}.pdf`);
