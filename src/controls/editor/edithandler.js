@@ -47,6 +47,10 @@ let modifyGeometry;
  *  we must detect when a new drawing is started */
 let drawFeature;
 let validateOnDraw;
+let allowDelete;
+let allowCreate;
+let allowEditAttributes;
+let allowEditGeometry;
 
 function isActive() {
   if (modify === undefined || select === undefined) {
@@ -64,18 +68,18 @@ function setActive(editType) {
       break;
     case 'draw':
       draw.setActive(true);
-      modify.setActive(true);
+      if (modify) modify.setActive(true);
       select.setActive(false);
       break;
     case 'custom':
       draw.setActive(false);
-      modify.setActive(false);
+      if (modify) modify.setActive(false);
       select.setActive(false);
       break;
     default:
       draw.setActive(false);
       hasDraw = false;
-      modify.setActive(true);
+      if (modify) modify.setActive(true);
       select.setActive(true);
       break;
   }
@@ -380,6 +384,22 @@ function removeInteractions() {
   }
 }
 
+function setAllowedOperations() {
+  const allowedOperations = editLayers[currentLayer].get('allowedEditOperations');
+  if (allowedOperations) {
+    allowEditGeometry = allowedOperations.includes('updateGeometry');
+    allowEditAttributes = allowedOperations.includes('updateAttributes');
+    allowCreate = allowedOperations.includes('create');
+    allowDelete = allowedOperations.includes('delete');
+  } else {
+    // For backwards compability, allow everything if allowedEditOperations is not in config.
+    allowEditGeometry = true;
+    allowEditAttributes = true;
+    allowCreate = true;
+    allowDelete = true;
+  }
+}
+
 function setInteractions(drawType) {
   const editLayer = editLayers[currentLayer];
   editSource = editLayer.getSource();
@@ -403,14 +423,19 @@ function setInteractions(drawType) {
   select = new Select({
     layers: [editLayer]
   });
-  modify = new Modify({
-    features: select.getFeatures()
-  });
+  if (allowEditGeometry) {
+    modify = new Modify({
+      features: select.getFeatures()
+    });
+    map.addInteraction(modify);
+    modify.on('modifyend', onModifyEnd, this);
+    modify.on('modifystart', onModifyStart, this);
+  }
+
   map.addInteraction(select);
-  map.addInteraction(modify);
+
   map.addInteraction(draw);
-  modify.on('modifyend', onModifyEnd, this);
-  modify.on('modifystart', onModifyStart, this);
+
   draw.on('drawend', onDrawEnd, this);
   draw.on('drawstart', onDrawStart, this);
   draw.on('drawabort', onDrawAbort, this);
@@ -428,6 +453,7 @@ function setInteractions(drawType) {
 
 function setEditLayer(layerName) {
   currentLayer = layerName;
+  setAllowedOperations();
   setInteractions();
 }
 
@@ -882,21 +908,21 @@ function editAttributes(feat) {
 function onToggleEdit(e) {
   const { detail: { tool } } = e;
   e.stopPropagation();
-  if (tool === 'draw') {
+  if (tool === 'draw' && allowCreate) {
     if (hasDraw === false) {
       setInteractions();
       startDraw();
     } else {
       cancelDraw();
     }
-  } else if (tool === 'attribute') {
+  } else if (tool === 'attribute' && allowEditAttributes) {
     if (hasAttribute === false) {
       editAttributes();
       sList = sList || new searchList();
     } else {
       cancelAttribute();
     }
-  } else if (tool === 'delete') {
+  } else if (tool === 'delete' && allowDelete) {
     onDeleteSelected();
   } else if (tool === 'edit') {
     setEditLayer(e.detail.currentLayer);

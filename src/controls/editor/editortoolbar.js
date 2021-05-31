@@ -13,6 +13,7 @@ let $editDraw;
 let $editDelete;
 let $editLayers;
 let $editSave;
+let viewer;
 
 function render() {
   const { body: editortemplateHTML } = new DOMParser().parseFromString(editortemplate, 'text/html');
@@ -126,10 +127,49 @@ function toggleSave(e) {
   }
 }
 
+/**
+ * Sets visibility of the tools in the toolbar according to the current layer's configuration.
+ * Note that it only sets the visibility of the the tools in the toolbar, it does not enforce anything.
+ * */
+function setAllowedTools() {
+  const layer = viewer.getLayer(currentLayer);
+  const allowedOperations = layer.get('allowedEditOperations');
+  if (allowedOperations && !allowedOperations.includes('updateAttributes')) {
+    $editAttribute.classList.add('o-hidden');
+  } else {
+    $editAttribute.classList.remove('o-hidden');
+  }
+  if (allowedOperations && !allowedOperations.includes('create')) {
+    $editDraw.classList.add('o-hidden');
+  } else {
+    $editDraw.classList.remove('o-hidden');
+  }
+  if (allowedOperations && !allowedOperations.includes('delete')) {
+    $editDelete.classList.add('o-hidden');
+  } else {
+    $editDelete.classList.remove('o-hidden');
+  }
+}
+/**
+ * Called when toggleEdit event is raised
+ * @param {any} e Custom event
+ */
+function onToggleEdit(e) {
+  const { detail: { tool } } = e;
+  // If the event contains a currentLayer, the currentLayer has either changed
+  // or the editor toolbar is activated and should display the last edited layer or default if first time
+  if (tool === 'edit' && e.detail.currentLayer) {
+    currentLayer = e.detail.currentLayer;
+    setAllowedTools();
+  }
+  e.stopPropagation();
+}
+
 function init(options, v) {
   currentLayer = options.currentLayer;
   editableLayers = options.editableLayers;
-
+  // Keep a reference to viewer. Used later.
+  viewer = v;
   editHandler(options, v);
   render();
   editorLayers(editableLayers, {
@@ -140,6 +180,7 @@ function init(options, v) {
   document.addEventListener('enableInteraction', onEnableInteraction);
   document.addEventListener('changeEdit', onChangeEdit);
   document.addEventListener('editsChange', toggleSave);
+  document.addEventListener('toggleEdit', onToggleEdit);
 
   bindUIActions();
 
