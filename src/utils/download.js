@@ -136,6 +136,8 @@ export const printToScalePDF = async function printToScalePDF({
         || className.indexOf('padding-right-small') > -1
         || className.indexOf('padding-bottom-small') > -1
         || className.indexOf('o-print-description') > -1
+        || className.indexOf('o-print-footer') > -1
+        || className.indexOf('o-print-footer-left') > -1
         || className.indexOf('o-print-created') > -1
         || (className.indexOf('print-attribution') > -1
           && className.indexOf('ol-uncollapsible'))
