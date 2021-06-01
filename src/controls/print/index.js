@@ -1,9 +1,10 @@
-import { Component } from '../../ui';
+import { Component, Element as El, Button, dom } from '../../ui';
 import PrintComponent from './print-component';
 
 const Print = function Print(options = {}) {
   const {
     icon = '#ic_print_24px',
+    placement = ['menu'],
     logo = {},
     northArrow = {},
     title = 'Skriv ut',
@@ -53,6 +54,9 @@ const Print = function Print(options = {}) {
   } = options;
 
   let viewer;
+  let mapTools;
+  let screenButtonContainer;
+  let screenButton;
   let mapMenu;
   let menuItem;
 
@@ -105,20 +109,49 @@ const Print = function Print(options = {}) {
         leftFooterText,
         mapInteractionsActive
       });
-      mapMenu = viewer.getControlByName('mapmenu');
-      menuItem = mapMenu.MenuItem({
-        click() {
-          mapMenu.close();
-          printComponent.render();
-        },
-        icon,
-        title
-      });
-      this.addComponent(menuItem);
+      if (placement.indexOf('screen') > -1) {
+        mapTools = `${viewer.getMain().getMapTools().getId()}`;
+        screenButtonContainer = El({
+          tagName: 'div',
+          cls: 'flex column'
+        });
+        screenButton = Button({
+          cls: 'o-print padding-small margin-bottom-smaller icon-smaller round light box-shadow',
+          click() {
+            printComponent.render();
+          },
+          icon,
+          tooltipText: title,
+          tooltipPlacement: 'east'
+        });
+        this.addComponent(screenButton);
+      }
+      if (placement.indexOf('menu') > -1) {
+        mapMenu = viewer.getControlByName('mapmenu');
+        menuItem = mapMenu.MenuItem({
+          click() {
+            mapMenu.close();
+            printComponent.render();
+          },
+          icon,
+          title
+        });
+        this.addComponent(menuItem);
+      }
       this.render();
     },
     render() {
-      mapMenu.appendMenuItem(menuItem);
+      if (placement.indexOf('screen') > -1) {
+        let htmlString = `${screenButtonContainer.render()}`;
+        let el = dom.html(htmlString);
+        document.getElementById(mapTools).appendChild(el);
+        htmlString = screenButton.render();
+        el = dom.html(htmlString);
+        document.getElementById(screenButtonContainer.getId()).appendChild(el);
+      }
+      if (placement.indexOf('menu') > -1) {
+        mapMenu.appendMenuItem(menuItem);
+      }
       this.dispatch('render');
     }
   });
