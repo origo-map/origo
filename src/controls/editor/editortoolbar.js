@@ -74,8 +74,33 @@ function bindUIActions() {
   });
 }
 
+/**
+ * Sets visibility of the tools in the toolbar according to the current layer's configuration.
+ * Note that it only sets the visibility of the the tools in the toolbar, it does not enforce anything.
+ * */
+function setAllowedTools() {
+  const layer = viewer.getLayer(currentLayer);
+  const allowedOperations = layer.get('allowedEditOperations');
+  if (allowedOperations && !allowedOperations.includes('updateAttributes')) {
+    $editAttribute.classList.add('o-hidden');
+  } else {
+    $editAttribute.classList.remove('o-hidden');
+  }
+  if (allowedOperations && !allowedOperations.includes('create')) {
+    $editDraw.classList.add('o-hidden');
+  } else {
+    $editDraw.classList.remove('o-hidden');
+  }
+  if (allowedOperations && !allowedOperations.includes('delete')) {
+    $editDelete.classList.add('o-hidden');
+  } else {
+    $editDelete.classList.remove('o-hidden');
+  }
+}
+
 function setActive(state) {
   if (state === true) {
+    setAllowedTools();
     document.getElementById('o-editor-toolbar').classList.remove('o-hidden');
   } else {
     document.getElementById('o-editor-toolbar').classList.add('o-hidden');
@@ -127,29 +152,6 @@ function toggleSave(e) {
   }
 }
 
-/**
- * Sets visibility of the tools in the toolbar according to the current layer's configuration.
- * Note that it only sets the visibility of the the tools in the toolbar, it does not enforce anything.
- * */
-function setAllowedTools() {
-  const layer = viewer.getLayer(currentLayer);
-  const allowedOperations = layer.get('allowedEditOperations');
-  if (allowedOperations && !allowedOperations.includes('updateAttributes')) {
-    $editAttribute.classList.add('o-hidden');
-  } else {
-    $editAttribute.classList.remove('o-hidden');
-  }
-  if (allowedOperations && !allowedOperations.includes('create')) {
-    $editDraw.classList.add('o-hidden');
-  } else {
-    $editDraw.classList.remove('o-hidden');
-  }
-  if (allowedOperations && !allowedOperations.includes('delete')) {
-    $editDelete.classList.add('o-hidden');
-  } else {
-    $editDelete.classList.remove('o-hidden');
-  }
-}
 /**
  * Called when toggleEdit event is raised
  * @param {any} e Custom event
