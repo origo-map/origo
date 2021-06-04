@@ -128,7 +128,10 @@ export const printToScalePDF = async function printToScalePDF({
   // See: https://github.com/bubkoo/html-to-image#options
   const exportOptions = {
     filter(element) {
-      const className = element.className || '';
+      let className = element.className || '';
+      if (typeof className === 'object' && element.classList) {
+        className = `${element.classList}`;
+      }
       return (
         className.indexOf('o-print') === -1
         || className.indexOf('o-print-header') > -1
