@@ -5,10 +5,6 @@ const Help = function Help(options = {}) {
   const cls = 'o-help';
   const contentItems = [];
   const defaultOptions = {
-    About: {
-      text: 'Här finner du mer information',
-      icon: '#ic_info_outline_24px'
-    },
     ZoomIn: {
       text: 'Zooma in i kartan',
       icon: '#ic_add_24px'
@@ -17,13 +13,13 @@ const Help = function Help(options = {}) {
       text: 'Zooma ut i kartan',
       icon: '#ic_remove_24px'
     },
-    Help: {
-      text: 'Hjälper dig att hitta hit',
-      icon: '#ic_help_outline_24px'
-    },
     Home: {
       text: 'Tar kartan till startposition',
       icon: '#ic_home_24px'
+    },
+    Fullscreen: {
+      text: 'Öppnar kartan i helskärmsläge',
+      icon: '#ic_fullscreen_24px'
     },
     Geoposition: {
       text: 'Tar kartan till din position',
@@ -33,9 +29,33 @@ const Help = function Help(options = {}) {
       text: 'Mät avtånd och ytor',
       icon: '#ic_straighten_24px'
     },
+    Externalurl: {
+      text: 'Öppnar fler knappar där du kan välja att öppna din kartposition i annan applikation',
+      icon: '#ic_baseline_link_24px'
+    },
+    Editor: {
+      text: 'Öppnar redigeringsverktyget',
+      icon: '#ic_edit_24px'
+    },
+    Rotate: {
+      text: 'Rotera kartan med två fingrar på pekskärm, håll ned Shift+Alt på PC. Klicka på symbolen för att återgå',
+      icon: '#origo-compass'
+    },
+    Search: {
+      text: 'Sök i kartan',
+      icon: '#ic_search_24px'
+    },
     Mapmenu: {
       text: 'I menyn hittar du fler verktyg',
       icon: '#ic_menu_24px'
+    },
+    About: {
+      text: 'Här finner du mer information',
+      icon: '#ic_info_outline_24px'
+    },
+    Help: {
+      text: 'Hjälper dig att hitta hit',
+      icon: '#ic_help_outline_24px'
     },
     Sharemap: {
       text: 'Dela din karta med en kompis!',
@@ -49,18 +69,6 @@ const Help = function Help(options = {}) {
       text: 'Tar dig någon annanstans...',
       icon: '#ic_launch_24px'
     },
-    Draganddrop: {
-      text: 'Du har möjlighet att dra in lager från din dator till kartan. Möjliga format är: GPX, GeoJSON, IGC, KML och TopoJSON',
-      icon: ''
-    },
-    Editor: {
-      text: 'Öppnar redigeringsverktyget',
-      icon: '#ic_edit_24px'
-    },
-    Fullscreen: {
-      text: 'Öppnar kartan i helskärmsläge',
-      icon: '#ic_fullscreen_24px'
-    },
     Legend: {
       text: 'Innehållsförteckning och teckenförklaring - visa eller dölj kartlager, klicka på rubriker och kartlager för information, ändra lagers genomskinlighet mm',
       icon: '#ic_layers_24px'
@@ -73,10 +81,6 @@ const Help = function Help(options = {}) {
       text: 'Den blå linjen i nedre delan av kartan visar på hämtning av information',
       icon: ''
     },
-    Rotate: {
-      text: 'Rotera kartan med två fingrar på pekskärm, håll ned Shift+Alt på PC. Klicka på symbolen för att återgå',
-      icon: '#origo-compass'
-    },
     Scale: {
       text: '',
       icon: ''
@@ -85,20 +89,16 @@ const Help = function Help(options = {}) {
       text: '',
       icon: ''
     },
-    Search: {
-      text: 'Sök i kartan',
-      icon: '#ic_search_24px'
+    Scalepicker: {
+      text: 'Visar kartans nuvarande skala. Klicka för att välja skala manuellt',
+      icon: ''
     },
     Splash: {
       text: '',
       icon: ''
     },
-    Externalurl: {
-      text: 'Öppnar fler knappar där du kan välja att öppna din kartposition i annan applikation',
-      icon: '#ic_baseline_link_24px'
-    },
-    Scalepicker: {
-      text: 'Visar kartans nuvarande skala. Klicka för att välja skala manuellt',
+    Draganddrop: {
+      text: 'Du har möjlighet att dra in lager från din dator till kartan. Möjliga format är: GPX, GeoJSON, IGC, KML och TopoJSON',
       icon: ''
     }
   };
@@ -112,7 +112,7 @@ const Help = function Help(options = {}) {
         icon: iconEl,
         style: iconStyle
       });
-      const list = `<li class="flex ${cls}"><span class="flex icon icon-medium padding-x-large">${controlIcons.render()}</span>${textEl}</li>`;
+      const list = `<li class="flex ${cls}"${el.style ? ` style="${el.style}"` : ''}><span class="flex icon icon-medium padding-x-large">${controlIcons.render()}</span>${textEl}</li>`;
       contentItems.push(list);
     });
   };
