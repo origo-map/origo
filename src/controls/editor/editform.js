@@ -118,7 +118,7 @@ const createForm = function createForm(obj) {
           val = isoDate.slice(0, 19);
         }
       }
-      el = `<div class="validate ${cls}"><label>${label}</label><br><input type="datetime-local" name="datum och tid" id="${id}" placeholder="ÅÅÅÅ-MM-DDTtt:mm:ss" value="${val}"${readonly}></div>`;
+      el = `<div class="validate"><label>${label}</label><br><input type="datetime-local" name="datum och tid" id="${id}" placeholder="ÅÅÅÅ-MM-DDTtt:mm:ss" step="1" value="${val}"${readonly}></div>`;
       break;
     case 'color':
       if (!val) {
