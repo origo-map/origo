@@ -36,12 +36,12 @@ export const findStyleType = function findStyleType(styles) {
     return 'Line';
   } else if (styleTypes.circle) {
     return 'Circle';
-  } else if (styleTypes.text) {
-    return 'Text';
   } else if (styleTypes.icon) {
     return 'Icon';
   } else if (styleTypes.image) {
     return 'Image';
+  } else if (styleTypes.text) {
+    return 'Text';
   }
   return null;
 };
