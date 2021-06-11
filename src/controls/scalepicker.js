@@ -1,6 +1,5 @@
 import { Component, Dropdown, dom } from '../ui';
 import mapUtils from '../maputils';
-import numberFormatter from '../utils/numberformatter';
 
 const Scalepicker = function Scalepicker(options = {}) {
   const {
@@ -13,21 +12,8 @@ const Scalepicker = function Scalepicker(options = {}) {
   let resolutions;
   let dropdown;
 
-  const roundScale = (scale) => {
-    let scaleValue = scale;
-    const differens = scaleValue % 10;
-    if (differens !== 0) {
-      scaleValue += (10 - differens);
-    }
-    return scaleValue;
-  };
-
-  function getCurrentMapScale() {
-    return roundScale(mapUtils.resolutionToScale(map.getView().getResolution(), projection));
-  }
-
   function getScales() {
-    return resolutions.map(resolution => `${listItemPrefix}1:${numberFormatter(roundScale(mapUtils.resolutionToScale(resolution, projection)))}`);
+    return resolutions.map(resolution => `${listItemPrefix}${mapUtils.resolutionToFormattedScale(resolution, projection)}`);
   }
 
   function setMapScale(scale) {
@@ -38,7 +24,7 @@ const Scalepicker = function Scalepicker(options = {}) {
   }
 
   function onZoomChange() {
-    dropdown.setButtonText(`${buttonPrefix}1:${numberFormatter(getCurrentMapScale())}`);
+    dropdown.setButtonText(`${buttonPrefix}${mapUtils.resolutionToFormattedScale(map.getView().getResolution(), projection)}`);
   }
 
   return Component({
@@ -53,7 +39,7 @@ const Scalepicker = function Scalepicker(options = {}) {
       this.addComponent(dropdown);
       this.render();
 
-      dropdown.setButtonText(`${buttonPrefix}1:${numberFormatter(getCurrentMapScale())}`);
+      dropdown.setButtonText(`${buttonPrefix}${mapUtils.resolutionToFormattedScale(map.getView().getResolution(), projection)}`);
       dropdown.setItems(getScales());
 
       map.getView().on('change:resolution', onZoomChange);

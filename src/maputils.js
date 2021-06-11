@@ -6,6 +6,7 @@ import Vector from 'ol/source/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
 import { getTopLeft, getBottomLeft } from 'ol/extent';
 import WKT from 'ol/format/WKT';
+import numberFormatter from './utils/numberformatter';
 
 const maputils = {
   isWithinVisibleScales: function isWithinVisibleScales(scale, maxScale, minScale) {
@@ -112,11 +113,23 @@ const maputils = {
     scale = Math.round(scale);
     return scale;
   },
+  resolutionToFormattedScale: function resolutionToFormattedScale(resolution, projection) {
+    const scale = this.roundScale(this.resolutionToScale(resolution, projection));
+    return `1:${numberFormatter(scale)}`;
+  },
   scaleToResolution: function scaleToResolution(scale, projection) {
     const dpi = 25.4 / 0.28;
     const mpu = projection.getMetersPerUnit();
     const resolution = scale / (mpu * 39.37 * dpi);
     return resolution;
+  },
+  roundScale: function roundScale(scale) {
+    let scaleValue = scale;
+    const differens = scaleValue % 10;
+    if (differens !== 0) {
+      scaleValue += (10 - differens);
+    }
+    return scaleValue;
   }
 };
 

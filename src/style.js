@@ -169,6 +169,9 @@ function checkOptions(feature, scale, styleSettings, styleList, size) {
       if (Object.prototype.hasOwnProperty.call(s[j][0], 'filter')) {
         let expr;
         // find attribute vale between [] defined in styles
+        let regexExpr;
+        let regexFilter;
+        let featMatch;
         const matches = s[j][0].filter.match(/\[(.*?)\]/);
         if (matches) {
           let first = feature;
@@ -177,11 +180,21 @@ function checkOptions(feature, scale, styleSettings, styleList, size) {
           }
           const featAttr = matches[1];
           expr = s[j][0].filter.split(']')[1];
-          const featMatch = first.get(featAttr);
+          featMatch = first.get(featAttr);
+          regexFilter = s[j][0].filter.match(/\/(.*)\/([a-zA-Z]+)?/);
           expr = typeof featMatch === 'number' ? featMatch + expr : `"${featMatch}"${expr}`;
         }
+        if (regexFilter) {
+          regexExpr = new RegExp(regexFilter[1], regexFilter[2]);
+
+          if (regexExpr.test(featMatch)) {
+            styleL = styleList[j];
+            return styleL;
+          }
+        // eslint-disable-next-line brace-style
+        }
         // eslint-disable-next-line no-eval
-        if (eval(expr)) {
+        else if (eval(expr)) {
           styleL = styleList[j];
           return styleL;
         }
@@ -286,6 +299,20 @@ function createStyleRule(options) {
   }
   return styleRule;
 }
+function createGeometryCollectionStyle(options) {
+  const styleRule = [];
+
+  createStyleRule(options.Point).forEach((item) => {
+    styleRule.push(item);
+  });
+  createStyleRule(options.LineString).forEach((item) => {
+    styleRule.push(item);
+  });
+  createStyleRule(options.Polygon).forEach((item) => {
+    styleRule.push(item);
+  });
+  return styleRule;
+}
 
 function createGeometryStyle(geometryStyleOptions) {
   return {
@@ -294,7 +321,8 @@ function createGeometryStyle(geometryStyleOptions) {
     LineString: createStyleRule(geometryStyleOptions.LineString),
     MultiLineString: createStyleRule(geometryStyleOptions.LineString),
     Polygon: createStyleRule(geometryStyleOptions.Polygon),
-    MultiPolygon: createStyleRule(geometryStyleOptions.Polygon)
+    MultiPolygon: createStyleRule(geometryStyleOptions.Polygon),
+    GeometryCollection: createGeometryCollectionStyle(geometryStyleOptions)
   };
 }
 

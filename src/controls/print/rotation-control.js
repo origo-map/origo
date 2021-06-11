@@ -2,7 +2,8 @@ import { InputRange, Component } from '../../ui';
 
 export default function RotationControl(options = {}) {
   const {
-    rotation = 0,
+    rotation,
+    rotationStep,
     map
   } = options;
 
@@ -11,7 +12,7 @@ export default function RotationControl(options = {}) {
     minValue: 0,
     maxValue: 360,
     initialValue: rotation,
-    step: 1,
+    step: rotationStep,
     style: {
       'align-self': 'center'
     },
@@ -27,6 +28,9 @@ export default function RotationControl(options = {}) {
     },
     onRender() {
       this.dispatch('render');
+      if (rotation) {
+        map.getView().setRotation((rotation * Math.PI) / 180);
+      }
     },
     onChangeRotation(evt) {
       map.getView().setRotation((evt.value * Math.PI) / 180);

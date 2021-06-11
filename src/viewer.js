@@ -55,6 +55,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     url
   } = options;
 
+  const viewerOptions = Object.assign({}, options);
   const target = targetOption;
   const center = urlParams.center || centerOption;
   const zoom = urlParams.zoom || zoomOption;
@@ -120,6 +121,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
   const getTileSize = () => tileGridSettings.tileSize;
 
+  const getViewerOptions = () => viewerOptions;
+
   const getUrl = () => url;
 
   const getStyle = (styleName) => {
@@ -172,7 +175,17 @@ const Viewer = function Viewer(targetOption, options = {}) {
     return layers;
   };
 
-  const getLayer = layerName => getLayers().filter(layer => layer.get('name') === layerName)[0];
+  const getLayer = function getLayer(layerName) {
+    const layerArray = getLayers();
+    if (layerArray.some(layer => layer.get('name') === layerName)) {
+      return layerArray.find(layer => layer.get('name') === layerName);
+    } else if (layerArray.some(layer => layer.get('type') === 'GROUP')) {
+      const groupLayerArray = layerArray.filter(layer => layer.get('type') === 'GROUP');
+      const layersFromGroupLayersArray = groupLayerArray.map(groupLayer => groupLayer.getLayers().getArray());
+      return layersFromGroupLayersArray.flat().find(layer => layer.get('name') === layerName);
+    }
+    return undefined;
+  };
 
   const getQueryableLayers = function getQueryableLayers() {
     const queryableLayers = getLayers().filter(layer => layer.get('queryable') && layer.getVisible());
@@ -240,6 +253,10 @@ const Viewer = function Viewer(targetOption, options = {}) {
   const getFooter = () => footer;
 
   const getMain = () => main;
+
+  const getEmbedded = function getEmbedded() {
+    return isEmbedded(this.getTarget());
+  };
 
   const mergeSavedLayerProps = (initialLayerProps, savedLayerProps) => {
     if (savedLayerProps) {
@@ -396,7 +413,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
       });
 
       if (urlParams.feature) {
-        const featureId = urlParams.feature;
+        let featureId = urlParams.feature;
         const layerName = featureId.split('.')[0];
         const layer = getLayer(layerName);
         const type = layer.get('type');
@@ -410,6 +427,9 @@ const Viewer = function Viewer(targetOption, options = {}) {
             if (type === 'WFS' && clusterSource) {
               feature = clusterSource.getFeatureById(featureId);
             } else if (type === 'WFS') {
+              if (featureId.includes('__')) {
+                featureId = featureId.replace(featureId.substring(featureId.lastIndexOf('__'), featureId.lastIndexOf('.')), '');
+              }
               feature = layer.getSource().getFeatureById(featureId);
             } else if (clusterSource) {
               feature = clusterSource.getFeatureById(id);
@@ -515,10 +535,12 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getTileSize,
     getUrl,
     getUrlParams,
+    getViewerOptions,
     removeGroup,
     removeOverlays,
     zoomToExtent,
-    getSelectionManager
+    getSelectionManager,
+    getEmbedded
   });
 };
 

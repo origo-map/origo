@@ -1,5 +1,5 @@
 function emitChangeEdit(tool, state) {
-  const changeEdit = new CustomEvent('', {
+  const changeEdit = new CustomEvent('changeEdit', {
     detail: {
       tool,
       active: state
@@ -68,6 +68,15 @@ function emitChangeOfflineEdits(edits, layerName) {
   document.dispatchEvent(changeOfflineEdits);
 }
 
+function emitCustomDrawEnd(feature) {
+  const changeOfflineEdits = new CustomEvent('customDrawEnd', {
+    detail: {
+      feature
+    }
+  });
+  document.dispatchEvent(changeOfflineEdits);
+}
+
 export default {
   emitChangeEdit,
   emitChangeFeature,
@@ -75,5 +84,6 @@ export default {
   emitEnableInteraction,
   emitEditsChange,
   emitChangeEditorShapes,
-  emitChangeOfflineEdits
+  emitChangeOfflineEdits,
+  emitCustomDrawEnd
 };
