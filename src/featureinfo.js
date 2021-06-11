@@ -423,6 +423,26 @@ const Featureinfo = function Featureinfo(options = {}) {
           setActive(false);
         }
       });
+
+      // Change mouse pointer when hovering over a clickable feature
+      if (viewer.getViewerOptions().featureinfoOptions.linkPointer) {
+        let pointerActive = true;
+        document.addEventListener('enableInteraction', evt => {
+          pointerActive = evt.detail.interaction !== 'editor';
+          // Avoid getting stuck in pointer mode if user manages to enable editing while having pointer over a clickable feature.
+          // If the user manages to disable editing while standing on a clickable feature, it will remain arrow until moved. (Sorry)
+          map.getViewport().style.cursor = '';
+        });
+
+        // Check if there is a clickable feature when mouse is moved.
+        map.on('pointermove', evt => {
+          if (!pointerActive || evt.dragging) return;
+          // Just check if there is a pixel here. Pretty annoying on hatched symbols or hollow areas.
+          // Note that forEachLayerAtPixel requires that layers have unique class names to work correct.
+          // Hit tolerence seems to be ignored. It would probably look funny anyway.
+          map.getViewport().style.cursor = map.forEachLayerAtPixel(evt.pixel, () => true, { layerFilter: (l) => l.get('queryable') }) ? 'pointer' : '';
+        });
+      }
     },
     render
   });
