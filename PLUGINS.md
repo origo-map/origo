@@ -17,7 +17,7 @@ A draw tool plugin for simple sketching.
 A plugin that shows an elevation profile for linestring features with z-dimension.
 
 **[Geouttag](https://github.com/Eskilstuna-kommun/Geouttag)**
-A plugin for geodata export (requires FME Server)
+A plugin for geodata export (requires FME Server) (does not work well with Origo versions beyond 2.2, see its readme.md)
 
 **[Layermanager](https://github.com/origo-map/layermanager)**
 A layer manager plugin.
