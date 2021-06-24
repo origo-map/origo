@@ -1,7 +1,14 @@
 import { Component, Modal, Icon, Element as El, Button, dom } from '../ui';
 
 const Help = function Help(options = {}) {
-  const { icon = '#ic_help_outline_24px', title = 'Hjälp', controlList, placement = ['menu'] } = options;
+  const {
+    icon = '#ic_help_outline_24px',
+    title = 'Hjälp',
+    description,
+    descriptionStyle = 'padding-left:15px; padding-right:15px; padding-bottom:10px;',
+    controlList,
+    placement = ['menu']
+  } = options;
   const cls = 'o-help';
   const contentItems = [];
   const defaultOptions = {
@@ -104,6 +111,10 @@ const Help = function Help(options = {}) {
   };
 
   const modalContent = () => {
+    if (description) {
+      const descriptionEl = `<li class="flex ${cls}"${descriptionStyle ? ` style="${descriptionStyle}"` : ''}>${description}</li>`;
+      contentItems.push(descriptionEl);
+    }
     controlList.forEach((el) => {
       const textEl = el.text || defaultOptions[el.name].text;
       const iconEl = el.icon || defaultOptions[el.name].icon;
