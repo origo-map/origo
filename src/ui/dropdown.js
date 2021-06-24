@@ -14,7 +14,8 @@ export default function Dropdown(options = {}) {
     buttonContainerCls = '',
     style: styleSettings,
     direction = 'down',
-    text = ' '
+    text = ' ',
+    ariaLabel = ''
   } = options;
 
   let containerElement;
@@ -76,6 +77,7 @@ export default function Dropdown(options = {}) {
         },
         icon: `#ic_arrow_drop_${direction}_24px`,
         iconCls: `${buttonIconCls} icon-smaller flex`,
+        ariaLabel,
         textCls: 'flex'
       });
 

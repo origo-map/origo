@@ -49,7 +49,8 @@ const Mapmenu = function Mapmenu({
     const button = Button({
       cls: 'icon-smaller compact no-grow',
       click,
-      icon
+      icon,
+      title
     });
     const titleCmp = El({ cls: 'grow padding-left', innerHTML: title });
     return Component({

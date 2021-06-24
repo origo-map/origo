@@ -203,6 +203,7 @@ const Legend = function Legend(options = {}) {
 
       toolsCmp = El({
         cls: 'flex padding-small no-shrink hidden',
+        tooltipText: 'Lagerbytare',
         style: {
           'background-color': '#fff',
           'justify-content': 'flex-end',

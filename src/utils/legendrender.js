@@ -84,11 +84,11 @@ export const renderIcon = {
         'margin-top': marginTop
       });
     }
-    return `<img class="${fit}" src="${iconStyle.src}" style="${style}"/>`;
+    return `<img class="${fit}" src="${iconStyle.src}" style="${style}" alt="Lager ikon"/>`;
   },
   Image(iconStyle) {
     const fit = iconStyle.fit ? 'contain' : 'cover';
-    return `<img class="${fit}" src="${iconStyle.src}"/>`;
+    return `<img class="${fit}" src="${iconStyle.src}" alt="Lager ikon"/>`;
   },
   Text(color) {
     const fill = color ? `fill: ${color};` : 'fill: #000;';

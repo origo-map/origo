@@ -291,10 +291,12 @@ const Position = function Position(options = {}) {
           onTogglePosition();
         },
         icon: '#ic_gps_not_fixed_24px',
+        ariaLabel: 'Position ikon',
         iconCls: 'o-icon-position'
       });
       projButton = Button({
         cls: 'o-position-button',
+        ariaLabel: 'Projektion',
         click() {
           onToggleProjection();
         }
