@@ -28,10 +28,21 @@ function createSource(options) {
     }),
     loader(extent) {
       let requestExtent;
+      let layerExtent = options.dataExtent;
       if (options.dataProjection !== options.projectionCode) {
-        requestExtent = transformExtent(extent, options.projectionCode, options.dataProjection);
+        layerExtent = transformExtent(options.dataExtent, options.dataProjection, options.projectionCode);
+      }
+      const minExtent = [Math.max(extent[0], layerExtent[0]),
+        Math.max(extent[1], layerExtent[1]),
+        Math.min(extent[2], layerExtent[2]),
+        Math.min(extent[3], layerExtent[3])];
+      if (!(minExtent[0] < minExtent[2] && minExtent[1] < minExtent[3])) {
+        return;
+      }
+      if (options.dataProjection !== options.projectionCode) {
+        requestExtent = transformExtent(minExtent, options.projectionCode, options.dataProjection);
       } else {
-        requestExtent = extent;
+        requestExtent = minExtent;
       }
       let url = [`${serverUrl}?service=WFS`,
         `&version=1.1.0&request=GetFeature&typeName=${options.featureType}&outputFormat=application/json`,
@@ -64,6 +75,7 @@ export default function wfs(layerOptions, viewer) {
   sourceOptions.attribution = wfsOptions.attribution;
   sourceOptions.resolutions = viewer.getResolutions();
   sourceOptions.projectionCode = viewer.getProjectionCode();
+  sourceOptions.dataExtent = wfsOptions.extent;
   if (wfsOptions.projection) {
     sourceOptions.dataProjection = wfsOptions.projection;
   } else if (sourceOptions.projection) {
