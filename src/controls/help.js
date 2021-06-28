@@ -5,7 +5,7 @@ const Help = function Help(options = {}) {
     icon = '#ic_help_outline_24px',
     title = 'Hjälp',
     description,
-    descriptionStyle = 'padding-left:15px; padding-right:15px; padding-bottom:10px;',
+    descriptionStyle = 'display:block; padding-left:15px; padding-right:15px; padding-bottom:10px;',
     controlList,
     placement = ['menu']
   } = options;
