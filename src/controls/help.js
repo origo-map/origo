@@ -222,7 +222,7 @@ const Help = function Help(options = {}) {
       }
       if (viewer.name === 'printComponent' && placement.indexOf('print') > -1) {
         el = dom.html(printButton.render());
-        printTools.prependChild(el);
+        printTools.prepend(el);
       }
       this.dispatch('render');
     }
