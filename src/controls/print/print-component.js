@@ -354,6 +354,8 @@ const PrintComponent = function PrintComponent(options = {}) {
       map.setTarget(printMapComponent.getId());
       this.removeViewerControls();
       printMapComponent.addPrintControls();
+      const extraPrintControls = viewer.getComponents().filter(control => control.options && control.options.placement && control.options.placement.indexOf('print') > -1);
+      extraPrintControls.forEach(control => this.addComponent(control));
       printMapComponent.dispatch('change:toggleScale', { showScale });
       this.updatePageSize();
     },
