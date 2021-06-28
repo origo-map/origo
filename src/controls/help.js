@@ -111,6 +111,7 @@ const Help = function Help(options = {}) {
   };
 
   const modalContent = () => {
+    contentItems.length = 0;
     if (description) {
       const descriptionEl = `<li class="flex ${cls}"${descriptionStyle ? ` style="${descriptionStyle}"` : ''}>${description}</li>`;
       contentItems.push(descriptionEl);
@@ -135,6 +136,8 @@ const Help = function Help(options = {}) {
   let mapTools;
   let screenButtonContainer;
   let screenButton;
+  let printTools;
+  let printButton;
   let modal;
 
   return Component({
@@ -145,7 +148,7 @@ const Help = function Help(options = {}) {
       target = viewer.getId();
       modalContent();
 
-      if (placement.indexOf('screen') > -1) {
+      if (viewer.name !== 'printComponent' && placement.indexOf('screen') > -1) {
         mapTools = `${viewer.getMain().getMapTools().getId()}`;
         screenButtonContainer = El({
           tagName: 'div',
@@ -167,7 +170,7 @@ const Help = function Help(options = {}) {
         });
         this.addComponent(screenButton);
       }
-      if (placement.indexOf('menu') > -1) {
+      if (viewer.name !== 'printComponent' && placement.indexOf('menu') > -1) {
         mapMenu = viewer.getControlByName('mapmenu');
         menuItem = mapMenu.MenuItem({
           click() {
@@ -184,19 +187,42 @@ const Help = function Help(options = {}) {
         });
         this.addComponent(menuItem);
       }
+      if (viewer.name === 'printComponent' && placement.indexOf('print') > -1) {
+        printTools = document.getElementById('o-print-tools-left');
+        printButton = Button({
+          cls: 'o-print padding-small margin-bottom-smaller icon-smaller round light box-shadow',
+          click() {
+            modal = Modal({
+              title,
+              content: contentItems.join(' '),
+              target
+            });
+            this.addComponent(modal);
+          },
+          icon,
+          tooltipText: title,
+          tooltipPlacement: 'east'
+        });
+        this.addComponent(printButton);
+      }
       this.render();
     },
     render() {
-      if (placement.indexOf('screen') > -1) {
+      let el;
+      if (viewer.name !== 'printComponent' && placement.indexOf('screen') > -1) {
         let htmlString = `${screenButtonContainer.render()}`;
-        let el = dom.html(htmlString);
+        el = dom.html(htmlString);
         document.getElementById(mapTools).appendChild(el);
         htmlString = screenButton.render();
         el = dom.html(htmlString);
         document.getElementById(screenButtonContainer.getId()).appendChild(el);
       }
-      if (placement.indexOf('menu') > -1) {
+      if (viewer.name !== 'printComponent' && placement.indexOf('menu') > -1) {
         mapMenu.appendMenuItem(menuItem);
+      }
+      if (viewer.name === 'printComponent' && placement.indexOf('print') > -1) {
+        el = dom.html(printButton.render());
+        printTools.appendChild(el);
       }
       this.dispatch('render');
     }
