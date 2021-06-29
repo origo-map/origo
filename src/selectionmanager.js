@@ -130,6 +130,13 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     return Style.createStyleRule(multiselectStyleOptions.selected);
   }
 
+  function createSelectionGroup(selectionGroup, selectionGroupTitle) {
+    const urvalLayer = featurelayer(null, map);
+    urvalLayer.setStyle(featureStyler);
+    urval.set(selectionGroup, urvalLayer);
+    infowindow.createUrvalElement(selectionGroup, selectionGroupTitle);
+  }
+
   function onItemAdded(event) {
     const item = event.element;
 
@@ -137,10 +144,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     const selectionGroupTitle = event.element.getSelectionGroupTitle();
 
     if (!urval.has(selectionGroup)) {
-      const urvalLayer = featurelayer(null, map);
-      urvalLayer.setStyle(featureStyler);
-      urval.set(selectionGroup, urvalLayer);
-      infowindow.createUrvalElement(selectionGroup, selectionGroupTitle);
+      createSelectionGroup(selectionGroup, selectionGroupTitle);
     }
 
     urval.get(selectionGroup).addFeature(item.getFeature());
@@ -186,6 +190,10 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     return selectedItems.getLength();
   }
 
+  function getUrval() {
+    return urval;
+  }
+
   return Component({
     name: 'selectionmanager',
     addItems,
@@ -194,10 +202,12 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     addOrHighlightItem,
     removeItemById,
     clearSelection,
+    createSelectionGroup,
     highlightFeature,
     highlightFeatureById,
     getNumberOfSelectedItems,
     getSelectedItemsForASelectionGroup,
+    getUrval,
     onInit() {
       selectedItems = new Collection([], { unique: true });
       urval = new Map();
