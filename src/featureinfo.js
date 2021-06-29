@@ -256,17 +256,6 @@ const Featureinfo = function Featureinfo(options = {}) {
         });
         popup.setVisibility(true);
         initCarousel('#o-identify-carousel');
-        const popupEl = popup.getEl();
-        overlay = new Overlay({
-          element: popupEl,
-          autoPan: {
-            margin: 55,
-            animation: {
-              duration: 500
-            }
-          },
-          positioning: 'bottom-center'
-        });
         const firstFeature = items[0].feature;
         const geometry = firstFeature.getGeometry();
         const clone = firstFeature.clone();
@@ -278,8 +267,6 @@ const Featureinfo = function Featureinfo(options = {}) {
         );
         selectionLayer.setSourceLayer(items[0].layer);
         const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
-        map.addOverlay(overlay);
-        overlay.setPosition(coord);
         carouselIds.forEach((carouselId) => {
           let targetElement;
           const elements = document.getElementsByClassName(`o-image-carousel${carouselId}`);
@@ -293,8 +280,21 @@ const Featureinfo = function Featureinfo(options = {}) {
             initImageCarousel(`#o-image-carousel${carouselId}`, `.o-image-content${carouselId}`, carouselId, targetElement);
           }
         });
+        const popupEl = popup.getEl();
         const popupHeight = document.querySelector('.o-popup').offsetHeight + 10;
         popupEl.style.height = `${popupHeight}px`;
+        overlay = new Overlay({
+          element: popupEl,
+          autoPan: {
+            margin: 55,
+            animation: {
+              duration: 500
+            }
+          },
+          positioning: 'bottom-center'
+        });
+        map.addOverlay(overlay);
+        overlay.setPosition(coord);
         break;
       }
       case 'sidebar':
