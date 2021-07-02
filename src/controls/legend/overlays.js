@@ -140,6 +140,15 @@ const Overlays = function Overlays(options) {
     }
   };
 
+  const updateLegend = function updateLegend(comp) {
+    const parentName = comp.parent;
+    const parent = groupCmps.find((cmp) => cmp.name === parentName);
+    parent.dispatch('add:overlay');
+    if (parent.parent) {
+      updateLegend(parent);
+    }
+  };
+
   const addLayer = function addLayer(layer, {
     position
   } = {}) {
@@ -156,6 +165,9 @@ const Overlays = function Overlays(options) {
       if (groupCmp) {
         groupCmp.addOverlay(overlay);
         document.getElementById(groupCmp.getId()).classList.remove('hidden');
+      }
+      if (groupCmp.parent) {
+        updateLegend(groupCmp);
       }
     }
   };
