@@ -1,5 +1,6 @@
 const webpack = require('webpack');
 const ESLintPlugin = require('eslint-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
   entry: [
@@ -38,6 +39,7 @@ module.exports = {
     new ESLintPlugin({
       fix: true,
       emitError: true
-    })
+    }),
+    new CleanWebpackPlugin({ cleanStaleWebpackAssets: false })
   ]
 };
