@@ -26,6 +26,10 @@ import { renderSvgIcon } from './src/utils/legendmaker';
 import SelectedItem from './src/models/SelectedItem';
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
+// eslint-disable-next-line import/no-named-as-default
+import Loaders from './loaders';
+
+Loaders();
 
 const Origo = function Origo(configPath, options = {}) {
   let viewer;
