@@ -54,7 +54,8 @@ const Layer = function Layer(optOptions, viewer) {
 
   layerOptions.name = name.split(':').pop();
 
-  if (layerOptions.css) {
+  // Some features require that each layer has a unique class name. Set one if not provided.
+  if (layerOptions.css || (viewer.getViewerOptions().featureinfoOptions.linkPointer && layerOptions.queryable)) {
     layerOptions.className = layerOptions.cls || `o-layer-${layerOptions.name}`;
   }
 
