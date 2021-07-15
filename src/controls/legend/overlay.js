@@ -98,7 +98,7 @@ const OverlayLayer = function OverlayLayer(options) {
       'padding-left': '.5rem'
     },
     icon: getCheckIcon(layer.getVisible()),
-    ariaLabel: 'Växla lager synlighet'
+    ariaLabel: 'Växla lagersynlighet'
   });
 
   buttons.push(toggleButton);
