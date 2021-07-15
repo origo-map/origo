@@ -50,6 +50,7 @@ const Scalepicker = function Scalepicker(options = {}) {
         cls: 'o-scalepicker text-white flex',
         contentCls: 'bg-grey-darker text-smallest rounded',
         buttonCls: 'bg-black text-white',
+        ariaLabel: 'Välj skala',
         buttonIconCls: 'white'
       });
     },
