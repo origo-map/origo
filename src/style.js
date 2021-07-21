@@ -168,33 +168,79 @@ function checkOptions(feature, scale, styleSettings, styleList, size) {
       });
       if (Object.prototype.hasOwnProperty.call(s[j][0], 'filter')) {
         let expr;
+        const exprArr = [];
         // find attribute vale between [] defined in styles
         let regexExpr;
         let regexFilter;
         let featMatch;
-        const matches = s[j][0].filter.match(/\[(.*?)\]/);
-        if (matches) {
-          let first = feature;
-          if (feature.get('features')) {
-            first = feature.get('features')[0];
-          }
-          const featAttr = matches[1];
-          expr = s[j][0].filter.split(']')[1];
-          featMatch = first.get(featAttr);
-          regexFilter = s[j][0].filter.match(/\/(.*)\/([a-zA-Z]+)?/);
-          expr = typeof featMatch === 'number' ? featMatch + expr : `"${featMatch}"${expr}`;
+        let filters = [];
+        let filtering = '';
+        // Check for filtering on AND or OR
+        if (s[j][0].filter.search(' && ') > 0) {
+          filters = s[j][0].filter.split(' && ');
+          filtering = 'AND';
+        } else if (s[j][0].filter.search(' || ') > 0) {
+          filters = s[j][0].filter.split(' || ');
+          filtering = 'OR';
+        } else {
+          // Remove AND or OR filtering in the case it matched the one or other
+          filters = s[j][0].filter.split(' && ');
+          filters = filters[0].split(' || ');
         }
-        if (regexFilter) {
-          regexExpr = new RegExp(regexFilter[1], regexFilter[2]);
-
-          if (regexExpr.test(featMatch)) {
-            styleL = styleList[j];
-            return styleL;
+        // eslint-disable-next-line consistent-return
+        filters.forEach((item) => {
+          const matches = item.match(/\[(.*?)\]/);
+          if (matches) {
+            let first = feature;
+            if (feature.get('features')) {
+              first = feature.get('features')[0];
+            }
+            const featAttr = matches[1];
+            expr = item.split(']')[1];
+            featMatch = first.get(featAttr);
+            regexFilter = item.match(/\/(.*)\/([a-zA-Z]+)?/);
+            expr = typeof featMatch === 'number' ? featMatch + expr : `"${featMatch}"${expr}`;
           }
-        // eslint-disable-next-line brace-style
-        }
-        // eslint-disable-next-line no-eval
-        else if (eval(expr)) {
+          if (regexFilter) {
+            regexExpr = new RegExp(regexFilter[1], regexFilter[2]);
+            filtering = 'RegExp';
+          }
+          exprArr.push(expr);
+        });
+        let filterMatch = true;
+        // Check for true/false depending on if it is AND, OR, RegExp or single filtering
+        exprArr.forEach((exp) => {
+          if (filtering === 'AND') {
+            // eslint-disable-next-line no-eval
+            if (eval(exp) && filterMatch) {
+              filterMatch = true;
+            } else {
+              filterMatch = false;
+            }
+          } else if (filtering === 'OR') {
+            // eslint-disable-next-line no-eval
+            if (!(eval(exp) || filterMatch)) {
+              filterMatch = false;
+            } else {
+              filterMatch = true;
+            }
+          } else if (filtering === 'RegExp') {
+            // eslint-disable-next-line no-eval
+            if (regexExpr.test(featMatch)) {
+              filterMatch = true;
+            } else {
+              filterMatch = false;
+            }
+          } else if (filtering === '') {
+            // eslint-disable-next-line no-eval
+            if (eval(exp)) {
+              filterMatch = true;
+            } else {
+              filterMatch = false;
+            }
+          }
+        });
+        if (filterMatch) {
           styleL = styleList[j];
           return styleL;
         }
