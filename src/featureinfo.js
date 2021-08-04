@@ -24,7 +24,8 @@ const Featureinfo = function Featureinfo(options = {}) {
     pinsStyle: pinStyleOptions = styleTypes.getStyle('pin'),
     savedPin: savedPinOptions,
     savedSelection,
-    selectionStyles: selectionStylesOptions
+    selectionStyles: selectionStylesOptions,
+    autoplay = false
   } = options;
 
   let identifyTarget;
@@ -67,6 +68,40 @@ const Featureinfo = function Featureinfo(options = {}) {
     }
   };
 
+  const getTitle = function getTitle(item) {
+    let featureinfoTitle;
+    let title;
+    let layer;
+    if (item.layer) {
+      if (typeof item.layer === 'string') {
+        // bcuz in getfeatureinfo -> getFeaturesFromRemote only name of the layer is set on the object! (old version before using SelectedItems class)
+        layer = viewer.getLayer(item.layer);
+      } else {
+        layer = viewer.getLayer(item.layer.get('name'));
+      }
+    }
+    // This is very strange: layer above is only a string, could not possibly have method.
+    if (layer) {
+      featureinfoTitle = layer.getProperties().featureinfoTitle;
+    }
+    if (featureinfoTitle) {
+      const featureProps = item.feature.getProperties();
+      title = replacer.replace(featureinfoTitle, featureProps);
+      if (!title) {
+        if (item instanceof SelectedItem) {
+          title = item.getLayer().get('title') ? item.getLayer().get('title') : item.getLayer().get('name');
+        } else {
+          title = item.title ? item.title : item.name;
+        }
+      }
+    } else if (item instanceof SelectedItem) {
+      title = item.getLayer().get('title') ? item.getLayer().get('title') : item.getLayer().get('name');
+    } else {
+      title = item.title ? item.title : item.name;
+    }
+    return title;
+  };
+
   // TODO: direct access to feature and layer should be converted to getFeature and getLayer methods on currentItem
   const callback = function callback(evt) {
     const currentItemIndex = evt.item.index;
@@ -79,38 +114,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         clone,
         selectionStyles[currentItem.feature.getGeometry().getType()]
       );
-      let featureinfoTitle;
-      let title;
-      let layer;
-
-      if (currentItem.layer) {
-        if (typeof currentItem.layer === 'string') {
-          // bcuz in getfeatureinfo -> getFeaturesFromRemote only name of the layer is set on the object! (old version before using SelectedItems class)
-          layer = viewer.getLayer(currentItem.layer);
-        } else {
-          layer = viewer.getLayer(currentItem.layer.get('name'));
-        }
-      }
-      // This is very strange: layer above is only a string, could not possibly have method.
-      if (layer) {
-        featureinfoTitle = layer.getProperties().featureinfoTitle;
-      }
-
-      if (featureinfoTitle) {
-        const featureProps = currentItem.feature.getProperties();
-        title = replacer.replace(featureinfoTitle, featureProps);
-        if (!title) {
-          if (currentItem instanceof SelectedItem) {
-            title = currentItem.getLayer().get('title') ? currentItem.getLayer().get('title') : currentItem.getLayer().get('name');
-          } else {
-            title = currentItem.title ? currentItem.title : currentItem.name;
-          }
-        }
-      } else if (currentItem instanceof SelectedItem) {
-        title = currentItem.getLayer().get('title') ? currentItem.getLayer().get('title') : currentItem.getLayer().get('name');
-      } else {
-        title = currentItem.title ? currentItem.title : currentItem.name;
-      }
+      const title = getTitle(currentItem);
       selectionLayer.setSourceLayer(currentItem.layer);
       if (identifyTarget === 'overlay') {
         popup.setTitle(title);
@@ -130,10 +134,33 @@ const Featureinfo = function Featureinfo(options = {}) {
 
   const initCarousel = function initCarousel(id) {
     const { length } = Array.from(document.querySelectorAll('.o-identify-content'));
-    if (!document.querySelector('.glide') && length > 1) {
+    if (!document.querySelector('.glide-content') && length > 1) {
       OGlide({
         id,
         callback
+      });
+    }
+  };
+
+  // TODO: should there be anything done?
+  const callbackImage = function callbackImage(evt) {
+    const currentItemIndex = evt.item.index;
+    if (currentItemIndex !== null) {
+      // should there be anything done?
+    }
+  };
+
+  const initImageCarousel = function initImageCarousel(id, oClass, carouselId, targetElement) {
+    const carousel = document.getElementsByClassName(id.substring(1));
+    const { length } = Array.from(carousel[0].querySelectorAll('div.o-image-content > img'));
+    if (!document.querySelector(`.glide-image${carouselId}`) && length > 1) {
+      OGlide({
+        id,
+        callback: callbackImage,
+        oClass,
+        glideClass: `glide-image${carouselId}`,
+        autoplay,
+        targetElement
       });
     }
   };
@@ -215,10 +242,12 @@ const Featureinfo = function Featureinfo(options = {}) {
         popup = Popup(`#${viewer.getId()}`);
         popup.setContent({
           content,
-          title: items[0] instanceof SelectedItem ? items[0].getLayer().get('title') : items[0].title
+          title: getTitle(items[0])
         });
         const contentDiv = document.getElementById('o-identify-carousel');
+        const carouselIds = [];
         items.forEach((item) => {
+          carouselIds.push(item.feature.ol_uid);
           if (item.content instanceof Element) {
             contentDiv.appendChild(item.content);
           } else {
@@ -227,19 +256,6 @@ const Featureinfo = function Featureinfo(options = {}) {
         });
         popup.setVisibility(true);
         initCarousel('#o-identify-carousel');
-        const popupHeight = document.querySelector('.o-popup').offsetHeight + 10;
-        const popupEl = popup.getEl();
-        popupEl.style.height = `${popupHeight}px`;
-        overlay = new Overlay({
-          element: popupEl,
-          autoPan: {
-            margin: 55,
-            animation: {
-              duration: 500
-            }
-          },
-          positioning: 'bottom-center'
-        });
         const firstFeature = items[0].feature;
         const geometry = firstFeature.getGeometry();
         const clone = firstFeature.clone();
@@ -251,6 +267,32 @@ const Featureinfo = function Featureinfo(options = {}) {
         );
         selectionLayer.setSourceLayer(items[0].layer);
         const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
+        carouselIds.forEach((carouselId) => {
+          let targetElement;
+          const elements = document.getElementsByClassName(`o-image-carousel${carouselId}`);
+          elements.forEach(element => {
+            if (!element.closest('.glide__slide--clone')) {
+              targetElement = element;
+            }
+          });
+          const imageCarouselEl = document.getElementsByClassName(`o-image-carousel${carouselId}`);
+          if (imageCarouselEl.length > 0) {
+            initImageCarousel(`#o-image-carousel${carouselId}`, `.o-image-content${carouselId}`, carouselId, targetElement);
+          }
+        });
+        const popupEl = popup.getEl();
+        const popupHeight = document.querySelector('.o-popup').offsetHeight + 10;
+        popupEl.style.height = `${popupHeight}px`;
+        overlay = new Overlay({
+          element: popupEl,
+          autoPan: {
+            margin: 55,
+            animation: {
+              duration: 500
+            }
+          },
+          positioning: 'bottom-center'
+        });
         map.addOverlay(overlay);
         overlay.setPosition(coord);
         break;
@@ -259,7 +301,7 @@ const Featureinfo = function Featureinfo(options = {}) {
       {
         sidebar.setContent({
           content,
-          title: items[0] instanceof SelectedItem ? items[0].getLayer().get('title') : items[0].title
+          title: getTitle(items[0])
         });
         const contentDiv = document.getElementById('o-identify-carousel');
         items.forEach((item) => {

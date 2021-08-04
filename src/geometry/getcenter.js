@@ -18,7 +18,7 @@ export default function getCenter(geometryIn, destination, axisOrientation, map)
       center = geometry.getCoordinates();
       break;
     case 'MultiPoint':
-      center = geometry[0].getCoordinates();
+      center = geometry.getPoint(0).getCoordinates();
       break;
     case 'LineString':
       center = geometry.getCoordinateAt(0.5);
