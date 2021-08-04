@@ -20,7 +20,7 @@ const OverlayLayer = function OverlayLayer(options) {
   let ButtonsHtml;
   let layerList;
 
-  let cls = `${clsSettings} flex row align-center padding-left padding-right item`.trim();
+  const cls = `${clsSettings} flex row align-center padding-left padding-right item`.trim();
   const title = layer.get('title') || 'Titel saknas';
   const name = layer.get('name');
   const secure = layer.get('secure');
@@ -30,7 +30,6 @@ const OverlayLayer = function OverlayLayer(options) {
 
   if (secure) {
     uncheckIcon = '#ic_lock_outline_24px';
-    cls += '"style="pointer-events:none';
   }
 
   const opacity = layer.getOpacity();
@@ -97,7 +96,9 @@ const OverlayLayer = function OverlayLayer(options) {
   const toggleButton = Button({
     cls: 'round small icon-smaller no-shrink',
     click() {
-      toggleVisible(layer.getVisible());
+      if (!secure) {
+        toggleVisible(layer.getVisible());
+      }
     },
     style: {
       'align-self': 'center',
