@@ -425,7 +425,7 @@ const Featureinfo = function Featureinfo(options = {}) {
       });
 
       // Change mouse pointer when hovering over a clickable feature
-      if (viewer.getViewerOptions().featureinfoOptions.linkPointer) {
+      if (viewer.getViewerOptions().featureinfoOptions.changePointerOnHover) {
         let pointerActive = true;
         document.addEventListener('enableInteraction', evt => {
           pointerActive = evt.detail.interaction !== 'editor';
@@ -438,7 +438,10 @@ const Featureinfo = function Featureinfo(options = {}) {
         map.on('pointermove', evt => {
           if (!pointerActive || evt.dragging) return;
           // Just check if there is a pixel here. Pretty annoying on hatched symbols or hollow areas.
-          // Note that forEachLayerAtPixel requires that layers have unique class names to work correct.
+          // Note that forEachLayerAtPixel actually only checks if there is a pixel on the canvas where the layer resides,
+          // so non queryable layers must not share canvas with queryable layers, otherwise there will be false positives.
+          // When a pixel is found on the canvas, the callback is called with all layers added to that canvas as it does not know which layer actually draw a pixel there. But we don't care which
+          // layer was hit to change the pointer.
           // Hit tolerence seems to be ignored. It would probably look funny anyway.
           map.getViewport().style.cursor = map.forEachLayerAtPixel(evt.pixel, () => true, { layerFilter: (l) => l.get('queryable') }) ? 'pointer' : '';
         });

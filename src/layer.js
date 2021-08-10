@@ -53,10 +53,21 @@ const Layer = function Layer(optOptions, viewer) {
   }
 
   layerOptions.name = name.split(':').pop();
-
-  // Some features require that each layer has a unique class name. Set one if not provided.
-  if (layerOptions.css || (viewer.getViewerOptions().featureinfoOptions.linkPointer && layerOptions.queryable)) {
+  
+  if (layerOptions.css) {
     layerOptions.className = layerOptions.cls || `o-layer-${layerOptions.name}`;
+  }
+
+  //changePointerOnHover requires that non queryable layers are not drawn on the same canvas as queryable layers.
+  //OL will merge layers to the same canvas if they have the same class and some other reconcilable properties.
+  //Note that the merge preserves layer ordering, so if a layer can not use same canvas as previous layer, a new
+  //canvas will be created, so keep layers with same properties together.
+  //Make sure that queryable layers get a class name to avoid merging with non queryable layers.
+  //A unique class would be best, but produces a new canvas for each layer, which could affect the
+  //performance. 
+  //If user has configured a className then keep it and let the user take the consequences if they mix queryable and non queryable layers.
+  if (viewer.getViewerOptions().featureinfoOptions.changePointerOnHover && layerOptions.queryable && !layerOptions.className) {
+    layerOptions.className = 'o-layer-queryable';
   }
 
   if (layerOptions.type) {
