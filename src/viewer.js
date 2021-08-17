@@ -62,13 +62,22 @@ const Viewer = function Viewer(targetOption, options = {}) {
   const zoom = urlParams.zoom || zoomOption;
   const groups = flattenGroups(groupOptions);
 
-  const getCapabilitiesLayers = {};
-  (Object.keys(source)).forEach(sourceName => {
-    const sourceOptions = source[sourceName];
-    if (sourceOptions && sourceOptions.capabilitiesURL) {
-      getCapabilitiesLayers[sourceName] = getCapabilities(sourceOptions.capabilitiesURL);
-    }
-  });
+  const getCapabilitiesLayers = () => {
+    const capabilitiesPromises = [];
+    (Object.keys(source)).forEach(sourceName => {
+      const sourceOptions = source[sourceName];
+      if (sourceOptions && sourceOptions.capabilitiesURL) {
+        capabilitiesPromises.push(getCapabilities(sourceName, sourceOptions.capabilitiesURL));
+      }
+    });
+    return Promise.all(capabilitiesPromises).then(capabilitiesResults => {
+      const layers = {};
+      capabilitiesResults.forEach(result => {
+        layers[result.name] = result.capabilites;
+      });
+      return layers;
+    }).catch(error => console.log(error));
+  };
 
   const defaultTileGridOptions = {
     alignBottomLeft: true,
@@ -302,24 +311,25 @@ const Viewer = function Viewer(targetOption, options = {}) {
     return layerlist;
   };
 
-  const mergeSavedLayerProps = (initialLayerProps, savedLayerProps, capabilitiesLayers) => {
-    let mergedLayerProps;
-    if (savedLayerProps) {
-      mergedLayerProps = initialLayerProps.reduce((acc, initialProps) => {
-        const layerName = initialProps.name.split(':').pop();
-        const savedProps = savedLayerProps[layerName] || {
-          visible: false,
-          legend: false
-        };
-        savedProps.name = initialProps.name;
-        const mergedProps = Object.assign({}, initialProps, savedProps);
-        acc.push(mergedProps);
-        return acc;
-      }, []);
-      return mergeSecuredLayer(mergedLayerProps, capabilitiesLayers);
-    }
-    return mergeSecuredLayer(initialLayerProps, capabilitiesLayers);
-  };
+  const mergeSavedLayerProps = (initialLayerProps, savedLayerProps) => getCapabilitiesLayers()
+    .then(capabilitiesLayers => {
+      let mergedLayerProps;
+      if (savedLayerProps) {
+        mergedLayerProps = initialLayerProps.reduce((acc, initialProps) => {
+          const layerName = initialProps.name.split(':').pop();
+          const savedProps = savedLayerProps[layerName] || {
+            visible: false,
+            legend: false
+          };
+          savedProps.name = initialProps.name;
+          const mergedProps = Object.assign({}, initialProps, savedProps);
+          acc.push(mergedProps);
+          return acc;
+        }, []);
+        return mergeSecuredLayer(mergedLayerProps, capabilitiesLayers);
+      }
+      return mergeSecuredLayer(initialLayerProps, capabilitiesLayers);
+    });
 
   const removeOverlays = function removeOverlays(overlays) {
     if (overlays) {
@@ -448,8 +458,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
       setMap(Map(Object.assign(options, { projection, center, zoom, target: this.getId() })));
 
-      const layerProps = mergeSavedLayerProps(layerOptions, urlParams.layers, getCapabilitiesLayers);
-      this.addLayers(layerProps);
+      mergeSavedLayerProps(layerOptions, urlParams.layers)
+        .then(layerProps => this.addLayers(layerProps));
 
       mapSize = MapSize(map, {
         breakPoints,
