@@ -115,3 +115,5 @@ export default {
     }
   }
 };
+
+export { default as slugify } from './utils/slugify';
