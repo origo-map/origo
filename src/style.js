@@ -176,16 +176,16 @@ function checkOptions(feature, scale, styleSettings, styleList, size) {
         let filters = [];
         let filtering = '';
         // Check for filtering on AND or OR
-        if (s[j][0].filter.search(' && ') > 0) {
-          filters = s[j][0].filter.split(' && ');
+        if (s[j][0].filter.search(' AND ') > 0) {
+          filters = s[j][0].filter.split(' AND ');
           filtering = 'AND';
-        } else if (s[j][0].filter.search(' || ') > 0) {
-          filters = s[j][0].filter.split(' || ');
+        } else if (s[j][0].filter.search(' OR ') > 0) {
+          filters = s[j][0].filter.split(' OR ');
           filtering = 'OR';
         } else {
           // Remove AND or OR filtering in the case it matched the one or other
-          filters = s[j][0].filter.split(' && ');
-          filters = filters[0].split(' || ');
+          filters = s[j][0].filter.split(' AND ');
+          filters = filters[0].split(' OR ');
         }
         // eslint-disable-next-line consistent-return
         filters.forEach((item) => {
@@ -208,6 +208,7 @@ function checkOptions(feature, scale, styleSettings, styleList, size) {
           exprArr.push(expr);
         });
         let filterMatch = true;
+        let filterMatchOR = false;
         // Check for true/false depending on if it is AND, OR, RegExp or single filtering
         exprArr.forEach((exp) => {
           if (filtering === 'AND') {
@@ -219,11 +220,12 @@ function checkOptions(feature, scale, styleSettings, styleList, size) {
             }
           } else if (filtering === 'OR') {
             // eslint-disable-next-line no-eval
-            if (!(eval(exp) || filterMatch)) {
-              filterMatch = false;
-            } else {
+            if ((eval(exp) || filterMatchOR)) {
               filterMatch = true;
+            } else {
+              filterMatch = false;
             }
+            filterMatchOR = filterMatch;
           } else if (filtering === 'RegExp') {
             // eslint-disable-next-line no-eval
             if (regexExpr.test(featMatch)) {
