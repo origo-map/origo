@@ -229,6 +229,26 @@ const Measure = function Measure({
     labelOverlay.setPosition(oo);
     measureElement.innerHTML = formatLength(/** @type {LineString} */(segment));
     map.addOverlay(labelOverlay);
+    if (coords.length < 6 && showSegmentLengths) {
+      switch (type) {
+        case 'LineString':
+          if (coords.length === 3) {
+            document.getElementById('measure_3').style.display = 'none';
+          } else {
+            document.getElementById('measure_3').style.display = 'block';
+          }
+          break;
+        case 'Polygon':
+          if (coords.length === 4) {
+            document.getElementById('measure_4').style.display = 'none';
+          } else {
+            document.getElementById('measure_4').style.display = 'block';
+          }
+          break;
+        default:
+          break;
+      }
+    }
   }
 
   function centerSketch() {

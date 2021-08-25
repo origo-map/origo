@@ -26,6 +26,7 @@ import { renderSvgIcon } from './src/utils/legendmaker';
 import SelectedItem from './src/models/SelectedItem';
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
+import 'elm-pep';
 
 const Origo = function Origo(configPath, options = {}) {
   let viewer;
