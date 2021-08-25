@@ -459,80 +459,82 @@ const Viewer = function Viewer(targetOption, options = {}) {
       setMap(Map(Object.assign(options, { projection, center, zoom, target: this.getId() })));
 
       mergeSavedLayerProps(layerOptions, urlParams.layers)
-        .then(layerProps => this.addLayers(layerProps));
+        .then(layerProps => {
+          this.addLayers(layerProps);
 
-      mapSize = MapSize(map, {
-        breakPoints,
-        breakPointsPrefix,
-        mapId: this.getId()
-      });
+          mapSize = MapSize(map, {
+            breakPoints,
+            breakPointsPrefix,
+            mapId: this.getId()
+          });
 
-      if (urlParams.feature) {
-        let featureId = urlParams.feature;
-        const layerName = featureId.split('.')[0];
-        const layer = getLayer(layerName);
-        const type = layer.get('type');
+          if (urlParams.feature) {
+            let featureId = urlParams.feature;
+            const layerName = featureId.split('.')[0];
+            const layer = getLayer(layerName);
+            const type = layer.get('type');
 
-        if (layer && type !== 'GROUP') {
-          const clusterSource = layer.getSource().source;
-          const id = featureId.split('.')[1];
-          layer.once('postrender', () => {
-            let feature;
+            if (layer && type !== 'GROUP') {
+              const clusterSource = layer.getSource().source;
+              const id = featureId.split('.')[1];
+              layer.once('postrender', () => {
+                let feature;
 
-            if (type === 'WFS' && clusterSource) {
-              feature = clusterSource.getFeatureById(featureId);
-            } else if (type === 'WFS') {
-              if (featureId.includes('__')) {
-                featureId = featureId.replace(featureId.substring(featureId.lastIndexOf('__'), featureId.lastIndexOf('.')), '');
-              }
-              feature = layer.getSource().getFeatureById(featureId);
-            } else if (clusterSource) {
-              feature = clusterSource.getFeatureById(id);
-            } else {
-              feature = layer.getSource().getFeatureById(id);
-            }
+                if (type === 'WFS' && clusterSource) {
+                  feature = clusterSource.getFeatureById(featureId);
+                } else if (type === 'WFS') {
+                  if (featureId.includes('__')) {
+                    featureId = featureId.replace(featureId.substring(featureId.lastIndexOf('__'), featureId.lastIndexOf('.')), '');
+                  }
+                  feature = layer.getSource().getFeatureById(featureId);
+                } else if (clusterSource) {
+                  feature = clusterSource.getFeatureById(id);
+                } else {
+                  feature = layer.getSource().getFeatureById(id);
+                }
 
-            if (feature) {
-              const obj = {};
-              obj.feature = feature;
-              obj.title = layer.get('title');
-              obj.content = getAttributes(feature, layer);
-              obj.layer = layer;
-              const centerGeometry = getcenter(feature.getGeometry());
-              const infowindowType = featureinfoOptions.showOverlay === false ? 'sidebar' : 'overlay';
-              featureinfo.render([obj], infowindowType, centerGeometry);
-              map.getView().fit(feature.getGeometry(), {
-                maxZoom: getResolutions().length - 2,
-                padding: [15, 15, 40, 15],
-                duration: 1000
+                if (feature) {
+                  const obj = {};
+                  obj.feature = feature;
+                  obj.title = layer.get('title');
+                  obj.content = getAttributes(feature, layer);
+                  obj.layer = layer;
+                  const centerGeometry = getcenter(feature.getGeometry());
+                  const infowindowType = featureinfoOptions.showOverlay === false ? 'sidebar' : 'overlay';
+                  featureinfo.render([obj], infowindowType, centerGeometry);
+                  map.getView().fit(feature.getGeometry(), {
+                    maxZoom: getResolutions().length - 2,
+                    padding: [15, 15, 40, 15],
+                    duration: 1000
+                  });
+                }
               });
             }
-          });
-        }
-      }
+          }
 
-      if (urlParams.pin) {
-        featureinfoOptions.savedPin = urlParams.pin;
-      } else if (urlParams.selection) {
-        // This needs further development for proper handling in permalink
-        featureinfoOptions.savedSelection = new Feature({
-          geometry: new geom[urlParams.selection.geometryType](urlParams.selection.coordinates)
+          if (urlParams.pin) {
+            featureinfoOptions.savedPin = urlParams.pin;
+          } else if (urlParams.selection) {
+            // This needs further development for proper handling in permalink
+            featureinfoOptions.savedSelection = new Feature({
+              geometry: new geom[urlParams.selection.geometryType](urlParams.selection.coordinates)
+            });
+          }
+
+          if (!urlParams.zoom && !urlParams.mapStateId && startExtent) {
+            map.getView().fit(startExtent, { size: map.getSize() });
+          }
+
+          featureinfoOptions.viewer = this;
+
+          selectionmanager = Selectionmanager(featureinfoOptions);
+          this.addComponent(selectionmanager);
+
+          featureinfo = Featureinfo(featureinfoOptions);
+          this.addComponent(featureinfo);
+
+          this.addControls();
         });
-      }
-
-      if (!urlParams.zoom && !urlParams.mapStateId && startExtent) {
-        map.getView().fit(startExtent, { size: map.getSize() });
-      }
-
-      featureinfoOptions.viewer = this;
-
-      selectionmanager = Selectionmanager(featureinfoOptions);
-      this.addComponent(selectionmanager);
-
-      featureinfo = Featureinfo(featureinfoOptions);
-      this.addComponent(featureinfo);
-
-      this.addControls();
     },
     render() {
       const htmlString = `<div id="${this.getId()}" class="${cls}">
