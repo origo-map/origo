@@ -11,6 +11,7 @@ import PrintInteractionToggle from './print-interaction-toggle';
 import PrintToolbar from './print-toolbar';
 import { downloadPNG, downloadPDF, printToScalePDF } from '../../utils/download';
 import { afterRender, beforeRender } from './download-callback';
+import maputils from '../../maputils';
 
 const PrintComponent = function PrintComponent(options = {}) {
   const {
@@ -34,13 +35,13 @@ const PrintComponent = function PrintComponent(options = {}) {
     sizeCustomMinWidth,
     sizeCustomMaxWidth,
     resolutions,
-    scales,
     scaleInitial,
     createdPrefix,
     rotation,
     rotationStep,
     leftFooterText,
-    mapInteractionsActive
+    mapInteractionsActive,
+    supressResultionsRecalculation
   } = options;
 
   let {
@@ -51,6 +52,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     size,
     orientation,
     resolution,
+    scales,
     showMargins,
     showCreated,
     showScale,
@@ -70,6 +72,28 @@ const PrintComponent = function PrintComponent(options = {}) {
   let printScale = 0;
   let widthImage = 0;
   let heightImage = 0;
+  const originalResolutions = viewer.getResolutions().map(item => item);
+
+  if (!Array.isArray(scales) || scales.length === 0) {
+    scales = originalResolutions.map(currRes => maputils.resolutionToFormattedScale(currRes, viewer.getProjection()));
+  }
+
+  /** Recalculate the array of allowed zoomlevels to reflect changes in DPI */
+  const recalculateResolutions = function recalculateResolutions() {
+    if (!supressResultionsRecalculation) {
+      const viewerResolutions = viewer.getResolutions();
+      viewerResolutions.forEach((currRes, ix) => {
+        // Do the calculation the same way as when setting the scale. Otherwise there will be rounding errors and the scale bar will have another scale than selected
+        // (and probably not an even nice looking number)
+        const scale = maputils.resolutionToScale(originalResolutions[ix], viewer.getProjection()) / 1000;
+        const scaleResolution = scale / getPointResolution(viewer.getProjection(), resolution / 25.4, map.getView().getCenter());
+        viewerResolutions[ix] = scaleResolution;
+      });
+      // As we do a "dirty" update of resolutions we have to trigger a re-read of the limits, otherwise the outer limits still apply.
+      map.getView().setMinZoom(0);
+      map.getView().setMaxZoom(viewerResolutions.length - 1);
+    }
+  };
 
   const setCustomSize = function setCustomSize(sizeObj) {
     if ('width' in sizeObj) {
@@ -157,7 +181,8 @@ const PrintComponent = function PrintComponent(options = {}) {
     showScale,
     showNorthArrow,
     rotation,
-    rotationStep
+    rotationStep,
+    viewerResolutions: originalResolutions
   });
   const printInteractionToggle = PrintInteractionToggle({ map, target, mapInteractionsActive, pageSettings: viewer.getViewerOptions().pageSettings });
   const printToolbar = PrintToolbar();
@@ -170,6 +195,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     name: 'printComponent',
     onInit() {
       this.on('render', this.onRender);
+
       this.addComponent(printSettings);
       this.addComponent(printInteractionToggle);
       this.addComponent(printToolbar);
@@ -246,6 +272,8 @@ const PrintComponent = function PrintComponent(options = {}) {
     },
     changeResolution(evt) {
       resolution = evt.resolution;
+      recalculateResolutions();
+
       this.updatePageSize();
       if (printScale > 0) {
         this.changeScale({ scale: printScale });
@@ -276,6 +304,16 @@ const PrintComponent = function PrintComponent(options = {}) {
       printMapComponent.dispatch('change:toggleNorthArrow', { showNorthArrow });
     },
     close() {
+      // Restore scales
+      if (!supressResultionsRecalculation) {
+        const viewerResolutions = viewer.getResolutions();
+        viewerResolutions.forEach((currRes, ix) => {
+          viewerResolutions[ix] = originalResolutions[ix];
+        });
+        // As we do a "dirty" update of resolutions we have to trigger a re-read of the limits, otherwise the outer limits still apply.
+        map.getView().setMinZoom(0);
+        map.getView().setMaxZoom(viewerResolutions.length - 1);
+      }
       printMapComponent.removePrintControls();
       if (map.getView().getRotation() !== 0) {
         map.getView().setRotation(0);
@@ -354,6 +392,7 @@ const PrintComponent = function PrintComponent(options = {}) {
       map.setTarget(printMapComponent.getId());
       this.removeViewerControls();
       printMapComponent.addPrintControls();
+      recalculateResolutions();
       printMapComponent.dispatch('change:toggleScale', { showScale });
       this.updatePageSize();
     },
