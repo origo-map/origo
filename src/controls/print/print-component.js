@@ -41,7 +41,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     rotationStep,
     leftFooterText,
     mapInteractionsActive,
-    supressResultionsRecalculation
+    supressResolutionsRecalculation
   } = options;
 
   let {
@@ -80,7 +80,7 @@ const PrintComponent = function PrintComponent(options = {}) {
 
   /** Recalculate the array of allowed zoomlevels to reflect changes in DPI */
   const recalculateResolutions = function recalculateResolutions() {
-    if (!supressResultionsRecalculation) {
+    if (!supressResolutionsRecalculation) {
       const viewerResolutions = viewer.getResolutions();
       viewerResolutions.forEach((currRes, ix) => {
         // Do the calculation the same way as when setting the scale. Otherwise there will be rounding errors and the scale bar will have another scale than selected
@@ -305,7 +305,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     },
     close() {
       // Restore scales
-      if (!supressResultionsRecalculation) {
+      if (!supressResolutionsRecalculation) {
         const viewerResolutions = viewer.getResolutions();
         viewerResolutions.forEach((currRes, ix) => {
           viewerResolutions[ix] = originalResolutions[ix];
