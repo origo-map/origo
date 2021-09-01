@@ -111,7 +111,7 @@ function OGlide(options) {
 
   if (oiContent.length > 0) {
     el.mount();
-    el.on('move', () => {
+    el.on('run.after', () => {
       callback({ item: { index: el.index, count: oiContent.length } });
     });
   }
