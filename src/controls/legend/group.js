@@ -58,7 +58,7 @@ const Group = function Group(options = {}, viewer) {
       const el = document.getElementById(this.getId());
       el.dispatchEvent(tickEvent);
     },
-    icon: '#ic_check_circle_24px',
+    icon: '#ic_radio_button_unchecked_24px',
     iconCls: '',
     state: visibleState,
     style: {
