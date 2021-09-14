@@ -20,6 +20,7 @@ const Measure = function Measure({
   elevationTargetProjection,
   elevationAttribute,
   showSegmentLengths = false,
+  showSegmentLabelButtonActive = true,
   useHectare = true
 } = {}) {
   const style = Style;
@@ -58,6 +59,7 @@ const Measure = function Measure({
   let elevationToolButton;
   let addNodeButton;
   let showSegmentLabelButton;
+  let showSegmentLabels;
   let undoButton;
   let clearButton;
   const buttons = [];
@@ -235,20 +237,25 @@ const Measure = function Measure({
         case 'LineString':
           if (coords.length === 3) {
             document.getElementById('measure_3').style.display = 'none';
-          } else {
+          }
+          if (showSegmentLabels) {
             document.getElementById('measure_3').style.display = 'block';
           }
           break;
         case 'Polygon':
           if (coords.length === 4) {
             document.getElementById('measure_4').style.display = 'none';
-          } else {
+          }
+          if (showSegmentLabels) {
             document.getElementById('measure_4').style.display = 'block';
           }
           break;
         default:
           break;
       }
+    }
+    if (!showSegmentLabels) {
+      measureElement.style.display = 'none';
     }
   }
 
@@ -434,6 +441,9 @@ const Measure = function Measure({
     }
     if (showSegmentLengths) {
       document.getElementById(showSegmentLabelButton.getId()).classList.remove('hidden');
+      if (showSegmentLabelButtonActive) {
+        document.getElementById(showSegmentLabelButton.getId()).classList.add('active');
+      }
       renderMarker();
     }
     setActive(true);
@@ -541,12 +551,19 @@ const Measure = function Measure({
       const e = elements[i];
 
       if (e.id.startsWith('measure_')) {
-        if (e.style.display === 'block' || e.style.display === '') {
+        if (showSegmentLabels) {
           e.style.display = 'none';
         } else {
           e.style.display = 'block';
         }
       }
+    }
+    if (showSegmentLabels) {
+      showSegmentLabels = false;
+      document.getElementById(showSegmentLabelButton.getId()).classList.remove('active');
+    } else {
+      document.getElementById(showSegmentLabelButton.getId()).classList.add('active');
+      showSegmentLabels = true;
     }
   }
 
@@ -582,13 +599,18 @@ const Measure = function Measure({
         buttons.push(addNodeButton);
       }
       if (showSegmentLengths) {
+        if (showSegmentLabelButtonActive) {
+          showSegmentLabels = true;
+        } else {
+          showSegmentLabels = false;
+        }
         showSegmentLabelButton = Button({
           cls: 'o-measure-segment-label padding-small margin-bottom-smaller icon-smaller round light box-shadow hidden',
           click() {
             toggleSegmentLabels();
           },
           icon: '#ic_linear_scale_24px',
-          tooltipText: 'Växla visning av delsträckor',
+          tooltipText: 'Visa delsträckor',
           tooltipPlacement: 'east'
         });
         buttons.push(showSegmentLabelButton);
