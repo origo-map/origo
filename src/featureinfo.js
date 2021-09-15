@@ -34,6 +34,8 @@ const Featureinfo = function Featureinfo(options = {}) {
   let popup;
   let viewer;
   let selectionManager;
+  /** The featureinfo component itself */
+  let component;
 
   const pinStyle = Style.createStyleRule(pinStyleOptions)[0];
   const selectionStyles = selectionStylesOptions ? Style.createGeometryStyle(selectionStylesOptions) : Style.createEditStyle();
@@ -68,6 +70,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     }
   };
 
+  // FIXME: overly complex. Don't think layer can be a string anymore
   const getTitle = function getTitle(item) {
     let featureinfoTitle;
     let title;
@@ -102,6 +105,14 @@ const Featureinfo = function Featureinfo(options = {}) {
     return title;
   };
 
+  /**
+ * Dispatches an "official" api event.
+ * @param {SelectedItem} item The currently selected item
+ */
+  const dispatchNewSelection = function dispachtNewSelection(item) {
+    component.dispatch('changeselection', item);
+  };
+
   const dispatchToggleFeatureEvent = function dispatchToggleFeatureEvent(currentItem) {
     const toggleFeatureinfo = new CustomEvent('toggleFeatureinfo', {
       detail: {
@@ -109,7 +120,10 @@ const Featureinfo = function Featureinfo(options = {}) {
         currentItem
       }
     });
+    // FIXME: should be deprecated
     document.dispatchEvent(toggleFeatureinfo);
+    // Also emit an API-event
+    dispatchNewSelection(currentItem);
   };
 
   // TODO: direct access to feature and layer should be converted to getFeature and getLayer methods on currentItem
@@ -119,6 +133,7 @@ const Featureinfo = function Featureinfo(options = {}) {
       const currentItem = items[currentItemIndex];
       const clone = currentItem.feature.clone();
       clone.setId(currentItem.feature.getId());
+      // FIXME: Should be taken from layer name
       clone.layerName = currentItem.name;
       selectionLayer.clearAndAdd(
         clone,
@@ -173,6 +188,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     return selectionLayer.getFeatureLayer();
   }
 
+  // FIXME: Can't handle selectionmanager (infowindow)
   function getSelection() {
     const selection = {};
     const firstFeature = selectionLayer.getFeatures()[0];
@@ -180,12 +196,14 @@ const Featureinfo = function Featureinfo(options = {}) {
       selection.geometryType = firstFeature.getGeometry().getType();
       selection.coordinates = firstFeature.getGeometry().getCoordinates();
       selection.id = firstFeature.getId() != null ? firstFeature.getId() : firstFeature.ol_uid;
+      // FIXME: typeof layer can not be string, and if it is it would probably not have a property called type that is set to WFS
       selection.type = typeof selectionLayer.getSourceLayer() === 'string' ? selectionLayer.getFeatureLayer().type : selectionLayer.getSourceLayer().get('type');
       if (selection.type === 'WFS') {
         const idSuffix = selection.id.substring(selection.id.lastIndexOf('.') + 1, selection.id.length);
         selection.id = `${selectionLayer.getSourceLayer().get('name')}.${idSuffix}`;
       }
       if (selection.type !== 'WFS') {
+        // FIXME: typeof layer can not be string
         const name = typeof selectionLayer.getSourceLayer() === 'string' ? selectionLayer.getSourceLayer() : selectionLayer.getSourceLayer().get('name');
         const id = firstFeature.getId() || selection.id;
         selection.id = `${name}.${id}`;
@@ -238,6 +256,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     const map = viewer.getMap();
     items = identifyItems;
     clear();
+    // FIXME: variable is overwritten in next row
     let content = items.map((i) => i.content).join('');
     content = '<div id="o-identify"><div id="o-identify-carousel" class="flex"></div></div>';
     switch (target) {
@@ -264,6 +283,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         const geometry = firstFeature.getGeometry();
         const clone = firstFeature.clone();
         clone.setId(firstFeature.getId());
+        // FIXME: should be layer name, not feature name
         clone.layerName = firstFeature.name;
         selectionLayer.clearAndAdd(
           clone,
@@ -320,6 +340,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         const geometry = firstFeature.getGeometry();
         const clone = firstFeature.clone();
         clone.setId(firstFeature.getId());
+        // FIXME: should be layer name
         clone.layerName = firstFeature.name;
         selectionLayer.clearAndAdd(
           clone,
@@ -348,7 +369,32 @@ const Featureinfo = function Featureinfo(options = {}) {
     for (let i = 0; i < modalLinks.length; i += 1) {
       addLinkListener(modalLinks[i]);
     }
-    dispatchToggleFeatureEvent(items[0]);
+    // Don't send event for infowindow. Infowindow will send an event that triggers sending the event later.
+    if (target === 'overlay' || target === 'sidebar') {
+      dispatchToggleFeatureEvent(items[0]);
+    }
+  };
+
+  /**
+  * Shows the featureinfo popup/sidebar/infowindow for the provided features. Only vector layers are supported.
+  * @param {any} fidsbylayer An object containing layer names as keys with a list of feature ids for each layer
+  * @param {any} opts An object containing options. Supported options are : coordinate, the coordinate where popup will be shown. If omitted first feature is used.
+  * @returns nothing
+  */
+  const showInfo = function showInfo(fidsbylayer, opts = {}) {
+    const newItems = [];
+    const grouplayers = viewer.getGroupLayers();
+    const map = viewer.getMap();
+    const keys = Object.keys(fidsbylayer);
+    keys.forEach(layername => {
+      fidsbylayer[layername].forEach(currFeatureId => {
+        const layer = viewer.getLayer(layername);
+        const f = layer.getSource().getFeatureById(currFeatureId);
+        const newItem = getFeatureInfo.createSelectedItem(f, layer, map, grouplayers);
+        newItems.push(newItem);
+      });
+    });
+    render(newItems, identifyTarget, opts.coordinate || maputils.getCenter(newItems[0].getFeature().getGeometry()));
   };
 
   const onClick = function onClick(evt) {
@@ -415,11 +461,17 @@ const Featureinfo = function Featureinfo(options = {}) {
     getSelection,
     addAttributeType,
     onAdd(e) {
+      // Keep a reference to "ourselves"
+      component = this;
       viewer = e.target;
       const map = viewer.getMap();
       setUIoutput(viewer);
       selectionLayer = featurelayer(savedFeature, map);
       selectionManager = viewer.getSelectionManager();
+      // Re dispatch selectionmanager's event as our own
+      if (selectionManager) {
+        selectionManager.on('highlight', evt => dispatchToggleFeatureEvent(evt));
+      }
       map.on(clickEvent, onClick);
       viewer.on('toggleClickInteraction', (detail) => {
         if ((detail.name === 'featureinfo' && detail.active) || (detail.name !== 'featureinfo' && !detail.active)) {
@@ -452,7 +504,8 @@ const Featureinfo = function Featureinfo(options = {}) {
         });
       }
     },
-    render
+    render,
+    showInfo
   });
 };
 

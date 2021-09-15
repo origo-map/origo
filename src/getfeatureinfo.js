@@ -268,6 +268,7 @@ function getFeaturesAtPixel({
 }
 
 export default {
+  createSelectedItem,
   getFeaturesFromRemote,
   getFeaturesAtPixel
 };
