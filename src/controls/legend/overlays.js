@@ -165,9 +165,12 @@ const Overlays = function Overlays(options) {
       if (groupCmp) {
         groupCmp.addOverlay(overlay);
         document.getElementById(groupCmp.getId()).classList.remove('hidden');
-      }
-      if (groupCmp.parent) {
-        updateLegend(groupCmp);
+
+        if (groupCmp.parent) {
+          updateLegend(groupCmp);
+        }
+      } else {
+        console.warn(`Group ${groupName} does not exist`);
       }
     }
   };
