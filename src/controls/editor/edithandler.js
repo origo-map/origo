@@ -574,7 +574,7 @@ function attributesSaveHandler(features, formEl) {
       action: 'update'
     }, true);
   });
-  //Take control of auto save here to avoid one transaction per feature when batch editing
+  // Take control of auto save here to avoid one transaction per feature when batch editing
   if (autoSave) {
     saveFeatures();
   }
@@ -582,7 +582,7 @@ function attributesSaveHandler(features, formEl) {
 
 /**
  * Sets up an eventlistener on the attribute editor form save button.
- * @param {Collection} features The features that should be updated 
+ * @param {Collection} features The features that should be updated
  * @param {any} attrs Array of attributes whih values to set
  */
 function onAttributesSave(features, attrs) {
@@ -857,14 +857,14 @@ function addImageListener() {
 function addBatchEditListener() {
   const fn = (obj) => {
     document.getElementById(obj.elId).addEventListener('click', (ev) => {
-      let classList = document.querySelector(`.${obj.relatedAttrId}`).classList;
+      const classList = document.querySelector(`.${obj.relatedAttrId}`).classList;
       if (ev.target.checked) {
         classList.remove('o-hidden');
       } else {
         classList.add('o-hidden');
       }
     });
-  }
+  };
   return fn;
 }
 
@@ -876,28 +876,27 @@ function editAttributes(feat) {
   let feature;
   let attributeObjects;
   /** Array of batch edit checkbox models */
-  let batchEditBoxes = [];
+  const batchEditBoxes = [];
   /** OL Collection */
   let features;
-  let dlgTitle;
 
   // Get attributes from the created, or the selected, feature and fill DOM elements with the values
   if (feat) {
     features = new Collection();
     features.push(feat);
   } else {
-    //Interaction is set up to only select for edited layer, so no need to check layer.
+    // Interaction is set up to only select for edited layer, so no need to check layer.
     features = select.getFeatures();
   }
-  const isBatchEdit = features.getLength() > 1;
-  dlgTitle = isBatchEdit ? `Batch edit ${title}.<br>(${features.getLength()} objekt)` : title;
+  const isBatchEdit = features.getLength() > 1 && attributes.some(a => a.allowBatchEdit);
+  const dlgTitle = isBatchEdit ? `Batch edit ${title}.<br>(${features.getLength()} objekt)` : title;
 
-  /**Filtered list of attributes containing only those that should be displayed */
-  const editableAttributes = attributes.filter(attr => !isBatchEdit || isBatchEdit && attr.allowBatchEdit);
+  /** Filtered list of attributes containing only those that should be displayed */
+  const editableAttributes = attributes.filter(attr => !isBatchEdit || (isBatchEdit && attr.allowBatchEdit));
 
-  if (features.getLength() > 0) {
+  if (features.getLength() === 1 || isBatchEdit) {
     dispatcher.emitChangeEdit('attribute', true);
-    //Pick first feature to extract some properties from.
+    // Pick first feature to extract some properties from.
     feature = features.item(0);
     if (editableAttributes.length > 0) {
       // Create an array of defined attributes and corresponding values from selected feature
@@ -933,25 +932,26 @@ function editAttributes(feat) {
           obj.isVisible = true;
           obj.elId = `input-${obj.name}`;
         }
-        if (isBatchEdit) {
-          //Create an additional ckeckbox, that controls if this attribute should be changed
+        if (isBatchEdit && !('constraint' in obj)) {
+          // Create an additional ckeckbox, that controls if this attribute should be changed
+          // Attributes with constraints don't have their own checkbox. They are forced to change value if the dependee is checked
+          // if it is configured as allowBatchEdit as well. If not, it won't change and you probaby broke some business rule.
           const batchObj = {};
           batchObj.isVisible = true;
           batchObj.title = `Ändra ${obj.title}`;
           batchObj.elId = `${obj.elId}-batch`;
           batchObj.type = 'checkbox';
           batchObj.relatedAttrId = obj.elId;
-          //Hide the attribute that this checkbox is connected to so it won't be changed unless user checks the box first.
+          // Hide the attribute that this checkbox is connected to so it won't be changed unless user checks the box first.
           obj.isVisible = false;
-          //Inject the checkbox next to the attribute
+          // Inject the checkbox next to the attribute
           obj.formElement = editForm(batchObj) + editForm(obj);
 
-          //Defer adding click handler until element exists in DOM
+          // Defer adding click handler until element exists in DOM
           batchObj.addListener = addBatchEditListener();
 
           batchEditBoxes.push(batchObj);
-        }
-        else {
+        } else {
           obj.formElement = editForm(obj);
         }
         return obj;
@@ -974,7 +974,7 @@ function editAttributes(feat) {
       }
     });
 
-    //Add the deferred click handlers
+    // Add the deferred click handlers
     batchEditBoxes.forEach((obj) => {
       if ('addListener' in obj) {
         obj.addListener(obj);
