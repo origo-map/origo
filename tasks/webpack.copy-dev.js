@@ -24,5 +24,8 @@ module.exports = merge(common, {
         'img/**'
       ]
     })
-  ]
+  ],
+  node: {
+    fs: 'empty'
+  }
 });
