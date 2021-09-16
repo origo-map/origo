@@ -906,16 +906,16 @@ const Measure = function Measure({
         el = dom.html(htmlString);
         document.getElementById(measureElement.getId()).appendChild(el);
       }
+      if (toggleSnapButton) {
+        htmlString = toggleSnapButton.render();
+        el = dom.html(htmlString);
+        document.getElementById(measureElement.getId()).appendChild(el);
+      }
       if (lengthTool || areaTool) {
         htmlString = undoButton.render();
         el = dom.html(htmlString);
         document.getElementById(measureElement.getId()).appendChild(el);
         htmlString = clearButton.render();
-        el = dom.html(htmlString);
-        document.getElementById(measureElement.getId()).appendChild(el);
-      }
-      if (toggleSnapButton) {
-        htmlString = toggleSnapButton.render();
         el = dom.html(htmlString);
         document.getElementById(measureElement.getId()).appendChild(el);
       }
