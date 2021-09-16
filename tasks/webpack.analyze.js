@@ -7,9 +7,12 @@ module.exports = merge(prod, {
   performance: { hints: 'warning' },
   plugins: [
     new CompressionPlugin({
-      asset: '[path].gz[query]',
+      filename: '[path].gz[query]',
       algorithm: 'gzip'
     }),
     new BundleAnalyzerPlugin()
-  ]
+  ],
+  node: {
+    fs: 'empty'
+  }
 });
