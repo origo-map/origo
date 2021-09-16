@@ -290,9 +290,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
         let secure;
         let layername = layer.name;
         // remove workspace if syntax is workspace:layername
-        if (layername.includes(':')) {
-          layername = layername.split(':').pop();
-        }
+        layername = layername.split(':').pop();
         // remove double underscore plus a suffix from layer name
         if (layername.includes('__')) {
           layername = layername.substring(0, layername.lastIndexOf('__'));
