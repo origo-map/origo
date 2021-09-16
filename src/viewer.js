@@ -4,6 +4,7 @@ import geom from 'ol/geom/Geometry';
 import { Component } from './ui';
 import Map from './map';
 import proj from './projection';
+import getCapabilities from './getCapabilities';
 import MapSize from './utils/mapsize';
 import Featureinfo from './featureinfo';
 import Selectionmanager from './selectionmanager';
@@ -60,6 +61,24 @@ const Viewer = function Viewer(targetOption, options = {}) {
   const center = urlParams.center || centerOption;
   const zoom = urlParams.zoom || zoomOption;
   const groups = flattenGroups(groupOptions);
+
+  const getCapabilitiesLayers = () => {
+    const capabilitiesPromises = [];
+    (Object.keys(source)).forEach(sourceName => {
+      const sourceOptions = source[sourceName];
+      if (sourceOptions && sourceOptions.capabilitiesURL) {
+        capabilitiesPromises.push(getCapabilities(sourceName, sourceOptions.capabilitiesURL));
+      }
+    });
+    return Promise.all(capabilitiesPromises).then(capabilitiesResults => {
+      const layers = {};
+      capabilitiesResults.forEach(result => {
+        layers[result.name] = result.capabilites;
+      });
+      return layers;
+    }).catch(error => console.log(error));
+  };
+
   const defaultTileGridOptions = {
     alignBottomLeft: true,
     extent,
@@ -221,6 +240,13 @@ const Viewer = function Viewer(targetOption, options = {}) {
     throw new Error(`There is no source with name: ${name}`);
   };
 
+  const getSource2 = function getSource2(name) {
+    if (name in source) {
+      return source[name];
+    }
+    return undefined;
+  };
+
   const getGroups = () => groups;
 
   const getProjectionCode = () => projectionCode;
@@ -258,23 +284,52 @@ const Viewer = function Viewer(targetOption, options = {}) {
     return isEmbedded(this.getTarget());
   };
 
-  const mergeSavedLayerProps = (initialLayerProps, savedLayerProps) => {
-    if (savedLayerProps) {
-      const mergedLayerProps = initialLayerProps.reduce((acc, initialProps) => {
-        const layerName = initialProps.name.split(':').pop();
-        const savedProps = savedLayerProps[layerName] || {
-          visible: false,
-          legend: false
-        };
-        savedProps.name = initialProps.name;
-        const mergedProps = Object.assign({}, initialProps, savedProps);
-        acc.push(mergedProps);
-        return acc;
-      }, []);
-      return mergedLayerProps;
+  const mergeSecuredLayer = (layerlist, capabilitiesLayers) => {
+    if (capabilitiesLayers && Object.keys(capabilitiesLayers).length > 0) {
+      return layerlist.map(layer => {
+        let secure;
+        // remove double underscore plus a suffix from layer name
+        let layername = '';
+        if (layer.name.includes('__')) {
+          layername = layer.name.substring(0, layer.name.lastIndexOf('__'));
+        } else {
+          layername = layer.name;
+        }
+        const layerSourceOptions = layer.source ? getSource2(layer.source) : undefined;
+        if (layerSourceOptions && layerSourceOptions.capabilitiesURL) {
+          if (capabilitiesLayers[layer.source].indexOf(layername) >= 0) {
+            secure = false;
+          } else {
+            secure = true;
+          }
+        } else {
+          secure = false;
+        }
+        return { ...layer, secure };
+      });
     }
-    return initialLayerProps;
+    return layerlist;
   };
+
+  const mergeSavedLayerProps = (initialLayerProps, savedLayerProps) => getCapabilitiesLayers()
+    .then(capabilitiesLayers => {
+      let mergedLayerProps;
+      if (savedLayerProps) {
+        mergedLayerProps = initialLayerProps.reduce((acc, initialProps) => {
+          const layerName = initialProps.name.split(':').pop();
+          const savedProps = savedLayerProps[layerName] || {
+            visible: false,
+            legend: false
+          };
+          savedProps.name = initialProps.name;
+          const mergedProps = Object.assign({}, initialProps, savedProps);
+          acc.push(mergedProps);
+          return acc;
+        }, []);
+        return mergeSecuredLayer(mergedLayerProps, capabilitiesLayers);
+      }
+      return mergeSecuredLayer(initialLayerProps, capabilitiesLayers);
+    });
 
   const removeOverlays = function removeOverlays(overlays) {
     if (overlays) {
@@ -403,81 +458,83 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
       setMap(Map(Object.assign(options, { projection, center, zoom, target: this.getId() })));
 
-      const layerProps = mergeSavedLayerProps(layerOptions, urlParams.layers);
-      this.addLayers(layerProps);
+      mergeSavedLayerProps(layerOptions, urlParams.layers)
+        .then(layerProps => {
+          this.addLayers(layerProps);
 
-      mapSize = MapSize(map, {
-        breakPoints,
-        breakPointsPrefix,
-        mapId: this.getId()
-      });
+          mapSize = MapSize(map, {
+            breakPoints,
+            breakPointsPrefix,
+            mapId: this.getId()
+          });
 
-      if (urlParams.feature) {
-        let featureId = urlParams.feature;
-        const layerName = featureId.split('.')[0];
-        const layer = getLayer(layerName);
-        const type = layer.get('type');
+          if (urlParams.feature) {
+            let featureId = urlParams.feature;
+            const layerName = featureId.split('.')[0];
+            const layer = getLayer(layerName);
+            const type = layer.get('type');
 
-        if (layer && type !== 'GROUP') {
-          const clusterSource = layer.getSource().source;
-          const id = featureId.split('.')[1];
-          layer.once('postrender', () => {
-            let feature;
+            if (layer && type !== 'GROUP') {
+              const clusterSource = layer.getSource().source;
+              const id = featureId.split('.')[1];
+              layer.once('postrender', () => {
+                let feature;
 
-            if (type === 'WFS' && clusterSource) {
-              feature = clusterSource.getFeatureById(featureId);
-            } else if (type === 'WFS') {
-              if (featureId.includes('__')) {
-                featureId = featureId.replace(featureId.substring(featureId.lastIndexOf('__'), featureId.lastIndexOf('.')), '');
-              }
-              feature = layer.getSource().getFeatureById(featureId);
-            } else if (clusterSource) {
-              feature = clusterSource.getFeatureById(id);
-            } else {
-              feature = layer.getSource().getFeatureById(id);
-            }
+                if (type === 'WFS' && clusterSource) {
+                  feature = clusterSource.getFeatureById(featureId);
+                } else if (type === 'WFS') {
+                  if (featureId.includes('__')) {
+                    featureId = featureId.replace(featureId.substring(featureId.lastIndexOf('__'), featureId.lastIndexOf('.')), '');
+                  }
+                  feature = layer.getSource().getFeatureById(featureId);
+                } else if (clusterSource) {
+                  feature = clusterSource.getFeatureById(id);
+                } else {
+                  feature = layer.getSource().getFeatureById(id);
+                }
 
-            if (feature) {
-              const obj = {};
-              obj.feature = feature;
-              obj.title = layer.get('title');
-              obj.content = getAttributes(feature, layer);
-              obj.layer = layer;
-              const centerGeometry = getcenter(feature.getGeometry());
-              const infowindowType = featureinfoOptions.showOverlay === false ? 'sidebar' : 'overlay';
-              featureinfo.render([obj], infowindowType, centerGeometry);
-              map.getView().fit(feature.getGeometry(), {
-                maxZoom: getResolutions().length - 2,
-                padding: [15, 15, 40, 15],
-                duration: 1000
+                if (feature) {
+                  const obj = {};
+                  obj.feature = feature;
+                  obj.title = layer.get('title');
+                  obj.content = getAttributes(feature, layer);
+                  obj.layer = layer;
+                  const centerGeometry = getcenter(feature.getGeometry());
+                  const infowindowType = featureinfoOptions.showOverlay === false ? 'sidebar' : 'overlay';
+                  featureinfo.render([obj], infowindowType, centerGeometry);
+                  map.getView().fit(feature.getGeometry(), {
+                    maxZoom: getResolutions().length - 2,
+                    padding: [15, 15, 40, 15],
+                    duration: 1000
+                  });
+                }
               });
             }
-          });
-        }
-      }
+          }
 
-      if (urlParams.pin) {
-        featureinfoOptions.savedPin = urlParams.pin;
-      } else if (urlParams.selection) {
-        // This needs further development for proper handling in permalink
-        featureinfoOptions.savedSelection = new Feature({
-          geometry: new geom[urlParams.selection.geometryType](urlParams.selection.coordinates)
+          if (urlParams.pin) {
+            featureinfoOptions.savedPin = urlParams.pin;
+          } else if (urlParams.selection) {
+            // This needs further development for proper handling in permalink
+            featureinfoOptions.savedSelection = new Feature({
+              geometry: new geom[urlParams.selection.geometryType](urlParams.selection.coordinates)
+            });
+          }
+
+          if (!urlParams.zoom && !urlParams.mapStateId && startExtent) {
+            map.getView().fit(startExtent, { size: map.getSize() });
+          }
+
+          featureinfoOptions.viewer = this;
+
+          selectionmanager = Selectionmanager(featureinfoOptions);
+          this.addComponent(selectionmanager);
+
+          featureinfo = Featureinfo(featureinfoOptions);
+          this.addComponent(featureinfo);
+
+          this.addControls();
         });
-      }
-
-      if (!urlParams.zoom && !urlParams.mapStateId && startExtent) {
-        map.getView().fit(startExtent, { size: map.getSize() });
-      }
-
-      featureinfoOptions.viewer = this;
-
-      selectionmanager = Selectionmanager(featureinfoOptions);
-      this.addComponent(selectionmanager);
-
-      featureinfo = Featureinfo(featureinfoOptions);
-      this.addComponent(featureinfo);
-
-      this.addControls();
     },
     render() {
       const htmlString = `<div id="${this.getId()}" class="${cls}">
