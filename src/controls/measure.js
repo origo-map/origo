@@ -870,8 +870,8 @@ const Measure = function Measure({
             click() {
               toggleSnap();
             },
-            icon: '#ic_linear_scale_24px',
-            tooltipText: 'Sätt på/stäng av snap',
+            icon: '#fa-magnet',
+            tooltipText: 'Snappning',
             tooltipPlacement: 'east'
           });
           buttons.push(toggleSnapButton);
