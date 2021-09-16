@@ -288,12 +288,14 @@ const Viewer = function Viewer(targetOption, options = {}) {
     if (capabilitiesLayers && Object.keys(capabilitiesLayers).length > 0) {
       return layerlist.map(layer => {
         let secure;
+        let layername = layer.name;
+        // remove workspace if syntax is workspace:layername
+        if (layername.includes(':')) {
+          layername = layername.split(':').pop();
+        }
         // remove double underscore plus a suffix from layer name
-        let layername = '';
-        if (layer.name.includes('__')) {
-          layername = layer.name.substring(0, layer.name.lastIndexOf('__'));
-        } else {
-          layername = layer.name;
+        if (layername.includes('__')) {
+          layername = layername.substring(0, layername.lastIndexOf('__'));
         }
         const layerSourceOptions = layer.source ? getSource2(layer.source) : undefined;
         if (layerSourceOptions && layerSourceOptions.capabilitiesURL) {
