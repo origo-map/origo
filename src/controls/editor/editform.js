@@ -32,7 +32,7 @@ const createForm = function createForm(obj) {
       break;
     case 'checkbox':
       checked = val ? ' checked' : '';
-      el = `<div class="o-form-checkbox ${cls}"><label>${label}</label><input type="checkbox" id="${id}" value="${val}"${checked}${disabled}></div>`;
+      el = `<div class="o-form-checkbox ${cls}"><label for="${id}">${label}</label><input type="checkbox" id="${id}" value="${val}"${checked}${disabled}></div>`;
       break;
     case 'dropdown':
       if (val) {
