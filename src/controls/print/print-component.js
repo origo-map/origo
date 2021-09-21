@@ -1,6 +1,9 @@
 import olAttribution from 'ol/control/Attribution';
 import olScaleLine from 'ol/control/ScaleLine';
 import { getPointResolution } from 'ol/proj';
+import TileImage from 'ol/source/TileImage';
+import TileWMSSource from 'ol/source/TileWMS';
+import TileGrid from 'ol/tilegrid/TileGrid';
 import {
   Button, Component, cuid, dom
 } from '../../ui';
@@ -41,7 +44,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     rotationStep,
     leftFooterText,
     mapInteractionsActive,
-    supressResolutionsRecalculation
+    recalculateResolutions
   } = options;
 
   let {
@@ -73,26 +76,92 @@ const PrintComponent = function PrintComponent(options = {}) {
   let widthImage = 0;
   let heightImage = 0;
   const originalResolutions = viewer.getResolutions().map(item => item);
+  const originalGrids = new Map();
 
   if (!Array.isArray(scales) || scales.length === 0) {
     scales = originalResolutions.map(currRes => maputils.resolutionToFormattedScale(currRes, viewer.getProjection()));
   }
 
-  /** Recalculate the array of allowed zoomlevels to reflect changes in DPI */
-  const recalculateResolutions = function recalculateResolutions() {
-    if (!supressResolutionsRecalculation) {
-      const viewerResolutions = viewer.getResolutions();
-      viewerResolutions.forEach((currRes, ix) => {
-        // Do the calculation the same way as when setting the scale. Otherwise there will be rounding errors and the scale bar will have another scale than selected
-        // (and probably not an even nice looking number)
-        const scale = maputils.resolutionToScale(originalResolutions[ix], viewer.getProjection()) / 1000;
-        const scaleResolution = scale / getPointResolution(viewer.getProjection(), resolution / 25.4, map.getView().getCenter());
-        viewerResolutions[ix] = scaleResolution;
-      });
-      // As we do a "dirty" update of resolutions we have to trigger a re-read of the limits, otherwise the outer limits still apply.
-      map.getView().setMinZoom(0);
-      map.getView().setMaxZoom(viewerResolutions.length - 1);
+  /**
+   * Recalulates a resoultions array to reflect dpi changes
+   * @param {number []} src the array of resolutions
+   * @returns {number []} A new array with recalculated values
+   */
+  const recalculateResolutionsArray = function recalculateResolutionsArray(src) {
+    const retval = [];
+    for (let ix = 0; ix < src.length; ix += 1) {
+      // Do the calculation the same way as when setting the scale. Otherwise there will be rounding errors and the scale bar will have another scale than selected
+      // (and probably not an even nice looking number)
+      const scale = maputils.resolutionToScale(src[ix], viewer.getProjection()) / 1000;
+      const scaleResolution = scale / getPointResolution(viewer.getProjection(), resolution / 25.4, map.getView().getCenter());
+      retval.push(scaleResolution);
     }
+    return retval;
+  };
+
+  /** Recalculate the grid of tiled layers when resolution has changed as more tiles may be needed to cover the extent */
+  const updateTileGrids = function updateTileGrids() {
+    const layers = map.getLayers();
+    for (let i = 0; i < layers.getLength(); i += 1) {
+      const currLayer = layers.item(i);
+      if (currLayer.getSource() instanceof TileImage) {
+        const grid = currLayer.getSource().getTileGrid();
+        let needNewGrid = false;
+        // Store original grid if we don't have it already
+        // Don't always copy as it is only the first time it is original grid
+        if (!originalGrids.has(currLayer)) {
+          originalGrids.set(currLayer, grid);
+        }
+
+        // Deep copy grid so we can exchange it without messing with anything else
+        const newgridOptions = {};
+        // If layer uses the grid from the viewer, it is a shared instance and has been changed when resolutions were recalculated
+        // as the grid uses a pointer to resolutions
+        if (grid === viewer.getTileGrid()) {
+          // No need for deep copy yet
+          newgridOptions.resolutions = originalResolutions;
+          needNewGrid = true;
+        } else {
+          // No need for deep copy yet
+          newgridOptions.resolutions = originalGrids.get(currLayer).getResolutions();
+        }
+
+        // TileWms is actually not a tile service. So we can create a new dynamic grid to create crisp tiles matching the new
+        // resolutions, it will just cost a few cache misses on the server. All other tile sources are tiled, so we can't assume that there exist tiles for a "random" resolution
+        // so the new grid is actually the same as before, but it may have been reverted to the resolutions it had before map resolutions was recalculated
+        // An alternative (better) solution would have been to deep copy resolutions when making the grid in viewer, but that might upset someone else.
+        // In theory we could have added a flag to which layers should be recalculated. Someone might have multiple grids to support different resolutions.
+        if (currLayer.getSource() instanceof TileWMSSource) {
+          // This is actually a deep copy
+          newgridOptions.resolutions = recalculateResolutionsArray(newgridOptions.resolutions);
+          needNewGrid = true;
+        }
+        // Would be silly to create a deep clone if it is exactly the same.
+        if (needNewGrid) {
+          newgridOptions.extent = grid.getExtent();
+          newgridOptions.minZoom = grid.getMinZoom();
+          newgridOptions.origin = grid.getOrigin();
+          newgridOptions.tileSize = grid.getTileSize();
+          const newGrid = new TileGrid(newgridOptions);
+          // Set our brand new grid on current layer
+          currLayer.getSource().tileGrid = newGrid;
+        }
+      }
+    }
+  };
+
+  /** Recalculate the array of allowed zoomlevels to reflect changes in DPI and updates the view */
+  const updateResolutions = function updateResolutions() {
+    const viewerResolutions = viewer.getResolutions();
+    const newResolutions = recalculateResolutionsArray(originalResolutions);
+    for (let ix = 0; ix < viewerResolutions.length; ix += 1) {
+      viewerResolutions[ix] = newResolutions[ix];
+    }
+    // As we do a "dirty" update of resolutions we have to trigger a re-read of the limits, otherwise the outer limits still apply.
+    map.getView().setMinZoom(0);
+    map.getView().setMaxZoom(viewerResolutions.length - 1);
+    // Have to recalculate tiles extents as well.
+    updateTileGrids();
   };
 
   const setCustomSize = function setCustomSize(sizeObj) {
@@ -272,7 +341,9 @@ const PrintComponent = function PrintComponent(options = {}) {
     },
     changeResolution(evt) {
       resolution = evt.resolution;
-      recalculateResolutions();
+      if (recalculateResolutions) {
+        updateResolutions();
+      }
 
       this.updatePageSize();
       if (printScale > 0) {
@@ -305,14 +376,21 @@ const PrintComponent = function PrintComponent(options = {}) {
     },
     close() {
       // Restore scales
-      if (!supressResolutionsRecalculation) {
+      if (recalculateResolutions) {
         const viewerResolutions = viewer.getResolutions();
-        viewerResolutions.forEach((currRes, ix) => {
+        for (let ix = 0; ix < viewerResolutions.length; ix += 1) {
           viewerResolutions[ix] = originalResolutions[ix];
+        }
+        originalGrids.forEach((value, key) => {
+          // Sorry, but there is no setter and a map does not allow indexing.
+          // eslint-disable-next-line no-param-reassign
+          key.getSource().tileGrid = value;
         });
         // As we do a "dirty" update of resolutions we have to trigger a re-read of the limits, otherwise the outer limits still apply.
         map.getView().setMinZoom(0);
         map.getView().setMaxZoom(viewerResolutions.length - 1);
+        updateTileGrids();
+        originalGrids.clear();
       }
       printMapComponent.removePrintControls();
       if (map.getView().getRotation() !== 0) {
@@ -392,7 +470,9 @@ const PrintComponent = function PrintComponent(options = {}) {
       map.setTarget(printMapComponent.getId());
       this.removeViewerControls();
       printMapComponent.addPrintControls();
-      recalculateResolutions();
+      if (recalculateResolutions) {
+        updateResolutions();
+      }
       printMapComponent.dispatch('change:toggleScale', { showScale });
       this.updatePageSize();
     },
