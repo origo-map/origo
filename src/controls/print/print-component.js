@@ -4,6 +4,7 @@ import { getPointResolution } from 'ol/proj';
 import TileImage from 'ol/source/TileImage';
 import TileWMSSource from 'ol/source/TileWMS';
 import TileGrid from 'ol/tilegrid/TileGrid';
+import { Group } from 'ol/layer';
 import {
   Button, Component, cuid, dom
 } from '../../ui';
@@ -99,11 +100,28 @@ const PrintComponent = function PrintComponent(options = {}) {
     return retval;
   };
 
+  /**
+   * Recursively flattens group layers in an array of layers
+   * @param {any []} layers Array of layers
+   * @returns {any []} Array of layers with group layers flattened
+   */
+  const flattenLayers = function flattenLayers(layers) {
+    return layers.reduce((acc, currLayer) => {
+      if (currLayer instanceof Group) {
+        // eslint-disable-next-line no-param-reassign
+        acc = acc.concat(flattenLayers(currLayer.getLayers().getArray()));
+      } else {
+        acc.push(currLayer);
+      }
+      return acc;
+    }, []);
+  };
+
   /** Recalculate the grid of tiled layers when resolution has changed as more tiles may be needed to cover the extent */
   const updateTileGrids = function updateTileGrids() {
-    const layers = map.getLayers();
-    for (let i = 0; i < layers.getLength(); i += 1) {
-      const currLayer = layers.item(i);
+    const layers = flattenLayers(viewer.getLayers());
+    for (let i = 0; i < layers.length; i += 1) {
+      const currLayer = layers[i];
       if (currLayer.getSource() instanceof TileImage) {
         const grid = currLayer.getSource().getTileGrid();
         let needNewGrid = false;
