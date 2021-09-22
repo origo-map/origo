@@ -109,7 +109,10 @@ const Origo = function Origo(configPath, options = {}) {
           viewerOptions.extensions = initExtensions(viewerOptions.extensions || []);
           const target = viewerOptions.target;
           viewer = Viewer(target, viewerOptions);
-          this.dispatch('load', viewer);
+          let origo = this;
+          viewer.on('loaded', function(){
+            origo.dispatch('load', viewer);
+          });
         })
         .catch(error => console.error(error));
     }
