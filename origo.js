@@ -109,8 +109,8 @@ const Origo = function Origo(configPath, options = {}) {
           viewerOptions.extensions = initExtensions(viewerOptions.extensions || []);
           const target = viewerOptions.target;
           viewer = Viewer(target, viewerOptions);
-          let origo = this;
-          viewer.on('loaded', function(){
+          const origo = this;
+          viewer.on('loaded', () => {
             origo.dispatch('load', viewer);
           });
         })
