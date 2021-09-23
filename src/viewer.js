@@ -534,6 +534,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
           this.addComponent(featureinfo);
 
           this.addControls();
+          this.dispatch('loaded');
         });
     },
     render() {
