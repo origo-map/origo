@@ -38,7 +38,7 @@
     "copyfiles": "^2.4.1",
     "core-js": "^3.8.2",
     "cuid": "^2.1.4",
-    "dom-to-image-more": "^2.8.0",
+    "dom-to-image-more": "2.8.0",
     "downloadjs": "^1.4.7",
     "elm-pep": "^1.0.6",
     "html2canvas": "^1.0.0-rc.7",
