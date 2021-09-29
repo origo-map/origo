@@ -47,7 +47,7 @@ const Print = function Print(options = {}) {
     leftFooterText = '',
     filename,
     mapInteractionsActive = false,
-    recalculateResolutions = false
+    supressResolutionsRecalculation = false
   } = options;
   let {
     showNorthArrow = true
@@ -105,7 +105,7 @@ const Print = function Print(options = {}) {
         rotationStep,
         leftFooterText,
         mapInteractionsActive,
-        recalculateResolutions
+        supressResolutionsRecalculation
       });
       mapMenu = viewer.getControlByName('mapmenu');
       menuItem = mapMenu.MenuItem({

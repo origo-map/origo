@@ -45,7 +45,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     rotationStep,
     leftFooterText,
     mapInteractionsActive,
-    recalculateResolutions
+    supressResolutionsRecalculation
   } = options;
 
   let {
@@ -359,7 +359,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     },
     changeResolution(evt) {
       resolution = evt.resolution;
-      if (recalculateResolutions) {
+      if (!supressResolutionsRecalculation) {
         updateResolutions();
       }
 
@@ -394,7 +394,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     },
     close() {
       // Restore scales
-      if (recalculateResolutions) {
+      if (!supressResolutionsRecalculation) {
         const viewerResolutions = viewer.getResolutions();
         for (let ix = 0; ix < viewerResolutions.length; ix += 1) {
           viewerResolutions[ix] = originalResolutions[ix];
@@ -407,7 +407,6 @@ const PrintComponent = function PrintComponent(options = {}) {
         // As we do a "dirty" update of resolutions we have to trigger a re-read of the limits, otherwise the outer limits still apply.
         map.getView().setMinZoom(0);
         map.getView().setMaxZoom(viewerResolutions.length - 1);
-        updateTileGrids();
         originalGrids.clear();
       }
       printMapComponent.removePrintControls();
@@ -488,7 +487,7 @@ const PrintComponent = function PrintComponent(options = {}) {
       map.setTarget(printMapComponent.getId());
       this.removeViewerControls();
       printMapComponent.addPrintControls();
-      if (recalculateResolutions) {
+      if (!supressResolutionsRecalculation) {
         updateResolutions();
       }
       printMapComponent.dispatch('change:toggleScale', { showScale });
