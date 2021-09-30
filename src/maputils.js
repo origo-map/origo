@@ -3,10 +3,14 @@ import TileGrid from 'ol/tilegrid/TileGrid';
 import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
 import Vector from 'ol/source/Vector';
+import VectorLayer from 'ol/layer/Vector';
+import Overlay from 'ol/Overlay';
 import GeoJSON from 'ol/format/GeoJSON';
 import { getTopLeft, getBottomLeft } from 'ol/extent';
 import WKT from 'ol/format/WKT';
 import numberFormatter from './utils/numberformatter';
+import Style from './style';
+import Popup from './popup';
 
 const maputils = {
   isWithinVisibleScales: function isWithinVisibleScales(scale, maxScale, minScale) {
@@ -130,6 +134,62 @@ const maputils = {
       scaleValue += (10 - differens);
     }
     return scaleValue;
+  },
+  createMarker: function createMarker(coordinates, title, content, viewer) {
+    const featureStyles = {
+      stroke: {
+        color: [100, 149, 237, 1],
+        width: 4,
+        lineDash: null
+      },
+      fill: {
+        color: [100, 149, 237, 0.2]
+      },
+      circle: {
+        radius: 7,
+        stroke: {
+          color: [100, 149, 237, 1],
+          width: 2
+        },
+        fill: {
+          color: [255, 255, 255, 1]
+        }
+      }
+    };
+    const vectorStyles = Style.createStyleRule(featureStyles);
+    const layer = new VectorLayer({
+      source: new Vector({
+        features: [
+          new Feature({
+            geometry: new Point(coordinates)
+          })
+        ]
+      }),
+      style: vectorStyles
+    });
+    const popup = Popup(`#${viewer.getId()}`);
+    popup.setContent({
+      content,
+      title
+    });
+    popup.setTitle(title);
+    popup.setVisibility(true);
+    const popupEl = popup.getEl();
+    const popupHeight = document.querySelector('.o-popup').offsetHeight + 10;
+    popupEl.style.height = `${popupHeight}px`;
+    const overlay = new Overlay({
+      element: popupEl,
+      autoPan: {
+        margin: 55,
+        animation: {
+          duration: 500
+        }
+      },
+      positioning: 'bottom-center'
+    });
+    viewer.getMap().addOverlay(overlay);
+    overlay.setPosition(coordinates);
+    return layer;
   }
 };
 

@@ -440,6 +440,11 @@ const Viewer = function Viewer(targetOption, options = {}) {
     }
   };
 
+  const addMarker = function addMarker(coordinates, title, content) {
+    const layer = maputils.createMarker(coordinates, title, content, this);
+    map.addLayer(layer);
+  };
+
   const getUrlParams = function getUrlParams() {
     return urlParams;
   };
@@ -556,6 +561,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     addLayers,
     addSource,
     addStyle,
+    addMarker,
     getBreakPoints,
     getCenter,
     getClusterOptions,
