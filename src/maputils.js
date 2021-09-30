@@ -175,7 +175,6 @@ const maputils = {
     popup.setTitle(title);
     popup.setVisibility(true);
     const popupEl = popup.getEl();
-    console.log(popupEl);
     const popupHeight = document.querySelector('.o-popup').offsetHeight + 10;
     popupEl.style.height = `${popupHeight}px`;
     const overlay = new Overlay({
