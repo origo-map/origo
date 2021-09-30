@@ -7,12 +7,14 @@ export default function SetScaleControl(options = {}, map) {
     initialScale
   } = options;
 
-  let projection;
-  let resolutions;
   let selectScale;
 
-  function getScales() {
-    return resolutions.map(resolution => mapUtils.resolutionToFormattedScale(resolution, projection));
+  /**
+   * Parses a formatted scale string and returns the denominator as a number
+   * @param {any} scale
+   */
+  function parseScale(scale) {
+    return parseInt(scale.replace(/\s+/g, '').split(':').pop(), 10);
   }
 
   return Component({
@@ -26,21 +28,15 @@ export default function SetScaleControl(options = {}, map) {
         text: 'Välj skala'
       });
       this.addComponents([selectScale]);
-      projection = map.getView().getProjection();
-      resolutions = map.getView().getResolutions();
     },
     onChangeScale(evt) {
-      const scaleDenominator = parseInt(evt.replace(/\s+/g, '').split(':').pop(), 10);
+      const scaleDenominator = parseScale(evt);
       this.dispatch('change:scale', { scale: scaleDenominator / 1000 });
       selectScale.setButtonText(evt);
     },
     onRender() {
       this.dispatch('render');
-      if (Array.isArray(scales) && scales.length) {
-        selectScale.setItems(scales);
-      } else {
-        selectScale.setItems(getScales());
-      }
+      selectScale.setItems(scales);
       document.getElementById(selectScale.getId()).addEventListener('dropdown:select', (evt) => {
         this.onChangeScale(evt.target.textContent);
       });
@@ -48,8 +44,10 @@ export default function SetScaleControl(options = {}, map) {
         this.onChangeScale(initialScale);
       } else {
         const viewResolution = map.getView().getResolution();
-        const closest = resolutions.reduce((prev, curr) => (Math.abs(curr - viewResolution) < Math.abs(prev - viewResolution) ? curr : prev));
-        this.onChangeScale(mapUtils.resolutionToFormattedScale(closest, projection));
+        const projection = map.getView().getProjection();
+        const mapScale = mapUtils.resolutionToScale(viewResolution, projection);
+        const closest = scales.reduce((prev, curr) => (Math.abs(parseScale(curr) - mapScale) < Math.abs(parseScale(prev) - mapScale) ? curr : prev));
+        this.onChangeScale(closest);
       }
     },
     render() {
