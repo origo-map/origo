@@ -47,7 +47,8 @@ const Print = function Print(options = {}) {
     rotationStep = 1,
     leftFooterText = '',
     filename,
-    mapInteractionsActive = false
+    mapInteractionsActive = false,
+    supressResolutionsRecalculation = false
   } = options;
   let {
     showNorthArrow = true
@@ -107,7 +108,8 @@ const Print = function Print(options = {}) {
         rotation,
         rotationStep,
         leftFooterText,
-        mapInteractionsActive
+        mapInteractionsActive,
+        supressResolutionsRecalculation
       });
       if (placement.indexOf('screen') > -1) {
         mapTools = `${viewer.getMain().getMapTools().getId()}`;

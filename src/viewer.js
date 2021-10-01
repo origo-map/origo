@@ -288,12 +288,12 @@ const Viewer = function Viewer(targetOption, options = {}) {
     if (capabilitiesLayers && Object.keys(capabilitiesLayers).length > 0) {
       return layerlist.map(layer => {
         let secure;
+        let layername = layer.name;
+        // remove workspace if syntax is workspace:layername
+        layername = layername.split(':').pop();
         // remove double underscore plus a suffix from layer name
-        let layername = '';
-        if (layer.name.includes('__')) {
-          layername = layer.name.substring(0, layer.name.lastIndexOf('__'));
-        } else {
-          layername = layer.name;
+        if (layername.includes('__')) {
+          layername = layername.substring(0, layername.lastIndexOf('__'));
         }
         const layerSourceOptions = layer.source ? getSource2(layer.source) : undefined;
         if (layerSourceOptions && layerSourceOptions.capabilitiesURL) {
@@ -440,6 +440,11 @@ const Viewer = function Viewer(targetOption, options = {}) {
     }
   };
 
+  const addMarker = function addMarker(coordinates, title, content) {
+    const layer = maputils.createMarker(coordinates, title, content, this);
+    map.addLayer(layer);
+  };
+
   const getUrlParams = function getUrlParams() {
     return urlParams;
   };
@@ -556,6 +561,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     addLayers,
     addSource,
     addStyle,
+    addMarker,
     getBreakPoints,
     getCenter,
     getClusterOptions,
