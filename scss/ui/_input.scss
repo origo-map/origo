@@ -95,6 +95,7 @@ input[type=range] {
 
 input[type=range]:focus {
   outline: none;
+  border: 1px solid $black;
 }
 
 input[type=range]::-webkit-slider-runnable-track {
