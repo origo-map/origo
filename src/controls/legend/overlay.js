@@ -74,7 +74,8 @@ const OverlayLayer = function OverlayLayer(options) {
       width: '1.5rem'
     },
     ariaLabel: 'Lager ikon',
-    icon: headerIcon
+    icon: headerIcon,
+    tabIndex: -1
   });
 
   buttons.push(layerIcon);
@@ -105,7 +106,8 @@ const OverlayLayer = function OverlayLayer(options) {
       'padding-left': '.5rem'
     },
     icon: getCheckIcon(layer.getVisible()),
-    ariaLabel: 'Växla lagersynlighet'
+    ariaLabel: 'Växla lagersynlighet',
+    tabIndex: -1
   });
 
   buttons.push(toggleButton);
@@ -121,7 +123,8 @@ const OverlayLayer = function OverlayLayer(options) {
         'align-self': 'center',
         'padding-left': '.5rem'
       },
-      icon: '#ic_remove_circle_outline_24px'
+      icon: '#ic_remove_circle_outline_24px',
+      tabIndex: -1
     });
     buttons.push(removeButton);
     ButtonsHtml = `${layerIcon.render()}${label.render()}${removeButton.render()}${toggleButton.render()}`;

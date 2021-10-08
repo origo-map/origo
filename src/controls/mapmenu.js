@@ -18,10 +18,22 @@ const Mapmenu = function Mapmenu({
   let mapMenuEl;
   let menuButtonEl;
 
+  // Set tabindex for all buttons to include or exclude in taborder depending on if expanded or not
+  const setTabIndex = function setTabIndex() {
+    let idx = -1;
+    if (isExpanded) {
+      idx = 0;
+    }
+    for (let i = 0; i < mapMenuEl.getElementsByTagName('button').length; i += 1) {
+      mapMenuEl.getElementsByTagName('button')[i].tabIndex = idx;
+    }
+  };
+
   const toggle = function toggle() {
     mapMenuEl.classList.toggle('faded');
     menuButtonEl.classList.toggle('faded');
     isExpanded = !isExpanded;
+    setTabIndex();
   };
 
   const close = function close() {
@@ -46,11 +58,16 @@ const Mapmenu = function Mapmenu({
     click,
     title = ''
   } = {}) {
+    let idx = -1;
+    if (isExpanded) {
+      idx = 0;
+    }
     const button = Button({
       cls: 'icon-smaller compact no-grow',
       click,
       icon,
-      title
+      title,
+      tabIndex: idx
     });
     const titleCmp = El({ cls: 'grow padding-left', innerHTML: title });
     return Component({
@@ -131,6 +148,7 @@ const Mapmenu = function Mapmenu({
       const el = dom.html(menuButton.render());
       target.appendChild(el);
       menuButtonEl = document.getElementById(menuButton.getId());
+      setTabIndex();
       this.dispatch('render');
     }
   });
