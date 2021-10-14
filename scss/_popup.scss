@@ -66,6 +66,11 @@
     width: 200px;
   }
 }
+.o-popup-page {
+  #o-popup, .o-popup {
+    width: auto;
+  }
+}
 
 .o-popup .o-card-content {
   max-height: calc(70vh - 46px) !important;

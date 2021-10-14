@@ -317,6 +317,12 @@ const Featureinfo = function Featureinfo(options = {}) {
           },
           positioning: 'bottom-center'
         });
+        const contentEl = contentDiv.getElementsByClassName('o-identify-page');
+        if (contentEl.length > 0) {
+          const iframeEl = contentDiv.getElementsByTagName('iframe');
+          popupEl.classList.add('o-popup-page');
+          contentEl[0].style = iframeEl[0].style.cssText;
+        }
         map.addOverlay(overlay);
         overlay.setPosition(coord);
         break;

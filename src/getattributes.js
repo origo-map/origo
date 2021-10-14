@@ -150,6 +150,12 @@ const getContent = {
     }
     newElement.innerHTML = val;
     return newElement;
+  },
+  page(feature, attribute) {
+    const newElement = document.createElement('iframe');
+    newElement.src = feature.get(attribute.page);
+    newElement.style = `width: ${attribute.pageWidth}; height: ${attribute.pageHeight};`;
+    return newElement;
   }
 };
 
@@ -199,6 +205,12 @@ function getAttributes(feature, layer, map) {
             val = getContent.img(feature, attribute, attributes, map);
           } else if (attribute.html) {
             val = getContent.html(feature, attribute, attributes, map);
+          } else if (attribute.page) {
+            val = getContent.page(feature, attribute);
+            featureinfoElement.appendChild(val);
+            featureinfoElement.classList.remove('o-identify-content');
+            featureinfoElement.classList.add('o-identify-page');
+            val = '';
           } else if (attribute.carousel) {
             val = getContent.carousel(feature, attribute, attributes, map);
             ulList.classList.add('o-carousel-list');
