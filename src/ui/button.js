@@ -21,7 +21,8 @@ export default function Button(options = {}) {
     title = '',
     tooltipPlacement = 'east',
     validStates = ['initial', 'active', 'disabled', 'inactive', 'loading', 'tracking'],
-    ariaLabel = tooltipText || title || ''
+    ariaLabel = tooltipText || title || '',
+    tabIndex = 0
   } = options;
 
   let buttonEl;
@@ -119,7 +120,7 @@ export default function Button(options = {}) {
       }
     },
     render: function render() {
-      return `<button id="${this.getId()}" class="${cls} o-tooltip" style="${style}" aria-label="${ariaLabel}">
+      return `<button id="${this.getId()}" class="${cls} o-tooltip" style="${style}" aria-label="${ariaLabel}" tabindex="${tabIndex}">
                 ${getInnerHTML()}
                 ${getTooltip()}
               </button>`;
