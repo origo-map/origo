@@ -444,7 +444,6 @@ const Measure = function Measure({
       if (showSegmentLabelButtonActive) {
         document.getElementById(showSegmentLabelButton.getId()).classList.add('active');
       }
-      renderMarker();
     }
     setActive(true);
   }
