@@ -19,6 +19,7 @@ import searchList from './addons/searchList/searchList';
 import validate from '../../utils/validate';
 import slugify from '../../utils/slugify';
 import topology from '../../utils/topology';
+import attachmentsform from './attachmentsform';
 
 const editsStore = store();
 let editLayers = {};
@@ -136,6 +137,16 @@ function saveFeatures() {
       const ids = edits[layerName][editType];
       const features = getFeaturesByIds(editType, layer, ids);
       if (features.length) {
+        // Remove attributes added by attachments before saving.
+        const attachmentsConfig = layer.get('attachments');
+        if (attachmentsConfig && attachmentsConfig.groups) {
+          features.forEach(feat => {
+            attachmentsConfig.groups.forEach(g => {
+              feat.unset(g.linkAttribute);
+              feat.unset(g.fileNameAttribute);
+            });
+          });
+        }
         transaction[editType] = features;
       }
     });
@@ -879,6 +890,7 @@ function editAttributes(feat) {
   const batchEditBoxes = [];
   /** OL Collection */
   let features;
+  const layer = viewer.getLayer(currentLayer);
 
   // Get attributes from the created, or the selected, feature and fill DOM elements with the values
   if (feat) {
@@ -892,7 +904,13 @@ function editAttributes(feat) {
   const dlgTitle = isBatchEdit ? `Batch edit ${title}.<br>(${features.getLength()} objekt)` : title;
 
   /** Filtered list of attributes containing only those that should be displayed */
-  const editableAttributes = attributes.filter(attr => !isBatchEdit || (isBatchEdit && attr.allowBatchEdit));
+  const editableAttributes = attributes.filter(attr => {
+    const attachmentsConfig = layer.get('attachments');
+    // Filter out attributes created from attachments. Actually can produce false positives if name is not set, but that is handled in the next row
+    // as name is required for editable attributes (although not specified in the docs, but needed to create the input)
+    const isAttachment = attachmentsConfig && attachmentsConfig.groups.some(g => g.linkAttribute === attr.name || g.fileNameAttribute === attr.name);
+    return attr.name && (!isBatchEdit || (isBatchEdit && attr.allowBatchEdit)) && !isAttachment;
+  });
 
   if (features.getLength() === 1 || isBatchEdit) {
     dispatcher.emitChangeEdit('attribute', true);
@@ -959,7 +977,12 @@ function editAttributes(feat) {
     }
 
     const formElement = attributeObjects.reduce((prev, next) => prev + next.formElement, '');
-    const form = `<div id="o-form">${formElement}<br><div class="o-form-save"><input id="o-save-button" type="button" value="Ok"></input></div></div>`;
+
+    let attachmentsForm = '';
+    if (layer.get('attachments') && !isBatchEdit) {
+      attachmentsForm = '<div id="o-attach-form"></div>';
+    }
+    const form = `<div id="o-form">${formElement}${attachmentsForm}<br><div class="o-form-save"><input id="o-save-button" type="button" value="Ok"></input></div></div>`;
 
     modal = Modal({
       title: dlgTitle,
@@ -967,6 +990,18 @@ function editAttributes(feat) {
       static: true,
       target: viewer.getId()
     });
+
+    // This injects the entire attachment handling which is performed independently from save, so fire and forget it sets up
+    // its own callbacks and what not.
+    // Lucky for us when the form is saved, that handler only looks for attributes in the attributesObjects array, so we don't
+    // have to bother filter out attachment inputs.
+    if (attachmentsForm) {
+      if (editsStore.hasFeature('insert', feature, currentLayer)) {
+        document.getElementById('o-attach-form').innerHTML = '<h3>Bilagor</h3><p>Du måste spara innan du kan lägga till bilagor.</p>';
+      } else {
+        attachmentsform(layer, feature, 'o-attach-form').then(res => { console.log(res); });
+      }
+    }
 
     attributeObjects.forEach((obj) => {
       if ('addListener' in obj) {
