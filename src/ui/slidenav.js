@@ -138,7 +138,7 @@ export default function Slidenav(options = {}) {
         click: () => {
           this.slideToMain();
         },
-        tabIndex: -1
+        tabIndex: -99
       });
       header = Component({
         onRender() {
