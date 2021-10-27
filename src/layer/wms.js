@@ -31,7 +31,8 @@ function createImageSource(options) {
     params: {
       LAYERS: options.id,
       VERSION: options.version,
-      FORMAT: options.format
+      FORMAT: options.format,
+      STYLES: options.style
     }
   }));
 }
