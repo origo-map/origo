@@ -68,7 +68,8 @@ const attachmentclient = function attachmentclient(layer) {
    * @returns A promise when resolved yields an array of attachments infos
    */
   const getAttachments = function getAttachments(feature) {
-    const relativeUrl = `${layerId}/${getId(feature)}/attachments`;
+    // Parameter f to get repsonse in json from AGS. Origo format ignores parameter
+    const relativeUrl = `${layerId}/${getId(feature)}/attachments?f=json`;
     const url = new URL(relativeUrl, urlbase);
 
     // Do the actual call to server
@@ -99,9 +100,6 @@ const attachmentclient = function attachmentclient(layer) {
         }
         return allAttachments;
       });
-      // .catch(err => {
-      //  console.log(err);
-      // });
     // No error handling. Let caller deal with that
     return retval;
   };
@@ -169,9 +167,6 @@ const attachmentclient = function attachmentclient(layer) {
     })
       .then(res => res.json())
       .then(res => res.addAttachmentResult.objectId);
-    // .catch(err => {
-    //  console.log(err);
-    // });
     // No error handling. Let caller deal with that.
     return retval;
   };
@@ -195,10 +190,7 @@ const attachmentclient = function attachmentclient(layer) {
       })
     })
       .then(res => res.json());
-    // .catch(err => {
-    //  console.log(err);
-    // });
-    // No error handling
+    // No error handling let caller deal with that
   };
 
   // Return all operations on the repository

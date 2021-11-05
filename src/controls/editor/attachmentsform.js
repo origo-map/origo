@@ -73,25 +73,26 @@ const attachmentsform = function attachmentsform(layer, feature, containerId) {
         links.forEach(link => {
           const deleteButtonElm = document.getElementById(`o-attachid-${link.id}`);
           deleteButtonElm.addEventListener('click', () => {
-            // TODO:: Add confirm
-            ac.deleteAttachment(feature, link.id)
-              .then(() => {
-                // Kinda looks like it is recursive, but it's not. It just schedules a promise to re-read attachements
-                attachmentsform(layer, feature, containerId);
-              })
-              .catch(err => {
-                const errorMessage = `<p>Misslyckades med att ta bort: ${err}</p>`;
-                document.getElementById(containerId).innerHTML = errorMessage;
-              });
+            if (window.confirm(`Är du säker att du vill ta bort filen ${link.filename}`)) {
+              ac.deleteAttachment(feature, link.id)
+                .then(() => {
+                  // Kinda looks like it is recursive, but it's not. It just schedules a promise to re-read attachements
+                  attachmentsform(layer, feature, containerId);
+                })
+                .catch(err => {
+                  const errorMessage = `<p>Misslyckades med att ta bort: ${err}</p>`;
+                  document.getElementById(containerId).innerHTML = errorMessage;
+                });
+            }
           });
         });
       }
     });
-  });
-  // .catch(err => {
-  //  const errorMessage = `<p>Misslyckades med att hämta attachments: ${err}</p>`;
-  //  document.getElementById(containerId).innerHTML = errorMessage;
-  // });
+  })
+    .catch(err => {
+      const errorMessage = `<p>Misslyckades med att hämta attachments: ${err}</p>`;
+      document.getElementById(containerId).innerHTML = errorMessage;
+    });
 };
 
 export default attachmentsform;
