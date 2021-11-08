@@ -247,36 +247,36 @@ const Legend = function Legend(options = {}) {
       const layersArr = viewer.getLayers();
       const hitArr = [];
       layersArr.forEach((layer) => {
-        let found = false;
-        // eslint-disable-next-line no-underscore-dangle
-        const label = layer.values_.name;
-        let value = label;
-        if (label.toLowerCase().search(obj.value.toLowerCase()) !== -1 && searchLayersParameters.includes('name')) {
-          found = true;
-        }
-        // eslint-disable-next-line no-underscore-dangle
-        if ('title' in layer.values_ && searchLayersParameters.includes('title')) {
-          // eslint-disable-next-line no-underscore-dangle
-          value = layer.values_.title;
-          if (value.toLowerCase().search(obj.value.toLowerCase()) !== -1) {
+        if (layer.get('group') !== 'none') {
+          let found = false;
+          const label = layer.get('name');
+          let value = label;
+          if (label.toLowerCase().search(obj.value.toLowerCase()) !== -1 && searchLayersParameters.includes('name')) {
             found = true;
           }
-        }
-        // eslint-disable-next-line no-underscore-dangle
-        if ('abstract' in layer.values_ && searchLayersParameters.includes('abstract') && !found) {
-          // eslint-disable-next-line no-underscore-dangle
-          value = layer.values_.abstract;
-          if (value.toLowerCase().search(obj.value.toLowerCase()) !== -1) {
-            found = true;
+          if (typeof layer.get('title') !== 'undefined' && searchLayersParameters.includes('title')) {
+            value = layer.get('title');
+            if (value.toLowerCase().search(obj.value.toLowerCase()) !== -1) {
+              found = true;
+            }
           }
-          // eslint-disable-next-line no-underscore-dangle
-          value = `${layer.values_.title} (${shorten(value, obj.value)})`;
-        }
-        if (found) {
-          const dataItem = {};
-          dataItem.label = label;
-          dataItem.value = value;
-          hitArr.push(dataItem);
+          if (typeof layer.get('abstract') !== 'undefined' && searchLayersParameters.includes('abstract') && !found) {
+            value = layer.get('abstract');
+            if (value.toLowerCase().search(obj.value.toLowerCase()) !== -1) {
+              found = true;
+            }
+            if (typeof layer.get('title') === 'undefined') {
+              value = `Titel saknas (${shorten(value, obj.value)})`;
+            } else {
+              value = `${layer.get('title')} (${shorten(value, obj.value)})`;
+            }
+          }
+          if (found) {
+            const dataItem = {};
+            dataItem.label = label;
+            dataItem.value = value;
+            hitArr.push(dataItem);
+          }
         }
       });
       awesomplete.list = hitArr;
