@@ -20,7 +20,8 @@ const Legend = function Legend(options = {}) {
     useGroupIndication = true,
     searchLayersControl = false,
     searchLayersMinLength = 2,
-    searchLayersLimit = 10
+    searchLayersLimit = 10,
+    searchLayersParameters = ['name', 'title']
   } = options;
   const keyCodes = {
     9: 'tab',
@@ -234,6 +235,14 @@ const Legend = function Legend(options = {}) {
   function initAutocomplete() {
     const input = document.getElementsByClassName('o-search-layer-field')[0];
 
+    function shorten(text, searchword) {
+      let returnValue = text;
+      if (text.length > 20) {
+        returnValue = `...${text.substring(text.indexOf(searchword) - 3, text.indexOf(searchword) + searchword.length + 3).trim()}...`;
+      }
+      return returnValue;
+    }
+
     function makeRequest(obj) {
       const layersArr = viewer.getLayers();
       const hitArr = [];
@@ -242,16 +251,26 @@ const Legend = function Legend(options = {}) {
         // eslint-disable-next-line no-underscore-dangle
         const label = layer.values_.name;
         let value = label;
-        if (label.toLowerCase().search(obj.value.toLowerCase()) !== -1) {
+        if (label.toLowerCase().search(obj.value.toLowerCase()) !== -1 && searchLayersParameters.includes('name')) {
           found = true;
         }
         // eslint-disable-next-line no-underscore-dangle
-        if ('title' in layer.values_) {
+        if ('title' in layer.values_ && searchLayersParameters.includes('title')) {
           // eslint-disable-next-line no-underscore-dangle
           value = layer.values_.title;
           if (value.toLowerCase().search(obj.value.toLowerCase()) !== -1) {
             found = true;
           }
+        }
+        // eslint-disable-next-line no-underscore-dangle
+        if ('abstract' in layer.values_ && searchLayersParameters.includes('abstract') && !found) {
+          // eslint-disable-next-line no-underscore-dangle
+          value = layer.values_.abstract;
+          if (value.toLowerCase().search(obj.value.toLowerCase()) !== -1) {
+            found = true;
+          }
+          // eslint-disable-next-line no-underscore-dangle
+          value = `${layer.values_.title} (${shorten(value, obj.value)})`;
         }
         if (found) {
           const dataItem = {};
