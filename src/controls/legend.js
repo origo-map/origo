@@ -1,5 +1,6 @@
+import Awesomplete from 'awesomplete';
 import {
-  Component, Button, Element as El, ToggleGroup, dom
+  Component, Button, Element as El, ToggleGroup, dom, Input
 } from '../ui';
 import imageSource from './legend/imagesource';
 import Overlays from './legend/overlays';
@@ -16,11 +17,24 @@ const Legend = function Legend(options = {}) {
     turnOffLayersControl = false,
     name = 'legend',
     labelOpacitySlider = '',
-    useGroupIndication = true
+    useGroupIndication = true,
+    searchLayersControl = false,
+    searchLayersMinLength = 2,
+    searchLayersLimit = 10
   } = options;
+  const keyCodes = {
+    9: 'tab',
+    27: 'esc',
+    37: 'left',
+    39: 'right',
+    13: 'enter',
+    38: 'up',
+    40: 'down'
+  };
 
   let viewer;
   let target;
+  let awesomplete;
   let mainContainerCmp;
   let overlaysCmp;
   let mainContainerEl;
@@ -115,6 +129,13 @@ const Legend = function Legend(options = {}) {
     }
   });
 
+  const layerSearchInput = Input({
+    cls: 'o-search-layer-field placeholder-text-smaller smaller',
+    style: { height: '1.5rem', margin: 0, width: '100%' },
+    placeholderText: 'Sök lager',
+    value: ''
+  });
+
   const toggleVisibility = function toggleVisibility() {
     if (isExpanded) {
       layerSwitcherEl.classList.add('fade-out');
@@ -144,6 +165,131 @@ const Legend = function Legend(options = {}) {
       }
     }
   };
+
+  /** There are several different ways to handle selected search result.
+ */
+
+  function selectHandler(evt) {
+    const label = evt.text.label;
+    if (name) {
+      // Todo
+      const layer = viewer.getLayer(label);
+      layer.setVisible(true);
+      document.getElementsByClassName('o-search-layer-field')[0].value = '';
+    } else {
+      console.error('Search options are missing');
+    }
+  }
+
+  function clearSearchResults() {
+    awesomplete.list = [];
+  }
+
+  function onClearSearch() {
+    document.getElementById(`${closeButton.getId()}`).addEventListener('click', () => {
+      clearSearchResults();
+      document.getElementById(`${layerSearchInput.getId()}`).classList.remove('o-search-true');
+      document.getElementById(`${layerSearchInput.getId()}`).classList.add('o-search-false');
+      document.getElementsByClassName('o-search-layer-field')[0].value = '';
+    });
+  }
+
+  function bindUIActions() {
+    if (searchLayersControl) {
+      document.getElementById(`${layerSearchInput.getId()}`).addEventListener('awesomplete-selectcomplete', selectHandler);
+
+      document.getElementsByClassName('o-search-layer-field')[0].addEventListener('input', () => {
+        if (document.getElementsByClassName('o-search-layer-field')[0].value && document.getElementById(`${layerSearchInput.getId()}`).classList.contains('o-search-false')) {
+          document.getElementById(`${layerSearchInput.getId()}`).classList.remove('o-search-false');
+          document.getElementById(`${layerSearchInput.getId()}`).classList.add('o-search-true');
+          onClearSearch();
+        } else if (!(document.getElementsByClassName('o-search-layer-field')[0].value) && document.getElementById(`${layerSearchInput.getId()}`).classList.contains('o-search-true')) {
+          document.getElementById(`${layerSearchInput.getId()}`).classList.remove('o-search-true');
+          document.getElementById(`${layerSearchInput.getId()}`).classList.add('o-search-false');
+        }
+      });
+    }
+  }
+
+  function renderList(suggestion, input) {
+    let opts = {};
+    let html = input === '' ? suggestion.value : suggestion.value.replace(RegExp(Awesomplete.$.regExpEscape(input), 'gi'), '<mark>$&</mark>');
+    html = `<div class="suggestion">${html}</div>`;
+    opts = {
+      innerHTML: html,
+      'aria-selected': 'false'
+    };
+
+    return Awesomplete.$.create('li', opts);
+  }
+
+  /*
+  The label property in Awesomplete is used to store the feature id. This way the properties
+  of each feature in the search response will be available in event handling.
+  The complete properties are stored in a tempory db called searchDb. This is a workaround
+  for a limit in Awesomplete that can only store data in the fields label and text.
+  The data-category attribute is used to make a layer division in the sugguestion list.
+  */
+
+  function initAutocomplete() {
+    const input = document.getElementsByClassName('o-search-layer-field')[0];
+
+    function makeRequest(obj) {
+      const layersArr = viewer.getLayers();
+      const hitArr = [];
+      layersArr.forEach((layer) => {
+        let found = false;
+        // eslint-disable-next-line no-underscore-dangle
+        const label = layer.values_.name;
+        let value = label;
+        if (label.toLowerCase().search(obj.value.toLowerCase()) !== -1) {
+          found = true;
+        }
+        // eslint-disable-next-line no-underscore-dangle
+        if ('title' in layer.values_) {
+          // eslint-disable-next-line no-underscore-dangle
+          value = layer.values_.title;
+          if (value.toLowerCase().search(obj.value.toLowerCase()) !== -1) {
+            found = true;
+          }
+        }
+        if (found) {
+          const dataItem = {};
+          dataItem.label = label;
+          dataItem.value = value;
+          hitArr.push(dataItem);
+        }
+      });
+      awesomplete.list = hitArr;
+      awesomplete.evaluate();
+    }
+
+    if (typeof input !== 'undefined') {
+      awesomplete = new Awesomplete('.o-search-layer-field', {
+        minChars: searchLayersMinLength,
+        autoFirst: false,
+        sort: false,
+        maxItems: searchLayersLimit,
+        item: renderList,
+        filter(suggestion, userInput) {
+          const { value: suggestionValue } = suggestion;
+          return suggestionValue.toLowerCase().includes(userInput.toLowerCase()) ? suggestionValue : false;
+        }
+      });
+
+      input.parentNode.classList.add('black');
+      input.addEventListener('keyup', (e) => {
+        const keyCode = e.keyCode;
+        if (input.value.length >= searchLayersMinLength) {
+          if (keyCode in keyCodes) {
+            // empty
+          } else {
+            makeRequest(input);
+          }
+        }
+      });
+    }
+  }
 
   return Component({
     name,
@@ -190,6 +336,9 @@ const Legend = function Legend(options = {}) {
       });
       window.addEventListener('resize', updateMaxHeight);
       if (turnOffLayersControl) this.addButtonToTools(turnOffLayersButton);
+      if (searchLayersControl) this.addButtonToTools(layerSearchInput);
+      initAutocomplete();
+      bindUIActions();
     },
     render() {
       const size = viewer.getSize();
