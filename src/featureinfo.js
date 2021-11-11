@@ -10,7 +10,8 @@ import StyleTypes from './style/styletypes';
 import getFeatureInfo from './getfeatureinfo';
 import replacer from './utils/replacer';
 import SelectedItem from './models/SelectedItem';
-import { getContent } from './getattributes';
+import getAttributes, { getContent } from './getattributes';
+import relatedtables from './utils/relatedtables';
 
 const styleTypes = StyleTypes();
 let selectionLayer;
@@ -127,6 +128,7 @@ const Featureinfo = function Featureinfo(options = {}) {
   };
 
   // TODO: direct access to feature and layer should be converted to getFeature and getLayer methods on currentItem
+  // Must take into consideration that search can send an item that is not a SelecedItem
   const callback = function callback(evt) {
     const currentItemIndex = evt.item.index;
     if (currentItemIndex !== null) {
@@ -161,7 +163,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     }
   };
 
-  // TODO: should there be anything done?
+  // FIXME: should there be anything done?
   const callbackImage = function callbackImage(evt) {
     const currentItemIndex = evt.item.index;
     if (currentItemIndex !== null) {
@@ -252,8 +254,71 @@ const Featureinfo = function Featureinfo(options = {}) {
     });
   };
 
+  function hoistRelatedAttributes(parentLayer, parentFeature, layerConfig, hoistedAttributes) {
+    // First recurse our own children
+
+    if (layerConfig.promoteAttribs) {
+      const childLayer = viewer.getLayer(layerConfig.layerName);
+      const childConfig = relatedtables.getConfig(childLayer);
+      // TODO: It's async now...
+      const childFeatures = relatedtables.getChildFeatures(parentLayer, parentFeature, childLayer);
+
+      if (childConfig) {
+        childConfig.forEach(childLayerConfig => {
+          if (childLayerConfig.promoteAttribs) {
+            childFeatures.forEach(childFeature => {
+              hoistRelatedAttributes(childLayer, childFeature, childLayerConfig, hoistedAttributes);
+            });
+          }
+        });
+      }
+
+      layerConfig.promoteAttribs.forEach(currAttribConf => {
+        const resarray = [];
+        childFeatures.forEach(child => {
+          if (currAttribConf.html) {
+            const val = replacer.replace(currAttribConf.html, child.getProperties());
+            resarray.push(val);
+          }
+        });
+        let resaggregate;
+        if (currAttribConf.html) {
+          const sep = currAttribConf.separator ? currAttribConf.separator : '';
+          resaggregate = resarray.join(sep);
+        }
+        // TODO: add more aggregate functions here
+        parentFeature.set(currAttribConf.parentName, resaggregate);
+        hoistedAttributes.push({ feature: parentFeature, attrib: currAttribConf.parentName });
+      });
+    }
+  }
+
   const render = function render(identifyItems, target, coordinate) {
     const map = viewer.getMap();
+    const hoistedAttributes = [];
+    identifyItems.forEach(currItem => {
+      // At least search can call render without SelectedItem as Items, it just sends an object with the least possible fields render uses
+      // so we need to exclude those from related tables handling, as we know nothing about them
+      if (currItem instanceof SelectedItem) {
+        // Add properties from related tables (if any)
+        const layer = currItem.getLayer();
+        const relatedLayersConfig = relatedtables.getConfig(layer);
+        if (relatedLayersConfig) {
+          relatedLayersConfig.forEach(layerConfig => {
+            if (layerConfig.promoteAttribs) {
+              // hoistRelatedAttributes(layer, currItem.getFeature(), viewer.getLayer(layerConfig.layerName), layerConfig.promoteAttribs);
+              hoistRelatedAttributes(layer, currItem.getFeature(), layerConfig, hoistedAttributes);
+            }
+          });
+        }
+        const content = getAttributes(currItem.getFeature(), layer, map);
+        // TODO: magically merge with the attachments attchemnts loop
+        currItem.setContent(content);
+      }
+    });
+    hoistedAttributes.forEach(item => {
+      item.feature.unset(item.attrib, true);
+    });
     items = identifyItems;
     clear();
     // FIXME: variable is overwritten in next row

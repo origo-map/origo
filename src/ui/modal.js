@@ -22,6 +22,8 @@ export default function Modal(options = {}) {
   let contentEl;
   let closeButton;
   let newTabButton;
+  /** The component itself. Used to enable events */
+  let component;
 
   const closeModal = function closeModal() {
     modal.parentNode.removeChild(modal);
@@ -29,6 +31,14 @@ export default function Modal(options = {}) {
 
   return Component({
     closeModal,
+    /** Hides the modal (does not close it) */
+    hide() {
+      modal.classList.add('o-hidden');
+    },
+    /** Shows the modal if it has been hidden */
+    show() {
+      modal.classList.remove('o-hidden');
+    },
     onInit() {
       screenEl = Element({
         cls: 'o-modal-screen'
@@ -61,6 +71,7 @@ export default function Modal(options = {}) {
         ariaLabel: 'Stäng',
         click() {
           closeModal();
+          component.dispatch('closed');
         }
       });
       headerCmps.push(closeButton);
@@ -82,6 +93,7 @@ export default function Modal(options = {}) {
       this.on('render', this.onRender);
       document.getElementById(target).appendChild(html(this.render()));
       this.dispatch('render');
+      component = this;
     },
     onRender() {
       modal = document.getElementById(this.getId());
