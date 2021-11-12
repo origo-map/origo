@@ -980,7 +980,7 @@ function editAttributes(feat) {
 
     let attachmentsForm = '';
     if (layer.get('attachments') && !isBatchEdit) {
-      attachmentsForm = '<div id="o-attach-form"></div>';
+      attachmentsForm = `<div id="o-attach-form-${currentLayer}"></div>`;
     }
     const form = `<div id="o-form">${formElement}${attachmentsForm}<br><div class="o-form-save"><input id="o-save-button" type="button" value="Ok"></input></div></div>`;
 
@@ -996,10 +996,12 @@ function editAttributes(feat) {
     // Lucky for us when the form is saved, that handler only looks for attributes in the attributesObjects array, so we don't
     // have to bother filter out attachment inputs.
     if (attachmentsForm) {
+      const attachmentEl = document.getElementById(`o-attach-form-${currentLayer}`);
       if (editsStore.hasFeature('insert', feature, currentLayer)) {
-        document.getElementById('o-attach-form').innerHTML = '<h3>Bilagor</h3><p>Du måste spara innan du kan lägga till bilagor.</p>';
+        attachmentEl.innerHTML = `<label>${layer.get('attachments').formTitle || 'Bilagor'}</label><p>Du måste spara innan du kan lägga till bilagor.</p>`;
       } else {
-        attachmentsform(layer, feature, 'o-attach-form').then(res => { console.log(res); });
+        // Async fire and forget. Populates the form placeholder.
+        attachmentsform(layer, feature, attachmentEl);
       }
     }
 
