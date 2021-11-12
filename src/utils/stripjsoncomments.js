@@ -32,7 +32,7 @@ function stripJSONComments(jsonstring) {
       json[ix + 1] = ' ';
       ix += 2;
       // Accept pretty much any row ending combo. We don't care and don't destroy
-      while (json[ix] !== '\n' && json[ix] !== '\r' && ix < lastindex) {
+      while (json[ix] !== '\n' && json[ix] !== '\r' && ix <= lastindex) {
         json[ix] = ' ';
         ix += 1;
       }
@@ -41,7 +41,7 @@ function stripJSONComments(jsonstring) {
       json[ix] = ' ';
       json[ix + 1] = ' ';
       ix += 2;
-      while (json[ix] !== '*' && json[ix + 1] !== '/' && ix < lastindex) {
+      while (!(json[ix] === '*' && json[ix + 1] === '/') && ix <= lastindex) {
         // Keep eol markers so we can produce a good error message when JSON.parse fails.
         if (json[ix] !== '\n' && json[ix] !== '\r') {
           json[ix] = ' ';
