@@ -33,7 +33,7 @@ const attachmentsform = function attachmentsform(layer, feature, el) {
         value.forEach(link => {
           // Display the link and add a delete button
           const rowEl = createElement('div', `<a class="grow" href="${link.url}" target="_blank">${link.filename}</a>`, { cls: 'flex row padding-x padding-y-smaller' });
-          const deleteButtonEl = createElement('button', '<span class="icon-smaller"><svg class="o-icon-24"><use xlink:href="#ic_delete_24px"></use></svg></span><span data-tooltip="Ta bort"></span>', { cls: 'icon-smaller compact o-tooltip hover', 'aria-label': 'Ta bort' });
+          const deleteButtonEl = createElement('button', '<span class="icon"><svg class="o-icon-24"><use xlink:href="#ic_delete_24px"></use></svg></span><span data-tooltip="Ta bort"></span>', { cls: 'compact o-tooltip hover', 'aria-label': 'Ta bort' });
           deleteButtonEl.addEventListener('click', () => {
             if (window.confirm(`Är du säker att du vill ta bort filen ${link.filename}`)) {
               ac.deleteAttachment(feature, link.id)
@@ -59,10 +59,10 @@ const attachmentsform = function attachmentsform(layer, feature, el) {
         acceptstring = group.allowedFiles;
       }
       const rowEl = createElement('div', '', { cls: 'flex row padding-x padding-y-smaller row-reverse' });
-      const labelEl = createElement('label', '', { style: 'cursor: pointer;', cls: 'hover' });
-      const addButtonEl = createElement('button', '<span data-tooltip="Lägg till ny"></span><span class="icon-smaller"><svg class="o-icon-24"><use xlink:href="#ic_add_24px"></use></svg></span>', { cls: 'compact o-tooltip hover', 'aria-label': 'Lägg till', style: 'pointer-events: none;' });
+      const labelEl = createElement('label', '<span data-tooltip="Lägg till"></span>', { style: 'cursor: pointer;', cls: 'hover o-tooltip' });
+      const addButtonEl = createElement('button', '<span class="icon"><svg class="o-icon-24"><use xlink:href="#ic_add_24px"></use></svg></span>', { cls: 'compact', 'aria-label': 'Lägg till', style:'pointer-events:none;' });
       // Do some silly css stuff to hide the actual file input as it is very ugly and use the label instead
-      const inputEl = createElement('input', '', { type: 'file', accept: `${acceptstring}`, style: 'opacity: 0; width: 0; height:0; padding: 0; border:0;' });
+      const inputEl = createElement('input', '', { type: 'file', accept: `${acceptstring}`, style: 'opacity: 0; width: 1px; height:1px; padding: 0; border:0;' });
       labelEl.appendChild(inputEl);
       labelEl.appendChild(addButtonEl);
       rowEl.appendChild(labelEl);
