@@ -39,14 +39,15 @@ const Legend = function Legend(options = {}) {
     let idx = -1;
     if (isExpanded) {
       idx = 0;
-      document.getElementById(closeButton.getId()).focus();
-    } else {
-      document.getElementById(layerButton.getId()).focus();
     }
     for (let i = 0; i < document.getElementById(mainContainerCmp.getId()).getElementsByTagName('button').length; i += 1) {
-      // Skip if it's slidenav button otherwise set tab index
+      // Skip if it's slidenav button and not expanded otherwise set tab index
       if (document.getElementById(mainContainerCmp.getId()).getElementsByTagName('button')[i].tabIndex !== -99) {
-        document.getElementById(mainContainerCmp.getId()).getElementsByTagName('button')[i].tabIndex = idx;
+        if (document.getElementById(mainContainerCmp.getId()).getElementsByTagName('button')[i].closest('.collapse') !== null) {
+          if (document.getElementById(mainContainerCmp.getId()).getElementsByTagName('button')[i].closest('.collapse').className.indexOf('expanded') !== -1) {
+            document.getElementById(mainContainerCmp.getId()).getElementsByTagName('button')[i].tabIndex = idx;
+          }
+        }
       }
     }
   };
