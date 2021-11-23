@@ -11,6 +11,7 @@ import getFeatureInfo from './getfeatureinfo';
 import replacer from './utils/replacer';
 import SelectedItem from './models/SelectedItem';
 import { getContent } from './getattributes';
+import attachmentclient from './utils/attachmentclient';
 
 const styleTypes = StyleTypes();
 let selectionLayer;
@@ -256,7 +257,13 @@ const Featureinfo = function Featureinfo(options = {}) {
     });
   };
 
-  const render = function render(identifyItems, target, coordinate) {
+  /**
+   * Internal helper that performs the actual rendering
+   * @param {any} identifyItems
+   * @param {any} target
+   * @param {any} coordinate
+   */
+  const doRender = function doRender(identifyItems, target, coordinate) {
     const map = viewer.getMap();
     items = identifyItems;
     clear();
@@ -378,7 +385,40 @@ const Featureinfo = function Featureinfo(options = {}) {
       dispatchToggleFeatureEvent(items[0]);
     }
   };
+  /**
+   * Renders the feature info window. Consider using showInfo instead if calling using api.
+   * @param {any} identifyItems Array of SelectedItems
+   * @param {any} target Name of infoWindow type
+   * @param {any} coordinate Coordinate where to show pop up.
+   */
+  const render = function render(identifyItems, target, coordinate) {
+    // Append attachments (if any) to the SelectedItems
+    const requests = [];
+    identifyItems.forEach(currItem => {
+      // At least search can call render without SelectedItem as Items, it just sends an object with the least possible fields render uses
+      // so we need to exclude those from attachment handling, as we know nothing about them
+      if (currItem instanceof SelectedItem) {
+        const layer = currItem.getLayer();
+        const attachments = layer.get('attachments');
+        if (attachments && attachments.groups.some(g => g.linkAttribute || g.fileNameAttribute)) {
+          const ac = attachmentclient(layer);
+          // This actually adds attributes to the feature
+          requests.push(ac.populatePseudoAttributes(currItem, viewer.getMap()));
+        }
+      }
+    });
 
+    // Wait for all requests. If there are no attachments it just calls .then() without waiting.
+    Promise.all(requests)
+      .then(() => {
+        doRender(identifyItems, target, coordinate);
+      })
+      .catch(() => {
+        alert('Kunde inte hämta bilagor. Fält från bilagor kommer att vara tomma.');
+        // Show without attachments
+        doRender(identifyItems, target, coordinate);
+      });
+  };
   /**
   * Shows the featureinfo popup/sidebar/infowindow for the provided features. Only vector layers are supported.
   * @param {any} fidsbylayer An object containing layer names as keys with a list of feature ids for each layer
