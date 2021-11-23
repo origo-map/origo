@@ -116,6 +116,8 @@ export default function Collapse(options = {}) {
       contentEl = document.getElementById(contentComponent.getId());
       if (expanded) {
         setTabIndex(0);
+      } else {
+        setTabIndex(-1);
       }
       this.dispatch('render');
     },

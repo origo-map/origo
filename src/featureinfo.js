@@ -109,8 +109,12 @@ const Featureinfo = function Featureinfo(options = {}) {
  * Dispatches an "official" api event.
  * @param {SelectedItem} item The currently selected item
  */
-  const dispatchNewSelection = function dispachtNewSelection(item) {
-    component.dispatch('changeselection', item);
+  const dispatchNewSelection = function dispatchNewSelection(item) {
+    // Make sure it actually is a SelectedItem. At least Search can call render() without creating proper selectedItems when
+    // search result is remote.
+    if (item instanceof SelectedItem) {
+      component.dispatch('changeselection', item);
+    }
   };
 
   const dispatchToggleFeatureEvent = function dispatchToggleFeatureEvent(currentItem) {
