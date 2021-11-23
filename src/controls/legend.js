@@ -35,6 +35,23 @@ const Legend = function Legend(options = {}) {
   const cls = `${clsSettings} control bottom-right box overflow-hidden flex row o-legend`.trim();
   const style = dom.createStyle(Object.assign({}, { width: 'auto' }, styleSettings));
 
+  const setTabIndex = function setTabIndex() {
+    let idx = -1;
+    if (isExpanded) {
+      idx = 0;
+    }
+    for (let i = 0; i < document.getElementById(mainContainerCmp.getId()).getElementsByTagName('button').length; i += 1) {
+      // Skip if it's slidenav button and not expanded otherwise set tab index
+      if (document.getElementById(mainContainerCmp.getId()).getElementsByTagName('button')[i].tabIndex !== -99) {
+        if (document.getElementById(mainContainerCmp.getId()).getElementsByTagName('button')[i].closest('.collapse') !== null) {
+          if (document.getElementById(mainContainerCmp.getId()).getElementsByTagName('button')[i].closest('.collapse').className.indexOf('expanded') !== -1) {
+            document.getElementById(mainContainerCmp.getId()).getElementsByTagName('button')[i].tabIndex = idx;
+          }
+        }
+      }
+    }
+  };
+
   const addBackgroundButton = function addBackgroundButton(layer) {
     const styleName = layer.get('styleName') || 'default';
     const icon = viewer.getStyle(styleName) ? imageSource(viewer.getStyle(styleName)) : 'img/png/farg.png';
@@ -132,6 +149,7 @@ const Legend = function Legend(options = {}) {
     layerButtonEl.classList.toggle('faded');
     layerSwitcherEl.classList.toggle('faded');
     isExpanded = !isExpanded;
+    setTabIndex();
   };
 
   const onMapClick = function onMapClick() {
@@ -190,6 +208,7 @@ const Legend = function Legend(options = {}) {
       });
       window.addEventListener('resize', updateMaxHeight);
       if (turnOffLayersControl) this.addButtonToTools(turnOffLayersButton);
+      setTabIndex();
     },
     render() {
       const size = viewer.getSize();
