@@ -53,7 +53,7 @@ const Bookmarks = function Bookmarks(options = {}) {
   } = {}) {
     const titleCmp = El({ cls: 'grow padding-left', innerHTML: bookmarkTitle });
     const button = Button({
-      cls: 'icon-smallest compact no-grow',
+      cls: 'icon-smallest compact no-grow o-bookmark-button',
       click,
       icon
     });
