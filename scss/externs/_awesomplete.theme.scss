@@ -69,8 +69,16 @@
   font-weight: bold;
 }
 
+.black mark {
+  color: #aaa;
+}
+
 .awesomplete li .suggestion:hover mark {
   background-color: $search-hover-backround;
+}
+
+.black li .suggestion:hover mark {
+  background-color: #fff;
 }
 
 .awesomplete li[aria-selected='true'] mark {

@@ -19,6 +19,7 @@ import searchList from './addons/searchList/searchList';
 import validate from '../../utils/validate';
 import slugify from '../../utils/slugify';
 import topology from '../../utils/topology';
+import attachmentsform from './attachmentsform';
 import relatedTablesForm from './relatedtablesform';
 import relatedtables from '../../utils/relatedtables';
 
@@ -994,9 +995,14 @@ function editAttributes(feat) {
   const dlgTitle = isBatchEdit ? `Batch edit ${title}.<br>(${features.getLength()} objekt)` : title;
 
   /** Filtered list of attributes containing only those that should be displayed */
-  // TODO: break out to function to merge with attachmnets. Remove ignore type and loop config instead as the igonore type is too hard
-  // to explain in doc and attachments don't use it.
-  const editableAttributes = attributes.filter(attr => attr.type !== 'ignore' && (!isBatchEdit || (isBatchEdit && attr.allowBatchEdit)));
+  const editableAttributes = attributes.filter(attr => {
+    const attachmentsConfig = layer.get('attachments');
+    // Filter out attributes created from attachments. Actually can produce false positives if name is not set, but that is handled in the next row
+    // as name is required for editable attributes (although not specified in the docs, but needed to create the input)
+    // TODO: filter out related tables as well.
+    const isAttachment = attachmentsConfig && attachmentsConfig.groups.some(g => g.linkAttribute === attr.name || g.fileNameAttribute === attr.name);
+    return attr.name && (!isBatchEdit || (isBatchEdit && attr.allowBatchEdit)) && !isAttachment;
+  });
 
   if (features.getLength() === 1 || isBatchEdit) {
     dispatcher.emitChangeEdit('attribute', true);
@@ -1069,7 +1075,14 @@ function editAttributes(feat) {
     }
 
     const formElement = attributeObjects.reduce((prev, next) => prev + next.formElement, '');
-    const form = `<div id="o-form">${formElement}${relatedTablesFormHTML}<br><div class="o-form-save"><input id="o-save-button-${currentLayer}" type="button" value="Ok"></input></div></div>`;
+
+    let attachmentsForm = '';
+    if (layer.get('attachments') && !isBatchEdit) {
+      attachmentsForm = `<div id="o-attach-form-${currentLayer}"></div>`;
+    }
+
+    // TODO: add related form
+    const form = `<div id="o-form">${formElement}${attachmentsForm}<br><div class="o-form-save"><input id="o-save-button" type="button" value="Ok"></input></div></div>`;
 
     modal = Modal({
       title: dlgTitle,
@@ -1077,6 +1090,20 @@ function editAttributes(feat) {
       static: true,
       target: viewer.getId()
     });
+
+    // This injects the entire attachment handling which is performed independently from save, so fire and forget it sets up
+    // its own callbacks and what not.
+    // Lucky for us when the form is saved, that handler only looks for attributes in the attributesObjects array, so we don't
+    // have to bother filter out attachment inputs.
+    if (attachmentsForm) {
+      const attachmentEl = document.getElementById(`o-attach-form-${currentLayer}`);
+      if (editsStore.hasFeature('insert', feature, currentLayer)) {
+        attachmentEl.innerHTML = `<label>${layer.get('attachments').formTitle || 'Bilagor'}</label><p>Du måste spara innan du kan lägga till bilagor.</p>`;
+      } else {
+        // Async fire and forget. Populates the form placeholder.
+        attachmentsform(layer, feature, attachmentEl);
+      }
+    }
 
     // Get notified when form is closed in order to go back to parent form when closing a child form
     modal.on('closed', () => { onModalClosed(); });
