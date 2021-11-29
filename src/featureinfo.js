@@ -305,11 +305,13 @@ const Featureinfo = function Featureinfo(options = {}) {
         carouselIds.forEach((carouselId) => {
           let targetElement;
           const elements = document.getElementsByClassName(`o-image-carousel${carouselId}`);
-          elements.forEach(element => {
-            if (!element.closest('.glide__slide--clone')) {
-              targetElement = element;
-            }
-          });
+          if(elements.length > 0) {
+            elements.forEach(element => {
+              if (!element.closest('.glide__slide--clone')) {
+                targetElement = element;
+              }
+            });
+          }
           const imageCarouselEl = document.getElementsByClassName(`o-image-carousel${carouselId}`);
           if (imageCarouselEl.length > 0) {
             initImageCarousel(`#o-image-carousel${carouselId}`, `.o-image-content${carouselId}`, carouselId, targetElement);
@@ -407,7 +409,6 @@ const Featureinfo = function Featureinfo(options = {}) {
         }
       }
     });
-
     // Wait for all requests. If there are no attachments it just calls .then() without waiting.
     Promise.all(requests)
       .then(() => {
