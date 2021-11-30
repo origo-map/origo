@@ -3,7 +3,9 @@ import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import DrawInteraction from 'ol/interaction/Draw';
 import Overlay from 'ol/Overlay';
+import Feature from 'ol/Feature';
 import Polygon from 'ol/geom/Polygon';
+import Circle from 'ol/geom/Circle';
 import LineString from 'ol/geom/LineString';
 import Point from 'ol/geom/Point';
 import Projection from 'ol/proj/Projection';
@@ -46,6 +48,7 @@ const Measure = function Measure({
   let lengthTool;
   let areaTool;
   let elevationTool;
+  let bufferTool;
   let defaultTool;
   let isActive = false;
   let tempOverlayArray = [];
@@ -56,6 +59,8 @@ const Measure = function Measure({
   let measureButton;
   let lengthToolButton;
   let areaToolButton;
+  let bufferToolButton;
+  let bufferSize = 1000;
   let elevationToolButton;
   let addNodeButton;
   let showSegmentLabelButton;
@@ -214,6 +219,30 @@ const Measure = function Measure({
       feature.getStyle()[0].getText().setText(`${elevation.toFixed(1)} m`);
       source.changed();
     });
+  }
+
+  function addBuffer(evt) {
+    const feature = evt.feature;
+    // Mark the central point of the circle
+    feature.getStyle()[0].getText().setText('o');
+    function addBufferToFeature() {
+      const pointCenter = feature.getGeometry().getCoordinates();
+      // Create a buffer around the point which was clicked on.
+      const bufferCircle = new Circle(pointCenter, bufferSize);
+      const bufferedFeature = new Feature(bufferCircle);
+      // Create a new point at top of the circle to add a text with radius information
+      const radiusText = new Point([pointCenter[0], bufferCircle.getExtent()[3]]);
+      const radiusFeature = new Feature(radiusText);
+      const featStyle = createStyle(feature);
+      radiusFeature.setStyle(featStyle);
+      // Offset the text so it dont't cover the circle
+      radiusFeature.getStyle()[0].getText().setOffsetY(-10);
+      radiusFeature.getStyle()[0].getText().setText(`Radie ${bufferSize} m`);
+      vector.getSource().addFeature(bufferedFeature);
+      vector.getSource().addFeature(radiusFeature);
+    }
+
+    addBufferToFeature();
   }
 
   function placeMeasurementLabel(segment, coords) {
@@ -397,6 +426,9 @@ const Measure = function Measure({
     if (elevationTool) {
       document.getElementById(elevationToolButton.getId()).classList.add('hidden');
     }
+    if (bufferTool) {
+      document.getElementById(bufferToolButton.getId()).classList.add('hidden');
+    }
     document.getElementById(measureButton.getId()).classList.add('tooltip');
     document.getElementById(clearButton.getId()).classList.add('hidden');
     if (touchMode && isActive) {
@@ -431,6 +463,9 @@ const Measure = function Measure({
     }
     if (elevationTool) {
       document.getElementById(elevationToolButton.getId()).classList.remove('hidden');
+    }
+    if (bufferTool) {
+      document.getElementById(bufferToolButton.getId()).classList.remove('hidden');
     }
     document.getElementById(measureButton.getId()).classList.remove('tooltip');
     document.getElementById(clearButton.getId()).classList.remove('hidden');
@@ -479,6 +514,9 @@ const Measure = function Measure({
       if (type === 'LineString' || type === 'Polygon') {
         document.getElementById(undoButton.getId()).classList.remove('hidden');
       }
+      if (document.getElementById(bufferToolButton.getId()).classList.contains('active')) {
+        bufferSize = Number(window.prompt('Ange radie på buffer i meter?', 1000));
+      }
     }, this);
 
     measure.on('drawend', (evt) => {
@@ -499,7 +537,15 @@ const Measure = function Measure({
 
       document.getElementById(undoButton.getId()).classList.add('hidden');
       if (feature.getGeometry().getType() === 'Point') {
-        getElevation(evt);
+        if (document.getElementById(bufferToolButton.getId()).classList.contains('active')) {
+          if (Number.isNaN(bufferSize)) {
+            feature.getStyle()[0].getText().setText('');
+          } else {
+            addBuffer(evt);
+          }
+        } else {
+          getElevation(evt);
+        }
       }
     }, this);
   }
@@ -644,8 +690,9 @@ const Measure = function Measure({
       lengthTool = measureTools.indexOf('length') >= 0;
       areaTool = measureTools.indexOf('area') >= 0;
       elevationTool = measureTools.indexOf('elevation') >= 0;
+      bufferTool = measureTools.indexOf('buffer') >= 0;
       defaultTool = lengthTool ? defaultMeasureTool : 'area';
-      if (lengthTool || areaTool || elevationTool) {
+      if (lengthTool || areaTool || elevationTool || bufferTool) {
         measureElement = El({
           tagName: 'div',
           cls: 'flex column'
@@ -689,7 +736,6 @@ const Measure = function Measure({
             tooltipPlacement: 'east'
           });
           buttons.push(areaToolButton);
-          defaultButton = defaultTool === 'length' ? lengthToolButton : areaToolButton;
         }
 
         if (elevationTool) {
@@ -704,7 +750,33 @@ const Measure = function Measure({
             tooltipPlacement: 'east'
           });
           buttons.push(elevationToolButton);
-          defaultButton = defaultTool === 'length' ? lengthToolButton : elevationToolButton;
+        }
+
+        if (bufferTool) {
+          bufferToolButton = Button({
+            cls: 'o-measure-buffer padding-small margin-bottom-smaller icon-smaller round light box-shadow hidden',
+            click() {
+              type = 'Point';
+              toggleType(this);
+            },
+            icon: '#ic_adjust_24px',
+            tooltipText: 'Buffer',
+            tooltipPlacement: 'east'
+          });
+          buttons.push(bufferToolButton);
+        }
+        switch (defaultTool) {
+          case 'area':
+            defaultButton = areaToolButton;
+            break;
+          case 'elevation':
+            defaultButton = elevationToolButton;
+            break;
+          case 'buffer':
+            defaultButton = bufferToolButton;
+            break;
+          default:
+            defaultButton = lengthToolButton;
         }
 
         if (lengthTool || areaTool) {
@@ -763,6 +835,11 @@ const Measure = function Measure({
       }
       if (showSegmentLengths) {
         htmlString = showSegmentLabelButton.render();
+        el = dom.html(htmlString);
+        document.getElementById(measureElement.getId()).appendChild(el);
+      }
+      if (bufferTool) {
+        htmlString = bufferToolButton.render();
         el = dom.html(htmlString);
         document.getElementById(measureElement.getId()).appendChild(el);
       }
