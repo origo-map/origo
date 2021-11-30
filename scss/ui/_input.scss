@@ -93,7 +93,7 @@ input[type=range] {
   min-width: 0;
 }
 
-input[type=range]:focus {
+input[type=range]:focus-visible {
   outline: none;
   border: 1px solid $black;
 }
