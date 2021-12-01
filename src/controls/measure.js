@@ -237,7 +237,7 @@ const Measure = function Measure({
       radiusFeature.setStyle(featStyle);
       // Offset the text so it dont't cover the circle
       radiusFeature.getStyle()[0].getText().setOffsetY(-10);
-      radiusFeature.getStyle()[0].getText().setText(`Radie ${bufferSize} m`);
+      radiusFeature.getStyle()[0].getText().setText(`${bufferSize} m`);
       vector.getSource().addFeature(bufferedFeature);
       vector.getSource().addFeature(radiusFeature);
     }
