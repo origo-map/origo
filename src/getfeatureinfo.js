@@ -25,7 +25,7 @@ function createSelectedItem(feature, layer, map, groupLayers) {
     selectionGroupTitle = layer.get('title');
   }
 
-  // Add pseudo attributes to make sure they exist when featureinfo shows them
+  // Add pseudo attributes to make sure they exist when the SelectedItem is created as the content is created in constructor
   // Ideally we would also populate here, but that is an async operation and will break the api.
   const attachments = layer.get('attachments');
   if (attachments) {
@@ -35,6 +35,16 @@ function createSelectedItem(feature, layer, map, groupLayers) {
       }
       if (a.fileNameAttribute) {
         feature.set(a.fileNameAttribute, '');
+      }
+    });
+  }
+  const relatedLayers = layer.get('relatedLayers');
+  if (relatedLayers) {
+    relatedLayers.forEach(currLayer => {
+      if (currLayer.promoteAttribs) {
+        currLayer.promoteAttribs.forEach(currAttrib => {
+          feature.set(currAttrib.parentName, '');
+        });
       }
     });
   }

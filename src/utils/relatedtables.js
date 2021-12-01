@@ -1,3 +1,5 @@
+import * as LoadingStrategy from 'ol/loadingstrategy';
+
 const RELATED_TABLES_CONFIG_ROOT = 'relatedLayers';
 
 /**
@@ -35,8 +37,6 @@ function getId(parentLayer, childLayerName, feature) {
  * @returns {any[]} An array of OL-features with the related objects
  */
 async function getChildFeatures(parentLayer, feature, childLayer) {
-  // TODO: Hazze wants composite keys.
-  // TODO: add order by?
   const childLayerName = childLayer.get('name');
   let parentPK = getId(parentLayer, childLayerName, feature);
   const layerconf = parentLayer.get(RELATED_TABLES_CONFIG_ROOT).find(item => item.layerName === childLayerName);
@@ -46,14 +46,14 @@ async function getChildFeatures(parentLayer, feature, childLayer) {
   // Unfortunately we can not know this from data. We could pick first fetaure if table is not empty.
   // Can't look in parent either, as fid is always string when fid includes layer name.
   if (layerconf.FKIsString) {
-    parentPK = `${parentPK.replace("'","''")}'`;
+    parentPK = `${parentPK.replace("'", "''")}'`;
   }
 
-
-
-  // Make sure the features are loaded
-  // TODO: strings must be enclosed in single apostrophe. How to know type if using fid?
-  await childLayer.getSource().ensureLoaded(`${FKField} = ${parentPK}`);
+  // Make sure the features are loaded if not using strategy "all"
+  const childSource = childLayer.getSource();
+  if (childSource.getOptions().loadingstrategy === LoadingStrategy.bbox) {
+    await childSource.ensureLoaded(`${FKField} = ${parentPK}`);
+  }
 
   // Compare ids as strings to avoid implicit (lint) or complicated type conversions depending on column types.
   // Problem is that if wfs layer name i stripped the id is a string, but in db it might be a number. We don't know that

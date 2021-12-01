@@ -12,4 +12,5 @@ export default function transactionhandler(transaction, layerName, viewer) {
   if (Object.prototype.hasOwnProperty.call(transactions, type)) {
     return transactions[type](transaction, layerName, viewer);
   }
+  return false;
 }

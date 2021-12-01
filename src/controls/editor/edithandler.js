@@ -126,12 +126,12 @@ function getSnapSources(layers) {
 }
 /**
  * Saves the features to server.
- * @returns A promise which is resolved when all features have been saved.
+ * @returns A promise which is resolved when all features have been saved if the source supports it. Otherwise it is resolved immediately.
  * */
 async function saveFeatures() {
   const edits = editsStore.getEdits();
   const layerNames = Object.getOwnPropertyNames(edits);
-  let promises = [];
+  const promises = [];
   layerNames.forEach((layerName) => {
     const transaction = {
       insert: null,
@@ -161,11 +161,8 @@ async function saveFeatures() {
 async function saveFeature(change, ignoreAutoSave) {
   dispatcher.emitChangeFeature(change);
   if (autoSave && !ignoreAutoSave) {
-    return saveFeatures(change);
+    await saveFeatures(change);
   }
-  // Don't leave our callers hanging
-  // the async keyword makes sure an empty Promise is returned
-  //return Promise.resolve();
 }
 
 function onModifyEnd(evt) {
@@ -211,7 +208,7 @@ async function addFeatureToLayer(feature, layerName) {
 /**
  * Helper for adding new features. Typically called from various eventhandlers
  * @param {Feature} feature The feature to add.
- * @returns a promise which is resolved when feature is saved to db (or immediately id not autosave)
+ * @returns a promise which is resolved when feature is saved to db (or immediately if not autosave)
  */
 async function addFeature(feature) {
   await addFeatureToLayer(feature, currentLayer);
@@ -535,20 +532,24 @@ async function deleteFeature(feature, layer, supressDbDelete) {
   // If editor is not in auto save, it is up to the transactionhandler in combination with the map server if
   // delete order is preserved. Better not have any db constraints if mode is 'cascade'.
   // If mode is 'db' child features are only deleted from the map and it is up to the database to delete or keep orphaned children.
-  // If mode in 'none' (default), just delete this feature and keep children orphaned in map.
+  // If mode is 'none' (default), just delete this feature and keep children orphaned in map.
 
   // First delete child features recursively
   const relatedLayersConfig = relatedtables.getConfig(layer);
   if (relatedLayersConfig) {
     // async and forEach do not mix. Use some old school looping as lint forbids for in
-    for (let ix = 0; ix < relatedLayersConfig.lengh; ix++) {
+    for (let ix = 0; ix < relatedLayersConfig.length; ix += 1) {
       const currLayerConfig = relatedLayersConfig[ix];
       const deleteMode = currLayerConfig.cascadingDelete;
       if (deleteMode === 'cascade' || deleteMode === 'db') {
         const childLayer = viewer.getLayer(currLayerConfig.layerName);
+        // This funtion is recursive, we have to await
+        // eslint-disable-next-line no-await-in-loop
         const childFeatures = await relatedtables.getChildFeatures(layer, feature, childLayer);
-        for (let jx = 0; jx < childFeatures.length; jx++) {
+        for (let jx = 0; jx < childFeatures.length; jx += 1) {
           const currChildFeature = childFeatures[jx];
+          // This funtion is recursive, we have to await
+          // eslint-disable-next-line no-await-in-loop
           await deleteFeature(currChildFeature, childLayer, deleteMode === 'db');
         }
       }
@@ -577,15 +578,7 @@ function onDeleteSelected() {
     const feature = features.item(0);
     const r = window.confirm('Är du säker på att du vill ta bort det här objektet?');
     if (r === true) {
-      // TODO: call delete helper
       deleteFeature(feature, editLayers[currentLayer]).then(() => select.getFeatures().clear());
-      // saveFeature({
-      //  feature,
-      //  layerName: currentLayer,
-      //  action: 'delete'
-      // });
-      //select.getFeatures().clear();
-      // editSource.removeFeature(editSource.getFeatureById(feature.getId()));
     }
   }
 }
@@ -997,11 +990,12 @@ function editAttributes(feat) {
   /** Filtered list of attributes containing only those that should be displayed */
   const editableAttributes = attributes.filter(attr => {
     const attachmentsConfig = layer.get('attachments');
+    const relatedTablesConfig = relatedtables.getConfig(layer);
     // Filter out attributes created from attachments. Actually can produce false positives if name is not set, but that is handled in the next row
     // as name is required for editable attributes (although not specified in the docs, but needed to create the input)
-    // TODO: filter out related tables as well.
     const isAttachment = attachmentsConfig && attachmentsConfig.groups.some(g => g.linkAttribute === attr.name || g.fileNameAttribute === attr.name);
-    return attr.name && (!isBatchEdit || (isBatchEdit && attr.allowBatchEdit)) && !isAttachment;
+    const isRelatedPromoted = relatedTablesConfig && relatedTablesConfig.some(c => c.promoteAttribs && c.promoteAttribs.some(c2 => c2.parentName === attr.name));
+    return attr.name && (!isBatchEdit || (isBatchEdit && attr.allowBatchEdit)) && !isAttachment && !isRelatedPromoted;
   });
 
   if (features.getLength() === 1 || isBatchEdit) {
@@ -1030,7 +1024,7 @@ function editAttributes(feat) {
             }
             obj.addListener = addListener();
             obj.elId = `input-${currentLayer}-${obj.name}-${slugify(obj.requiredVal)}`;
-            obj.elDependencyId = `input-${constraintProps[1]}`;
+            obj.elDependencyId = `input-${currentLayer}-${constraintProps[1]}`;
           } else {
             alert('Villkor verkar inte vara rätt formulerat. Villkor formuleras enligt principen change:attribute:value');
           }
@@ -1081,8 +1075,7 @@ function editAttributes(feat) {
       attachmentsForm = `<div id="o-attach-form-${currentLayer}"></div>`;
     }
 
-    // TODO: add related form
-    const form = `<div id="o-form">${formElement}${attachmentsForm}<br><div class="o-form-save"><input id="o-save-button" type="button" value="Ok"></input></div></div>`;
+    const form = `<div id="o-form">${formElement}${relatedTablesFormHTML}${attachmentsForm}<br><div class="o-form-save"><input id="o-save-button-${currentLayer}" type="button" value="Ok"></input></div></div>`;
 
     modal = Modal({
       title: dlgTitle,
@@ -1212,7 +1205,7 @@ async function onAddChild(e) {
   relatedtables.attachChild(e.detail.parentLayer, e.detail.parentFeature, e.detail.childLayer, newfeature);
   await addFeatureToLayer(newfeature, e.detail.childLayer.get('name'));
   if (autoForm) {
-    //if (autoSave) {
+    // if (autoSave) {
     //  // If auto save we have to wait for the feature to actually have been saved to the server, otherwise
     //  // id is not set yet and child form will be out of sync.
     //  // We know that when the editstore dispaches an event with 0 features remaining.
@@ -1228,10 +1221,10 @@ async function onAddChild(e) {
     //  document.addEventListener('editsChange', onceFunc);
     //  //newfeature.once('change', () => { editChild(e.detail.childLayer, e.detail.parentFeature, newfeature) });
     //  addFeatureToLayer(newfeature, e.detail.childLayer.get('name'));
-    //} else {
-      //editChild(e.detail.childLayer, e.detail.parentFeature, newfeature);
-  //}
-  editChild(e.detail.childLayer, e.detail.parentFeature, newfeature);
+    // } else {
+    // editChild(e.detail.childLayer, e.detail.parentFeature, newfeature);
+  // }
+    editChild(e.detail.childLayer, e.detail.parentFeature, newfeature);
   } else {
     // Refresh / add to parent list. Not needed for autoform, as it will be handled when child modal closes
     refreshRelatedTablesForm(e.detail.parentFeature);
@@ -1244,7 +1237,6 @@ async function onAddChild(e) {
  */
 function onDeleteChild(e) {
   deleteFeature(e.detail.feature, e.detail.layer).then(() => refreshRelatedTablesForm(e.detail.parentFeature));
-  
 }
 
 export default function editHandler(options, v) {

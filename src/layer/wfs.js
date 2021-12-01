@@ -1,8 +1,7 @@
 import * as LoadingStrategy from 'ol/loadingstrategy';
 import { createXYZ } from 'ol/tilegrid';
 import vector from './vector';
-import WfsSource from './wfssource'
-
+import WfsSource from './wfssource';
 
 export default function wfs(layerOptions, viewer) {
   const wfsDefault = {

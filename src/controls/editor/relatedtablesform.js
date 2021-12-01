@@ -17,12 +17,11 @@ function relatedTablesForm(viewer, layer, feature, el) {
 
   relatedLayersConf.forEach(relatedLayerConf => {
     const childLayer = viewer.getLayer(relatedLayerConf.layerName);
-
-    el.appendChild(createElement('b', `${relatedLayerConf.childTitle || childLayer.get('title') || relatedLayerConf.layerName}`));
-    // const listEl = createElement('ul', '', { cls: 'padding-y-small' });
-    // el.appendChild(listEl);
+    const tableEl = createElement('div', '');
     // Get only children related to the feature
     relatedtables.getChildFeatures(layer, feature, childLayer).then((childFeatures) => {
+      tableEl.appendChild(createElement('p', `<b>${relatedLayerConf.childTitle || childLayer.get('title') || relatedLayerConf.layerName}</b>`));
+
       childFeatures.forEach(currChild => {
         const currId = currChild.getId();
         let itemTitle = currId;
@@ -37,7 +36,9 @@ function relatedTablesForm(viewer, layer, feature, el) {
         if (!relatedLayerConf.disableDelete) {
           const deleteButtonEl = createElement('button', '<span class="icon-smaller"><svg class="o-icon-24"><use xlink:href="#ic_delete_24px"></use></svg></span><span data-tooltip="Ta bort"></span>', { cls: 'compact o-tooltip hover', 'aria-label': 'Ta bort' });
           deleteButtonEl.addEventListener('click', () => {
-            editdispatcher.emitDeleteChild(childLayer, feature, currChild);
+            if (window.confirm(`Är du säker att du vill ta bort objektet ${itemTitle}?`)) {
+              editdispatcher.emitDeleteChild(childLayer, feature, currChild);
+            }
           });
           rowEl.appendChild(deleteButtonEl);
         }
@@ -51,9 +52,8 @@ function relatedTablesForm(viewer, layer, feature, el) {
           rowEl.appendChild(editButtonEl);
         }
         // Add the row to the form
-        el.appendChild(rowEl);
+        tableEl.appendChild(rowEl);
       });
-      // el.appendChild(rowEl);
 
       // Add an add button
       if (!relatedLayerConf.disableAdd && (!relatedLayerConf.maxChildren || childFeatures.length < relatedLayerConf.maxChildren)) {
@@ -63,8 +63,9 @@ function relatedTablesForm(viewer, layer, feature, el) {
           editdispatcher.emitAddChild(layer, feature, childLayer);
         });
         rowEl.appendChild(addButtonEl);
-        el.appendChild(rowEl);
+        tableEl.appendChild(rowEl);
       }
+      el.appendChild(tableEl);
     });
   });
 }

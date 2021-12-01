@@ -74,7 +74,7 @@ function wfsTransaction(transObj, layerName, viewer) {
 
       if (result.transactionSummary.totalInserted > 0) {
         feature = transObj.insert;
-       
+
         dispatcher.emitChangeFeature({
           feature: transObj.insert,
           layerName,
