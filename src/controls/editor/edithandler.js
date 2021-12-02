@@ -1205,25 +1205,6 @@ async function onAddChild(e) {
   relatedtables.attachChild(e.detail.parentLayer, e.detail.parentFeature, e.detail.childLayer, newfeature);
   await addFeatureToLayer(newfeature, e.detail.childLayer.get('name'));
   if (autoForm) {
-    // if (autoSave) {
-    //  // If auto save we have to wait for the feature to actually have been saved to the server, otherwise
-    //  // id is not set yet and child form will be out of sync.
-    //  // We know that when the editstore dispaches an event with 0 features remaining.
-    //  // It would have been nice if the save operation was awaitable instead.
-    //  // Explorer does not support the once option so add and remove a handler.
-    //  const onceFunc = (ev) => {
-    //    if (ev.detail.edits === 0) {
-    //      newfeature.once('change', () => { editChild(e.detail.childLayer, e.detail.parentFeature, newfeature) });
-    //      //editChild(e.detail.childLayer, e.detail.parentFeature, newfeature);
-    //      document.removeEventListener('editsChange', onceFunc);
-    //    }
-    //  };
-    //  document.addEventListener('editsChange', onceFunc);
-    //  //newfeature.once('change', () => { editChild(e.detail.childLayer, e.detail.parentFeature, newfeature) });
-    //  addFeatureToLayer(newfeature, e.detail.childLayer.get('name'));
-    // } else {
-    // editChild(e.detail.childLayer, e.detail.parentFeature, newfeature);
-  // }
     editChild(e.detail.childLayer, e.detail.parentFeature, newfeature);
   } else {
     // Refresh / add to parent list. Not needed for autoform, as it will be handled when child modal closes

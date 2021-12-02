@@ -42,11 +42,11 @@ async function getChildFeatures(parentLayer, feature, childLayer) {
   const layerconf = parentLayer.get(RELATED_TABLES_CONFIG_ROOT).find(item => item.layerName === childLayerName);
   const FKField = layerconf.FK;
 
-  // Must escape single quotes and enclose in single quotes id column is string.
+  // Must escape single quotes and enclose in single quotes if PK-column is string.
   // Unfortunately we can not know this from data. We could pick first fetaure if table is not empty.
   // Can't look in parent either, as fid is always string when fid includes layer name.
   if (layerconf.FKIsString) {
-    parentPK = `${parentPK.replace("'", "''")}'`;
+    parentPK = `'${parentPK.replace(/'/g, "''")}'`;
   }
 
   // Make sure the features are loaded if not using strategy "all"
