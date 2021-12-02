@@ -24,6 +24,7 @@ import dropdown from './src/dropdown';
 import { renderSvgIcon } from './src/utils/legendmaker';
 import SelectedItem from './src/models/SelectedItem';
 import 'elm-pep';
+import 'pepjs';
 
 const Origo = function Origo(configPath, options = {}) {
   let viewer;
