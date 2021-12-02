@@ -34,7 +34,6 @@
   "dependencies": {
     "@glidejs/glide": "^3.5.1",
     "awesomplete": "^1.1.5",
-    "core-js": "^3.19.1",
     "cuid": "^2.1.8",
     "dom-to-image-more": "2.8.0",
     "downloadjs": "^1.4.7",
