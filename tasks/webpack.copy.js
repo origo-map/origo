@@ -12,6 +12,7 @@ module.exports = merge(common, {
     library: 'Origo',
     chunkLoading: false
   },
+  devtool: false,
   mode: 'development',
   plugins: [
     new CopyWebpackPlugin({

@@ -36,7 +36,7 @@
     "awesomplete": "^1.1.5",
     "core-js": "^3.19.1",
     "cuid": "^2.1.8",
-    "dom-to-image-more": "2.9.1",
+    "dom-to-image-more": "2.8.0",
     "downloadjs": "^1.4.7",
     "elm-pep": "^1.0.6",
     "html2canvas": "^1.3.3",

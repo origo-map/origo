@@ -7,7 +7,6 @@ import * as olLayer from 'ol/layer';
 import * as olSource from 'ol/source';
 import * as olStyle from 'ol/style';
 import * as olFormat from 'ol/format';
-import polyfill from './src/utils/polyfill';
 import * as ui from './src/ui';
 import Viewer from './src/viewer';
 import loadResources from './src/loadresources';
@@ -24,8 +23,6 @@ import * as Utils from './src/utils';
 import dropdown from './src/dropdown';
 import { renderSvgIcon } from './src/utils/legendmaker';
 import SelectedItem from './src/models/SelectedItem';
-import 'core-js/stable';
-import 'regenerator-runtime/runtime';
 import 'elm-pep';
 
 const Origo = function Origo(configPath, options = {}) {
@@ -59,7 +56,6 @@ const Origo = function Origo(configPath, options = {}) {
     renderError('browser', el);
     return null;
   }
-  polyfill();
 
   const initControls = (controlDefs) => {
     const controls = [];

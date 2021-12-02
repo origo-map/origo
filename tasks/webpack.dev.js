@@ -17,5 +17,5 @@ module.exports = merge(common, {
     },
     port: 9966
   },
-  target: 'web'
+  devtool: 'eval-cheap-source-map'
 });
