@@ -431,6 +431,9 @@ const Measure = function Measure({
     }
     document.getElementById(measureButton.getId()).classList.add('tooltip');
     document.getElementById(clearButton.getId()).classList.add('hidden');
+    if (showSegmentLengths) {
+      document.getElementById(showSegmentLabelButton.getId()).classList.add('hidden');
+    }
     if (touchMode && isActive) {
       document.getElementById(addNodeButton.getId()).classList.add('hidden');
       const markerIconElement = document.getElementById(`${markerIcon.getId()}`);
