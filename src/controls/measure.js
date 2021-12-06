@@ -25,7 +25,7 @@ const Measure = function Measure({
   elevationAttribute,
   showSegmentLengths = false,
   useHectare = true,
-  snap = true,
+  snap = false,
   snapIsActive = true,
   snapLayers,
   snapRadius = 15
