@@ -34,7 +34,7 @@ const Position = function Position(options = {}) {
   let coordsFindElement;
   let containerElement;
 
-  function undefinedhtml() {
+  function placeholder() {
     return noPositionText.length === 0 ? noPositionText === false : noPositionText;
   }
 
@@ -76,7 +76,7 @@ const Position = function Position(options = {}) {
       coordinateFormat: createStringXY(precision),
       projection: currentProjection,
       target: document.getElementById(`${coordsElement.getId()}`),
-      undefinedHTML: undefinedhtml()
+      placeholder: placeholder()
     });
 
     map.addControl(mousePositionControl);
@@ -291,10 +291,12 @@ const Position = function Position(options = {}) {
           onTogglePosition();
         },
         icon: '#ic_gps_not_fixed_24px',
+        ariaLabel: 'Position ikon',
         iconCls: 'o-icon-position'
       });
       projButton = Button({
         cls: 'o-position-button',
+        ariaLabel: 'Projektion',
         click() {
           onToggleProjection();
         }

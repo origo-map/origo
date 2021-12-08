@@ -5,7 +5,6 @@ import Icon from 'ol/style/Icon';
 import Stroke from 'ol/style/Stroke';
 import Style from 'ol/style/Style';
 import Text from 'ol/style/Text';
-import validateurl from './utils/validateurl';
 import stylefunctions from './style/stylefunctions';
 import replacer from './utils/replacer';
 import maputils from './maputils';
@@ -73,7 +72,7 @@ const editStyleOptions = {
   ]
 };
 
-function createStyleOptions(styleParams, baseUrl) {
+function createStyleOptions(styleParams) {
   const styleOptions = {};
   if (Object.prototype.hasOwnProperty.call(styleParams, 'geometry')) {
     switch (styleParams.geometry) {
@@ -115,9 +114,6 @@ function createStyleOptions(styleParams, baseUrl) {
   }
   if ('icon' in styleParams) {
     const styleIcon = styleParams.icon;
-    if ('src' in styleIcon) {
-      styleIcon.src = validateurl(styleIcon.src, baseUrl);
-    }
     styleOptions.image = new Icon(styleIcon);
   }
   if ('circle' in styleParams) {
@@ -130,7 +126,7 @@ function createStyleOptions(styleParams, baseUrl) {
   return styleOptions;
 }
 
-function createStyleList(styleOptions, baseUrl) {
+function createStyleList(styleOptions) {
   const styleList = [];
   // Create style for each rule
   for (let i = 0; i < styleOptions.length; i += 1) {
@@ -139,11 +135,11 @@ function createStyleList(styleOptions, baseUrl) {
     // Check if rule is array, ie multiple styles for the rule
     if (styleOptions[i].constructor === Array) {
       for (let j = 0; j < styleOptions[i].length; j += 1) {
-        styleOption = createStyleOptions(styleOptions[i][j], baseUrl);
+        styleOption = createStyleOptions(styleOptions[i][j]);
         styleRule.push(new Style(styleOption));
       }
     } else {
-      styleOption = createStyleOptions(styleOptions[i], baseUrl);
+      styleOption = createStyleOptions(styleOptions[i]);
       styleRule = [new Style(styleOption)];
     }
 
@@ -172,20 +168,81 @@ function checkOptions(feature, scale, styleSettings, styleList, size) {
       });
       if (Object.prototype.hasOwnProperty.call(s[j][0], 'filter')) {
         let expr;
+        const exprArr = [];
         // find attribute vale between [] defined in styles
-        const matches = s[j][0].filter.match(/\[(.*?)\]/);
-        if (matches) {
-          let first = feature;
-          if (feature.get('features')) {
-            first = feature.get('features')[0];
-          }
-          const featAttr = matches[1];
-          expr = s[j][0].filter.split(']')[1];
-          const featMatch = first.get(featAttr);
-          expr = typeof featMatch === 'number' ? featMatch + expr : `"${featMatch}"${expr}`;
+        let regexExpr;
+        let regexFilter;
+        let featMatch;
+        let filters = [];
+        let filtering = '';
+        // Check for filtering on AND or OR
+        if (s[j][0].filter.search(' AND ') > 0) {
+          filters = s[j][0].filter.split(' AND ');
+          filtering = 'AND';
+        } else if (s[j][0].filter.search(' OR ') > 0) {
+          filters = s[j][0].filter.split(' OR ');
+          filtering = 'OR';
+        } else {
+          // Remove AND or OR filtering in the case it matched the one or other
+          filters = s[j][0].filter.split(' AND ');
+          filters = filters[0].split(' OR ');
         }
-        // eslint-disable-next-line no-eval
-        if (eval(expr)) {
+        // eslint-disable-next-line consistent-return
+        filters.forEach((item) => {
+          const matches = item.match(/\[(.*?)\]/);
+          if (matches) {
+            let first = feature;
+            if (feature.get('features')) {
+              first = feature.get('features')[0];
+            }
+            const featAttr = matches[1];
+            expr = item.split(']')[1];
+            featMatch = first.get(featAttr);
+            regexFilter = item.match(/\/(.*)\/([a-zA-Z]+)?/);
+            expr = typeof featMatch === 'number' ? featMatch + expr : `"${featMatch}"${expr}`;
+          }
+          if (regexFilter) {
+            regexExpr = new RegExp(regexFilter[1], regexFilter[2]);
+            filtering = 'RegExp';
+          }
+          exprArr.push(expr);
+        });
+        let filterMatch = true;
+        let filterMatchOR = false;
+        // Check for true/false depending on if it is AND, OR, RegExp or single filtering
+        exprArr.forEach((exp) => {
+          if (filtering === 'AND') {
+            // eslint-disable-next-line no-eval
+            if (eval(exp) && filterMatch) {
+              filterMatch = true;
+            } else {
+              filterMatch = false;
+            }
+          } else if (filtering === 'OR') {
+            // eslint-disable-next-line no-eval
+            if ((eval(exp) || filterMatchOR)) {
+              filterMatch = true;
+            } else {
+              filterMatch = false;
+            }
+            filterMatchOR = filterMatch;
+          } else if (filtering === 'RegExp') {
+            // eslint-disable-next-line no-eval
+            if (regexExpr.test(featMatch)) {
+              filterMatch = true;
+            } else {
+              filterMatch = false;
+            }
+          } else if (filtering === '') {
+            // eslint-disable-next-line no-eval
+            if (eval(exp)) {
+              filterMatch = true;
+            } else {
+              filterMatch = false;
+            }
+          }
+        });
+        if (filterMatch) {
           styleL = styleList[j];
           return styleL;
         }
@@ -234,7 +291,6 @@ function createStyle({
   const resolutions = viewer.getResolutions();
   const projection = viewer.getProjection();
   const styleSettings = viewer.getStyle(styleName);
-  const baseUrl = viewer.getBaseUrl();
 
   if (!styleSettings || Object.keys(styleSettings).length === 0) {
     const style = getCustomStyle('stylefunction', { name: 'default' });
@@ -255,9 +311,9 @@ function createStyle({
 
   const style = (function style() {
     // Create style for each rule
-    const styleList = createStyleList(styleSettings, baseUrl);
+    const styleList = createStyleList(styleSettings);
     if (clusterStyleSettings) {
-      const clusterStyleList = createStyleList(clusterStyleSettings, baseUrl);
+      const clusterStyleList = createStyleList(clusterStyleSettings);
       return styleFunction({
         styleSettings,
         styleList,
@@ -277,18 +333,32 @@ function createStyle({
   return style;
 }
 
-function createStyleRule(options, baseUrl = '') {
+function createStyleRule(options) {
   let styleRule = [];
   let styleOption;
   if (options.constructor === Array) {
     for (let i = 0; i < options.length; i += 1) {
-      styleOption = createStyleOptions(options[i], baseUrl);
+      styleOption = createStyleOptions(options[i]);
       styleRule.push(new Style(styleOption));
     }
   } else {
-    styleOption = createStyleOptions(options, baseUrl);
+    styleOption = createStyleOptions(options);
     styleRule = [new Style(styleOption)];
   }
+  return styleRule;
+}
+function createGeometryCollectionStyle(options) {
+  const styleRule = [];
+
+  createStyleRule(options.Point).forEach((item) => {
+    styleRule.push(item);
+  });
+  createStyleRule(options.LineString).forEach((item) => {
+    styleRule.push(item);
+  });
+  createStyleRule(options.Polygon).forEach((item) => {
+    styleRule.push(item);
+  });
   return styleRule;
 }
 
@@ -299,7 +369,8 @@ function createGeometryStyle(geometryStyleOptions) {
     LineString: createStyleRule(geometryStyleOptions.LineString),
     MultiLineString: createStyleRule(geometryStyleOptions.LineString),
     Polygon: createStyleRule(geometryStyleOptions.Polygon),
-    MultiPolygon: createStyleRule(geometryStyleOptions.Polygon)
+    MultiPolygon: createStyleRule(geometryStyleOptions.Polygon),
+    GeometryCollection: createGeometryCollectionStyle(geometryStyleOptions)
   };
 }
 

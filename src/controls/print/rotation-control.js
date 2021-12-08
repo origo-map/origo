@@ -2,7 +2,8 @@ import { InputRange, Component } from '../../ui';
 
 export default function RotationControl(options = {}) {
   const {
-    rotation = 0,
+    rotation,
+    rotationStep,
     map
   } = options;
 
@@ -11,10 +12,12 @@ export default function RotationControl(options = {}) {
     minValue: 0,
     maxValue: 360,
     initialValue: rotation,
-    step: 1,
+    step: rotationStep,
     style: {
       'align-self': 'center'
-    }
+    },
+    unit: '&deg;',
+    label: 'Rotera karta'
   });
 
   return Component({
@@ -25,6 +28,9 @@ export default function RotationControl(options = {}) {
     },
     onRender() {
       this.dispatch('render');
+      if (rotation) {
+        map.getView().setRotation((rotation * Math.PI) / 180);
+      }
     },
     onChangeRotation(evt) {
       map.getView().setRotation((evt.value * Math.PI) / 180);
@@ -52,10 +58,8 @@ export default function RotationControl(options = {}) {
     render() {
       return `
       <div class="padding-top-large"></div>
-      <h6>Rotera karta</h6>
-      <div class="padding-smaller o-tooltip active">
+      <div class="padding-right-small o-tooltip active">
         ${rotationSlider.render()}
-      <div class="text-align-center"><span class="text-smaller float-left">0&deg;</span><span class="text-smaller float-right">360&deg;</span></div>
       </div>`;
     }
   });

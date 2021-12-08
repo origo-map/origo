@@ -32,6 +32,21 @@
   z-index: 1;
 }
 
+.awesomplete.black > ul {
+  background: #000 !important;
+  box-sizing: border-box;
+  color: #fff;
+  left: 0px;
+  list-style: none;
+  margin: 0;
+  min-width: 100%;
+  padding: 0;
+  position: absolute;
+  top: auto;
+  bottom: 100%;
+  z-index: 9999999;
+}
+
 .awesomplete > ul:empty {
   display: none;
 }

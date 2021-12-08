@@ -31,7 +31,8 @@ function createImageSource(options) {
     params: {
       LAYERS: options.id,
       VERSION: options.version,
-      FORMAT: options.format
+      FORMAT: options.format,
+      STYLES: options.style
     }
   }));
 }
@@ -66,6 +67,7 @@ const wms = function wms(layerOptions, viewer) {
     sourceOptions.tileGrid = viewer.getTileGrid();
 
     if (wmsOptions.extent) {
+      // FIXME: there is no "extent" property to set. Code has no effect. Probably must create a new grid from viewer.getTileGridSettings .
       sourceOptions.tileGrid.extent = wmsOptions.extent;
     }
   }

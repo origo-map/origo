@@ -100,7 +100,7 @@ const Splash = function Splash(options = {}) {
       if (!content) content = defaultContent;
 
       if (url) {
-        const fullUrl = viewer.getBaseUrl() + url;
+        const fullUrl = url;
         const req = new Request(`${fullUrl}`);
         fetch(req).then(response => response.text().then((text) => {
           createModal(text);

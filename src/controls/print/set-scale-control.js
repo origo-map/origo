@@ -1,28 +1,20 @@
 import { Dropdown, Component } from '../../ui';
 import mapUtils from '../../maputils';
-import numberFormatter from '../../utils/numberformatter';
 
 export default function SetScaleControl(options = {}, map) {
   const {
-    scales = []
+    scales = [],
+    initialScale
   } = options;
-
-  let projection;
-  let resolutions;
 
   let selectScale;
 
-  const roundScale = (scale) => {
-    let scaleValue = scale;
-    const differens = scaleValue % 10;
-    if (differens !== 0) {
-      scaleValue += (10 - differens);
-    }
-    return scaleValue;
-  };
-
-  function getScales() {
-    return resolutions.map(resolution => `1:${numberFormatter(roundScale(mapUtils.resolutionToScale(resolution, projection)))}`);
+  /**
+   * Parses a formatted scale string and returns the denominator as a number
+   * @param {any} scale
+   */
+  function parseScale(scale) {
+    return parseInt(scale.replace(/\s+/g, '').split(':').pop(), 10);
   }
 
   return Component({
@@ -32,28 +24,31 @@ export default function SetScaleControl(options = {}, map) {
         cls: 'o-scalepicker text-black flex',
         contentCls: 'bg-grey-lighter text-smallest rounded',
         buttonCls: 'bg-white border text-black',
-        buttonIconCls: 'black'
+        buttonIconCls: 'black',
+        text: 'Välj skala'
       });
       this.addComponents([selectScale]);
-      projection = map.getView().getProjection();
-      resolutions = map.getView().getResolutions();
     },
     onChangeScale(evt) {
-      const scaleDenominator = parseInt(evt.replace(/\s+/g, '').split(':').pop(), 10);
+      const scaleDenominator = parseScale(evt);
       this.dispatch('change:scale', { scale: scaleDenominator / 1000 });
       selectScale.setButtonText(evt);
     },
     onRender() {
       this.dispatch('render');
-      selectScale.setButtonText('Välj skala');
-      if (Array.isArray(scales) && scales.length) {
-        selectScale.setItems(scales);
-      } else {
-        selectScale.setItems(getScales());
-      }
+      selectScale.setItems(scales);
       document.getElementById(selectScale.getId()).addEventListener('dropdown:select', (evt) => {
         this.onChangeScale(evt.target.textContent);
       });
+      if (initialScale) {
+        this.onChangeScale(initialScale);
+      } else {
+        const viewResolution = map.getView().getResolution();
+        const projection = map.getView().getProjection();
+        const mapScale = mapUtils.resolutionToScale(viewResolution, projection);
+        const closest = scales.reduce((prev, curr) => (Math.abs(parseScale(curr) - mapScale) < Math.abs(parseScale(prev) - mapScale) ? curr : prev));
+        this.onChangeScale(closest);
+      }
     },
     render() {
       return `

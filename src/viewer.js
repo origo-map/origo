@@ -4,6 +4,7 @@ import geom from 'ol/geom/Geometry';
 import { Component } from './ui';
 import Map from './map';
 import proj from './projection';
+import getCapabilities from './getCapabilities';
 import MapSize from './utils/mapsize';
 import Featureinfo from './featureinfo';
 import Selectionmanager from './selectionmanager';
@@ -28,7 +29,6 @@ const Viewer = function Viewer(targetOption, options = {}) {
   } = options;
 
   const {
-    baseUrl = '',
     breakPoints,
     breakPointsPrefix,
     clsOptions = '',
@@ -56,10 +56,29 @@ const Viewer = function Viewer(targetOption, options = {}) {
     url
   } = options;
 
+  const viewerOptions = Object.assign({}, options);
   const target = targetOption;
   const center = urlParams.center || centerOption;
   const zoom = urlParams.zoom || zoomOption;
   const groups = flattenGroups(groupOptions);
+
+  const getCapabilitiesLayers = () => {
+    const capabilitiesPromises = [];
+    (Object.keys(source)).forEach(sourceName => {
+      const sourceOptions = source[sourceName];
+      if (sourceOptions && sourceOptions.capabilitiesURL) {
+        capabilitiesPromises.push(getCapabilities(sourceName, sourceOptions.capabilitiesURL));
+      }
+    });
+    return Promise.all(capabilitiesPromises).then(capabilitiesResults => {
+      const layers = {};
+      capabilitiesResults.forEach(result => {
+        layers[result.name] = result.capabilites;
+      });
+      return layers;
+    }).catch(error => console.log(error));
+  };
+
   const defaultTileGridOptions = {
     alignBottomLeft: true,
     extent,
@@ -99,8 +118,6 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
   const getExtent = () => extent;
 
-  const getBaseUrl = () => baseUrl;
-
   const getBreakPoints = function getBreakPoints(size) {
     return size && size in breakPoints ? breakPoints[size] : breakPoints;
   };
@@ -122,6 +139,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
   const getTileGridSettings = () => tileGridSettings;
 
   const getTileSize = () => tileGridSettings.tileSize;
+
+  const getViewerOptions = () => viewerOptions;
 
   const getUrl = () => url;
 
@@ -175,7 +194,17 @@ const Viewer = function Viewer(targetOption, options = {}) {
     return layers;
   };
 
-  const getLayer = layerName => getLayers().filter(layer => layer.get('name') === layerName)[0];
+  const getLayer = function getLayer(layerName) {
+    const layerArray = getLayers();
+    if (layerArray.some(layer => layer.get('name') === layerName)) {
+      return layerArray.find(layer => layer.get('name') === layerName);
+    } else if (layerArray.some(layer => layer.get('type') === 'GROUP')) {
+      const groupLayerArray = layerArray.filter(layer => layer.get('type') === 'GROUP');
+      const layersFromGroupLayersArray = groupLayerArray.map(groupLayer => groupLayer.getLayers().getArray());
+      return layersFromGroupLayersArray.flat().find(layer => layer.get('name') === layerName);
+    }
+    return undefined;
+  };
 
   const getQueryableLayers = function getQueryableLayers() {
     const queryableLayers = getLayers().filter(layer => layer.get('queryable') && layer.getVisible());
@@ -211,6 +240,13 @@ const Viewer = function Viewer(targetOption, options = {}) {
     throw new Error(`There is no source with name: ${name}`);
   };
 
+  const getSource2 = function getSource2(name) {
+    if (name in source) {
+      return source[name];
+    }
+    return undefined;
+  };
+
   const getGroups = () => groups;
 
   const getProjectionCode = () => projectionCode;
@@ -244,23 +280,56 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
   const getMain = () => main;
 
-  const mergeSavedLayerProps = (initialLayerProps, savedLayerProps) => {
-    if (savedLayerProps) {
-      const mergedLayerProps = initialLayerProps.reduce((acc, initialProps) => {
-        const layerName = initialProps.name.split(':').pop();
-        const savedProps = savedLayerProps[layerName] || {
-          visible: false,
-          legend: false
-        };
-        savedProps.name = initialProps.name;
-        const mergedProps = Object.assign({}, initialProps, savedProps);
-        acc.push(mergedProps);
-        return acc;
-      }, []);
-      return mergedLayerProps;
-    }
-    return initialLayerProps;
+  const getEmbedded = function getEmbedded() {
+    return isEmbedded(this.getTarget());
   };
+
+  const mergeSecuredLayer = (layerlist, capabilitiesLayers) => {
+    if (capabilitiesLayers && Object.keys(capabilitiesLayers).length > 0) {
+      return layerlist.map(layer => {
+        let secure;
+        let layername = layer.name;
+        // remove workspace if syntax is workspace:layername
+        layername = layername.split(':').pop();
+        // remove double underscore plus a suffix from layer name
+        if (layername.includes('__')) {
+          layername = layername.substring(0, layername.lastIndexOf('__'));
+        }
+        const layerSourceOptions = layer.source ? getSource2(layer.source) : undefined;
+        if (layerSourceOptions && layerSourceOptions.capabilitiesURL) {
+          if (capabilitiesLayers[layer.source].indexOf(layername) >= 0) {
+            secure = false;
+          } else {
+            secure = true;
+          }
+        } else {
+          secure = false;
+        }
+        return { ...layer, secure };
+      });
+    }
+    return layerlist;
+  };
+
+  const mergeSavedLayerProps = (initialLayerProps, savedLayerProps) => getCapabilitiesLayers()
+    .then(capabilitiesLayers => {
+      let mergedLayerProps;
+      if (savedLayerProps) {
+        mergedLayerProps = initialLayerProps.reduce((acc, initialProps) => {
+          const layerName = initialProps.name.split(':').pop();
+          const savedProps = savedLayerProps[layerName] || {
+            visible: false,
+            legend: false
+          };
+          savedProps.name = initialProps.name;
+          const mergedProps = Object.assign({}, initialProps, savedProps);
+          acc.push(mergedProps);
+          return acc;
+        }, []);
+        return mergeSecuredLayer(mergedLayerProps, capabilitiesLayers);
+      }
+      return mergeSecuredLayer(initialLayerProps, capabilitiesLayers);
+    });
 
   const removeOverlays = function removeOverlays(overlays) {
     if (overlays) {
@@ -371,6 +440,11 @@ const Viewer = function Viewer(targetOption, options = {}) {
     }
   };
 
+  const addMarker = function addMarker(coordinates, title, content) {
+    const layer = maputils.createMarker(coordinates, title, content, this);
+    map.addLayer(layer);
+  };
+
   const getUrlParams = function getUrlParams() {
     return urlParams;
   };
@@ -389,78 +463,84 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
       setMap(Map(Object.assign(options, { projection, center, zoom, target: this.getId() })));
 
-      const layerProps = mergeSavedLayerProps(layerOptions, urlParams.layers);
-      this.addLayers(layerProps);
+      mergeSavedLayerProps(layerOptions, urlParams.layers)
+        .then(layerProps => {
+          this.addLayers(layerProps);
 
-      mapSize = MapSize(map, {
-        breakPoints,
-        breakPointsPrefix,
-        mapId: this.getId()
-      });
+          mapSize = MapSize(map, {
+            breakPoints,
+            breakPointsPrefix,
+            mapId: this.getId()
+          });
 
-      if (urlParams.feature) {
-        const featureId = urlParams.feature;
-        const layerName = featureId.split('.')[0];
-        const layer = getLayer(layerName);
-        const type = layer.get('type');
+          if (urlParams.feature) {
+            let featureId = urlParams.feature;
+            const layerName = featureId.split('.')[0];
+            const layer = getLayer(layerName);
+            const type = layer.get('type');
 
-        if (layer && type !== 'GROUP') {
-          const clusterSource = layer.getSource().source;
-          const id = featureId.split('.')[1];
-          layer.once('postrender', () => {
-            let feature;
+            if (layer && type !== 'GROUP') {
+              const clusterSource = layer.getSource().source;
+              const id = featureId.split('.')[1];
+              layer.once('postrender', () => {
+                let feature;
 
-            if (type === 'WFS' && clusterSource) {
-              feature = clusterSource.getFeatureById(featureId);
-            } else if (type === 'WFS') {
-              feature = layer.getSource().getFeatureById(featureId);
-            } else if (clusterSource) {
-              feature = clusterSource.getFeatureById(id);
-            } else {
-              feature = layer.getSource().getFeatureById(id);
-            }
+                if (type === 'WFS' && clusterSource) {
+                  feature = clusterSource.getFeatureById(featureId);
+                } else if (type === 'WFS') {
+                  if (featureId.includes('__')) {
+                    featureId = featureId.replace(featureId.substring(featureId.lastIndexOf('__'), featureId.lastIndexOf('.')), '');
+                  }
+                  feature = layer.getSource().getFeatureById(featureId);
+                } else if (clusterSource) {
+                  feature = clusterSource.getFeatureById(id);
+                } else {
+                  feature = layer.getSource().getFeatureById(id);
+                }
 
-            if (feature) {
-              const obj = {};
-              obj.feature = feature;
-              obj.title = layer.get('title');
-              obj.content = getAttributes(feature, layer);
-              obj.layer = layer;
-              const centerGeometry = getcenter(feature.getGeometry());
-              const infowindowType = featureinfoOptions.showOverlay === false ? 'sidebar' : 'overlay';
-              featureinfo.render([obj], infowindowType, centerGeometry);
-              map.getView().fit(feature.getGeometry(), {
-                maxZoom: getResolutions().length - 2,
-                padding: [15, 15, 40, 15],
-                duration: 1000
+                if (feature) {
+                  const obj = {};
+                  obj.feature = feature;
+                  obj.title = layer.get('title');
+                  obj.content = getAttributes(feature, layer);
+                  obj.layer = layer;
+                  const centerGeometry = getcenter(feature.getGeometry());
+                  const infowindowType = featureinfoOptions.showOverlay === false ? 'sidebar' : 'overlay';
+                  featureinfo.render([obj], infowindowType, centerGeometry);
+                  map.getView().fit(feature.getGeometry(), {
+                    maxZoom: getResolutions().length - 2,
+                    padding: [15, 15, 40, 15],
+                    duration: 1000
+                  });
+                }
               });
             }
-          });
-        }
-      }
+          }
 
-      if (urlParams.pin) {
-        featureinfoOptions.savedPin = urlParams.pin;
-      } else if (urlParams.selection) {
-        // This needs further development for proper handling in permalink
-        featureinfoOptions.savedSelection = new Feature({
-          geometry: new geom[urlParams.selection.geometryType](urlParams.selection.coordinates)
+          if (urlParams.pin) {
+            featureinfoOptions.savedPin = urlParams.pin;
+          } else if (urlParams.selection) {
+            // This needs further development for proper handling in permalink
+            featureinfoOptions.savedSelection = new Feature({
+              geometry: new geom[urlParams.selection.geometryType](urlParams.selection.coordinates)
+            });
+          }
+
+          if (!urlParams.zoom && !urlParams.mapStateId && startExtent) {
+            map.getView().fit(startExtent, { size: map.getSize() });
+          }
+
+          featureinfoOptions.viewer = this;
+
+          selectionmanager = Selectionmanager(featureinfoOptions);
+          this.addComponent(selectionmanager);
+
+          featureinfo = Featureinfo(featureinfoOptions);
+          this.addComponent(featureinfo);
+
+          this.addControls();
+          this.dispatch('loaded');
         });
-      }
-
-      if (!urlParams.zoom && !urlParams.mapStateId && startExtent) {
-        map.getView().fit(startExtent, { size: map.getSize() });
-      }
-
-      featureinfoOptions.viewer = this;
-
-      selectionmanager = Selectionmanager(featureinfoOptions);
-      this.addComponent(selectionmanager);
-
-      featureinfo = Featureinfo(featureinfoOptions);
-      this.addComponent(featureinfo);
-
-      this.addControls();
     },
     render() {
       const htmlString = `<div id="${this.getId()}" class="${cls}">
@@ -481,7 +561,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     addLayers,
     addSource,
     addStyle,
-    getBaseUrl,
+    addMarker,
     getBreakPoints,
     getCenter,
     getClusterOptions,
@@ -519,10 +599,12 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getTileSize,
     getUrl,
     getUrlParams,
+    getViewerOptions,
     removeGroup,
     removeOverlays,
     zoomToExtent,
-    getSelectionManager
+    getSelectionManager,
+    getEmbedded
   });
 };
 

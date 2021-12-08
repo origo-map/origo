@@ -21,5 +21,8 @@ module.exports = merge(common, {
     library: 'Origo'
   },
   devtool: false,
-  mode: 'production'
+  mode: 'production',
+  node: {
+    fs: 'empty'
+  }
 });

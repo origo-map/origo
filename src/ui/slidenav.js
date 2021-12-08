@@ -137,7 +137,8 @@ export default function Slidenav(options = {}) {
         iconCls: 'grey',
         click: () => {
           this.slideToMain();
-        }
+        },
+        tabIndex: -99
       });
       header = Component({
         onRender() {

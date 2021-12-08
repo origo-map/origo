@@ -26,11 +26,13 @@ import { renderSvgIcon } from './src/utils/legendmaker';
 import SelectedItem from './src/models/SelectedItem';
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
+import 'elm-pep';
 
 const Origo = function Origo(configPath, options = {}) {
   let viewer;
   const origoConfig = {
     controls: [],
+    featureinfoOptions: {},
     crossDomain: true,
     target: '#app-wrapper',
     svgSpritePath: 'css/svg/',
@@ -98,6 +100,9 @@ const Origo = function Origo(configPath, options = {}) {
     getConfig,
     onInit() {
       const defaultConfig = Object.assign({}, origoConfig, options);
+      const base = document.createElement('base');
+      base.href = defaultConfig.baseUrl;
+      document.getElementsByTagName('head')[0].appendChild(base);
       loadResources(configPath, defaultConfig)
         .then((data) => {
           const viewerOptions = data.options;
@@ -105,7 +110,10 @@ const Origo = function Origo(configPath, options = {}) {
           viewerOptions.extensions = initExtensions(viewerOptions.extensions || []);
           const target = viewerOptions.target;
           viewer = Viewer(target, viewerOptions);
-          this.dispatch('load', viewer);
+          const origo = this;
+          viewer.on('loaded', () => {
+            origo.dispatch('load', viewer);
+          });
         })
         .catch(error => console.error(error));
     }

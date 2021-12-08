@@ -29,8 +29,20 @@ const replacer = function replacer() {
         }
         if (matches[1].indexOf('.') > 0) {
           const splitMatch = matches[1].split('.');
-          object = obj[splitMatch.shift()];
-          val = `${start}${splitMatch.join('.')}${end}`;
+          let objectTemp = obj;
+          // Drill down to the end of the nested attribute and return the value
+          do {
+            const key = splitMatch.shift();
+            if (key in objectTemp) {
+              objectTemp = objectTemp[key];
+            }
+          } while (splitMatch.length > 1);
+          if (typeof objectTemp[splitMatch[0]] !== 'undefined') {
+            val = objectTemp[splitMatch[0]];
+          } else {
+            val = '';
+          }
+          object = obj;
         } else {
           object = obj;
         }

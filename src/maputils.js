@@ -3,9 +3,14 @@ import TileGrid from 'ol/tilegrid/TileGrid';
 import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
 import Vector from 'ol/source/Vector';
+import VectorLayer from 'ol/layer/Vector';
+import Overlay from 'ol/Overlay';
 import GeoJSON from 'ol/format/GeoJSON';
 import { getTopLeft, getBottomLeft } from 'ol/extent';
 import WKT from 'ol/format/WKT';
+import numberFormatter from './utils/numberformatter';
+import Style from './style';
+import Popup from './popup';
 
 const maputils = {
   isWithinVisibleScales: function isWithinVisibleScales(scale, maxScale, minScale) {
@@ -89,7 +94,7 @@ const maputils = {
         center = geometry.getCoordinates();
         break;
       case 'MultiPoint':
-        center = geometry[0].getCoordinates();
+        center = geometry.getPoint(0).getCoordinates();
         break;
       case 'LineString':
         center = geometry.getCoordinateAt(0.5);
@@ -112,11 +117,79 @@ const maputils = {
     scale = Math.round(scale);
     return scale;
   },
+  resolutionToFormattedScale: function resolutionToFormattedScale(resolution, projection) {
+    const scale = this.roundScale(this.resolutionToScale(resolution, projection));
+    return `1:${numberFormatter(scale)}`;
+  },
   scaleToResolution: function scaleToResolution(scale, projection) {
     const dpi = 25.4 / 0.28;
     const mpu = projection.getMetersPerUnit();
     const resolution = scale / (mpu * 39.37 * dpi);
     return resolution;
+  },
+  roundScale: function roundScale(scale) {
+    let scaleValue = scale;
+    const differens = scaleValue % 10;
+    if (differens !== 0) {
+      scaleValue += (10 - differens);
+    }
+    return scaleValue;
+  },
+  createMarker: function createMarker(coordinates, title, content, viewer) {
+    const featureStyles = {
+      stroke: {
+        color: [100, 149, 237, 1],
+        width: 4,
+        lineDash: null
+      },
+      fill: {
+        color: [100, 149, 237, 0.2]
+      },
+      circle: {
+        radius: 7,
+        stroke: {
+          color: [100, 149, 237, 1],
+          width: 2
+        },
+        fill: {
+          color: [255, 255, 255, 1]
+        }
+      }
+    };
+    const vectorStyles = Style.createStyleRule(featureStyles);
+    const layer = new VectorLayer({
+      source: new Vector({
+        features: [
+          new Feature({
+            geometry: new Point(coordinates)
+          })
+        ]
+      }),
+      style: vectorStyles
+    });
+    const popup = Popup(`#${viewer.getId()}`);
+    popup.setContent({
+      content,
+      title
+    });
+    popup.setTitle(title);
+    popup.setVisibility(true);
+    const popupEl = popup.getEl();
+    const popupHeight = document.querySelector('.o-popup').offsetHeight + 10;
+    popupEl.style.height = `${popupHeight}px`;
+    const overlay = new Overlay({
+      element: popupEl,
+      autoPan: {
+        margin: 55,
+        animation: {
+          duration: 500
+        }
+      },
+      positioning: 'bottom-center'
+    });
+    viewer.getMap().addOverlay(overlay);
+    overlay.setPosition(coordinates);
+    return layer;
   }
 };
 

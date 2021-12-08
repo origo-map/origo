@@ -1,4 +1,4 @@
-import { Component } from '../../ui';
+import { Component, InputRange } from '../../ui';
 import { Legend } from '../../utils/legendmaker';
 
 const OverlayProperties = function OverlayProperties(options = {}) {
@@ -19,9 +19,17 @@ const OverlayProperties = function OverlayProperties(options = {}) {
   let sliderEl;
   let label = '';
   if (options.labelOpacitySlider) {
-    label = `<span class="text-smaller">${options.labelOpacitySlider}</span>`;
+    label = options.labelOpacitySlider;
   }
-  const inputRange = opacityControl ? `<div class="padding-smaller o-tooltip active"><input id="opacitySlider" type="range" min="0" max="1" value="${opacity}" step="0.1"><div class="text-align-center"><span class="text-smaller float-left">0%</span>${label}<span class="text-smaller float-right">100%</span></div></div>` : '';
+  const transparencySlider = InputRange({
+    cls: 'o-tooltip active',
+    minValue: 0,
+    maxValue: 1,
+    initialValue: opacity,
+    step: 0.1,
+    unit: '%',
+    label
+  });
 
   function extendedLegendZoom(e) {
     const parentOverlay = document.getElementById(options.parent.getId());
@@ -37,19 +45,22 @@ const OverlayProperties = function OverlayProperties(options = {}) {
 
   return Component({
     onInit() {
+      this.addComponents([transparencySlider]);
       this.on('click', (e) => {
         extendedLegendZoom(e);
       });
     },
     onRender() {
+      sliderEl = document.getElementById(transparencySlider.getId());
       overlayEl = document.getElementById(this.getId());
       overlayEl.addEventListener('click', (e) => {
         this.dispatch('click', e);
       });
       if (opacityControl) {
-        sliderEl = document.getElementById('opacitySlider');
+        sliderEl.nextElementSibling.value *= 100;
         sliderEl.addEventListener('input', () => {
           layer.setOpacity(sliderEl.valueAsNumber);
+          sliderEl.nextElementSibling.value *= 100;
         });
         sliderEl.addEventListener('change', () => {
           layer.setOpacity(sliderEl.valueAsNumber);
@@ -58,8 +69,8 @@ const OverlayProperties = function OverlayProperties(options = {}) {
     },
     render() {
       return `<div id="${this.getId()}" class="${cls} border-bottom">
-                <div class="padding-small">${legend}${inputRange}</div>
-                <div class="padding-small padding-x text-small">${abstract}</div>
+                <div class="padding-small">${legend}${transparencySlider.render()}</div>
+                ${abstract ? `<div class="padding-small padding-x text-small">${abstract}</div>` : ''}
               </div>`;
     },
     labelCls: 'text-small text-semibold',

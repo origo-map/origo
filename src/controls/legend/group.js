@@ -19,7 +19,8 @@ const Group = function Group(options = {}, viewer) {
     position = 'top',
     type = 'group',
     autoExpand = true,
-    exclusive = false
+    exclusive = false,
+    toggleAll = true
   } = options;
 
   const stateCls = {
@@ -47,7 +48,7 @@ const Group = function Group(options = {}, viewer) {
 
   const getVisible = () => visibleState;
 
-  const tickButton = !exclusive ? Button({
+  const tickButton = !exclusive && toggleAll ? Button({
     cls: 'icon-smaller round small',
     click() {
       const eventType = visibleState === 'all' ? 'untick:all' : 'tick:all';
@@ -57,7 +58,7 @@ const Group = function Group(options = {}, viewer) {
       const el = document.getElementById(this.getId());
       el.dispatchEvent(tickEvent);
     },
-    icon: '#ic_check_circle_24px',
+    icon: '#ic_radio_button_unchecked_24px',
     iconCls: '',
     state: visibleState,
     style: {

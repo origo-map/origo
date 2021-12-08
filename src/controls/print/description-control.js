@@ -2,19 +2,21 @@ import { Textarea, cuid, Component, Button, Dropdown, ToggleGroup } from '../../
 
 export default function DescriptionControl(options = {}) {
   const {
-    text = '',
-    alignment = 'center',
-    classes = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']
+    description,
+    descriptionPlaceholderText,
+    descriptionAlignment,
+    descriptionSizes
   } = options;
+
   let {
-    size = 'h4'
+    descriptionSize,
+    descriptionFormatIsVisible
   } = options;
+
   const cls = 'placeholder-text-smaller smaller';
-  const placeholderText = 'Här kan du skriva en beskrivning';
   const style = { margin: 0 };
   const align = ['text-align-left', 'text-align-center', 'text-align-right'];
   const formatId = cuid();
-  let isVisible = false;
   let formatEl;
   let textareaDescription;
   let formatButton;
@@ -29,10 +31,10 @@ export default function DescriptionControl(options = {}) {
     onInit() {
       textareaDescription = Textarea({
         cls,
-        placeholderText,
+        placeholderText: descriptionPlaceholderText,
         style,
         cols: 32,
-        value: text
+        value: description
       });
       formatButton = Button({
         cls: 'grow light text-smaller',
@@ -43,19 +45,19 @@ export default function DescriptionControl(options = {}) {
       alignLeftComponent = Button({
         cls: 'grow light text-smaller',
         text: 'Vänster',
-        state: alignment === 'left' ? 'active' : 'initial',
+        state: descriptionAlignment === 'left' ? 'active' : 'initial',
         style: { width: '34%' }
       });
       alignCenterComponent = Button({
         cls: 'grow light text-smaller',
         text: 'Mitten',
-        state: alignment === 'center' ? 'active' : 'initial',
+        state: descriptionAlignment === 'center' ? 'active' : 'initial',
         style: { width: '34%' }
       });
       alignRightComponent = Button({
         cls: 'grow light text-smaller',
         text: 'Höger',
-        state: alignment === 'right' ? 'active' : 'initial',
+        state: descriptionAlignment === 'right' ? 'active' : 'initial',
         style: { width: '33%' }
       });
       alignButtons = [alignLeftComponent, alignCenterComponent, alignRightComponent];
@@ -88,25 +90,25 @@ export default function DescriptionControl(options = {}) {
     onChangeSize(evt) {
       this.dispatch('change:descriptionSize', { class: evt });
       selectSize.setButtonText(evt);
-      size = evt;
+      descriptionSize = evt;
     },
     onRender() {
       formatEl = document.getElementById(formatId);
       this.dispatch('render');
-      selectSize.setButtonText(size);
-      selectSize.setItems(classes);
-      this.onChangeSize(size);
+      selectSize.setButtonText(descriptionSize);
+      selectSize.setItems(descriptionSizes);
+      this.onChangeSize(descriptionSize);
       document.getElementById(selectSize.getId()).addEventListener('dropdown:select', (evt) => {
         this.onChangeSize(evt.target.textContent);
       });
     },
     onChangeVisible() {
-      if (isVisible) {
+      if (descriptionFormatIsVisible) {
         formatEl.classList.add('hidden');
       } else {
         formatEl.classList.remove('hidden');
       }
-      isVisible = !isVisible;
+      descriptionFormatIsVisible = !descriptionFormatIsVisible;
     },
     onChangeDescription(evt) {
       this.dispatch('change:description', evt);
@@ -123,7 +125,7 @@ export default function DescriptionControl(options = {}) {
           ${formatButton.render()}
         </div>
       </div>
-      <div class="hidden" id="${formatId}">
+      <div class="${descriptionFormatIsVisible ? '' : 'hidden'}" id="${formatId}">
       <div class="padding-smaller">
         <h6>Justering beskrivning</h6>
         ${alignControl.render()}
