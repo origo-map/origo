@@ -16,6 +16,7 @@ import PrintToolbar from './print-toolbar';
 import { downloadPNG, downloadPDF, printToScalePDF } from '../../utils/download';
 import { afterRender, beforeRender } from './download-callback';
 import maputils from '../../maputils';
+import PrintResize from './print-resize';
 
 const PrintComponent = function PrintComponent(options = {}) {
   const {
@@ -219,6 +220,16 @@ const PrintComponent = function PrintComponent(options = {}) {
 
   const printMapComponent = PrintMap({ logo, northArrow, map, viewer, showNorthArrow });
 
+  const printResize = PrintResize({
+    map,
+    viewer,
+    logoComponent: printMapComponent.getLogoComponent(),
+    northArrowComponent: printMapComponent.getNorthArrowComponent(),
+    titleComponent,
+    descriptionComponent,
+    createdComponent
+  });
+
   const setScale = function setScale(scale) {
     printScale = scale;
     const widthInMm = orientation === 'portrait' ? sizes[size][1] : sizes[size][0];
@@ -228,6 +239,9 @@ const PrintComponent = function PrintComponent(options = {}) {
       resolution / 25.4,
       map.getView().getCenter());
     printMapComponent.dispatch('change:setDPI', { resolution });
+    printResize.setResolution(resolution);
+    printResize.resize();
+    printResize.updateLayers();
     pageElement.style.width = `${widthImage}px`;
     pageElement.style.height = `${heightImage}px`;
     // Scale the printed map to make it fit in the preview
@@ -393,6 +407,9 @@ const PrintComponent = function PrintComponent(options = {}) {
       printMapComponent.dispatch('change:toggleNorthArrow', { showNorthArrow });
     },
     close() {
+      printResize.setResolution(150);
+      printResize.resize();
+      printResize.resetLayers();
       // Restore scales
       if (!supressResolutionsRecalculation) {
         const viewerResolutions = viewer.getResolutions();
