@@ -26,6 +26,7 @@ const Measure = function Measure({
   showSegmentLengths = false,
   useHectare = true,
   snap = false,
+  snapIsActive = true,
   snapLayers,
   snapRadius = 15
 } = {}) {
@@ -72,7 +73,7 @@ const Measure = function Measure({
   let touchMode;
   let snapCollection;
   let snapEventListenerKeys;
-  let snapActive;
+  let snapActive = snapIsActive;
 
   function createStyle(feature) {
     const featureType = feature.getGeometry().getType();
@@ -513,7 +514,7 @@ const Measure = function Measure({
         source: layer.getSource(),
         pixelTolerance: snapRadius
       });
-      sn.setActive(!!state.visible);
+      sn.setActive(!!state.visible && snapActive);
       sn.set('layerId', layerId);
     }
     const eventKey = layer.on('change:visible', (visibilityChangeEvent) => {
@@ -522,7 +523,7 @@ const Measure = function Measure({
           source: layer.getSource(),
           pixelTolerance: snapRadius
         });
-        s.setActive(!visibilityChangeEvent.oldValue);
+        s.setActive(!visibilityChangeEvent.oldValue && snapActive);
         s.set('layerId', layerId);
         map.addInteraction(s);
         snapCollection.push(s);
@@ -587,7 +588,6 @@ const Measure = function Measure({
     map.addInteraction(measure);
 
     if (snap) {
-      snapActive = true;
       addSnapInteractions();
     }
 
@@ -600,7 +600,6 @@ const Measure = function Measure({
     measure.on(
       'drawstart',
       (evt) => {
-        measure.getOverlay().getSource().getFeatures()[1].setStyle([]);
         sketch = evt.feature;
         sketch.on('change', pointerMoveHandler);
         if (touchMode) {
@@ -866,7 +865,7 @@ const Measure = function Measure({
         if (snap) {
           toggleSnapButton = Button({
             cls:
-              'o-measure-elevation padding-small margin-bottom-smaller icon-smaller round light box-shadow hidden active',
+              `o-measure-elevation padding-small margin-bottom-smaller icon-smaller round light box-shadow hidden activ ${snapActive && 'active'}`,
             click() {
               toggleSnap();
             },
