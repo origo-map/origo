@@ -421,7 +421,7 @@ const Measure = function Measure({
   function createRadiusModal(feature) {
     const title = 'Ange buffert i meter (ex 1000):';
     const content = `<div>
-                      <input type="number" id="bufferradius" autofocus>
+                      <input type="number" id="bufferradius">
                       <button id="bufferradiusBtn">OK</button>
                     </div>`;
     const modal = Modal({
@@ -431,6 +431,7 @@ const Measure = function Measure({
       style: 'width: auto;'
     });
     const bufferradiusEl = document.getElementById('bufferradius');
+    bufferradiusEl.focus();
     const bufferradiusBtn = document.getElementById('bufferradiusBtn');
     bufferradiusBtn.addEventListener('click', (e) => {
       const radiusVal = bufferradiusEl.value;
