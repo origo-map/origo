@@ -10,7 +10,7 @@ import LineString from 'ol/geom/LineString';
 import Point from 'ol/geom/Point';
 import Projection from 'ol/proj/Projection';
 import * as Extent from 'ol/extent';
-import { Component, Icon, Element as El, Button, dom } from '../ui';
+import { Component, Icon, Element as El, Button, dom, Modal } from '../ui';
 import Style from '../style';
 import StyleTypes from '../style/styletypes';
 import replacer from '../utils/replacer';
@@ -167,8 +167,7 @@ const Measure = function Measure({
     return properties.reduce((prev, curr) => prev && prev[curr], obj);
   }
 
-  function getElevation(evt) {
-    const feature = evt.feature;
+  function getElevation(feature) {
     let coordinates;
     let elevationProjection;
     const options = {
@@ -221,10 +220,16 @@ const Measure = function Measure({
     });
   }
 
-  function addBuffer(evt) {
-    const feature = evt.feature;
+  function addBuffer(feature, radius = 0) {
+    if (feature.getStyle() === null) {
+      feature.setStyle(style.createStyleRule(measureStyleOptions.interaction));
+      source.addFeature(feature);
+    }
     // Mark the central point of the circle
     feature.getStyle()[0].getText().setText('o');
+    if (radius !== 0) {
+      bufferSize = radius;
+    }
     function addBufferToFeature() {
       const pointCenter = feature.getGeometry().getCoordinates();
       // Create a buffer around the point which was clicked on.
@@ -235,8 +240,12 @@ const Measure = function Measure({
       const radiusFeature = new Feature(radiusText);
       const featStyle = createStyle(feature);
       radiusFeature.setStyle(featStyle);
+      // Remove stroke and fill only to leave the text styling from default measure style
+      radiusFeature.getStyle()[0].setStroke(null);
+      radiusFeature.getStyle()[0].setFill(null);
       // Offset the text so it dont't cover the circle
       radiusFeature.getStyle()[0].getText().setOffsetY(-10);
+      radiusFeature.getStyle()[0].getText().setPlacement('line');
       radiusFeature.getStyle()[0].getText().setText(`${bufferSize} m`);
       vector.getSource().addFeature(bufferedFeature);
       vector.getSource().addFeature(radiusFeature);
@@ -409,6 +418,39 @@ const Measure = function Measure({
     document.getElementById(`${viewer.getId()}`).appendChild(markerElement);
   }
 
+  function createRadiusModal(feature) {
+    const title = 'Ange buffert i meter (ex 1000):';
+    const content = `<div>
+                      <input type="number" id="bufferradius" autofocus>
+                      <button id="bufferradiusBtn">OK</button>
+                    </div>`;
+    const modal = Modal({
+      title,
+      content,
+      target: viewer.getId(),
+      style: 'width: auto;'
+    });
+    const bufferradiusEl = document.getElementById('bufferradius');
+    const bufferradiusBtn = document.getElementById('bufferradiusBtn');
+    bufferradiusBtn.addEventListener('click', (e) => {
+      const radiusVal = bufferradiusEl.value;
+      const radius = parseFloat(radiusVal);
+      if ((!radius && radius !== 0)
+        || (radius <= 0)) {
+        bufferradiusEl.classList.add('unvalidValue');
+        e.stopPropagation();
+        return;
+      }
+      e.stopPropagation();
+      modal.closeModal();
+      if (Number.isNaN(radius)) {
+        feature.getStyle()[0].getText().setText('');
+      } else {
+        addBuffer(feature, radius);
+      }
+    });
+  }
+
   function disableInteraction() {
     if (activeButton) {
       document.getElementById(activeButton.getId()).classList.remove('active');
@@ -431,6 +473,9 @@ const Measure = function Measure({
     }
     document.getElementById(measureButton.getId()).classList.add('tooltip');
     document.getElementById(clearButton.getId()).classList.add('hidden');
+    if (showSegmentLengths) {
+      document.getElementById(showSegmentLabelButton.getId()).classList.add('hidden');
+    }
     if (touchMode && isActive) {
       document.getElementById(addNodeButton.getId()).classList.add('hidden');
       const markerIconElement = document.getElementById(`${markerIcon.getId()}`);
@@ -514,8 +559,10 @@ const Measure = function Measure({
       if (type === 'LineString' || type === 'Polygon') {
         document.getElementById(undoButton.getId()).classList.remove('hidden');
       }
-      if (document.getElementById(bufferToolButton.getId()).classList.contains('active')) {
-        bufferSize = Number(window.prompt('Ange radie på buffer i meter?', 1000));
+      if (bufferTool) {
+        if (document.getElementById(bufferToolButton.getId()).classList.contains('active')) {
+          createRadiusModal(evt.feature);
+        }
       }
     }, this);
 
@@ -537,14 +584,8 @@ const Measure = function Measure({
 
       document.getElementById(undoButton.getId()).classList.add('hidden');
       if (feature.getGeometry().getType() === 'Point') {
-        if (document.getElementById(bufferToolButton.getId()).classList.contains('active')) {
-          if (Number.isNaN(bufferSize)) {
-            feature.getStyle()[0].getText().setText('');
-          } else {
-            addBuffer(evt);
-          }
-        } else {
-          getElevation(evt);
+        if (!document.getElementById(bufferToolButton.getId()).classList.contains('active')) {
+          getElevation(evt.feature);
         }
       }
     }, this);
