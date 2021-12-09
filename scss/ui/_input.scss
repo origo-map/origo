@@ -93,9 +93,14 @@ input[type=range] {
   min-width: 0;
 }
 
-input[type=range]:focus-visible {
+input[type=range]:focus {
   outline: none;
   border: 1px solid $black;
+}
+
+input[type=range]:focus:not(:focus-visible) {
+  outline: none;
+  border: 0;
 }
 
 input[type=range]::-webkit-slider-runnable-track {
