@@ -1,5 +1,6 @@
 import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
+import { OSM } from 'ol/source';
 import TileArcGISRest from 'ol/source/TileArcGISRest';
 import Style from '../../style';
 import { Component } from '../../ui';
