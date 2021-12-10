@@ -1,6 +1,6 @@
 import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
-import { OSM } from 'ol/source';
+import { OSM, WMTS, XYZ } from 'ol/source';
 import TileArcGISRest from 'ol/source/TileArcGISRest';
 import Style from '../../style';
 import { Component } from '../../ui';
@@ -23,6 +23,10 @@ export default function PrintResize(options = {}) {
   // Will become an issue if 150 dpi is no longer the "standard" dpi setting
   const multiplyByFactor = function multiplyByFactor(value) {
     return value * (resolution / 150);
+  };
+
+  const isValidSource = function isValidSource(source) {
+    return (!(source instanceof OSM) && !(source instanceof XYZ) && !(source instanceof WMTS));
   };
 
   const getCssRule = function getCssRule(selector) {
@@ -201,6 +205,8 @@ export default function PrintResize(options = {}) {
     const visibleLayers = map.getLayers().getArray().filter(layer => layer.getVisible());
 
     visibleLayers.forEach(layer => {
+      const source = layer.getSource();
+
       if (layer instanceof VectorLayer) {
         const styleName = layer.get('styleName');
         if (styleName) {
@@ -215,14 +221,14 @@ export default function PrintResize(options = {}) {
               image.setScale(styleScale);
             }
           });
-          layer.getSource().getFeatures().forEach(feature => {
+          source.getFeatures().forEach(feature => {
             feature.setStyle(newStyle);
           });
         }
       }
 
-      if (layer instanceof TileLayer && !(layer.getSource() instanceof OSM)) {
-        const params = layer.getSource().getParams();
+      if (layer instanceof TileLayer && isValidSource(source)) {
+        const params = source.getParams();
 
         if (getSourceType(layer, viewer) === 'Geoserver') {
           params.format_options = `dpi:${resolution}`;
@@ -237,8 +243,10 @@ export default function PrintResize(options = {}) {
     const visibleLayers = map.getLayers().getArray().filter(layer => layer.getVisible());
 
     visibleLayers.forEach(layer => {
+      const source = layer.getSource();
+
       if (layer instanceof VectorLayer) {
-        layer.getSource().getFeatures().forEach(feature => {
+        source.getFeatures().forEach(feature => {
           // Remove styles instead?
           feature.getStyle().forEach(style => {
             const image = style.getImage();
@@ -249,8 +257,8 @@ export default function PrintResize(options = {}) {
         });
       }
 
-      if (layer instanceof TileLayer && !(layer.getSource() instanceof OSM)) {
-        const params = layer.getSource().getParams();
+      if (layer instanceof TileLayer && isValidSource(source)) {
+        const params = source.getParams();
 
         if (getSourceType(layer, viewer) === 'Geoserver' && params.format_options) {
           delete params.format_options;
