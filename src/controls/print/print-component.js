@@ -240,7 +240,6 @@ const PrintComponent = function PrintComponent(options = {}) {
       map.getView().getCenter());
     printMapComponent.dispatch('change:setDPI', { resolution });
     printResize.setResolution(resolution);
-    printResize.resize();
     printResize.updateLayers();
     pageElement.style.width = `${widthImage}px`;
     pageElement.style.height = `${heightImage}px`;
@@ -408,7 +407,6 @@ const PrintComponent = function PrintComponent(options = {}) {
     },
     close() {
       printResize.setResolution(150);
-      printResize.resize();
       printResize.resetLayers();
       // Restore scales
       if (!supressResolutionsRecalculation) {

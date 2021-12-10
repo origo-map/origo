@@ -19,10 +19,6 @@ export default function PrintResize(options = {}) {
     resolution
   } = options;
 
-  const setResolution = function setResolution(value) {
-    resolution = value;
-  };
-
   // Will become an issue if 150 dpi is no longer the "standard" dpi setting
   const multiplyByFactor = function multiplyByFactor(value) {
     return value * (resolution / 150);
@@ -265,10 +261,10 @@ export default function PrintResize(options = {}) {
         resizeScalebarElements();
       });
     },
-    setResolution,
     updateLayers,
     resetLayers,
-    resize() {
+    setResolution(newResolution) {
+      resolution = newResolution;
       resizeRules();
       resizeNorthArrow(northArrowComponent.getId());
       resizeLogo(logoComponent.getId());
