@@ -217,7 +217,7 @@ export default function PrintResize(options = {}) {
         }
       }
 
-      if (layer instanceof TileLayer) {
+      if (layer instanceof TileLayer && !(layer.getSource() instanceof OSM)) {
         const params = layer.getSource().getParams();
 
         if (getSourceType(layer, viewer) === 'Geoserver') {
