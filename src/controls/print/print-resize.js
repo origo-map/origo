@@ -210,7 +210,10 @@ export default function PrintResize(options = {}) {
           })();
           const styleScale = multiplyByFactor(1.5);
           newStyle.forEach(style => {
-            style.getImage().setScale(styleScale);
+            const image = style.getImage();
+            if (image) {
+              image.setScale(styleScale);
+            }
           });
           layer.getSource().getFeatures().forEach(feature => {
             feature.setStyle(newStyle);
@@ -238,12 +241,15 @@ export default function PrintResize(options = {}) {
         layer.getSource().getFeatures().forEach(feature => {
           // Remove styles instead?
           feature.getStyle().forEach(style => {
-            style.getImage().setScale(1);
+            const image = style.getImage();
+            if (image) {
+              image.setScale(1);
+            }
           });
         });
       }
 
-      if (layer instanceof TileLayer) {
+      if (layer instanceof TileLayer && !(layer.getSource() instanceof OSM)) {
         const params = layer.getSource().getParams();
 
         if (getSourceType(layer, viewer) === 'Geoserver' && params.format_options) {
