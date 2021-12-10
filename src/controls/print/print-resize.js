@@ -1,6 +1,7 @@
+import ImageLayer from 'ol/layer/Image';
 import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
-import { OSM, WMTS, XYZ } from 'ol/source';
+import { OSM, WMTS, XYZ, ImageWMS } from 'ol/source';
 import TileArcGISRest from 'ol/source/TileArcGISRest';
 import Style from '../../style';
 import { Component } from '../../ui';
@@ -43,10 +44,11 @@ export default function PrintResize(options = {}) {
     const mapSource = viewer.getMapSource();
     const sourceName = layer.get('sourceName');
     const source = layer.getSource();
+    const url = source instanceof ImageWMS ? source.getUrl() : source.getUrls()[0];
 
-    if ((typeof mapSource[sourceName].type === 'string' && mapSource[sourceName].type === 'Geoserver') || source.getUrls()[0].includes('geoserver')) {
+    if ((typeof mapSource[sourceName].type === 'string' && mapSource[sourceName].type === 'Geoserver') || url.includes('geoserver')) {
       return 'Geoserver';
-    } else if ((typeof mapSource[sourceName].type === 'string' && mapSource[sourceName].type === 'QGIS') || source.getUrls()[0].includes('qgis')) {
+    } else if ((typeof mapSource[sourceName].type === 'string' && mapSource[sourceName].type === 'QGIS') || url.includes('qgis')) {
       return 'QGIS';
     } else if ((typeof mapSource[sourceName].type === 'string' && mapSource[sourceName].type === 'ArcGIS') || source instanceof TileArcGISRest) {
       return 'ArcGIS';
@@ -227,7 +229,7 @@ export default function PrintResize(options = {}) {
         }
       }
 
-      if (layer instanceof TileLayer && isValidSource(source)) {
+      if ((layer instanceof TileLayer || layer instanceof ImageLayer) && isValidSource(source)) {
         const params = source.getParams();
 
         if (getSourceType(layer, viewer) === 'Geoserver') {
@@ -257,7 +259,7 @@ export default function PrintResize(options = {}) {
         });
       }
 
-      if (layer instanceof TileLayer && isValidSource(source)) {
+      if ((layer instanceof TileLayer || layer instanceof ImageLayer) && isValidSource(source)) {
         const params = source.getParams();
 
         if (getSourceType(layer, viewer) === 'Geoserver' && params.format_options) {
