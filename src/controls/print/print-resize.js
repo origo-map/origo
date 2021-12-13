@@ -14,7 +14,8 @@ export default function PrintResize(options = {}) {
     northArrowComponent,
     titleComponent,
     descriptionComponent,
-    createdComponent
+    createdComponent,
+    closeButton
   } = options;
 
   let {
@@ -147,6 +148,14 @@ export default function PrintResize(options = {}) {
     if (el) {
       el.style.fontSize = `${multiplyByFactor(0.75)}rem`;
       el.style.lineHeight = `${multiplyByFactor(1.125)}rem`;
+    }
+  };
+
+  const resizeCloseButton = function resizeCloseButton(closeButtonId) {
+    const el = document.getElementById(closeButtonId);
+    if (el) {
+      el.style.top = '1rem';
+      el.style.right = '1rem';
     }
   };
 
@@ -288,6 +297,7 @@ export default function PrintResize(options = {}) {
       resizeTitleComponent(titleComponent.getId());
       resizeDescriptionComponent(descriptionComponent.getId());
       resizeCreatedComponent(createdComponent.getId());
+      resizeCloseButton(closeButton.getId());
       resizeScalebarRules();
     }
   });
