@@ -220,6 +220,22 @@ const PrintComponent = function PrintComponent(options = {}) {
 
   const printMapComponent = PrintMap({ logo, northArrow, map, viewer, showNorthArrow });
 
+  const closeButton = Button({
+    cls: 'fixed top-right medium round icon-smaller light box-shadow z-index-ontop-high',
+    icon: '#ic_close_24px'
+  });
+
+  const printResize = PrintResize({
+    map,
+    viewer,
+    logoComponent: printMapComponent.getLogoComponent(),
+    northArrowComponent: printMapComponent.getNorthArrowComponent(),
+    titleComponent,
+    descriptionComponent,
+    createdComponent,
+    closeButton
+  });
+
   const setScale = function setScale(scale) {
     printScale = scale;
     const widthInMm = orientation === 'portrait' ? sizes[size][1] : sizes[size][0];
@@ -276,22 +292,6 @@ const PrintComponent = function PrintComponent(options = {}) {
   });
   const printInteractionToggle = PrintInteractionToggle({ map, target, mapInteractionsActive, pageSettings: viewer.getViewerOptions().pageSettings });
   const printToolbar = PrintToolbar();
-  const closeButton = Button({
-    cls: 'fixed top-right medium round icon-smaller light box-shadow z-index-ontop-high',
-    icon: '#ic_close_24px'
-  });
-
-  const printResize = PrintResize({
-    map,
-    viewer,
-    logoComponent: printMapComponent.getLogoComponent(),
-    northArrowComponent: printMapComponent.getNorthArrowComponent(),
-    titleComponent,
-    descriptionComponent,
-    createdComponent,
-    closeButton
-  });
-
   return Component({
     name: 'printComponent',
     onInit() {

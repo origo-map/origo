@@ -1,7 +1,9 @@
+import LayerGroup from 'ol/layer/Group';
 import ImageLayer from 'ol/layer/Image';
 import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
-import { OSM, WMTS, XYZ, ImageWMS } from 'ol/source';
+import VectorImageLayer from 'ol/layer/VectorImage';
+import { OSM, WMTS, XYZ, ImageWMS, ImageArcGISRest } from 'ol/source';
 import TileArcGISRest from 'ol/source/TileArcGISRest';
 import Style from '../../style';
 import { Component } from '../../ui';
@@ -31,6 +33,14 @@ export default function PrintResize(options = {}) {
     return (!(source instanceof OSM) && !(source instanceof XYZ) && !(source instanceof WMTS));
   };
 
+  const isVector = function isVector(layer) {
+    return layer instanceof VectorLayer || layer instanceof VectorImageLayer;
+  };
+
+  const isImage = function isImage(layer) {
+    return layer instanceof TileLayer || layer instanceof ImageLayer;
+  };
+
   const getCssRule = function getCssRule(selector) {
     const rules = document.styleSheets[0].cssRules;
     for (let i = 0; i < rules.length; i += 1) {
@@ -45,13 +55,13 @@ export default function PrintResize(options = {}) {
     const mapSource = viewer.getMapSource();
     const sourceName = layer.get('sourceName');
     const source = layer.getSource();
-    const url = source instanceof ImageWMS ? source.getUrl() : source.getUrls()[0];
+    const url = source instanceof ImageWMS || source instanceof ImageArcGISRest ? source.getUrl() : source.getUrls()[0];
 
     if ((typeof mapSource[sourceName].type === 'string' && mapSource[sourceName].type === 'Geoserver') || url.includes('geoserver')) {
       return 'Geoserver';
     } else if ((typeof mapSource[sourceName].type === 'string' && mapSource[sourceName].type === 'QGIS') || url.includes('qgis')) {
       return 'QGIS';
-    } else if ((typeof mapSource[sourceName].type === 'string' && mapSource[sourceName].type === 'ArcGIS') || source instanceof TileArcGISRest) {
+    } else if ((typeof mapSource[sourceName].type === 'string' && mapSource[sourceName].type === 'ArcGIS') || source instanceof TileArcGISRest || source instanceof ImageArcGISRest) {
       return 'ArcGIS';
     }
     return 'Unknown source type';
@@ -212,19 +222,18 @@ export default function PrintResize(options = {}) {
     }
   };
 
-  const updateLayers = function updateLayers() {
-    const visibleLayers = map.getLayers().getArray().filter(layer => layer.getVisible());
+  const setLayerScale = function setLayerScale(layer) {
+    const source = layer.getSource();
 
-    visibleLayers.forEach(layer => {
-      const source = layer.getSource();
+    if (isVector(layer)) {
+      const styleName = layer.get('styleName');
 
-      if (layer instanceof VectorLayer) {
-        const styleName = layer.get('styleName');
-        if (styleName) {
-          const newStyle = Style.createStyle({
-            style: styleName,
-            viewer
-          })();
+      if (styleName) {
+        const newStyle = Style.createStyle({
+          style: styleName,
+          viewer
+        })();
+        if (newStyle) {
           const styleScale = multiplyByFactor(1.5);
           newStyle.forEach(style => {
             const image = style.getImage();
@@ -237,15 +246,58 @@ export default function PrintResize(options = {}) {
           });
         }
       }
+    }
 
-      if ((layer instanceof TileLayer || layer instanceof ImageLayer) && isValidSource(source)) {
-        const params = source.getParams();
+    if (isImage(layer) && isValidSource(source)) {
+      const params = source.getParams();
+      if (getSourceType(layer) === 'Geoserver') {
+        params.format_options = `dpi:${resolution}`;
+      } else if (getSourceType(layer) === 'QGIS' || getSourceType(layer) === 'ArcGIS') {
+        params.DPI = `${resolution}`;
+      }
+    }
+  };
 
-        if (getSourceType(layer, viewer) === 'Geoserver') {
-          params.format_options = `dpi:${resolution}`;
-        } else if (getSourceType(layer, viewer) === 'QGIS' || getSourceType(layer, viewer) === 'ArcGIS') {
-          params.DPI = `${resolution}`;
+  const resetLayerScale = function resetLayerScale(layer) {
+    const source = layer.getSource();
+
+    if (isVector(layer)) {
+      source.getFeatures().forEach(feature => {
+        // Remove styles instead?
+        const styles = feature.getStyle();
+        if (styles) {
+          styles.forEach(style => {
+            const image = style.getImage();
+            if (image) {
+              image.setScale(1);
+            }
+          });
         }
+      });
+    }
+
+    if (isImage(layer) && isValidSource(source)) {
+      const params = source.getParams();
+
+      if (getSourceType(layer) === 'Geoserver' && params.format_options) {
+        delete params.format_options;
+      } else if ((getSourceType(layer) === 'QGIS' || getSourceType(layer) === 'ArcGIS') && params.DPI) {
+        delete params.DPI;
+      }
+    }
+  };
+
+  const updateLayers = function updateLayers() {
+    const visibleLayers = map.getLayers().getArray().filter(layer => layer.getVisible());
+
+    visibleLayers.forEach(layer => {
+      if (layer instanceof LayerGroup) {
+        const layers = layer.getLayers().getArray();
+        layers.forEach(layerInGroup => {
+          setLayerScale(layerInGroup);
+        });
+      } else {
+        setLayerScale(layer);
       }
     });
   };
@@ -254,28 +306,13 @@ export default function PrintResize(options = {}) {
     const visibleLayers = map.getLayers().getArray().filter(layer => layer.getVisible());
 
     visibleLayers.forEach(layer => {
-      const source = layer.getSource();
-
-      if (layer instanceof VectorLayer) {
-        source.getFeatures().forEach(feature => {
-          // Remove styles instead?
-          feature.getStyle().forEach(style => {
-            const image = style.getImage();
-            if (image) {
-              image.setScale(1);
-            }
-          });
+      if (layer instanceof LayerGroup) {
+        const layers = layer.getLayers().getArray();
+        layers.forEach(layerInGroup => {
+          resetLayerScale(layerInGroup);
         });
-      }
-
-      if ((layer instanceof TileLayer || layer instanceof ImageLayer) && isValidSource(source)) {
-        const params = source.getParams();
-
-        if (getSourceType(layer, viewer) === 'Geoserver' && params.format_options) {
-          delete params.format_options;
-        } else if ((getSourceType(layer, viewer) === 'QGIS' || getSourceType(layer, viewer) === 'ArcGIS') && params.DPI) {
-          delete params.DPI;
-        }
+      } else {
+        resetLayerScale(layer);
       }
     });
   };
