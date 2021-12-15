@@ -67,6 +67,7 @@ export default function PrintResize(options = {}) {
     return 'Unknown source type';
   };
 
+  // Resize CSS Rules to compensate for changing resolution
   const resizeRules = function resizeRules() {
     const h4Rule = getCssRule('.o-ui h4, .o-ui .h4');
     if (h4Rule) {
@@ -118,6 +119,7 @@ export default function PrintResize(options = {}) {
     }
   };
 
+  // Resize north arrow, top right of the map
   const resizeNorthArrow = function resizeNorthArrow(northArrowComponentId) {
     const el = document.getElementById(northArrowComponentId);
     if (el) {
@@ -126,6 +128,7 @@ export default function PrintResize(options = {}) {
     }
   };
 
+  // Resize Origo logo and print attribution, bottom left of the map
   const resizeLogo = function resizeLogo(logoComponentId) {
     const logoEl = document.getElementById(logoComponentId);
     if (logoEl) {
@@ -139,6 +142,7 @@ export default function PrintResize(options = {}) {
     }
   };
 
+  // Resize the title component, displaying a textfield at the top of the map
   const resizeTitleComponent = function resizeTitleComponent(titleComponentId) {
     const el = document.getElementById(titleComponentId);
     if (el) {
@@ -146,6 +150,7 @@ export default function PrintResize(options = {}) {
     }
   };
 
+  // Resize the description component, displaying a textfield at the bottom of the map
   const resizeDescriptionComponent = function resizeDescriptionComponent(descriptionComponentId) {
     const el = document.getElementById(descriptionComponentId);
     if (el) {
@@ -153,6 +158,7 @@ export default function PrintResize(options = {}) {
     }
   };
 
+  // Resizes the created component, displaying timestamp at the bottom of the map
   const resizeCreatedComponent = function resizeCreatedComponent(createdComponentId) {
     const el = document.getElementById(createdComponentId);
     if (el) {
@@ -161,6 +167,7 @@ export default function PrintResize(options = {}) {
     }
   };
 
+  // Sets static top-right style to compensate for the CSS Rule '.o-ui .top-right' changing
   const resizeCloseButton = function resizeCloseButton(closeButtonId) {
     const el = document.getElementById(closeButtonId);
     if (el) {
@@ -202,6 +209,7 @@ export default function PrintResize(options = {}) {
     }
   };
 
+  // Resize CSS Rules for Scalebar
   const resizeScalebarRules = function resizeScalebarRules() {
     const scaleTextRule = getCssRule('.o-map .ol-scale-text');
     if (scaleTextRule) {
@@ -228,6 +236,7 @@ export default function PrintResize(options = {}) {
     }
   };
 
+  // Alters layer in map, if vector then set scale for feature, if image set DPI parameter for source
   const setLayerScale = function setLayerScale(layer) {
     const source = layer.getSource();
 
@@ -264,6 +273,7 @@ export default function PrintResize(options = {}) {
     }
   };
 
+  // "Resets" layer by changing scale to 1 or removing DPI parameter
   const resetLayerScale = function resetLayerScale(layer) {
     const source = layer.getSource();
 
@@ -293,6 +303,7 @@ export default function PrintResize(options = {}) {
     }
   };
 
+  // Alters all visible layers, for when entering print preview or changing DPI
   const updateLayers = function updateLayers() {
     const visibleLayers = map.getLayers().getArray().filter(layer => layer.getVisible());
 
@@ -308,6 +319,7 @@ export default function PrintResize(options = {}) {
     });
   };
 
+  // "Resets" all visible layers, for when exiting print preview
   const resetLayers = function resetLayers() {
     const visibleLayers = map.getLayers().getArray().filter(layer => layer.getVisible());
 
