@@ -39,8 +39,13 @@
     {
       "name": "legend",
       "options": {
+        "contentStyle": {
+          "width": "280px"
+        },
+        "expanded": false,
         "labelOpacitySlider": "Opacity",
-        "useGroupIndication" : true
+        "useGroupIndication" : true,
+        "turnOffLayersControl" : true
       }
     },
     {
@@ -125,6 +130,21 @@
       "name": "background",
       "title": "Bakgrundskartor",
       "expanded": true
+    },
+    {
+      "name": "wfs",
+      "title": "WFS",
+      "expanded": false
+    },
+    {
+      "name": "wms",
+      "title": "WMS/WMTS",
+      "expanded": false
+    },
+    {
+      "name": "grupp",
+      "title": "Grupplager",
+      "expanded": false
     }
   ],
   "layers": [
@@ -161,6 +181,42 @@
       "style": "karta_osm",
       "type": "OSM",
       "visible": true
+    },
+    {
+      "name": "fastigheter_mock_geojson",
+      "title": "Fastighetsytor (mock)",
+      "group": "wms",
+      "source": "http://localhost:3002/ows/fastighetsytor",
+      "style": "default",
+      "type": "GEOJSON",
+      "visible": false
+    },
+    {
+      "name": "fastighetsytor_alla",
+      "title": "Fastighetsytor (GeoServer)",
+      "group": "wms",
+      "source": "sigtuna",
+      "style": "default",
+      "type": "WFS",
+      "visible": false
+    },
+    {
+      "name": "OGRGeoJSON",
+      "title": "testdatastaengd",
+      "group": "wms",
+      "source": "sigtuna",
+      "style": "default",
+      "type": "WMS",
+      "visible": false
+    },
+    {
+      "name": "OGRGeoJSON2",
+      "title": "testdataOppen",
+      "group": "wms",
+      "source": "sigtuna",
+      "style": "default",
+      "type": "WFS",
+      "visible": false
     }
   ],
   "styles": {

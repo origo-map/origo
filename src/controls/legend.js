@@ -4,6 +4,7 @@ import {
 } from '../ui';
 import imageSource from './legend/imagesource';
 import Overlays from './legend/overlays';
+import VisibleOverlays from './legend/visibleOverlays';
 import LayerProperties from './legend/overlayproperties';
 
 const Legend = function Legend(options = {}) {
@@ -15,6 +16,7 @@ const Legend = function Legend(options = {}) {
     contentCls,
     contentStyle,
     turnOffLayersControl = false,
+    showVisibleLayersControl = true,
     name = 'legend',
     labelOpacitySlider = '',
     useGroupIndication = true,
@@ -38,6 +40,8 @@ const Legend = function Legend(options = {}) {
   let awesomplete;
   let mainContainerCmp;
   let overlaysCmp;
+  let visibleOverlaysCmp;
+  let visibleLayersActive = false;
   let mainContainerEl;
   const backgroundLayerButtons = [];
   let toggleGroup;
@@ -122,6 +126,17 @@ const Legend = function Legend(options = {}) {
     });
   };
 
+  const toggleShowVisibleLayers = function toggleShowVisibleLayers() {
+    if (visibleLayersActive) {
+      document.getElementById(`${overlaysCmp.getId()}`).classList.remove('hidden');
+      document.getElementById(`${visibleOverlaysCmp.getId()}`).classList.add('hidden');
+    } else {
+      document.getElementById(`${overlaysCmp.getId()}`).classList.add('hidden');
+      document.getElementById(`${visibleOverlaysCmp.getId()}`).classList.remove('hidden');
+    }
+    visibleLayersActive = !visibleLayersActive;
+  };
+
   const divider = El({
     cls: 'divider margin-x-small',
     style: {
@@ -142,6 +157,22 @@ const Legend = function Legend(options = {}) {
       'padding-right': '6px'
     },
     icon: '#ic_visibility_off_24px',
+    iconStyle: {
+      fill: '#7a7a7a'
+    }
+  });
+
+  const showVisibleLayersButton = Button({
+    cls: 'round compact icon-small margin-x-smaller',
+    title: 'Släck alla lager',
+    click() {
+      viewer.dispatch('active:togglevisibleLayers');
+    },
+    style: {
+      'align-self': 'right',
+      'padding-right': '6px'
+    },
+    icon: '#ic_fullscreen_24px',
     iconStyle: {
       fill: '#7a7a7a'
     }
@@ -352,6 +383,9 @@ const Legend = function Legend(options = {}) {
       if (turnOffLayersControl) {
         viewer.on('active:turnofflayers', turnOffAllLayers);
       }
+      if (showVisibleLayersControl) {
+        viewer.on('active:togglevisibleLayers', toggleShowVisibleLayers);
+      }
       const backgroundLayers = viewer.getLayersByProperty('group', 'background').reverse();
       addBackgroundButtons(backgroundLayers);
       toggleGroup = ToggleGroup({
@@ -373,6 +407,7 @@ const Legend = function Legend(options = {}) {
       });
       window.addEventListener('resize', updateMaxHeight);
       if (turnOffLayersControl) this.addButtonToTools(turnOffLayersButton);
+      if (showVisibleLayersControl) this.addButtonToTools(showVisibleLayersButton);
       if (searchLayersControl) this.addButtonToTools(layerSearchInput);
       initAutocomplete();
       bindUIActions();
@@ -385,6 +420,9 @@ const Legend = function Legend(options = {}) {
       const maxHeight = calcMaxHeight(getTargetHeight());
       overlaysCmp = Overlays({
         viewer, cls: contentCls, style: contentStyle, labelOpacitySlider
+      });
+      visibleOverlaysCmp = VisibleOverlays({
+        viewer, expanded: false, cls: contentCls, style: contentStyle, labelOpacitySlider
       });
       const baselayerCmps = [toggleGroup];
 
@@ -409,7 +447,7 @@ const Legend = function Legend(options = {}) {
         components: baselayerCmps
       });
 
-      const mainContainerComponents = [overlaysCmp, toolsCmp, baselayersCmp];
+      const mainContainerComponents = [overlaysCmp, visibleOverlaysCmp, toolsCmp, baselayersCmp];
 
       mainContainerCmp = El({
         cls: 'flex column overflow-hidden relative',
