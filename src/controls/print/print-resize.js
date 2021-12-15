@@ -269,6 +269,7 @@ export default function PrintResize(options = {}) {
         params.format_options = `dpi:${resolution}`;
       } else if (getSourceType(layer) === 'QGIS' || getSourceType(layer) === 'ArcGIS') {
         params.DPI = `${resolution}`;
+        source.refresh();
       }
     }
   };
@@ -299,6 +300,7 @@ export default function PrintResize(options = {}) {
         delete params.format_options;
       } else if ((getSourceType(layer) === 'QGIS' || getSourceType(layer) === 'ArcGIS') && params.DPI) {
         delete params.DPI;
+        source.refresh();
       }
     }
   };
