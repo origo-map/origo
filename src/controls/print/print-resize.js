@@ -171,28 +171,34 @@ export default function PrintResize(options = {}) {
 
   // Scalebar is re-rendered so this function needs to wait until the rendering is complete
   const resizeScalebarElements = function resizeScalebarElements() {
-    if (document.getElementsByClassName('ol-scale-bar-inner')[0]) {
-      document.getElementsByClassName('ol-scale-bar-inner')[0].style.width = `${multiplyByFactor(118)}px`;
+    const scaleBarInner = document.getElementsByClassName('ol-scale-bar-inner')[0];
+    if (scaleBarInner) {
+      scaleBarInner.style.width = `${multiplyByFactor(scaleBarInner.style.width)}px`;
     }
 
-    if (document.getElementsByClassName('ol-scale-text')[0]) {
-      document.getElementsByClassName('ol-scale-text')[0].style.width = `${multiplyByFactor(118)}px`;
+    const scaleText = document.getElementsByClassName('ol-scale-text')[0];
+    if (scaleText) {
+      scaleText.style.width = `${multiplyByFactor(scaleText.style.width)}px`;
     }
 
-    if (document.getElementsByClassName('ol-scale-step-marker')[0]) {
-      document.getElementsByClassName('ol-scale-step-marker')[0].style.top = `${multiplyByFactor(0)}px`;
+    const firstScaleStepMarker = document.getElementsByClassName('ol-scale-step-marker')[0];
+    if (firstScaleStepMarker) {
+      firstScaleStepMarker.style.top = `${multiplyByFactor(0)}px`;
     }
 
-    if (document.getElementsByClassName('ol-scale-step-marker')[1]) {
-      document.getElementsByClassName('ol-scale-step-marker')[1].style.top = `${multiplyByFactor(-10)}px`;
+    const secondScaleStepMarker = document.getElementsByClassName('ol-scale-step-marker')[1];
+    if (secondScaleStepMarker) {
+      secondScaleStepMarker.style.top = `${multiplyByFactor(-10)}px`;
     }
 
-    if (document.getElementsByClassName('ol-scale-step-marker')[2]) {
-      document.getElementsByClassName('ol-scale-step-marker')[2].style.top = `${multiplyByFactor(-10)}px`;
+    const thirdScaleStepMarker = document.getElementsByClassName('ol-scale-step-marker')[2];
+    if (thirdScaleStepMarker) {
+      thirdScaleStepMarker.style.top = `${multiplyByFactor(-10)}px`;
     }
 
-    if (document.getElementsByClassName('ol-scale-step-text')[0]) {
-      document.getElementsByClassName('ol-scale-step-text')[0].style.marginLeft = `${multiplyByFactor(-3)}px`;
+    const scaleStepText = document.getElementsByClassName('ol-scale-step-text')[0];
+    if (scaleStepText) {
+      scaleStepText.style.marginLeft = `${multiplyByFactor(-3)}px`;
     }
   };
 
