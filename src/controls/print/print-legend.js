@@ -45,6 +45,7 @@ const LayerRow = function LayerRow(options) {
         const style = viewer.getStyle(layer.get('styleName'));
         if (style && style[0]) {
           icon = renderSvgIcon(style[0], { opacity: 100 });
+          icon = icon.replaceAll('style=""', 'style="height:100%;"');
         } else {
           getLegendGraphicUrl = getLegendUrl(layer, 'image/png');
           json = await getLegendGraphicJSON(getLegendUrl(layer, 'application/json'));
