@@ -115,7 +115,7 @@ const LayerRows = function LayerRows(options) {
         }
       });
       return `
-        <div id="${this.getId()}" class="overflow-hidden" style="height: 100%; min-width: 220px;">
+        <div id="${this.getId()}" class="overflow-hidden" style="height: 100%;">
           <div class="flex column overflow-hidden width-100" style="width: 100%">
             ${await layerListCmp.render()}
           </div>
