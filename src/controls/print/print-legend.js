@@ -3,6 +3,7 @@ import ImageLayer from 'ol/layer/Image';
 import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
 import VectorImageLayer from 'ol/layer/VectorImage';
+import LayerGroup from 'ol/layer/Group';
 import {
   Component
 } from '../../ui';
@@ -56,7 +57,7 @@ const LayerRow = function LayerRow(options) {
             icon = `<img class="cover" src="${getLegendGraphicUrl}">`;
           }
         }
-      } else if (layer instanceof VectorLayer || layer instanceof VectorImageLayer) {
+      } else if (layer instanceof VectorLayer || layer instanceof VectorImageLayer || layer instanceof LayerGroup) {
         const style = viewer.getStyle(layer.get('styleName'));
         if (style && style[0]) {
           icon = renderSvgIcon(style[0], { opacity: 100 });
