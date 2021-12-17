@@ -14,7 +14,7 @@ const LayerRow = function LayerRow(options) {
     const source = aLayer.getSource();
     const url = source instanceof ImageWMS || source instanceof ImageArcGISRest ? source.getUrl() : source.getUrls()[0];
     const layerName = aLayer.get('name');
-    return `${url}?layer=${layerName}&format=${type}&version=1.1.1&request=getLegendGraphic&scale=401&legend_options=dpi:300`;
+    return `${url}?SERVICE=WMS&layer=${layerName}&format=${type}&version=1.1.1&request=getLegendGraphic&scale=401&legend_options=dpi:300`;
   };
 
   const getLegendGraphicJSON = async (url) => {
