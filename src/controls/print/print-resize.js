@@ -136,6 +136,18 @@ export default function PrintResize(options = {}) {
     if (paddingBottomSmall) {
       paddingBottomSmall.style.paddingBottom = `${multiplyByFactor(0.5)}rem`;
     }
+
+    const paddingExtraSmall = getCssRule('.o-ui .padding-x-small');
+    if (paddingExtraSmall) {
+      paddingExtraSmall.style.paddingLeft = `${multiplyByFactor(0.5)}rem`;
+      paddingExtraSmall.style.paddingBottom = `${multiplyByFactor(0.5)}rem`;
+    }
+
+    const controlRule = getCssRule('.o-ui .control');
+    if (controlRule) {
+      controlRule.style.borderRadius = `${multiplyByFactor(0.5)}rem`;
+      controlRule.style.boxShadow = `0 ${multiplyByFactor(4)}px ${multiplyByFactor(6)}px 0 rgb(0 0 0 / 20%)`;
+    }
   };
 
   // Resize north arrow, top right of the map
@@ -255,6 +267,45 @@ export default function PrintResize(options = {}) {
     }
   };
 
+  // Resizes the legend, changing fontsize and icon width and height
+  const resizeLegendComponent = function resizeLegendComponent() {
+    const el = document.querySelector('#legendContainer');
+    if (el) {
+      el.style.fontSize = `${multiplyByFactor(1)}rem`;
+      console.log(el.parentElement);
+      if (el.parentElement) {
+        el.parentElement.style.left = `${multiplyByFactor(1)}rem`;
+        el.parentElement.style.top = `${multiplyByFactor(1)}rem`;
+        el.parentElement.style.minWidth = `${multiplyByFactor(220)}px`;
+      }
+
+      const itemRule = getCssRule('.o-ui .list > li, .o-ui .list > .item');
+      if (itemRule) {
+        itemRule.style.paddingBottom = `${multiplyByFactor(0.25)}rem`;
+        itemRule.style.paddingTop = `${multiplyByFactor(0.25)}rem`;
+      }
+
+      const lastChildRule = getCssRule('.o-ui .list > li:last-child, .o-ui .list > .item:last-child');
+      if (lastChildRule) {
+        lastChildRule.style.paddingBottom = `${multiplyByFactor(0.5)}rem`;
+      }
+
+      const firstChildRule = getCssRule('.o-ui .list > li:first-child, .o-ui .list > .item:first-child');
+      if (firstChildRule) {
+        firstChildRule.style.paddingTop = `${multiplyByFactor(0.5)}rem`;
+      }
+
+      const icons = document.getElementsByClassName('legend-icon');
+      if (icons.length > 0) {
+        icons.forEach(icon => {
+          const style = icon.style;
+          style.width = `${multiplyByFactor(1.5)}rem`;
+          style.height = `${multiplyByFactor(1.5)}rem`;
+        });
+      }
+    }
+  };
+
   // Alters layer in map, if vector then set scale for feature, if image set DPI parameter for source
   const setLayerScale = function setLayerScale(layer) {
     const source = layer.getSource();
@@ -363,6 +414,7 @@ export default function PrintResize(options = {}) {
   // ISSUE: Currently this causes map to render, being part of the 'rendercomplete' listener
   //        it causes an infinite loop. Also I have yet to find an effecient way of updating the
   //        the cluster styles and setting the styles to the features.
+  // eslint-disable-next-line no-unused-vars
   const updateClusterFeatures = function updateClusterFeatures(layer) {
     const source = layer.getSource();
     const clusterStyleName = layer.getProperties().clusterStyle;
@@ -472,6 +524,7 @@ export default function PrintResize(options = {}) {
       resizeDescriptionComponent(descriptionComponent.getId());
       resizeCreatedComponent(createdComponent.getId());
       resizeCloseButton(closeButton.getId());
+      resizeLegendComponent();
       resizeScalebarRules();
     }
   });
