@@ -1,3 +1,6 @@
+import { ImageWMS, ImageArcGISRest } from 'ol/source';
+import ImageLayer from 'ol/layer/Image';
+import TileLayer from 'ol/layer/Tile';
 import {
   Component
 } from '../../ui';
@@ -8,7 +11,8 @@ const LayerRow = function LayerRow(options) {
   } = options;
 
   const getLegendUrl = (aLayer, type) => {
-    const url = aLayer.getSource().getUrls()[0];
+    const source = aLayer.getSource();
+    const url = source instanceof ImageWMS || source instanceof ImageArcGISRest ? source.getUrl() : source.getUrls()[0];
     const layerName = aLayer.get('name');
     return `${url}?layer=${layerName}&format=${type}&version=1.1.1&request=getLegendGraphic&scale=401&legend_options=dpi:300`;
   };
@@ -27,64 +31,66 @@ const LayerRow = function LayerRow(options) {
   return Component({
     async render() {
       const title = layer.get('title') || 'Titel saknas';
-      const getLegendGraphicUrl = getLegendUrl(layer, 'image/png');
+      if (layer instanceof TileLayer || layer instanceof ImageLayer) {
+        const getLegendGraphicUrl = getLegendUrl(layer, 'image/png');
 
-      let isTheme = false;
-      let icon = '';
-      const json = await getLegendGraphicJSON(getLegendUrl(layer, 'application/json'));
-      if (!json) {
-        isTheme = false;
-      } else {
-        isTheme = json.Legend[0].rules.length > 1;
-        icon = `<img class="cover" src="${getLegendGraphicUrl}">`;
-      }
-      console.log(json, isTheme);
+        let isTheme = false;
+        let icon = '';
+        const json = await getLegendGraphicJSON(getLegendUrl(layer, 'application/json'));
+        if (!json) {
+          isTheme = false;
+        } else {
+          isTheme = json.Legend[0].rules.length > 1;
+          icon = `<img class="cover" src="${getLegendGraphicUrl}">`;
+        }
+        console.log(json, isTheme);
 
-      let content = '';
-      if (!isTheme) {
-        content = `
-          <div class="flex row">
-            <div class="grey-lightest round compact icon-small light relative no-shrink legend-icon" style="height: 1.5rem; width: 1.5rem;">
-              <span class="icon">
-                ${icon}
-              </span>
-            </div>
-            <div class="padding-x-small grow no-select overflow-hidden">${title}</div>
-          </div>`;
-      } else {
-        let rules = '';
-        json.Legend[0].rules.forEach((rule, index) => {
-          const ruleImageUrl = `${getLegendGraphicUrl}&rule=${rule.name}`;
-          const rowTitle = rule.title ? rule.title : index + 1;
-          rules += `
-            <li class="flex row align-center padding-left padding-right item">
-              <div class="flex column">
-                <div class="flex row">
-                  <div class="grey-lightest round compact icon-small light relative no-shrink legend-icon" style="height: 1.5rem; width: 1.5rem;">
-                    <span class="icon">
-                      <img class="cover" src="${ruleImageUrl}" style="" title="">
-                    </span>
-                  </div>
-                  <div class="padding-x-small grow no-select overflow-hidden">${rowTitle}</div>
-                </div>
+        let content = '';
+        if (!isTheme) {
+          content = `
+            <div class="flex row">
+              <div class="grey-lightest round compact icon-small light relative no-shrink legend-icon" style="height: 1.5rem; width: 1.5rem;">
+                <span class="icon">
+                  ${icon}
+                </span>
               </div>
-            </li>`;
-        });
-        content = `
-          <div class="flex row">
-            <div class="padding-x-small grow no-select overflow-hidden">${title}</div>
-          </div>
-          <div class="padding-left">
-            <ul>${rules}</ul>
-          </div>`;
+              <div class="padding-x-small grow no-select overflow-hidden">${title}</div>
+            </div>`;
+        } else {
+          let rules = '';
+          json.Legend[0].rules.forEach((rule, index) => {
+            const ruleImageUrl = `${getLegendGraphicUrl}&rule=${rule.name}`;
+            const rowTitle = rule.title ? rule.title : index + 1;
+            rules += `
+              <li class="flex row align-center padding-left padding-right item">
+                <div class="flex column">
+                  <div class="flex row">
+                    <div class="grey-lightest round compact icon-small light relative no-shrink legend-icon" style="height: 1.5rem; width: 1.5rem;">
+                      <span class="icon">
+                        <img class="cover" src="${ruleImageUrl}" style="" title="">
+                      </span>
+                    </div>
+                    <div class="padding-x-small grow no-select overflow-hidden">${rowTitle}</div>
+                  </div>
+                </div>
+              </li>`;
+          });
+          content = `
+            <div class="flex row">
+              <div class="padding-x-small grow no-select overflow-hidden">${title}</div>
+            </div>
+            <div class="padding-left">
+              <ul>${rules}</ul>
+            </div>`;
+        }
+        return `
+          <li id="${this.getId()}" class="flex row align-center padding-left padding-right item">
+            <div class="flex column">
+              ${content}
+            </div>
+          </li>`;
       }
-
-      return `
-        <li id="${this.getId()}" class="flex row align-center padding-left padding-right item">
-          <div class="flex column">
-            ${content}
-          </div>
-        </li>`;
+      return '';
     }
   });
 };
