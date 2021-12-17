@@ -1,13 +1,17 @@
 import { ImageWMS, ImageArcGISRest } from 'ol/source';
 import ImageLayer from 'ol/layer/Image';
 import TileLayer from 'ol/layer/Tile';
+import VectorLayer from 'ol/layer/Vector';
+import VectorImageLayer from 'ol/layer/VectorImage';
 import {
   Component
 } from '../../ui';
+import { renderSvgIcon } from '../../utils/legendmaker';
 
 const LayerRow = function LayerRow(options) {
   const {
-    layer
+    layer,
+    viewer
   } = options;
 
   const getLegendUrl = (aLayer, type) => {
@@ -23,7 +27,7 @@ const LayerRow = function LayerRow(options) {
       const json = await response.json();
       return json;
     } catch (e) {
-      console.log(e);
+      console.warn(e);
       return null;
     }
   };
@@ -31,66 +35,76 @@ const LayerRow = function LayerRow(options) {
   return Component({
     async render() {
       const title = layer.get('title') || 'Titel saknas';
-      if (layer instanceof TileLayer || layer instanceof ImageLayer) {
-        const getLegendGraphicUrl = getLegendUrl(layer, 'image/png');
+      let content = '';
+      let isTheme = false;
+      let icon = '';
+      let json;
+      let getLegendGraphicUrl;
 
-        let isTheme = false;
-        let icon = '';
-        const json = await getLegendGraphicJSON(getLegendUrl(layer, 'application/json'));
-        if (!json) {
-          isTheme = false;
+      if ((layer instanceof TileLayer || layer instanceof ImageLayer) && !layer.get('type').includes('AGS')) {
+        const style = viewer.getStyle(layer.get('styleName'));
+        if (style && style[0]) {
+          icon = renderSvgIcon(style[0], { opacity: 100 });
         } else {
-          isTheme = json.Legend[0].rules.length > 1;
-          icon = `<img class="cover" src="${getLegendGraphicUrl}">`;
+          getLegendGraphicUrl = getLegendUrl(layer, 'image/png');
+          json = await getLegendGraphicJSON(getLegendUrl(layer, 'application/json'));
+          if (!json) {
+            isTheme = false;
+          } else {
+            isTheme = json.Legend[0].rules.length > 1;
+            icon = `<img class="cover" src="${getLegendGraphicUrl}">`;
+          }
         }
-        console.log(json, isTheme);
+      } else if (layer instanceof VectorLayer || layer instanceof VectorImageLayer) {
+        const style = viewer.getStyle(layer.get('styleName'));
+        if (style && style[0]) {
+          icon = renderSvgIcon(style[0], { opacity: 100 });
+        }
+      }
 
-        let content = '';
-        if (!isTheme) {
-          content = `
-            <div class="flex row">
-              <div class="grey-lightest round compact icon-small light relative no-shrink legend-icon" style="height: 1.5rem; width: 1.5rem;">
-                <span class="icon">
-                  ${icon}
-                </span>
-              </div>
-              <div class="padding-x-small grow no-select overflow-hidden">${title}</div>
-            </div>`;
-        } else {
-          let rules = '';
-          json.Legend[0].rules.forEach((rule, index) => {
-            const ruleImageUrl = `${getLegendGraphicUrl}&rule=${rule.name}`;
-            const rowTitle = rule.title ? rule.title : index + 1;
-            rules += `
-              <li class="flex row align-center padding-left padding-right item">
-                <div class="flex column">
-                  <div class="flex row">
-                    <div class="grey-lightest round compact icon-small light relative no-shrink legend-icon" style="height: 1.5rem; width: 1.5rem;">
-                      <span class="icon">
-                        <img class="cover" src="${ruleImageUrl}" style="" title="">
-                      </span>
-                    </div>
-                    <div class="padding-x-small grow no-select overflow-hidden">${rowTitle}</div>
-                  </div>
-                </div>
-              </li>`;
-          });
-          content = `
-            <div class="flex row">
-              <div class="padding-x-small grow no-select overflow-hidden">${title}</div>
+      if (!isTheme) {
+        content = `
+          <div class="flex row">
+            <div class="grey-lightest round compact icon-small light relative no-shrink legend-icon" style="height: 1.5rem; width: 1.5rem;">
+              <span class="icon">
+                ${icon}
+              </span>
             </div>
-            <div class="padding-left">
-              <ul>${rules}</ul>
-            </div>`;
-        }
-        return `
+            <div class="padding-x-small grow no-select overflow-hidden">${title}</div>
+          </div>`;
+      } else if (getLegendGraphicUrl) {
+        let rules = '';
+        json.Legend[0].rules.forEach((rule, index) => {
+          const ruleImageUrl = `${getLegendGraphicUrl}&rule=${rule.name}`;
+          const rowTitle = rule.title ? rule.title : index + 1;
+          rules += `
+            <li class="flex row align-center padding-left padding-right item">
+              <div class="flex column">
+                <div class="flex row">
+                  <div class="grey-lightest round compact icon-small light relative no-shrink legend-icon" style="height: 1.5rem; width: 1.5rem;">
+                    <span class="icon">
+                      <img class="cover" src="${ruleImageUrl}" style="" title="">
+                    </span>
+                  </div>
+                  <div class="padding-x-small grow no-select overflow-hidden">${rowTitle}</div>
+                </div>
+              </div>
+            </li>`;
+        });
+        content = `
+          <div class="flex row">
+            <div class="padding-x-small grow no-select overflow-hidden">${title}</div>
+          </div>
+          <div class="padding-left">
+            <ul>${rules}</ul>
+          </div>`;
+      }
+      return `
           <li id="${this.getId()}" class="flex row align-center padding-left padding-right item">
             <div class="flex column">
               ${content}
             </div>
           </li>`;
-      }
-      return '';
     }
   });
 };
@@ -106,7 +120,7 @@ const LayerRows = function LayerRows(options) {
       const overlayEls = [];
 
       overlays.forEach((layer) => {
-        overlayEls.push(LayerRow({ layer }));
+        overlayEls.push(LayerRow({ layer, viewer }));
       });
       const layerListCmp = Component({
         async render() {
