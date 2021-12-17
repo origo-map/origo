@@ -141,6 +141,7 @@ export default function PrintResize(options = {}) {
     if (paddingExtraSmall) {
       paddingExtraSmall.style.paddingLeft = `${multiplyByFactor(0.5)}rem`;
       paddingExtraSmall.style.paddingBottom = `${multiplyByFactor(0.5)}rem`;
+      paddingExtraSmall.style.paddingRight = `${multiplyByFactor(0.5)}rem`;
     }
 
     const controlRule = getCssRule('.o-ui .control');
@@ -272,7 +273,6 @@ export default function PrintResize(options = {}) {
     const el = document.querySelector('#legendContainer');
     if (el) {
       el.style.fontSize = `${multiplyByFactor(1)}rem`;
-      console.log(el.parentElement);
       if (el.parentElement) {
         el.parentElement.style.left = `${multiplyByFactor(1)}rem`;
         el.parentElement.style.top = `${multiplyByFactor(1)}rem`;
