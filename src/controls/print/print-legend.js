@@ -44,7 +44,7 @@ const LayerRow = function LayerRow(options) {
       if (!isTheme) {
         content = `
           <div class="flex row">
-            <div class="grey-lightest round compact icon-small light relative no-shrink" style="height: 1.5rem; width: 1.5rem;">
+            <div class="grey-lightest round compact icon-small light relative no-shrink legend-icon" style="height: 1.5rem; width: 1.5rem;">
               <span class="icon">
                 ${icon}
               </span>
@@ -60,7 +60,7 @@ const LayerRow = function LayerRow(options) {
             <li class="flex row align-center padding-left padding-right item">
               <div class="flex column">
                 <div class="flex row">
-                  <div class="grey-lightest round compact icon-small light relative no-shrink" style="height: 1.5rem; width: 1.5rem;">
+                  <div class="grey-lightest round compact icon-small light relative no-shrink legend-icon" style="height: 1.5rem; width: 1.5rem;">
                     <span class="icon">
                       <img class="cover" src="${ruleImageUrl}" style="" title="">
                     </span>
