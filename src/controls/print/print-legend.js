@@ -59,6 +59,7 @@ const LayerRow = function LayerRow(options) {
         const style = viewer.getStyle(layer.get('styleName'));
         if (style && style[0]) {
           icon = renderSvgIcon(style[0], { opacity: 100 });
+          icon = icon.replaceAll('24px', '100%');
         }
       }
 
