@@ -322,7 +322,20 @@ export default function PrintResize(options = {}) {
           newStyle.forEach(style => {
             const image = style.getImage();
             if (image) {
-              image.setScale(styleScale);
+              const imageScale = image.getScale() ? multiplyByFactor(image.getScale()) : styleScale;
+              image.setScale(imageScale);
+            }
+
+            const stroke = style.getStroke();
+            if (stroke) {
+              const strokeWidth = stroke.getWidth() ? multiplyByFactor(stroke.getWidth()) : styleScale;
+              stroke.setWidth(strokeWidth);
+            }
+
+            const text = style.getText();
+            if (text) {
+              const textScale = text.getScale() ? multiplyByFactor(text.getScale()) : styleScale;
+              text.setScale(textScale);
             }
           });
           source.getFeatures().forEach(feature => {
@@ -354,11 +367,22 @@ export default function PrintResize(options = {}) {
       source.getFeatures().forEach(feature => {
         // Remove styles instead?
         const styles = feature.getStyle();
+        const scale = 1;
         if (styles) {
           styles.forEach(style => {
             const image = style.getImage();
             if (image) {
-              image.setScale(1);
+              image.setScale(scale);
+            }
+
+            const stroke = style.getStroke();
+            if (stroke) {
+              stroke.setWidth(scale);
+            }
+
+            const text = style.getText();
+            if (text) {
+              text.setScale(scale);
             }
           });
         }
@@ -373,7 +397,7 @@ export default function PrintResize(options = {}) {
       } else if ((getSourceType(layer) === 'QGIS' || getSourceType(layer) === 'ArcGIS') && params.DPI) {
         // Creates ImageArcGISRest source and sets it as layer source, removing ImageWMS as source.
         // This can be removed once OpenLayers has support for DPI parameter on ImageArcGISRest.
-        if (layer.getProperties().type === 'AGS_MAP') {
+        if (layer.getProperties().type === 'AGS_MAP' && source instanceof ImageWMS) {
           const props = layer.getProperties();
           props.source = props.sourceName;
           const agsmap = agsMap(props, viewer);
