@@ -1,7 +1,6 @@
 import {
-  Component, Collapse, Element as El, Slidenav, dom
+  Component, Element as El, Slidenav, dom
 } from '../../ui';
-import ThemeGroups from './themegroups';
 import GroupList from './grouplist';
 import LayerProperties from './overlayproperties';
 import Overlay from './overlay';
@@ -16,7 +15,6 @@ import Overlay from './overlay';
 const Overlays = function Overlays(options) {
   const {
     cls: clsSettings = '',
-    expanded = true,
     style: styleSettings = {},
     viewer,
     labelOpacitySlider
@@ -27,10 +25,8 @@ const Overlays = function Overlays(options) {
     width: '220px', height: '100%', 'min-width': '220px', ...styleSettings
   });
   const nonGroupNames = ['background', 'none'];
-  const rootGroupNames = ['root', '', null, undefined];
   let overlays;
 
-  const themeGroups = ThemeGroups();
   const rootGroup = GroupList({ viewer }, true);
 
   const groupContainer = El({
@@ -62,27 +58,6 @@ const Overlays = function Overlays(options) {
     }
   });
 
-  const collapseHeader = Component({
-    render() {
-      const headerCls = 'flex row grow no-shrink justify-center align-center collapse-header';
-      return `<div id="${this.getId()}" class="${headerCls}" style="height: 0.5rem;">
-              </div>`;
-    }
-  });
-
-  const overlaysCollapse = Collapse({
-    legendCollapse: false,
-    bubble: true,
-    collapseX: false,
-    cls: 'flex column overflow-hidden width-100',
-    contentCls: 'flex column o-scrollbar',
-    contentStyle: { height: '100%', 'overflow-y': 'auto', width: '100%' },
-    style: { width: '100%' },
-    expanded,
-    contentComponent: navContainer,
-    headerComponent: collapseHeader
-  });
-
   const hasOverlays = () => overlays.length;
 
   const readOverlays = () => {
@@ -110,33 +85,33 @@ const Overlays = function Overlays(options) {
       viewer
     });
     const groupName = layer.get('group');
-    if (rootGroupNames.includes(groupName) && !nonGroupNames.includes(groupName)) {
+    if (!nonGroupNames.includes(groupName)) {
       rootGroup.addOverlay(overlay);
     }
   };
 
-  const onAddLayer = function onAddLayer(evt) {
-    this.onChangeLayer();
-    const layer = evt.element;
-    addLayer(layer);
-  };
-
-  const onRemoveLayer = function onRemoveLayer(evt) {
-    this.onChangeLayer();
-    const layer = evt.element;
-    const layerName = layer.get('name');
-    rootGroup.removeOverlay(layerName);
+  const updateVisibleOverlays = function updateVisibleOverlays() {
+    const existing = rootGroup.getOverlays();
+    existing.forEach(overlay => {
+      document.getElementById(overlay.getId()).classList.add('hidden');
+    });
+    readOverlays();
+    overlays.forEach(overlay => {
+      if (!existing.find(eOverlay => eOverlay.name === overlay.name)) {
+        addLayer(overlay, { position: 'bottom' });
+      }
+    });
   };
 
   return Component({
     onChangeLayer,
     slidenav,
     onInit() {
-      //this.addComponent(overlaysCollapse);
       this.addComponent(navContainer);
       readOverlays();
-      viewer.getMap().getLayers().on('add', onAddLayer.bind(this));
-      viewer.getMap().getLayers().on('remove', onRemoveLayer.bind(this));
+      this.on('readOverlays', () => {
+        updateVisibleOverlays();
+      });
     },
     onRender() {
       overlays.forEach((layer) => {

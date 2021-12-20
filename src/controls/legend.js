@@ -126,17 +126,6 @@ const Legend = function Legend(options = {}) {
     });
   };
 
-  const toggleShowVisibleLayers = function toggleShowVisibleLayers() {
-    if (visibleLayersActive) {
-      document.getElementById(`${overlaysCmp.getId()}`).classList.remove('hidden');
-      document.getElementById(`${visibleOverlaysCmp.getId()}`).classList.add('hidden');
-    } else {
-      document.getElementById(`${overlaysCmp.getId()}`).classList.add('hidden');
-      document.getElementById(`${visibleOverlaysCmp.getId()}`).classList.remove('hidden');
-    }
-    visibleLayersActive = !visibleLayersActive;
-  };
-
   const divider = El({
     cls: 'divider margin-x-small',
     style: {
@@ -163,8 +152,8 @@ const Legend = function Legend(options = {}) {
   });
 
   const showVisibleLayersButton = Button({
-    cls: 'round compact icon-small margin-x-smaller',
-    title: 'Släck alla lager',
+    cls: 'compact icon-small margin-x-smaller',
+    title: 'Visa endast tända lager',
     click() {
       viewer.dispatch('active:togglevisibleLayers');
     },
@@ -172,11 +161,25 @@ const Legend = function Legend(options = {}) {
       'align-self': 'right',
       'padding-right': '6px'
     },
-    icon: '#ic_fullscreen_24px',
+    icon: '#fa-compress-alt',
     iconStyle: {
       fill: '#7a7a7a'
     }
   });
+
+  const toggleShowVisibleLayers = function toggleShowVisibleLayers() {
+    if (visibleLayersActive) {
+      document.getElementById(`${overlaysCmp.getId()}`).classList.remove('hidden');
+      document.getElementById(`${visibleOverlaysCmp.getId()}`).classList.add('hidden');
+      showVisibleLayersButton.setIcon('#fa-compress-alt');
+    } else {
+      document.getElementById(`${overlaysCmp.getId()}`).classList.add('hidden');
+      document.getElementById(`${visibleOverlaysCmp.getId()}`).classList.remove('hidden');
+      showVisibleLayersButton.setIcon('#fa-expand-alt');
+      visibleOverlaysCmp.dispatch('readOverlays');
+    }
+    visibleLayersActive = !visibleLayersActive;
+  };
 
   const layerSearchInput = Input({
     cls: 'o-search-layer-field placeholder-text-smaller smaller',
@@ -398,6 +401,12 @@ const Legend = function Legend(options = {}) {
       viewer.getMap().on('click', onMapClick);
     },
     onRender() {
+      const layerControlCmps = [];
+      if (showVisibleLayersControl) layerControlCmps.push(showVisibleLayersButton);
+      if (turnOffLayersControl) layerControlCmps.push(turnOffLayersButton);
+      const layerControll = El({
+        components: layerControlCmps
+      });
       mainContainerEl = document.getElementById(mainContainerCmp.getId());
       layerButtonEl = document.getElementById(layerButton.getId());
       layerSwitcherEl.addEventListener('collapse:toggle', (e) => {
@@ -406,8 +415,7 @@ const Legend = function Legend(options = {}) {
         toggleVisibility();
       });
       window.addEventListener('resize', updateMaxHeight);
-      if (turnOffLayersControl) this.addButtonToTools(turnOffLayersButton);
-      if (showVisibleLayersControl) this.addButtonToTools(showVisibleLayersButton);
+      if (layerControlCmps.length > 0) this.addButtonToTools(layerControll);
       if (searchLayersControl) this.addButtonToTools(layerSearchInput);
       initAutocomplete();
       bindUIActions();
@@ -422,7 +430,7 @@ const Legend = function Legend(options = {}) {
         viewer, cls: contentCls, style: contentStyle, labelOpacitySlider
       });
       visibleOverlaysCmp = VisibleOverlays({
-        viewer, expanded: false, cls: contentCls, style: contentStyle, labelOpacitySlider
+        viewer, cls: contentCls, style: contentStyle, labelOpacitySlider
       });
       const baselayerCmps = [toggleGroup];
 
