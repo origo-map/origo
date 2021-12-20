@@ -42,26 +42,22 @@ const LayerRow = function LayerRow(options) {
       let json;
       let getLegendGraphicUrl;
 
-      if ((layer instanceof TileLayer || layer instanceof ImageLayer) && !layer.get('type').includes('AGS')) {
-        const style = viewer.getStyle(layer.get('styleName'));
-        if (style && style[0]) {
-          icon = renderSvgIcon(style[0], { opacity: 100 });
-          icon = icon.replaceAll('style=""', 'style="height:100%;"');
-        } else {
-          getLegendGraphicUrl = getLegendUrl(layer, 'image/png');
-          json = await getLegendGraphicJSON(getLegendUrl(layer, 'application/json'));
-          if (!json) {
-            isTheme = false;
-          } else {
-            isTheme = json.Legend[0].rules.length > 1;
-            icon = `<img class="cover" src="${getLegendGraphicUrl}">`;
-          }
-        }
-      } else if (layer instanceof VectorLayer || layer instanceof VectorImageLayer || layer instanceof LayerGroup) {
-        const style = viewer.getStyle(layer.get('styleName'));
-        if (style && style[0]) {
-          icon = renderSvgIcon(style[0], { opacity: 100 });
+      const style = viewer.getStyle(layer.get('styleName'));
+      if (style && style[0]) {
+        icon = renderSvgIcon(style[0], { opacity: 100 });
+        if (icon.includes('<svg')) {
           icon = icon.replaceAll('24px', '100%');
+        } else {
+          icon = icon.replaceAll('style=""', 'style="height:100%;"');
+        }
+      } else if (!layer.get('type').includes('AGS')) {
+        getLegendGraphicUrl = getLegendUrl(layer, 'image/png');
+        json = await getLegendGraphicJSON(getLegendUrl(layer, 'application/json'));
+        if (!json) {
+          isTheme = false;
+        } else {
+          isTheme = json.Legend[0].rules.length > 1;
+          icon = `<img class="cover" src="${getLegendGraphicUrl}">`;
         }
       }
 
