@@ -42,7 +42,6 @@ export default function PrintMap(options = {}) {
       this.dispatch('render');
     },
     setDpi(resolution) {
-      if (!scaleLine) return;
       scaleLine.setDpi(resolution.resolution);
     },
     toggleNorthArrow(display) {
@@ -68,9 +67,6 @@ export default function PrintMap(options = {}) {
       el2.appendChild(dom.html(northArrowComponent.render()));
       northArrowComponent.onRotationChanged();
       northArrowComponent.setVisible({ showNorthArrow });
-      const el3 = document.getElementById(topLeftMapControls.getId());
-      el3.appendChild(dom.html(await printLegendComponent.render()));
-      printLegendComponent.setVisible({ showPrintLegend });
       scaleLine = new olScaleLine({
         target: bottomRightMapControls.getId(),
         bar: true,
@@ -83,6 +79,9 @@ export default function PrintMap(options = {}) {
         collapsed: false,
         target: bottomLeftMapControls.getId()
       });
+      const topLeftElement = document.getElementById(topLeftMapControls.getId());
+      topLeftElement.appendChild(dom.html(await printLegendComponent.render()));
+      printLegendComponent.setVisible({ showPrintLegend });
       mapControls = [scaleLine, attribution];
       map.addControl(scaleLine);
       map.addControl(attribution);
