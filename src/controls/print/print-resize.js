@@ -5,6 +5,7 @@ import VectorLayer from 'ol/layer/Vector';
 import VectorImageLayer from 'ol/layer/VectorImage';
 import { OSM, WMTS, XYZ, ImageWMS, ImageArcGISRest, Cluster } from 'ol/source';
 import TileArcGISRest from 'ol/source/TileArcGISRest';
+import Layer from '../../layer';
 import agsMap from '../../layer/agsmap';
 import Style from '../../style';
 import { Component } from '../../ui';
@@ -27,6 +28,7 @@ export default function PrintResize(options = {}) {
 
   let isActive = false;
   let layersWithChangedSource = [];
+  let layersOriginalStyles = [];
 
   // Will become an issue if 150 dpi is no longer the "standard" dpi setting
   const multiplyByFactor = function multiplyByFactor(value) {
@@ -306,13 +308,59 @@ export default function PrintResize(options = {}) {
     }
   };
 
+  const changeWfsThemeLayer = function changeWfsThemeLayer(layer, styleName, styles) {
+    const layerOption = viewer.getViewerOptions().layers.find(option => option.style && option.style === styleName);
+    const newStyles = [...styles];
+    if (layerOption) {
+      const layerName = layer.get('name');
+      if (!(layersOriginalStyles.some(layerInArr => layerInArr.layerName === layerName))) {
+        layersOriginalStyles.push({
+          layerName,
+          styleName,
+          styles: JSON.parse(JSON.stringify(newStyles))
+        });
+      }
+
+      const originalStyle = layersOriginalStyles.find(item => item.layerName === layerName);
+      if (originalStyle) {
+        originalStyle.styles.forEach((style, index) => {
+          if (style[0].stroke) {
+            newStyles[index][0].stroke.width = multiplyByFactor(style[0].stroke.width || 1);
+          }
+        });
+
+        viewer.setStyle(styleName, newStyles);
+        const newLayer = Layer(layerOption, viewer);
+        layer.setStyle(newLayer.getStyle());
+      }
+    }
+  };
+
+  const resetWfsThemeLayers = function resetWfsThemeLayers() {
+    layersOriginalStyles.forEach(item => {
+      const currentLayer = map.getLayers().getArray().find(layer => layer.get('name') === item.layerName && layer.get('type') === 'WFS');
+      if (currentLayer) {
+        const layerOption = viewer.getViewerOptions().layers.find(option => option.style && option.style === item.styleName);
+        if (layerOption) {
+          viewer.setStyle(item.styleName, item.styles);
+          const newLayer = Layer(layerOption, viewer);
+          currentLayer.setStyle(newLayer.getStyle());
+        }
+      }
+    });
+  };
+
   // Alters layer in map, if vector then set scale for feature, if image set DPI parameter for source
   const setLayerScale = function setLayerScale(layer) {
     const source = layer.getSource();
 
     if (isVector(layer)) {
       const styleName = layer.get('styleName');
-      if (styleName) {
+      const styles = viewer.getStyle(styleName);
+
+      if (styles && styles.length > 1) {
+        changeWfsThemeLayer(layer, styleName, styles);
+      } else if (styleName && styles.length === 1) {
         const newStyle = Style.createStyle({
           style: styleName,
           viewer
@@ -536,8 +584,10 @@ export default function PrintResize(options = {}) {
     },
     resetLayers() {
       resetLayers();
+      resetWfsThemeLayers();
       isActive = false;
       layersWithChangedSource = [];
+      layersOriginalStyles = [];
     },
     setResolution(newResolution) {
       resolution = newResolution;
