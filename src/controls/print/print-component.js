@@ -407,8 +407,8 @@ const PrintComponent = function PrintComponent(options = {}) {
       printMapComponent.dispatch('change:toggleNorthArrow', { showNorthArrow });
     },
     close() {
-      printResize.setResolution(150);
       printResize.resetLayers();
+      printResize.setResolution(150);
       // Restore scales
       if (!supressResolutionsRecalculation) {
         const viewerResolutions = viewer.getResolutions();

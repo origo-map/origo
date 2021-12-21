@@ -412,7 +412,10 @@ export default function PrintResize(options = {}) {
     const source = layer.getSource();
 
     if (isVector(layer)) {
-      source.getFeatures().forEach(feature => {
+      const features = source.getFeatures();
+      if (features && features.length) {
+        const feature = features[0];
+
         // Remove styles instead?
         const styles = feature.getStyle();
         const scale = 1;
@@ -425,7 +428,8 @@ export default function PrintResize(options = {}) {
 
             const stroke = style.getStroke();
             if (stroke) {
-              stroke.setWidth(scale);
+              const strokeWidth = stroke.getWidth();
+              stroke.setWidth(strokeWidth * (150 / resolution));
             }
 
             const text = style.getText();
@@ -434,7 +438,7 @@ export default function PrintResize(options = {}) {
             }
           });
         }
-      });
+      }
     }
 
     if (isImage(layer) && isValidSource(source)) {
