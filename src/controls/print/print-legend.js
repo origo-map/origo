@@ -28,70 +28,94 @@ const LayerRow = function LayerRow(options) {
     }
   };
 
+  const getTitleWithChildren = (title, children) => `
+    <div class="flex row">
+      <div class="padding-x-small grow no-select overflow-hidden">${title}</div>
+    </div>
+    <div class="padding-left">
+      <ul>${children}</ul>
+    </div>`;
+
+  const getTitleWithIcon = (title, icon) => `
+    <div class="flex row">
+      <div class="grey-lightest round compact icon-small light relative no-shrink legend-icon" style="height: 1.5rem; width: 1.5rem;">
+        <span class="icon">
+          ${icon}
+        </span>
+      </div>
+      <div class="padding-x-small grow no-select overflow-hidden">${title}</div>
+    </div>`;
+
+  const getListItem = (title, icon, iconLink = false) => {
+    const iconElement = iconLink ? `<img class="cover" src="${icon}" style="" title=""></img>` : icon;
+    return `
+      <li class="flex row align-center padding-left padding-right item">
+        <div class="flex column">
+          <div class="flex row">
+            <div class="grey-lightest round compact icon-small light relative no-shrink legend-icon" style="height: 1.5rem; width: 1.5rem;">
+              <span class="icon">
+                ${iconElement}
+              </span>
+            </div>
+            <div class="padding-x-small grow no-select overflow-hidden">${title}</div>
+          </div>
+        </div>
+      </li>`;
+  };
+
+  const getStyleIcon = (style) => {
+    const styleIcon = renderSvgIcon(style, { opacity: 100 });
+    if (styleIcon.includes('<svg')) {
+      return styleIcon.replaceAll('24px', '100%');
+    }
+    return styleIcon.replaceAll('style=""', 'style="height:100%;"');
+  };
+
+  const getStyleContent = (title, style) => {
+    if (style.length < 2) {
+      return getTitleWithIcon(title, getStyleIcon(style[0]));
+    }
+
+    let styles = '';
+    style.forEach((thisStyle, index) => {
+      const styleIcon = getStyleIcon(thisStyle);
+      const rowTitle = thisStyle[0].label ? thisStyle[0].label : index + 1;
+      styles += getListItem(rowTitle, styleIcon);
+    });
+    return getTitleWithChildren(title, styles);
+  };
+
+  const getJSONContent = async (title) => {
+    const getLegendGraphicUrl = getLegendUrl(layer, 'image/png');
+    const json = await getLegendGraphicJSON(getLegendUrl(layer, 'application/json'));
+
+    if (!json) {
+      return getTitleWithIcon(title, '');
+    }
+    if (json.Legend[0].rules.length <= 1) {
+      const icon = `<img class="cover" src="${getLegendGraphicUrl}">`;
+      return getTitleWithIcon(title, icon);
+    }
+
+    let rules = '';
+    json.Legend[0].rules.forEach((rule, index) => {
+      const ruleImageUrl = `${getLegendGraphicUrl}&rule=${rule.name}`;
+      const rowTitle = rule.title ? rule.title : index + 1;
+      rules += getListItem(rowTitle, ruleImageUrl, true);
+    });
+    return getTitleWithChildren(title, rules);
+  };
+
   return Component({
     async render() {
       const title = layer.get('title') || 'Titel saknas';
       let content = '';
-      let isTheme = false;
-      let icon = '';
-      let json;
-      let getLegendGraphicUrl;
 
       const style = viewer.getStyle(layer.get('styleName'));
       if (style && style[0]) {
-        icon = renderSvgIcon(style[0], { opacity: 100 });
-        if (icon.includes('<svg')) {
-          icon = icon.replaceAll('24px', '100%');
-        } else {
-          icon = icon.replaceAll('style=""', 'style="height:100%;"');
-        }
+        content = getStyleContent(title, style);
       } else if (!layer.get('type').includes('AGS')) {
-        getLegendGraphicUrl = getLegendUrl(layer, 'image/png');
-        json = await getLegendGraphicJSON(getLegendUrl(layer, 'application/json'));
-        if (!json) {
-          isTheme = false;
-        } else {
-          isTheme = json.Legend[0].rules.length > 1;
-          icon = `<img class="cover" src="${getLegendGraphicUrl}">`;
-        }
-      }
-
-      if (!isTheme) {
-        content = `
-          <div class="flex row">
-            <div class="grey-lightest round compact icon-small light relative no-shrink legend-icon" style="height: 1.5rem; width: 1.5rem;">
-              <span class="icon">
-                ${icon}
-              </span>
-            </div>
-            <div class="padding-x-small grow no-select overflow-hidden">${title}</div>
-          </div>`;
-      } else if (getLegendGraphicUrl) {
-        let rules = '';
-        json.Legend[0].rules.forEach((rule, index) => {
-          const ruleImageUrl = `${getLegendGraphicUrl}&rule=${rule.name}`;
-          const rowTitle = rule.title ? rule.title : index + 1;
-          rules += `
-            <li class="flex row align-center padding-left padding-right item">
-              <div class="flex column">
-                <div class="flex row">
-                  <div class="grey-lightest round compact icon-small light relative no-shrink legend-icon" style="height: 1.5rem; width: 1.5rem;">
-                    <span class="icon">
-                      <img class="cover" src="${ruleImageUrl}" style="" title="">
-                    </span>
-                  </div>
-                  <div class="padding-x-small grow no-select overflow-hidden">${rowTitle}</div>
-                </div>
-              </div>
-            </li>`;
-        });
-        content = `
-          <div class="flex row">
-            <div class="padding-x-small grow no-select overflow-hidden">${title}</div>
-          </div>
-          <div class="padding-left">
-            <ul>${rules}</ul>
-          </div>`;
+        content = await getJSONContent(title);
       }
       return `
           <li id="${this.getId()}" class="flex row align-center padding-left padding-right item">
