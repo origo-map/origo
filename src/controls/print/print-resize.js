@@ -174,6 +174,11 @@ export default function PrintResize(options = {}) {
       attributionRule.style.fontSize = `${multiplyByFactor(0.625)}rem`;
       attributionRule.style.padding = `${multiplyByFactor(0.1875)}rem`;
     }
+
+    const attributionLinkRule = getCssRule('.o-map .print-attribution a');
+    if (attributionLinkRule) {
+      attributionLinkRule.style.fontSize = `${multiplyByFactor(0.625)}rem`;
+    }
   };
 
   // Resize the title component, displaying a textfield at the top of the map
