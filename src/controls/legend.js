@@ -152,7 +152,7 @@ const Legend = function Legend(options = {}) {
   });
 
   const showVisibleLayersButton = Button({
-    cls: 'compact icon-small margin-x-smaller',
+    cls: 'compact icon-smaller margin-x-smaller',
     title: 'Visa endast tända lager',
     click() {
       viewer.dispatch('active:togglevisibleLayers');

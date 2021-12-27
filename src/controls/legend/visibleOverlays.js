@@ -61,9 +61,22 @@ const Overlays = function Overlays(options) {
   const hasOverlays = () => overlays.length;
 
   const readOverlays = () => {
-    const visibleLayers = viewer.getLayersByProperty('visible', true);
-    overlays = visibleLayers.filter((layer) => layer.get('group') !== 'background' && layer.get('group') !== 'none');
-    return overlays.reverse();
+    // Put subgroup items before group items so that same order is kept as the main legend.
+    const groups = viewer.getGroups().sort((a, b) => {
+      if (a.name === b.parent) return 1;
+      if (a.parent === b.name) return -1;
+      return 0;
+    });
+    // Sort layers to keep same order as the main legend.
+    const visibleLayers = viewer.getLayersByProperty('visible', true)
+      .filter((layer) => layer.get('group') !== 'background' && layer.get('group') !== 'none')
+      .sort((a, b) => {
+        const indexA = groups.findIndex((group) => group.name === a.get('group'));
+        const indexB = groups.findIndex((group) => group.name === b.get('group'));
+        return indexA - indexB;
+      });
+    overlays = visibleLayers;
+    return visibleLayers;
   };
 
   // Hide overlays container when empty
