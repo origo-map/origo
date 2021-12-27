@@ -68,11 +68,12 @@ const Overlays = function Overlays(options) {
       return 0;
     });
     // Sort layers to keep same order as the main legend.
-    const visibleLayers = viewer.getLayersByProperty('visible', true)
-      .filter((layer) => layer.get('group') !== 'background' && layer.get('group') !== 'none')
+    const visibleLayers = viewer
+      .getLayersByProperty('visible', true)
+      .filter(layer => layer.get('group') !== 'background' && layer.get('group') !== 'none')
       .sort((a, b) => {
-        const indexA = groups.findIndex((group) => group.name === a.get('group'));
-        const indexB = groups.findIndex((group) => group.name === b.get('group'));
+        const indexA = groups.findIndex(group => group.name === a.get('group'));
+        const indexB = groups.findIndex(group => group.name === b.get('group'));
         return indexA - indexB;
       });
     overlays = visibleLayers;
