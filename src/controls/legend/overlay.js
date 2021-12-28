@@ -61,13 +61,9 @@ const OverlayLayer = function OverlayLayer(options) {
   const layerIcon = Button({
     cls: `${headerIconCls} round compact icon-small light relative no-shrink`,
     click() {
-      const eventOverlayProps = new CustomEvent('overlayproperties', {
-        bubbles: true,
-        detail: {
-          layer
-        }
-      });
-      document.getElementById(this.getId()).dispatchEvent(eventOverlayProps);
+      if (!secure) {
+        toggleVisible(layer.getVisible());
+      }
     },
     style: {
       height: '1.5rem',
@@ -112,6 +108,27 @@ const OverlayLayer = function OverlayLayer(options) {
 
   buttons.push(toggleButton);
 
+  const moreInfoButton = Button({
+    cls: 'round small icon-smallest no-shrink',
+    click() {
+      const eventOverlayProps = new CustomEvent('overlayproperties', {
+        bubbles: true,
+        detail: {
+          layer
+        }
+      });
+      document.getElementById(this.getId()).dispatchEvent(eventOverlayProps);
+    },
+    style: {
+      'align-self': 'center'
+    },
+    icon: '#fa-ellipsis-v',
+    ariaLabel: 'Visa lagerinfo',
+    tabIndex: -1
+  });
+
+  buttons.push(moreInfoButton);
+
   if (layer.get('removable')) {
     removeButton = Button({
       cls: 'round small icon-smaller no-shrink',
@@ -127,9 +144,9 @@ const OverlayLayer = function OverlayLayer(options) {
       tabIndex: -1
     });
     buttons.push(removeButton);
-    ButtonsHtml = `${layerIcon.render()}${label.render()}${removeButton.render()}${toggleButton.render()}`;
+    ButtonsHtml = `${layerIcon.render()}${label.render()}${removeButton.render()}${toggleButton.render()}${moreInfoButton.render()}`;
   } else {
-    ButtonsHtml = `${layerIcon.render()}${label.render()}${toggleButton.render()}`;
+    ButtonsHtml = `${layerIcon.render()}${label.render()}${toggleButton.render()}${moreInfoButton.render()}`;
   }
 
   const onRemove = function onRemove() {
