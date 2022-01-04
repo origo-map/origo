@@ -38,6 +38,16 @@
   text-decoration: underline;
 }
 
+.o-footer a:focus {
+  color: $white;
+  text-decoration: underline;
+}
+
+.o-footer a:focus:not(:focus-visible) {
+  color: $white;
+  text-decoration: none;
+}
+
 .o-footer .o-footer-middle {
   float: left;
   position: relative;

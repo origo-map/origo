@@ -23,9 +23,14 @@ const OverlayLayer = function OverlayLayer(options) {
   const cls = `${clsSettings} flex row align-center padding-left padding-right item`.trim();
   const title = layer.get('title') || 'Titel saknas';
   const name = layer.get('name');
+  const secure = layer.get('secure');
 
   const checkIcon = '#ic_check_circle_24px';
-  const uncheckIcon = '#ic_radio_button_unchecked_24px';
+  let uncheckIcon = '#ic_radio_button_unchecked_24px';
+
+  if (secure) {
+    uncheckIcon = '#ic_lock_outline_24px';
+  }
 
   const opacity = layer.getOpacity();
 
@@ -68,7 +73,9 @@ const OverlayLayer = function OverlayLayer(options) {
       height: '1.5rem',
       width: '1.5rem'
     },
-    icon: headerIcon
+    ariaLabel: 'Lager ikon',
+    icon: headerIcon,
+    tabIndex: -1
   });
 
   buttons.push(layerIcon);
@@ -90,13 +97,17 @@ const OverlayLayer = function OverlayLayer(options) {
   const toggleButton = Button({
     cls: 'round small icon-smaller no-shrink',
     click() {
-      toggleVisible(layer.getVisible());
+      if (!secure) {
+        toggleVisible(layer.getVisible());
+      }
     },
     style: {
       'align-self': 'center',
       'padding-left': '.5rem'
     },
-    icon: getCheckIcon(layer.getVisible())
+    icon: getCheckIcon(layer.getVisible()),
+    ariaLabel: 'Växla lagersynlighet',
+    tabIndex: -1
   });
 
   buttons.push(toggleButton);
@@ -112,7 +123,8 @@ const OverlayLayer = function OverlayLayer(options) {
         'align-self': 'center',
         'padding-left': '.5rem'
       },
-      icon: '#ic_remove_circle_outline_24px'
+      icon: '#ic_remove_circle_outline_24px',
+      tabIndex: -1
     });
     buttons.push(removeButton);
     ButtonsHtml = `${layerIcon.render()}${label.render()}${removeButton.render()}${toggleButton.render()}`;

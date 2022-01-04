@@ -8,7 +8,8 @@ const Bookmarks = function Bookmarks(options = {}) {
     duration = 300,
     closeIcon = '#ic_close_24px',
     bookmarksIcon = '#ic_bookmark_24px',
-    title = 'Bokmärken'
+    title = 'Bokmärken',
+    autoClose = false
   } = options;
   let {
     isActive = false
@@ -52,7 +53,7 @@ const Bookmarks = function Bookmarks(options = {}) {
   } = {}) {
     const titleCmp = El({ cls: 'grow padding-left', innerHTML: bookmarkTitle });
     const button = Button({
-      cls: 'icon-smallest compact no-grow',
+      cls: 'icon-smallest compact no-grow o-bookmark-button',
       click,
       icon
     });
@@ -129,6 +130,12 @@ const Bookmarks = function Bookmarks(options = {}) {
           bookmarkTitle: item.name,
           click() {
             goToBookmark(item);
+            if (autoClose) {
+              const size = viewer.getSize();
+              if (size === 'm' || size === 's' || size === 'xs') {
+                toggle();
+              }
+            }
           }
         });
         items.push(bm);

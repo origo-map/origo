@@ -11,6 +11,7 @@ import getFeatureInfo from './getfeatureinfo';
 import replacer from './utils/replacer';
 import SelectedItem from './models/SelectedItem';
 import { getContent } from './getattributes';
+import attachmentclient from './utils/attachmentclient';
 
 const styleTypes = StyleTypes();
 let selectionLayer;
@@ -34,6 +35,8 @@ const Featureinfo = function Featureinfo(options = {}) {
   let popup;
   let viewer;
   let selectionManager;
+  /** The featureinfo component itself */
+  let component;
 
   const pinStyle = Style.createStyleRule(pinStyleOptions)[0];
   const selectionStyles = selectionStylesOptions ? Style.createGeometryStyle(selectionStylesOptions) : Style.createEditStyle();
@@ -68,6 +71,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     }
   };
 
+  // FIXME: overly complex. Don't think layer can be a string anymore
   const getTitle = function getTitle(item) {
     let featureinfoTitle;
     let title;
@@ -102,6 +106,31 @@ const Featureinfo = function Featureinfo(options = {}) {
     return title;
   };
 
+  /**
+ * Dispatches an "official" api event.
+ * @param {SelectedItem} item The currently selected item
+ */
+  const dispatchNewSelection = function dispatchNewSelection(item) {
+    // Make sure it actually is a SelectedItem. At least Search can call render() without creating proper selectedItems when
+    // search result is remote.
+    if (item instanceof SelectedItem) {
+      component.dispatch('changeselection', item);
+    }
+  };
+
+  const dispatchToggleFeatureEvent = function dispatchToggleFeatureEvent(currentItem) {
+    const toggleFeatureinfo = new CustomEvent('toggleFeatureinfo', {
+      detail: {
+        type: 'toggleFeatureinfo',
+        currentItem
+      }
+    });
+    // FIXME: should be deprecated
+    document.dispatchEvent(toggleFeatureinfo);
+    // Also emit an API-event
+    dispatchNewSelection(currentItem);
+  };
+
   // TODO: direct access to feature and layer should be converted to getFeature and getLayer methods on currentItem
   const callback = function callback(evt) {
     const currentItemIndex = evt.item.index;
@@ -109,6 +138,7 @@ const Featureinfo = function Featureinfo(options = {}) {
       const currentItem = items[currentItemIndex];
       const clone = currentItem.feature.clone();
       clone.setId(currentItem.feature.getId());
+      // FIXME: Should be taken from layer name
       clone.layerName = currentItem.name;
       selectionLayer.clearAndAdd(
         clone,
@@ -122,13 +152,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         sidebar.setTitle(title);
       }
 
-      const toggleFeatureinfo = new CustomEvent('toggleFeatureinfo', {
-        detail: {
-          type: 'toggleFeatureinfo',
-          currentItem
-        }
-      });
-      document.dispatchEvent(toggleFeatureinfo);
+      dispatchToggleFeatureEvent(currentItem);
     }
   };
 
@@ -169,6 +193,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     return selectionLayer.getFeatureLayer();
   }
 
+  // FIXME: Can't handle selectionmanager (infowindow)
   function getSelection() {
     const selection = {};
     const firstFeature = selectionLayer.getFeatures()[0];
@@ -176,12 +201,14 @@ const Featureinfo = function Featureinfo(options = {}) {
       selection.geometryType = firstFeature.getGeometry().getType();
       selection.coordinates = firstFeature.getGeometry().getCoordinates();
       selection.id = firstFeature.getId() != null ? firstFeature.getId() : firstFeature.ol_uid;
+      // FIXME: typeof layer can not be string, and if it is it would probably not have a property called type that is set to WFS
       selection.type = typeof selectionLayer.getSourceLayer() === 'string' ? selectionLayer.getFeatureLayer().type : selectionLayer.getSourceLayer().get('type');
       if (selection.type === 'WFS') {
         const idSuffix = selection.id.substring(selection.id.lastIndexOf('.') + 1, selection.id.length);
         selection.id = `${selectionLayer.getSourceLayer().get('name')}.${idSuffix}`;
       }
       if (selection.type !== 'WFS') {
+        // FIXME: typeof layer can not be string
         const name = typeof selectionLayer.getSourceLayer() === 'string' ? selectionLayer.getSourceLayer() : selectionLayer.getSourceLayer().get('name');
         const id = firstFeature.getId() || selection.id;
         selection.id = `${name}.${id}`;
@@ -230,10 +257,17 @@ const Featureinfo = function Featureinfo(options = {}) {
     });
   };
 
-  const render = function render(identifyItems, target, coordinate) {
+  /**
+   * Internal helper that performs the actual rendering
+   * @param {any} identifyItems
+   * @param {any} target
+   * @param {any} coordinate
+   */
+  const doRender = function doRender(identifyItems, target, coordinate) {
     const map = viewer.getMap();
     items = identifyItems;
     clear();
+    // FIXME: variable is overwritten in next row
     let content = items.map((i) => i.content).join('');
     content = '<div id="o-identify"><div id="o-identify-carousel" class="flex"></div></div>';
     switch (target) {
@@ -260,6 +294,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         const geometry = firstFeature.getGeometry();
         const clone = firstFeature.clone();
         clone.setId(firstFeature.getId());
+        // FIXME: should be layer name, not feature name
         clone.layerName = firstFeature.name;
         selectionLayer.clearAndAdd(
           clone,
@@ -316,6 +351,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         const geometry = firstFeature.getGeometry();
         const clone = firstFeature.clone();
         clone.setId(firstFeature.getId());
+        // FIXME: should be layer name
         clone.layerName = firstFeature.name;
         selectionLayer.clearAndAdd(
           clone,
@@ -344,6 +380,65 @@ const Featureinfo = function Featureinfo(options = {}) {
     for (let i = 0; i < modalLinks.length; i += 1) {
       addLinkListener(modalLinks[i]);
     }
+    // Don't send event for infowindow. Infowindow will send an event that triggers sending the event later.
+    if (target === 'overlay' || target === 'sidebar') {
+      dispatchToggleFeatureEvent(items[0]);
+    }
+  };
+  /**
+   * Renders the feature info window. Consider using showInfo instead if calling using api.
+   * @param {any} identifyItems Array of SelectedItems
+   * @param {any} target Name of infoWindow type
+   * @param {any} coordinate Coordinate where to show pop up.
+   */
+  const render = function render(identifyItems, target, coordinate) {
+    // Append attachments (if any) to the SelectedItems
+    const requests = [];
+    identifyItems.forEach(currItem => {
+      // At least search can call render without SelectedItem as Items, it just sends an object with the least possible fields render uses
+      // so we need to exclude those from attachment handling, as we know nothing about them
+      if (currItem instanceof SelectedItem) {
+        const layer = currItem.getLayer();
+        const attachments = layer.get('attachments');
+        if (attachments && attachments.groups.some(g => g.linkAttribute || g.fileNameAttribute)) {
+          const ac = attachmentclient(layer);
+          // This actually adds attributes to the feature
+          requests.push(ac.populatePseudoAttributes(currItem, viewer.getMap()));
+        }
+      }
+    });
+
+    // Wait for all requests. If there are no attachments it just calls .then() without waiting.
+    Promise.all(requests)
+      .then(() => {
+        doRender(identifyItems, target, coordinate);
+      })
+      .catch(() => {
+        alert('Kunde inte hämta bilagor. Fält från bilagor kommer att vara tomma.');
+        // Show without attachments
+        doRender(identifyItems, target, coordinate);
+      });
+  };
+  /**
+  * Shows the featureinfo popup/sidebar/infowindow for the provided features. Only vector layers are supported.
+  * @param {any} fidsbylayer An object containing layer names as keys with a list of feature ids for each layer
+  * @param {any} opts An object containing options. Supported options are : coordinate, the coordinate where popup will be shown. If omitted first feature is used.
+  * @returns nothing
+  */
+  const showInfo = function showInfo(fidsbylayer, opts = {}) {
+    const newItems = [];
+    const grouplayers = viewer.getGroupLayers();
+    const map = viewer.getMap();
+    const keys = Object.keys(fidsbylayer);
+    keys.forEach(layername => {
+      fidsbylayer[layername].forEach(currFeatureId => {
+        const layer = viewer.getLayer(layername);
+        const f = layer.getSource().getFeatureById(currFeatureId);
+        const newItem = getFeatureInfo.createSelectedItem(f, layer, map, grouplayers);
+        newItems.push(newItem);
+      });
+    });
+    render(newItems, identifyTarget, opts.coordinate || maputils.getCenter(newItems[0].getFeature().getGeometry()));
   };
 
   const onClick = function onClick(evt) {
@@ -410,11 +505,17 @@ const Featureinfo = function Featureinfo(options = {}) {
     getSelection,
     addAttributeType,
     onAdd(e) {
+      // Keep a reference to "ourselves"
+      component = this;
       viewer = e.target;
       const map = viewer.getMap();
       setUIoutput(viewer);
       selectionLayer = featurelayer(savedFeature, map);
       selectionManager = viewer.getSelectionManager();
+      // Re dispatch selectionmanager's event as our own
+      if (selectionManager) {
+        selectionManager.on('highlight', evt => dispatchToggleFeatureEvent(evt));
+      }
       map.on(clickEvent, onClick);
       viewer.on('toggleClickInteraction', (detail) => {
         if ((detail.name === 'featureinfo' && detail.active) || (detail.name !== 'featureinfo' && !detail.active)) {
@@ -423,8 +524,32 @@ const Featureinfo = function Featureinfo(options = {}) {
           setActive(false);
         }
       });
+
+      // Change mouse pointer when hovering over a clickable feature
+      if (viewer.getViewerOptions().featureinfoOptions.changePointerOnHover) {
+        let pointerActive = true;
+        document.addEventListener('enableInteraction', evt => {
+          pointerActive = evt.detail.interaction !== 'editor';
+          // Avoid getting stuck in pointer mode if user manages to enable editing while having pointer over a clickable feature.
+          // If the user manages to disable editing while standing on a clickable feature, it will remain arrow until moved. (Sorry)
+          map.getViewport().style.cursor = '';
+        });
+
+        // Check if there is a clickable feature when mouse is moved.
+        map.on('pointermove', evt => {
+          if (!pointerActive || evt.dragging) return;
+          // Just check if there is a pixel here. Pretty annoying on hatched symbols or hollow areas.
+          // Note that forEachLayerAtPixel actually only checks if there is a pixel on the canvas where the layer resides,
+          // so non queryable layers must not share canvas with queryable layers, otherwise there will be false positives.
+          // When a pixel is found on the canvas, the callback is called with all layers added to that canvas as it does not know which layer actually draw a pixel there. But we don't care which
+          // layer was hit to change the pointer.
+          // Hit tolerence seems to be ignored. It would probably look funny anyway.
+          map.getViewport().style.cursor = map.forEachLayerAtPixel(evt.pixel, () => true, { layerFilter: (l) => l.get('queryable') }) ? 'pointer' : '';
+        });
+      }
     },
-    render
+    render,
+    showInfo
   });
 };
 

@@ -1,0 +1,55 @@
+.o-bookmark-button:focus {
+  background-color: $grey-lighter;
+}
+
+.o-bookmark-button.light:focus {
+  background-color: $grey-lighter;
+}
+
+.o-bookmark-button.primary:focus {
+  background-color: $primary-color-dark;
+}
+
+.o-bookmark-button.danger:focus {
+  background-color: $danger-color-dark;
+}
+
+.o-bookmark-button.grey-light:focus {
+  background-color: $grey-light;
+}
+
+.o-bookmark-button.grey-lighter:focus {
+  background-color: $grey-lighter;
+}
+
+.o-bookmark-button.grey-lightest:focus {
+  background-color: $grey-lightest;
+}
+
+.o-bookmark-button:focus:not(:focus-visible) {
+  background-color: $light-color;
+}
+
+.o-bookmark-button.light:focus:not(:focus-visible) {
+  background-color: $light-color;
+}
+
+.o-bookmark-button.primary:focus:not(:focus-visible) {
+  background-color: $primary-color;
+}
+
+.o-bookmark-button.danger:focus:not(:focus-visible) {
+  background-color: $danger-color;
+}
+
+.o-bookmark-button.grey-light:focus:not(:focus-visible) {
+  background-color: $grey-light;
+}
+
+.o-bookmark-button.grey-lighter:focus:not(:focus-visible) {
+  background-color: $grey-lighter;
+}
+
+.o-bookmark-button.grey-lightest:focus:not(:focus-visible) {
+  background-color: $grey-lightest;
+}

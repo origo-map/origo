@@ -34,7 +34,8 @@ const About = function About(options = {}) {
           mapMenu.close();
         },
         icon,
-        title: buttonText
+        title: buttonText,
+        ariaLabel: title
       });
       this.addComponent(menuItem);
       this.render();

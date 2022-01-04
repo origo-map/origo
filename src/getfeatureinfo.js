@@ -25,6 +25,19 @@ function createSelectedItem(feature, layer, map, groupLayers) {
     selectionGroupTitle = layer.get('title');
   }
 
+  // Add pseudo attributes to make sure they exist when featureinfo shows them
+  // Ideally we would also populate here, but that is an async operation and will break the api.
+  const attachments = layer.get('attachments');
+  if (attachments) {
+    attachments.groups.forEach(a => {
+      if (a.linkAttribute) {
+        feature.set(a.linkAttribute, '');
+      }
+      if (a.fileNameAttribute) {
+        feature.set(a.fileNameAttribute, '');
+      }
+    });
+  }
   return new SelectedItem(feature, layer, map, selectionGroup, selectionGroupTitle);
 }
 
@@ -121,14 +134,14 @@ function getGetFeatureInfoRequest({ layer, coordinate }, viewer) {
       if (layer.get('featureinfoLayer')) {
         const featureinfoLayerName = layer.get('featureinfoLayer');
         const featureinfoLayer = viewer.getLayer(featureinfoLayerName);
-        return getGetFeatureInfoRequest({ featureinfoLayer, coordinate }, viewer);
+        return getGetFeatureInfoRequest({ layer: featureinfoLayer, coordinate }, viewer);
       }
       break;
     case 'WMS':
       if (layer.get('featureinfoLayer')) {
         const featureinfoLayerName = layer.get('featureinfoLayer');
         const featureinfoLayer = viewer.getLayer(featureinfoLayerName);
-        return getGetFeatureInfoRequest({ featureinfoLayer, coordinate }, viewer);
+        return getGetFeatureInfoRequest({ layer: featureinfoLayer, coordinate }, viewer);
       }
       obj.cb = 'GEOJSON';
       obj.fn = getFeatureInfoUrl({ coordinate, resolution, projection }, layer);
@@ -137,7 +150,7 @@ function getGetFeatureInfoRequest({ layer, coordinate }, viewer) {
       if (layer.get('featureinfoLayer')) {
         const featureinfoLayerName = layer.get('featureinfoLayer');
         const featureinfoLayer = viewer.getLayer(featureinfoLayerName);
-        return getGetFeatureInfoRequest({ featureinfoLayer, coordinate }, viewer);
+        return getGetFeatureInfoRequest({ layer: featureinfoLayer, coordinate }, viewer);
       }
       obj.fn = getAGSIdentifyUrl({ layer, coordinate }, viewer);
       return obj;
@@ -268,6 +281,7 @@ function getFeaturesAtPixel({
 }
 
 export default {
+  createSelectedItem,
   getFeaturesFromRemote,
   getFeaturesAtPixel
 };

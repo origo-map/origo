@@ -4,6 +4,16 @@
   color: #bbb;
 }
 
+.ol-attribution li a:focus {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.ol-attribution li a:focus:not(:focus-visible) {
+  color: #bbb;
+  text-decoration: none;
+}
+
 .ol-overlaycontainer-stopevent {
   z-index: unset !important;
 }

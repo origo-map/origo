@@ -2,6 +2,7 @@ import permalink from './permalink/permalink';
 import getUrl from './utils/geturl';
 import isUrl from './utils/isurl';
 import trimUrl from './utils/trimurl';
+import stripJSONComments from './utils/stripjsoncomments';
 
 function getQueryVariable(variable, storeMethod) {
   const query = window.location.search.substring(1);
@@ -106,13 +107,28 @@ const loadResources = async function loadResources(mapOptions, config) {
         .then(() => fetch(url, {
           dataType: format
         })
-          .then(res => res.json())
-          .then((data) => {
+          // res.json() does not allow comments in json. Read out body as string and parse "manually"
+          .then(res => res.text())
+          .then((bodyAsJson) => {
+            const stripped = stripJSONComments(bodyAsJson);
+            let data;
+            try {
+              data = JSON.parse(stripped);
+            } catch (e) {
+              const index = parseInt(e.message.split(' ').pop(), 10);
+              if (index) {
+                const row = stripped.substring(0, index).match(/^/gm).length;
+                throw Error(`${e.message}\non row : ${row}\nSomewhere around:\n${bodyAsJson.substring(index - 100, index + 100)}`);
+              } else {
+                throw e;
+              }
+            }
+
             map.options = Object.assign(config, data);
-            map.options.controls = config.defaultControls || [];
+            map.options.controls = config.defaultControls.slice() || [];
             if (data.controls) {
               data.controls.forEach((control) => {
-                const matchingControlIndex = map.options.controls.findIndex(
+                const matchingControlIndex = config.defaultControls.findIndex(
                   (defaultControl) => (defaultControl.name === control.name)
                 );
                 if (matchingControlIndex !== -1) {

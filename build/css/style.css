@@ -1709,6 +1709,44 @@ body {
     display: flex;
     flex-direction: column;
     max-height: calc(70vh - 46px); }
+  .o-map .glide__slide--clone {
+    height: 0; }
+  .o-map .o-image-carousel .glide_arrows {
+    position: absolute;
+    width: 100%;
+    top: 50%; }
+  .o-map .o-image-carousel .glide__arrow {
+    transform: translateY(-100%);
+    box-shadow: none;
+    border: 1px solid rgba(25, 25, 25, 0.25);
+    padding: .2em;
+    background-color: rgba(255, 255, 255, 0.6);
+    transition: background-color 0.5s; }
+    .o-map .o-image-carousel .glide__arrow:hover {
+      background-color: rgba(255, 255, 255, 0.8); }
+  .o-map .o-image-carousel .glide__bullets {
+    display: flex;
+    justify-content: center;
+    padding-left: 5px;
+    padding-right: 5px; }
+  .o-map .o-image-carousel .glide__bullet {
+    width: 100%;
+    height: 3px;
+    border: none;
+    padding: 0;
+    border-radius: 0; }
+    .o-map .o-image-carousel .glide__bullet--active {
+      background-color: #008ff5; }
+    .o-map .o-image-carousel .glide__bullet:hover {
+      background-color: rgba(45, 45, 45, 0.8); }
+  .o-map .o-image-carousel button.glide {
+    color: rgba(25, 25, 25, 0.25); }
+    .o-map .o-image-carousel button.glide__arrow--left {
+      left: 1rem;
+      border-radius: 50%; }
+    .o-map .o-image-carousel button.glide__arrow--right {
+      right: 1rem;
+      border-radius: 50%; }
   @media (hover: none) {
     .o-map .glide__arrow:hover {
       border-color: rgba(25, 25, 25, 0.25); } }
@@ -1976,6 +2014,9 @@ body {
         max-height: inherit; }
         .o-map .o-popup .o-card-content #o-identify #o-identify-carousel .owl-stage {
           margin-bottom: 10px; }
+    .o-map .o-popup .o-card-content .o-image-carousel {
+      max-height: inherit;
+      margin-bottom: 10px; }
   .o-map .o-popover-container {
     display: inline-block;
     position: relative; }
@@ -2090,6 +2131,9 @@ body {
     height: 1em;
     padding: 0.25em;
     width: 1em; }
+  .o-map .o-image-carousel [class^='o-icon-'],
+  .o-map .o-image-carousel [class*=' o-icon-'] {
+    fill: #424242; }
   .o-map .ol-control > button:hover [class^='o-icon-'],
   .o-map .ol-control > button:hover [class*=' o-icon-'],
   .o-map .o-button:hover [class^='o-icon-'],
@@ -2097,7 +2141,7 @@ body {
     fill: #fff; }
   .o-map .o-toolbar button:hover [class^='o-icon-'],
   .o-map .o-toolbar button:hover [class*='o-icon-'] {
-    fill: #007aff; }
+    fill: #008ff5; }
   .o-map button.o-disabled:hover [class^='o-icon-'],
   .o-map button.o-disabled:hover [class*=' o-icon-'],
   .o-map .o-disabled [class^='o-icon-'],
@@ -2390,7 +2434,7 @@ body {
   .o-map .o-measure-button-true .o-icon-steady-measure,
   .o-map .o-measure-button-true .o-icon-minicons-square-vector,
   .o-map .o-measure-button-true .o-icon-minicons-line-vector {
-    fill: #007aff; }
+    fill: #008ff5; }
   .o-map .o-measure-length .icon svg,
   .o-map .o-measure-area .icon svg {
     border-radius: 0;
@@ -2640,8 +2684,34 @@ body {
     width: 240px;
     word-wrap: break-word; }
   .o-map #o-identify-carousel > .o-identify-content {
-    max-height: calc(70vh - 46px);
-    overflow-y: auto; }
+    overflow-y: scroll; }
+  .o-map .o-image-content {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+    margin: 5px;
+    height: 160px; }
+  .o-map .o-image-content img {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto; }
+  @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    .o-map #o-identify-carousel > .o-identify-content {
+      max-height: calc(70vh - 46px);
+      overflow-y: auto; }
+    .o-map .o-image-content {
+      width: calc(100% - 12px);
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 5px;
+      margin: 5px;
+      overflow: hidden; } }
   .o-map .sidebarcontainer {
     background-color: white;
     border-radius: 0.5em;
@@ -2869,7 +2939,8 @@ body {
 html,
 body {
   height: 100%;
-  margin: 0; }
+  margin: 0;
+  overscroll-behavior-y: contain; }
 
 #o-wrapper,
 #app-wrapper {

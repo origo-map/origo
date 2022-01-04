@@ -19,6 +19,7 @@ import searchList from './addons/searchList/searchList';
 import validate from '../../utils/validate';
 import slugify from '../../utils/slugify';
 import topology from '../../utils/topology';
+import attachmentsform from './attachmentsform';
 
 const editsStore = store();
 let editLayers = {};
@@ -136,6 +137,16 @@ function saveFeatures() {
       const ids = edits[layerName][editType];
       const features = getFeaturesByIds(editType, layer, ids);
       if (features.length) {
+        // Remove attributes added by attachments before saving.
+        const attachmentsConfig = layer.get('attachments');
+        if (attachmentsConfig && attachmentsConfig.groups) {
+          features.forEach(feat => {
+            attachmentsConfig.groups.forEach(g => {
+              feat.unset(g.linkAttribute);
+              feat.unset(g.fileNameAttribute);
+            });
+          });
+        }
         transaction[editType] = features;
       }
     });
@@ -144,9 +155,14 @@ function saveFeatures() {
   });
 }
 
-function saveFeature(change) {
+/**
+ * Adds changed feature to the editstore and if config parameter autoSave is set, also triggers a transaction.
+ * @param {any} change The feature and change type
+ * @param {any} ignoreAutoSave Optional argument that overrides autoSave configuration parameter. Used to prevent numerous transactions in batch mode.
+ */
+function saveFeature(change, ignoreAutoSave) {
   dispatcher.emitChangeFeature(change);
-  if (autoSave) {
+  if (autoSave && !ignoreAutoSave) {
     saveFeatures(change);
   }
 }
@@ -550,27 +566,41 @@ function cancelAttribute() {
   dispatcher.emitChangeEdit('attribute', false);
 }
 
-function attributesSaveHandler(feature, formEl) {
-  // get DOM values and set attribute values to feature
-  attributes.forEach((attribute) => {
-    if (Object.prototype.hasOwnProperty.call(formEl, attribute.name)) {
-      feature.set(attribute.name, formEl[attribute.name]);
-    }
+/**
+ * Reads the new attribute values from from DOM and saves to feature
+ * @param {any} features The features to save
+ * @param {any} formEl The attributes to set on features
+ */
+function attributesSaveHandler(features, formEl) {
+  features.forEach(feature => {
+    // get DOM values and set attribute values to feature
+    attributes.forEach((attribute) => {
+      if (Object.prototype.hasOwnProperty.call(formEl, attribute.name)) {
+        feature.set(attribute.name, formEl[attribute.name]);
+      }
+    });
+    saveFeature({
+      feature,
+      layerName: currentLayer,
+      action: 'update'
+    }, true);
   });
-  saveFeature({
-    feature,
-    layerName: currentLayer,
-    action: 'update'
-  });
+  // Take control of auto save here to avoid one transaction per feature when batch editing
+  if (autoSave) {
+    saveFeatures();
+  }
 }
 
-function onAttributesSave(feature, attrs) {
+/**
+ * Sets up an eventlistener on the attribute editor form save button.
+ * @param {Collection} features The features that should be updated
+ * @param {any} attrs Array of attributes whih values to set
+ */
+function onAttributesSave(features, attrs) {
   document.getElementById('o-save-button').addEventListener('click', (e) => {
     const editEl = {};
     const valid = {};
     const fileReaders = [];
-
-    // Read values from form
     attrs.forEach((attribute) => {
       // Get the input container class
       const containerClass = `.${attribute.elId}`;
@@ -582,6 +612,8 @@ function onAttributesSave(feature, attrs) {
       const inputRequired = document.getElementById(attribute.elId).getAttribute('required');
 
       // If hidden element it should be excluded
+      // By sheer luck, this prevents attributes to be changed in batch edit mode when checkbox is not checked.
+      // If this code is changed, it may be necessary to excplict check if the batch edit checkbox is checked for this attribute.
       if (!document.querySelector(containerClass) || document.querySelector(containerClass).classList.contains('o-hidden') === false) {
         // Check if checkbox. If checkbox read state.
         if (inputType === 'checkbox') {
@@ -769,10 +801,10 @@ function onAttributesSave(feature, attrs) {
     if (valid.validates) {
       if (fileReaders.length > 0 && fileReaders.every(reader => reader.readyState === 1)) {
         document.addEventListener('imageresized', () => {
-          attributesSaveHandler(feature, editEl);
+          attributesSaveHandler(features, editEl);
         });
       } else {
-        attributesSaveHandler(feature, editEl);
+        attributesSaveHandler(features, editEl);
       }
 
       document.getElementById('o-save-button').blur();
@@ -830,24 +862,63 @@ function addImageListener() {
   return fn;
 }
 
+/**
+ * Returns a click handler that should be attached to batch edit checkboxes to show or hide the input field
+ * */
+function addBatchEditListener() {
+  const fn = (obj) => {
+    document.getElementById(obj.elId).addEventListener('click', (ev) => {
+      const classList = document.querySelector(`.${obj.relatedAttrId}`).classList;
+      if (ev.target.checked) {
+        classList.remove('o-hidden');
+      } else {
+        classList.add('o-hidden');
+      }
+    });
+  };
+  return fn;
+}
+
+/**
+ * Edits the attributes for given feature or selection from interaction
+ * @param {any} feat Feature to edit attributes for. If omitted selection will be used instead
+ */
 function editAttributes(feat) {
-  let feature = feat;
+  let feature;
   let attributeObjects;
+  /** Array of batch edit checkbox models */
+  const batchEditBoxes = [];
+  /** OL Collection */
   let features;
+  const layer = viewer.getLayer(currentLayer);
 
   // Get attributes from the created, or the selected, feature and fill DOM elements with the values
-  if (feature) {
+  if (feat) {
     features = new Collection();
-    features.push(feature);
+    features.push(feat);
   } else {
+    // Interaction is set up to only select for edited layer, so no need to check layer.
     features = select.getFeatures();
   }
-  if (features.getLength() === 1) {
+  const isBatchEdit = features.getLength() > 1 && attributes.some(a => a.allowBatchEdit);
+  const dlgTitle = isBatchEdit ? `Batch edit ${title}.<br>(${features.getLength()} objekt)` : title;
+
+  /** Filtered list of attributes containing only those that should be displayed */
+  const editableAttributes = attributes.filter(attr => {
+    const attachmentsConfig = layer.get('attachments');
+    // Filter out attributes created from attachments. Actually can produce false positives if name is not set, but that is handled in the next row
+    // as name is required for editable attributes (although not specified in the docs, but needed to create the input)
+    const isAttachment = attachmentsConfig && attachmentsConfig.groups.some(g => g.linkAttribute === attr.name || g.fileNameAttribute === attr.name);
+    return attr.name && (!isBatchEdit || (isBatchEdit && attr.allowBatchEdit)) && !isAttachment;
+  });
+
+  if (features.getLength() === 1 || isBatchEdit) {
     dispatcher.emitChangeEdit('attribute', true);
+    // Pick first feature to extract some properties from.
     feature = features.item(0);
-    if (attributes.length > 0) {
+    if (editableAttributes.length > 0) {
       // Create an array of defined attributes and corresponding values from selected feature
-      attributeObjects = attributes.map((attributeObject) => {
+      attributeObjects = editableAttributes.map((attributeObject) => {
         const obj = {};
         Object.assign(obj, attributeObject);
         obj.val = feature.get(obj.name) !== undefined ? feature.get(obj.name) : '';
@@ -879,21 +950,60 @@ function editAttributes(feat) {
           obj.isVisible = true;
           obj.elId = `input-${obj.name}`;
         }
+        if (isBatchEdit && !('constraint' in obj)) {
+          // Create an additional ckeckbox, that controls if this attribute should be changed
+          // Attributes with constraints don't have their own checkbox. They are forced to change value if the dependee is checked
+          // if it is configured as allowBatchEdit as well. If not, it won't change and you probaby broke some business rule.
+          const batchObj = {};
+          batchObj.isVisible = true;
+          batchObj.title = `Ändra ${obj.title}`;
+          batchObj.elId = `${obj.elId}-batch`;
+          batchObj.type = 'checkbox';
+          batchObj.relatedAttrId = obj.elId;
+          // Hide the attribute that this checkbox is connected to so it won't be changed unless user checks the box first.
+          obj.isVisible = false;
+          // Inject the checkbox next to the attribute
+          obj.formElement = editForm(batchObj) + editForm(obj);
 
-        obj.formElement = editForm(obj);
+          // Defer adding click handler until element exists in DOM
+          batchObj.addListener = addBatchEditListener();
+
+          batchEditBoxes.push(batchObj);
+        } else {
+          obj.formElement = editForm(obj);
+        }
         return obj;
       });
     }
 
     const formElement = attributeObjects.reduce((prev, next) => prev + next.formElement, '');
-    const form = `<div id="o-form">${formElement}<br><div class="o-form-save"><input id="o-save-button" type="button" value="Ok"></input></div></div>`;
+
+    let attachmentsForm = '';
+    if (layer.get('attachments') && !isBatchEdit) {
+      attachmentsForm = `<div id="o-attach-form-${currentLayer}"></div>`;
+    }
+    const form = `<div id="o-form">${formElement}${attachmentsForm}<br><div class="o-form-save"><input id="o-save-button" type="button" value="Ok"></input></div></div>`;
 
     modal = Modal({
-      title,
+      title: dlgTitle,
       content: form,
       static: true,
       target: viewer.getId()
     });
+
+    // This injects the entire attachment handling which is performed independently from save, so fire and forget it sets up
+    // its own callbacks and what not.
+    // Lucky for us when the form is saved, that handler only looks for attributes in the attributesObjects array, so we don't
+    // have to bother filter out attachment inputs.
+    if (attachmentsForm) {
+      const attachmentEl = document.getElementById(`o-attach-form-${currentLayer}`);
+      if (editsStore.hasFeature('insert', feature, currentLayer)) {
+        attachmentEl.innerHTML = `<label>${layer.get('attachments').formTitle || 'Bilagor'}</label><p>Du måste spara innan du kan lägga till bilagor.</p>`;
+      } else {
+        // Async fire and forget. Populates the form placeholder.
+        attachmentsform(layer, feature, attachmentEl);
+      }
+    }
 
     attributeObjects.forEach((obj) => {
       if ('addListener' in obj) {
@@ -901,7 +1011,14 @@ function editAttributes(feat) {
       }
     });
 
-    onAttributesSave(feature, attributeObjects);
+    // Add the deferred click handlers
+    batchEditBoxes.forEach((obj) => {
+      if ('addListener' in obj) {
+        obj.addListener(obj);
+      }
+    });
+
+    onAttributesSave(features, attributeObjects);
   }
 }
 

@@ -13,5 +13,8 @@ module.exports = merge(common, {
     contentBase: './',
     port: 9966,
     disableHostCheck: true
+  },
+  node: {
+    fs: 'empty'
   }
 });

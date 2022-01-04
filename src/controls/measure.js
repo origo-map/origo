@@ -20,6 +20,7 @@ const Measure = function Measure({
   elevationTargetProjection,
   elevationAttribute,
   showSegmentLengths = false,
+  showSegmentLabelButtonActive = true,
   useHectare = true
 } = {}) {
   const style = Style;
@@ -57,6 +58,8 @@ const Measure = function Measure({
   let areaToolButton;
   let elevationToolButton;
   let addNodeButton;
+  let showSegmentLabelButton;
+  let showSegmentLabels;
   let undoButton;
   let clearButton;
   const buttons = [];
@@ -229,6 +232,31 @@ const Measure = function Measure({
     labelOverlay.setPosition(oo);
     measureElement.innerHTML = formatLength(/** @type {LineString} */(segment));
     map.addOverlay(labelOverlay);
+    if (coords.length < 6 && showSegmentLengths) {
+      switch (type) {
+        case 'LineString':
+          if (coords.length === 3) {
+            document.getElementById('measure_3').style.display = 'none';
+          }
+          if (showSegmentLabels) {
+            document.getElementById('measure_3').style.display = 'block';
+          }
+          break;
+        case 'Polygon':
+          if (coords.length === 4) {
+            document.getElementById('measure_4').style.display = 'none';
+          }
+          if (showSegmentLabels) {
+            document.getElementById('measure_4').style.display = 'block';
+          }
+          break;
+        default:
+          break;
+      }
+    }
+    if (!showSegmentLabels) {
+      measureElement.style.display = 'none';
+    }
   }
 
   function centerSketch() {
@@ -371,6 +399,9 @@ const Measure = function Measure({
     }
     document.getElementById(measureButton.getId()).classList.add('tooltip');
     document.getElementById(clearButton.getId()).classList.add('hidden');
+    if (showSegmentLengths) {
+      document.getElementById(showSegmentLabelButton.getId()).classList.add('hidden');
+    }
     if (touchMode && isActive) {
       document.getElementById(addNodeButton.getId()).classList.add('hidden');
       const markerIconElement = document.getElementById(`${markerIcon.getId()}`);
@@ -410,6 +441,12 @@ const Measure = function Measure({
     if (touchMode) {
       document.getElementById(addNodeButton.getId()).classList.remove('hidden');
       renderMarker();
+    }
+    if (showSegmentLengths) {
+      document.getElementById(showSegmentLabelButton.getId()).classList.remove('hidden');
+      if (showSegmentLabelButtonActive) {
+        document.getElementById(showSegmentLabelButton.getId()).classList.add('active');
+      }
     }
     setActive(true);
   }
@@ -510,6 +547,28 @@ const Measure = function Measure({
     map.getViewport().dispatchEvent(up);
   }
 
+  function toggleSegmentLabels() {
+    const elements = document.getElementsByClassName('o-tooltip-measure');
+    for (let i = 0; i < elements.length; i += 1) {
+      const e = elements[i];
+
+      if (e.id.startsWith('measure_')) {
+        if (showSegmentLabels) {
+          e.style.display = 'none';
+        } else {
+          e.style.display = 'block';
+        }
+      }
+    }
+    if (showSegmentLabels) {
+      showSegmentLabels = false;
+      document.getElementById(showSegmentLabelButton.getId()).classList.remove('active');
+    } else {
+      document.getElementById(showSegmentLabelButton.getId()).classList.add('active');
+      showSegmentLabels = true;
+    }
+  }
+
   function undoLastPoint() {
     if ((type === 'LineString' && sketch.getGeometry().getCoordinates().length === 2) || (type === 'Polygon' && sketch.getGeometry().getCoordinates()[0].length <= 3)) {
       document.getElementsByClassName('o-tooltip-measure')[0].remove();
@@ -540,6 +599,23 @@ const Measure = function Measure({
           tooltipPlacement: 'east'
         });
         buttons.push(addNodeButton);
+      }
+      if (showSegmentLengths) {
+        if (showSegmentLabelButtonActive) {
+          showSegmentLabels = true;
+        } else {
+          showSegmentLabels = false;
+        }
+        showSegmentLabelButton = Button({
+          cls: 'o-measure-segment-label padding-small margin-bottom-smaller icon-smaller round light box-shadow hidden',
+          click() {
+            toggleSegmentLabels();
+          },
+          icon: '#ic_linear_scale_24px',
+          tooltipText: 'Visa delsträckor',
+          tooltipPlacement: 'east'
+        });
+        buttons.push(showSegmentLabelButton);
       }
       target = `${viewer.getMain().getMapTools().getId()}`;
 
@@ -685,6 +761,11 @@ const Measure = function Measure({
       }
       if (touchMode) {
         htmlString = addNodeButton.render();
+        el = dom.html(htmlString);
+        document.getElementById(measureElement.getId()).appendChild(el);
+      }
+      if (showSegmentLengths) {
+        htmlString = showSegmentLabelButton.render();
         el = dom.html(htmlString);
         document.getElementById(measureElement.getId()).appendChild(el);
       }
