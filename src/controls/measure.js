@@ -26,7 +26,7 @@ const Measure = function Measure({
   showSegmentLengths = false,
   showSegmentLabelButtonActive = true,
   useHectare = true,
-  snap = true,
+  snap = false,
   snapIsActive = true,
   snapLayers,
   snapRadius = 15
