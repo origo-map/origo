@@ -17,6 +17,7 @@ const Legend = function Legend(options = {}) {
     contentStyle,
     turnOffLayersControl = false,
     showVisibleLayersControl = true,
+    visibleLayersViewActive = false,
     name = 'legend',
     labelOpacitySlider = '',
     useGroupIndication = true,
@@ -420,6 +421,9 @@ const Legend = function Legend(options = {}) {
       initAutocomplete();
       bindUIActions();
       setTabIndex();
+      if (showVisibleLayersControl && visibleLayersViewActive) {
+        toggleShowVisibleLayers();
+      }
     },
     render() {
       const size = viewer.getSize();
