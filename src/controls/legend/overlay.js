@@ -1,4 +1,4 @@
-import { Component, Button, dom } from '../../ui';
+import { Component, Button, dom, Element as El } from '../../ui';
 import { HeaderIcon } from '../../utils/legendmaker';
 
 const OverlayLayer = function OverlayLayer(options) {
@@ -16,14 +16,15 @@ const OverlayLayer = function OverlayLayer(options) {
   } = options;
 
   const buttons = [];
-  let removeButton;
-  let ButtonsHtml;
+  const popupMenuItems = [];
   let layerList;
+  let popupMenuActive = false;
 
   const cls = `${clsSettings} flex row align-center padding-left padding-right item`.trim();
   const title = layer.get('title') || 'Titel saknas';
   const name = layer.get('name');
   const secure = layer.get('secure');
+  const popupMenuId = 'overlayPopupMenu';
 
   const checkIcon = '#ic_check_circle_24px';
   let uncheckIcon = '#ic_radio_button_unchecked_24px';
@@ -39,6 +40,13 @@ const OverlayLayer = function OverlayLayer(options) {
     headerIcon = icon;
     headerIconCls = iconCls;
   }
+
+  const eventOverlayProps = new CustomEvent('overlayproperties', {
+    bubbles: true,
+    detail: {
+      layer
+    }
+  });
 
   const getCheckIcon = (visible) => {
     const isVisible = visible ? checkIcon : uncheckIcon;
@@ -108,16 +116,79 @@ const OverlayLayer = function OverlayLayer(options) {
 
   buttons.push(toggleButton);
 
+  const layerInfoMenuItem = Component({
+    onRender() {
+      const labelEl = document.getElementById(this.getId());
+      labelEl.addEventListener('click', (e) => {
+        document.getElementById(this.getId()).dispatchEvent(eventOverlayProps);
+        document.getElementById(popupMenuId).dispatchEvent(new Event('toggleoverlaypopup'));
+        e.preventDefault();
+      });
+    },
+    render() {
+      const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
+      return `<li id="${this.getId()}" class="${labelCls}">Visa lagerinformation</li>`;
+    }
+  });
+  popupMenuItems.push(layerInfoMenuItem);
+
+  const removeLayerMenuItem = Component({
+    onRender() {
+      const labelEl = document.getElementById(this.getId());
+      labelEl.addEventListener('click', (e) => {
+        layerList.removeOverlay(layer.get('name'));
+        viewer.getMap().removeLayer(layer);
+        document.getElementById(popupMenuId).dispatchEvent(new Event('toggleoverlaypopup'));
+        e.preventDefault();
+      });
+    },
+    render() {
+      const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
+      return `<li id="${this.getId()}" class="${labelCls}">Ta bort lager</li>`;
+    }
+  });
+  popupMenuItems.push(removeLayerMenuItem);
+
+  const popupMenuList = Component({
+    onAdd() {
+      this.addComponents(popupMenuItems);
+    },
+    render() {
+      let html = `<ul id="${this.getId()}" class="hidden">`;
+      popupMenuItems.forEach((item) => {
+        html += `${item.render()}`;
+      });
+      html += '</ul>';
+      return html;
+    }
+  });
+
+  const togglePopupMenu = function togglePopupMenu(eventFromThisComponent) {
+    const el = document.getElementById(popupMenuList.getId());
+    if (!eventFromThisComponent || popupMenuActive) {
+      el.classList.add('hidden');
+      popupMenuActive = false;
+    } else {
+      el.classList.remove('hidden');
+      popupMenuActive = true;
+    }
+  };
+
   const moreInfoButton = Button({
     cls: 'round small icon-smallest no-shrink',
     click() {
-      const eventOverlayProps = new CustomEvent('overlayproperties', {
+      const eventShowOverlayPopup = new CustomEvent('showoverlaypopup', {
         bubbles: true,
         detail: {
-          layer
+          id: popupMenuList.getId()
         }
       });
-      document.getElementById(this.getId()).dispatchEvent(eventOverlayProps);
+      console.log('click', eventShowOverlayPopup, eventOverlayProps);
+      if (popupMenuItems.length > 1) {
+        document.getElementById(this.getId()).dispatchEvent(eventShowOverlayPopup);
+      } else {
+        document.getElementById(this.getId()).dispatchEvent(eventOverlayProps);
+      }
     },
     style: {
       'align-self': 'center'
@@ -128,28 +199,15 @@ const OverlayLayer = function OverlayLayer(options) {
   });
 
   buttons.push(moreInfoButton);
+  const ButtonsHtml = `${layerIcon.render()}${label.render()}${toggleButton.render()}${moreInfoButton.render()}`;
 
-  if (layer.get('removable')) {
-    removeButton = Button({
-      cls: 'round small icon-smaller no-shrink',
-      click() {
-        layerList.removeOverlay(layer.get('name'));
-        viewer.getMap().removeLayer(layer);
-      },
-      style: {
-        'align-self': 'center',
-        'padding-left': '.5rem'
-      },
-      icon: '#ic_remove_circle_outline_24px',
-      tabIndex: -1
-    });
-    buttons.push(removeButton);
-    ButtonsHtml = `${layerIcon.render()}${label.render()}${removeButton.render()}${toggleButton.render()}${moreInfoButton.render()}`;
-  } else {
-    ButtonsHtml = `${layerIcon.render()}${label.render()}${toggleButton.render()}${moreInfoButton.render()}`;
-  }
+  const removeOverlayMenuItem = function removeListeners() {
+    const popupMenuListEl = document.getElementById(popupMenuList.getId());
+    popupMenuListEl.remove();
+  };
 
   const onRemove = function onRemove() {
+    removeOverlayMenuItem();
     const el = document.getElementById(this.getId());
     el.remove();
   };
@@ -173,7 +231,23 @@ const OverlayLayer = function OverlayLayer(options) {
       }
       this.addComponents(buttons);
       this.addComponent(label);
+      this.addComponent(popupMenuList);
+      const popupMenuEl = document.getElementById(popupMenuId);
+      popupMenuEl.appendChild(dom.html(popupMenuList.render()));
+      popupMenuList.dispatch('render');
       this.dispatch('render');
+
+      const popupMenuListEl = document.getElementById(popupMenuList.getId());
+      popupMenuListEl.addEventListener('toggleoverlaypopup', (e) => {
+        const eventFromThisComponent = e.detail && e.detail.id === popupMenuList.getId();
+        togglePopupMenu(eventFromThisComponent);
+      });
+
+      popupMenuListEl.addEventListener('unfocusoverlaypopup', (e) => {
+        if (!document.getElementById(moreInfoButton.getId()).contains(e.detail.target)) {
+          togglePopupMenu();
+        }
+      });
 
       if (layer.getMaxResolution() !== Infinity || layer.getMinResolution() !== 0) {
         const elId = this.getId();

@@ -1,0 +1,21 @@
+$popup-background-color: $white !default;
+$popup-radius: $radius-base;
+$popup-border-color: $grey-light;
+$popup-z: $z-middle;
+
+.popup-menu {
+  z-index: $popup-z;
+  position: absolute;
+}
+
+.popup-menu > ul {
+  background-color: $popup-background-color;
+  border-radius: $popup-radius;
+  border: solid 1px $popup-border-color;
+  overflow-x: hidden;
+  overflow-y: hidden;
+
+  > li {
+    margin: $margin-small;
+  }
+}

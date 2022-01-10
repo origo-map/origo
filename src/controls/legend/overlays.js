@@ -33,6 +33,7 @@ const Overlays = function Overlays(options) {
 
   const themeGroups = ThemeGroups();
   const rootGroup = GroupList({ viewer }, true);
+  const popupMenuId = 'overlayPopupMenu';
 
   const groupCmps = viewer.getGroups().reduce((acc, group) => {
     if (nonGroupNames.includes(group.name)) return acc;
@@ -238,12 +239,30 @@ const Overlays = function Overlays(options) {
     }
   };
 
+  const popupMenu = Component({
+    onRender() {
+      window.addEventListener('click', (e) => {
+        const popupMenuEl = document.getElementById(popupMenuId);
+        if (!popupMenuEl.contains(e.target)) {
+          const toggleEvent = new CustomEvent('unfocusoverlaypopup', { detail: { target: e.target } });
+          popupMenuEl.children.forEach((child) => {
+            child.dispatchEvent(toggleEvent);
+          });
+        }
+      });
+    },
+    render() {
+      return `<div class="popup-menu" id="${popupMenuId}"></div>`;
+    }
+  });
+
   return Component({
     onAddGroup,
     onChangeLayer,
     slidenav,
     onInit() {
       this.addComponent(overlaysCollapse);
+      this.addComponent(popupMenu);
       readOverlays();
       viewer.getMap().getLayers().on('add', onAddLayer.bind(this));
       viewer.getMap().getLayers().on('remove', onRemoveLayer.bind(this));
@@ -273,12 +292,26 @@ const Overlays = function Overlays(options) {
         }
         evt.stopPropagation();
       });
+
+      el.addEventListener('showoverlaypopup', (evt) => {
+        const popupEl = document.getElementById(popupMenuId);
+        const targetRect = evt.target.getBoundingClientRect();
+        const rect = el.getBoundingClientRect();
+        popupEl.style.right = `${rect.right - targetRect.right}px`;
+        popupEl.style.top = `${targetRect.top - rect.top + targetRect.height}px`;
+        evt.stopPropagation();
+        const toggleEvent = new CustomEvent('toggleoverlaypopup', { detail: evt.detail });
+        popupEl.children.forEach((child) => {
+          child.dispatchEvent(toggleEvent);
+        });
+      });
       this.dispatch('render');
     },
     render() {
       const emptyCls = hasOverlays() ? '' : 'hidden';
       return `<div id="${this.getId()}" class="${cls} ${emptyCls}" style="${style}">
                 ${overlaysCollapse.render()}
+                ${popupMenu.render()}
               </div>`;
     }
   });
