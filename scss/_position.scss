@@ -30,6 +30,11 @@
   color: #000;
 }
 
+.o-position-button:focus:not(:focus-visible) {
+  background-color: #000;
+  color: #fff;
+}
+
 .o-position-center-button {
   background-color: rgba(0, 0, 0, 0.8);
   border-radius: 50%;
@@ -50,6 +55,15 @@
 
   .o-icon-position {
     fill: #000;
+  }
+}
+
+.o-position-center-button:focus:not(:focus-visible) {
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+
+  .o-icon-position {
+    fill: #fff;
   }
 }
 

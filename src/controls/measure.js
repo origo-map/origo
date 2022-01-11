@@ -10,6 +10,10 @@ import LineString from 'ol/geom/LineString';
 import Point from 'ol/geom/Point';
 import Projection from 'ol/proj/Projection';
 import * as Extent from 'ol/extent';
+import { Snap } from 'ol/interaction';
+import { Collection } from 'ol';
+import LayerGroup from 'ol/layer/Group';
+import { unByKey } from 'ol/Observable';
 import { Component, Icon, Element as El, Button, dom, Modal } from '../ui';
 import Style from '../style';
 import StyleTypes from '../style/styletypes';
@@ -23,7 +27,11 @@ const Measure = function Measure({
   elevationAttribute,
   showSegmentLengths = false,
   showSegmentLabelButtonActive = true,
-  useHectare = true
+  useHectare = true,
+  snap = false,
+  snapIsActive = true,
+  snapLayers,
+  snapRadius = 15
 } = {}) {
   const style = Style;
   const styleTypes = StyleTypes();
@@ -49,6 +57,7 @@ const Measure = function Measure({
   let areaTool;
   let elevationTool;
   let bufferTool;
+  let toggleSnapButton;
   let defaultTool;
   let isActive = false;
   let tempOverlayArray = [];
@@ -70,6 +79,9 @@ const Measure = function Measure({
   const buttons = [];
   let target;
   let touchMode;
+  let snapCollection;
+  let snapEventListenerKeys;
+  let snapActive = snapIsActive;
 
   function createStyle(feature) {
     const featureType = feature.getGeometry().getType();
@@ -252,6 +264,13 @@ const Measure = function Measure({
     }
 
     addBufferToFeature();
+  }
+
+  function clearSnapInteractions() {
+    snapCollection.forEach((s) => map.removeInteraction(s));
+    snapCollection.clear();
+    snapEventListenerKeys.forEach((k) => unByKey(k));
+    snapEventListenerKeys.clear();
   }
 
   function placeMeasurementLabel(segment, coords) {
@@ -472,6 +491,9 @@ const Measure = function Measure({
     if (bufferTool) {
       document.getElementById(bufferToolButton.getId()).classList.add('hidden');
     }
+    if (snap) {
+      document.getElementById(toggleSnapButton.getId()).classList.add('hidden');
+    }
     document.getElementById(measureButton.getId()).classList.add('tooltip');
     document.getElementById(clearButton.getId()).classList.add('hidden');
     if (showSegmentLengths) {
@@ -485,6 +507,9 @@ const Measure = function Measure({
     setActive(false);
     map.un('pointermove', pointerMoveHandler);
     map.removeInteraction(measure);
+    if (snap) {
+      clearSnapInteractions();
+    }
     if (typeof helpTooltipElement !== 'undefined' && helpTooltipElement !== null) {
       if (helpTooltipElement.parentNode !== null) {
         helpTooltipElement.outerHTML = '';
@@ -513,6 +538,9 @@ const Measure = function Measure({
     if (bufferTool) {
       document.getElementById(bufferToolButton.getId()).classList.remove('hidden');
     }
+    if (snap) {
+      document.getElementById(toggleSnapButton.getId()).classList.remove('hidden');
+    }
     document.getElementById(measureButton.getId()).classList.remove('tooltip');
     document.getElementById(clearButton.getId()).classList.remove('hidden');
     document.getElementById(defaultButton.getId()).click();
@@ -529,6 +557,77 @@ const Measure = function Measure({
     setActive(true);
   }
 
+  function createSnapInteractionForVectorLayer(layer) {
+    const state = layer.getLayerState();
+    // Using ol_uid because the Origo layer id is unreliable
+    const layerId = layer.ol_uid;
+    let sn;
+    if (state.visible) {
+      sn = new Snap({
+        source: layer.getSource(),
+        pixelTolerance: snapRadius
+      });
+      sn.setActive(!!state.visible && snapActive);
+      sn.set('layerId', layerId);
+    }
+    const eventKey = layer.on('change:visible', (visibilityChangeEvent) => {
+      if (!visibilityChangeEvent.oldValue) {
+        const s = new Snap({
+          source: layer.getSource(),
+          pixelTolerance: snapRadius
+        });
+        s.setActive(!visibilityChangeEvent.oldValue && snapActive);
+        s.set('layerId', layerId);
+        map.addInteraction(s);
+        snapCollection.push(s);
+      } else {
+        const int = map
+          .getInteractions()
+          .getArray()
+          .find((i) => (i instanceof Snap ? i.get('layerId') === layerId : false));
+        map.removeInteraction(int);
+        snapCollection.remove(int);
+      }
+    });
+    snapEventListenerKeys.push(eventKey);
+    return sn;
+  }
+
+  function createSnapInteractionsRecursive(layer) {
+    const snaps = [];
+    if (layer instanceof VectorLayer) {
+      const sn = createSnapInteractionForVectorLayer(layer);
+      if (sn) snaps.push(sn);
+    } else if (layer instanceof LayerGroup) {
+      layer.getLayers().forEach((l) => {
+        snaps.concat(createSnapInteractionsRecursive(l));
+      });
+    }
+    return snaps;
+  }
+
+  function addSnapInteractions() {
+    if (snapLayers === undefined) {
+      const allLayers = viewer.getLayers();
+      allLayers.forEach((l) => {
+        snapCollection.extend(createSnapInteractionsRecursive(l));
+      });
+    } else {
+      snapLayers.forEach((sl) => {
+        const l = viewer.getLayer(sl);
+        if (l instanceof VectorLayer) {
+          const sn = createSnapInteractionForVectorLayer(l);
+          if (sn) snapCollection.push(sn);
+        }
+      });
+      const sn = createSnapInteractionForVectorLayer(vector);
+      if (sn) snapCollection.push(sn);
+    }
+    snapCollection.forEach((s) => {
+      map.addInteraction(s);
+    });
+  }
+
   function addInteraction() {
     measure = new DrawInteraction({
       source,
@@ -540,6 +639,9 @@ const Measure = function Measure({
     });
 
     map.addInteraction(measure);
+    if (snap) {
+      addSnapInteractions();
+    }
     createMeasureTooltip();
     createHelpTooltip();
     if (!touchMode) {
@@ -547,7 +649,6 @@ const Measure = function Measure({
     }
 
     measure.on('drawstart', (evt) => {
-      measure.getOverlay().getSource().getFeatures()[1].setStyle([]);
       sketch = evt.feature;
       sketch.on('change', pointerMoveHandler);
       if (touchMode) {
@@ -671,6 +772,16 @@ const Measure = function Measure({
     }
   }
 
+  function toggleSnap() {
+    snapCollection.forEach(s => s.setActive(!snapActive));
+    snapActive = !snapActive;
+    if (snapActive) {
+      document.getElementById(toggleSnapButton.getId()).classList.add('active');
+    } else {
+      document.getElementById(toggleSnapButton.getId()).classList.remove('active');
+    }
+  }
+
   return Component({
     name: 'measure',
     onAdd(evt) {
@@ -737,6 +848,10 @@ const Measure = function Measure({
       elevationTool = measureTools.indexOf('elevation') >= 0;
       bufferTool = measureTools.indexOf('buffer') >= 0;
       defaultTool = lengthTool ? defaultMeasureTool : 'area';
+      snapCollection = new Collection([], {
+        unique: true
+      });
+      snapEventListenerKeys = new Collection([], { unique: true });
       if (lengthTool || areaTool || elevationTool || bufferTool) {
         measureElement = El({
           tagName: 'div',
@@ -848,6 +963,21 @@ const Measure = function Measure({
           });
           buttons.push(clearButton);
         }
+
+        if (snap) {
+          toggleSnapButton = Button({
+            cls: `o-measure-snap padding-small margin-bottom-smaller icon-smaller round light box-shadow hidden activ ${
+              snapActive && 'active'
+            }`,
+            click() {
+              toggleSnap();
+            },
+            icon: '#fa-magnet',
+            tooltipText: 'Snappning',
+            tooltipPlacement: 'east'
+          });
+          buttons.push(toggleSnapButton);
+        }
       }
     },
     render() {
@@ -885,6 +1015,11 @@ const Measure = function Measure({
       }
       if (bufferTool) {
         htmlString = bufferToolButton.render();
+        el = dom.html(htmlString);
+        document.getElementById(measureElement.getId()).appendChild(el);
+      }
+      if (toggleSnapButton) {
+        htmlString = toggleSnapButton.render();
         el = dom.html(htmlString);
         document.getElementById(measureElement.getId()).appendChild(el);
       }
