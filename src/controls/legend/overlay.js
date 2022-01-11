@@ -132,22 +132,24 @@ const OverlayLayer = function OverlayLayer(options) {
   });
   popupMenuItems.push(layerInfoMenuItem);
 
-  const removeLayerMenuItem = Component({
-    onRender() {
-      const labelEl = document.getElementById(this.getId());
-      labelEl.addEventListener('click', (e) => {
-        layerList.removeOverlay(layer.get('name'));
-        viewer.getMap().removeLayer(layer);
-        document.getElementById(popupMenuId).dispatchEvent(new Event('toggleoverlaypopup'));
-        e.preventDefault();
-      });
-    },
-    render() {
-      const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
-      return `<li id="${this.getId()}" class="${labelCls}">Ta bort lager</li>`;
-    }
-  });
-  popupMenuItems.push(removeLayerMenuItem);
+  if (layer.get('removable')) {
+    const removeLayerMenuItem = Component({
+      onRender() {
+        const labelEl = document.getElementById(this.getId());
+        labelEl.addEventListener('click', (e) => {
+          layerList.removeOverlay(layer.get('name'));
+          viewer.getMap().removeLayer(layer);
+          document.getElementById(popupMenuId).dispatchEvent(new Event('toggleoverlaypopup'));
+          e.preventDefault();
+        });
+      },
+      render() {
+        const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
+        return `<li id="${this.getId()}" class="${labelCls}">Ta bort lager</li>`;
+      }
+    });
+    popupMenuItems.push(removeLayerMenuItem);
+  }
 
   const popupMenuList = Component({
     onAdd() {
@@ -183,7 +185,6 @@ const OverlayLayer = function OverlayLayer(options) {
           id: popupMenuList.getId()
         }
       });
-      console.log('click', eventShowOverlayPopup, eventOverlayProps);
       if (popupMenuItems.length > 1) {
         document.getElementById(this.getId()).dispatchEvent(eventShowOverlayPopup);
       } else {
