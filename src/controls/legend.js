@@ -392,10 +392,13 @@ const Legend = function Legend(options = {}) {
       }
       const backgroundLayers = viewer.getLayersByProperty('group', 'background').reverse();
       addBackgroundButtons(backgroundLayers);
+      if (showVisibleLayersControl) backgroundLayerButtons.push(showVisibleLayersButton);
+      
       toggleGroup = ToggleGroup({
         components: backgroundLayerButtons,
         cls: 'spacing-horizontal-small'
       });
+
 
       this.render();
       this.dispatch('render');
@@ -403,7 +406,6 @@ const Legend = function Legend(options = {}) {
     },
     onRender() {
       const layerControlCmps = [];
-      if (showVisibleLayersControl) layerControlCmps.push(showVisibleLayersButton);
       if (turnOffLayersControl) layerControlCmps.push(turnOffLayersButton);
       const layerControll = El({
         components: layerControlCmps
