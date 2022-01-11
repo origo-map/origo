@@ -127,6 +127,7 @@ const Overlays = function Overlays(options) {
         updateVisibleOverlays();
       });
     },
+    hasOverlays,
     onRender() {
       overlays.forEach((layer) => {
         addLayer(layer, { position: 'bottom' });

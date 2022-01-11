@@ -168,16 +168,38 @@ const Legend = function Legend(options = {}) {
     }
   });
 
+  const showAllVisibleLayersButton = Button({
+    cls: 'compact icon-smaller margin-x-smaller',
+    title: 'Visa alla lager',
+    click() {
+      viewer.dispatch('active:togglevisibleLayers');
+    },
+    style: {
+      'align-self': 'right',
+      'padding-right': '6px'
+    },
+    icon: '#fa-expand-alt',
+    iconStyle: {
+      fill: '#7a7a7a'
+    }
+  });
+
   const toggleShowVisibleLayers = function toggleShowVisibleLayers() {
     if (visibleLayersActive) {
-      document.getElementById(`${overlaysCmp.getId()}`).classList.remove('hidden');
-      document.getElementById(`${visibleOverlaysCmp.getId()}`).classList.add('hidden');
-      showVisibleLayersButton.setIcon('#fa-compress-alt');
+      document.getElementById(overlaysCmp.getId()).classList.remove('hidden');
+      document.getElementById(visibleOverlaysCmp.getId()).classList.add('hidden');
+      document.getElementById(showAllVisibleLayersButton.getId()).classList.add('hidden');
+      document.getElementById(showVisibleLayersButton.getId()).classList.remove('hidden');
+      document.getElementById(toolsCmp.getId()).classList.remove('hidden');
     } else {
-      document.getElementById(`${overlaysCmp.getId()}`).classList.add('hidden');
-      document.getElementById(`${visibleOverlaysCmp.getId()}`).classList.remove('hidden');
-      showVisibleLayersButton.setIcon('#fa-expand-alt');
+      document.getElementById(overlaysCmp.getId()).classList.add('hidden');
+      document.getElementById(visibleOverlaysCmp.getId()).classList.remove('hidden');
+      document.getElementById(showAllVisibleLayersButton.getId()).classList.remove('hidden');
+      document.getElementById(showVisibleLayersButton.getId()).classList.add('hidden');
       visibleOverlaysCmp.dispatch('readOverlays');
+      if (!visibleOverlaysCmp.hasOverlays()) {
+        document.getElementById(toolsCmp.getId()).classList.add('hidden');
+      }
     }
     visibleLayersActive = !visibleLayersActive;
   };
@@ -392,13 +414,10 @@ const Legend = function Legend(options = {}) {
       }
       const backgroundLayers = viewer.getLayersByProperty('group', 'background').reverse();
       addBackgroundButtons(backgroundLayers);
-      if (showVisibleLayersControl) backgroundLayerButtons.push(showVisibleLayersButton);
-      
       toggleGroup = ToggleGroup({
         components: backgroundLayerButtons,
         cls: 'spacing-horizontal-small'
       });
-
 
       this.render();
       this.dispatch('render');
@@ -407,7 +426,7 @@ const Legend = function Legend(options = {}) {
     onRender() {
       const layerControlCmps = [];
       if (turnOffLayersControl) layerControlCmps.push(turnOffLayersButton);
-      const layerControll = El({
+      const layerControl = El({
         components: layerControlCmps
       });
       mainContainerEl = document.getElementById(mainContainerCmp.getId());
@@ -418,7 +437,7 @@ const Legend = function Legend(options = {}) {
         toggleVisibility();
       });
       window.addEventListener('resize', updateMaxHeight);
-      if (layerControlCmps.length > 0) this.addButtonToTools(layerControll);
+      if (layerControlCmps.length > 0) this.addButtonToTools(layerControl);
       if (searchLayersControl) this.addButtonToTools(layerSearchInput);
       initAutocomplete();
       bindUIActions();
@@ -439,6 +458,11 @@ const Legend = function Legend(options = {}) {
         viewer, cls: contentCls, style: contentStyle, labelOpacitySlider
       });
       const baselayerCmps = [toggleGroup];
+
+      if (showVisibleLayersControl) {
+        baselayerCmps.push(showVisibleLayersButton);
+        baselayerCmps.push(showAllVisibleLayersButton);
+      }
 
       toolsCmp = El({
         cls: 'flex padding-small no-shrink hidden',
