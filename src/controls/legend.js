@@ -153,7 +153,7 @@ const Legend = function Legend(options = {}) {
   });
 
   const showVisibleLayersButton = Button({
-    cls: 'compact icon-smaller margin-x-smaller',
+    cls: 'compact icon-smaller margin-x-small',
     title: 'Visa endast tända lager',
     click() {
       viewer.dispatch('active:togglevisibleLayers');
@@ -169,7 +169,7 @@ const Legend = function Legend(options = {}) {
   });
 
   const showAllVisibleLayersButton = Button({
-    cls: 'compact icon-smaller margin-x-smaller',
+    cls: 'compact icon-smaller margin-x-small',
     title: 'Visa alla lager',
     click() {
       viewer.dispatch('active:togglevisibleLayers');
@@ -197,9 +197,7 @@ const Legend = function Legend(options = {}) {
       document.getElementById(showAllVisibleLayersButton.getId()).classList.remove('hidden');
       document.getElementById(showVisibleLayersButton.getId()).classList.add('hidden');
       visibleOverlaysCmp.dispatch('readOverlays');
-      if (!visibleOverlaysCmp.hasOverlays()) {
-        document.getElementById(toolsCmp.getId()).classList.add('hidden');
-      }
+      document.getElementById(toolsCmp.getId()).classList.add('hidden');
     }
     visibleLayersActive = !visibleLayersActive;
   };
@@ -460,6 +458,7 @@ const Legend = function Legend(options = {}) {
       const baselayerCmps = [toggleGroup];
 
       if (showVisibleLayersControl) {
+        baselayerCmps.push(divider);
         baselayerCmps.push(showVisibleLayersButton);
         baselayerCmps.push(showAllVisibleLayersButton);
       }
