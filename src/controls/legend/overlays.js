@@ -252,7 +252,7 @@ const Overlays = function Overlays(options) {
       });
     },
     render() {
-      return `<div class="popup-menu" id="${popupMenuId}"></div>`;
+      return `<div class="popup-menu z-index-ontop-low" id="${popupMenuId}"></div>`;
     }
   });
 

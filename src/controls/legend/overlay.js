@@ -1,4 +1,4 @@
-import { Component, Button, dom, Element as El } from '../../ui';
+import { Component, Button, dom } from '../../ui';
 import { HeaderIcon } from '../../utils/legendmaker';
 
 const OverlayLayer = function OverlayLayer(options) {
@@ -25,6 +25,7 @@ const OverlayLayer = function OverlayLayer(options) {
   const name = layer.get('name');
   const secure = layer.get('secure');
   const popupMenuId = 'overlayPopupMenu';
+  let popupMenuList;
 
   const checkIcon = '#ic_check_circle_24px';
   let uncheckIcon = '#ic_radio_button_unchecked_24px';
@@ -120,8 +121,8 @@ const OverlayLayer = function OverlayLayer(options) {
     onRender() {
       const labelEl = document.getElementById(this.getId());
       labelEl.addEventListener('click', (e) => {
+        document.getElementById(popupMenuList.getId()).dispatchEvent(new Event('toggleoverlaypopup'));
         document.getElementById(this.getId()).dispatchEvent(eventOverlayProps);
-        document.getElementById(popupMenuId).dispatchEvent(new Event('toggleoverlaypopup'));
         e.preventDefault();
       });
     },
@@ -139,7 +140,6 @@ const OverlayLayer = function OverlayLayer(options) {
         labelEl.addEventListener('click', (e) => {
           layerList.removeOverlay(layer.get('name'));
           viewer.getMap().removeLayer(layer);
-          document.getElementById(popupMenuId).dispatchEvent(new Event('toggleoverlaypopup'));
           e.preventDefault();
         });
       },
@@ -151,7 +151,7 @@ const OverlayLayer = function OverlayLayer(options) {
     popupMenuItems.push(removeLayerMenuItem);
   }
 
-  const popupMenuList = Component({
+  popupMenuList = Component({
     onAdd() {
       this.addComponents(popupMenuItems);
     },
