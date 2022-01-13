@@ -262,8 +262,9 @@ const Featureinfo = function Featureinfo(options = {}) {
    * @param {any} identifyItems
    * @param {any} target
    * @param {any} coordinate
+   * @param {bool} ignorePan true if overlay should not be panned into view
    */
-  const doRender = function doRender(identifyItems, target, coordinate) {
+  const doRender = function doRender(identifyItems, target, coordinate, ignorePan) {
     const map = viewer.getMap();
     items = identifyItems;
     clear();
@@ -317,17 +318,17 @@ const Featureinfo = function Featureinfo(options = {}) {
         });
         const popupEl = popup.getEl();
         const popupHeight = document.querySelector('.o-popup').offsetHeight + 10;
-        popupEl.style.height = `${popupHeight}px`;
-        overlay = new Overlay({
-          element: popupEl,
-          autoPan: {
-            margin: 55,
-            animation: {
-              duration: 500
+          popupEl.style.height = `${popupHeight}px`;
+          let overlayOptions = { element: popupEl, positioning: 'bottom-center' };
+          if (!ignorePan) {
+            overlayOptions.autoPan = {
+              margin: 55,
+              animation: {
+                duration: 500
+              }
             }
-          },
-          positioning: 'bottom-center'
-        });
+          }
+        overlay = new Overlay(overlayOptions);
         map.addOverlay(overlay);
         overlay.setPosition(coord);
         break;
@@ -390,8 +391,9 @@ const Featureinfo = function Featureinfo(options = {}) {
    * @param {any} identifyItems Array of SelectedItems
    * @param {any} target Name of infoWindow type
    * @param {any} coordinate Coordinate where to show pop up.
+   * @param {any} opts Additional options. Supported options are : ignorePan, disable auto pan to popup overlay.
    */
-  const render = function render(identifyItems, target, coordinate) {
+  const render = function render(identifyItems, target, coordinate, opts = {}) {
     // Append attachments (if any) to the SelectedItems
     const requests = [];
     identifyItems.forEach(currItem => {
@@ -411,18 +413,19 @@ const Featureinfo = function Featureinfo(options = {}) {
     // Wait for all requests. If there are no attachments it just calls .then() without waiting.
     Promise.all(requests)
       .then(() => {
-        doRender(identifyItems, target, coordinate);
+        doRender(identifyItems, target, coordinate, opts.ignorePan);
       })
       .catch(() => {
         alert('Kunde inte hämta bilagor. Fält från bilagor kommer att vara tomma.');
         // Show without attachments
-        doRender(identifyItems, target, coordinate);
+        doRender(identifyItems, target, coordinate, opts.ignorePan);
       });
   };
   /**
   * Shows the featureinfo popup/sidebar/infowindow for the provided features. Only vector layers are supported.
   * @param {any} fidsbylayer An object containing layer names as keys with a list of feature ids for each layer
   * @param {any} opts An object containing options. Supported options are : coordinate, the coordinate where popup will be shown. If omitted first feature is used.
+  *                                                                         ignorePan, do not autopan if type is overlay. Pan should be supressed if view is changed manually to avoid contradicting animations.
   * @returns nothing
   */
   const showInfo = function showInfo(fidsbylayer, opts = {}) {
@@ -438,7 +441,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         newItems.push(newItem);
       });
     });
-    render(newItems, identifyTarget, opts.coordinate || maputils.getCenter(newItems[0].getFeature().getGeometry()));
+    render(newItems, identifyTarget, opts.coordinate || maputils.getCenter(newItems[0].getFeature().getGeometry()), opts);
   };
 
   const onClick = function onClick(evt) {
