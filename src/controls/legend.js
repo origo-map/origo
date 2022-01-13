@@ -169,7 +169,7 @@ const Legend = function Legend(options = {}) {
   });
 
   const showAllVisibleLayersButton = Button({
-    cls: 'compact icon-smaller margin-x-small',
+    cls: 'compact icon-smaller margin-x-small hidden',
     title: 'Visa alla lager',
     click() {
       viewer.dispatch('active:togglevisibleLayers');

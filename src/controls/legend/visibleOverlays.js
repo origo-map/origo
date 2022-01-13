@@ -71,6 +71,7 @@ const Overlays = function Overlays(options) {
     const visibleLayers = viewer
       .getLayersByProperty('visible', true)
       .filter(layer => layer.get('group') !== 'background' && layer.get('group') !== 'none')
+      .reverse()
       .sort((a, b) => {
         const indexA = groups.findIndex(group => group.name === a.get('group'));
         const indexB = groups.findIndex(group => group.name === b.get('group'));
