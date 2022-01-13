@@ -318,16 +318,16 @@ const Featureinfo = function Featureinfo(options = {}) {
         });
         const popupEl = popup.getEl();
         const popupHeight = document.querySelector('.o-popup').offsetHeight + 10;
-          popupEl.style.height = `${popupHeight}px`;
-          let overlayOptions = { element: popupEl, positioning: 'bottom-center' };
-          if (!ignorePan) {
-            overlayOptions.autoPan = {
-              margin: 55,
-              animation: {
-                duration: 500
-              }
+        popupEl.style.height = `${popupHeight}px`;
+        const overlayOptions = { element: popupEl, positioning: 'bottom-center' };
+        if (!ignorePan) {
+          overlayOptions.autoPan = {
+            margin: 55,
+            animation: {
+              duration: 500
             }
-          }
+          };
+        }
         overlay = new Overlay(overlayOptions);
         map.addOverlay(overlay);
         overlay.setPosition(coord);

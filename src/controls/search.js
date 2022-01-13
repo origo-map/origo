@@ -70,7 +70,7 @@ const Search = function Search(options = {}) {
     obj.title = objTitle;
     obj.content = content;
     clear();
-    featureInfo.render([obj], 'overlay', getCenter(features[0].getGeometry()), {ignorePan : true});
+    featureInfo.render([obj], 'overlay', getCenter(features[0].getGeometry()), { ignorePan: true });
     viewer.zoomToExtent(features[0].getGeometry(), maxZoomLevel);
   }
 
