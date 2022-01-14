@@ -43,7 +43,7 @@ const Search = function Search(options = {}) {
   const {
     geometryAttribute,
     url,
-    customQueryParameter
+    queryParameterName = 'q'
   } = options;
 
   let searchDb = {};
@@ -331,7 +331,7 @@ const Search = function Search(options = {}) {
     };
 
     function makeRequest(reqHandler, obj) {
-      let queryUrl = `${url}${url.indexOf('?') !== -1 ? '&' : '?'}${customQueryParameter || 'q'}=${encodeURI(obj.value)}`;
+      let queryUrl = `${url}${url.indexOf('?') !== -1 ? '&' : '?'}${queryParameterName}=${encodeURI(obj.value)}`;
       if (includeSearchableLayers) {
         queryUrl += `&l=${viewer.getSearchableLayers(searchableDefault)}`;
       }
