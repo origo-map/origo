@@ -330,7 +330,7 @@ const Search = function Search(options = {}) {
     };
 
     function makeRequest(reqHandler, obj) {
-      let queryUrl = `${url}?q=${encodeURI(obj.value)}`;
+      let queryUrl = `${url}${url.indexOf('?') !== -1 ? '&' : '?'}q=${encodeURI(obj.value)}`;
       if (includeSearchableLayers) {
         queryUrl += `&l=${viewer.getSearchableLayers(searchableDefault)}`;
       }
