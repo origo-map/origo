@@ -19,9 +19,9 @@
 { "type": "Feature", "properties": { "id": 14, "name": "Kramfors" }, "geometry": { "type": "Point", "coordinates": [ 1979837, 9083261 ] } },
 { "type": "Feature", "properties": { "id": 15, "name": "Sollefteå" }, "geometry": { "type": "Point", "coordinates": [ 1922083, 9141271 ] } },
 { "type": "Feature", "properties": { "id": 16, "name": "Örnsköldsvik" }, "geometry": { "type": "Point", "coordinates": [ 2082559, 9171375 ] } },
-{ "type": "Feature", "properties": { "id": 17, "name": "Norberg" }, "geometry": { "type": "Point", "coordinates": [ 1773055.38020924734883, 8414134.496209517121315 ] } },
-{ "type": "Feature", "properties": { "id": 18, "name": "Avesta" }, "geometry": { "type": "Point", "coordinates": [ 1801204.592429682379588, 8431717.450815515592694 ] } },
-{ "type": "Feature", "properties": { "id": 19, "name": "Fagersta" }, "geometry": { "type": "Point", "coordinates": [ 1758647.088812010362744, 8400343.057295046746731 ] } },
-{ "type": "Feature", "properties": { "id": 20, "name": "Kristianstad" }, "geometry": { "type": "Point", "coordinates": [ 1575633.338405187241733, 7565358.774145370349288 ] } }
+{ "type": "Feature", "properties": { "id": 17, "name": "Norberg" }, "geometry": { "type": "Point", "coordinates": [ 1773055, 8414134 ] } },
+{ "type": "Feature", "properties": { "id": 18, "name": "Avesta" }, "geometry": { "type": "Point", "coordinates": [ 1801204, 8431717 ] } },
+{ "type": "Feature", "properties": { "id": 19, "name": "Fagersta" }, "geometry": { "type": "Point", "coordinates": [ 1758647, 8400343 ] } },
+{ "type": "Feature", "properties": { "id": 20, "name": "Kristianstad" }, "geometry": { "type": "Point", "coordinates": [ 1575633, 7565358 ] } }
 ]
 }
