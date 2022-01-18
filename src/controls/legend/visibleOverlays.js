@@ -27,6 +27,14 @@ const Overlays = function Overlays(options) {
   const nonGroupNames = ['background', 'none'];
   let overlays;
 
+  const header = Component({
+    render() {
+      const headerCls = 'flex row grow no-shrink justify-center align-center collapse-header';
+      return `<div id="${this.getId()}" class="${headerCls}" style="height: 0.5rem;">
+              </div>`;
+    }
+  });
+
   const rootGroup = GroupList({ viewer }, true);
 
   const groupContainer = El({
@@ -54,7 +62,7 @@ const Overlays = function Overlays(options) {
       this.dispatch('render');
     },
     render() {
-      return `<div id="${this.getId()}"><div class="flex row no-shrink">${slidenav.render()}</div></div>`;
+      return `<div id="${this.getId()}" class="flex row no-shrink">${slidenav.render()}</div>`;
     }
   });
 
@@ -116,6 +124,12 @@ const Overlays = function Overlays(options) {
         addLayer(overlay, { position: 'bottom' });
       }
     });
+
+    if (hasOverlays()) {
+      document.getElementById(slidenav.getId()).classList.remove('hidden');
+    } else {
+      document.getElementById(slidenav.getId()).classList.add('hidden');
+    }
   };
 
   return Component({
@@ -154,6 +168,7 @@ const Overlays = function Overlays(options) {
     render() {
       const emptyCls = hasOverlays() ? 'hidden' : 'hidden';
       return `<div id="${this.getId()}" class="flex column o-scrollbar ${cls} ${emptyCls}" style="${style}">
+                ${header.render()}
                 ${navContainer.render()}
               </div>`;
     }

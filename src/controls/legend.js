@@ -16,7 +16,7 @@ const Legend = function Legend(options = {}) {
     contentCls,
     contentStyle,
     turnOffLayersControl = false,
-    showVisibleLayersControl = true,
+    showVisibleLayersControl = false,
     visibleLayersViewActive = false,
     name = 'legend',
     labelOpacitySlider = '',
@@ -190,7 +190,9 @@ const Legend = function Legend(options = {}) {
       document.getElementById(visibleOverlaysCmp.getId()).classList.add('hidden');
       document.getElementById(showAllVisibleLayersButton.getId()).classList.add('hidden');
       document.getElementById(showVisibleLayersButton.getId()).classList.remove('hidden');
-      document.getElementById(toolsCmp.getId()).classList.remove('hidden');
+      if (toolsCmp.getComponents().length > 0) {
+        document.getElementById(toolsCmp.getId()).classList.remove('hidden');
+      }
     } else {
       document.getElementById(overlaysCmp.getId()).classList.add('hidden');
       document.getElementById(visibleOverlaysCmp.getId()).classList.remove('hidden');
@@ -457,12 +459,6 @@ const Legend = function Legend(options = {}) {
       });
       const baselayerCmps = [toggleGroup];
 
-      if (showVisibleLayersControl) {
-        baselayerCmps.push(divider);
-        baselayerCmps.push(showVisibleLayersButton);
-        baselayerCmps.push(showAllVisibleLayersButton);
-      }
-
       toolsCmp = El({
         cls: 'flex padding-small no-shrink hidden',
         tooltipText: 'Lagerbytare',
@@ -473,12 +469,46 @@ const Legend = function Legend(options = {}) {
         }
       });
 
+      const closeButtonState = isExpanded ? 'initial' : 'hidden';
+      closeButton = Button({
+        cls: 'icon-smaller small round grey-lightest',
+        icon: '#ic_close_24px',
+        state: closeButtonState,
+        validStates: ['initial', 'hidden'],
+        ariaLabel: 'Stäng',
+        click() {
+          toggleVisibility();
+        }
+      });
+
+      const legendControlDivider = El({
+        cls: 'divider margin-x-small',
+        style: {
+          height: '100%',
+          'border-width': '2px'
+        }
+      });
+
+      const legendControlCmps = [];
+      if (showVisibleLayersControl) {
+        legendControlCmps.push(legendControlDivider);
+        legendControlCmps.push(showVisibleLayersButton);
+        legendControlCmps.push(showAllVisibleLayersButton);
+      }
+      legendControlCmps.push(closeButton);
+
+      const legendControlCmp = El({
+        cls: 'grow flex justify-end align-center no-shrink',
+        components: legendControlCmps
+      });
+
+      baselayerCmps.push(legendControlCmp);
+
       const baselayersCmp = El({
         cls: 'flex padding-small no-shrink',
         style: {
           'background-color': '#fff',
           height: '50px',
-          'padding-right': '30px',
           'border-top': '1px solid #dbdbdb'
         },
         components: baselayerCmps
@@ -517,22 +547,9 @@ const Legend = function Legend(options = {}) {
           }
         }
       });
-      const closeButtonState = isExpanded ? 'initial' : 'hidden';
-      closeButton = Button({
-        cls: 'icon-smaller small round absolute margin-bottom margin-right grey-lightest bottom-right z-index-top',
-        icon: '#ic_close_24px',
-        state: closeButtonState,
-        validStates: ['initial', 'hidden'],
-        ariaLabel: 'Stäng',
-        click() {
-          toggleVisibility();
-        }
-      });
+
       this.addComponent(layerButton);
-      this.addComponent(closeButton);
-      let el = dom.html(layerButton.render());
-      target.appendChild(el);
-      el = dom.html(closeButton.render());
+      const el = dom.html(layerButton.render());
       target.appendChild(el);
     }
   });
