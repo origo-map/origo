@@ -305,11 +305,11 @@ const Featureinfo = function Featureinfo(options = {}) {
         carouselIds.forEach((carouselId) => {
           let targetElement;
           const elements = document.getElementsByClassName(`o-image-carousel${carouselId}`);
-          for (let i = 0; i < elements.length; i += 1) {
-            if (!elements[i].closest('.glide__slide--clone')) {
-              targetElement = elements[i];
+          Array.from(elements).forEach(element => {
+            if (!element.closest('.glide__slide--clone')) {
+              targetElement = element;
             }
-          }
+          });
           const imageCarouselEl = document.getElementsByClassName(`o-image-carousel${carouselId}`);
           if (imageCarouselEl.length > 0) {
             initImageCarousel(`#o-image-carousel${carouselId}`, `.o-image-content${carouselId}`, carouselId, targetElement);
