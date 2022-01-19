@@ -3,10 +3,25 @@ import Element from './element';
 import Button from './button';
 import { html } from './dom/dom';
 
+/**
+ * Creates a modal and displays it. The modal is created as a div tag that is attached to the DOM as a child of the options.target element.
+ * @param {any} options Object containing options for the modal. Valid options are:
+ *  title: Title of modal
+ *  content: The content to display. String containing html
+ *  contentElement: HTMLElement containing the content. If specified the 'content' param is ignored.
+ *  cls: Optional classes to append to the modal container div
+ *  static: true if modal must be explicitly closed
+ *  target: DOM element to wich modal div is appended as a child. Required. Most likely the viewer element.
+ *  closeIcon: name of icon to use as close button. Defaults to a cross.
+ *  style: html style attributes to add to modal div
+ *  newTabUrl: URL to create a link button to
+ *  @returns {any} A Component representing the modal.
+ */
 export default function Modal(options = {}) {
   const {
     title = '',
     content = '',
+    contentElement,
     cls = '',
     isStatic = options.static,
     target,
@@ -72,7 +87,7 @@ export default function Modal(options = {}) {
 
       contentEl = Element({
         cls: 'o-modal-content',
-        innerHTML: `${content}`
+        innerHTML: contentElement || `${content}`
       });
 
       this.addComponent(screenEl);
