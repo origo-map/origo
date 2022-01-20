@@ -69,7 +69,7 @@ const Measure = function Measure({
   let lengthToolButton;
   let areaToolButton;
   let bufferToolButton;
-  let bufferSize = 1000;
+  let bufferSize;
   let elevationToolButton;
   let addNodeButton;
   let showSegmentLabelButton;
@@ -457,7 +457,6 @@ const Measure = function Measure({
       const radius = parseFloat(radiusVal);
       if ((!radius && radius !== 0)
         || (radius <= 0)) {
-        bufferradiusEl.classList.add('unvalidValue');
         e.stopPropagation();
         return;
       }
