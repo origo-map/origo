@@ -1,4 +1,4 @@
-import { Component, InputRange } from '../../ui';
+import { Component, InputRange, Dropdown } from '../../ui';
 import { Legend } from '../../utils/legendmaker';
 
 const OverlayProperties = function OverlayProperties(options = {}) {
@@ -15,6 +15,9 @@ const OverlayProperties = function OverlayProperties(options = {}) {
   const opacityControl = layer.get('opacityControl') !== false;
   const style = viewer.getStyle(layer.get('styleName'));
   const legend = Legend(style, opacity);
+  const alternativeStyles = viewer.getLayerAlternativeStyles(layer);
+
+  let styleSelection;
   let overlayEl;
   let sliderEl;
   let label = '';
@@ -43,14 +46,28 @@ const OverlayProperties = function OverlayProperties(options = {}) {
     }
   }
 
+  function renderStyleSelection() {
+    return alternativeStyles ? styleSelection.render() : '';
+  }
+
   return Component({
     onInit() {
-      this.addComponents([transparencySlider]);
+      styleSelection = Dropdown({
+        direction: 'up',
+        cls: 'o-scalepicker text-white flex',
+        contentCls: 'bg-grey-darker text-smallest rounded',
+        buttonCls: 'bg-black text-white',
+        ariaLabel: 'Välj skala',
+        buttonIconCls: 'white'
+      });
+
+      this.addComponents([transparencySlider, styleSelection]);
       this.on('click', (e) => {
         extendedLegendZoom(e);
       });
     },
     onRender() {
+      this.dispatch('render');
       sliderEl = document.getElementById(transparencySlider.getId());
       overlayEl = document.getElementById(this.getId());
       overlayEl.addEventListener('click', (e) => {
@@ -66,10 +83,17 @@ const OverlayProperties = function OverlayProperties(options = {}) {
           layer.setOpacity(sliderEl.valueAsNumber);
         });
       }
+      if (alternativeStyles) {
+        styleSelection.setItems(Object.keys(alternativeStyles));
+      }
     },
     render() {
       return `<div id="${this.getId()}" class="${cls} border-bottom">
-                <div class="padding-small">${legend}${transparencySlider.render()}</div>
+                <div class="padding-small">
+                  ${legend}
+                  ${renderStyleSelection()}
+                  ${transparencySlider.render()}
+                </div>
                 ${abstract ? `<div class="padding-small padding-x text-small">${abstract}</div>` : ''}
               </div>`;
     },

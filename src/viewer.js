@@ -61,6 +61,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
   const center = urlParams.center || centerOption;
   const zoom = urlParams.zoom || zoomOption;
   const groups = flattenGroups(groupOptions);
+  const layerAlternativeStyles = {};
 
   const getCapabilitiesLayers = () => {
     const capabilitiesPromises = [];
@@ -366,8 +367,25 @@ const Viewer = function Viewer(targetOption, options = {}) {
     return false;
   };
 
+  const getLayerAlternativeStyles = function getLayerAlternativeStyles(layer) {
+    const alternativeStyles = layerAlternativeStyles[layer.get('name')];
+    if (layerAlternativeStyles[layer.get('name')]) {
+      const asArray = Object.entries(styles);
+      const filtered = asArray.filter(([key]) => alternativeStyles.includes(key));
+      return Object.fromEntries(filtered);
+    }
+    return null;
+  };
+
+  const addLayerAlternativeStyles = function addLayerAlternativeStyles(layerProps) {
+    if (!layerAlternativeStyles[layerProps.name]) {
+      layerAlternativeStyles[layerProps.name] = layerProps.alternativeStyles;
+    }
+  };
+
   const addLayer = function addLayer(layerProps) {
     const layer = Layer(layerProps, this);
+    addLayerAlternativeStyles(layerProps);
     map.addLayer(layer);
     this.dispatch('addlayer', {
       layerName: layerProps.name
@@ -584,6 +602,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getSearchableLayers,
     getSize,
     getLayer,
+    getLayerAlternativeStyles,
     getLayers,
     getLayersByProperty,
     getMap,
