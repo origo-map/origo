@@ -73,6 +73,7 @@ const Measure = function Measure({
   let elevationToolButton;
   let addNodeButton;
   let showSegmentLabelButton;
+  let showSegmentLabelButtonState = showSegmentLabelButtonActive;
   let showSegmentLabels;
   let undoButton;
   let clearButton;
@@ -186,6 +187,10 @@ const Measure = function Measure({
       start: '{',
       end: '}'
     };
+    if (feature.getStyle() === null) {
+      feature.setStyle(style.createStyleRule(measureStyleOptions.interaction));
+      source.addFeature(feature);
+    }
 
     if (elevationTargetProjection && elevationTargetProjection !== viewer.getProjection().getCode()) {
       const clone = feature.getGeometry().clone();
@@ -285,7 +290,9 @@ const Measure = function Measure({
       stopEvent: true
     });
 
-    tempOverlayArray.push(labelOverlay);
+    if (type !== 'Point') {
+      tempOverlayArray.push(labelOverlay);
+    }
     labelOverlay.setPosition(oo);
     measureElement.innerHTML = formatLength(/** @type {LineString} */(segment));
     map.addOverlay(labelOverlay);
@@ -307,6 +314,13 @@ const Measure = function Measure({
             document.getElementById('measure_4').style.display = 'block';
           }
           break;
+        case 'Point':
+          if (showSegmentLabels) {
+            document.getElementById('measure_2').style.display = 'block';
+          } else {
+            document.getElementById('measure_2').style.display = 'none';
+          }
+          break;
         default:
           break;
       }
@@ -314,6 +328,39 @@ const Measure = function Measure({
     if (!showSegmentLabels) {
       measureElement.style.display = 'none';
     }
+  }
+
+  // Takes a Polygon as input and adds area measurements on it
+  function addArea(area) {
+    const tempFeature = new Feature(area);
+    const areaLabel = formatArea(area);
+    tempFeature.setStyle(style.createStyleRule(measureStyleOptions.polygon));
+    source.addFeature(tempFeature);
+    const flatCoords = area.getCoordinates();
+    for (let i = 0; i < flatCoords[0].length; i += 1) {
+      if (i < flatCoords[0].length - 1) {
+        const tempSegment = new LineString([flatCoords[0][i], flatCoords[0][i + 1]]);
+        placeMeasurementLabel(tempSegment, flatCoords[0][i]);
+      }
+    }
+    const totalLength = formatLength(new LineString(flatCoords[0]));
+    tempFeature.getStyle()[0].getText().setText(`${areaLabel}\n${totalLength}`);
+  }
+
+  // Takes a LineString as input and adds length measurements on it
+  function addLength(line) {
+    const tempFeature = new Feature(line);
+    const totalLength = formatLength(line);
+    tempFeature.setStyle(style.createStyleRule(measureStyleOptions.linestring));
+    source.addFeature(tempFeature);
+    const flatCoords = line.getCoordinates();
+    for (let i = 0; i < flatCoords.length; i += 1) {
+      if (i < flatCoords.length - 1) {
+        const tempSegment = new LineString([flatCoords[i], flatCoords[i + 1]]);
+        placeMeasurementLabel(tempSegment, flatCoords[i]);
+      }
+    }
+    tempFeature.getStyle()[0].getText().setText(totalLength);
   }
 
   function centerSketch() {
@@ -549,7 +596,7 @@ const Measure = function Measure({
     }
     if (showSegmentLengths) {
       document.getElementById(showSegmentLabelButton.getId()).classList.remove('hidden');
-      if (showSegmentLabelButtonActive) {
+      if (showSegmentLabelButtonState) {
         document.getElementById(showSegmentLabelButton.getId()).classList.add('active');
       }
     }
@@ -648,6 +695,7 @@ const Measure = function Measure({
     }
 
     measure.on('drawstart', (evt) => {
+      measure.getOverlay().getSource().getFeatures()[1].setStyle([]);
       sketch = evt.feature;
       sketch.on('change', pointerMoveHandler);
       if (touchMode) {
@@ -670,6 +718,7 @@ const Measure = function Measure({
       }
       pointerMoveHandler(evt);
       feature.setStyle(createStyle(feature));
+      feature.getStyle()[0].getText().setText(label);
       document.getElementsByClassName('o-tooltip-measure')[0].remove();
       overlayArray.push(...tempOverlayArray);
       tempOverlayArray = [];
@@ -781,8 +830,119 @@ const Measure = function Measure({
     }
   }
 
+  function getState() {
+    if (vector) {
+      const sourceMeasure = vector.getSource();
+      const features = sourceMeasure.getFeatures();
+      const length = [];
+      const area = [];
+      const elevation = [];
+      const buffer = [];
+      const bufferRadius = [];
+      features.forEach((feature) => {
+        switch (feature.getGeometry().getType()) {
+          case 'LineString':
+            length.push(feature.getGeometry().getCoordinates());
+            break;
+          case 'Polygon':
+            area.push(feature.getGeometry().getCoordinates());
+            break;
+          case 'Point':
+            if (feature.getStyle()[0].getText().getText() === 'o') {
+              buffer.push(feature.getGeometry().getCoordinates());
+            } else if (feature.getStyle()[0].getText().getPlacement() === 'line') {
+              bufferRadius.push(feature.getStyle()[0].getText().getText());
+            } else {
+              elevation.push(feature.getGeometry().getCoordinates());
+            }
+            break;
+          default:
+            break;
+        }
+      });
+      const returnValue = {};
+      if (length.length > 0) {
+        returnValue.length = length;
+      }
+      if (area.length > 0) {
+        returnValue.area = area;
+      }
+      if (elevation.length > 0) {
+        returnValue.elevation = elevation;
+      }
+      if (buffer.length > 0) {
+        returnValue.buffer = buffer;
+      }
+      if (bufferRadius.length > 0) {
+        returnValue.bufferRadius = bufferRadius;
+      }
+      returnValue.showSegmentLabels = showSegmentLabels;
+      if (Object.keys(returnValue).length !== 0) {
+        return returnValue;
+      }
+    }
+
+    return undefined;
+  }
+
+  function restoreState(params) {
+    if (params && params.controls && params.controls.measure) {
+      enableInteraction();
+      // Restore areas
+      if (params.controls.measure.measureState && params.controls.measure.measureState.area && params.controls.measure.measureState.area.length > 0) {
+        if (Array.isArray(params.controls.measure.measureState.area)) {
+          params.controls.measure.measureState.area.forEach((item) => {
+            addArea(new Polygon(item));
+          });
+        }
+      }
+      // Restore length
+      if (params.controls.measure.measureState && params.controls.measure.measureState.length && params.controls.measure.measureState.length.length > 0) {
+        if (Array.isArray(params.controls.measure.measureState.length)) {
+          params.controls.measure.measureState.length.forEach((item) => {
+            addLength(new LineString(item));
+          });
+        }
+      }
+      // Restore buffers
+      if (params.controls.measure.measureState && params.controls.measure.measureState.buffer && params.controls.measure.measureState.buffer.length > 0) {
+        if (Array.isArray(params.controls.measure.measureState.buffer)) {
+          for (let i = 0; i < params.controls.measure.measureState.buffer.length; i += 1) {
+            let radius = params.controls.measure.measureState.bufferRadius[i];
+            radius = radius.replace(' m', '');
+            addBuffer(new Feature(new Point(params.controls.measure.measureState.buffer[i]), Number(radius)), Number(radius));
+          }
+        }
+      }
+      // Restore elevation measurements
+      if (params.controls.measure.measureState && params.controls.measure.measureState.elevation && params.controls.measure.measureState.elevation.length > 0) {
+        if (Array.isArray(params.controls.measure.measureState.elevation)) {
+          for (let i = 0; i < params.controls.measure.measureState.elevation.length; i += 1) {
+            getElevation(new Feature(new Point(params.controls.measure.measureState.elevation[i])));
+          }
+        }
+      }
+      // Restore showSegmentLabels state
+      if (params.controls.measure.measureState) {
+        if (showSegmentLabels !== params.controls.measure.measureState.showSegmentLabels) {
+          toggleSegmentLabels();
+        }
+        if (!params.controls.measure.measureState.showSegmentLabels) {
+          document.getElementById(showSegmentLabelButton.getId()).classList.remove('active');
+          showSegmentLabelButtonState = false;
+        }
+      }
+    }
+  }
+
   return Component({
     name: 'measure',
+    getState() {
+      return getState();
+    },
+    restoreState() {
+      restoreState();
+    },
     onAdd(evt) {
       viewer = evt.target;
       touchMode = 'ontouchstart' in document.documentElement;
@@ -799,7 +959,7 @@ const Measure = function Measure({
         buttons.push(addNodeButton);
       }
       if (showSegmentLengths) {
-        if (showSegmentLabelButtonActive) {
+        if (showSegmentLabelButtonState) {
           showSegmentLabels = true;
         } else {
           showSegmentLabels = false;
@@ -833,6 +993,7 @@ const Measure = function Measure({
       map.addLayer(vector);
       this.addComponents(buttons);
       this.render();
+      restoreState(viewer.getUrlParams());
       viewer.on('toggleClickInteraction', (detail) => {
         if (detail.name === 'measure' && detail.active) {
           enableInteraction();

@@ -71,6 +71,19 @@ const measure = {
       fill: {
         color: [255, 255, 255, 0.2]
       }
+    },
+    text: {
+      font: 'bold 13px "Helvetica Neue", Helvetica, Arial, sans-serif',
+      textBaseline: 'middle',
+      textAlign: 'center',
+      overflow: 'true',
+      fill: {
+        color: [0, 153, 255, 1]
+      },
+      stroke: {
+        color: [255, 255, 255, 0.8],
+        width: 4
+      }
     }
   }]
 };

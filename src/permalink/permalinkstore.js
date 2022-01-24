@@ -41,6 +41,12 @@ permalinkStore.getState = function getState(viewer, isExtended) {
         draw: draw.getState()
       };
     }
+    const measure = viewer.getControlByName('measure');
+    if (measure) {
+      state.controls = {
+        measure: measure.getState()
+      };
+    }
   }
 
   if (featureinfo.getSelection().id && (type === 'AGS_FEATURE' || type === 'WFS' || type === 'GEOJSON' || type === 'TOPOJSON')) {
