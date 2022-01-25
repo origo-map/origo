@@ -13,7 +13,6 @@ export default function PrintLegendControl(options = {}) {
   return Button({
     cls: 'round small icon-smaller no-shrink',
     click() {
-      console.log('click', !showPrintLegend);
       showPrintLegend = !showPrintLegend;
       this.setIcon(getCheckIcon(showPrintLegend));
       this.dispatch('change:check', { showPrintLegend });

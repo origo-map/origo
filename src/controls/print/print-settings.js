@@ -231,7 +231,7 @@ const PrintSettings = function PrintSettings(options = {}) {
       titleControl.on('change:titleAlign', (evt) => this.dispatch('change:titleAlign', evt));
       createdControl.on('change:check', (evt) => this.dispatch('change:created', evt));
       northArrowControl.on('change:check', (evt) => this.dispatch('change:northarrow', evt));
-      printLegendControl.on('change:check', (evt) => { console.log('change', evt); this.dispatch('change:printlegend', evt); });
+      printLegendControl.on('change:check', (evt) => this.dispatch('change:printlegend', evt));
       resolutionControl.on('change:resolution', (evt) => this.dispatch('change:resolution', evt));
       setScaleControl.on('change:scale', (evt) => this.dispatch('change:scale', evt));
       showScaleControl.on('change:check', (evt) => this.dispatch('change:showscale', evt));

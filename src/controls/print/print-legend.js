@@ -12,13 +12,23 @@ const LayerRow = function LayerRow(options) {
 
   const getLegendUrl = (aLayer, type) => {
     const source = aLayer.getSource();
-    const url = source instanceof ImageWMS || source instanceof ImageArcGISRest ? source.getUrl() : source.getUrls()[0];
+    let url = '';
+    if ((source instanceof ImageWMS || source instanceof ImageArcGISRest) && typeof source.getUrl === 'function') {
+      url = source.getUrl();
+    } else if (typeof source.getUrls === 'function') {
+      url = source.getUrls()[0];
+    } else {
+      return '';
+    }
     const layerName = aLayer.get('name');
     return `${url}?SERVICE=WMS&layer=${layerName}&format=${type}&version=1.1.1&request=getLegendGraphic&scale=401&legend_options=dpi:300`;
   };
 
   const getLegendGraphicJSON = async (url) => {
     try {
+      if (!url) {
+        return null;
+      }
       const response = await fetch(url);
       const json = await response.json();
       return json;
