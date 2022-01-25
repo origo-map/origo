@@ -83,7 +83,10 @@ const controls = function controls(controlsStr) {
 };
 
 const controlDraw = function controlDraw(drawState) {
-  const features = new GeoJSON().readFeatures(drawState.features);
+  let features;
+  if (drawState !== '') {
+    features = new GeoJSON().readFeatures(drawState.features);
+  }
   return { features };
 };
 
