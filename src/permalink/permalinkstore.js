@@ -36,19 +36,14 @@ permalinkStore.getState = function getState(viewer, isExtended) {
 
   if (isExtended) {
     const draw = viewer.getControlByName('draw');
-    let drawState = '';
     const measure = viewer.getControlByName('measure');
-    let measureState = '';
+    state.controls = {};
     if (draw) {
-      drawState = draw.getState();
+      state.controls.draw = draw.getState();
     }
     if (measure) {
-      measureState = measure.getState();
+      state.controls.measure = measure.getState();
     }
-    state.controls = {
-      draw: drawState,
-      measure: measureState
-    };
   }
 
   if (featureinfo.getSelection().id && (type === 'AGS_FEATURE' || type === 'WFS' || type === 'GEOJSON' || type === 'TOPOJSON')) {
