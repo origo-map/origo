@@ -365,7 +365,7 @@ export default function PrintResize(options = {}) {
 
       if (styles && styles.length > 1) {
         changeWfsThemeLayer(layer, styleName, styles);
-      } else if (styleName && styles.length === 1) {
+      } else if (styleName && styles && styles.length === 1) {
         const newStyle = Style.createStyle({
           style: styleName,
           viewer
