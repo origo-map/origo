@@ -16,10 +16,12 @@ function readResponse(data) {
 }
 
 function writeWfsTransaction(transObj, options) {
-  transObj.insert.forEach((feature) => {
-    const feat = feature.getProperties();
-    Object.keys(feat).forEach(key => (feat[key] === '') && feature.unset(key));
-  });
+  if (transObj.insert) {
+    transObj.insert.forEach((feature) => {
+      const props = feature.getProperties();
+      Object.keys(props).forEach(prop => (props[prop] === '') && feature.unset(prop));
+    });
+  }
   const node = format.writeTransaction(transObj.insert, transObj.update, transObj.delete, options);
   return node;
 }
