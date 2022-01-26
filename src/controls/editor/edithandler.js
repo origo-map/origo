@@ -741,7 +741,7 @@ function onAttributesSave(features, attrs) {
           break;
         case 'date':
           valid.date = validate.date(inputValue) ? inputValue : false;
-          if (!valid.date && inputValue !== '') {
+          if (!valid.date) {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }
