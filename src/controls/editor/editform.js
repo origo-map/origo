@@ -106,7 +106,7 @@ const createForm = function createForm(obj) {
           val = isoDate.slice(11, 19);
         }
       }
-      el = `<div class="validate ${cls}"><label>${label}</label><br><input type="time" name="timmar, minuter och sekunder" id="${id}" placeholder="tt:mm:ss" value="${val}"${readonly}></div>`;
+      el = `<div class="validate ${cls}"><label>${label}</label><br><input type="time" name="timmar, minuter och sekunder" id="${id}" placeholder="tt:mm:ss" step="1" value="${val}"${readonly}></div>`;
       break;
     case 'datetime':
       if (!val) {
