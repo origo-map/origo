@@ -60,7 +60,7 @@ const attachmentsform = function attachmentsform(layer, feature, el) {
       }
       const rowEl = createElement('div', '', { cls: 'flex row padding-x padding-y-smaller row-reverse' });
       const labelEl = createElement('label', '<span data-tooltip="Lägg till"></span>', { style: 'cursor: pointer;', cls: 'hover o-tooltip' });
-      const addButtonEl = createElement('button', '<span class="icon"><svg class="o-icon-24"><use xlink:href="#ic_add_24px"></use></svg></span>', { cls: 'compact', 'aria-label': 'Lägg till', style:'pointer-events:none;' });
+      const addButtonEl = createElement('button', '<span class="icon"><svg class="o-icon-24"><use xlink:href="#ic_add_24px"></use></svg></span>', { cls: 'compact', 'aria-label': 'Lägg till', style: 'pointer-events:none;' });
       // Do some silly css stuff to hide the actual file input as it is very ugly and use the label instead
       const inputEl = createElement('input', '', { type: 'file', accept: `${acceptstring}`, style: 'opacity: 0; width: 1px; height:1px; padding: 0; border:0;' });
       labelEl.appendChild(inputEl);
