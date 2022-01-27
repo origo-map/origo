@@ -482,9 +482,12 @@ const Viewer = function Viewer(targetOption, options = {}) {
             if (layer && type !== 'GROUP') {
               const clusterSource = layer.getSource().source;
               const id = featureId.split('.')[1];
+              // FIXME: postrender event is only emitted if any features from a layer is actually drawn, which means there is no feature in the default extent,
+              // it will not be triggered until map is panned or zoomed where a feature exists.
               layer.once('postrender', () => {
                 let feature;
-
+                // FIXME: ensure that feature is loaded. If using bbox and feature is outside default extent it will not be found.
+                // Workaround is to have a default extent covering the entire map with the layer in visible range or use strategy all
                 if (type === 'WFS' && clusterSource) {
                   feature = clusterSource.getFeatureById(featureId);
                 } else if (type === 'WFS') {
@@ -505,8 +508,10 @@ const Viewer = function Viewer(targetOption, options = {}) {
                   obj.content = getAttributes(feature, layer);
                   obj.layer = layer;
                   const centerGeometry = getcenter(feature.getGeometry());
+                  // FIXME: showOverlay option is undocumented and behaviour is probably not the desired.
                   const infowindowType = featureinfoOptions.showOverlay === false ? 'sidebar' : 'overlay';
-                  featureinfo.render([obj], infowindowType, centerGeometry);
+                  // Don't auto pan as we're zooming in anyway on the next row.
+                  featureinfo.render([obj], infowindowType, centerGeometry, { ignorePan: true });
                   map.getView().fit(feature.getGeometry(), {
                     maxZoom: getResolutions().length - 2,
                     padding: [15, 15, 40, 15],
