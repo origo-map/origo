@@ -306,7 +306,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         carouselIds.forEach((carouselId) => {
           let targetElement;
           const elements = document.getElementsByClassName(`o-image-carousel${carouselId}`);
-          elements.forEach(element => {
+          Array.from(elements).forEach(element => {
             if (!element.closest('.glide__slide--clone')) {
               targetElement = element;
             }
