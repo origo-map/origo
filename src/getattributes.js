@@ -83,6 +83,13 @@ const getContent = {
       if (attribute.suffix) {
         suffix = attribute.suffix;
       }
+      if (attribute.formatDatetime) {
+        if (!Number.isNaN(Date.parse(featureValue))) {
+          const locale = 'locale' in attribute.formatDatetime ? attribute.formatDatetime.locale : 'default';
+          const options = 'options' in attribute.formatDatetime ? attribute.formatDatetime.options : { dateStyle: 'full', timeStyle: 'long' };
+          val = new Intl.DateTimeFormat(locale, options).format(Date.parse(featureValue));
+        }
+      }
       if (attribute.url) {
         val = buildUrlContent(feature, attribute, attributes, map);
       }
