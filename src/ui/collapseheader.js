@@ -49,7 +49,7 @@ export default function CollapseHeader(options = {}) {
       });
     },
     render: function render() {
-      return `<div id="${this.getId()}" class="${cls} flex row align-center pointer collapse-header" id="${this.getId()}" style="${style} width: 100%;">
+      return `<div id="${this.getId()}" class="${cls} flex row align-center pointer collapse-header" id="${this.getId()}" style="${style}">
                 ${titleCmp.render()}
                 ${headerButton.render()}
               </div>`;
