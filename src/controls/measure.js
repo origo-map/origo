@@ -924,7 +924,7 @@ const Measure = function Measure({
         if (showSegmentLabels !== params.controls.measure.measureState.showSegmentLabels) {
           toggleSegmentLabels();
         }
-        if (!params.controls.measure.measureState.showSegmentLabels) {
+        if (!params.controls.measure.measureState.showSegmentLabels && typeof showSegmentLabelButton !== 'undefined') {
           document.getElementById(showSegmentLabelButton.getId()).classList.remove('active');
           showSegmentLabelButtonState = false;
         }
