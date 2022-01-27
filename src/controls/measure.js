@@ -289,10 +289,7 @@ const Measure = function Measure({
       positioning: 'center-center',
       stopEvent: true
     });
-
-    if (type !== 'Point') {
-      tempOverlayArray.push(labelOverlay);
-    }
+    tempOverlayArray.push(labelOverlay);
     labelOverlay.setPosition(oo);
     measureElement.innerHTML = formatLength(/** @type {LineString} */(segment));
     map.addOverlay(labelOverlay);
@@ -301,17 +298,17 @@ const Measure = function Measure({
         case 'LineString':
           if (coords.length === 3) {
             document.getElementById('measure_3').style.display = 'none';
-          }
-          if (showSegmentLabels) {
-            document.getElementById('measure_3').style.display = 'block';
+            if (showSegmentLabels) {
+              document.getElementById('measure_3').style.display = 'block';
+            }
           }
           break;
         case 'Polygon':
           if (coords.length === 4) {
             document.getElementById('measure_4').style.display = 'none';
-          }
-          if (showSegmentLabels) {
-            document.getElementById('measure_4').style.display = 'block';
+            if (showSegmentLabels) {
+              document.getElementById('measure_4').style.display = 'block';
+            }
           }
           break;
         case 'Point':
@@ -932,6 +929,8 @@ const Measure = function Measure({
           showSegmentLabelButtonState = false;
         }
       }
+      overlayArray.push(...tempOverlayArray);
+      tempOverlayArray = [];
     }
   }
 
