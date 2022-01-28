@@ -172,6 +172,7 @@ function checkOptions(feature, scale, styleSettings, styleList, size) {
         // find attribute vale between [] defined in styles
         let regexExpr;
         let regexFilter;
+        let dateDiffNowFilter;
         let featMatch;
         let filters = [];
         let filtering = '';
@@ -182,6 +183,10 @@ function checkOptions(feature, scale, styleSettings, styleList, size) {
         } else if (s[j][0].filter.search(' OR ') > 0) {
           filters = s[j][0].filter.split(' OR ');
           filtering = 'OR';
+        } else if (s[j][0].filter.search(' DATETIMEDIFFNOW ') > 0) {
+          filters = s[j][0].filter.split(' DATETIMEDIFFNOW ');
+          dateDiffNowFilter = filters[1];
+          filtering = 'DATETIMEDIFFNOW';
         } else {
           // Remove AND or OR filtering in the case it matched the one or other
           filters = s[j][0].filter.split(' AND ');
@@ -229,6 +234,12 @@ function checkOptions(feature, scale, styleSettings, styleList, size) {
           } else if (filtering === 'RegExp') {
             // eslint-disable-next-line no-eval
             if (regexExpr.test(featMatch)) {
+              filterMatch = true;
+            } else {
+              filterMatch = false;
+            }
+          } else if (filtering === 'DATETIMEDIFFNOW') {
+            if (Date.parse(exp.replaceAll('"', '')) > Date.now() - dateDiffNowFilter * 1000) {
               filterMatch = true;
             } else {
               filterMatch = false;
