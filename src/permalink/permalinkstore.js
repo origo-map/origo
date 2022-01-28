@@ -48,9 +48,19 @@ permalinkStore.getState = function getState(viewer, isExtended) {
   } else {
     const selectedItems = viewer.getSelectionManager().getSelectedItems().getArray();
     if (selectedItems.length > 0) {
-      const layerType = selectedItems[0].getLayer().getProperties().type;
-      if(layerType === 'AGS_FEATURE' || layerType === 'WFS' || layerType === 'GEOJSON' || layerType === 'TOPOJSON') {
-        state.feature = selectedItems[0].getId();
+      const layer = selectedItems[0].getLayer();
+      const layerType = layer.get('type');
+      const layerName = layer.get('name');
+      if (layerType === 'AGS_FEATURE' || layerType === 'WFS' || layerType === 'GEOJSON' || layerType === 'TOPOJSON') {
+        const id = selectedItems[0].getId() || selectedItems[0].ol_uid;
+        if (layerType === 'WFS') {
+          const idSuffix = id.substring(id.lastIndexOf('.') + 1, id.length);
+          state.feature = `${layerName}.${idSuffix}`;
+        } else if (layerType !== 'WFS') {
+          state.feature = `${layerName}.${id}`;
+        } else {
+          state.feature = id;
+        }
       }
     }
   }
