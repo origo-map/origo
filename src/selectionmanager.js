@@ -28,6 +28,11 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     return selectedItems.getArray().some((i) => item.getId() === i.getId());
   }
 
+  function getSelectedItemsForASelectionGroup(selectionGroup) {
+    const items = selectedItems.getArray().filter((i) => i.getSelectionGroup() === selectionGroup);
+    return items;
+  }
+
   function removeItem(item) {
     selectedItems.remove(item);
   }
@@ -60,6 +65,9 @@ const Selectionmanager = function Selectionmanager(options = {}) {
       return;
     }
     selectedItems.push(item);
+    if (getSelectedItemsForASelectionGroup(item.getSelectionGroup()).length === selectedItems.getArray().length) {
+      infowindow.showSelectedList(item.getSelectionGroup());
+    }
   }
 
   function addItems(items) {
@@ -129,11 +137,6 @@ const Selectionmanager = function Selectionmanager(options = {}) {
 
   function getSelectedItems() {
     return selectedItems;
-  }
-
-  function getSelectedItemsForASelectionGroup(selectionGroup) {
-    const items = selectedItems.getArray().filter((i) => i.getSelectionGroup() === selectionGroup);
-    return items;
   }
 
   function clearSelection() {
