@@ -874,6 +874,7 @@ const Measure = function Measure({
         returnValue.bufferRadius = bufferRadius;
       }
       returnValue.showSegmentLabels = showSegmentLabels;
+      returnValue.isActive = isActive;
       if (Object.keys(returnValue).length !== 0) {
         return returnValue;
       }
@@ -884,7 +885,9 @@ const Measure = function Measure({
 
   function restoreState(params) {
     if (params && params.controls && params.controls.measure) {
-      enableInteraction();
+      if (params.controls.measure.measureState.isActive) {
+        enableInteraction();
+      }
       // Restore areas
       if (params.controls.measure.measureState && params.controls.measure.measureState.area && params.controls.measure.measureState.area.length > 0) {
         if (Array.isArray(params.controls.measure.measureState.area)) {
