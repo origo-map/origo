@@ -127,6 +127,10 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     }
   }
 
+  function getSelectedItems() {
+    return selectedItems;
+  }
+
   function getSelectedItemsForASelectionGroup(selectionGroup) {
     const items = selectedItems.getArray().filter((i) => i.getSelectionGroup() === selectionGroup);
     return items;
@@ -224,6 +228,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     highlightFeature,
     highlightFeatureById,
     getNumberOfSelectedItems,
+    getSelectedItems,
     getSelectedItemsForASelectionGroup,
     getUrval,
     onInit() {

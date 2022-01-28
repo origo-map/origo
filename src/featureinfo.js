@@ -443,6 +443,22 @@ const Featureinfo = function Featureinfo(options = {}) {
     render(newItems, identifyTarget, opts.coordinate || maputils.getCenter(newItems[0].getFeature().getGeometry()), opts);
   };
 
+  /**
+  * Shows the featureinfo popup/sidebar/infowindow for the provided feature and fit the view to it.
+  * @param {any} feature An object containing layerName and feature
+  * @returns nothing
+  */
+  const showFeatureInfo = function showFeatureInfo(featureObj) {
+    const feature = featureObj.feature;
+    const layerName = featureObj.layerName;
+    const layer = viewer.getLayer(layerName);
+    const map = viewer.getMap();
+    const grouplayers = viewer.getGroupLayers();
+    const newItem = getFeatureInfo.createSelectedItem(feature, layer, map, grouplayers);
+    render([newItem], identifyTarget, maputils.getCenter(feature.getGeometry()), { ignorePan: true });
+    viewer.zoomToExtent(feature.getGeometry());
+  };
+
   const onClick = function onClick(evt) {
     savedPin = undefined;
     // Featurinfo in two steps. Concat serverside and clientside when serverside is finished
@@ -551,7 +567,8 @@ const Featureinfo = function Featureinfo(options = {}) {
       }
     },
     render,
-    showInfo
+    showInfo,
+    showFeatureInfo
   });
 };
 

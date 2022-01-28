@@ -504,14 +504,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
                 if (feature) {
                   const obj = {};
                   obj.feature = feature;
-                  obj.title = layer.get('title');
-                  obj.content = getAttributes(feature, layer);
-                  obj.layer = layer;
-                  const centerGeometry = getcenter(feature.getGeometry());
-                  // FIXME: showOverlay option is undocumented and behaviour is probably not the desired.
-                  const infowindowType = featureinfoOptions.showOverlay === false ? 'sidebar' : 'overlay';
-                  // Don't auto pan as we're zooming in anyway on the next row.
-                  featureinfo.render([obj], infowindowType, centerGeometry, { ignorePan: true });
+                  obj.layerName = layerName;
+                  featureinfo.showFeatureInfo(obj);
                   map.getView().fit(feature.getGeometry(), {
                     maxZoom: getResolutions().length - 2,
                     padding: [15, 15, 40, 15],
@@ -538,9 +532,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
           featureinfoOptions.viewer = this;
 
           selectionmanager = Selectionmanager(featureinfoOptions);
-          this.addComponent(selectionmanager);
-
           featureinfo = Featureinfo(featureinfoOptions);
+          this.addComponent(selectionmanager);
           this.addComponent(featureinfo);
 
           this.addControls();
