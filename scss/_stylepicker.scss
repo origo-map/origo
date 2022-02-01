@@ -1,0 +1,24 @@
+.o-stylepicker {
+  height: 1.25rem;
+  margin-right: 5px;
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+  min-width: 110px;
+}
+
+.o-stylepicker button {
+  border-radius: 10px;
+  font-family: Arial, 'Helvetica Neue', sans-serif;
+  font-size: .625rem;
+  line-height: 1.25rem;
+}
+
+.o-stylepicker .dropdown ul {
+  border: 2px solid $grey-light;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.o-stylepicker .dropdown li:hover {
+  color: $grey-darker;
+}

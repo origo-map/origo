@@ -137,6 +137,12 @@ const OverlayLayer = function OverlayLayer(options) {
     el.remove();
   };
 
+  const onLayerStyleChange = function onLayerStyleChange() {
+    const newStyle = viewer.getStyle(layer.get('styleName'));
+    const newIcon = HeaderIcon(newStyle, opacity) || icon;
+    layerIcon.dispatch('change', { icon: newIcon });
+  };
+
   return Component({
     name,
     getLayer,
@@ -174,6 +180,9 @@ const OverlayLayer = function OverlayLayer(options) {
           bubbles: true
         });
         document.getElementById(this.getId()).dispatchEvent(visibleEvent);
+      });
+      layer.on('change:style', () => {
+        onLayerStyleChange();
       });
     },
     render() {

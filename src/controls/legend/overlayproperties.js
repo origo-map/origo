@@ -1,5 +1,6 @@
 import { Component, InputRange, Dropdown } from '../../ui';
 import { Legend } from '../../utils/legendmaker';
+import Style from '../../style';
 
 const OverlayProperties = function OverlayProperties(options = {}) {
   const {
@@ -16,6 +17,12 @@ const OverlayProperties = function OverlayProperties(options = {}) {
   const style = viewer.getStyle(layer.get('styleName'));
   const legend = Legend(style, opacity);
   const alternativeStyles = viewer.getLayerAlternativeStyles(layer);
+
+  const legendComponent = Component({
+    render() {
+      return `<div id=${this.getId()}>${legend}</div>`;
+    }
+  });
 
   let styleSelection;
   let overlayEl;
@@ -50,18 +57,30 @@ const OverlayProperties = function OverlayProperties(options = {}) {
     return alternativeStyles ? styleSelection.render() : '';
   }
 
+  const onSelectStyle = (styleName) => {
+    const newStyle = Style.createStyle({ style: styleName, viewer });
+    const legendCmp = document.getElementById(legendComponent.getId());
+    legendCmp.innerHTML = Legend(viewer.getStyle(styleName), opacity);
+    layer.setProperties({ styleName });
+    layer.setStyle(newStyle);
+    layer.dispatchEvent('change:style');
+  };
+
   return Component({
     onInit() {
       styleSelection = Dropdown({
         direction: 'up',
-        cls: 'o-scalepicker text-white flex',
-        contentCls: 'bg-grey-darker text-smallest rounded',
-        buttonCls: 'bg-black text-white',
-        ariaLabel: 'Välj skala',
-        buttonIconCls: 'white'
+        cls: 'o-stylepicker text-black flex',
+        contentCls: 'bg-white text-smallest rounded',
+        buttonCls: 'bg-white border text-black',
+        text: 'Välj styling',
+        buttonIconCls: 'black'
       });
-
-      this.addComponents([transparencySlider, styleSelection]);
+      const components = [transparencySlider];
+      if (alternativeStyles) {
+        components.push(styleSelection);
+      }
+      this.addComponents(components);
       this.on('click', (e) => {
         extendedLegendZoom(e);
       });
@@ -85,12 +104,15 @@ const OverlayProperties = function OverlayProperties(options = {}) {
       }
       if (alternativeStyles) {
         styleSelection.setItems(Object.keys(alternativeStyles));
+        document.getElementById(styleSelection.getId()).addEventListener('dropdown:select', (evt) => {
+          onSelectStyle(evt.target.textContent);
+        });
       }
     },
     render() {
       return `<div id="${this.getId()}" class="${cls} border-bottom">
                 <div class="padding-small">
-                  ${legend}
+                  ${legendComponent.render()}
                   ${renderStyleSelection()}
                   ${transparencySlider.render()}
                 </div>
