@@ -477,9 +477,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
             let featureId = urlParams.feature;
             const layerName = featureId.split('.')[0];
             const layer = getLayer(layerName);
-            const type = layer.get('type');
 
-            if (layer && type !== 'GROUP') {
+            if (layer && layer.get('type') !== 'GROUP') {
               const clusterSource = layer.getSource().source;
               const id = featureId.split('.')[1];
               // FIXME: postrender event is only emitted if any features from a layer is actually drawn, which means there is no feature in the default extent,
@@ -488,9 +487,9 @@ const Viewer = function Viewer(targetOption, options = {}) {
                 let feature;
                 // FIXME: ensure that feature is loaded. If using bbox and feature is outside default extent it will not be found.
                 // Workaround is to have a default extent covering the entire map with the layer in visible range or use strategy all
-                if (type === 'WFS' && clusterSource) {
+                if (layer.get('type') === 'WFS' && clusterSource) {
                   feature = clusterSource.getFeatureById(featureId);
-                } else if (type === 'WFS') {
+                } else if (layer.get('type') === 'WFS') {
                   if (featureId.includes('__')) {
                     featureId = featureId.replace(featureId.substring(featureId.lastIndexOf('__'), featureId.lastIndexOf('.')), '');
                   }
