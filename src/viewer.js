@@ -369,7 +369,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
   const getLayerAlternativeStyles = function getLayerAlternativeStyles(layer) {
     const alternativeStyles = layerAlternativeStyles[layer.get('name')];
-    if (layerAlternativeStyles[layer.get('name')]) {
+    if (alternativeStyles) {
       const asArray = Object.entries(styles);
       const filtered = asArray.filter(([key]) => alternativeStyles.includes(key));
       return Object.fromEntries(filtered);
@@ -379,7 +379,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
   const addLayerAlternativeStyles = function addLayerAlternativeStyles(layerProps) {
     if (!layerAlternativeStyles[layerProps.name]) {
-      layerAlternativeStyles[layerProps.name] = layerProps.alternativeStyles;
+      layerAlternativeStyles[layerProps.name] = [layerProps.style].concat(layerProps.alternativeStyles);
     }
   };
 

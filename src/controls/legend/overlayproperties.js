@@ -41,6 +41,10 @@ const OverlayProperties = function OverlayProperties(options = {}) {
     label
   });
 
+  function hasAlternativeStyles() {
+    return Object.entries(alternativeStyles).length > 1;
+  }
+
   function extendedLegendZoom(e) {
     const parentOverlay = document.getElementById(options.parent.getId());
 
@@ -54,10 +58,11 @@ const OverlayProperties = function OverlayProperties(options = {}) {
   }
 
   function renderStyleSelection() {
-    return alternativeStyles ? styleSelection.render() : '';
+    return hasAlternativeStyles() ? styleSelection.render() : '';
   }
 
   const onSelectStyle = (styleName) => {
+    styleSelection.setButtonText(styleName);
     const newStyle = Style.createStyle({ style: styleName, viewer });
     const legendCmp = document.getElementById(legendComponent.getId());
     legendCmp.innerHTML = Legend(viewer.getStyle(styleName), opacity);
@@ -71,13 +76,13 @@ const OverlayProperties = function OverlayProperties(options = {}) {
       styleSelection = Dropdown({
         direction: 'up',
         cls: 'o-stylepicker text-black flex',
-        contentCls: 'bg-white text-smallest rounded',
+        contentCls: 'bg-grey-lighter text-smallest rounded',
         buttonCls: 'bg-white border text-black',
-        text: 'Välj styling',
+        text: layer.get('styleName'),
         buttonIconCls: 'black'
       });
       const components = [transparencySlider];
-      if (alternativeStyles) {
+      if (hasAlternativeStyles()) {
         components.push(styleSelection);
       }
       this.addComponents(components);
@@ -102,7 +107,7 @@ const OverlayProperties = function OverlayProperties(options = {}) {
           layer.setOpacity(sliderEl.valueAsNumber);
         });
       }
-      if (alternativeStyles) {
+      if (hasAlternativeStyles()) {
         styleSelection.setItems(Object.keys(alternativeStyles));
         document.getElementById(styleSelection.getId()).addEventListener('dropdown:select', (evt) => {
           onSelectStyle(evt.target.textContent);
