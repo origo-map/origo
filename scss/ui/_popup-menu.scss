@@ -9,7 +9,8 @@ $popup-border-color: $grey-light;
 .popup-menu > ul {
   background-color: $popup-background-color;
   border-radius: $popup-radius;
-  border: solid 1px $popup-border-color;
+  box-shadow: $shadow;
+  /*border: solid 1px $popup-border-color;*/
   overflow-x: hidden;
   overflow-y: hidden;
 

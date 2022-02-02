@@ -177,7 +177,7 @@ const OverlayLayer = function OverlayLayer(options) {
   };
 
   const moreInfoButton = Button({
-    cls: 'round small icon-smallest no-shrink',
+    cls: 'round small icon-smaller no-shrink',
     click() {
       const eventShowOverlayPopup = new CustomEvent('showoverlaypopup', {
         bubbles: true,
@@ -194,7 +194,7 @@ const OverlayLayer = function OverlayLayer(options) {
     style: {
       'align-self': 'center'
     },
-    icon: '#fa-ellipsis-v',
+    icon: '#ic_more_vert_24px',
     ariaLabel: 'Visa lagerinfo',
     tabIndex: -1
   });
