@@ -371,8 +371,9 @@ const Featureinfo = function Featureinfo(options = {}) {
    * @param {any} identifyItems
    * @param {any} target
    * @param {any} coordinate
+   * @param {bool} ignorePan true if overlay should not be panned into view
    */
-  const doRender = function doRender(identifyItems, target, coordinate) {
+  const doRender = function doRender(identifyItems, target, coordinate, ignorePan) {
     const map = viewer.getMap();
 
     items = identifyItems;
@@ -415,7 +416,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         carouselIds.forEach((carouselId) => {
           let targetElement;
           const elements = document.getElementsByClassName(`o-image-carousel${carouselId}`);
-          elements.forEach(element => {
+          Array.from(elements).forEach(element => {
             if (!element.closest('.glide__slide--clone')) {
               targetElement = element;
             }
@@ -428,16 +429,16 @@ const Featureinfo = function Featureinfo(options = {}) {
         const popupEl = popup.getEl();
         const popupHeight = document.querySelector('.o-popup').offsetHeight + 10;
         popupEl.style.height = `${popupHeight}px`;
-        overlay = new Overlay({
-          element: popupEl,
-          autoPan: {
+        const overlayOptions = { element: popupEl, positioning: 'bottom-center' };
+        if (!ignorePan) {
+          overlayOptions.autoPan = {
             margin: 55,
             animation: {
               duration: 500
             }
-          },
-          positioning: 'bottom-center'
-        });
+          };
+        }
+        overlay = new Overlay(overlayOptions);
         map.addOverlay(overlay);
         overlay.setPosition(coord);
         break;
@@ -500,9 +501,10 @@ const Featureinfo = function Featureinfo(options = {}) {
    * @param {any} identifyItems Array of SelectedItems
    * @param {any} target Name of infoWindow type
    * @param {any} coordinate Coordinate where to show pop up.
+   * @param {any} opts Additional options. Supported options are : ignorePan, disable auto pan to popup overlay.
    */
-  const render = function render(identifyItems, target, coordinate) {
-    /** Array of promises to await before displaying the info */
+  const render = function render(identifyItems, target, coordinate, opts = {}) {
+    // Append attachments (if any) to the SelectedItems
     const requests = [];
     identifyItems.forEach(currItem => {
       // At least search can call render without SelectedItem as Items, it just sends an object with the least possible fields render uses
@@ -513,7 +515,6 @@ const Featureinfo = function Featureinfo(options = {}) {
         requests.push(addRelatedContent(currItem));
       }
     });
-
     // Wait for all requests. If there are no attachments it just calls .then() without waiting.
     Promise.all(requests)
       .catch((err) => {
@@ -521,7 +522,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         alert('Kunde inte hämta relaterade objekt. En del fält från relaterade objekt kommer att vara tomma.');
       })
       .then(() => {
-        doRender(identifyItems, target, coordinate);
+        doRender(identifyItems, target, coordinate, opts.ignorePan);
       })
       .catch(err => console.log(err));
   };
@@ -530,6 +531,7 @@ const Featureinfo = function Featureinfo(options = {}) {
   * Shows the featureinfo popup/sidebar/infowindow for the provided features. Only vector layers are supported.
   * @param {any} fidsbylayer An object containing layer names as keys with a list of feature ids for each layer
   * @param {any} opts An object containing options. Supported options are : coordinate, the coordinate where popup will be shown. If omitted first feature is used.
+  *                                                                         ignorePan, do not autopan if type is overlay. Pan should be supressed if view is changed manually to avoid contradicting animations.
   * @returns nothing
   */
   const showInfo = function showInfo(fidsbylayer, opts = {}) {
@@ -545,7 +547,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         newItems.push(newItem);
       });
     });
-    render(newItems, identifyTarget, opts.coordinate || maputils.getCenter(newItems[0].getFeature().getGeometry()));
+    render(newItems, identifyTarget, opts.coordinate || maputils.getCenter(newItems[0].getFeature().getGeometry()), opts);
   };
 
   const onClick = function onClick(evt) {

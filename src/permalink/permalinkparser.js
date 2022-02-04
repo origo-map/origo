@@ -87,7 +87,12 @@ const controlDraw = function controlDraw(drawState) {
   return { features };
 };
 
+const controlMeasure = function controlMeasure(measureState) {
+  return { measureState };
+};
+
 parseFunctions.draw = controlDraw;
+parseFunctions.measure = controlMeasure;
 
 export default {
   layers,
@@ -98,5 +103,6 @@ export default {
   pin,
   map,
   controls,
-  controlDraw
+  controlDraw,
+  controlMeasure
 };

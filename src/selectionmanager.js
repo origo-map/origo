@@ -23,9 +23,12 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   const isInfowindow = options.infowindow === 'infowindow' || false;
 
   function alreadyExists(item) {
-    // FIXME: Take into consideration which layer? Also affects remove and all other by id functions.
-    // Right now, if several layers use the same source, a feature can only be selected in one layer (the first attempted)
-    return selectedItems.getArray().some((i) => item.getId() === i.getId());
+    return selectedItems.getArray().some((i) => item.getId() === i.getId() && item.selectionGroup === i.selectionGroup);
+  }
+
+  function getSelectedItemsForASelectionGroup(selectionGroup) {
+    const items = selectedItems.getArray().filter((i) => i.getSelectionGroup() === selectionGroup);
+    return items;
   }
 
   function removeItem(item) {
@@ -60,6 +63,9 @@ const Selectionmanager = function Selectionmanager(options = {}) {
       return;
     }
     selectedItems.push(item);
+    if (getSelectedItemsForASelectionGroup(item.getSelectionGroup()).length === selectedItems.getArray().length) {
+      infowindow.showSelectedList(item.getSelectionGroup());
+    }
   }
 
   function addItems(items) {
@@ -125,11 +131,6 @@ const Selectionmanager = function Selectionmanager(options = {}) {
         highlightAndExpandItem(item);
       }
     }
-  }
-
-  function getSelectedItemsForASelectionGroup(selectionGroup) {
-    const items = selectedItems.getArray().filter((i) => i.getSelectionGroup() === selectionGroup);
-    return items;
   }
 
   function clearSelection() {

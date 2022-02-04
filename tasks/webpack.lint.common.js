@@ -3,7 +3,6 @@ const ESLintPlugin = require('eslint-webpack-plugin');
 
 module.exports = {
   entry: [
-    'whatwg-fetch',
     './origo.js'
   ],
   module: {
@@ -12,19 +11,6 @@ module.exports = {
         test: /\.m?js$/,
         enforce: 'pre',
         use: ['source-map-loader']
-      },
-      {
-        test: /\.(js)$/,
-        exclude: {
-          test: /node_modules/,
-          not: [
-            /@mapbox/,
-            /@glidejs/
-          ]
-        },
-        use: {
-          loader: 'babel-loader'
-        }
       }
     ]
   },

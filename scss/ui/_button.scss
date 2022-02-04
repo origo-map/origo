@@ -101,6 +101,10 @@ button {
     &.active:focus {
       border: 2px solid $grey-light;
     }
+
+    &.active:focus:not(:focus-visible) {
+      border: 2px solid $grey-light;
+    }
   }
 
   &.border:hover {
@@ -108,6 +112,10 @@ button {
   }
 
   &.border:focus {
+    border: 2px solid $grey-lighter;
+  }
+
+  &.border:focus:not(:focus-visible) {
     border: 2px solid $grey-lighter;
   }
 
@@ -121,6 +129,10 @@ button {
     }
 
     &.primary:focus {
+      border: 2px solid $primary-color-dark;
+    }
+
+    &.primary:focus:not(:focus-visible) {
       border: 2px solid $primary-color-dark;
     }
 
@@ -212,6 +224,47 @@ button:focus,
 
   &.icon-smaller:focus {
     border: 1px solid $black;
+  }
+}
+
+button:focus:not(:focus-visible),
+.button:focus:not(:focus-visible) {
+  &.light:focus:not(:focus-visible) {
+    background-color: $light-color;
+    border: 0;
+  }
+
+  &.primary:focus:not(:focus-visible) {
+    background-color: $primary-color;
+    border: 0;
+  }
+
+  &.danger:focus:not(:focus-visible) {
+    background-color: $danger-color;
+    border: 0;
+  }
+
+  &.grey-light:focus:not(:focus-visible) {
+    background-color: $grey-light;
+    border: 0;
+  }
+
+  &.grey-lighter:focus:not(:focus-visible) {
+    background-color: $grey-lighter;
+    border: 0;
+  }
+
+  &.grey-lightest:focus:not(:focus-visible) {
+    background-color: $grey-lightest;
+    border: 0;
+  }
+
+  &.icon-small:focus:not(:focus-visible) {
+    border: 0;
+  }
+
+  &.icon-smaller:focus:not(:focus-visible) {
+    border: 0;
   }
 }
 
