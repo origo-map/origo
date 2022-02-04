@@ -509,9 +509,8 @@ const Featureinfo = function Featureinfo(options = {}) {
     identifyItems.forEach(currItem => {
       // At least search can call render without SelectedItem as Items, it just sends an object with the least possible fields render uses
       // so we need to exclude those from related tables handling, as we know nothing about them
-      if (currItem instanceof SelectedItem) {
+      if (currItem instanceof SelectedItem && currItem.getLayer()) {
         // Fire off a bunch of promises that fetches attachments and related tables
-        // requests.push(hoistRelatedAttributes(currItem.getLayer(), currItem.getFeature(), hoistedAttributes));
         requests.push(addRelatedContent(currItem));
       }
     });

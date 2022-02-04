@@ -39,6 +39,10 @@ function getId(parentLayer, childLayerName, feature) {
 async function getChildFeatures(parentLayer, feature, childLayer) {
   const childLayerName = childLayer.get('name');
   let parentPK = getId(parentLayer, childLayerName, feature);
+  // For arbitrary PK fields PK may be null or even worse undefined.
+  if (!parentPK) {
+    return [];
+  }
   const layerconf = parentLayer.get(RELATED_TABLES_CONFIG_ROOT).find(item => item.layerName === childLayerName);
   const FKField = layerconf.FK;
 
@@ -58,7 +62,7 @@ async function getChildFeatures(parentLayer, feature, childLayer) {
   // Compare ids as strings to avoid implicit (lint) or complicated type conversions depending on column types.
   // Problem is that if wfs layer name i stripped the id is a string, but in db it might be a number. We don't know that
   // and the FK may very well be a number in the db which would progate to the feature as number.
-  const childFeatures = childLayer.getSource().getFeatures().filter((f) => parentPK.toString() === f.get(FKField).toString());
+  const childFeatures = childLayer.getSource().getFeatures().filter((f) => f.get(FKField) && (parentPK.toString() === f.get(FKField).toString()));
   return childFeatures;
 }
 

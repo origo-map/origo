@@ -103,7 +103,6 @@ const attachmentclient = function attachmentclient(layer) {
     return retval;
   };
 
- 
   /**
    * Posts a new attachment to the server
    * @param {any} feature The feature the attachments belongs to
