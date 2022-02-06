@@ -89,36 +89,30 @@ const createForm = function createForm(obj) {
         if (obj.defaultDate === false) {
           val = '';
         } else if (obj.defaultDate) {
-          val = obj.defaultDate;
-        } else {
           val = isoDate.slice(0, 10);
         }
       }
-      el = `<div class="validate ${cls}"><label>${label}</label><br><input type="date" name="datum" id="${id}" placeholder="ÅÅÅÅ-MM-DD" value="${val}"${readonly}${required}></div>`;
+      el = `<div class="validate ${cls}"><label>${label}</label><br><input type="date" name="datum" id="${id}" value="${val}"${readonly}${required}></div>`;
       break;
     case 'time':
       if (!val) {
         if (obj.defaultTime === false) {
           val = '';
         } else if (obj.defaultTime) {
-          val = obj.defaultTime;
-        } else {
           val = isoDate.slice(11, 19);
         }
       }
-      el = `<div class="validate ${cls}"><label>${label}</label><br><input type="time" name="timmar, minuter och sekunder" id="${id}" placeholder="tt:mm:ss" step="1" value="${val}"${readonly}></div>`;
+      el = `<div class="validate ${cls}"><label>${label}</label><br><input type="time" name="timmar, minuter och sekunder" id="${id}" step="1" value="${val}"${readonly}${required}></div>`;
       break;
     case 'datetime':
       if (!val) {
         if (obj.defaultDatetime === false) {
           val = '';
         } else if (obj.defaultDatetime) {
-          val = obj.defaultDatetime;
-        } else {
           val = isoDate.slice(0, 19);
         }
       }
-      el = `<div class="validate"><label>${label}</label><br><input type="datetime-local" name="datum och tid" id="${id}" placeholder="ÅÅÅÅ-MM-DDTtt:mm:ss" step="1" value="${val}"${readonly}></div>`;
+      el = `<div class="validate"><label>${label}</label><br><input type="datetime-local" name="datum och tid" id="${id}" step="1" value="${val}"${readonly}${required}></div>`;
       break;
     case 'color':
       if (!val) {

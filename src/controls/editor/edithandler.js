@@ -730,8 +730,8 @@ function onAttributesSave(features, attrs) {
           }
           break;
         case 'datetime':
-          valid.datetime = validate.datetime(inputValue) ? inputValue : false;
-          if (!valid.datetime) {
+          valid.datetime = validate.datetime(inputValue) || inputValue === '' ? inputValue : false;
+          if (!valid.datetime && inputValue !== '') {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }
@@ -740,8 +740,8 @@ function onAttributesSave(features, attrs) {
           }
           break;
         case 'date':
-          valid.date = validate.date(inputValue) ? inputValue : false;
-          if (!valid.date) {
+          valid.date = validate.date(inputValue) || inputValue === '' ? inputValue : false;
+          if (!valid.date && inputValue !== '') {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }
@@ -750,8 +750,8 @@ function onAttributesSave(features, attrs) {
           }
           break;
         case 'time':
-          valid.time = validate.time(inputValue) ? inputValue : false;
-          if (!valid.time) {
+          valid.time = validate.time(inputValue) || inputValue === '' ? inputValue : false;
+          if (!valid.time && inputValue !== '') {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }
