@@ -40,7 +40,7 @@ const createForm = function createForm(obj) {
       } else {
         firstOption = '<option value="">Välj</option>';
       }
-      el = `<div class="${cls}"><label>${label}</label><br><select id=${id}${disabled}>${firstOption}`;
+      el = `<div class="validate ${cls}"><label>${label}</label><br><select id=${id}${disabled}${required}>${firstOption}`;
       for (let i = 0; i < dropdownOptions.length; i += 1) {
         el += `<option value="${dropdownOptions[i]}">${dropdownOptions[i]}</option>`;
       }
@@ -61,7 +61,7 @@ const createForm = function createForm(obj) {
       elInput.setAttribute('maxlength', maxLength || 50);
       elInput.setAttribute('value', val);
       if (required) {
-        elInput.setAttribute('required', required);
+        elInput.required = true;
       }
 
       elButton.setAttribute('class', `dropdown-btn ${id}`);

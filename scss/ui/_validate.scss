@@ -18,4 +18,16 @@
   textarea:required:invalid {
     border-color: $orange;
   }
+
+  select:required:invalid {
+    border-color: $orange;
+  }
+
+  select:required:invalid {
+    border-color: $orange;
+  }
+}
+
+input[type="searchList-input"]:required:invalid {
+  border-color: $orange;
 }
