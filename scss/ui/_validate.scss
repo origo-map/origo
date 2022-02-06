@@ -14,4 +14,8 @@
   input:invalid {
     border-color: $orange;
   }
+
+  textarea:required:invalid {
+    border-color: $orange;
+  }
 }
