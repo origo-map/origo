@@ -42,7 +42,7 @@ const OverlayProperties = function OverlayProperties(options = {}) {
   });
 
   function hasAlternativeStyles() {
-    return Object.entries(alternativeStyles).length > 1;
+    return alternativeStyles.length > 0;
   }
 
   function extendedLegendZoom(e) {
@@ -61,12 +61,18 @@ const OverlayProperties = function OverlayProperties(options = {}) {
     return hasAlternativeStyles() ? styleSelection.render() : '';
   }
 
-  const onSelectStyle = (styleName) => {
-    styleSelection.setButtonText(styleName);
-    const newStyle = Style.createStyle({ style: styleName, viewer });
+  function getStyleDisplayName(styleName) {
+    const altStyle = alternativeStyles.find(s => s.style === styleName);
+    return (altStyle && altStyle.title) || styleName;
+  }
+
+  const onSelectStyle = (styleTitle) => {
+    const altStyle = alternativeStyles.find(s => s.title === styleTitle);
+    styleSelection.setButtonText(styleTitle);
+    const newStyle = Style.createStyle({ style: altStyle.style, viewer });
     const legendCmp = document.getElementById(legendComponent.getId());
-    legendCmp.innerHTML = Legend(viewer.getStyle(styleName), opacity);
-    layer.setProperties({ styleName });
+    legendCmp.innerHTML = Legend(viewer.getStyle(altStyle.style), opacity);
+    layer.setProperties({ styleName: altStyle.style });
     layer.setStyle(newStyle);
     layer.dispatchEvent('change:style');
   };
@@ -78,7 +84,7 @@ const OverlayProperties = function OverlayProperties(options = {}) {
         cls: 'o-stylepicker text-black flex',
         contentCls: 'bg-grey-lighter text-smallest rounded',
         buttonCls: 'bg-white border text-black',
-        text: layer.get('styleName'),
+        text: getStyleDisplayName(layer.get('styleName')),
         buttonIconCls: 'black'
       });
       const components = [transparencySlider];
@@ -108,7 +114,7 @@ const OverlayProperties = function OverlayProperties(options = {}) {
         });
       }
       if (hasAlternativeStyles()) {
-        styleSelection.setItems(Object.keys(alternativeStyles));
+        styleSelection.setItems(alternativeStyles.map(altStyle => altStyle.title));
         document.getElementById(styleSelection.getId()).addEventListener('dropdown:select', (evt) => {
           onSelectStyle(evt.target.textContent);
         });

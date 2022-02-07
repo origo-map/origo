@@ -2,10 +2,8 @@ import { Component, Button, dom } from '../../ui';
 import { HeaderIcon } from '../../utils/legendmaker';
 
 const OverlayLayer = function OverlayLayer(options) {
-  let {
-    headerIconCls = ''
-  } = options;
   const {
+    headerIconCls = '',
     cls: clsSettings = '',
     icon = '#o_list_24px',
     iconCls = 'grey-lightest',
@@ -16,10 +14,12 @@ const OverlayLayer = function OverlayLayer(options) {
   } = options;
 
   const buttons = [];
+  let headerIconClass = headerIconCls;
   let removeButton;
   let ButtonsHtml;
   let layerList;
 
+  const layerIconCls = 'round compact icon-small light relative no-shrink';
   const cls = `${clsSettings} flex row align-center padding-left padding-right item`.trim();
   const title = layer.get('title') || 'Titel saknas';
   const name = layer.get('name');
@@ -37,7 +37,7 @@ const OverlayLayer = function OverlayLayer(options) {
   let headerIcon = HeaderIcon(style, opacity);
   if (!headerIcon) {
     headerIcon = icon;
-    headerIconCls = iconCls;
+    headerIconClass = iconCls;
   }
 
   const getCheckIcon = (visible) => {
@@ -59,7 +59,7 @@ const OverlayLayer = function OverlayLayer(options) {
   };
 
   const layerIcon = Button({
-    cls: `${headerIconCls} round compact icon-small light relative no-shrink`,
+    cls: `${headerIconClass} ${layerIconCls}`,
     click() {
       const eventOverlayProps = new CustomEvent('overlayproperties', {
         bubbles: true,
@@ -139,7 +139,11 @@ const OverlayLayer = function OverlayLayer(options) {
 
   const onLayerStyleChange = function onLayerStyleChange() {
     const newStyle = viewer.getStyle(layer.get('styleName'));
-    const newIcon = HeaderIcon(newStyle, opacity) || icon;
+    const layerIconCmp = document.getElementById(layerIcon.getId());
+    let newIcon = HeaderIcon(newStyle, opacity);
+    headerIconClass = !newIcon ? iconCls : headerIconCls;
+    newIcon = !newIcon ? icon : newIcon;
+    layerIconCmp.className = `${headerIconClass} ${layerIconCls}`;
     layerIcon.dispatch('change', { icon: newIcon });
   };
 
