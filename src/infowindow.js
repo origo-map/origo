@@ -1,4 +1,5 @@
 import { simpleExportHandler, layerSpecificExportHandler } from './infowindow_exporthandler';
+import exportToFile from './utils/exporttofile';
 
 let parentElement;
 let mainContainer;
@@ -293,10 +294,30 @@ function createSubexportComponent(selectionGroup) {
       });
       subexportContainer.appendChild(exportBtn);
     } else {
+      // TOOD: Is this logging really necessary?
       console.warn(`Export is not allowed for selection group: ${selectionGroup}`);
     }
-  } else {
-    console.warn(`Neither Specific Export is specified for selection group: ${selectionGroup} nor Simple Export is allowed!`);
+  } else if (exportOptions.clientExport) {
+    const conf = exportOptions.clientExport;
+    const exportAllowed = !conf.layers || conf.layers.find((l) => l === selectionGroup);
+    if (exportAllowed) {
+      const exportBtn = createExportButton(conf.buttonText || 'Exportera');
+      const btn = exportBtn.querySelector('button');
+      btn.addEventListener('click', () => {
+        exportBtn.loadStart();
+        const selectedItems = selectionManager.getSelectedItemsForASelectionGroup(selectionGroup);
+        const features = selectedItems.map(i => i.getFeature());
+        exportToFile(features, conf.format, {
+          featureProjection: viewer.getProjection().getCode(),
+          filename: selectionGroup
+        });
+        exportBtn.loadStop();
+      });
+      subexportContainer.appendChild(exportBtn);
+    } else {
+      // TOOD: Is this logging really necessary?
+      console.warn(`Neither Specific Export is specified for selection group: ${selectionGroup} nor Simple Export is allowed!`);
+    }
   }
 
   return subexportContainer;
