@@ -133,6 +133,10 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     }
   }
 
+  function getSelectedItems() {
+    return selectedItems;
+  }
+
   function clearSelection() {
     selectedItems.clear();
   }
@@ -225,6 +229,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     highlightFeature,
     highlightFeatureById,
     getNumberOfSelectedItems,
+    getSelectedItems,
     getSelectedItemsForASelectionGroup,
     getUrval,
     onInit() {
