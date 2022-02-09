@@ -4,15 +4,14 @@ $popup-border-color: $grey-light;
 
 .popup-menu {
   position: absolute;
-}
-
-.popup-menu > ul {
   background-color: $popup-background-color;
   border-radius: $popup-radius;
   box-shadow: $shadow;
-  /*border: solid 1px $popup-border-color;*/
   overflow-x: hidden;
   overflow-y: hidden;
+}
+
+.popup-menu > ul {
 
   > li {
     margin: $margin-small;

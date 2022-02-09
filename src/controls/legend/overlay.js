@@ -1,5 +1,6 @@
 import { Component, Button, dom } from '../../ui';
 import { HeaderIcon } from '../../utils/legendmaker';
+import PopupMenu from '../../popupmenu';
 
 const OverlayLayer = function OverlayLayer(options) {
   let {
@@ -18,14 +19,13 @@ const OverlayLayer = function OverlayLayer(options) {
   const buttons = [];
   const popupMenuItems = [];
   let layerList;
-  let popupMenuActive = false;
 
   const cls = `${clsSettings} flex row align-center padding-left padding-right item`.trim();
   const title = layer.get('title') || 'Titel saknas';
   const name = layer.get('name');
   const secure = layer.get('secure');
-  const popupMenuId = 'overlayPopupMenu';
-  let popupMenuList;
+  let moreInfoButton;
+  let popupMenu;
 
   const checkIcon = '#ic_check_circle_24px';
   let uncheckIcon = '#ic_radio_button_unchecked_24px';
@@ -121,8 +121,8 @@ const OverlayLayer = function OverlayLayer(options) {
     onRender() {
       const labelEl = document.getElementById(this.getId());
       labelEl.addEventListener('click', (e) => {
-        document.getElementById(popupMenuList.getId()).dispatchEvent(new Event('toggleoverlaypopup'));
-        document.getElementById(this.getId()).dispatchEvent(eventOverlayProps);
+        popupMenu.close();
+        document.getElementById(moreInfoButton.getId()).dispatchEvent(eventOverlayProps);
         e.preventDefault();
       });
     },
@@ -151,12 +151,12 @@ const OverlayLayer = function OverlayLayer(options) {
     popupMenuItems.push(removeLayerMenuItem);
   }
 
-  popupMenuList = Component({
-    onAdd() {
+  const popupMenuList = Component({
+    onInit() {
       this.addComponents(popupMenuItems);
     },
     render() {
-      let html = `<ul id="${this.getId()}" class="hidden">`;
+      let html = `<ul id="${this.getId()}">`;
       popupMenuItems.forEach((item) => {
         html += `${item.render()}`;
       });
@@ -165,28 +165,53 @@ const OverlayLayer = function OverlayLayer(options) {
     }
   });
 
-  const togglePopupMenu = function togglePopupMenu(eventFromThisComponent) {
-    const el = document.getElementById(popupMenuList.getId());
-    if (!eventFromThisComponent || popupMenuActive) {
-      el.classList.add('hidden');
-      popupMenuActive = false;
+  const getElementOffset = function getElementOffset(el, rootParentEl) {
+    let left = 0;
+    let top = 0;
+    let currentEl = el;
+    while (
+      currentEl
+      && !Number.isNaN(currentEl.offsetLeft)
+      && !Number.isNaN(currentEl.offsetTop)
+      && currentEl.id !== rootParentEl.id
+    ) {
+      left += currentEl.offsetLeft - currentEl.scrollLeft;
+      top += currentEl.offsetTop - currentEl.scrollTop;
+      currentEl = currentEl.offsetParent;
+    }
+    return { top, left };
+  };
+
+  const createPopupMenu = function createPopupMenu() {
+    const moreInfoButtonEl = document.getElementById(moreInfoButton.getId());
+    const onUnfocus = (e) => {
+      if (!moreInfoButtonEl.contains(e.target)) {
+        popupMenu.close();
+      }
+    };
+    const viewerEl = document.getElementById(viewer.getId());
+    const { top, left } = getElementOffset(moreInfoButtonEl, viewerEl);
+    const right = viewerEl.offsetWidth - left - moreInfoButtonEl.offsetWidth;
+    const targetRect = moreInfoButtonEl.getBoundingClientRect();
+    popupMenu = PopupMenu({ target: viewer.getId(), onUnfocus });
+    popupMenu.setContent(popupMenuList.render());
+    popupMenuList.dispatch('render');
+    popupMenu.setPosition({ right: `${right}px`, top: `${top + targetRect.height}px` });
+  };
+
+  const showPopupMenu = function showPopupMenu() {
+    if (!popupMenu) {
+      createPopupMenu();
     } else {
-      el.classList.remove('hidden');
-      popupMenuActive = true;
+      popupMenu.show();
     }
   };
 
-  const moreInfoButton = Button({
+  moreInfoButton = Button({
     cls: 'round small icon-smaller no-shrink',
     click() {
-      const eventShowOverlayPopup = new CustomEvent('showoverlaypopup', {
-        bubbles: true,
-        detail: {
-          id: popupMenuList.getId()
-        }
-      });
       if (popupMenuItems.length > 1) {
-        document.getElementById(this.getId()).dispatchEvent(eventShowOverlayPopup);
+        showPopupMenu();
       } else {
         document.getElementById(this.getId()).dispatchEvent(eventOverlayProps);
       }
@@ -232,23 +257,7 @@ const OverlayLayer = function OverlayLayer(options) {
       }
       this.addComponents(buttons);
       this.addComponent(label);
-      this.addComponent(popupMenuList);
-      const popupMenuEl = document.getElementById(popupMenuId);
-      popupMenuEl.appendChild(dom.html(popupMenuList.render()));
-      popupMenuList.dispatch('render');
       this.dispatch('render');
-
-      const popupMenuListEl = document.getElementById(popupMenuList.getId());
-      popupMenuListEl.addEventListener('toggleoverlaypopup', (e) => {
-        const eventFromThisComponent = e.detail && e.detail.id === popupMenuList.getId();
-        togglePopupMenu(eventFromThisComponent);
-      });
-
-      popupMenuListEl.addEventListener('unfocusoverlaypopup', (e) => {
-        if (!document.getElementById(moreInfoButton.getId()).contains(e.detail.target)) {
-          togglePopupMenu();
-        }
-      });
 
       if (layer.getMaxResolution() !== Infinity || layer.getMinResolution() !== 0) {
         const elId = this.getId();
