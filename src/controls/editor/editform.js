@@ -92,6 +92,7 @@ const createForm = function createForm(obj) {
           val = isoDate.slice(0, 10);
         }
       }
+      val = val.slice(0, 10);
       el = `<div class="validate ${cls}"><label>${label}</label><br><input type="date" name="datum" id="${id}" value="${val}"${readonly}${required}></div>`;
       break;
     case 'time':
@@ -102,6 +103,7 @@ const createForm = function createForm(obj) {
           val = isoDate.slice(11, 19);
         }
       }
+      val = val.slice(11, 19);
       el = `<div class="validate ${cls}"><label>${label}</label><br><input type="time" name="timmar, minuter och sekunder" id="${id}" step="1" value="${val}"${readonly}${required}></div>`;
       break;
     case 'datetime':
@@ -112,6 +114,7 @@ const createForm = function createForm(obj) {
           val = isoDate.slice(0, 19);
         }
       }
+      val = val.slice(0, 19);
       el = `<div class="validate"><label>${label}</label><br><input type="datetime-local" name="datum och tid" id="${id}" step="1" value="${val}"${readonly}${required}></div>`;
       break;
     case 'color':
