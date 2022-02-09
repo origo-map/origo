@@ -82,8 +82,9 @@ const OverlayProperties = function OverlayProperties(options = {}) {
       styleSelection = Dropdown({
         direction: 'up',
         cls: 'o-stylepicker text-black flex',
-        contentCls: 'bg-grey-lighter text-smallest rounded',
-        buttonCls: 'bg-white border text-black',
+        contentCls: 'bg-grey-lighter text-smaller rounded box-shadow',
+        buttonCls: 'bg-white border text-black box-shadow',
+        buttonTextCls: 'text-smaller',
         text: getStyleDisplayName(layer.get('styleName')),
         buttonIconCls: 'black'
       });
