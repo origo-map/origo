@@ -134,14 +134,14 @@ function getGetFeatureInfoRequest({ layer, coordinate }, viewer) {
       if (layer.get('featureinfoLayer')) {
         const featureinfoLayerName = layer.get('featureinfoLayer');
         const featureinfoLayer = viewer.getLayer(featureinfoLayerName);
-        return getGetFeatureInfoRequest({ featureinfoLayer, coordinate }, viewer);
+        return getGetFeatureInfoRequest({ layer: featureinfoLayer, coordinate }, viewer);
       }
       break;
     case 'WMS':
       if (layer.get('featureinfoLayer')) {
         const featureinfoLayerName = layer.get('featureinfoLayer');
         const featureinfoLayer = viewer.getLayer(featureinfoLayerName);
-        return getGetFeatureInfoRequest({ featureinfoLayer, coordinate }, viewer);
+        return getGetFeatureInfoRequest({ layer: featureinfoLayer, coordinate }, viewer);
       }
       obj.cb = 'GEOJSON';
       obj.fn = getFeatureInfoUrl({ coordinate, resolution, projection }, layer);
@@ -150,7 +150,7 @@ function getGetFeatureInfoRequest({ layer, coordinate }, viewer) {
       if (layer.get('featureinfoLayer')) {
         const featureinfoLayerName = layer.get('featureinfoLayer');
         const featureinfoLayer = viewer.getLayer(featureinfoLayerName);
-        return getGetFeatureInfoRequest({ featureinfoLayer, coordinate }, viewer);
+        return getGetFeatureInfoRequest({ layer: featureinfoLayer, coordinate }, viewer);
       }
       obj.fn = getAGSIdentifyUrl({ layer, coordinate }, viewer);
       return obj;

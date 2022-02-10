@@ -1,7 +1,7 @@
 const { merge } = require('webpack-merge');
 const CompressionPlugin = require('compression-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const prod = require('./webpack.prod.js');
+const prod = require('./webpack.prod');
 
 module.exports = merge(prod, {
   performance: { hints: 'warning' },
@@ -11,8 +11,5 @@ module.exports = merge(prod, {
       algorithm: 'gzip'
     }),
     new BundleAnalyzerPlugin()
-  ],
-  node: {
-    fs: 'empty'
-  }
+  ]
 });
