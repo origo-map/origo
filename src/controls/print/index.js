@@ -48,7 +48,8 @@ const Print = function Print(options = {}) {
     leftFooterText = '',
     filename,
     mapInteractionsActive = false,
-    supressResolutionsRecalculation = false
+    supressResolutionsRecalculation = false,
+    suppressNewDPIMethod = false
   } = options;
   let {
     showNorthArrow = true
@@ -109,7 +110,8 @@ const Print = function Print(options = {}) {
         rotationStep,
         leftFooterText,
         mapInteractionsActive,
-        supressResolutionsRecalculation
+        supressResolutionsRecalculation,
+        suppressNewDPIMethod
       });
       if (placement.indexOf('screen') > -1) {
         mapTools = `${viewer.getMain().getMapTools().getId()}`;

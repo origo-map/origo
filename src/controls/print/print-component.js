@@ -75,7 +75,8 @@ const PrintComponent = function PrintComponent(options = {}) {
     rotationStep,
     leftFooterText,
     mapInteractionsActive,
-    supressResolutionsRecalculation
+    supressResolutionsRecalculation,
+    suppressNewDPIMethod
   } = options;
 
   let {
@@ -274,8 +275,10 @@ const PrintComponent = function PrintComponent(options = {}) {
       resolution / 25.4,
       map.getView().getCenter());
     printMapComponent.dispatch('change:setDPI', { resolution });
-    printResize.setResolution(resolution);
-    printResize.updateLayers();
+    if (suppressNewDPIMethod === false) {
+      printResize.setResolution(resolution);
+      printResize.updateLayers();
+    }
     pageElement.style.width = `${widthImage}px`;
     pageElement.style.height = `${heightImage}px`;
     // Scale the printed map to make it fit in the preview
@@ -436,8 +439,10 @@ const PrintComponent = function PrintComponent(options = {}) {
       printMapComponent.dispatch('change:toggleNorthArrow', { showNorthArrow });
     },
     close() {
-      printResize.resetLayers();
-      printResize.setResolution(150);
+      if (suppressNewDPIMethod === false) {
+        printResize.resetLayers();
+        printResize.setResolution(150);
+      }
       // Restore monkey patch
       // WORKAROUND: Remove when OL supports transform: scale
       // See https://github.com/openlayers/openlayers/issues/13283
