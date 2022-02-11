@@ -8,6 +8,7 @@ export default function popup(options = {}) {
   } = options;
 
   const id = Cuid();
+  let isVisible = true;
 
   function render(targetId) {
     const pop = `<div id="${id}" class="popup-menu z-index-ontop-high"></div>`;
@@ -27,6 +28,7 @@ export default function popup(options = {}) {
   }
 
   function setVisibility(visible) {
+    isVisible = visible;
     const el = getEl();
     if (visible) {
       el.classList.remove('hidden');
@@ -35,16 +37,12 @@ export default function popup(options = {}) {
     }
   }
 
+  function toggleVisibility() {
+    setVisibility(!isVisible);
+  }
+
   function setContent(content) {
     if (content) getEl().innerHTML = content;
-  }
-
-  function close() {
-    setVisibility(false);
-  }
-
-  function show() {
-    setVisibility(true);
   }
 
   function bindUIActions() {
@@ -63,8 +61,7 @@ export default function popup(options = {}) {
     getEl,
     setPosition,
     setVisibility,
-    setContent,
-    close,
-    show
+    toggleVisibility,
+    setContent
   };
 }

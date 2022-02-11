@@ -121,7 +121,7 @@ const OverlayLayer = function OverlayLayer(options) {
     onRender() {
       const labelEl = document.getElementById(this.getId());
       labelEl.addEventListener('click', (e) => {
-        popupMenu.close();
+        popupMenu.setVisibility(false);
         document.getElementById(moreInfoButton.getId()).dispatchEvent(eventOverlayProps);
         e.preventDefault();
       });
@@ -186,7 +186,7 @@ const OverlayLayer = function OverlayLayer(options) {
     const moreInfoButtonEl = document.getElementById(moreInfoButton.getId());
     const onUnfocus = (e) => {
       if (!moreInfoButtonEl.contains(e.target)) {
-        popupMenu.close();
+        popupMenu.setVisibility(false);
       }
     };
     const viewerEl = document.getElementById(viewer.getId());
@@ -199,11 +199,11 @@ const OverlayLayer = function OverlayLayer(options) {
     popupMenu.setPosition({ right: `${right}px`, top: `${top + targetRect.height}px` });
   };
 
-  const showPopupMenu = function showPopupMenu() {
+  const togglePopupMenu = function togglePopupMenu() {
     if (!popupMenu) {
       createPopupMenu();
     } else {
-      popupMenu.show();
+      popupMenu.toggleVisibility();
     }
   };
 
@@ -211,7 +211,7 @@ const OverlayLayer = function OverlayLayer(options) {
     cls: 'round small icon-smaller no-shrink',
     click() {
       if (popupMenuItems.length > 1) {
-        showPopupMenu();
+        togglePopupMenu();
       } else {
         document.getElementById(this.getId()).dispatchEvent(eventOverlayProps);
       }
