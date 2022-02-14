@@ -304,11 +304,11 @@ export default function PrintResize(options = {}) {
 
       const icons = document.getElementsByClassName('legend-icon');
       if (icons.length > 0) {
-        for (let i = 0; i < icons.length; i += 1) {
-          const style = icons[i].style;
+        Array.from(icons).forEach(icon => {
+          const style = icon.style;
           style.width = `${multiplyByFactor(1.5)}rem`;
           style.height = `${multiplyByFactor(1.5)}rem`;
-        }
+        });
       }
     }
   };
