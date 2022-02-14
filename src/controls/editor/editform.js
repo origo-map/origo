@@ -105,7 +105,10 @@ const createForm = function createForm(obj) {
           val = isoDate.slice(11, 19);
         }
       }
-      if (val.length > 12) {
+      if (val.endsWith('.000')) {
+        val = val.slice(0, -4);
+      }
+      if (val.length > 8) {
         val = val.slice(11, 19);
       }
       el = `<div class="validate ${cls}"><label>${label}</label><br><input type="time" name="timmar, minuter och sekunder" id="${id}" step="1" placeholder="--:--:--" value="${val}"${readonly}${required}></div>`;
@@ -117,6 +120,9 @@ const createForm = function createForm(obj) {
         } else if (obj.defaultDatetime) {
           val = isoDate.slice(0, 19);
         }
+      }
+      if (val.endsWith('.000')) {
+        val = val.slice(0, -4);
       }
       if (val.length > 19) {
         val = val.slice(0, 19);
