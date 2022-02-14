@@ -7,6 +7,7 @@ const Print = function Print(options = {}) {
     placement = ['menu'],
     logo = {},
     northArrow = {},
+    printLegend = {},
     title = 'Skriv ut',
     headerText = '',
     headerPlaceholderText = 'Här kan du skriva en rubrik',
@@ -52,7 +53,8 @@ const Print = function Print(options = {}) {
     suppressNewDPIMethod = false
   } = options;
   let {
-    showNorthArrow = true
+    showNorthArrow = true,
+    showPrintLegend = true
   } = options;
 
   let viewer;
@@ -68,12 +70,16 @@ const Print = function Print(options = {}) {
       if ('visible' in northArrow) {
         showNorthArrow = northArrow.visible;
       }
+      if ('visible' in printLegend) {
+        showPrintLegend = printLegend.visible;
+      }
     },
     onAdd(evt) {
       viewer = evt.target;
       const printComponent = PrintComponent({
         logo,
         northArrow,
+        printLegend,
         filename,
         map: viewer.getMap(),
         target: viewer.getId(),
@@ -106,6 +112,7 @@ const Print = function Print(options = {}) {
         createdPrefix,
         showScale,
         showNorthArrow,
+        showPrintLegend,
         rotation,
         rotationStep,
         leftFooterText,

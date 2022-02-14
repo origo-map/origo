@@ -51,6 +51,7 @@ const PrintComponent = function PrintComponent(options = {}) {
   const {
     logo,
     northArrow,
+    printLegend,
     filename = 'origo-map',
     map,
     target,
@@ -91,7 +92,8 @@ const PrintComponent = function PrintComponent(options = {}) {
     showMargins,
     showCreated,
     showScale,
-    showNorthArrow
+    showNorthArrow,
+    showPrintLegend
   } = options;
 
   let pageElement;
@@ -248,7 +250,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     }
   });
 
-  const printMapComponent = PrintMap({ logo, northArrow, map, viewer, showNorthArrow });
+  const printMapComponent = PrintMap({ logo, northArrow, map, viewer, showNorthArrow, printLegend, showPrintLegend });
 
   const closeButton = Button({
     cls: 'fixed top-right medium round icon-smaller light box-shadow z-index-ontop-high',
@@ -318,6 +320,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     showCreated,
     showScale,
     showNorthArrow,
+    showPrintLegend,
     rotation,
     rotationStep,
     viewerResolutions: originalResolutions
@@ -353,6 +356,7 @@ const PrintComponent = function PrintComponent(options = {}) {
       printSettings.on('change:titleAlign', this.changeTitleAlign.bind(this));
       printSettings.on('change:created', this.toggleCreated.bind(this));
       printSettings.on('change:northarrow', this.toggleNorthArrow.bind(this));
+      printSettings.on('change:printlegend', this.togglePrintLegend.bind(this));
       printSettings.on('change:resolution', this.changeResolution.bind(this));
       printSettings.on('change:scale', this.changeScale.bind(this));
       printSettings.on('change:showscale', this.toggleScale.bind(this));
@@ -437,6 +441,10 @@ const PrintComponent = function PrintComponent(options = {}) {
     toggleNorthArrow() {
       showNorthArrow = !showNorthArrow;
       printMapComponent.dispatch('change:toggleNorthArrow', { showNorthArrow });
+    },
+    togglePrintLegend() {
+      showPrintLegend = !showPrintLegend;
+      printMapComponent.dispatch('change:togglePrintLegend', { showPrintLegend });
     },
     close() {
       if (suppressNewDPIMethod === false) {
@@ -532,7 +540,7 @@ const PrintComponent = function PrintComponent(options = {}) {
         heightImage
       });
     },
-    onRender() {
+    async onRender() {
       // Monkey patch OL
       // WORKAROUND: Remove when OL supports transform: scale
       // See https://github.com/openlayers/openlayers/issues/13283
@@ -544,7 +552,7 @@ const PrintComponent = function PrintComponent(options = {}) {
       pageElement = document.getElementById(pageId);
       map.setTarget(printMapComponent.getId());
       this.removeViewerControls();
-      printMapComponent.addPrintControls();
+      await printMapComponent.addPrintControls();
       if (!supressResolutionsRecalculation) {
         updateResolutions();
       }
