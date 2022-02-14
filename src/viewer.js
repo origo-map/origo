@@ -151,6 +151,12 @@ const Viewer = function Viewer(targetOption, options = {}) {
     return null;
   };
 
+  const setStyle = (styleName, style) => {
+    if (styleName in styles) {
+      styles[styleName] = style;
+    }
+  };
+
   const getStyles = () => styles;
 
   const getResolutions = () => resolutions;
@@ -599,6 +605,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getViewerOptions,
     removeGroup,
     removeOverlays,
+    setStyle,
     zoomToExtent,
     getSelectionManager,
     getEmbedded

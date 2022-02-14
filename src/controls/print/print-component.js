@@ -17,6 +17,7 @@ import PrintToolbar from './print-toolbar';
 import { downloadPNG, downloadPDF, printToScalePDF } from '../../utils/download';
 import { afterRender, beforeRender } from './download-callback';
 import maputils from '../../maputils';
+import PrintResize from './print-resize';
 /** Backup of original OL function */
 const original = PluggableMap.prototype.getEventPixel;
 
@@ -74,7 +75,8 @@ const PrintComponent = function PrintComponent(options = {}) {
     rotationStep,
     leftFooterText,
     mapInteractionsActive,
-    supressResolutionsRecalculation
+    supressResolutionsRecalculation,
+    suppressNewDPIMethod
   } = options;
 
   let {
@@ -248,6 +250,22 @@ const PrintComponent = function PrintComponent(options = {}) {
 
   const printMapComponent = PrintMap({ logo, northArrow, map, viewer, showNorthArrow });
 
+  const closeButton = Button({
+    cls: 'fixed top-right medium round icon-smaller light box-shadow z-index-ontop-high',
+    icon: '#ic_close_24px'
+  });
+
+  const printResize = PrintResize({
+    map,
+    viewer,
+    logoComponent: printMapComponent.getLogoComponent(),
+    northArrowComponent: printMapComponent.getNorthArrowComponent(),
+    titleComponent,
+    descriptionComponent,
+    createdComponent,
+    closeButton
+  });
+
   const setScale = function setScale(scale) {
     printScale = scale;
     const widthInMm = orientation === 'portrait' ? sizes[size][1] : sizes[size][0];
@@ -257,6 +275,10 @@ const PrintComponent = function PrintComponent(options = {}) {
       resolution / 25.4,
       map.getView().getCenter());
     printMapComponent.dispatch('change:setDPI', { resolution });
+    if (suppressNewDPIMethod === false) {
+      printResize.setResolution(resolution);
+      printResize.updateLayers();
+    }
     pageElement.style.width = `${widthImage}px`;
     pageElement.style.height = `${heightImage}px`;
     // Scale the printed map to make it fit in the preview
@@ -302,11 +324,6 @@ const PrintComponent = function PrintComponent(options = {}) {
   });
   const printInteractionToggle = PrintInteractionToggle({ map, target, mapInteractionsActive, pageSettings: viewer.getViewerOptions().pageSettings });
   const printToolbar = PrintToolbar();
-  const closeButton = Button({
-    cls: 'fixed top-right medium round icon-smaller light box-shadow z-index-ontop-high',
-    icon: '#ic_close_24px'
-  });
-
   return Component({
     name: 'printComponent',
     onInit() {
@@ -422,6 +439,10 @@ const PrintComponent = function PrintComponent(options = {}) {
       printMapComponent.dispatch('change:toggleNorthArrow', { showNorthArrow });
     },
     close() {
+      if (suppressNewDPIMethod === false) {
+        printResize.resetLayers();
+        printResize.setResolution(150);
+      }
       // Restore monkey patch
       // WORKAROUND: Remove when OL supports transform: scale
       // See https://github.com/openlayers/openlayers/issues/13283
