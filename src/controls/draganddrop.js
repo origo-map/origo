@@ -10,13 +10,15 @@ import Style from '../style';
 import { Component } from '../ui';
 
 const DragAndDrop = function DragAndDrop(options = {}) {
+  let dragAndDrop;
   let viewer;
+  let map;
 
   return Component({
     name: 'draganddrop',
     onAdd(evt) {
       viewer = evt.target;
-      const map = viewer.getMap();
+      map = viewer.getMap();
       const groupName = options.groupName || 'egna-lager';
       const groupTitle = options.groupTitle || 'Egna lager';
       const featureStyles = options.featureStyles || {
@@ -65,7 +67,7 @@ const DragAndDrop = function DragAndDrop(options = {}) {
       let vectorSource;
       let vectorLayer;
       const vectorStyles = Style.createGeometryStyle(featureStyles);
-      const dragAndDrop = new olDragAndDrop({
+      dragAndDrop = new olDragAndDrop({
         formatConstructors: [
           GPXFormat,
           GeoJSONFormat,
@@ -75,7 +77,7 @@ const DragAndDrop = function DragAndDrop(options = {}) {
         ]
       });
 
-      map.addInteraction(dragAndDrop);
+      this.addInteraction();
 
       dragAndDrop.on('addfeatures', (event) => {
         let layerName = event.file.name.split('.')[0].replace(/\W/g, '');
@@ -116,6 +118,9 @@ const DragAndDrop = function DragAndDrop(options = {}) {
     },
     render() {
       this.dispatch('render');
+    },
+    addInteraction() {
+      map.addInteraction(dragAndDrop);
     }
   });
 };
