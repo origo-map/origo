@@ -78,6 +78,19 @@ const DragAndDrop = function DragAndDrop(options = {}) {
       map.addInteraction(dragAndDrop);
 
       dragAndDrop.on('addfeatures', (event) => {
+        let layerName = event.file.name.split('.')[0].replace(/\W/g, '');
+        let layerTitle = event.file.name.split('.')[0];
+        if (viewer.getLayer(layerName)) {
+          let i = 1;
+          while (i < 99) {
+            if (!viewer.getLayer(`${layerName}-${i}`)) {
+              layerName = `${layerName}-${i}`;
+              layerTitle = `${layerTitle} ${i}`;
+              break;
+            }
+            i += 1;
+          }
+        }
         vectorSource = new VectorSource({
           features: event.features
         });
@@ -86,9 +99,9 @@ const DragAndDrop = function DragAndDrop(options = {}) {
         }
         vectorLayer = new VectorLayer({
           source: vectorSource,
-          name: event.file.name.split('.')[0].replace(/\W/g, ''),
+          name: layerName,
           group: groupName,
-          title: event.file.name.split('.')[0],
+          title: layerTitle,
           queryable: true,
           removable: true,
           style: vectorStyles[event.features[0].getGeometry().getType()]
