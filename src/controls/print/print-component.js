@@ -273,9 +273,11 @@ const PrintComponent = function PrintComponent(options = {}) {
     const widthInMm = orientation === 'portrait' ? sizes[size][1] : sizes[size][0];
     widthImage = orientation === 'portrait' ? Math.round((sizes[size][1] * resolution) / 25.4) : Math.round((sizes[size][0] * resolution) / 25.4);
     heightImage = orientation === 'portrait' ? Math.round((sizes[size][0] * resolution) / 25.4) : Math.round((sizes[size][1] * resolution) / 25.4);
-    const scaleResolution = scale / getPointResolution(map.getView().getProjection(),
+    const scaleResolution = scale / getPointResolution(
+      map.getView().getProjection(),
       resolution / 25.4,
-      map.getView().getCenter());
+      map.getView().getCenter()
+    );
     printMapComponent.dispatch('change:setDPI', { resolution });
     if (suppressNewDPIMethod === false) {
       printResize.setResolution(resolution);

@@ -16,6 +16,9 @@ function readResponse(data) {
 }
 
 function writeWfsTransaction(transObj, options) {
+  // FIXME: This doesn't do anything. It just deletes the key from the feat object, which is a deep copy of feature's values
+  // and if it did something it would delete an attribute, which probably is a bad thing in itself
+  // but also since it would prevent setting the attribute to empty string, which might would be the desired action.
   if (transObj.insert) {
     transObj.insert.forEach((feature) => {
       const feat = feature.getProperties();
@@ -71,6 +74,7 @@ function wfsTransaction(transObj, layerName, viewer) {
 
       if (result.transactionSummary.totalInserted > 0) {
         feature = transObj.insert;
+
         dispatcher.emitChangeFeature({
           feature: transObj.insert,
           layerName,
