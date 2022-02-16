@@ -583,7 +583,7 @@ const PrintComponent = function PrintComponent(options = {}) {
       const scalelineControl = viewer.getControlByName('scaleline');
       if (scalelineControl) scalelineControl.render();
       const draganddropControl = viewer.getControlByName('draganddrop');
-      if (draganddropControl) draganddropControl.render();
+      if (draganddropControl) draganddropControl.addInteraction();
     },
     render() {
       targetElement = document.getElementById(target);
