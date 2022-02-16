@@ -238,6 +238,11 @@ button:focus:not(:focus-visible),
     border: 0;
   }
 
+  &.light:focus:not([class*='icon']):not(:focus-visible) {
+    background-color: $grey-lighter;
+    border: 0;
+  }
+
   &.primary:focus:not(:focus-visible) {
     background-color: $primary-color;
     border: 0;
