@@ -21,8 +21,8 @@ function writeWfsTransaction(transObj, options) {
   // but also since it would prevent setting the attribute to empty string, which might would be the desired action.
   if (transObj.insert) {
     transObj.insert.forEach((feature) => {
-      const feat = feature.getProperties();
-      Object.keys(feat).forEach(key => (feat[key] === '') && delete feat[key]);
+      const props = feature.getProperties();
+      Object.keys(props).forEach(prop => (props[prop] === '') && feature.unset(prop));
     });
   }
   const node = format.writeTransaction(transObj.insert, transObj.update, transObj.delete, options);
@@ -39,7 +39,7 @@ function wfsTransaction(transObj, layerName, viewer) {
       srsName
     },
     featureNS: source.workspace,
-    featurePrefix: source.prefix || source.workspace,
+    featurePrefix: source.prefix,
     featureType
   };
   const node = writeWfsTransaction(transObj, options);

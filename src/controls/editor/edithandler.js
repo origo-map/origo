@@ -691,7 +691,7 @@ function onAttributesSave(features, attrs) {
       const inputValue = document.getElementById(attribute.elId).value;
       const inputName = document.getElementById(attribute.elId).getAttribute('name');
       const inputId = document.getElementById(attribute.elId).getAttribute('id');
-      const inputRequired = document.getElementById(attribute.elId).getAttribute('required');
+      const inputRequired = document.getElementById(attribute.elId).required;
 
       // If hidden element it should be excluded
       // By sheer luck, this prevents attributes to be changed in batch edit mode when checkbox is not checked.
@@ -812,8 +812,8 @@ function onAttributesSave(features, attrs) {
           }
           break;
         case 'datetime':
-          valid.datetime = validate.datetime(inputValue) ? inputValue : false;
-          if (!valid.datetime) {
+          valid.datetime = validate.datetime(inputValue) || inputValue === '' ? inputValue : false;
+          if (!valid.datetime && inputValue !== '') {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }
@@ -822,7 +822,7 @@ function onAttributesSave(features, attrs) {
           }
           break;
         case 'date':
-          valid.date = validate.date(inputValue) ? inputValue : false;
+          valid.date = validate.date(inputValue) || inputValue === '' ? inputValue : false;
           if (!valid.date && inputValue !== '') {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
@@ -832,8 +832,8 @@ function onAttributesSave(features, attrs) {
           }
           break;
         case 'time':
-          valid.time = validate.time(inputValue) ? inputValue : false;
-          if (!valid.time) {
+          valid.time = validate.time(inputValue) || inputValue === '' ? inputValue : false;
+          if (!valid.time && inputValue !== '') {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }
