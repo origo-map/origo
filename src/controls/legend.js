@@ -162,7 +162,7 @@ const Legend = function Legend(options = {}) {
       'align-self': 'right',
       'padding-right': '6px'
     },
-    icon: '#fa-compress-alt',
+    icon: '#ic_close_fullscreen_24px',
     iconStyle: {
       fill: '#7a7a7a'
     }
@@ -178,7 +178,7 @@ const Legend = function Legend(options = {}) {
       'align-self': 'right',
       'padding-right': '6px'
     },
-    icon: '#fa-expand-alt',
+    icon: '#ic_open_in_full_24px',
     iconStyle: {
       fill: '#7a7a7a'
     }
