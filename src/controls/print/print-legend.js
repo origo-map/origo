@@ -124,7 +124,9 @@ const LayerRow = function LayerRow(options) {
       const style = viewer.getStyle(layer.get('styleName'));
       if (style && style[0]) {
         content = getStyleContent(title, style);
-      } else if (!layer.get('type').includes('AGS')) {
+      } else if ((!layer.get('type')) || (layer.get('type').includes('AGS'))) {
+        content = getTitleWithIcon(title, '');
+      } else {
         content = await getJSONContent(title);
       }
       return `
