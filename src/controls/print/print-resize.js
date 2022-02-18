@@ -424,7 +424,7 @@ export default function PrintResize(options = {}) {
         // Remove styles instead?
         const styles = feature.getStyle();
         const scale = 1;
-        if (styles) {
+        if (Array.isArray(styles)) {
           styles.forEach(style => {
             const image = style.getImage();
             if (image) {
