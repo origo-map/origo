@@ -15,17 +15,21 @@ const Legend = function Legend(options = {}) {
     expanded = true,
     contentCls,
     contentStyle,
-    turnOffLayersControl = false,
-    showVisibleLayersControl = false,
-    visibleLayersViewActive = false,
     name = 'legend',
     labelOpacitySlider = '',
+    turnOffLayersControl = false,
     useGroupIndication = true,
     searchLayersControl = false,
     searchLayersMinLength = 2,
     searchLayersLimit = 10,
     searchLayersParameters = ['name', 'title']
   } = options;
+
+  let {
+    showVisibleLayersControl = false,
+    visibleLayersViewActive = false
+  } = options;
+
   const keyCodes = {
     9: 'tab',
     27: 'esc',
@@ -42,7 +46,6 @@ const Legend = function Legend(options = {}) {
   let mainContainerCmp;
   let overlaysCmp;
   let visibleOverlaysCmp;
-  let visibleLayersActive = false;
   let mainContainerEl;
   const backgroundLayerButtons = [];
   let toggleGroup;
@@ -137,7 +140,7 @@ const Legend = function Legend(options = {}) {
   });
 
   const turnOffLayersButton = Button({
-    cls: 'round compact icon-small margin-x-smaller',
+    cls: `round compact icon-small margin-x-smaller ${!turnOffLayersControl && 'hidden'}`,
     title: 'Släck alla lager',
     click() {
       viewer.dispatch('active:turnofflayers');
@@ -153,7 +156,7 @@ const Legend = function Legend(options = {}) {
   });
 
   const showVisibleLayersButton = Button({
-    cls: 'compact icon-smaller margin-x-small',
+    cls: `compact icon-smaller margin-x-small ${!showVisibleLayersControl && 'hidden'}`,
     title: 'Visa endast tända lager',
     click() {
       viewer.dispatch('active:togglevisibleLayers');
@@ -184,8 +187,17 @@ const Legend = function Legend(options = {}) {
     }
   });
 
-  const toggleShowVisibleLayers = function toggleShowVisibleLayers() {
-    if (visibleLayersActive) {
+  const setVisibleLayersViewActive = function setVisibleLayersViewActive(active) {
+    if (!showVisibleLayersControl) return;
+    visibleLayersViewActive = active;
+    if (active) {
+      document.getElementById(overlaysCmp.getId()).classList.add('hidden');
+      document.getElementById(visibleOverlaysCmp.getId()).classList.remove('hidden');
+      document.getElementById(showAllVisibleLayersButton.getId()).classList.remove('hidden');
+      document.getElementById(showVisibleLayersButton.getId()).classList.add('hidden');
+      visibleOverlaysCmp.dispatch('readOverlays');
+      document.getElementById(toolsCmp.getId()).classList.add('hidden');
+    } else {
       document.getElementById(overlaysCmp.getId()).classList.remove('hidden');
       document.getElementById(visibleOverlaysCmp.getId()).classList.add('hidden');
       document.getElementById(showAllVisibleLayersButton.getId()).classList.add('hidden');
@@ -193,15 +205,21 @@ const Legend = function Legend(options = {}) {
       if (toolsCmp.getComponents().length > 0) {
         document.getElementById(toolsCmp.getId()).classList.remove('hidden');
       }
-    } else {
-      document.getElementById(overlaysCmp.getId()).classList.add('hidden');
-      document.getElementById(visibleOverlaysCmp.getId()).classList.remove('hidden');
-      document.getElementById(showAllVisibleLayersButton.getId()).classList.remove('hidden');
-      document.getElementById(showVisibleLayersButton.getId()).classList.add('hidden');
-      visibleOverlaysCmp.dispatch('readOverlays');
-      document.getElementById(toolsCmp.getId()).classList.add('hidden');
     }
-    visibleLayersActive = !visibleLayersActive;
+  };
+
+  const toggleShowVisibleLayers = function toggleShowVisibleLayers() {
+    setVisibleLayersViewActive(!visibleLayersViewActive);
+  };
+
+  const setVisibleLayersControlActive = function setVisibleLayersControlActive(active) {
+    showVisibleLayersControl = active;
+    if (!active) {
+      document.getElementById(overlaysCmp.getId()).classList.remove('hidden');
+      document.getElementById(visibleOverlaysCmp.getId()).classList.add('hidden');
+      document.getElementById(showAllVisibleLayersButton.getId()).classList.add('hidden');
+      document.getElementById(showVisibleLayersButton.getId()).classList.add('hidden');
+    }
   };
 
   const layerSearchInput = Input({
@@ -385,8 +403,37 @@ const Legend = function Legend(options = {}) {
     }
   }
 
+  function getState() {
+    return {
+      expanded: isExpanded,
+      showVisibleLayersControl,
+      visibleLayersViewActive
+    };
+  }
+
+  function restoreState(params) {
+    if (params && params.legend) {
+      const legendState = params.legend;
+      if (legendState.expanded != null && legendState.expanded !== isExpanded) {
+        toggleVisibility();
+      }
+      if (legendState.showVisibleLayersControl != null) {
+        setVisibleLayersControlActive(legendState.showVisibleLayersControl);
+      }
+      if (legendState.visibleLayersViewActive != null) {
+        setVisibleLayersViewActive(legendState.visibleLayersViewActive);
+      }
+    }
+  }
+
   return Component({
     name,
+    getState() {
+      return getState();
+    },
+    restoreState(params) {
+      restoreState(params);
+    },
     getuseGroupIndication() { return useGroupIndication; },
     addButtonToTools(button) {
       const toolsEl = document.getElementById(toolsCmp.getId());
@@ -406,12 +453,9 @@ const Legend = function Legend(options = {}) {
     },
     onAdd(evt) {
       viewer = evt.target;
-      if (turnOffLayersControl) {
-        viewer.on('active:turnofflayers', turnOffAllLayers);
-      }
-      if (showVisibleLayersControl) {
-        viewer.on('active:togglevisibleLayers', toggleShowVisibleLayers);
-      }
+      viewer.on('active:turnofflayers', turnOffAllLayers);
+      viewer.on('active:togglevisibleLayers', toggleShowVisibleLayers);
+
       const backgroundLayers = viewer.getLayersByProperty('group', 'background').reverse();
       addBackgroundButtons(backgroundLayers);
       toggleGroup = ToggleGroup({
@@ -425,7 +469,7 @@ const Legend = function Legend(options = {}) {
     },
     onRender() {
       const layerControlCmps = [];
-      if (turnOffLayersControl) layerControlCmps.push(turnOffLayersButton);
+      layerControlCmps.push(turnOffLayersButton);
       const layerControl = El({
         components: layerControlCmps
       });
@@ -442,9 +486,10 @@ const Legend = function Legend(options = {}) {
       initAutocomplete();
       bindUIActions();
       setTabIndex();
-      if (showVisibleLayersControl && visibleLayersViewActive) {
-        toggleShowVisibleLayers();
+      if (showVisibleLayersControl) {
+        setVisibleLayersViewActive(visibleLayersViewActive);
       }
+      restoreState(viewer.getUrlParams());
     },
     render() {
       const size = viewer.getSize();
@@ -482,7 +527,7 @@ const Legend = function Legend(options = {}) {
       });
 
       const legendControlDivider = El({
-        cls: 'divider margin-x-small',
+        cls: `divider margin-x-small ${!showVisibleLayersControl && 'hidden'}`,
         style: {
           height: '100%',
           'border-width': '2px'
@@ -490,11 +535,11 @@ const Legend = function Legend(options = {}) {
       });
 
       const legendControlCmps = [];
-      if (showVisibleLayersControl) {
-        legendControlCmps.push(legendControlDivider);
-        legendControlCmps.push(showVisibleLayersButton);
-        legendControlCmps.push(showAllVisibleLayersButton);
-      }
+
+      legendControlCmps.push(legendControlDivider);
+      legendControlCmps.push(showVisibleLayersButton);
+      legendControlCmps.push(showAllVisibleLayersButton);
+
       legendControlCmps.push(closeButton);
 
       const legendControlCmp = El({

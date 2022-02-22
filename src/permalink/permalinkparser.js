@@ -87,6 +87,14 @@ const controlDraw = function controlDraw(drawState) {
   return { features };
 };
 
+const legend = function legend(stateStr) {
+  const state = urlparser.objectify(stateStr);
+  if (state.expanded) state.expanded = state.expanded === 'true';
+  if (state.showVisibleLayersControl) state.showVisibleLayersControl = state.showVisibleLayersControl === 'true';
+  if (state.visibleLayersViewActive) state.visibleLayersViewActive = state.visibleLayersViewActive === 'true';
+  return state;
+};
+
 parseFunctions.draw = controlDraw;
 
 export default {
@@ -98,5 +106,6 @@ export default {
   pin,
   map,
   controls,
-  controlDraw
+  controlDraw,
+  legend
 };
