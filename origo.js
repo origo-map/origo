@@ -25,6 +25,7 @@ import { renderSvgIcon } from './src/utils/legendmaker';
 import SelectedItem from './src/models/SelectedItem';
 import 'elm-pep';
 import 'pepjs';
+import permalink from './src/permalink/permalink';
 
 const Origo = function Origo(configPath, options = {}) {
   /** Reference to the returned Component */
@@ -112,9 +113,13 @@ const Origo = function Origo(configPath, options = {}) {
       .catch(error => console.error(error));
   };
   // Add a listener to handle a new sharemap when using hash format.
-  window.addEventListener('hashchange', () => {
-    // "Reboot" the application by creating a new viewer instance using the original configuration and the new sharemap state
-    initViewer();
+  window.addEventListener('hashchange', (ev) => {
+    const newParams = permalink.parsePermalink(ev.newURL);
+
+    if (newParams.map) {
+      // "Reboot" the application by creating a new viewer instance using the original configuration and the new sharemap state
+      initViewer();
+    }
   });
 
   return ui.Component({
