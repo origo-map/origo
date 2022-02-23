@@ -88,14 +88,15 @@ const Legend = function Legend(options = {}) {
         initial: () => layer.setVisible(false)
       },
       click() {
-        if (overlaysCmp.slidenav.getState() === 'initial') {
-          const slided = document.getElementById(overlaysCmp.slidenav.getId()).classList.contains('slide-secondary');
+        const overlayComponent = visibleLayersViewActive ? visibleOverlaysCmp : overlaysCmp;
+        if (overlayComponent.slidenav.getState() === 'initial') {
+          const slided = document.getElementById(overlayComponent.slidenav.getId()).classList.contains('slide-secondary');
           if (this.getState() === 'active' && !slided) {
             const layerProperties = LayerProperties({ layer, viewer, parent: this });
-            overlaysCmp.slidenav.setSecondary(layerProperties);
-            overlaysCmp.slidenav.slideToSecondary();
+            overlayComponent.slidenav.setSecondary(layerProperties);
+            overlayComponent.slidenav.slideToSecondary();
           } else if (slided) {
-            overlaysCmp.slidenav.slideToMain();
+            overlayComponent.slidenav.slideToMain();
           }
         }
       }
@@ -189,6 +190,7 @@ const Legend = function Legend(options = {}) {
 
   const setVisibleLayersViewActive = function setVisibleLayersViewActive(active) {
     if (!showVisibleLayersControl) return;
+
     visibleLayersViewActive = active;
     if (active) {
       document.getElementById(overlaysCmp.getId()).classList.add('hidden');

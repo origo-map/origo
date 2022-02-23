@@ -51,7 +51,7 @@ const Overlays = function Overlays(options) {
     secondaryComponent: layerProps,
     cls: 'right flex width-100',
     style: { width: '100%' },
-    legendSlideNav: true
+    legendSlideNav: false
   });
 
   const navContainer = Component({
@@ -126,9 +126,9 @@ const Overlays = function Overlays(options) {
     });
 
     if (hasOverlays()) {
-      document.getElementById(slidenav.getId()).classList.remove('hidden');
+      document.getElementById(header.getId()).classList.remove('hidden');
     } else {
-      document.getElementById(slidenav.getId()).classList.add('hidden');
+      document.getElementById(header.getId()).classList.add('hidden');
     }
   };
 
@@ -166,7 +166,7 @@ const Overlays = function Overlays(options) {
       this.dispatch('render');
     },
     render() {
-      const emptyCls = hasOverlays() ? 'hidden' : 'hidden';
+      const emptyCls = hasOverlays() ? '' : 'hidden';
       return `<div id="${this.getId()}" class="flex column o-scrollbar ${cls} ${emptyCls}" style="${style}">
                 ${header.render()}
                 ${navContainer.render()}
