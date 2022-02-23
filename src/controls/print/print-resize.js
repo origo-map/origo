@@ -419,30 +419,11 @@ export default function PrintResize(options = {}) {
     if (isVector(layer)) {
       const features = source.getFeatures();
       if (features && features.length) {
-        const feature = features[0];
-
-        // Remove styles instead?
-        const styles = feature.getStyle();
-        const scale = 1;
-        if (Array.isArray(styles)) {
-          styles.forEach(style => {
-            const image = style.getImage();
-            if (image) {
-              image.setScale(scale);
-            }
-
-            const stroke = style.getStroke();
-            if (stroke) {
-              const strokeWidth = stroke.getWidth();
-              stroke.setWidth(strokeWidth * (150 / resolution));
-            }
-
-            const text = style.getText();
-            if (text) {
-              text.setScale(scale);
-            }
-          });
-        }
+        const orgStyle = Style.createStyle({
+          style: layer.get('styleName'),
+          viewer
+        })();
+        layer.setStyle(orgStyle);
       }
     }
 
