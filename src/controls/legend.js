@@ -88,7 +88,7 @@ const Legend = function Legend(options = {}) {
         initial: () => layer.setVisible(false)
       },
       click() {
-        const overlayComponent = visibleLayersViewActive ? visibleOverlaysCmp : overlaysCmp;
+        const overlayComponent = showVisibleLayersControl && visibleLayersViewActive ? visibleOverlaysCmp : overlaysCmp;
         if (overlayComponent.slidenav.getState() === 'initial') {
           const slided = document.getElementById(overlayComponent.slidenav.getId()).classList.contains('slide-secondary');
           if (this.getState() === 'active' && !slided) {
