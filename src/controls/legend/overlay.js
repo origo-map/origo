@@ -19,6 +19,7 @@ const OverlayLayer = function OverlayLayer(options) {
   let ButtonsHtml;
   let layerList;
 
+  const hasStylePicker = viewer.getLayerStylePicker(layer).length > 0;
   const layerIconCls = 'round compact icon-small light relative no-shrink';
   const cls = `${clsSettings} flex row align-center padding-left padding-right item`.trim();
   const title = layer.get('title') || 'Titel saknas';
@@ -59,7 +60,7 @@ const OverlayLayer = function OverlayLayer(options) {
   };
 
   const layerIcon = Button({
-    cls: `${headerIconClass} ${layerIconCls}`,
+    cls: `${headerIconClass} ${layerIconCls} ${hasStylePicker ? 'o-stylepicker-layerIcon' : ''}`,
     click() {
       const eventOverlayProps = new CustomEvent('overlayproperties', {
         bubbles: true,
@@ -69,10 +70,9 @@ const OverlayLayer = function OverlayLayer(options) {
       });
       document.getElementById(this.getId()).dispatchEvent(eventOverlayProps);
     },
-    iconStyle: { border: '2px solid green' },
     style: {
-      height: '1.5rem',
-      width: '1.5rem'
+      height: 'calc(1.5rem + 2px)',
+      width: 'calc(1.5rem + 2px)'
     },
     ariaLabel: 'Lager ikon',
     icon: headerIcon,
