@@ -16,7 +16,7 @@ const OverlayProperties = function OverlayProperties(options = {}) {
   const opacityControl = layer.get('opacityControl') !== false;
   const style = viewer.getStyle(layer.get('styleName'));
   const legend = Legend(style, opacity);
-  const alternativeStyles = viewer.getLayerAlternativeStyles(layer);
+  const stylePicker = viewer.getLayerStylePicker(layer);
 
   const legendComponent = Component({
     render() {
@@ -41,8 +41,8 @@ const OverlayProperties = function OverlayProperties(options = {}) {
     label
   });
 
-  function hasAlternativeStyles() {
-    return alternativeStyles.length > 0;
+  function hasStylePicker() {
+    return stylePicker.length > 0;
   }
 
   function extendedLegendZoom(e) {
@@ -58,16 +58,16 @@ const OverlayProperties = function OverlayProperties(options = {}) {
   }
 
   function renderStyleSelection() {
-    return hasAlternativeStyles() ? styleSelection.render() : '';
+    return hasStylePicker() ? styleSelection.render() : '';
   }
 
   function getStyleDisplayName(styleName) {
-    const altStyle = alternativeStyles.find(s => s.style === styleName);
+    const altStyle = stylePicker.find(s => s.style === styleName);
     return (altStyle && altStyle.title) || styleName;
   }
 
   const onSelectStyle = (styleTitle) => {
-    const altStyle = alternativeStyles.find(s => s.title === styleTitle);
+    const altStyle = stylePicker.find(s => s.title === styleTitle);
     styleSelection.setButtonText(styleTitle);
     const newStyle = Style.createStyle({ style: altStyle.style, viewer });
     const legendCmp = document.getElementById(legendComponent.getId());
@@ -89,7 +89,7 @@ const OverlayProperties = function OverlayProperties(options = {}) {
         buttonIconCls: 'black'
       });
       const components = [transparencySlider];
-      if (hasAlternativeStyles()) {
+      if (hasStylePicker()) {
         components.push(styleSelection);
       }
       this.addComponents(components);
@@ -114,8 +114,8 @@ const OverlayProperties = function OverlayProperties(options = {}) {
           layer.setOpacity(sliderEl.valueAsNumber);
         });
       }
-      if (hasAlternativeStyles()) {
-        styleSelection.setItems(alternativeStyles.map(altStyle => altStyle.title));
+      if (hasStylePicker()) {
+        styleSelection.setItems(stylePicker.map(altStyle => altStyle.title));
         document.getElementById(styleSelection.getId()).addEventListener('dropdown:select', (evt) => {
           onSelectStyle(evt.target.textContent);
         });

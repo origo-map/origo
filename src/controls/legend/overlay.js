@@ -69,6 +69,7 @@ const OverlayLayer = function OverlayLayer(options) {
       });
       document.getElementById(this.getId()).dispatchEvent(eventOverlayProps);
     },
+    iconStyle: { border: '2px solid green' },
     style: {
       height: '1.5rem',
       width: '1.5rem'
