@@ -144,7 +144,7 @@ const OverlayLayer = function OverlayLayer(options) {
     let newIcon = HeaderIcon(newStyle, opacity);
     headerIconClass = !newIcon ? iconCls : headerIconCls;
     newIcon = !newIcon ? icon : newIcon;
-    layerIconCmp.className = `${headerIconClass} ${layerIconCls}`;
+    layerIconCmp.className = `${headerIconClass} ${layerIconCls} ${hasStylePicker ? 'o-stylepicker-layerIcon' : ''}`;
     layerIcon.dispatch('change', { icon: newIcon });
   };
 
