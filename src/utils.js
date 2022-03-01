@@ -117,3 +117,4 @@ export default {
 };
 
 export { default as slugify } from './utils/slugify';
+export { default as exportToFile } from './utils/exporttofile';

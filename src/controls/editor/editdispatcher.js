@@ -1,3 +1,8 @@
+// Define some constants so we can use intellisense (and save a few bytes in the minified version)
+const ADD_CHILD_EVENT = 'addChild';
+const EDIT_CHILD_EVENT = 'editChild';
+const DELETE_CHILD_EVENT = 'deleteChild';
+
 function emitChangeEdit(tool, state) {
   const changeEdit = new CustomEvent('changeEdit', {
     detail: {
@@ -76,6 +81,34 @@ function emitCustomDrawEnd(feature) {
   });
   document.dispatchEvent(changeOfflineEdits);
 }
+/**
+ * Called from relatedTablesForm when add button is pressed
+ * @param {any} parentLayer
+ * @param {any} parentFeature
+ * @param {any} childLayer
+ */
+function emitAddChild(parentLayer, parentFeature, childLayer) {
+  document.dispatchEvent(new CustomEvent(ADD_CHILD_EVENT, { detail: { parentLayer, parentFeature, childLayer } }));
+}
+
+/**
+ * Called from relatedTablesForm when edit button is pressed
+ * @param {any} layer
+ * @param {any} parentFeature
+ * @param {any} feature
+ */
+function emitEditChild(layer, parentFeature, feature) {
+  document.dispatchEvent(new CustomEvent(EDIT_CHILD_EVENT, { detail: { layer, parentFeature, feature } }));
+}
+/**
+ * Called from relatedTablesForm when delete button is pressed
+ * @param {any} layer
+ * @param {any} parentFeature
+ * @param {any} feature
+ */
+function emitDeleteChild(layer, parentFeature, feature) {
+  document.dispatchEvent(new CustomEvent(DELETE_CHILD_EVENT, { detail: { layer, parentFeature, feature } }));
+}
 
 export default {
   emitChangeEdit,
@@ -85,5 +118,11 @@ export default {
   emitEditsChange,
   emitChangeEditorShapes,
   emitChangeOfflineEdits,
-  emitCustomDrawEnd
+  emitCustomDrawEnd,
+  ADD_CHILD_EVENT,
+  emitEditChild,
+  EDIT_CHILD_EVENT,
+  emitAddChild,
+  emitDeleteChild,
+  DELETE_CHILD_EVENT
 };

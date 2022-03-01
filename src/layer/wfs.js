@@ -1,54 +1,7 @@
 import * as LoadingStrategy from 'ol/loadingstrategy';
 import { createXYZ } from 'ol/tilegrid';
-import VectorSource from 'ol/source/Vector';
-import GeoJSONFormat from 'ol/format/GeoJSON';
-import { transformExtent } from 'ol/proj';
 import vector from './vector';
-import replacer from '../utils/replacer';
-
-function createSource(options) {
-  const serverUrl = options.url;
-  let queryFilter = '';
-
-  const filter = replacer.replace(options.filter, window);
-
-  // If cql filter then bbox must be used in the filter.
-  if (options.strategy === 'all') {
-    queryFilter = filter ? `&CQL_FILTER=${filter}` : '';
-  } else {
-    queryFilter = filter ? `&CQL_FILTER=${filter} AND BBOX(${options.geometryName},` : '&BBOX=';
-  }
-  const bboxProjectionCode = filter ? `'${options.dataProjection}')` : options.dataProjection;
-  const vectorSource = new VectorSource({
-    attributions: options.attribution,
-    format: new GeoJSONFormat({
-      geometryName: options.geometryName,
-      dataProjection: options.dataProjection,
-      featureProjection: options.projectionCode
-    }),
-    loader(extent) {
-      let requestExtent;
-      if (options.dataProjection !== options.projectionCode) {
-        requestExtent = transformExtent(extent, options.projectionCode, options.dataProjection);
-      } else {
-        requestExtent = extent;
-      }
-      let url = [`${serverUrl}?service=WFS`,
-        `&version=1.1.0&request=GetFeature&typeName=${options.featureType}&outputFormat=application/json`,
-        `&srsname=${options.dataProjection}`].join('');
-      url += options.strategy === 'all' ? queryFilter : `${queryFilter + requestExtent.join(',')},${bboxProjectionCode}`;
-      url = encodeURI(url);
-
-      fetch(url).then(response => response.json({
-        cache: false
-      })).then((data) => {
-        vectorSource.addFeatures(vectorSource.getFormat().readFeatures(data));
-      });
-    },
-    strategy: options.loadingstrategy
-  });
-  return vectorSource;
-}
+import WfsSource from './wfssource';
 
 export default function wfs(layerOptions, viewer) {
   const wfsDefault = {
@@ -72,6 +25,11 @@ export default function wfs(layerOptions, viewer) {
     sourceOptions.dataProjection = viewer.getProjectionCode();
   }
 
+  // Override some settings if it is a table (ignoring geometry) so the user does not have to remember to set them
+  if (wfsOptions.isTable) {
+    sourceOptions.isTable = true;
+    wfsOptions.visible = true;
+  }
   sourceOptions.strategy = layerOptions.strategy ? layerOptions.strategy : sourceOptions.strategy;
   switch (sourceOptions.strategy) {
     case 'all':
@@ -86,6 +44,6 @@ export default function wfs(layerOptions, viewer) {
       sourceOptions.loadingstrategy = LoadingStrategy.bbox;
       break;
   }
-  const wfsSource = createSource(sourceOptions);
+  const wfsSource = new WfsSource(sourceOptions);
   return vector(wfsOptions, wfsSource, viewer);
 }
