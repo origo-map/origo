@@ -40,7 +40,7 @@ const createForm = function createForm(obj) {
       } else {
         firstOption = '<option value="">Välj</option>';
       }
-      el = `<div class="${cls}"><label>${label}</label><br><select id=${id}${disabled}>${firstOption}`;
+      el = `<div class="validate ${cls}"><label>${label}</label><br><select id=${id}${disabled}${required}>${firstOption}`;
       for (let i = 0; i < dropdownOptions.length; i += 1) {
         el += `<option value="${dropdownOptions[i]}">${dropdownOptions[i]}</option>`;
       }
@@ -61,7 +61,7 @@ const createForm = function createForm(obj) {
       elInput.setAttribute('maxlength', maxLength || 50);
       elInput.setAttribute('value', val);
       if (required) {
-        elInput.setAttribute('required', required);
+        elInput.required = true;
       }
 
       elButton.setAttribute('class', `dropdown-btn ${id}`);
@@ -86,39 +86,46 @@ const createForm = function createForm(obj) {
     }
     case 'date':
       if (!val) {
-        if (obj.defaultDate === false) {
+        if (obj.defaultDate === false || obj.defaultDate === 'undefined') {
           val = '';
-        } else if (obj.defaultDate) {
-          val = obj.defaultDate;
         } else {
           val = isoDate.slice(0, 10);
         }
       }
-      el = `<div class="validate ${cls}"><label>${label}</label><br><input type="date" name="datum" id="${id}" placeholder="ÅÅÅÅ-MM-DD" value="${val}"${readonly}${required}></div>`;
+      if (val.length > 10) {
+        val = val.slice(0, 10);
+      }
+      el = `<div class="validate ${cls}"><label>${label}</label><br><input type="date" name="datum" id="${id}" placeholder="åååå-MM-dd" value="${val}"${readonly}${required}></div>`;
       break;
     case 'time':
       if (!val) {
-        if (obj.defaultTime === false) {
+        if (obj.defaultTime === false || obj.defaultDate === 'undefined') {
           val = '';
-        } else if (obj.defaultTime) {
-          val = obj.defaultTime;
         } else {
           val = isoDate.slice(11, 19);
         }
       }
-      el = `<div class="validate ${cls}"><label>${label}</label><br><input type="time" name="timmar, minuter och sekunder" id="${id}" placeholder="tt:mm:ss" value="${val}"${readonly}></div>`;
+      if (val.endsWith('.000')) {
+        val = val.slice(0, -4);
+      } else if (val.length > 8) {
+        val = val.slice(11, 19);
+      }
+      el = `<div class="validate ${cls}"><label>${label}</label><br><input type="time" name="timmar, minuter och sekunder" id="${id}" step="1" placeholder="--:--:--" value="${val}"${readonly}${required}></div>`;
       break;
     case 'datetime':
       if (!val) {
-        if (obj.defaultDatetime === false) {
+        if (obj.defaultDatetime === false || obj.defaultDate === 'undefined') {
           val = '';
-        } else if (obj.defaultDatetime) {
-          val = obj.defaultDatetime;
         } else {
           val = isoDate.slice(0, 19);
         }
       }
-      el = `<div class="validate"><label>${label}</label><br><input type="datetime-local" name="datum och tid" id="${id}" placeholder="ÅÅÅÅ-MM-DDTtt:mm:ss" step="1" value="${val}"${readonly}></div>`;
+      if (val.endsWith('.000')) {
+        val = val.slice(0, -4);
+      } else if (val.length > 19) {
+        val = val.slice(0, 19);
+      }
+      el = `<div class="validate"><label>${label}</label><br><input type="datetime-local" name="datum och tid" id="${id}" step="1" placeholder="åååå-MM-dd --:--:--" value="${val}"${readonly}${required}></div>`;
       break;
     case 'color':
       if (!val) {

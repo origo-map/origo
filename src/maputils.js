@@ -1,4 +1,5 @@
 import Projection from 'ol/proj/Projection';
+import { transform } from 'ol/proj';
 import TileGrid from 'ol/tilegrid/TileGrid';
 import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
@@ -190,6 +191,9 @@ const maputils = {
     viewer.getMap().addOverlay(overlay);
     overlay.setPosition(coordinates);
     return layer;
+  },
+  transformCoordinate: function transformCoordinate(coordinate, source, destination) {
+    return transform(coordinate, source, destination);
   }
 };
 

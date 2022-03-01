@@ -151,6 +151,12 @@ const Viewer = function Viewer(targetOption, options = {}) {
     return null;
   };
 
+  const setStyle = (styleName, style) => {
+    if (styleName in styles) {
+      styles[styleName] = style;
+    }
+  };
+
   const getStyles = () => styles;
 
   const getResolutions = () => resolutions;
@@ -474,25 +480,38 @@ const Viewer = function Viewer(targetOption, options = {}) {
           });
 
           if (urlParams.feature) {
-            let featureId = urlParams.feature;
+            const featureId = urlParams.feature;
             const layerName = featureId.split('.')[0];
             const layer = getLayer(layerName);
-            const type = layer.get('type');
-
-            if (layer && type !== 'GROUP') {
-              const clusterSource = layer.getSource().source;
-              const id = featureId.split('.')[1];
+            const layerType = layer.get('type');
+            if (layer && layerType !== 'GROUP') {
+              // FIXME: postrender event is only emitted if any features from a layer is actually drawn, which means there is no feature in the default extent,
+              // it will not be triggered until map is panned or zoomed where a feature exists.
               layer.once('postrender', () => {
+                const clusterSource = layer.getSource().source;
+                // Assume that id is just the second part of the argumment and adjust it for special cases later.
+                let id = featureId.split('.')[1];
                 let feature;
 
-                if (type === 'WFS' && clusterSource) {
-                  feature = clusterSource.getFeatureById(featureId);
-                } else if (type === 'WFS') {
-                  if (featureId.includes('__')) {
-                    featureId = featureId.replace(featureId.substring(featureId.lastIndexOf('__'), featureId.lastIndexOf('.')), '');
+                if (layerType === 'WFS') {
+                  // WFS uses the layername as a part of the featureId. Problem is that it what the server think is the name that matters.
+                  // First we assume that the layername is actually correct, then take the special cases
+                  let idLayerPart = layerName;
+                  const layerId = layer.get('id');
+                  if (layerId) {
+                    // if layer explicitly has set the id it takes precedense over name
+                    // layer name already have popped the namespace part, but id is untouched.
+                    idLayerPart = layerId.split(':').pop();
+                  } else if (layerName.includes('__')) {
+                    // If using the __-notation to use same layer several times, we must only use the actual layer name
+                    idLayerPart = layerName.split('__')[0];
                   }
-                  feature = layer.getSource().getFeatureById(featureId);
-                } else if (clusterSource) {
+                  // Build the correct WFS id
+                  id = `${idLayerPart}.${id}`;
+                }
+                // FIXME: ensure that feature is loaded. If using bbox and feature is outside default extent it will not be found.
+                // Workaround is to have a default extent covering the entire map with the layer in visible range or use strategy all
+                if (clusterSource) {
                   feature = clusterSource.getFeatureById(id);
                 } else {
                   feature = layer.getSource().getFeatureById(id);
@@ -501,12 +520,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
                 if (feature) {
                   const obj = {};
                   obj.feature = feature;
-                  obj.title = layer.get('title');
-                  obj.content = getAttributes(feature, layer);
-                  obj.layer = layer;
-                  const centerGeometry = getcenter(feature.getGeometry());
-                  const infowindowType = featureinfoOptions.showOverlay === false ? 'sidebar' : 'overlay';
-                  featureinfo.render([obj], infowindowType, centerGeometry);
+                  obj.layerName = layerName;
+                  featureinfo.showFeatureInfo(obj);
                   map.getView().fit(feature.getGeometry(), {
                     maxZoom: getResolutions().length - 2,
                     padding: [15, 15, 40, 15],
@@ -533,9 +548,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
           featureinfoOptions.viewer = this;
 
           selectionmanager = Selectionmanager(featureinfoOptions);
-          this.addComponent(selectionmanager);
-
           featureinfo = Featureinfo(featureinfoOptions);
+          this.addComponent(selectionmanager);
           this.addComponent(featureinfo);
 
           this.addControls();
@@ -602,6 +616,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getViewerOptions,
     removeGroup,
     removeOverlays,
+    setStyle,
     zoomToExtent,
     getSelectionManager,
     getEmbedded

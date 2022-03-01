@@ -95,7 +95,12 @@ const legend = function legend(stateStr) {
   return state;
 };
 
+const controlMeasure = function controlMeasure(measureState) {
+  return { measureState };
+};
+
 parseFunctions.draw = controlDraw;
+parseFunctions.measure = controlMeasure;
 
 export default {
   layers,
@@ -107,5 +112,6 @@ export default {
   map,
   controls,
   controlDraw,
-  legend
+  legend,
+  controlMeasure
 };

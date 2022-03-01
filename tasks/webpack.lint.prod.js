@@ -1,6 +1,6 @@
 const TerserPlugin = require('terser-webpack-plugin');
 const { merge } = require('webpack-merge');
-const common = require('./webpack.lint.common.js');
+const common = require('./webpack.lint.common');
 
 module.exports = merge(common, {
   optimization: {
@@ -16,13 +16,12 @@ module.exports = merge(common, {
   output: {
     path: `${__dirname}/../dist`,
     filename: 'origo.min.js',
-    libraryTarget: 'var',
-    libraryExport: 'default',
-    library: 'Origo'
+    library: {
+      type: 'var',
+      export: 'default',
+      name: 'Origo'
+    }
   },
   devtool: false,
-  mode: 'production',
-  node: {
-    fs: 'empty'
-  }
+  mode: 'production'
 });
