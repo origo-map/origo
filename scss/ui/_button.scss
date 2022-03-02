@@ -272,6 +272,10 @@ button:focus:not(:focus-visible),
     border: 0;
   }
 
+  &.icon-bg:focus:not(:focus-visible) {
+    border: 2px solid $grey-light;
+  }
+
   &.icon-smaller:focus:not(:focus-visible) {
     border: 0;
   }

@@ -72,7 +72,7 @@ const Legend = function Legend(options = {}) {
     const icon = viewer.getStyle(styleName) ? imageSource(viewer.getStyle(styleName)) : 'img/png/farg.png';
     backgroundLayerButtons.push(Button({
       icon,
-      cls: 'round smallest border icon-small',
+      cls: 'round smallest border icon-small icon-bg',
       title: layer.get('title'),
       state: layer.get('visible') ? 'active' : undefined,
       methods: {
