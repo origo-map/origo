@@ -21,7 +21,7 @@ const OverlayLayer = function OverlayLayer(options) {
   let layerList;
 
   const hasStylePicker = viewer.getLayerStylePicker(layer).length > 0;
-  const layerIconCls = 'round compact icon-small light relative no-shrink';
+  const layerIconCls = `round compact icon-small relative no-shrink ${hasStylePicker ? 'style-picker' : 'light'}`;
   const cls = `${clsSettings} flex row align-center padding-left padding-right item`.trim();
   const title = layer.get('title') || 'Titel saknas';
   const name = layer.get('name');
@@ -70,7 +70,7 @@ const OverlayLayer = function OverlayLayer(options) {
   };
 
   const layerIcon = Button({
-    cls: `${headerIconClass} ${layerIconCls} ${hasStylePicker ? 'o-stylepicker-layerIcon' : ''}`,
+    cls: `${headerIconClass} ${layerIconCls}`,
     click() {
       if (!secure) {
         toggleVisible(layer.getVisible());
