@@ -36,7 +36,10 @@ permalinkStore.getState = function getState(viewer, isExtended) {
 
   const legend = viewer.getControlByName('legend');
   if (legend) {
-    state.legend = urlparser.stringify(legend.getState());
+    const legendState = [];
+    if (legend.getState().expanded) legendState.push('expanded');
+    if (legend.getState().visibleLayersViewActive) legendState.push('visibleLayersViewActive');
+    state.legend = legendState.join(',');
   }
 
   if (isExtended) {

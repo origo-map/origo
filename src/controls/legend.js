@@ -17,6 +17,7 @@ const Legend = function Legend(options = {}) {
     contentStyle,
     name = 'legend',
     labelOpacitySlider = '',
+    visibleLayersControl = false,
     turnOffLayersControl = false,
     useGroupIndication = true,
     searchLayersControl = false,
@@ -26,7 +27,6 @@ const Legend = function Legend(options = {}) {
   } = options;
 
   let {
-    showVisibleLayersControl = false,
     visibleLayersViewActive = false
   } = options;
 
@@ -88,7 +88,7 @@ const Legend = function Legend(options = {}) {
         initial: () => layer.setVisible(false)
       },
       click() {
-        const overlayComponent = showVisibleLayersControl && visibleLayersViewActive ? visibleOverlaysCmp : overlaysCmp;
+        const overlayComponent = visibleLayersControl && visibleLayersViewActive ? visibleOverlaysCmp : overlaysCmp;
         if (overlayComponent.slidenav.getState() === 'initial') {
           const slided = document.getElementById(overlayComponent.slidenav.getId()).classList.contains('slide-secondary');
           if (this.getState() === 'active' && !slided) {
@@ -157,7 +157,7 @@ const Legend = function Legend(options = {}) {
   });
 
   const showVisibleLayersButton = Button({
-    cls: `compact icon-smaller margin-x-small ${!showVisibleLayersControl && 'hidden'}`,
+    cls: `compact icon-smaller margin-x-small ${!visibleLayersControl && 'hidden'}`,
     title: 'Visa endast tända lager',
     click() {
       viewer.dispatch('active:togglevisibleLayers');
@@ -189,7 +189,7 @@ const Legend = function Legend(options = {}) {
   });
 
   const setVisibleLayersViewActive = function setVisibleLayersViewActive(active) {
-    if (!showVisibleLayersControl) return;
+    if (!visibleLayersControl) return;
 
     visibleLayersViewActive = active;
     if (active) {
@@ -212,16 +212,6 @@ const Legend = function Legend(options = {}) {
 
   const toggleShowVisibleLayers = function toggleShowVisibleLayers() {
     setVisibleLayersViewActive(!visibleLayersViewActive);
-  };
-
-  const setVisibleLayersControlActive = function setVisibleLayersControlActive(active) {
-    showVisibleLayersControl = active;
-    if (!active) {
-      document.getElementById(overlaysCmp.getId()).classList.remove('hidden');
-      document.getElementById(visibleOverlaysCmp.getId()).classList.add('hidden');
-      document.getElementById(showAllVisibleLayersButton.getId()).classList.add('hidden');
-      document.getElementById(showVisibleLayersButton.getId()).classList.add('hidden');
-    }
   };
 
   const layerSearchInput = Input({
@@ -408,7 +398,6 @@ const Legend = function Legend(options = {}) {
   function getState() {
     return {
       expanded: isExpanded,
-      showVisibleLayersControl,
       visibleLayersViewActive
     };
   }
@@ -418,9 +407,6 @@ const Legend = function Legend(options = {}) {
       const legendState = params.legend;
       if (legendState.expanded != null && legendState.expanded !== isExpanded) {
         toggleVisibility();
-      }
-      if (legendState.showVisibleLayersControl != null) {
-        setVisibleLayersControlActive(legendState.showVisibleLayersControl);
       }
       if (legendState.visibleLayersViewActive != null) {
         setVisibleLayersViewActive(legendState.visibleLayersViewActive);
@@ -488,7 +474,7 @@ const Legend = function Legend(options = {}) {
       initAutocomplete();
       bindUIActions();
       setTabIndex();
-      if (showVisibleLayersControl) {
+      if (visibleLayersControl) {
         setVisibleLayersViewActive(visibleLayersViewActive);
       }
       restoreState(viewer.getUrlParams());
@@ -529,7 +515,7 @@ const Legend = function Legend(options = {}) {
       });
 
       const legendControlDivider = El({
-        cls: `divider margin-x-small ${!showVisibleLayersControl && 'hidden'}`,
+        cls: `divider margin-x-small ${!visibleLayersControl && 'hidden'}`,
         style: {
           height: '100%',
           'border-width': '2px'
