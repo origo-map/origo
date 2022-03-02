@@ -102,7 +102,7 @@ class WfsSource extends VectorSource {
     }
 
     // Create the complete URL
-    let url = [`${serverUrl}?service=WFS`,
+    let url = [`${serverUrl}${serverUrl.indexOf('?') < 0 ? '?' : '&'}service=WFS`,
       `&version=1.1.0&request=GetFeature&typeName=${this._options.featureType}&outputFormat=application/json`,
       `&srsname=${this._options.dataProjection}`].join('');
     url += queryFilter;
