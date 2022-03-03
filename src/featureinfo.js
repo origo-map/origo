@@ -10,8 +10,9 @@ import StyleTypes from './style/styletypes';
 import getFeatureInfo from './getfeatureinfo';
 import replacer from './utils/replacer';
 import SelectedItem from './models/SelectedItem';
-import { getContent } from './getattributes';
 import attachmentclient from './utils/attachmentclient';
+import getAttributes, { getContent } from './getattributes';
+import relatedtables from './utils/relatedtables';
 
 const styleTypes = StyleTypes();
 let selectionLayer;
@@ -132,6 +133,7 @@ const Featureinfo = function Featureinfo(options = {}) {
   };
 
   // TODO: direct access to feature and layer should be converted to getFeature and getLayer methods on currentItem
+  // Must take into consideration that search can send an item that is not a SelecedItem
   const callback = function callback(evt) {
     const currentItemIndex = evt.item.index;
     if (currentItemIndex !== null) {
@@ -166,7 +168,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     }
   };
 
-  // TODO: should there be anything done?
+  // FIXME: should there be anything done?
   const callbackImage = function callbackImage(evt) {
     const currentItemIndex = evt.item.index;
     if (currentItemIndex !== null) {
@@ -258,6 +260,113 @@ const Featureinfo = function Featureinfo(options = {}) {
   };
 
   /**
+   * Creates temporary attributes on a feature in order for featureinfo to display attributes from related tables and
+   * display attachments as links. Recursively adds attributes to related features in order to support multi level relations.
+   * In order to do so, attributes are also added to the related features.
+   * The hoistedAttributes array can be used to remove all attributes that have been added.
+   * @param {any} parentLayer The layer that holds the feature
+   * @param {any} parentFeature The feature to add attributes to
+   * @param {any} hoistedAttributes An existing array that is populated with the added attributes.
+   */
+  async function hoistRelatedAttributes(parentLayer, parentFeature, hoistedAttributes) {
+    // This function is async and called recursively, DO NOT USE forEach!!! (It won't work)
+
+    let dirty = false;
+    // Add attachments first but only if configured for attribute hoisting
+    const attachmentsConf = parentLayer.get('attachments');
+    if (attachmentsConf && attachmentsConf.groups.some(g => g.linkAttribute || g.fileNameAttribute)) {
+      const ac = attachmentclient(parentLayer);
+      const attachments = await ac.getAttachments(parentFeature);
+      for (let i = 0; i < ac.getGroups().length; i += 1) {
+        const currAttrib = ac.getGroups()[i];
+        let val = '';
+        let texts = '';
+        if (attachments.has(currAttrib.name)) {
+          const group = attachments.get(currAttrib.name);
+          val = group.map(g => g.url).join(';');
+          texts = group.map(g => g.filename).join(';');
+        }
+        if (currAttrib.linkAttribute) {
+          parentFeature.set(currAttrib.linkAttribute, val);
+          hoistedAttributes.push({ feature: parentFeature, attrib: currAttrib.linkAttribute });
+          dirty = true;
+        }
+        if (currAttrib.fileNameAttribute) {
+          hoistedAttributes.push({ feature: parentFeature, attrib: currAttrib.fileNameAttribute });
+          parentFeature.set(currAttrib.fileNameAttribute, texts);
+          dirty = true;
+        }
+      }
+    }
+
+    // Add related layers
+    const relatedLayersConfig = relatedtables.getConfig(parentLayer);
+    if (relatedLayersConfig) {
+      for (let i = 0; i < relatedLayersConfig.length; i += 1) {
+        const layerConfig = relatedLayersConfig[i];
+
+        if (layerConfig.promoteAttribs) {
+          // First recurse our children so we can propagate from n-level to top level
+          const childLayer = viewer.getLayer(layerConfig.layerName);
+          // Function is recursice, we have to await
+          // eslint-disable-next-line no-await-in-loop
+          const childFeatures = await relatedtables.getChildFeatures(parentLayer, parentFeature, childLayer);
+          for (let jx = 0; jx < childFeatures.length; jx += 1) {
+            const childFeature = childFeatures[jx];
+            // So here comes the infamous recursive call ...
+            // Function is recursice, we have to await
+            // eslint-disable-next-line no-await-in-loop
+            await hoistRelatedAttributes(childLayer, childFeature, hoistedAttributes);
+          }
+
+          // Then actually hoist some related attributes
+          for (let j = 0; j < layerConfig.promoteAttribs.length; j += 1) {
+            const currAttribConf = layerConfig.promoteAttribs[j];
+            const resarray = [];
+            childFeatures.forEach(child => {
+              // Collect the attributes from all children
+              // Here one could imagine supporting more attribute types, but html is pretty simple and powerful
+              if (currAttribConf.html) {
+                const val = replacer.replace(currAttribConf.html, child.getProperties());
+                resarray.push(val);
+              }
+            });
+            // Then actually aggregate them. Its a two step operation so in the future we could support more aggregate functions, like min(), max() etc
+            // and also to avoid appending manually and handle that pesky separator on last element.
+            const sep = currAttribConf.separator ? currAttribConf.separator : '';
+            const resaggregate = resarray.join(sep);
+            parentFeature.set(currAttribConf.parentName, resaggregate);
+            hoistedAttributes.push({ feature: parentFeature, attrib: currAttribConf.parentName });
+            dirty = true;
+          }
+        }
+      }
+    }
+    // Only returns if top level is dirty. We don't build content for related objects.
+    return dirty;
+  }
+
+  /**
+   * Adds content from related tables and attachments.
+   * @param {any} item
+   * @param {any} hoistedAttributes
+   */
+  async function addRelatedContent(item) {
+    const hoistedAttributes = [];
+    const updated = await hoistRelatedAttributes(item.getLayer(), item.getFeature(), hoistedAttributes);
+    if (updated) {
+      // Update content as the pseudo attributes have changed
+      // Ideally this should have been made before SelectedItem was created, but that changes so much
+      // in the code flow as the getAttachment is async-ish
+      item.setContent(getAttributes(item.getFeature(), item.getLayer(), viewer.getMap()));
+    }
+    // Remove all temporary added attributes. They mess up saving edits as there are no such fields in db.
+    hoistedAttributes.forEach(hoist => {
+      hoist.feature.unset(hoist.attrib, true);
+    });
+  }
+
+  /**
    * Internal helper that performs the actual rendering
    * @param {any} identifyItems
    * @param {any} target
@@ -266,6 +375,7 @@ const Featureinfo = function Featureinfo(options = {}) {
    */
   const doRender = function doRender(identifyItems, target, coordinate, ignorePan) {
     const map = viewer.getMap();
+
     items = identifyItems;
     clear();
     // FIXME: variable is overwritten in next row
@@ -398,28 +508,24 @@ const Featureinfo = function Featureinfo(options = {}) {
     const requests = [];
     identifyItems.forEach(currItem => {
       // At least search can call render without SelectedItem as Items, it just sends an object with the least possible fields render uses
-      // so we need to exclude those from attachment handling, as we know nothing about them
-      if (currItem instanceof SelectedItem) {
-        const layer = currItem.getLayer();
-        const attachments = layer.get('attachments');
-        if (attachments && attachments.groups.some(g => g.linkAttribute || g.fileNameAttribute)) {
-          const ac = attachmentclient(layer);
-          // This actually adds attributes to the feature
-          requests.push(ac.populatePseudoAttributes(currItem, viewer.getMap()));
-        }
+      // so we need to exclude those from related tables handling, as we know nothing about them
+      if (currItem instanceof SelectedItem && currItem.getLayer()) {
+        // Fire off a bunch of promises that fetches attachments and related tables
+        requests.push(addRelatedContent(currItem));
       }
     });
     // Wait for all requests. If there are no attachments it just calls .then() without waiting.
     Promise.all(requests)
+      .catch((err) => {
+        console.log(err);
+        alert('Kunde inte hämta relaterade objekt. En del fält från relaterade objekt kommer att vara tomma.');
+      })
       .then(() => {
         doRender(identifyItems, target, coordinate, opts.ignorePan);
       })
-      .catch(() => {
-        alert('Kunde inte hämta bilagor. Fält från bilagor kommer att vara tomma.');
-        // Show without attachments
-        doRender(identifyItems, target, coordinate, opts.ignorePan);
-      });
+      .catch(err => console.log(err));
   };
+
   /**
   * Shows the featureinfo popup/sidebar/infowindow for the provided features. Only vector layers are supported.
   * @param {any} fidsbylayer An object containing layer names as keys with a list of feature ids for each layer

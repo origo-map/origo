@@ -17,6 +17,7 @@ import PrintToolbar from './print-toolbar';
 import { downloadPNG, downloadPDF, printToScalePDF } from '../../utils/download';
 import { afterRender, beforeRender } from './download-callback';
 import maputils from '../../maputils';
+import PrintResize from './print-resize';
 /** Backup of original OL function */
 const original = PluggableMap.prototype.getEventPixel;
 
@@ -50,6 +51,7 @@ const PrintComponent = function PrintComponent(options = {}) {
   const {
     logo,
     northArrow,
+    printLegend,
     filename = 'origo-map',
     map,
     target,
@@ -74,7 +76,8 @@ const PrintComponent = function PrintComponent(options = {}) {
     rotationStep,
     leftFooterText,
     mapInteractionsActive,
-    supressResolutionsRecalculation
+    supressResolutionsRecalculation,
+    suppressNewDPIMethod
   } = options;
 
   let {
@@ -89,7 +92,8 @@ const PrintComponent = function PrintComponent(options = {}) {
     showMargins,
     showCreated,
     showScale,
-    showNorthArrow
+    showNorthArrow,
+    showPrintLegend
   } = options;
 
   let pageElement;
@@ -246,17 +250,39 @@ const PrintComponent = function PrintComponent(options = {}) {
     }
   });
 
-  const printMapComponent = PrintMap({ logo, northArrow, map, viewer, showNorthArrow });
+  const printMapComponent = PrintMap({ logo, northArrow, map, viewer, showNorthArrow, printLegend, showPrintLegend });
+
+  const closeButton = Button({
+    cls: 'fixed top-right medium round icon-smaller light box-shadow z-index-ontop-high',
+    icon: '#ic_close_24px'
+  });
+
+  const printResize = PrintResize({
+    map,
+    viewer,
+    logoComponent: printMapComponent.getLogoComponent(),
+    northArrowComponent: printMapComponent.getNorthArrowComponent(),
+    titleComponent,
+    descriptionComponent,
+    createdComponent,
+    closeButton
+  });
 
   const setScale = function setScale(scale) {
     printScale = scale;
     const widthInMm = orientation === 'portrait' ? sizes[size][1] : sizes[size][0];
     widthImage = orientation === 'portrait' ? Math.round((sizes[size][1] * resolution) / 25.4) : Math.round((sizes[size][0] * resolution) / 25.4);
     heightImage = orientation === 'portrait' ? Math.round((sizes[size][0] * resolution) / 25.4) : Math.round((sizes[size][1] * resolution) / 25.4);
-    const scaleResolution = scale / getPointResolution(map.getView().getProjection(),
+    const scaleResolution = scale / getPointResolution(
+      map.getView().getProjection(),
       resolution / 25.4,
-      map.getView().getCenter());
+      map.getView().getCenter()
+    );
     printMapComponent.dispatch('change:setDPI', { resolution });
+    if (suppressNewDPIMethod === false) {
+      printResize.setResolution(resolution);
+      printResize.updateLayers();
+    }
     pageElement.style.width = `${widthImage}px`;
     pageElement.style.height = `${heightImage}px`;
     // Scale the printed map to make it fit in the preview
@@ -296,17 +322,13 @@ const PrintComponent = function PrintComponent(options = {}) {
     showCreated,
     showScale,
     showNorthArrow,
+    showPrintLegend,
     rotation,
     rotationStep,
     viewerResolutions: originalResolutions
   });
   const printInteractionToggle = PrintInteractionToggle({ map, target, mapInteractionsActive, pageSettings: viewer.getViewerOptions().pageSettings });
   const printToolbar = PrintToolbar();
-  const closeButton = Button({
-    cls: 'fixed top-right medium round icon-smaller light box-shadow z-index-ontop-high',
-    icon: '#ic_close_24px'
-  });
-
   return Component({
     name: 'printComponent',
     onInit() {
@@ -336,6 +358,7 @@ const PrintComponent = function PrintComponent(options = {}) {
       printSettings.on('change:titleAlign', this.changeTitleAlign.bind(this));
       printSettings.on('change:created', this.toggleCreated.bind(this));
       printSettings.on('change:northarrow', this.toggleNorthArrow.bind(this));
+      printSettings.on('change:printlegend', this.togglePrintLegend.bind(this));
       printSettings.on('change:resolution', this.changeResolution.bind(this));
       printSettings.on('change:scale', this.changeScale.bind(this));
       printSettings.on('change:showscale', this.toggleScale.bind(this));
@@ -421,7 +444,15 @@ const PrintComponent = function PrintComponent(options = {}) {
       showNorthArrow = !showNorthArrow;
       printMapComponent.dispatch('change:toggleNorthArrow', { showNorthArrow });
     },
+    togglePrintLegend() {
+      showPrintLegend = !showPrintLegend;
+      printMapComponent.dispatch('change:togglePrintLegend', { showPrintLegend });
+    },
     close() {
+      if (suppressNewDPIMethod === false) {
+        printResize.resetLayers();
+        printResize.setResolution(150);
+      }
       // Restore monkey patch
       // WORKAROUND: Remove when OL supports transform: scale
       // See https://github.com/openlayers/openlayers/issues/13283
@@ -511,7 +542,7 @@ const PrintComponent = function PrintComponent(options = {}) {
         heightImage
       });
     },
-    onRender() {
+    async onRender() {
       // Monkey patch OL
       // WORKAROUND: Remove when OL supports transform: scale
       // See https://github.com/openlayers/openlayers/issues/13283
@@ -523,7 +554,7 @@ const PrintComponent = function PrintComponent(options = {}) {
       pageElement = document.getElementById(pageId);
       map.setTarget(printMapComponent.getId());
       this.removeViewerControls();
-      printMapComponent.addPrintControls();
+      await printMapComponent.addPrintControls();
       if (!supressResolutionsRecalculation) {
         updateResolutions();
       }
@@ -551,6 +582,8 @@ const PrintComponent = function PrintComponent(options = {}) {
       if (attibutionControl) attibutionControl.render();
       const scalelineControl = viewer.getControlByName('scaleline');
       if (scalelineControl) scalelineControl.render();
+      const draganddropControl = viewer.getControlByName('draganddrop');
+      if (draganddropControl) draganddropControl.addInteraction();
     },
     render() {
       targetElement = document.getElementById(target);
