@@ -8,14 +8,16 @@ export default function ResolutionControl({ initialResolution, resolutions }) {
         cls: 'grow light text-smaller',
         text: `${resolution.label} (${resolution.value})`,
         state: initialResolution === resolution.value ? 'active' : 'initial',
-        style: { width: `${String(round2(100 - round2(100 / resolutions.length, 1) * (resolutions.length - 1), 1))}%` }
+        style: { width: `${String(round2(100 - round2(100 / resolutions.length, 1) * (resolutions.length - 1), 1))}%` },
+        ariaLabel: `${resolution.label} (${resolution.value})`
       });
     }
     return Button({
       cls: 'grow light text-smaller',
       text: `${resolution.label} (${resolution.value})`,
       state: initialResolution === resolution.value ? 'active' : 'initial',
-      style: { width: `${String(round2(100 / resolutions.length, 1))}%` }
+      style: { width: `${String(round2(100 / resolutions.length, 1))}%` },
+      ariaLabel: `${resolution.label} (${resolution.value})`
     });
   });
 
