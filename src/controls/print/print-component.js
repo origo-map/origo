@@ -254,7 +254,8 @@ const PrintComponent = function PrintComponent(options = {}) {
 
   const closeButton = Button({
     cls: 'fixed top-right medium round icon-smaller light box-shadow z-index-ontop-high',
-    icon: '#ic_close_24px'
+    icon: '#ic_close_24px',
+    ariaLabel: 'Stäng'
   });
 
   const printResize = PrintResize({
