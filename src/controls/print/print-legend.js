@@ -122,7 +122,7 @@ const LayerRow = function LayerRow(options) {
       let content = '';
 
       const style = viewer.getStyle(layer.get('styleName'));
-      if (style && style[0]) {
+      if (style && style[0] && (!style[0][0].extendedLegend)) {
         content = getStyleContent(title, style);
       } else if ((!layer.get('type')) || (layer.get('type').includes('AGS'))) {
         content = getTitleWithIcon(title, '');
