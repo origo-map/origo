@@ -96,7 +96,7 @@ const Group = function Group(options = {}, viewer) {
         });
       },
       render() {
-        return `<div class="flex row align-center padding-left text-smaller pointer collapse-header" style="width: 100%; padding-right: 2.375rem">
+        return `<div class="flex row align-center padding-left text-smaller pointer collapse-header" style="width: 100%; padding-right: 1.875rem">
                 <div id="${this.getId()}" class="flex row align-center grow">
                    ${expandButton.render()}
                     <span class="grow padding-x-small" style="word-break: break-all;">${title}</span>
