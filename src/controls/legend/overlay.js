@@ -1,6 +1,6 @@
 import { Component, Button, dom } from '../../ui';
 import { HeaderIcon } from '../../utils/legendmaker';
-import PopupMenu from '../../popupmenu';
+import PopupMenu from '../../ui/popupmenu';
 
 const OverlayLayer = function OverlayLayer(options) {
   let {
@@ -193,7 +193,8 @@ const OverlayLayer = function OverlayLayer(options) {
     const { top, left } = getElementOffset(moreInfoButtonEl, viewerEl);
     const right = viewerEl.offsetWidth - left - moreInfoButtonEl.offsetWidth;
     const targetRect = moreInfoButtonEl.getBoundingClientRect();
-    popupMenu = PopupMenu({ target: viewer.getId(), onUnfocus });
+    popupMenu = PopupMenu({ onUnfocus });
+    document.getElementById(viewer.getId()).appendChild(dom.html(popupMenu.render()));
     popupMenu.setContent(popupMenuList.render());
     popupMenuList.dispatch('render');
     popupMenu.setPosition({ right: `${right}px`, top: `${top + targetRect.height}px` });
