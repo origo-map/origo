@@ -21,7 +21,8 @@ const Legend = function Legend(options = {}) {
     searchLayersControl = false,
     searchLayersMinLength = 2,
     searchLayersLimit = 10,
-    searchLayersParameters = ['name', 'title']
+    searchLayersParameters = ['name', 'title'],
+    searchLayersPlaceholderText = 'Sök lager'
   } = options;
   const keyCodes = {
     9: 'tab',
@@ -150,7 +151,7 @@ const Legend = function Legend(options = {}) {
   const layerSearchInput = Input({
     cls: 'o-search-layer-field placeholder-text-smaller smaller',
     style: { height: '1.5rem', margin: 0, width: '100%' },
-    placeholderText: 'Sök lager',
+    placeholderText: searchLayersPlaceholderText,
     value: ''
   });
 
