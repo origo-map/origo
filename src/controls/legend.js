@@ -168,7 +168,7 @@ const Legend = function Legend(options = {}) {
     },
     icon: '#ic_close_fullscreen_24px',
     iconStyle: {
-      fill: '#7a7a7a'
+      fill: '#4a4a4a'
     }
   });
 
@@ -184,7 +184,7 @@ const Legend = function Legend(options = {}) {
     },
     icon: '#ic_open_in_full_24px',
     iconStyle: {
-      fill: '#7a7a7a'
+      fill: '#4a4a4a'
     }
   });
 
