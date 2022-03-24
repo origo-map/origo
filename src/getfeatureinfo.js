@@ -56,9 +56,9 @@ function getFeatureInfoUrl({
   resolution,
   projection
 }, layer) {
-  if (layer.get('infoFormat') === 'application/geo+json') {
+  if (layer.get('infoFormat') === 'application/geo+json' || layer.get('infoFormat') === 'application/geojson') {
     const url = layer.getSource().getFeatureInfoUrl(coordinate, resolution, projection, {
-      INFO_FORMAT: 'application/geo+json',
+      INFO_FORMAT: layer.get('infoFormat'),
       FEATURE_COUNT: '20'
     });
 
