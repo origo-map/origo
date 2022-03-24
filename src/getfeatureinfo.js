@@ -56,6 +56,34 @@ function getFeatureInfoUrl({
   resolution,
   projection
 }, layer) {
+  if (layer.get('infoFormat') === 'application/geo+json' || layer.get('infoFormat') === 'application/geojson') {
+    const url = layer.getSource().getFeatureInfoUrl(coordinate, resolution, projection, {
+      INFO_FORMAT: layer.get('infoFormat'),
+      FEATURE_COUNT: '20'
+    });
+
+    return fetch(url, { type: 'GET' })
+      .then((res) => {
+        if (res.error) {
+          return [];
+        }
+        return res.json();
+      })
+      .then(json => {
+        if (json.features.length > 0) {
+          const copyJson = json;
+          copyJson.features.forEach((item, i) => {
+            if (!item.geometry) {
+              copyJson.features[i].geometry = { type: 'Point', coordinates: coordinate };
+            }
+          });
+          const feature = maputils.geojsonToFeature(copyJson);
+          return feature;
+        }
+        return [];
+      })
+      .catch(error => console.error(error));
+  }
   const url = layer.getSource().getFeatureInfoUrl(coordinate, resolution, projection, {
     INFO_FORMAT: 'application/json',
     FEATURE_COUNT: '20'
