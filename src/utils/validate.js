@@ -48,7 +48,7 @@ validate.url = (url) => {
 
 validate.datetime = (datetime) => {
   if (datetime) {
-    const regex = /^(\d{4,})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}(?:\.\d+)?))?$/;
+    const regex = /^[0-9]{4}-[0-9]{2}-[0-9]{2}T|\s[0-9]{2}:[0-9]{2}:[0-9]{2}/;
     return regex.test(datetime);
   }
   return false;
@@ -56,7 +56,7 @@ validate.datetime = (datetime) => {
 
 validate.date = (date) => {
   if (date) {
-    const regex = /(?:19|20)[0-9]{2}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))/;
+    const regex = /^[0-9]{4}-[0-9]{2}-[0-9]{2}/;
     return regex.test(date);
   }
   return false;
@@ -64,7 +64,7 @@ validate.date = (date) => {
 
 validate.time = (time) => {
   if (time) {
-    const regex = /^(?:2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]$/;
+    const regex = /^[0-9]{2}:[0-9]{2}:[0-9]{2}/;
     return regex.test(time);
   }
   return false;

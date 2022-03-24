@@ -36,15 +36,36 @@ permalinkStore.getState = function getState(viewer, isExtended) {
 
   if (isExtended) {
     const draw = viewer.getControlByName('draw');
+    const measure = viewer.getControlByName('measure');
+    state.controls = {};
     if (draw) {
-      state.controls = {
-        draw: draw.getState()
-      };
+      state.controls.draw = draw.getState();
+    }
+    if (measure) {
+      state.controls.measure = measure.getState();
     }
   }
 
   if (featureinfo.getSelection().id && (type === 'AGS_FEATURE' || type === 'WFS' || type === 'GEOJSON' || type === 'TOPOJSON')) {
     state.feature = featureinfo.getSelection().id;
+  } else {
+    const selectedItems = viewer.getSelectionManager().getSelectedItems().getArray();
+    if (selectedItems.length > 0) {
+      const layer = selectedItems[0].getLayer();
+      const layerType = layer.get('type');
+      const layerName = layer.get('name');
+      if (layerType === 'AGS_FEATURE' || layerType === 'WFS' || layerType === 'GEOJSON' || layerType === 'TOPOJSON') {
+        const id = selectedItems[0].getId() || selectedItems[0].ol_uid;
+        if (layerType === 'WFS') {
+          const idSuffix = id.substring(id.lastIndexOf('.') + 1, id.length);
+          state.feature = `${layerName}.${idSuffix}`;
+        } else if (layerType !== 'WFS') {
+          state.feature = `${layerName}.${id}`;
+        } else {
+          state.feature = id;
+        }
+      }
+    }
   }
 
   if (getPin()) {

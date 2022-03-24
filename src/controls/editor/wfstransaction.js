@@ -16,10 +16,13 @@ function readResponse(data) {
 }
 
 function writeWfsTransaction(transObj, options) {
+  // FIXME: This doesn't do anything. It just deletes the key from the feat object, which is a deep copy of feature's values
+  // and if it did something it would delete an attribute, which probably is a bad thing in itself
+  // but also since it would prevent setting the attribute to empty string, which might would be the desired action.
   if (transObj.insert) {
     transObj.insert.forEach((feature) => {
-      const feat = feature.getProperties();
-      Object.keys(feat).forEach(key => (feat[key] === '') && delete feat[key]);
+      const props = feature.getProperties();
+      Object.keys(props).forEach(prop => (props[prop] === '') && feature.unset(prop));
     });
   }
   const node = format.writeTransaction(transObj.insert, transObj.update, transObj.delete, options);
@@ -36,7 +39,7 @@ function wfsTransaction(transObj, layerName, viewer) {
       srsName
     },
     featureNS: source.workspace,
-    featurePrefix: source.prefix || source.workspace,
+    featurePrefix: source.prefix,
     featureType
   };
   const node = writeWfsTransaction(transObj, options);
@@ -71,6 +74,7 @@ function wfsTransaction(transObj, layerName, viewer) {
 
       if (result.transactionSummary.totalInserted > 0) {
         feature = transObj.insert;
+
         dispatcher.emitChangeFeature({
           feature: transObj.insert,
           layerName,
