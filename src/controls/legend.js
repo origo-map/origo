@@ -141,7 +141,7 @@ const Legend = function Legend(options = {}) {
   });
 
   const turnOffLayersButton = Button({
-    cls: `round compact icon-small margin-x-smaller ${!turnOffLayersControl && 'hidden'}`,
+    cls: 'round compact icon-small margin-x-smaller',
     title: 'Släck alla lager',
     click() {
       viewer.dispatch('active:turnofflayers');
@@ -157,7 +157,7 @@ const Legend = function Legend(options = {}) {
   });
 
   const showVisibleLayersButton = Button({
-    cls: `compact icon-smaller margin-x-small ${!visibleLayersControl && 'hidden'}`,
+    cls: 'compact icon-smaller margin-x-small hidden',
     title: 'Visa endast tända lager',
     click() {
       viewer.dispatch('active:togglevisibleLayers');
@@ -168,7 +168,7 @@ const Legend = function Legend(options = {}) {
     },
     icon: '#ic_close_fullscreen_24px',
     iconStyle: {
-      fill: '#7a7a7a'
+      fill: '#4a4a4a'
     }
   });
 
@@ -184,15 +184,14 @@ const Legend = function Legend(options = {}) {
     },
     icon: '#ic_open_in_full_24px',
     iconStyle: {
-      fill: '#7a7a7a'
+      fill: '#4a4a4a'
     }
   });
 
   const setVisibleLayersViewActive = function setVisibleLayersViewActive(active) {
     if (!visibleLayersControl) return;
-
     visibleLayersViewActive = active;
-    if (active) {
+    if (visibleLayersViewActive) {
       document.getElementById(overlaysCmp.getId()).classList.add('hidden');
       document.getElementById(visibleOverlaysCmp.getId()).classList.remove('hidden');
       document.getElementById(showAllVisibleLayersButton.getId()).classList.remove('hidden');
@@ -457,7 +456,7 @@ const Legend = function Legend(options = {}) {
     },
     onRender() {
       const layerControlCmps = [];
-      layerControlCmps.push(turnOffLayersButton);
+      if (turnOffLayersControl) layerControlCmps.push(turnOffLayersButton);
       const layerControl = El({
         components: layerControlCmps
       });
@@ -474,9 +473,7 @@ const Legend = function Legend(options = {}) {
       initAutocomplete();
       bindUIActions();
       setTabIndex();
-      if (visibleLayersControl) {
-        setVisibleLayersViewActive(visibleLayersViewActive);
-      }
+      setVisibleLayersViewActive(visibleLayersViewActive);
       restoreState(viewer.getUrlParams());
     },
     render() {
@@ -488,7 +485,7 @@ const Legend = function Legend(options = {}) {
         viewer, cls: contentCls, style: contentStyle, labelOpacitySlider
       });
       visibleOverlaysCmp = VisibleOverlays({
-        viewer, cls: contentCls, style: contentStyle, labelOpacitySlider
+        viewer, cls: `${contentCls} hidden`, style: contentStyle, labelOpacitySlider
       });
       const baselayerCmps = [toggleGroup];
 
