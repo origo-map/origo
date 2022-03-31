@@ -46,19 +46,22 @@ export default function DescriptionControl(options = {}) {
         cls: 'grow light text-smaller',
         text: 'Vänster',
         state: descriptionAlignment === 'left' ? 'active' : 'initial',
-        style: { width: '34%' }
+        style: { width: '34%' },
+        ariaLabel: 'Text till vänster'
       });
       alignCenterComponent = Button({
         cls: 'grow light text-smaller',
         text: 'Mitten',
         state: descriptionAlignment === 'center' ? 'active' : 'initial',
-        style: { width: '34%' }
+        style: { width: '34%' },
+        ariaLabel: 'Text till mitten'
       });
       alignRightComponent = Button({
         cls: 'grow light text-smaller',
         text: 'Höger',
         state: descriptionAlignment === 'right' ? 'active' : 'initial',
-        style: { width: '33%' }
+        style: { width: '33%' },
+        ariaLabel: 'Text till höger'
       });
       alignButtons = [alignLeftComponent, alignCenterComponent, alignRightComponent];
       alignControl = ToggleGroup({
@@ -71,7 +74,8 @@ export default function DescriptionControl(options = {}) {
         cls: 'o-scalepicker text-black flex',
         contentCls: 'bg-grey-lighter text-smallest rounded',
         buttonCls: 'bg-white border text-black',
-        buttonIconCls: 'black'
+        buttonIconCls: 'black',
+        ariaLabel: 'Storlek på titel'
       });
 
       this.addComponents([textareaDescription, formatButton, alignControl, selectSize]);

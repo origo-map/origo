@@ -1,19 +1,12 @@
-import Cuid from 'cuid';
-import { dom } from './ui';
+import { Component } from '.';
 
 export default function popup(options = {}) {
   const {
-    target,
     onUnfocus = () => {}
   } = options;
 
-  const id = Cuid();
+  let id;
   let isVisible = true;
-
-  function render(targetId) {
-    const pop = `<div id="${id}" class="popup-menu z-index-ontop-high"></div>`;
-    document.getElementById(targetId).appendChild(dom.html(pop));
-  }
 
   function getEl() {
     return document.getElementById(id);
@@ -45,23 +38,24 @@ export default function popup(options = {}) {
     if (content) getEl().innerHTML = content;
   }
 
-  function bindUIActions() {
-    window.addEventListener('click', (e) => {
-      const popupMenuEl = document.getElementById(id);
-      if (!popupMenuEl.contains(e.target)) {
-        onUnfocus(e);
-        e.preventDefault();
-      }
-    });
-  }
-
-  render(target);
-  bindUIActions();
-  return {
+  return Component({
+    onInit() {
+      id = this.getId();
+      window.addEventListener('click', (e) => {
+        const popupMenuEl = document.getElementById(id);
+        if (!popupMenuEl.contains(e.target)) {
+          onUnfocus(e);
+          e.preventDefault();
+        }
+      });
+    },
     getEl,
     setPosition,
     setVisibility,
     toggleVisibility,
-    setContent
-  };
+    setContent,
+    render() {
+      return `<div id="${this.getId()}" class="popup-menu z-index-ontop-high"></div>`;
+    }
+  });
 }
