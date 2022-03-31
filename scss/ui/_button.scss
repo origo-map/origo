@@ -188,10 +188,6 @@ button:hover,
   &.grey-lightest:hover {
     background-color: $grey-lighter;
   }
-
-  &.style-picker:hover {
-    background-color: $grey-lightest;
-  }
 }
 
 button:focus,
@@ -227,7 +223,6 @@ button:focus,
   }
 
   &.style-picker:focus {
-    background-color: $grey-light;
     border: $blue solid 1px;
   }
 
@@ -294,12 +289,10 @@ button:focus:not(:focus-visible),
   }
 
   &.style-picker:focus:not(:focus-visible) {
-    background-color: $light-color;
     border: $blue solid 1px;
   }
 
   &.style-picker:focus:not([class*='icon']):not(:focus-visible) {
-    background-color: $grey-lighter;
     border: $blue solid 1px;
   }
 }
