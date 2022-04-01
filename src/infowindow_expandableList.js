@@ -363,8 +363,8 @@ function createUrvalElement(selectionGroup, selectionGroupTitle) {
 
   urvalContainer.appendChild(dom.html(urvalCmp.render()));
   urvalCmp.dispatch('render');
-  const urvalElement = document.getElementById(urvalCmp.getId());
-  urvalElements.set(selectionGroup, urvalElement);
+  //const urvalElement = document.getElementById(urvalCmp.getId());
+  urvalElements.set(selectionGroup, urvalCmp);
   const urvalContentEl = document.getElementById(urvalContentCmp.getId());
   urvalElementContents.set(selectionGroup, urvalContentEl);
 }
@@ -451,7 +451,8 @@ function createExpandableContent(listElementContentContainer, content, elementId
 }
 
 function showUrvalElement(selectionGroup) {
-  const urvalElement = urvalElements.get(selectionGroup);
+  const urvalCmp = urvalElements.get(selectionGroup);
+  const urvalElement = document.getElementById(urvalCmp.getId());
   urvalElement.classList.remove('hidden');
 }
 
@@ -546,14 +547,21 @@ function removeListElement(item) {
 }
 
 function hideUrvalElement(selectionGroup) {
-  const urvalElement = urvalElements.get(selectionGroup);
+  const urvalCmp = urvalElements.get(selectionGroup);
+  const urvalElement = document.getElementById(urvalCmp.getId());
   urvalElement.classList.add('hidden');
 }
 
 function updateUrvalElementText(selectionGroup, selectionGroupTitle, sum) {
-  const urvalElement = urvalElements.get(selectionGroup);
+  const urvalCmp = urvalElements.get(selectionGroup);
+  if (sum > 1) {
+    urvalCmp.getComponents()[0].collapse();
+  } else if (sum > 0) {
+    urvalCmp.getComponents()[0].expand();
+  }
+  const urvalElement = document.getElementById(urvalCmp.getId());
   const newNodeValue = `${selectionGroupTitle} (${sum})`;
-  urvalElement.childNodes[0].nodeValue = newNodeValue;
+  urvalElement.getElementsByTagName('span')[0].innerText = newNodeValue;
 }
 
 function init(options) {

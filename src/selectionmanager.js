@@ -170,12 +170,12 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     urval.get(selectionGroup).addFeature(item.getFeature());
     infowindow.createListElement(item);
 
-    const sum = urval.get(selectionGroup).getFeatures().length;
-    infowindow.updateUrvalElementText(selectionGroup, selectionGroupTitle, sum);
-
     if (isInfowindow) {
       infowindow.show();
     }
+
+    const sum = urval.get(selectionGroup).getFeatures().length;
+    infowindow.updateUrvalElementText(selectionGroup, selectionGroupTitle, sum);
   }
 
   function onItemRemoved(event) {

@@ -18,7 +18,7 @@
 
 .expandable_list {
   .urvalcontainer {
-    border-bottom: 1px solid #d9d9d9;
+    // border-bottom: 1px solid #d9d9d9;
     cursor: move;
     font-size: 12px;
     font-weight: bold;
@@ -36,6 +36,8 @@
   .urvalelement {
     width: 100%;
     box-sizing: border-box;
+    margin-right: 0;
+    padding: 0;
   }
 
   // .urvalelement {
@@ -85,6 +87,10 @@
     scroll-behavior: smooth;
   }
 
+  .listelement {
+    border-bottom: 1px solid #d9d9d9;
+  }
+
   .removelistelement-svg-container {
     cursor: pointer;
     display: inline-block;
@@ -101,7 +107,7 @@
   }
 
   .listelement-content-container {
-    border-bottom: 1px solid #d9d9d9;
+    border-bottom: none;
     cursor: pointer;
     display: inline-block;
     padding: 0.5em;
