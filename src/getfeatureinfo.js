@@ -179,26 +179,14 @@ function getFeatureInfoRequests({
   pixel
 }, viewer) {
   const requests = [];
-  // Check for support of crossOrigin in image, absent in IE 8 and 9
-  if ('crossOrigin' in new (Image)()) {
-    viewer.getQueryableLayers().forEach(layer => {
-      if (layer.getData(pixel) instanceof Uint8ClampedArray && layer.getData(pixel)[3] > 0) {
-        const item = getGetFeatureInfoRequest({ layer, coordinate }, viewer);
-        if (item) {
-          requests.push(item);
-        }
+  viewer.getQueryableLayers().forEach(layer => {
+    if (layer.getData(pixel) instanceof Uint8ClampedArray && layer.getData(pixel)[3] > 0) {
+      const item = getGetFeatureInfoRequest({ layer, coordinate }, viewer);
+      if (item) {
+        requests.push(item);
       }
-    });
-  } else { // If crossOrigin is not supported
-    viewer.getQueryableLayers().forEach(layer => {
-      if (layer.getData(pixel) instanceof Uint8ClampedArray && layer.getData(pixel)[3] > 0) {
-        const item = getGetFeatureInfoRequest({ layer, coordinate }, viewer);
-        if (item) {
-          requests.push(item);
-        }
-      }
-    });
-  }
+    }
+  });
   return requests;
 }
 
