@@ -135,31 +135,6 @@ function getAGSIdentifyUrl({ layer, coordinate }, viewer) {
   }).catch(error => console.error(error));
 }
 
-function isTainted({
-  pixel,
-  layerFilter,
-  map
-}) {
-  try {
-    if (layerFilter) {
-      map.forEachLayerAtPixel(pixel, (layer) => layerFilter === layer);
-    }
-
-    return false;
-  } catch (e) {
-    console.error(e);
-    return true;
-  }
-}
-
-function layerAtPixel({
-  pixel,
-  matchLayer,
-  map
-}) {
-  map.forEachLayerAtPixel(pixel, (layer) => matchLayer === layer);
-}
-
 function getGetFeatureInfoRequest({ layer, coordinate }, viewer) {
   const layerType = layer.get('type');
   const obj = {};
@@ -201,41 +176,22 @@ function getGetFeatureInfoRequest({ layer, coordinate }, viewer) {
 
 function getFeatureInfoRequests({
   coordinate,
-  layers,
-  map,
   pixel
 }, viewer) {
   const requests = [];
   // Check for support of crossOrigin in image, absent in IE 8 and 9
   if ('crossOrigin' in new (Image)()) {
-    map.forEachLayerAtPixel(pixel, (layer) => {
-      if (layer.get('queryable')) {
+    viewer.getQueryableLayers().forEach(layer => {
+      if (layer.getData(pixel) instanceof Uint8ClampedArray && layer.getData(pixel)[3] > 0) {
         const item = getGetFeatureInfoRequest({ layer, coordinate }, viewer);
         if (item) {
           requests.push(item);
         }
       }
     });
-  } else if (isTainted({ map, pixel })) { // If canvas is tainted
-    layers.forEach((layer) => {
-      if (layer.get('queryable')) {
-        // If layer is tainted, then create request for layer
-        if (isTainted({ pixel, layer, map })) {
-          const item = getGetFeatureInfoRequest({ layer, coordinate }, viewer);
-          if (item) {
-            requests.push(item);
-          }
-        } else if (layerAtPixel({ pixel, layer, map })) { // If layer is not tainted, test if layer hit at pixel
-          const item = getGetFeatureInfoRequest({ layer, coordinate }, viewer);
-          if (item) {
-            requests.push(item);
-          }
-        }
-      }
-    });
-  } else { // If crossOrigin is not supported and canvas not tainted
-    map.forEachLayerAtPixel(pixel, (layer) => {
-      if (layer.get('queryable') === true) {
+  } else { // If crossOrigin is not supported
+    viewer.getQueryableLayers().forEach(layer => {
+      if (layer.getData(pixel) instanceof Uint8ClampedArray && layer.getData(pixel)[3] > 0) {
         const item = getGetFeatureInfoRequest({ layer, coordinate }, viewer);
         if (item) {
           requests.push(item);
