@@ -1,6 +1,5 @@
 import Overlay from 'ol/Overlay';
 import TileLayer from 'ol/layer/Tile';
-import VectorLayer from 'ol/layer/Vector';
 import OGlide from './oglide';
 import { Component, Modal } from './ui';
 import Popup from './popup';
@@ -665,15 +664,17 @@ const Featureinfo = function Featureinfo(options = {}) {
         map.on('pointermove', evt => {
           if (!pointerActive || evt.dragging) return;
           let cursor = '';
-          const layers = viewer.getQueryableLayers();
-          for (let i = 0; i < layers.length; i += 1) {
-            const layer = layers[i];
-            if (layer instanceof TileLayer && layer.getData(evt.pixel) instanceof Uint8ClampedArray && layer.getData(evt.pixel)[3] > 0) {
-              cursor = 'pointer';
-              break;
-            }
-            if (layer instanceof VectorLayer) {
-              if (map.getFeaturesAtPixel(evt.pixel).length > 0) {
+          const features = map.getFeaturesAtPixel(evt.pixel, { layerFilter(layer) {
+            return layer.get('queryable');
+          }
+          });
+          if (features.length > 0) {
+            cursor = 'pointer';
+          } else {
+            const layers = viewer.getQueryableLayers().filter(layer => layer instanceof TileLayer);
+            for (let i = 0; i < layers.length; i += 1) {
+              const layer = layers[i];
+              if (layer.getData(evt.pixel) instanceof Uint8ClampedArray && layer.getData(evt.pixel)[3] > 0) {
                 cursor = 'pointer';
                 break;
               }
