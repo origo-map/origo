@@ -1,5 +1,6 @@
 
 .sidebarcontainer.expandable_list {
+  cursor: move;
   background-color: $white;
   border-radius: 0.5em;
   box-shadow: 0 0 8px #888;
@@ -19,13 +20,14 @@
 .expandable_list {
   .urvalcontainer {
     // border-bottom: 1px solid #d9d9d9;
-    cursor: move;
     font-size: 12px;
     font-weight: bold;
     padding: 0;
     z-index: 10;
     display: flex;
     flex-direction: column;
+    max-height: 60em;
+    overflow-y: scroll;
   }
 
   .urval-textnode-container {
@@ -34,8 +36,8 @@
   }
 
   .urvalelement {
+    border: none;
     width: 100%;
-    box-sizing: border-box;
     margin-right: 0;
     padding: 0;
   }
@@ -51,6 +53,10 @@
 
   .urvalcontent {
     box-sizing: content-box;
+
+    .sublist:last-child {
+      border-bottom: 1px solid #d9d9d9;
+    }
   }
 
   .selectedurvalelement {
@@ -88,7 +94,10 @@
   }
 
   .listelement {
-    border-bottom: 1px solid #d9d9d9;
+    margin: 0 1em;
+    &:not(:last-child) {
+      border-bottom: 1px solid #d9d9d9;
+    }
   }
 
   .removelistelement-svg-container {
@@ -188,7 +197,8 @@
   }
 
   .export-buttons-container {
-    margin: 0.5em 0.2em;
+    padding: 0.5em 0;
+    margin: 0;
   }
 
   .export-button {

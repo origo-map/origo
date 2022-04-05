@@ -1,13 +1,13 @@
 import { simpleExportHandler, layerSpecificExportHandler } from './infowindow_exporthandler';
 import exportToFile from './utils/exporttofile';
 import { Component, Collapse, CollapseHeader, dom } from './ui';
-import group from './layer/group';
+import { identityTransform } from 'ol/proj';
 
 let parentElement;
 let mainContainer;
 let urvalContainer;
 //let listContainer;
-let exportContainer;
+//let exportContainer;
 let sublists;
 let subexports;
 let urvalElements;
@@ -89,16 +89,18 @@ function makeElementDraggable(elm) {
 function render(viewerId, title) {
   mainContainer = document.createElement('div');
   mainContainer.classList.add('sidebarcontainer', 'expandable_list');
-  mainContainer.id = 'sidebarcontainer';
+  //mainContainer.id = 'sidebarcontainer';
+  mainContainer.id = 'sidebarcontainer-draggable';
   urvalContainer = document.createElement('div');
   urvalContainer.classList.add('urvalcontainer');
   // We add this so that urvalcontainer can become draggable
-  urvalContainer.id = 'sidebarcontainer-draggable';
+  //urvalContainer.id = 'sidebarcontainer-draggable';
   const urvalTextNodeContainer = document.createElement('div');
   urvalTextNodeContainer.classList.add('urval-textnode-container');
   const urvalTextNode = document.createTextNode(title || 'Träffar');
   urvalTextNodeContainer.appendChild(urvalTextNode);
-  urvalContainer.appendChild(urvalTextNodeContainer);
+  //urvalContainer.appendChild(urvalTextNodeContainer);
+  mainContainer.appendChild(urvalTextNodeContainer);
   const closeButtonSvg = createSvgElement('ic_close_24px', 'closebutton-svg');
   closeButtonSvg.addEventListener('click', () => {
     const detail = {
@@ -109,16 +111,17 @@ function render(viewerId, title) {
     selectionManager.clearSelection();
     hideInfowindow();
   });
-  urvalContainer.appendChild(closeButtonSvg);
+  //urvalContainer.appendChild(closeButtonSvg);
+  mainContainer.appendChild(closeButtonSvg);
   // listContainer = document.createElement('div');
   // listContainer.classList.add('listcontainer');
 
-  exportContainer = document.createElement('div');
-  exportContainer.classList.add('exportcontainer');
+  //exportContainer = document.createElement('div');
+  //exportContainer.classList.add('exportcontainer');
 
   mainContainer.appendChild(urvalContainer);
   //mainContainer.appendChild(listContainer);
-  mainContainer.appendChild(exportContainer);
+  //mainContainer.appendChild(exportContainer);
 
   parentElement = document.getElementById(viewerId);
   parentElement.appendChild(mainContainer);
@@ -140,11 +143,11 @@ function showSelectedList(selectionGroup) {
   // const sublistToAppend = sublists.get(selectionGroup);
   // listContainer.appendChild(sublistToAppend);
 
-  while (exportContainer.firstChild) {
-    exportContainer.removeChild(exportContainer.firstChild);
-  }
-  const subexportToAppend = subexports.get(selectionGroup);
-  exportContainer.appendChild(subexportToAppend);
+  // while (exportContainer.firstChild) {
+  //   exportContainer.removeChild(exportContainer.firstChild);
+  // }
+  // const subexportToAppend = subexports.get(selectionGroup);
+  // exportContainer.appendChild(subexportToAppend);
 
   // urvalElements.forEach((value, key) => {
   //   if (key === selectionGroup) {
@@ -327,10 +330,12 @@ function createUrvalElement(selectionGroup, selectionGroupTitle) {
   //   showSelectedList(selectionGroup);
   // });
 
-  const sublistContainter = document.createElement('div');
-  sublists.set(selectionGroup, sublistContainter);
+  const sublistContainer = document.createElement('div');
+  sublistContainer.classList.add('sublist');
+  sublists.set(selectionGroup, sublistContainer);
 
   const subexportComponent = createSubexportComponent(selectionGroup);
+  subexportComponent.classList.add('sublist');
   subexports.set(selectionGroup, subexportComponent);
 
   //---------------------
@@ -478,6 +483,9 @@ function createListElement(item) {
   // ------
   const urvalContent = urvalElementContents.get(item.getSelectionGroup());
   urvalContent.replaceChildren(sublist);
+
+  const subexportToAppend = subexports.get(item.getSelectionGroup());
+  urvalContent.appendChild(subexportToAppend);
 }
 
 function expandListElement(featureId) {
@@ -552,12 +560,22 @@ function hideUrvalElement(selectionGroup) {
   urvalElement.classList.add('hidden');
 }
 
+const debounceTimeout = [];
+function debounce(func, id) {
+  if (debounceTimeout[id]) clearTimeout(debounceTimeout[id]);
+  debounceTimeout[id] = setTimeout(() => {
+    func();
+  }, 100);
+}
+
 function updateUrvalElementText(selectionGroup, selectionGroupTitle, sum) {
   const urvalCmp = urvalElements.get(selectionGroup);
-  if (sum > 1) {
-    urvalCmp.getComponents()[0].collapse();
-  } else if (sum > 0) {
-    urvalCmp.getComponents()[0].expand();
+  if (sum === 1) {
+    // Debounce needed due to race condition in rendering expand/collaps animation.
+    debounce(() => urvalCmp.getComponents()[0].expand(), selectionGroup);
+  } else {
+    // Debounce needed due to race condition in rendering expand/collaps animation.
+    debounce(() => urvalCmp.getComponents()[0].collapse(), selectionGroup);
   }
   const urvalElement = document.getElementById(urvalCmp.getId());
   const newNodeValue = `${selectionGroupTitle} (${sum})`;
