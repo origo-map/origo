@@ -391,9 +391,7 @@ export default function PrintResize(options = {}) {
               text.setScale(textScale);
             }
           });
-          source.getFeatures().forEach(feature => {
-            feature.setStyle(newStyle);
-          });
+          layer.setStyle(newStyle);
         }
       }
     }
