@@ -34,7 +34,16 @@ permalinkStore.getState = function getState(viewer, isExtended) {
   state.center = view.getCenter().map(coord => Math.round(coord)).join();
   state.zoom = view.getZoom().toString();
 
+  const legend = viewer.getControlByName('legend');
+  if (legend) {
+    const legendState = [];
+    if (legend.getState().expanded) legendState.push('expanded');
+    if (legend.getState().visibleLayersViewActive) legendState.push('visibleLayersViewActive');
+    state.legend = legendState.join(',');
+  }
+
   if (isExtended) {
+    state.controls = {};
     const draw = viewer.getControlByName('draw');
     const measure = viewer.getControlByName('measure');
     state.controls = {};
