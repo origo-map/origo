@@ -48,7 +48,7 @@ export default function PrintResize(options = {}) {
   };
 
   const getCssRule = function getCssRule(selector) {
-    const origoStyleSheet = Array.from(document.styleSheets).find(sheet => sheet.href && sheet.href.includes('css/style.css'));
+    const origoStyleSheet = viewer.getOrigoCSS();
     const rules = origoStyleSheet.cssRules;
     for (let i = 0; i < rules.length; i += 1) {
       if (rules[i].selectorText === selector) {

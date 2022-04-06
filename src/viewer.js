@@ -61,6 +61,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
   const center = urlParams.center || centerOption;
   const zoom = urlParams.zoom || zoomOption;
   const groups = flattenGroups(groupOptions);
+  let origoCSS = {};
 
   const getCapabilitiesLayers = () => {
     const capabilitiesPromises = [];
@@ -289,6 +290,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
   const getEmbedded = function getEmbedded() {
     return isEmbedded(this.getTarget());
   };
+
+  const getOrigoCSS = () => origoCSS;
 
   const mergeSecuredLayer = (layerlist, capabilitiesLayers) => {
     if (capabilitiesLayers && Object.keys(capabilitiesLayers).length > 0) {
@@ -553,6 +556,11 @@ const Viewer = function Viewer(targetOption, options = {}) {
           this.addComponent(featureinfo);
 
           this.addControls();
+          origoCSS = Array.from(document.styleSheets).find(sheet => (
+            Array.from(sheet.cssRules).find(rule => (
+              rule.cssText.startsWith('.o-ui')
+            ))
+          ));
           this.dispatch('loaded');
         });
     },
@@ -614,6 +622,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getUrl,
     getUrlParams,
     getViewerOptions,
+    getOrigoCSS,
     removeGroup,
     removeOverlays,
     setStyle,
