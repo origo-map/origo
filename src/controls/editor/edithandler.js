@@ -678,9 +678,10 @@ function attributesSaveHandler(features, formEl) {
  * @param {Collection} features The features that shouldn't be updated
  */
 function onAttributesAbort(features) {
-  if (document.getElementById(`o-abort-button-${currentLayer}`) !== null) {
-    document.getElementById(`o-abort-button-${currentLayer}`).addEventListener('click', (e) => {
-      document.getElementById(`o-abort-button-${currentLayer}`).blur();
+  const abortBtnEl = document.getElementById(`o-abort-button-${currentLayer}`);
+  if (abortBtnEl !== null) {
+    abortBtnEl.addEventListener('click', (e) => {
+      abortBtnEl.blur();
       features.forEach((feature) => {
         deleteFeature(feature, editLayers[currentLayer]).then(() => select.getFeatures().clear());
       });
@@ -1096,9 +1097,9 @@ function editAttributes(feat) {
       attachmentsForm = `<div id="o-attach-form-${currentLayer}"></div>`;
     }
 
-    let form = `<div id="o-form">${formElement}${relatedTablesFormHTML}${attachmentsForm}<br><div class="o-form-save"><input id="o-save-button-${currentLayer}" type="button" value="OK"></input></div></div>`;
+    let form = `<div id="o-form">${formElement}${relatedTablesFormHTML}${attachmentsForm}<br><div class="o-form-save"><input id="o-save-button-${currentLayer}" type="button" value="OK" aria-label="OK"></input></div></div>`;
     if (autoCreatedFeature) {
-      form = `<div id="o-form">${formElement}${relatedTablesFormHTML}${attachmentsForm}<br><div class="o-form-save"><input id="o-save-button-${currentLayer}" type="button" value="Spara"></input><input id="o-abort-button-${currentLayer}" type="button" value="Avbryt"></input></div></div>`;
+      form = `<div id="o-form">${formElement}${relatedTablesFormHTML}${attachmentsForm}<br><div class="o-form-save"><input id="o-save-button-${currentLayer}" type="button" value="Spara" aria-label="Spara"></input><input id="o-abort-button-${currentLayer}" type="button" value="Ta bort" aria-label="Ta bort"></input></div></div>`;
       autoCreatedFeature = false;
     }
 
