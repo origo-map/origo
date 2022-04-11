@@ -174,6 +174,14 @@ function init(options, v) {
   viewer = v;
   editHandler(options, v);
   render();
+  // Hide layers choice button if only 1 layer in editable
+  if (editableLayers.length < 2) {
+    $editLayers.parentNode.classList.add('o-hidden');
+  }
+  // Hide save button if configured with autoSave
+  if (options.autoSave) {
+    $editSave.classList.add('o-hidden');
+  }
   editorLayers(editableLayers, {
     activeLayer: currentLayer
   }, v);
