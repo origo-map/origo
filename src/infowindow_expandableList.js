@@ -1,13 +1,10 @@
 import { simpleExportHandler, layerSpecificExportHandler } from './infowindow_exporthandler';
 import exportToFile from './utils/exporttofile';
 import { Component, Collapse, CollapseHeader, dom } from './ui';
-import { identityTransform } from 'ol/proj';
 
 let parentElement;
 let mainContainer;
 let urvalContainer;
-//let listContainer;
-//let exportContainer;
 let sublists;
 let subexports;
 let urvalElements;
@@ -89,17 +86,13 @@ function makeElementDraggable(elm) {
 function render(viewerId, title) {
   mainContainer = document.createElement('div');
   mainContainer.classList.add('sidebarcontainer', 'expandable_list');
-  //mainContainer.id = 'sidebarcontainer';
   mainContainer.id = 'sidebarcontainer-draggable';
   urvalContainer = document.createElement('div');
   urvalContainer.classList.add('urvalcontainer');
-  // We add this so that urvalcontainer can become draggable
-  //urvalContainer.id = 'sidebarcontainer-draggable';
   const urvalTextNodeContainer = document.createElement('div');
   urvalTextNodeContainer.classList.add('urval-textnode-container');
   const urvalTextNode = document.createTextNode(title || 'Träffar');
   urvalTextNodeContainer.appendChild(urvalTextNode);
-  //urvalContainer.appendChild(urvalTextNodeContainer);
   mainContainer.appendChild(urvalTextNodeContainer);
   const closeButtonSvg = createSvgElement('ic_close_24px', 'closebutton-svg');
   closeButtonSvg.addEventListener('click', () => {
@@ -111,17 +104,8 @@ function render(viewerId, title) {
     selectionManager.clearSelection();
     hideInfowindow();
   });
-  //urvalContainer.appendChild(closeButtonSvg);
   mainContainer.appendChild(closeButtonSvg);
-  // listContainer = document.createElement('div');
-  // listContainer.classList.add('listcontainer');
-
-  //exportContainer = document.createElement('div');
-  //exportContainer.classList.add('exportcontainer');
-
   mainContainer.appendChild(urvalContainer);
-  //mainContainer.appendChild(listContainer);
-  //mainContainer.appendChild(exportContainer);
 
   parentElement = document.getElementById(viewerId);
   parentElement.appendChild(mainContainer);
@@ -137,25 +121,6 @@ function showSelectedList(selectionGroup) {
   }
 
   activeSelectionGroup = selectionGroup;
-  // while (listContainer.firstChild) {
-  //   listContainer.removeChild(listContainer.firstChild);
-  // }
-  // const sublistToAppend = sublists.get(selectionGroup);
-  // listContainer.appendChild(sublistToAppend);
-
-  // while (exportContainer.firstChild) {
-  //   exportContainer.removeChild(exportContainer.firstChild);
-  // }
-  // const subexportToAppend = subexports.get(selectionGroup);
-  // exportContainer.appendChild(subexportToAppend);
-
-  // urvalElements.forEach((value, key) => {
-  //   if (key === selectionGroup) {
-  //     value.classList.add('selectedurvalelement');
-  //   } else {
-  //     value.classList.remove('selectedurvalelement');
-  //   }
-  // });
 }
 
 function createExportButton(buttonText) {
@@ -320,16 +285,6 @@ function createSubexportComponent(selectionGroup) {
 }
 
 function createUrvalElement(selectionGroup, selectionGroupTitle) {
-  // const urvalElement = document.createElement('div');
-  // urvalElement.classList.add('urvalelement');
-  // const textNode = document.createTextNode(selectionGroupTitle);
-  // urvalElement.appendChild(textNode);
-  // urvalContainer.appendChild(urvalElement);
-  // urvalElements.set(selectionGroup, urvalElement);
-  // urvalElement.addEventListener('click', () => {
-  //   showSelectedList(selectionGroup);
-  // });
-
   const sublistContainer = document.createElement('div');
   sublistContainer.classList.add('sublist');
   sublists.set(selectionGroup, sublistContainer);
@@ -338,7 +293,6 @@ function createUrvalElement(selectionGroup, selectionGroupTitle) {
   subexportComponent.classList.add('sublist');
   subexports.set(selectionGroup, subexportComponent);
 
-  //---------------------
   const urvalContentCmp = Component({
     render() {
       return `<div class="urvalcontent" id="${this.getId()}"></div>`;
@@ -368,7 +322,6 @@ function createUrvalElement(selectionGroup, selectionGroupTitle) {
 
   urvalContainer.appendChild(dom.html(urvalCmp.render()));
   urvalCmp.dispatch('render');
-  //const urvalElement = document.getElementById(urvalCmp.getId());
   urvalElements.set(selectionGroup, urvalCmp);
   const urvalContentEl = document.getElementById(urvalContentCmp.getId());
   urvalElementContents.set(selectionGroup, urvalContentEl);
@@ -512,27 +465,7 @@ function expandListElement(featureId) {
 }
 
 function scrollListElementToView(featureId) {
-  // sublists.forEach((sublist) => {
-  //   const elements = sublist.getElementsByClassName('listelement');
-  //   for (let index = 0; index < elements.length; index += 1) {
-  //     const element = elements[index];
-  //     if (element.id === featureId) {
-  //       // time out is set so that element gets the time to expand first, otherwise it will be scrolled halfway to the view
-  //       setTimeout(() => {
-  //         const elementBoundingBox = element.getBoundingClientRect();
-  //         const listContainer2 = document.getElementsByClassName('listcontainer')[0];
-  //         const listContainerBoundingBox = listContainer2.getBoundingClientRect();
-  //         if (elementBoundingBox.top < listContainerBoundingBox.top) {
-  //           const scrollDownValue = listContainerBoundingBox.top - elementBoundingBox.top;
-  //           listContainer2.scrollTop -= scrollDownValue;
-  //         } else if (elementBoundingBox.bottom > listContainerBoundingBox.bottom) {
-  //           const scrollUpValue = elementBoundingBox.bottom - listContainerBoundingBox.bottom;
-  //           listContainer2.scrollTop += scrollUpValue;
-  //         }
-  //       }, 500);
-  //     }
-  //   }
-  // });
+  // Do nothing
 }
 
 function removeListElement(item) {
