@@ -133,6 +133,29 @@ const OverlayLayer = function OverlayLayer(options) {
   });
   popupMenuItems.push(layerInfoMenuItem);
 
+  if (layer.get('zoomToExtent')) {
+    const zoomToExtentMenuItem = Component({
+      onRender() {
+        const labelEl = document.getElementById(this.getId());
+        labelEl.addEventListener('click', (e) => {
+          const extent = typeof layer.getSource !== 'undefined' && typeof layer.getSource().getExtent !== 'undefined' ? layer.getSource().getExtent() : layer.getExtent();
+          if (layer.getVisible()) {
+            viewer.getMap().getView().fit(extent, {
+              padding: [50, 50, 50, 50],
+              duration: 1000
+            });
+            e.preventDefault();
+          }
+        });
+      },
+      render() {
+        const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
+        return `<li id="${this.getId()}" class="${labelCls}">Zooma till</li>`;
+      }
+    });
+    popupMenuItems.push(zoomToExtentMenuItem);
+  }
+
   if (layer.get('removable')) {
     const removeLayerMenuItem = Component({
       onRender() {
