@@ -87,10 +87,6 @@ button {
     background-color: $grey-lightest;
   }
 
-  &.style-picker {
-    border: $blue solid 1px;
-  }
-
   &.border {
     border: 2px solid $white;
 
@@ -222,10 +218,6 @@ button:focus,
     border: 1px solid $black;
   }
 
-  &.style-picker:focus {
-    border: $blue solid 1px;
-  }
-
   &.icon-small:focus {
     border: 1px solid $black;
   }
@@ -290,14 +282,6 @@ button:focus:not(:focus-visible),
 
   &.icon-smallest:focus:not(:focus-visible) {
     border: 0;
-  }
-
-  &.style-picker:focus:not(:focus-visible) {
-    border: $blue solid 1px;
-  }
-
-  &.style-picker:focus:not([class*='icon']):not(:focus-visible) {
-    border: $blue solid 1px;
   }
 }
 

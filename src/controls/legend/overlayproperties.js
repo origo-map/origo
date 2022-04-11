@@ -58,7 +58,8 @@ const OverlayProperties = function OverlayProperties(options = {}) {
   }
 
   function renderStyleSelection() {
-    return hasStylePicker() ? styleSelection.render() : '';
+    const html = `<div class="o-stylepicker-header text-small padding-small">Välj stil</div>${styleSelection.render()}`;
+    return hasStylePicker() ? html : '';
   }
 
   function getStyleDisplayName(styleName) {
@@ -116,9 +117,12 @@ const OverlayProperties = function OverlayProperties(options = {}) {
       }
       if (hasStylePicker()) {
         styleSelection.setItems(stylePicker.map(altStyle => altStyle.title));
-        document.getElementById(styleSelection.getId()).addEventListener('dropdown:select', (evt) => {
+        const styleSelectionEl = document.getElementById(styleSelection.getId());
+        styleSelectionEl.addEventListener('dropdown:select', (evt) => {
           onSelectStyle(evt.target.textContent);
         });
+        styleSelectionEl.setAttribute('aria-label', 'Välj stil');
+        styleSelectionEl.setAttribute('aria-labelledby', 'Välj stil');
       }
     },
     render() {
