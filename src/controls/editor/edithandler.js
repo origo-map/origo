@@ -112,11 +112,58 @@ function getFeaturesByIds(type, layer, ids) {
   return features;
 }
 
+/**
+ * Helper that calculates the default value for one attribute
+ * @param {any} attribConf The list entry from "attributes"-configuration that default value should be calculated for
+ * @returns The default value for provided attribute
+ */
+function getDefaultValueForAttribute(attribConf) {
+  const defaultsConfig = attribConf.defaultValue;
+  if (defaultsConfig) {
+    if (typeof defaultsConfig === 'string') {
+      return defaultsConfig;
+    }
+    // Else look for some properties
+    if (defaultsConfig.type === 'sessionStorage') {
+      return sessionStorage.getItem(defaultsConfig.key);
+    } else if (defaultsConfig.type === 'localStorage') {
+      return localStorage.getItem(defaultsConfig.key);
+    } else if (defaultsConfig.type === 'timestamp') {
+      // If an exact timestamp is needed, use a database default or trigger, this is taken when editor opens
+      const today = new Date();
+      // Can't win the timezone war. If local time is used, save it without any timezone info and hope the server does the right thing
+      const isoDate = defaultsConfig.useUTC ? today.toISOString() : new Date(today.getTime() - (today.getTimezoneOffset() * 60000)).toISOString();
+      switch (defaultsConfig.timeStampFormat) {
+        // yy-MM-dd consistent with attribute format "date"
+        case 'date':
+          return isoDate.slice(0, 10);
+        case 'time':
+          // HH:mm:ss consistent with attribute format "time"
+          return isoDate.slice(11, 19);
+        case 'datetime':
+          // "yy-MM-dd HH:mm:ss" consistent with attribute format "datetime"
+          return `${isoDate.slice(0, 10)} ${isoDate.slice(11, 19)}`;
+        default:
+          // Can be parsed to DateTime by server, skipping milliseconds and timezone info.
+          // Suitable for hidden fields that correspond to a DateTime in database
+          return isoDate.slice(0, 19);
+      }
+    }
+  }
+  // Consistent return
+  return undefined;
+}
+
+/**
+ * Helper that calculate all default values for a layer.
+ * @param {any} attrs The "attributes"-configuration for the desired layer
+ * @returns {object} An object with attributes names as properties and the default value as value.
+ */
 function getDefaultValues(attrs) {
   return attrs.filter(attribute => attribute.name && attribute.defaultValue)
     .reduce((prev, curr) => {
       const previous = prev;
-      previous[curr.name] = curr.defaultValue;
+      previous[curr.name] = getDefaultValueForAttribute(curr);
       return previous;
     }, {});
 }
@@ -1007,7 +1054,11 @@ function editAttributes(feat) {
       attributeObjects = editableAttributes.map((attributeObject) => {
         const obj = {};
         Object.assign(obj, attributeObject);
-        obj.val = feature.get(obj.name) !== undefined ? feature.get(obj.name) : '';
+        if (obj.defaultValue && obj.defaultValue.updateOnEdit) {
+          obj.val = getDefaultValueForAttribute(obj);
+        } else {
+          obj.val = feature.get(obj.name) !== undefined ? feature.get(obj.name) : '';
+        }
         if ('constraint' in obj) {
           const constraintProps = obj.constraint.split(':');
           if (constraintProps.length === 3) {

@@ -146,7 +146,9 @@ const createForm = function createForm(obj) {
       el = `<div class="validate ${cls}"><label>${label}</label><br><input type="number" step="0.01" min="0" name="decimaltal" id="${id}" value="${val}"${readonly}${required}></div>`;
       break;
     case 'hidden':
-      el = `<input type="hidden ${cls}" id="${id}" value="${val}">`;
+      // Note that an input with type="hidden" is not the same as an input with class="o-hidden". Type hidden is to roundtrip values invisible to the user
+      // class o-hidden is to temporarily hide an input as logic in view says it should not be visible right now (batch edit or constraints).
+      el = `<input class="${cls}" type="hidden" id="${id}" value="${val}">`;
       break;
     default:
       break;
