@@ -10,11 +10,25 @@
   top: 6em;
   width: 320px;
   z-index: 1;
+  &.expandable_list {
+    cursor: move;
+  }
 }
 
 /**
    * ============ Urval ==============
    */
+
+.expandable_list {
+  .urvalcontainer {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    max-height: 60em;
+    margin-right: 0.5em;
+    overflow-y: scroll;
+  }
+}
 
 .urvalcontainer {
   border-bottom: 1px solid #d9d9d9;
@@ -25,9 +39,34 @@
   z-index: 10;
 }
 
+.expandable_list {
+  .urval-textnode-container {
+    font-weight: bold;
+    margin: 1em;
+  }
+}
+
 .urval-textnode-container {
   font-size: 15px;
   margin-bottom: 0.5em;
+}
+
+.expandable_list {
+  .urvalelement {
+    box-sizing: border-box; 
+    border: none;
+    width: 100%;
+    margin-right: 0;
+    padding: 0;
+  }
+
+  .urvalcontent {
+    box-sizing: content-box;
+  
+    .sublist:last-child {
+      border-bottom: 1px solid #d9d9d9;
+    }
+  }
 }
 
 .urvalelement {
@@ -73,6 +112,15 @@
   scroll-behavior: smooth;
 }
 
+.expandable_list {
+  .listelement {
+    margin: 0 0.3em;
+    &:not(:last-child) {
+      border-bottom: 1px solid #d9d9d9;
+    }
+  }
+}
+
 .removelistelement-svg-container {
   cursor: pointer;
   display: inline-block;
@@ -86,6 +134,12 @@
   fill: rgb(77, 77, 77);
   height: 100%;
   width: 100%;
+}
+
+.expandable_list {
+  .listelement-content-container {
+    border-bottom: none;
+  }
 }
 
 .listelement-content-container {
@@ -169,8 +223,21 @@
   font-weight: normal;
 }
 
+.expandable_list {
+  .export-buttons-container {
+    padding: 0.5em 0;
+    margin: 0;
+  }
+}
+
 .export-buttons-container {
   margin: 0.5em 0.2em;
+}
+
+.expandable_list {
+  .export-buttons-container {
+    padding: 0.5em 0;
+  }
 }
 
 .export-button {
@@ -238,6 +305,15 @@
     top: 5em;
     transform: translateX(-50%);
     width: 280px;
+    &.expandable_list {
+      .urvalcontainer {
+        max-height: 20em;
+      }
+      .listelement-content-container {
+        display: inline-flex;
+        width: 80%;
+      }
+    }
   }
 
   .o-identify-content {
