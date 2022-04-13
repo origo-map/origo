@@ -14,6 +14,7 @@ let exportOptions;
 let activeSelectionGroup;
 let selectionManager;
 let viewer;
+let infowindowOptions;
 
 function createSvgElement(id, className) {
   const svgContainer = document.createElement('div');
@@ -29,11 +30,40 @@ function createSvgElement(id, className) {
   return svgContainer;
 }
 
+const debounceTimeout = [];
+function debounce(func, id) {
+  if (debounceTimeout[id]) clearTimeout(debounceTimeout[id]);
+  debounceTimeout[id] = setTimeout(() => {
+    func();
+  }, 50);
+}
+
+function toggleExpandCollapse() {
+  const visibleGroups = [];
+  urvalElements.forEach(cmp => {
+    const el = document.getElementById(cmp.getId());
+    if (!el.classList.contains('hidden')) {
+      visibleGroups.push({ cmp, el });
+    }
+  });
+
+  visibleGroups.forEach(group => {
+    if (visibleGroups.length === 1) {
+      // Debounce needed due to race condition in rendering expand/collaps animation.
+      debounce(() => group.cmp.getComponents()[0].expand(), group.cmp.getId());
+    } else {
+      // Debounce needed due to race condition in rendering expand/collaps animation.
+      debounce(() => group.cmp.getComponents()[0].collapse(), group.cmp.getId());
+    }
+  });
+}
+
 function hideInfowindow() {
   mainContainer.classList.add('hidden');
 }
 
 function showInfowindow() {
+  toggleExpandCollapse();
   mainContainer.classList.remove('hidden');
 }
 
@@ -83,15 +113,24 @@ function makeElementDraggable(elm) {
   }
 }
 
-function render(viewerId, title) {
+function setInfowindowWidth() {
+  // Only change style for standard screen size (desktop).
+  const shouldSetWidth = document.querySelectorAll('div[class*="o-media-l"]').length === 0;
+  if (infowindowOptions.windowWidth && shouldSetWidth) {
+    mainContainer.style.width = infowindowOptions.windowWidth;
+  }
+}
+
+function render(viewerId) {
   mainContainer = document.createElement('div');
+  setInfowindowWidth();
   mainContainer.classList.add('sidebarcontainer', 'expandable_list');
   mainContainer.id = 'sidebarcontainer-draggable';
   urvalContainer = document.createElement('div');
   urvalContainer.classList.add('urvalcontainer');
   const urvalTextNodeContainer = document.createElement('div');
   urvalTextNodeContainer.classList.add('urval-textnode-container');
-  const urvalTextNode = document.createTextNode(title || 'Träffar');
+  const urvalTextNode = document.createTextNode(infowindowOptions.title || 'Träffar');
   urvalTextNodeContainer.appendChild(urvalTextNode);
   mainContainer.appendChild(urvalTextNodeContainer);
   const closeButtonSvg = createSvgElement('ic_close_24px', 'closebutton-svg');
@@ -433,7 +472,6 @@ function createListElement(item) {
   sublist.appendChild(listElement);
   showUrvalElement(item.getSelectionGroup());
 
-  // ------
   const urvalContent = urvalElementContents.get(item.getSelectionGroup());
   urvalContent.replaceChildren(sublist);
 
@@ -493,23 +531,8 @@ function hideUrvalElement(selectionGroup) {
   urvalElement.classList.add('hidden');
 }
 
-const debounceTimeout = [];
-function debounce(func, id) {
-  if (debounceTimeout[id]) clearTimeout(debounceTimeout[id]);
-  debounceTimeout[id] = setTimeout(() => {
-    func();
-  }, 100);
-}
-
 function updateUrvalElementText(selectionGroup, selectionGroupTitle, sum) {
   const urvalCmp = urvalElements.get(selectionGroup);
-  if (sum === 1) {
-    // Debounce needed due to race condition in rendering expand/collaps animation.
-    debounce(() => urvalCmp.getComponents()[0].expand(), selectionGroup);
-  } else {
-    // Debounce needed due to race condition in rendering expand/collaps animation.
-    debounce(() => urvalCmp.getComponents()[0].collapse(), selectionGroup);
-  }
   const urvalElement = document.getElementById(urvalCmp.getId());
   const newNodeValue = `${selectionGroupTitle} (${sum})`;
   urvalElement.getElementsByTagName('span')[0].innerText = newNodeValue;
@@ -519,7 +542,7 @@ function init(options) {
   viewer = options.viewer;
   selectionManager = options.viewer.getSelectionManager();
 
-  const infowindowOptions = options.infowindowOptions ? options.infowindowOptions : {};
+  infowindowOptions = options.infowindowOptions ? options.infowindowOptions : {};
   exportOptions = infowindowOptions.export || {};
 
   sublists = new Map();
@@ -528,7 +551,7 @@ function init(options) {
   urvalElementContents = new Map();
   expandableContents = new Map();
 
-  render(options.viewer.getId(), infowindowOptions.title);
+  render(options.viewer.getId());
 
   return {
     createListElement,

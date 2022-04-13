@@ -14,6 +14,7 @@ let exportOptions;
 let activeSelectionGroup;
 let selectionManager;
 let viewer;
+let infowindowOptions;
 
 function createSvgElement(id, className) {
   const svgContainer = document.createElement('div');
@@ -83,8 +84,17 @@ function makeElementDraggable(elm) {
   }
 }
 
-function render(viewerId, title) {
+function setInfowindowWidth() {
+  // Only change style for standard screen size (desktop).
+  const shouldSetWidth = document.querySelectorAll('div[class*="o-media-l"]').length === 0;
+  if (infowindowOptions.windowWidth && shouldSetWidth) {
+    mainContainer.style.width = infowindowOptions.windowWidth;
+  }
+}
+
+function render(viewerId) {
   mainContainer = document.createElement('div');
+  setInfowindowWidth();
   mainContainer.classList.add('sidebarcontainer');
   mainContainer.id = 'sidebarcontainer';
   urvalContainer = document.createElement('div');
@@ -93,7 +103,7 @@ function render(viewerId, title) {
   urvalContainer.id = 'sidebarcontainer-draggable';
   const urvalTextNodeContainer = document.createElement('div');
   urvalTextNodeContainer.classList.add('urval-textnode-container');
-  const urvalTextNode = document.createTextNode(title || 'Träffar');
+  const urvalTextNode = document.createTextNode(infowindowOptions.title || 'Träffar');
   urvalTextNodeContainer.appendChild(urvalTextNode);
   urvalContainer.appendChild(urvalTextNodeContainer);
   const closeButtonSvg = createSvgElement('ic_close_24px', 'closebutton-svg');
@@ -518,7 +528,7 @@ function init(options) {
   viewer = options.viewer;
   selectionManager = options.viewer.getSelectionManager();
 
-  const infowindowOptions = options.infowindowOptions ? options.infowindowOptions : {};
+  infowindowOptions = options.infowindowOptions ? options.infowindowOptions : {};
   exportOptions = infowindowOptions.export || {};
 
   sublists = new Map();
@@ -526,7 +536,7 @@ function init(options) {
   urvalElements = new Map();
   expandableContents = new Map();
 
-  render(options.viewer.getId(), infowindowOptions.title);
+  render(options.viewer.getId());
 
   return {
     createListElement,
