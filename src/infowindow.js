@@ -1,5 +1,6 @@
 import { simpleExportHandler, layerSpecificExportHandler } from './infowindow_exporthandler';
 import exportToFile from './utils/exporttofile';
+import { dom } from './ui';
 
 let parentElement;
 let mainContainer;
@@ -84,17 +85,17 @@ function makeElementDraggable(elm) {
   }
 }
 
-function setInfowindowWidth() {
+function setInfowindowStyle() {
   // Only change style for standard screen size (desktop).
   const shouldSetWidth = document.querySelectorAll('div[class*="o-media-l"]').length === 0;
-  if (infowindowOptions.windowWidth && shouldSetWidth) {
-    mainContainer.style.width = infowindowOptions.windowWidth;
+  if (infowindowOptions.contentStyle && shouldSetWidth) {
+    mainContainer.style = dom.createStyle(infowindowOptions.contentStyle);
   }
 }
 
 function render(viewerId) {
   mainContainer = document.createElement('div');
-  setInfowindowWidth();
+  setInfowindowStyle();
   mainContainer.classList.add('sidebarcontainer');
   mainContainer.id = 'sidebarcontainer';
   urvalContainer = document.createElement('div');
