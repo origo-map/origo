@@ -11,6 +11,8 @@ function getSaveLayers(layers) {
     saveLayer.v = layer.getVisible() === true ? 1 : 0;
     saveLayer.s = layer.get('legend') === true ? 1 : 0;
     saveLayer.o = Number(layer.get('opacity')) * 100;
+    // Only get style for layer styles that have changed
+    if (layer.get('altStyleIndex') > 0) saveLayer.sn = layer.get('altStyleIndex');
     if (saveLayer.s || saveLayer.v) {
       saveLayer.name = layer.get('name');
       if (saveLayer.name !== 'measure') {

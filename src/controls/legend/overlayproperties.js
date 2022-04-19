@@ -68,11 +68,13 @@ const OverlayProperties = function OverlayProperties(options = {}) {
   }
 
   const onSelectStyle = (styleTitle) => {
-    const altStyle = stylePicker.find(s => s.title === styleTitle);
+    const altStyleIndex = stylePicker.findIndex(s => s.title === styleTitle);
+    const altStyle = stylePicker[altStyleIndex];
     styleSelection.setButtonText(styleTitle);
-    const newStyle = Style.createStyle({ style: altStyle.style, viewer });
+    const newStyle = Style.createStyle({ style: altStyle.style, clusterStyleName: altStyle.clusterStyle, viewer });
     const legendCmp = document.getElementById(legendComponent.getId());
     legendCmp.innerHTML = Legend(viewer.getStyle(altStyle.style), opacity);
+    layer.setProperties({ altStyleIndex });
     layer.setProperties({ styleName: altStyle.style });
     layer.setStyle(newStyle);
     layer.dispatchEvent('change:style');
