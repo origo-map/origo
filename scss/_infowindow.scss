@@ -88,18 +88,11 @@
 
 .closebutton-svg-container {
   cursor: pointer;
-  height: 1.2em;
   position: absolute;
-  right: 1em;
-  top: 1em;
-  width: 1.2em;
+  right: 0;
+  top: 0;
 }
 
-.closebutton-svg {
-  fill: rgb(77, 77, 77);
-  height: 100%;
-  width: 100%;
-}
 
 /**
    * ============ List ==============
@@ -156,10 +149,6 @@
   fill: rgb(100, 100, 100);
   height: 100%;
   width: 100%;
-
-  &:hover {
-    fill: #09f;
-  }
 }
 
 .expandlistelement-svg-container {
@@ -307,13 +296,13 @@
     top: 5em;
     transform: translateX(-50%);
     width: 280px;
+    .listelement-content-container {
+      display: inline-flex;
+      width: 80%;
+    }
     &.expandable_list {
       .urvalcontainer {
         max-height: 20em;
-      }
-      .listelement-content-container {
-        display: inline-flex;
-        width: 80%;
       }
     }
   }

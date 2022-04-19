@@ -1,6 +1,6 @@
 import { simpleExportHandler, layerSpecificExportHandler } from './infowindow_exporthandler';
 import exportToFile from './utils/exporttofile';
-import { dom } from './ui';
+import { dom, Button } from './ui';
 
 let parentElement;
 let mainContainer;
@@ -93,6 +93,16 @@ function setInfowindowStyle() {
   }
 }
 
+function createCloseButton() {
+  return Button({
+    cls: 'closebutton-svg-container small round small icon-smaller grey-lightest margin-top-small margin-right-small z-index-ontop-low ',
+    icon: '#ic_close_24px',
+    state: 'initial',
+    validStates: ['initial', 'hidden'],
+    ariaLabel: 'Stäng'
+  });
+}
+
 function render(viewerId) {
   mainContainer = document.createElement('div');
   setInfowindowStyle();
@@ -107,17 +117,8 @@ function render(viewerId) {
   const urvalTextNode = document.createTextNode(infowindowOptions.title || 'Träffar');
   urvalTextNodeContainer.appendChild(urvalTextNode);
   urvalContainer.appendChild(urvalTextNodeContainer);
-  const closeButtonSvg = createSvgElement('ic_close_24px', 'closebutton-svg');
-  closeButtonSvg.addEventListener('click', () => {
-    const detail = {
-      name: 'multiselection',
-      active: false
-    };
-    viewer.dispatch('toggleClickInteraction', detail);
-    selectionManager.clearSelection();
-    hideInfowindow();
-  });
-  urvalContainer.appendChild(closeButtonSvg);
+  const closeButton = createCloseButton();
+  urvalContainer.appendChild(dom.html(closeButton.render()));
   listContainer = document.createElement('div');
   listContainer.classList.add('listcontainer');
 
@@ -131,6 +132,16 @@ function render(viewerId) {
   parentElement = document.getElementById(viewerId);
   parentElement.appendChild(mainContainer);
   mainContainer.classList.add('hidden');
+
+  document.getElementById(closeButton.getId()).addEventListener('click', () => {
+    const detail = {
+      name: 'multiselection',
+      active: false
+    };
+    viewer.dispatch('toggleClickInteraction', detail);
+    selectionManager.clearSelection();
+    hideInfowindow();
+  });
 
   // Make the DIV element draggagle:
   makeElementDraggable(mainContainer);
