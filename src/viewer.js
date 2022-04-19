@@ -14,7 +14,6 @@ import Layer from './layer';
 import Main from './components/main';
 import Footer from './components/footer';
 import flattenGroups from './utils/flattengroups';
-import getAttributes from './getattributes';
 import getcenter from './geometry/getcenter';
 import isEmbedded from './utils/isembedded';
 
