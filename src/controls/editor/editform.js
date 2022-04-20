@@ -25,14 +25,14 @@ const createForm = function createForm(obj) {
   const maxLengthText = maxLength ? `, max ${obj.maxLength} tecken` : '';
   switch (type) {
     case 'text':
-      el = `<div class="validate ${cls}"><label>${label}</label><br><input type="text" name="text${maxLengthText}" id="${id}" value="${val}"${maxLength}${readonly}${required}></div>`;
+      el = `<div class="validate ${cls}"><label>${label}<br><input type="text" name="text${maxLengthText}" id="${id}" value="${val}"${maxLength}${readonly}${required}></label></div>`;
       break;
     case 'textarea':
-      el = `<div class="validate ${cls}"><label>${label}</label><br><textarea name="textarea${maxLengthText}" id="${id}" rows="3" ${maxLength}${readonly}${required}>${val}</textarea></div>`;
+      el = `<div class="validate ${cls}"><label>${label}<br><textarea name="textarea${maxLengthText}" id="${id}" rows="3" ${maxLength}${readonly}${required}>${val}</textarea></label></div>`;
       break;
     case 'checkbox':
       checked = val ? ' checked' : '';
-      el = `<div class="o-form-checkbox ${cls}"><label for="${id}">${label}</label><input type="checkbox" id="${id}" value="${val}"${checked}${disabled}></div>`;
+      el = `<div class="o-form-checkbox ${cls}"><label for="${id}">${label}<input type="checkbox" id="${id}" value="${val}"${checked}${disabled}></label></div>`;
       break;
     case 'dropdown':
       if (val) {
@@ -40,11 +40,11 @@ const createForm = function createForm(obj) {
       } else {
         firstOption = '<option value="">Välj</option>';
       }
-      el = `<div class="validate ${cls}"><label>${label}</label><br><select id=${id}${disabled}${required}>${firstOption}`;
+      el = `<div class="validate ${cls}"><label>${label}<br><select id=${id}${disabled}${required}>${firstOption}`;
       for (let i = 0; i < dropdownOptions.length; i += 1) {
         el += `<option value="${dropdownOptions[i]}">${dropdownOptions[i]}</option>`;
       }
-      el += '</select></div>';
+      el += '</select></label></div>';
       break;
     case 'searchList':
       elDiv.id = obj.type;
@@ -77,10 +77,10 @@ const createForm = function createForm(obj) {
       break;
     case 'image': {
       const imageClass = val ? '' : 'o-hidden';
-      el = `<div class="validate ${cls}"><label>${label}</label><br>`;
+      el = `<div class="validate ${cls}"><label>${label}<br>`;
       el += `<img src="${val}" id="image-upload" class="${imageClass}"/>`;
-      el += `<input type="file" name="bildfil" id="${id}" value="${val}" accept="image/*"${disabled}>`;
-      el += `<input id="o-delete-image-button" class="${imageClass}" type="button" value="Ta bort bild"${disabled}>`;
+      el += `<input type="file" name="bildfil" id="${id}" value="${val}" accept="image/*"${disabled}></label>`;
+      el += `<input id="o-delete-image-button" class="${imageClass}" type="button" aria-label="Ta bort bild" value="Ta bort bild"${disabled}>`;
       el += '</div>';
       break;
     }
@@ -95,7 +95,7 @@ const createForm = function createForm(obj) {
       if (val.length > 10) {
         val = val.slice(0, 10);
       }
-      el = `<div class="validate ${cls}"><label>${label}</label><br><input type="date" name="datum" id="${id}" placeholder="åååå-MM-dd" value="${val}"${readonly}${required}></div>`;
+      el = `<div class="validate ${cls}"><label>${label}<br><input type="date" name="datum" id="${id}" placeholder="åååå-MM-dd" value="${val}"${readonly}${required}></label></div>`;
       break;
     case 'time':
       if (!val) {
@@ -110,7 +110,7 @@ const createForm = function createForm(obj) {
       } else if (val.length > 8) {
         val = val.slice(11, 19);
       }
-      el = `<div class="validate ${cls}"><label>${label}</label><br><input type="time" name="timmar, minuter och sekunder" id="${id}" step="1" placeholder="--:--:--" value="${val}"${readonly}${required}></div>`;
+      el = `<div class="validate ${cls}"><label>${label}<br><input type="time" name="timmar, minuter och sekunder" id="${id}" step="1" placeholder="--:--:--" value="${val}"${readonly}${required}></label></div>`;
       break;
     case 'datetime':
       if (!val) {
@@ -125,25 +125,25 @@ const createForm = function createForm(obj) {
       } else if (val.length > 19) {
         val = val.slice(0, 19);
       }
-      el = `<div class="validate"><label>${label}</label><br><input type="datetime-local" name="datum och tid" id="${id}" step="1" placeholder="åååå-MM-dd --:--:--" value="${val}"${readonly}${required}></div>`;
+      el = `<div class="validate"><label>${label}<br><input type="datetime-local" name="datum och tid" id="${id}" step="1" placeholder="åååå-MM-dd --:--:--" value="${val}"${readonly}${required}></label></div>`;
       break;
     case 'color':
       if (!val) {
         val = obj.defaultColor ? obj.defaultColor : '';
       }
-      el = `<div class="validate ${cls}"><label>${label}</label><br><input type="color" name="hexadecimal" id="${id}" value="${val}"${readonly}></div>`;
+      el = `<div class="validate ${cls}"><label>${label}<br><input type="color" name="hexadecimal" id="${id}" value="${val}"${readonly}></label></div>`;
       break;
     case 'email':
-      el = `<div class="validate ${cls}"><label>${label}</label><br><input type="email" name="epost" id="${id}" value="${val}"${readonly}${required}></div>`;
+      el = `<div class="validate ${cls}"><label>${label}<br><input type="email" name="epost" id="${id}" value="${val}"${readonly}${required}></label></div>`;
       break;
     case 'url':
-      el = `<div class="validate ${cls}"><label>${label}</label><br><input type="url" name="hemsida" id="${id}" value="${val}"${readonly}${required}></div>`;
+      el = `<div class="validate ${cls}"><label>${label}<br><input type="url" name="hemsida" id="${id}" value="${val}"${readonly}${required}></label></div>`;
       break;
     case 'integer':
-      el = `<div class="validate ${cls}"><label>${label}</label><br><input type="number" step="1" min="0" name="heltal" id="${id}" value="${val}"${readonly}${required}></div>`;
+      el = `<div class="validate ${cls}"><label>${label}<br><input type="number" step="1" min="0" name="heltal" id="${id}" value="${val}"${readonly}${required}></label></div>`;
       break;
     case 'decimal':
-      el = `<div class="validate ${cls}"><label>${label}</label><br><input type="number" step="0.01" min="0" name="decimaltal" id="${id}" value="${val}"${readonly}${required}></div>`;
+      el = `<div class="validate ${cls}"><label>${label}<br><input type="number" step="0.01" min="0" name="decimaltal" id="${id}" value="${val}"${readonly}${required}></label></div>`;
       break;
     case 'hidden':
       // Note that an input with type="hidden" is not the same as an input with class="o-hidden". Type hidden is to roundtrip values invisible to the user

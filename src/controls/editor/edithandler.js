@@ -55,6 +55,7 @@ let allowEditAttributes;
 let allowEditGeometry;
 /** List that tracks the state when editing related tables */
 let breadcrumbs = [];
+let autoCreatedFeature = false;
 
 function isActive() {
   if (modify === undefined || select === undefined) {
@@ -263,6 +264,7 @@ async function addFeature(feature) {
   hasDraw = false;
   dispatcher.emitChangeEdit('draw', false);
   if (autoForm) {
+    autoCreatedFeature = true;
     // eslint-disable-next-line no-use-before-define
     editAttributes(feature);
   }
@@ -719,6 +721,26 @@ function attributesSaveHandler(features, formEl) {
 }
 
 /**
+ * Sets up an eventlistener on the attribute editor form abort button.
+ * @param {Collection} features The features that shouldn't be updated
+ */
+function onAttributesAbort(features) {
+  const abortBtnEl = document.getElementById(`o-abort-button-${currentLayer}`);
+  if (abortBtnEl !== null) {
+    abortBtnEl.addEventListener('click', (e) => {
+      abortBtnEl.blur();
+      features.forEach((feature) => {
+        deleteFeature(feature, editLayers[currentLayer]).then(() => select.getFeatures().clear());
+      });
+      modal.closeModal();
+      // The modal does not fire close event when it is closed externally
+      onModalClosed();
+      e.preventDefault();
+    });
+  }
+}
+
+/**
  * Sets up an eventlistener on the attribute editor form save button.
  * @param {Collection} features The features that should be updated
  * @param {any} attrs Array of attributes whih values to set
@@ -1126,7 +1148,11 @@ function editAttributes(feat) {
       attachmentsForm = `<div id="o-attach-form-${currentLayer}"></div>`;
     }
 
-    const form = `<div id="o-form">${formElement}${relatedTablesFormHTML}${attachmentsForm}<br><div class="o-form-save"><input id="o-save-button-${currentLayer}" type="button" value="Ok"></input></div></div>`;
+    let form = `<div id="o-form">${formElement}${relatedTablesFormHTML}${attachmentsForm}<br><div class="o-form-save"><input id="o-save-button-${currentLayer}" type="button" value="OK" aria-label="OK"></input></div></div>`;
+    if (autoCreatedFeature) {
+      form = `<div id="o-form">${formElement}${relatedTablesFormHTML}${attachmentsForm}<br><div class="o-form-save"><input id="o-save-button-${currentLayer}" type="button" value="Spara" aria-label="Spara"></input><input id="o-abort-button-${currentLayer}" type="button" value="Ta bort" aria-label="Ta bort"></input></div></div>`;
+      autoCreatedFeature = false;
+    }
 
     modal = Modal({
       title: dlgTitle,
@@ -1176,6 +1202,7 @@ function editAttributes(feat) {
     });
 
     onAttributesSave(features, attributeObjects);
+    onAttributesAbort(features);
   }
 }
 
