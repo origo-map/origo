@@ -74,6 +74,7 @@ const OverlayProperties = function OverlayProperties(options = {}) {
     const newStyle = Style.createStyle({ style: altStyle.style, clusterStyleName: altStyle.clusterStyle, viewer });
     const legendCmp = document.getElementById(legendComponent.getId());
     legendCmp.innerHTML = Legend(viewer.getStyle(altStyle.style), opacity);
+    if (!layer.get('defaultStyle')) layer.setProperties({ defaultStyle: layer.get('styleName') });
     layer.setProperties({ altStyleIndex });
     layer.setProperties({ styleName: altStyle.style });
     layer.setStyle(newStyle);
