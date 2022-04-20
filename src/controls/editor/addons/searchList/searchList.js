@@ -4,11 +4,12 @@ import awesomeImage from './utils/awesomeImage';
 import awesomeParser from './utils/awesomeParser';
 import makeEmptyList from './utils/makeEmptyList';
 import moveBtn from './utils/moveBtn';
+import spinner from '../../../../utils/spinner';
 
 /** Default user message. Can be overriden by config. */
 const hintTypeMore = 'Skriv fler tecken';
 /** Default user message. Can be overriden by config. */
-const hintNoHits = 'Inga tr�ffar';
+const hintNoHits = 'Inga träffar';
 
 /**
  * Helper to escape strings for regex
@@ -54,19 +55,6 @@ function imageItemFormatter(text, itemInput) {
   item.innerHTML = labelTxt;
   item.setAttribute('aria-selected', false);
   return item;
-}
-
-/**
- * Calls the remote server
- * @param {any} url Url to call.
- * @returns An array of suggestions
- */
-async function getSuggestionsFromRemote(url) {
-  const res = await fetch(url, {
-    method: 'GET'
-  });
-  const list = await res.json();
-  return list;
 }
 
 /**
@@ -122,6 +110,41 @@ function searchList(input, conf) {
       olist = awesomeParser(olist);
     }
     awesomeConfig.list = olist;
+  }
+  /** Keep track of ongoing requests */
+  let abortControllers = [];
+  /**
+   * Calls the remote server
+   * @param {any} url Url to call.
+   * @returns An array of suggestions
+   */
+  async function getSuggestionsFromRemote(url) {
+    let list = [];
+    let myController;
+    // Abort requests (if any) as we won't wait for the response anyway
+    abortControllers.forEach(ctrl => {
+      ctrl.abort();
+    });
+    try {
+      myController = new AbortController();
+      abortControllers.push(myController);
+      const res = await fetch(url, {
+        method: 'GET',
+        signal: myController.signal
+      });
+      list = await res.json();
+    } catch (ex) {
+      if (ex.name === 'AbortError') {
+        // Return null to indicate that we were aborted
+        return null;
+      }
+
+      throw ex;
+    } finally {
+      // Remove ourself from ongoing requests
+      abortControllers = abortControllers.filter(item => item !== myController);
+    }
+    return list;
   }
 
   /** Workaround to keep track of if the open button was pressed when awesome was closed */
@@ -206,12 +229,16 @@ function searchList(input, conf) {
     let url = searchListConfig.url;
     url += url.includes('?') ? '&' : '?';
     url += `${(searchListConfig.queryParameter || 'input')}=${encodeURIComponent(inputText)}`;
-    setMessage('Spinner...');
+    setMessage(spinner().outerHTML);
     awesome.list = [];
     getSuggestionsFromRemote(url).then(list => {
-      awesome.list = awesomeParser(list);
-      awesome.evaluate();
-      evaluateEmptyList();
+      // If list is null, request was aborted beacuse another request was sent before this was finished.
+      // Only need to update if request actually returns something
+      if (list) {
+        awesome.list = awesomeParser(list);
+        awesome.evaluate();
+        evaluateEmptyList();
+      }
     })
       .catch(e => {
         console.error(e);
@@ -242,7 +269,7 @@ function searchList(input, conf) {
   // Load the remote list into awesome if configured to do so
   if (searchListConfig.url && !searchListConfig.dynamic) {
     const url = searchListConfig.url;
-    setMessage('Spinner...');
+    setMessage(spinner().outerHTML);
     awesome.list = [];
     getSuggestionsFromRemote(url).then(list => {
       awesome.list = awesomeParser(list);
