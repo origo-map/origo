@@ -58,7 +58,8 @@ const OverlayProperties = function OverlayProperties(options = {}) {
   }
 
   function renderStyleSelection() {
-    return hasStylePicker() ? styleSelection.render() : '';
+    const html = `<div class="o-stylepicker-header text-small padding-small">Välj stil</div>${styleSelection.render()}`;
+    return hasStylePicker() ? html : '';
   }
 
   function getStyleDisplayName(styleName) {
@@ -67,11 +68,14 @@ const OverlayProperties = function OverlayProperties(options = {}) {
   }
 
   const onSelectStyle = (styleTitle) => {
-    const altStyle = stylePicker.find(s => s.title === styleTitle);
+    const altStyleIndex = stylePicker.findIndex(s => s.title === styleTitle);
+    const altStyle = stylePicker[altStyleIndex];
     styleSelection.setButtonText(styleTitle);
-    const newStyle = Style.createStyle({ style: altStyle.style, viewer });
+    const newStyle = Style.createStyle({ style: altStyle.style, clusterStyleName: altStyle.clusterStyle, viewer });
     const legendCmp = document.getElementById(legendComponent.getId());
     legendCmp.innerHTML = Legend(viewer.getStyle(altStyle.style), opacity);
+    if (!layer.get('defaultStyle')) layer.setProperties({ defaultStyle: layer.get('styleName') });
+    layer.setProperties({ altStyleIndex });
     layer.setProperties({ styleName: altStyle.style });
     layer.setStyle(newStyle);
     layer.dispatchEvent('change:style');
@@ -116,9 +120,12 @@ const OverlayProperties = function OverlayProperties(options = {}) {
       }
       if (hasStylePicker()) {
         styleSelection.setItems(stylePicker.map(altStyle => altStyle.title));
-        document.getElementById(styleSelection.getId()).addEventListener('dropdown:select', (evt) => {
+        const styleSelectionEl = document.getElementById(styleSelection.getId());
+        styleSelectionEl.addEventListener('dropdown:select', (evt) => {
           onSelectStyle(evt.target.textContent);
         });
+        styleSelectionEl.setAttribute('aria-label', 'Välj stil');
+        styleSelectionEl.setAttribute('aria-labelledby', 'Välj stil');
       }
     },
     render() {

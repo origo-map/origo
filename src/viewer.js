@@ -328,6 +328,13 @@ const Viewer = function Viewer(targetOption, options = {}) {
             visible: false,
             legend: false
           };
+          // Apply changed style
+          if (savedLayerProps[layerName] && savedLayerProps[layerName].altStyleIndex > -1) {
+            const altStyle = initialProps.stylePicker[savedLayerProps[layerName].altStyleIndex];
+            savedProps.clusterStyle = altStyle.clusterStyle;
+            savedProps.style = altStyle.style;
+            savedProps.defaultStyle = initialProps.style;
+          }
           savedProps.name = initialProps.name;
           const mergedProps = Object.assign({}, initialProps, savedProps);
           acc.push(mergedProps);
