@@ -12,6 +12,7 @@
   top: 6em;
   width: 320px;
   z-index: 1;
+  overflow-x: hidden;
   &.expandable_list {
     cursor: move;
   }
@@ -29,6 +30,8 @@
     max-height: 60em;
     margin-right: 0.5em;
     overflow-y: scroll;
+    overflow-x: hidden;
+    border-bottom: none;
   }
 }
 
@@ -56,7 +59,6 @@
 .expandable_list {
   .urvalelement {
     box-sizing: border-box; 
-    border: none;
     width: 100%;
     margin-right: 0;
     padding: 0;
@@ -107,15 +109,6 @@
   scroll-behavior: smooth;
 }
 
-.expandable_list {
-  .listelement {
-    margin: 0 0.3em;
-    &:not(:last-child) {
-      border-bottom: 1px solid #d9d9d9;
-    }
-  }
-}
-
 .listelement {
   display: flex;
 }
@@ -133,18 +126,13 @@
   width: 1em;
 }
 
-.expandable_list {
-  .listelement-content-container {
-    border-bottom: none;
-  }
-}
-
 .listelement-content-container {
   border-bottom: 1px solid #d9d9d9;
   cursor: pointer;
   display: flex;
   margin: 0.5em;
   flex: 1;
+  padding: 0 0.5em 0.5em;
   margin-right: 1em;
 }
 
