@@ -171,6 +171,7 @@
 
 .export-buttons-container {
   margin: 0.5em 0.2em;
+  margin-left: 1.8em; 
 }
 
 .export-button {
@@ -211,6 +212,14 @@
 .disabled {
   color: #888;
   cursor: not-allowed;
+}
+
+.spinner-custom {
+  height: 2.1em;
+  margin-right: 1.18em;
+  margin-left: 0.2em;
+  bottom: -7px;
+  position: relative;
 }
 
 .spinner {
