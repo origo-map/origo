@@ -330,7 +330,15 @@ const PrintComponent = function PrintComponent(options = {}) {
     viewerResolutions: originalResolutions
   });
   const printInteractionToggle = PrintInteractionToggle({ map, target, mapInteractionsActive, pageSettings: viewer.getViewerOptions().pageSettings });
+
   const printToolbar = PrintToolbar();
+  map.getAllLayers().forEach((l) => {
+    // if we begin loading any data we want to disable the print buttons...
+    l.getSource().on(["tileloadstart", "imageloadstart"], () => printToolbar.setDisabled(true));
+  });
+  // ...they then get re-enabled when the map has finished rendering
+  map.on('rendercomplete', () => printToolbar.setDisabled(false));
+
   return Component({
     name: 'printComponent',
     onInit() {

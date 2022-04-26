@@ -35,6 +35,10 @@ const PrintToolbar = function PrintToolbar() {
         ${pngButton.render()}
         ${pdfButton.render()}
       </div>`;
+    },
+    setDisabled(disabled) {
+      pngButton.setState(disabled ? 'disabled' : 'initial');
+      pdfButton.setState(disabled ? 'disabled' : 'initial');
     }
   });
 };
