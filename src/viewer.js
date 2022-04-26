@@ -24,10 +24,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
   let selectionmanager;
 
   let {
-    projection
-  } = options;
-
-  const {
+    projection,
     breakPoints,
     breakPointsPrefix,
     clsOptions = '',
@@ -561,6 +558,10 @@ const Viewer = function Viewer(targetOption, options = {}) {
                               ${main.render()}
                               ${footer.render()}
                             </div>
+                          </div>
+                              
+                          <div id="loading" class="hide">
+                            <div class="loading-spinner"></div>
                           </div>`;
       const el = document.querySelector(target);
       el.innerHTML = htmlString;

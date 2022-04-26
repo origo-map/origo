@@ -18,6 +18,7 @@ import { downloadPNG, downloadPDF, printToScalePDF } from '../../utils/download'
 import { afterRender, beforeRender } from './download-callback';
 import maputils from '../../maputils';
 import PrintResize from './print-resize';
+import { withLoading } from "../../loading";
 /** Backup of original OL function */
 const original = PluggableMap.prototype.getEventPixel;
 
@@ -487,12 +488,12 @@ const PrintComponent = function PrintComponent(options = {}) {
       printElement.remove();
     },
     async downloadPNG() {
-      await downloadPNG({
+      await withLoading(() => downloadPNG({
         afterRender: afterRender(map),
         beforeRender: beforeRender(map),
         filename: `${filename}.png`,
         el: pageElement
-      });
+      }));
     },
     async downloadPDF() {
       let height;
@@ -507,7 +508,7 @@ const PrintComponent = function PrintComponent(options = {}) {
         width = sizes[size][0];
         pdfOrientation = orientation;
       }
-      await downloadPDF({
+      await withLoading(() => downloadPDF({
         afterRender: afterRender(map),
         beforeRender: beforeRender(map),
         el: pageElement,
@@ -516,7 +517,7 @@ const PrintComponent = function PrintComponent(options = {}) {
         orientation: pdfOrientation,
         size,
         width
-      });
+      }));
     },
     async printToScalePDF() {
       let height;
@@ -531,17 +532,19 @@ const PrintComponent = function PrintComponent(options = {}) {
       }
       widthImage = orientation === 'portrait' ? Math.round((sizes[size][1] * resolution) / 25.4) : Math.round((sizes[size][0] * resolution) / 25.4);
       heightImage = orientation === 'portrait' ? Math.round((sizes[size][0] * resolution) / 25.4) : Math.round((sizes[size][1] * resolution) / 25.4);
-      await printToScalePDF({
-        el: pageElement,
-        filename,
-        height,
-        orientation: pdfOrientation,
-        size,
-        width,
-        printScale,
-        widthImage,
-        heightImage
-      });
+      await withLoading(() =>
+        printToScalePDF({
+          el: pageElement,
+          filename,
+          height,
+          orientation: pdfOrientation,
+          size,
+          width,
+          printScale,
+          widthImage,
+          heightImage
+        })
+      );
     },
     async onRender() {
       // Monkey patch OL
