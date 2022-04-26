@@ -63,49 +63,66 @@ class WfsSource extends VectorSource {
   }
 
   /**
+   * Generate a wfs query filter according to the wfs layer source's `filterType`. Combines
+   * the custom filter parameter with any layer filters already present.
+   * @param {string} filterType The filter type used by the layer source (`cql`)
+   * @param {string} customFilter custom filter to combine with preconfigured layer filters
+   * @param {any} extent ignored when using customFilter
+   */
+  createQueryFilter(filterType, customFilter, extent) {
+    let queryFilter = '';
+
+    switch (filterType) {
+      case 'cql': {
+        // Set up the filter as a combination of the layer filter and the temporary filter parameter
+        let cqlfilter = '';
+        if (this.getOptions().filter) {
+          cqlfilter = replacer.replace(this.getOptions().filter, window);
+          if (customFilter) {
+            cqlfilter += ' AND ';
+          }
+        }
+        if (customFilter) {
+          cqlfilter += `${replacer.replace(customFilter, window)}`;
+        }
+
+        // Create the complete CQL query string
+        if (this.getOptions().strategy === 'all' || customFilter || this.getOptions().isTable) {
+          queryFilter = cqlfilter ? `&CQL_FILTER=${cqlfilter}` : '';
+        } else {
+          // Extent should be used. Depending if there also is a filter, the queryfilter looks different
+          let requestExtent;
+          if (this.getOptions().dataProjection !== this.getOptions().projectionCode) {
+            requestExtent = transformExtent(extent, this.getOptions().projectionCode, this.getOptions().dataProjection);
+          } else {
+            requestExtent = extent;
+          }
+          if (cqlfilter) {
+            queryFilter = `&CQL_FILTER=${cqlfilter} AND BBOX(${this.getOptions().geometryName},${requestExtent.join(',')},'${this.getOptions().dataProjection}')`;
+          } else {
+            queryFilter = `&BBOX=${requestExtent.join(',')},${this.getOptions().dataProjection}`;
+          }
+        }
+        break;
+      }
+      default: break;
+      }
+        return queryFilter;
+    }
+
+  /**
    * Helper to reuse code. Consider it to be private to this class
    * @param {any} extent
-   * @param {any} cql if provided, extent is ignored
+   * @param {any} filter if provided, extent is ignored
    */
-  async _loaderHelper(extent, cql) {
+  async _loaderHelper(extent, filter) {
     const serverUrl = this._options.url;
-
-    // Set up the cql filter as a combination of the layer filter and the temporary cql parameter
-    let cqlfilter = '';
-    if (this._options.filter) {
-      cqlfilter = replacer.replace(this._options.filter, window);
-      if (cql) {
-        cqlfilter += ' AND ';
-      }
-    }
-    if (cql) {
-      cqlfilter += `${replacer.replace(cql, window)}`;
-    }
-
-    // Create the complete CQL query string
-    let queryFilter = '';
-    if (this._options.strategy === 'all' || cql || this._options.isTable) {
-      queryFilter = cqlfilter ? `&CQL_FILTER=${cqlfilter}` : '';
-    } else {
-      // Extent should be used. Depending if there also is a filter, the queryfilter looks different
-      let requestExtent;
-      if (this._options.dataProjection !== this._options.projectionCode) {
-        requestExtent = transformExtent(extent, this._options.projectionCode, this._options.dataProjection);
-      } else {
-        requestExtent = extent;
-      }
-      if (cqlfilter) {
-        queryFilter = `&CQL_FILTER=${cqlfilter} AND BBOX(${this._options.geometryName},${requestExtent.join(',')},'${this._options.dataProjection}')`;
-      } else {
-        queryFilter = `&BBOX=${requestExtent.join(',')},${this._options.dataProjection}`;
-      }
-    }
 
     // Create the complete URL
     let url = [`${serverUrl}${serverUrl.indexOf('?') < 0 ? '?' : '&'}service=WFS`,
       `&version=1.1.0&request=GetFeature&typeName=${this._options.featureType}&outputFormat=application/json`,
       `&srsname=${this._options.dataProjection}`].join('');
-    url += queryFilter;
+    url += this.createQueryFilter(this._options.filterType, filter, extent);
     url = encodeURI(url);
 
     // Actually fetch some features
@@ -125,12 +142,12 @@ class WfsSource extends VectorSource {
   }
 
   /**
-   * Makes a call to the server with the provided cql filter and adds all matching records to the layer.
+   * Makes a call to the server with the provided query filter and adds all matching records to the layer.
    * If the layer has a filter it is honoured.
-   * @param {any} cql
+   * @param {any} filter
    */
-  async ensureLoaded(cql) {
-    await this._loaderHelper(null, cql);
+  async ensureLoaded(filter) {
+    await this._loaderHelper(null, filter);
   }
 }
 
