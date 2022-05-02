@@ -768,8 +768,8 @@ function onAttributesSave(features, attrs) {
       if (!document.querySelector(containerClass) || document.querySelector(containerClass).classList.contains('o-hidden') === false) {
         // Check if checkbox. If checkbox read state.
         if (inputType === 'checkbox') {
-          const checkedValue = attribute.config && attribute.config.checkedValue || 1;
-          const uncheckedValue = attribute.config && attribute.config.uncheckedValue || 0;
+          const checkedValue = (attribute.config && attribute.config.checkedValue) || 1;
+          const uncheckedValue = (attribute.config && attribute.config.uncheckedValue) || 0;
           editEl[attribute.name] = document.getElementById(attribute.elId).checked ? checkedValue : uncheckedValue;
         } else { // Read value from input text, textarea or select
           editEl[attribute.name] = inputValue;
