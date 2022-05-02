@@ -20,7 +20,6 @@ const createForm = function createForm(obj) {
   const required = obj.required ? ' required' : '';
   const name = obj.name ? obj.name : '';
   let el;
-  let checked;
   let firstOption;
   const maxLengthText = maxLength ? `, max ${obj.maxLength} tecken` : '';
   switch (type) {
@@ -31,8 +30,9 @@ const createForm = function createForm(obj) {
       el = `<div class="validate ${cls}"><label>${label}<br><textarea name="textarea${maxLengthText}" id="${id}" rows="3" ${maxLength}${readonly}${required}>${val}</textarea></label></div>`;
       break;
     case 'checkbox':
-      checked = val ? ' checked' : '';
-      el = `<div class="o-form-checkbox ${cls}"><label for="${id}">${label}<input type="checkbox" id="${id}" value="${val}"${checked}${disabled}></label></div>`;
+      const isChecked = obj.config && obj.config.uncheckedValue ? obj.config.uncheckedValue !== val : val;
+      const checked = isChecked ? ' checked' : '';
+      el = `<div class="o-form-checkbox ${cls}"><label for="${id}"><input type="checkbox" id="${id}" value="${val}"${checked}${disabled}/>${label}</label></div>`;
       break;
     case 'dropdown':
       if (val) {
