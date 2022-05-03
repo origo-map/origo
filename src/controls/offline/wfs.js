@@ -15,7 +15,7 @@ wfs.request = function request(layer) {
   return req;
 
   function createRequest(options) {
-    console.log('createRequest')
+    console.log('createRequest');
     const format = new GeoJSONFormat({
       geometryName: options.geometryName
     });
