@@ -92,7 +92,7 @@ sourceType.WFS = function wfsSourceType(id, layer, serverUrl, extent) {
   const data = ['service=WFS',
     '&version=1.0.0',
     `&request=GetFeature&typeName=${layer.get('name')}`,
-    '&outputFormat=json',
+    '&outputFormat=application/json',
     queryFilter
   ].join('');
 
