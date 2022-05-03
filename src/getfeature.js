@@ -10,12 +10,13 @@ export default function getfeature(id, layer, source, projCode, proj, extent) {
   projectionCode = projCode;
   projection = proj;
   const serverUrl = source[layer.get('sourceName')].url;
+  const filterType = source[layer.get('sourceName')].filterType;
   const type = layer.get('type');
   // returns a promise with features as result
   if (type === 'AGS_FEATURE') {
     return sourceType.AGS_FEATURE(id, layer, serverUrl);
   }
-  return sourceType.WFS(id, layer, serverUrl, extent);
+  return sourceType.WFS(id, layer, serverUrl, filterType, extent);
 }
 
 function fail(response) {
@@ -53,7 +54,7 @@ sourceType.AGS_FEATURE = function agsFeature(id, layer, serverUrl) {
   })).catch(error => console.error(error));
 };
 
-sourceType.WFS = function wfsSourceType(id, layer, serverUrl, extent) {
+sourceType.WFS = function wfsSourceType(id, layer, serverUrl, filterType, extent) {
   const geometryName = layer.get('geometryName');
   const format = new GeoJSONFormat({
     geometryName
@@ -77,14 +78,22 @@ sourceType.WFS = function wfsSourceType(id, layer, serverUrl, extent) {
       minExtent = layerExtent;
     }
     if (filter) {
-      if (minExtent) {
+      if (minExtent && filterType === 'qgis') {
+        queryFilter = `&EXP_FILTER=${filter}&BBOX=${minExtent.toString()}`;
+      } else if (minExtent) {
         queryFilter = layer.get('geometryName') ? `&CQL_FILTER=${filter} AND BBOX(${layer.get('geometryName')},${minExtent.toString()})` : `&CQL_FILTER=${filter}&BBOX=${minExtent.toString()}`;
+      } else if (filterType === 'qgis') {
+        queryFilter = `&EXP_FILTER=${filter}`;
       } else {
         queryFilter = `&CQL_FILTER=${filter}`;
       }
+    } else if (!layer.get('geometryName') || (minExtent && filterType === 'qgis')) {
+      queryFilter = `&BBOX=${minExtent.toString()}`;
     } else if (minExtent) {
-      queryFilter = layer.get('geometryName') ? `&CQL_FILTER=BBOX(${layer.get('geometryName')},${minExtent.toString()})` : `&BBOX=${minExtent.toString()}`;
+      queryFilter = `&CQL_FILTER=BBOX(${layer.get('geometryName')},${minExtent.toString()})`;
     }
+  } else if (filterType === 'qgis') {
+    queryFilter = `&featureId=${layer.get('name')}.${id}`;
   } else {
     queryFilter = `&featureId=${id}`;
   }
