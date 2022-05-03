@@ -96,5 +96,14 @@ sourceType.WFS = function wfsSourceType(id, layer, serverUrl, extent) {
     queryFilter
   ].join('');
 
-  return fetch(url + data, { type: 'GET', dataType: 'json' }).then(res => res.json()).then(json => format.readFeatures(json)).catch(error => console.error(error));
+  return fetch(url + data, { type: 'GET', dataType: 'json' })
+    .then(res => res.json())
+    .then(json => {
+      const sourceOpts = layer.getSource().getOptions();
+      if (sourceOpts.dataProjection !== sourceOpts.projectionCode) {
+        return format.readFeatures(json, { dataProjection: sourceOpts.dataProjection, featureProjection: sourceOpts.projectionCode });
+      }
+      return format.readFeatures(json);
+    })
+    .catch(error => console.error(error));
 };
