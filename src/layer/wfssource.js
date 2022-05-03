@@ -130,8 +130,9 @@ class WfsSource extends VectorSource {
           // in EPSG:4326. EXP_FILTER comparisons still expects the SRS of the data to be used, which Origo then doesn't know.
           if (extent && this.getOptions().strategy !== 'all' && !customFilter && !this.getOptions().isTable) {
             queryFilter = `&BBOX=${requestExtent.join(',')},${this.getOptions().dataProjection}${qgisFilter}`;
+          } else {
+            queryFilter = qgisFilter;
           }
-
           break;
         }
         default: break;
