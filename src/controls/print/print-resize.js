@@ -424,9 +424,9 @@ export default function PrintResize(options = {}) {
                 const textScale = text.getScale() ? multiplyRelativeValueByFactor(text.getScale()) : styleScale;
                 text.setScale(textScale);
               }
-          });
+            });
             feature.setStyle(featureStyle);
-        }
+          }
         });
       }
     }
