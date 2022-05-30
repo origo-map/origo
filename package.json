@@ -16,7 +16,7 @@
   "main": "origo.js",
   "scripts": {
     "start": "npm run prebuild-sass | run-p watch-js watch-sass",
-    "lint": "eslint -c .eslintrc.json src/* --fix",
+    "lint": "eslint -c .eslintrc.json origo.js src/**/*.js --fix",
     "lint-run": "npm run prebuild-sass | webpack-dev-server --config ./tasks/webpack.lint.dev.js --mode development",
     "lint-build": "webpack --config ./tasks/webpack.lint.prod.js && npm run build-sass | npm run copy-plugins | npm run copy",
     "watch-js": "webpack-dev-server --config ./tasks/webpack.dev.js --mode development",

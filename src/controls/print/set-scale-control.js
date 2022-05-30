@@ -1,7 +1,7 @@
 import { Dropdown, Component } from '../../ui';
 import mapUtils from '../../maputils';
 
-export default function SetScaleControl(options = {}, map) {
+export default function SetScaleControl(map, options = {}) {
   const {
     scales = [],
     initialScale

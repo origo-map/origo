@@ -1,4 +1,4 @@
 export default function isUrl(s) {
-  const regexp = new RegExp('^(?:[a-z]+:)?//', 'i');
+  const regexp = /^(?:[a-z]+:)?\/\//i;
   return regexp.test(s);
 }
