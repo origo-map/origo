@@ -90,7 +90,8 @@ const OverlayProperties = function OverlayProperties(options = {}) {
         buttonCls: 'bg-white border text-black box-shadow',
         buttonTextCls: 'text-smaller',
         text: getStyleDisplayName(layer.get('styleName')),
-        buttonIconCls: 'black'
+        buttonIconCls: 'black',
+        ariaLabel: 'Välj stil'
       });
       const components = [transparencySlider];
       if (hasStylePicker()) {
@@ -124,8 +125,6 @@ const OverlayProperties = function OverlayProperties(options = {}) {
         styleSelectionEl.addEventListener('dropdown:select', (evt) => {
           onSelectStyle(evt.target.textContent);
         });
-        styleSelectionEl.setAttribute('aria-label', 'Välj stil');
-        styleSelectionEl.setAttribute('aria-labelledby', 'Välj stil');
       }
     },
     render() {
