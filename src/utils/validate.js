@@ -86,31 +86,4 @@ validate.color = (color) => {
   return false;
 };
 
-validate.searchList = (input, list) => {
-  let isInList = false;
-  if (input) {
-    const hasValue = list[0].value || false;
-    if (hasValue) {
-      const test = list.filter(obj => obj.value === input);
-      return test.length !== 0;
-    }
-    list.forEach((obj) => {
-      try {
-        const { location, extension } = obj;
-        const { location: { href } } = document;
-        const dir = `${href.substring(0, href.lastIndexOf('/'))}/`;
-        const xmlHttp = new XMLHttpRequest();
-        xmlHttp.open('GET', `${dir + location}/${input}.${extension}`, false); // false for synchronous request
-        xmlHttp.send(null);
-        const { status } = xmlHttp;
-        isInList = status >= 200 && status < 400;
-      } catch (error) {
-        console.error('error: ', error);
-      }
-    });
-    return isInList;
-  }
-  return isInList;
-};
-
 export default validate;

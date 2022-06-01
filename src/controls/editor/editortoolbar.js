@@ -182,9 +182,9 @@ function init(options, v) {
   if (options.autoSave) {
     $editSave.classList.add('o-hidden');
   }
-  editorLayers(editableLayers, {
+  editorLayers(editableLayers, v, {
     activeLayer: currentLayer
-  }, v);
+  });
   drawTools(options.drawTools, currentLayer, v);
 
   document.addEventListener('enableInteraction', onEnableInteraction);

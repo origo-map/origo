@@ -1,0 +1,7 @@
+// Must win over o-map o-modal img...
+img.spinner {
+    height: 1.5em;
+    margin: 0 0.3em;
+    transform: translateY(3px);
+    width: auto; // o-modal sets width to 100%, we don't want that.
+}

@@ -52,6 +52,7 @@ const mm2Pt = function convertMm2Pt(mm) {
 
 export const html2canvas = function html2canvas(el) {
   return convertHtml2canvas(el, {
+    useCORS: true,
     allowTaint: true,
     backgroundColor: null,
     logging: false,
