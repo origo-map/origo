@@ -34,7 +34,6 @@ let attributes;
 let title;
 let draw;
 let hasDraw;
-let hasAttribute;
 let hasSnap;
 let select;
 let modify;
@@ -42,7 +41,6 @@ let snap;
 let viewer;
 let featureInfo;
 let modal;
-let sList;
 /** Roll back copy of geometry that is currently being modified (if any) */
 let modifyGeometry;
 /** The feature that is currently being drawn (if any). Must be reset when draw is finished or abandoned as OL resuses its feature and
@@ -497,7 +495,6 @@ function setInteractions(drawType) {
   removeInteractions();
   draw = new Draw(drawOptions);
   hasDraw = false;
-  hasAttribute = false;
   select = new Select({
     layers: [editLayer]
   });
@@ -669,11 +666,6 @@ function onChangeShape(e) {
     setInteractions(e.detail.shape);
     startDraw();
   }
-}
-
-function cancelAttribute() {
-  modal.closeModal();
-  dispatcher.emitChangeEdit('attribute', false);
 }
 
 /**
@@ -940,10 +932,11 @@ function onAttributesSave(features, attrs) {
           }
           break;
         case 'searchList':
-          if (attribute.required || false) {
-            const { list } = attribute;
-            valid.searchList = validate.searchList(inputValue, list) || inputValue === '' ? inputValue : false;
-            if (!valid.searchList && inputValue !== '') {
+          if (attribute.required) {
+            // Only validate required. Validating if in list is performed in searchList as we don't have access to dynamic list
+            // and don't want to fetch it again just to validate. It's a better idea to make it impossible for user to type incorrect.
+            valid.searchList = inputValue !== '';
+            if (!valid.searchList) {
               errorOn.parentElement.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             } else if (errorMsg) {
               errorMsg.remove();
@@ -1042,6 +1035,15 @@ function addBatchEditListener() {
 }
 
 /**
+ * Makes an input into an searchList (aweseome). Called after model DOM i created.
+ * @param {any} obj
+ */
+function turnIntoSearchList(obj) {
+  const el = document.getElementById(obj.elId);
+  searchList(el, { list: obj.list, config: obj.config });
+}
+
+/**
  * Edits the attributes for given feature or selection from interaction
  * @param {any} feat Feature to edit attributes for. If omitted selection will be used instead
  */
@@ -1117,6 +1119,9 @@ function editAttributes(feat) {
         } else {
           obj.isVisible = true;
           obj.elId = `input-${currentLayer}-${obj.name}`;
+        }
+        if (obj.type === 'searchList') {
+          obj.searchListListener = turnIntoSearchList;
         }
         if (isBatchEdit && !('constraint' in obj)) {
           // Create an additional ckeckbox, that controls if this attribute should be changed
@@ -1197,9 +1202,13 @@ function editAttributes(feat) {
       }
     }
 
+    // Execute the function that need the DOM objects to operate on
     attributeObjects.forEach((obj) => {
       if ('addListener' in obj) {
         obj.addListener(obj);
+      }
+      if ('searchListListener' in obj) {
+        obj.searchListListener(obj);
       }
     });
 
@@ -1226,12 +1235,7 @@ function onToggleEdit(e) {
       cancelDraw();
     }
   } else if (tool === 'attribute' && allowEditAttributes) {
-    if (hasAttribute === false) {
-      editAttributes();
-      sList = sList || new searchList();
-    } else {
-      cancelAttribute();
-    }
+    editAttributes();
   } else if (tool === 'delete' && allowDelete) {
     onDeleteSelected();
   } else if (tool === 'edit') {

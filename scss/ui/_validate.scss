@@ -28,6 +28,8 @@
   }
 }
 
-input[type="searchList-input"]:required:invalid {
-  border-color: $orange;
+// Awesome input is not direct child of .validate, needs special treatment.
+input.awesome:required:invalid {
+    border-color: $orange;
 }
+
