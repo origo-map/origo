@@ -1,4 +1,6 @@
 import EsriJSON from 'ol/format/EsriJSON';
+import BaseTileLayer from 'ol/layer/BaseTile';
+import ImageLayer from 'ol/layer/Image';
 import maputils from './maputils';
 import SelectedItem from './models/SelectedItem';
 
@@ -179,8 +181,9 @@ function getFeatureInfoRequests({
   pixel
 }, viewer) {
   const requests = [];
-  viewer.getQueryableLayers().forEach(layer => {
-    if (layer.getData(pixel) instanceof Uint8ClampedArray && layer.getData(pixel)[3] > 0) {
+  viewer.getQueryableLayers().filter(layer => layer instanceof BaseTileLayer || layer instanceof ImageLayer).forEach(layer => {
+    const pixelVal = layer.getData(pixel);
+    if (pixelVal instanceof Uint8ClampedArray && pixelVal[3] > 0) {
       const item = getGetFeatureInfoRequest({ layer, coordinate }, viewer);
       if (item) {
         requests.push(item);

@@ -1,5 +1,6 @@
 import Overlay from 'ol/Overlay';
-import TileLayer from 'ol/layer/Tile';
+import BaseTileLayer from 'ol/layer/BaseTile';
+import ImageLayer from 'ol/layer/Image';
 import OGlide from './oglide';
 import { Component, Modal } from './ui';
 import Popup from './popup';
@@ -671,10 +672,11 @@ const Featureinfo = function Featureinfo(options = {}) {
           if (features.length > 0) {
             cursor = 'pointer';
           } else {
-            const layers = viewer.getQueryableLayers().filter(layer => layer instanceof TileLayer);
+            const layers = viewer.getQueryableLayers().filter(layer => layer instanceof BaseTileLayer || layer instanceof ImageLayer);
             for (let i = 0; i < layers.length; i += 1) {
               const layer = layers[i];
-              if (layer.getData(evt.pixel) instanceof Uint8ClampedArray && layer.getData(evt.pixel)[3] > 0) {
+              const pixelVal = layer.getData(evt.pixel);
+              if (pixelVal instanceof Uint8ClampedArray && pixelVal[3] > 0) {
                 cursor = 'pointer';
                 break;
               }
