@@ -1,5 +1,6 @@
 import { simpleExportHandler, layerSpecificExportHandler } from './infowindow_exporthandler';
 import exportToFile from './utils/exporttofile';
+import getSpinner from './utils/spinner';
 import Icon from './ui/icon';
 
 let parentElement;
@@ -156,9 +157,7 @@ function showSelectedList(selectionGroup) {
 function createExportButton(buttonText) {
   const container = document.createElement('div');
 
-  const spinner = document.createElement('img');
-  spinner.src = 'img/loading.gif';
-  spinner.classList.add('spinner');
+  const spinner = getSpinner();
   spinner.style.visibility = 'hidden';
 
   const button = document.createElement('button');
@@ -207,8 +206,7 @@ function createCustomExportButton(roundButtonIcon, roundButtonTooltipText) {
   button.innerHTML = `<span class="icon" style="z-index: 10000">${iconComponent.render()}</span><span data-tooltip="${roundButtonTooltipText}" data-placement="south"></span>`;
 
   container.appendChild(button);
-  const spinner = document.createElement('img');
-  spinner.src = 'img/loading.gif';
+  const spinner = getSpinner();
   spinner.classList.add('spinner-custom');
 
   button.loadStart = () => {

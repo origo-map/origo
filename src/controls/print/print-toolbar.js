@@ -13,7 +13,6 @@ const PrintToolbar = function PrintToolbar() {
 
   return Component({
     onInit() {
-      this.addComponents([pngButton, pdfButton]);
       pngButton.on('click', this.dispatchExport.bind(this));
       pdfButton.on('click', this.dispatchPrint.bind(this));
     },
@@ -27,14 +26,18 @@ const PrintToolbar = function PrintToolbar() {
       this.dispatch('render');
     },
     render() {
-      return `
+      return this.html`
       <div
         class="flex box fixed bottom-center button-group divider-horizontal box-shadow rounded-large bg-inverted z-index-ontop-high no-print"
         style="height: 2rem;"
       >
-        ${pngButton.render()}
-        ${pdfButton.render()}
+        ${pngButton}
+        ${pdfButton}
       </div>`;
+    },
+    setDisabled(disabled) {
+      pngButton.setState(disabled ? 'disabled' : 'initial');
+      pdfButton.setState(disabled ? 'disabled' : 'initial');
     }
   });
 };

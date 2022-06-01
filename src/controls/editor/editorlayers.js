@@ -6,7 +6,7 @@ const createElement = utils.createElement;
 
 let viewer;
 
-export default function editorLayers(editableLayers, optOptions = {}, v) {
+export default function editorLayers(editableLayers, v, optOptions = {}) {
   viewer = v;
   function selectionModel(layerNames) {
     const selectOptions = layerNames.map((layerName) => {

@@ -13,6 +13,10 @@ const layerModel = {
   o: {
     name: 'opacity',
     dataType: 'number'
+  },
+  sn: {
+    name: 'altStyleIndex',
+    dataType: 'number'
   }
 };
 
@@ -31,12 +35,15 @@ const layers = function layers(layersStr) {
     });
     Object.getOwnPropertyNames(layerObject).forEach((prop) => {
       const val = layerObject[prop];
-      if (Object.prototype.hasOwnProperty.call(layerModel, prop) && prop !== 'o') {
+      if (Object.prototype.hasOwnProperty.call(layerModel, prop) && prop !== 'o' && prop !== 'sn') {
         const attribute = layerModel[prop];
         obj[attribute.name] = urlparser.strBoolean(val);
       } else if (prop === 'o') {
         const attribute = layerModel[prop];
         obj[attribute.name] = Number(val) / 100;
+      } else if (prop === 'sn') {
+        const attribute = layerModel[prop];
+        obj[attribute.name] = Number(val);
       } else {
         obj[prop] = val;
       }

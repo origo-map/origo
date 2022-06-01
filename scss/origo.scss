@@ -25,6 +25,7 @@
   @import 'popover';
   @import 'dropdown';
   @import 'sidebar';
+  @import 'stylepicker';
   @import 'close';
   @import 'icon';
   @import 'tooltip';
@@ -46,6 +47,7 @@
   @import 'o-scale';
   @import 'scalepicker';
   @import 'embedded-overlay';
+  @import 'spinner';
 }
 
 html,
@@ -60,4 +62,33 @@ body {
   height: 100%;
   overflow: hidden;
   position: relative;
+}
+
+#loading {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 9999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background-color: rgba(0, 0, 0, 0.7);
+
+  &.hide {
+    display: none;
+  }
+
+  // based on code from https://codepen.io/mandelid/pen/kNBYLJ
+  .loading-spinner {
+    display: inline-block;
+    width: 75px;
+    height: 75px;
+    border: 5px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+  }
 }
