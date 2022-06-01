@@ -14,9 +14,9 @@ import Layer from './layer';
 import Main from './components/main';
 import Footer from './components/footer';
 import flattenGroups from './utils/flattengroups';
-import getAttributes from './getattributes';
 import getcenter from './geometry/getcenter';
 import isEmbedded from './utils/isembedded';
+import permalink from './permalink/permalink';
 
 const Viewer = function Viewer(targetOption, options = {}) {
   let map;
@@ -25,10 +25,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
   let selectionmanager;
 
   let {
-    projection
-  } = options;
-
-  const {
+    projection,
     breakPoints,
     breakPointsPrefix,
     clsOptions = '',
@@ -562,6 +559,10 @@ const Viewer = function Viewer(targetOption, options = {}) {
                               ${main.render()}
                               ${footer.render()}
                             </div>
+                          </div>
+                              
+                          <div id="loading" class="hide">
+                            <div class="loading-spinner"></div>
                           </div>`;
       const el = document.querySelector(target);
       el.innerHTML = htmlString;
@@ -619,7 +620,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
     setStyle,
     zoomToExtent,
     getSelectionManager,
-    getEmbedded
+    getEmbedded,
+    permalink
   });
 };
 

@@ -178,10 +178,10 @@ const PrintSettings = function PrintSettings(options = {}) {
         width: sizes.custom ? sizes.custom[1] : sizeCustomMinWidth,
         state: size === 'custom' ? 'active' : 'initial'
       });
-      setScaleControl = SetScaleControl({
+      setScaleControl = SetScaleControl(map, {
         scales,
         initialScale: scaleInitial
-      }, map);
+      });
 
       contentComponent = Component({
         onRender() { this.dispatch('render'); },

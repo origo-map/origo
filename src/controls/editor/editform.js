@@ -20,8 +20,8 @@ const createForm = function createForm(obj) {
   const required = obj.required ? ' required' : '';
   const name = obj.name ? obj.name : '';
   let el;
-  let checked;
   let firstOption;
+  let checked;
   const maxLengthText = maxLength ? `, max ${obj.maxLength} tecken` : '';
   switch (type) {
     case 'text':
@@ -31,8 +31,8 @@ const createForm = function createForm(obj) {
       el = `<div class="validate ${cls}"><label>${label}<br><textarea name="textarea${maxLengthText}" id="${id}" rows="3" ${maxLength}${readonly}${required}>${val}</textarea></label></div>`;
       break;
     case 'checkbox':
-      checked = val ? ' checked' : '';
-      el = `<div class="o-form-checkbox ${cls}"><label for="${id}">${label}<input type="checkbox" id="${id}" value="${val}"${checked}${disabled}></label></div>`;
+      checked = (obj.config && obj.config.uncheckedValue ? obj.config.uncheckedValue !== val : val) ? ' checked' : '';
+      el = `<div class="o-form-checkbox ${cls}"><label for="${id}"><input type="checkbox" id="${id}" value="${val}"${checked}${disabled}/>${label}</label></div>`;
       break;
     case 'dropdown':
       if (val) {
@@ -47,17 +47,14 @@ const createForm = function createForm(obj) {
       el += '</select></label></div>';
       break;
     case 'searchList':
-      elDiv.id = obj.type;
       elLabel.innerHTML = label;
       elLabel.appendChild(document.createElement('br'));
 
-      elDiv.setAttribute('class', `validate ${cls}`);
+      elDiv.setAttribute('class', `validate ${obj.type} ${cls}`);
       elInput.setAttribute('id', id);
       elInput.setAttribute('name', name);
-      elInput.setAttribute('type', 'searchList-input');
+      elInput.setAttribute('type', 'input');
       elInput.setAttribute('class', 'awesomplete');
-      elInput.setAttribute('o-list', `${JSON.stringify(obj.list)}`);
-      elInput.setAttribute('o-config', `${JSON.stringify(obj.config || {})}`);
       elInput.setAttribute('maxlength', maxLength || 50);
       elInput.setAttribute('value', val);
       if (required) {
@@ -65,7 +62,8 @@ const createForm = function createForm(obj) {
       }
 
       elButton.setAttribute('class', `dropdown-btn ${id}`);
-      elButton.setAttribute('type', 'searchList-button');
+      elButton.setAttribute('type', 'button');
+      elButton.tabIndex = -1;
       elSpan.setAttribute('class', 'caret');
       elButton.insertAdjacentElement('afterbegin', elSpan);
 
@@ -73,6 +71,7 @@ const createForm = function createForm(obj) {
       elLabel.insertAdjacentElement('afterend', elInput);
 
       elDiv.querySelector('.awesomplete').insertAdjacentElement('afterend', elButton);
+      // This removes all handlers and serialises data-attribs, so eventhandlers must be added later.
       el = elDiv.outerHTML;
       break;
     case 'image': {
