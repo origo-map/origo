@@ -1,0 +1,22 @@
+.o-stylepicker {
+  height: 1.25rem;
+  margin-right: 5px;
+  margin-bottom: 1.25rem;
+  min-width: 110px;
+}
+
+.o-stylepicker-header {
+  margin-right: 5px;
+  margin-top: 1.25rem;
+}
+
+.o-stylepicker button {
+  border-radius: 10px;
+  font-family: Arial, 'Helvetica Neue', sans-serif;
+  font-size: .625rem;
+  line-height: 1.25rem;
+}
+
+.o-stylepicker .dropdown li:hover {
+  color: $grey-darker;
+}
