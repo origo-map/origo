@@ -1,4 +1,6 @@
 import Overlay from 'ol/Overlay';
+import BaseTileLayer from 'ol/layer/BaseTile';
+import ImageLayer from 'ol/layer/Image';
 import OGlide from './oglide';
 import { Component, Modal } from './ui';
 import Popup from './popup';
@@ -662,13 +664,25 @@ const Featureinfo = function Featureinfo(options = {}) {
         // Check if there is a clickable feature when mouse is moved.
         map.on('pointermove', evt => {
           if (!pointerActive || evt.dragging) return;
-          // Just check if there is a pixel here. Pretty annoying on hatched symbols or hollow areas.
-          // Note that forEachLayerAtPixel actually only checks if there is a pixel on the canvas where the layer resides,
-          // so non queryable layers must not share canvas with queryable layers, otherwise there will be false positives.
-          // When a pixel is found on the canvas, the callback is called with all layers added to that canvas as it does not know which layer actually draw a pixel there. But we don't care which
-          // layer was hit to change the pointer.
-          // Hit tolerence seems to be ignored. It would probably look funny anyway.
-          map.getViewport().style.cursor = map.forEachLayerAtPixel(evt.pixel, () => true, { layerFilter: (l) => l.get('queryable') }) ? 'pointer' : '';
+          let cursor = '';
+          const features = map.getFeaturesAtPixel(evt.pixel, { layerFilter(layer) {
+            return layer.get('queryable');
+          }
+          });
+          if (features.length > 0) {
+            cursor = 'pointer';
+          } else {
+            const layers = viewer.getQueryableLayers().filter(layer => layer instanceof BaseTileLayer || layer instanceof ImageLayer);
+            for (let i = 0; i < layers.length; i += 1) {
+              const layer = layers[i];
+              const pixelVal = layer.getData(evt.pixel);
+              if (pixelVal instanceof Uint8ClampedArray && pixelVal[3] > 0) {
+                cursor = 'pointer';
+                break;
+              }
+            }
+          }
+          map.getViewport().style.cursor = cursor;
         });
       }
     },
