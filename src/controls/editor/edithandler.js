@@ -116,7 +116,7 @@ function getFeaturesByIds(type, layer, ids) {
 /**
  * Helper that calculates the default value for one attribute
  * @param {any} attribConf The list entry from "attributes"-configuration that default value should be calculated for
- * @returns The default value for provided attribute
+ * @returns The default value for provided attribute or undefined if no default value
  */
 function getDefaultValueForAttribute(attribConf) {
   const defaultsConfig = attribConf.defaultValue;
@@ -150,8 +150,12 @@ function getDefaultValueForAttribute(attribConf) {
           return isoDate.slice(0, 19);
       }
     }
+  } else if (attribConf.type === 'checkbox' && attribConf.config && attribConf.config.uncheckedValue) {
+    // Checkboxes defaults to unchecked value if no default value is specified. If no uncheckedValue is specified it
+    // will default to unchecked by some magic javascript falsly comparison later.
+    return attribConf.config.uncheckedValue;
   }
-  // Consistent return
+  // This attribute has no default value
   return undefined;
 }
 
@@ -161,10 +165,13 @@ function getDefaultValueForAttribute(attribConf) {
  * @returns {object} An object with attributes names as properties and the default value as value.
  */
 function getDefaultValues(attrs) {
-  return attrs.filter(attribute => attribute.name && attribute.defaultValue)
+  return attrs.filter(attribute => attribute.name)
     .reduce((prev, curr) => {
       const previous = prev;
-      previous[curr.name] = getDefaultValueForAttribute(curr);
+      const defaultValue = getDefaultValueForAttribute(curr);
+      if (defaultValue !== undefined) {
+        previous[curr.name] = defaultValue;
+      }
       return previous;
     }, {});
 }
@@ -768,7 +775,9 @@ function onAttributesSave(features, attrs) {
       if (!document.querySelector(containerClass) || document.querySelector(containerClass).classList.contains('o-hidden') === false) {
         // Check if checkbox. If checkbox read state.
         if (inputType === 'checkbox') {
-          editEl[attribute.name] = document.getElementById(attribute.elId).checked ? 1 : 0;
+          const checkedValue = (attribute.config && attribute.config.checkedValue) || 1;
+          const uncheckedValue = (attribute.config && attribute.config.uncheckedValue) || 0;
+          editEl[attribute.name] = document.getElementById(attribute.elId).checked ? checkedValue : uncheckedValue;
         } else { // Read value from input text, textarea or select
           editEl[attribute.name] = inputValue;
         }
