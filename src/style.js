@@ -156,7 +156,7 @@ function checkOptions(feature, scale, styleSettings, styleList, size) {
       s[j].some((element, index) => {
         if (Object.prototype.hasOwnProperty.call(element, 'text') && size) {
           styleList[j][index].getText().setText(size);
-        } else if (Object.prototype.hasOwnProperty.call(element, 'text')) {
+        } else if (Object.prototype.hasOwnProperty.call(element, 'text') && feature) {
           styleList[j][index].getText().setText(replacer.replace(element.text.text, feature.getProperties()));
         }
         if (element.icon && Object.prototype.hasOwnProperty.call(element.icon, 'rotation')) {
