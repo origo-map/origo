@@ -255,7 +255,7 @@ const OverlayLayer = function OverlayLayer(options) {
 
   const removeOverlayMenuItem = function removeListeners() {
     const popupMenuListEl = document.getElementById(popupMenuList.getId());
-    popupMenuListEl.remove();
+    if (popupMenuListEl) { popupMenuListEl.remove(); }
   };
 
   const onRemove = function onRemove() {
