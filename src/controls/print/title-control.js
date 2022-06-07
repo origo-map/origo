@@ -97,7 +97,6 @@ export default function TitleControl(options = {}) {
     },
     onRender() {
       formatEl = document.getElementById(formatId);
-      this.dispatch('render');
       selectSize.setButtonText(titleSize);
       selectSize.setItems(titleSizes);
       this.onChangeSize(titleSize);

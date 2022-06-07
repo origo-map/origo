@@ -330,7 +330,6 @@ const OverlayLayer = function OverlayLayer(options) {
       }
       this.addComponents(buttons);
       this.addComponent(label);
-      this.dispatch('render');
 
       if (layer.getMaxResolution() !== Infinity || layer.getMinResolution() !== 0) {
         const elId = this.getId();

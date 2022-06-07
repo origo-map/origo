@@ -10,7 +10,6 @@ const ThemeGroups = function ThemeGroups() {
     getEl,
     onRender() {
       el = document.getElementById(this.getId());
-      this.dispatch('render');
     },
     render() {
       const content = this.getComponents().reduce((acc, cmp) => acc + cmp.render(), '');

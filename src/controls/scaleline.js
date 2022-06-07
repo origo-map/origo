@@ -18,8 +18,11 @@ const ScaleLine = function ScaleLine(options = {}) {
       });
       this.render();
     },
-    render() {
+    addControlToMap() {
       viewer.getMap().addControl(scaleLine);
+    },
+    render() {
+      this.addControlToMap();
       this.dispatch('render');
     }
   });

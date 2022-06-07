@@ -60,7 +60,6 @@ export default function CustomSizeControl(options = {}) {
       customSizeEl.classList.add('hidden');
     },
     onRender() {
-      this.dispatch('render');
       customSizeEl = document.getElementById(this.getId());
     },
     isActive() {

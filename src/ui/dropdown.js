@@ -119,7 +119,6 @@ export default function Dropdown(options = {}) {
     },
     onRender() {
       setButtonText(text);
-      this.dispatch('render');
     },
     render() {
       return `<div id="${this.getId()}" class="${cls} relative" style="${style}">${containerElement.render()}</div>`;

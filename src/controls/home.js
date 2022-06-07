@@ -23,7 +23,6 @@ const Home = function Home(options = {}) {
       const map = viewer.getMap();
       if (!target) target = `${viewer.getMain().getNavigation().getId()}`;
       if (!extent) extent = map.getView().calculateExtent(map.getSize());
-      this.on('render', this.onRender);
       this.addComponents([homeButton]);
       this.render();
       if (zoomOnStart) {

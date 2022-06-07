@@ -60,9 +60,6 @@ export default function PrintInteractionToggle(options = {}) {
       });
       this.addComponent(mapInteractionToggleButton);
     },
-    onRender() {
-      this.dispatch('render');
-    },
     render() {
       if (!mapInteractionsActive) {
         onInitial();

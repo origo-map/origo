@@ -98,7 +98,6 @@ export default function DescriptionControl(options = {}) {
     },
     onRender() {
       formatEl = document.getElementById(formatId);
-      this.dispatch('render');
       selectSize.setButtonText(descriptionSize);
       selectSize.setItems(descriptionSizes);
       this.onChangeSize(descriptionSize);

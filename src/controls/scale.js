@@ -38,7 +38,6 @@ const Scale = function Scale(options = {}) {
     onAdd(evt) {
       viewer = evt.target;
       map = viewer.getMap();
-      this.on('render', this.onRender);
       this.addComponents([container]);
       if (!scaleText) scaleText = 'Skala 1:';
       const initialState = Object.prototype.hasOwnProperty.call(options, 'isActive') ? options.isActive : true;

@@ -71,9 +71,6 @@ const Overlays = function Overlays(options) {
     onInit() {
       this.addComponent(slidenav);
     },
-    onRender() {
-      this.dispatch('render');
-    },
     render() {
       return `<div id="${this.getId()}"><div class="flex row no-shrink">${slidenav.render()}</div></div>`;
     }
@@ -284,7 +281,6 @@ const Overlays = function Overlays(options) {
         }
         evt.stopPropagation();
       });
-      this.dispatch('render');
     },
     render() {
       const emptyCls = hasOverlays() ? '' : 'hidden';

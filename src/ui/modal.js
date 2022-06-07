@@ -105,7 +105,6 @@ export default function Modal(options = {}) {
       this.addComponent(headerEl);
       this.addComponent(contentEl);
 
-      this.on('render', this.onRender);
       document.getElementById(target).appendChild(html(this.render()));
       // Now the modal exists in DOM. Append the DOM content (if any).
       if (contentElement) {

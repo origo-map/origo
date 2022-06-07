@@ -103,7 +103,6 @@ const OverlayProperties = function OverlayProperties(options = {}) {
       });
     },
     onRender() {
-      this.dispatch('render');
       sliderEl = document.getElementById(transparencySlider.getId());
       overlayEl = document.getElementById(this.getId());
       overlayEl.addEventListener('click', (e) => {

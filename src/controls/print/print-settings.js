@@ -184,7 +184,6 @@ const PrintSettings = function PrintSettings(options = {}) {
       });
 
       contentComponent = Component({
-        onRender() { this.dispatch('render'); },
         render() {
           return printSettingsTemplate({
             id: this.getId(),
@@ -242,7 +241,6 @@ const PrintSettings = function PrintSettings(options = {}) {
     },
     onRender() {
       if (rotationControl) { rotationControl.setRotation(); }
-      this.dispatch('render');
       setTabIndex();
     },
     render() {

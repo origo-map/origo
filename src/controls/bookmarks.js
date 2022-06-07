@@ -64,7 +64,6 @@ const Bookmarks = function Bookmarks(options = {}) {
         this.addComponent(button);
       },
       onRender() {
-        this.dispatch('render');
         document.getElementById(titleCmp.getId()).addEventListener('click', () => {
           button.dispatch('click');
         });
@@ -85,7 +84,6 @@ const Bookmarks = function Bookmarks(options = {}) {
     onAdd(evt) {
       viewer = evt.target;
       target = document.getElementById(viewer.getMain().getMapTools().getId());
-      this.on('render', this.onRender);
       this.addComponents([bookmarks, bookmarksButton]);
       this.render();
     },

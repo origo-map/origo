@@ -33,7 +33,6 @@ const Fullscreen = function Fullscreen(options = {}) {
       });
       if (!target) target = `${viewer.getMain().getNavigation().getId()}`;
       if (isEmbedded(viewer.getTarget())) {
-        this.on('render', this.onRender);
         this.addComponents([fullscreenButton]);
         this.render();
       }

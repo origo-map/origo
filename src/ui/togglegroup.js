@@ -42,7 +42,6 @@ const ToggleGroup = function ToggleGroup(options = {}) {
     onRender() {
       const el = document.getElementById(this.getId());
       el.addEventListener('click', toggleHandler.bind(this));
-      this.dispatch('render');
     },
     render() {
       return `<div><${tagName} id="${this.getId()}" class="${cls}" style="${style}">

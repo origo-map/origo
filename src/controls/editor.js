@@ -48,7 +48,6 @@ const Editor = function Editor(options = {}) {
         }
       });
       this.addComponent(editorButton);
-      this.on('render', this.onRender);
       this.render();
       editorToolbar.init(toolbarOptions, viewer);
     },

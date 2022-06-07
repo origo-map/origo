@@ -158,9 +158,6 @@ export default function Slidenav(options = {}) {
           this.addComponent(backButton);
           this.addComponent(header);
         },
-        onRender() {
-          this.dispatch('render');
-        },
         renderSecondary() {
           return `<div class="flex column">
                     <div class="flex row padding-y-small align-center no-grow">${backButton.render()}${header.render()}</div>
@@ -187,7 +184,6 @@ export default function Slidenav(options = {}) {
       mainEl = document.getElementById(mainContainer.getId());
       secondaryEl = document.getElementById(secondaryContainer.getId());
       slidenavEl = document.getElementById(this.getId());
-      this.dispatch('render');
     },
     slideToSecondary,
     render() {

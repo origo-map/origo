@@ -22,9 +22,6 @@ const PrintToolbar = function PrintToolbar() {
     dispatchPrint() {
       this.dispatch('PDF');
     },
-    onRender() {
-      this.dispatch('render');
-    },
     render() {
       return this.html`
       <div

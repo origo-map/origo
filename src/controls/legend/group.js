@@ -1,4 +1,4 @@
-import { Component, Button, Collapse, CollapseHeader, dom } from '../../ui';
+import {Button, Collapse, CollapseHeader, Component, dom} from '../../ui';
 import GroupList from './grouplist';
 
 /**
@@ -39,10 +39,7 @@ const Group = function Group(viewer, options = {}) {
 
   const getEl = () => groupEl;
 
-  const getCheckIcon = (visible) => {
-    const isVisible = visible === 'mixed' || visible === 'all' ? checkIcon : uncheckIcon;
-    return isVisible;
-  };
+  const getCheckIcon = (visible) => (visible === 'mixed' || visible === 'all' ? checkIcon : uncheckIcon);
 
   const getOverlayList = () => groupList;
 
@@ -85,7 +82,6 @@ const Group = function Group(viewer, options = {}) {
         }
       },
       onRender() {
-        this.dispatch('render');
         const collapseEvent = 'collapse:toggle';
         const el = document.getElementById(this.getId());
         el.addEventListener('click', () => {
@@ -180,10 +176,6 @@ const Group = function Group(viewer, options = {}) {
     removeGroup,
     removeOverlay,
     onAdd(evt) {
-      if (evt.target) {
-        evt.target.on('render', this.onRender.bind(this));
-      }
-
       // Add directly if target is available in the dom
       if (evt.target.getEl()) {
         this.appendGroup(evt.target);
@@ -287,7 +279,6 @@ const Group = function Group(viewer, options = {}) {
           }
         });
       }
-      this.dispatch('render');
     },
     render() {
       this.dispatch('beforerender');

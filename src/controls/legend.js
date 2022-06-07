@@ -436,9 +436,6 @@ const Legend = function Legend(options = {}) {
       toolsCmp.addComponent(button);
       button.onRender();
     },
-    onInit() {
-      this.on('render', this.onRender);
-    },
     onAdd(evt) {
       viewer = evt.target;
       viewer.on('active:turnofflayers', turnOffAllLayers);
@@ -452,7 +449,6 @@ const Legend = function Legend(options = {}) {
       });
 
       this.render();
-      this.dispatch('render');
       viewer.getMap().on('click', onMapClick);
     },
     onRender() {
@@ -582,6 +578,7 @@ const Legend = function Legend(options = {}) {
       this.addComponent(layerButton);
       const el = dom.html(layerButton.render());
       target.appendChild(el);
+      this.dispatch('render');
     }
   });
 };

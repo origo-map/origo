@@ -24,8 +24,11 @@ const Attribution = function Attribution(options = {}) {
       });
       this.render();
     },
-    render() {
+    addControlToMap() {
       viewer.getMap().addControl(attribution);
+    },
+    render() {
+      this.addControlToMap();
       window.addEventListener('resize', checkSize);
       checkSize(attribution, breakPoint);
       this.dispatch('render');

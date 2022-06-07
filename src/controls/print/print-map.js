@@ -38,9 +38,6 @@ export default function PrintMap(options = {}) {
       this.on('change:toggleScale', this.toggleScale.bind(this));
       this.on('change:setDPI', this.setDpi.bind(this));
     },
-    onRender() {
-      this.dispatch('render');
-    },
     setDpi(resolution) {
       scaleLine.setDpi(resolution.resolution);
     },

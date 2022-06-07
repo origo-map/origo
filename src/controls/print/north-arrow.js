@@ -59,9 +59,6 @@ export default function NorthArrow(options = {}) {
     setVisible(display) {
       setVisible(display);
     },
-    onRender() {
-      this.dispatch('render');
-    },
     render() {
       return `<img src="${src}" class="${cls}" style="${styleString}" id="${this.getId()}" alt="NorthArrow" />`;
     }

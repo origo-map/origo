@@ -32,9 +32,6 @@ export default function Element(options = {}) {
       renderSettings.id = this.getId();
       this.addComponents(components);
     },
-    onRender() {
-      this.dispatch('render');
-    },
     render() {
       el = createElement(tagName, innerHTML, renderSettings);
       if (this.getComponents().length) {

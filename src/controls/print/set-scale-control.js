@@ -35,7 +35,6 @@ export default function SetScaleControl(map, options = {}) {
       selectScale.setButtonText(evt);
     },
     onRender() {
-      this.dispatch('render');
       selectScale.setItems(scales);
       document.getElementById(selectScale.getId()).addEventListener('dropdown:select', (evt) => {
         this.onChangeScale(evt.target.textContent);

@@ -342,8 +342,6 @@ const PrintComponent = function PrintComponent(options = {}) {
   return Component({
     name: 'printComponent',
     onInit() {
-      this.on('render', this.onRender);
-
       this.addComponent(printSettings);
       this.addComponent(printInteractionToggle);
       this.addComponent(printToolbar);
@@ -591,11 +589,17 @@ const PrintComponent = function PrintComponent(options = {}) {
     },
     restoreViewerControls() {
       const attibutionControl = viewer.getControlByName('attribution');
-      if (attibutionControl) attibutionControl.render();
+      if (attibutionControl) {
+        attibutionControl.addControlToMap();
+      }
       const scalelineControl = viewer.getControlByName('scaleline');
-      if (scalelineControl) scalelineControl.render();
+      if (scalelineControl) {
+        scalelineControl.addControlToMap();
+      }
       const draganddropControl = viewer.getControlByName('draganddrop');
-      if (draganddropControl) draganddropControl.addInteraction();
+      if (draganddropControl) {
+        draganddropControl.addInteraction();
+      }
     },
     render() {
       targetElement = document.getElementById(target);

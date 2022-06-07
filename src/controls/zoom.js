@@ -32,7 +32,6 @@ const Zoom = function Zoom(options = {}) {
     onAdd(evt) {
       viewer = evt.target;
       if (!target) target = `${viewer.getMain().getNavigation().getId()}`;
-      this.on('render', this.onRender);
       this.addComponents([zoomIn, zoomOut]);
       this.render();
     },

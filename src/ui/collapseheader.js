@@ -38,7 +38,6 @@ export default function CollapseHeader(options = {}) {
       this.addComponents([headerButton, titleCmp]);
     },
     onRender() {
-      this.dispatch('render');
       const el = document.getElementById(this.getId());
       el.addEventListener('click', () => {
         const customEvt = new CustomEvent(collapseEvent, {

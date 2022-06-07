@@ -76,7 +76,6 @@ const Mapmenu = function Mapmenu({
         this.addComponent(button);
       },
       onRender() {
-        this.dispatch('render');
         document.getElementById(titleCmp.getId()).addEventListener('click', () => {
           button.dispatch('click');
         });
@@ -101,7 +100,6 @@ const Mapmenu = function Mapmenu({
     onAdd(evt) {
       viewer = evt.target;
       target = document.getElementById(viewer.getMain().getId());
-      this.on('render', this.onRender);
       this.addComponents([mapMenu, menuButton]);
       this.render();
       viewer.getMap().on('click', onMapClick);

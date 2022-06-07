@@ -12,10 +12,7 @@ const LayerList = function LayerList(options, isRootGroup = false) {
   }
   const overlaysStore = {};
   const groupStore = {};
-  let el;
   let target;
-
-  const getEl = () => el;
 
   const addOverlay = function addOverlay(overlay) {
     const name = overlay.name;
@@ -99,7 +96,6 @@ const LayerList = function LayerList(options, isRootGroup = false) {
     getGroups,
     getOverlays,
     getVisible,
-    getEl,
     removeGroup,
     removeOverlay,
     onInit() {
@@ -119,12 +115,8 @@ const LayerList = function LayerList(options, isRootGroup = false) {
         }
       });
     },
-    onRender() {
-      el = document.getElementById(this.getId());
-      this.dispatch('render');
-    },
     render() {
-      const content = this.getComponents().reduce((acc, item) => acc + item.render(), '');
+      const content = this.getComponents().map((c) => c.render()).join('');
       return `<ul id="${this.getId()}" class="${cls}">${content}</ul>`;
     }
   });

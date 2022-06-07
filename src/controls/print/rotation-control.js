@@ -27,7 +27,6 @@ export default function RotationControl(options = {}) {
       map.getView().on('change:rotation', this.setRotation);
     },
     onRender() {
-      this.dispatch('render');
       if (rotation) {
         map.getView().setRotation((rotation * Math.PI) / 180);
       }

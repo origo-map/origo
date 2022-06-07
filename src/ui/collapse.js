@@ -119,7 +119,6 @@ export default function Collapse(options = {}) {
       } else {
         setTabIndex(-1);
       }
-      this.dispatch('render');
     },
     render: function render() {
       const height = !expanded && collapseY ? 'height: 0;' : '';
