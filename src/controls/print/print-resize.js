@@ -385,29 +385,10 @@ export default function PrintResize(options = {}) {
         }
         const newStyle = Style.createStyle({
           style: styleName,
-          viewer
-        })();
+          viewer,
+          scaleToDpi: resolution
+        });
         if (newStyle) {
-          const styleScale = multiplyByFactor(1.5);
-          newStyle.forEach(style => {
-            const image = style.getImage();
-            if (image) {
-              const imageScale = image.getScale() ? multiplyByFactor(image.getScale()) : styleScale;
-              image.setScale(imageScale);
-            }
-
-            const stroke = style.getStroke();
-            if (stroke) {
-              const strokeWidth = stroke.getWidth() ? multiplyByFactor(stroke.getWidth()) : styleScale;
-              stroke.setWidth(strokeWidth);
-            }
-
-            const text = style.getText();
-            if (text) {
-              const textScale = text.getScale() ? multiplyByFactor(text.getScale()) : styleScale;
-              text.setScale(textScale);
-            }
-          });
           layer.setStyle(newStyle);
         }
       } else if (features) {

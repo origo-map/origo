@@ -148,7 +148,15 @@ function createStyleList(styleOptions) {
   return styleList;
 }
 
-function checkOptions(feature, scale, styleSettings, styleList, size) {
+// Will become an issue if 150 dpi is no longer the "standard" dpi setting
+function multiplyByFactor(value, scaleToDpi = 150) {
+  return value * (scaleToDpi / 150);
+}
+
+function checkOptions(options = {}) {
+  const {
+    feature, scale, styleSettings, styleList, size, scaleToDpi
+  } = options;
   const s = styleSettings;
   for (let j = 0; j < s.length; j += 1) {
     let styleL;
@@ -166,6 +174,38 @@ function checkOptions(feature, scale, styleSettings, styleList, size) {
         }
         return null;
       });
+
+      if (styleList[j] && scaleToDpi) {
+        const styleScale = multiplyByFactor(1.5, scaleToDpi);
+        styleList[j].forEach((style, index) => {
+          console.log(style);
+          const image = style.getImage();
+          if (image) {
+            if (s[j][index].icon) {
+              const imageScale = s[j][index].icon.scale ? multiplyByFactor(s[j][index].icon.scale, scaleToDpi) : styleScale;
+              image.setScale(imageScale);
+            } else if (s[j][index].circle) {
+              const imageScale = s[j][index].circle.scale ? multiplyByFactor(s[j][index].circle.scale, scaleToDpi) : styleScale;
+              image.setScale(imageScale);
+            } else { image.setScale(styleScale); }
+          }
+
+          const stroke = style.getStroke();
+          if (stroke) {
+            const strokeWidth = stroke.getWidth() ? multiplyByFactor(stroke.getWidth(), scaleToDpi) : styleScale;
+            stroke.setWidth(strokeWidth);
+          }
+
+          const text = style.getText();
+          if (text) {
+            if (s[j][index].text) {
+              const textScale = s[j][index].text.scale ? multiplyByFactor(s[j][index].text.scale, scaleToDpi) : styleScale;
+              text.setScale(textScale);
+            }
+          }
+        });
+      }
+
       if (Object.prototype.hasOwnProperty.call(s[j][0], 'filter')) {
         let expr;
         const exprArr = [];
@@ -261,17 +301,19 @@ function styleFunction({
   clusterStyleSettings,
   clusterStyleList,
   projection,
-  resolutions
+  resolutions,
+  scaleToDpi
 } = {}) {
   const fn = function fn(feature, resolution) {
+    console.log('styleFunction', feature, resolution);
     const scale = maputils.resolutionToScale(resolution, projection);
     let styleL;
     // If size is larger than 1, it is a cluster
     const size = clusterStyleList ? feature.get('features').length : 1;
     if (size > 1 && resolution !== resolutions[resolutions.length + 1]) {
-      styleL = checkOptions(feature, scale, clusterStyleSettings, clusterStyleList, size.toString());
+      styleL = checkOptions({ feature, scale, styleSettings: clusterStyleSettings, styleList: clusterStyleList, size: size.toString(), scaleToDpi });
     } else {
-      styleL = checkOptions(feature, scale, styleSettings, styleList);
+      styleL = checkOptions({ feature, scale, styleSettings, styleList, scaleToDpi });
     }
     return styleL;
   };
@@ -286,7 +328,8 @@ function createStyle({
   file,
   source,
   type,
-  name
+  name,
+  scaleToDpi
 } = {}) {
   const resolutions = viewer.getResolutions();
   const projection = viewer.getProjection();
@@ -320,14 +363,16 @@ function createStyle({
         clusterStyleSettings,
         clusterStyleList,
         projection,
-        resolutions
+        resolutions,
+        scaleToDpi
       });
     }
     return styleFunction({
       styleSettings,
       styleList,
       projection,
-      resolutions
+      resolutions,
+      scaleToDpi
     });
   }());
   return style;
