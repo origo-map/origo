@@ -178,7 +178,6 @@ function checkOptions(options = {}) {
       if (styleList[j] && scaleToDpi) {
         const styleScale = multiplyByFactor(1.5, scaleToDpi);
         styleList[j].forEach((style, index) => {
-          console.log(style);
           const image = style.getImage();
           if (image) {
             if (s[j][index].icon) {
@@ -305,7 +304,6 @@ function styleFunction({
   scaleToDpi
 } = {}) {
   const fn = function fn(feature, resolution) {
-    console.log('styleFunction', feature, resolution);
     const scale = maputils.resolutionToScale(resolution, projection);
     let styleL;
     // If size is larger than 1, it is a cluster
