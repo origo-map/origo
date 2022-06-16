@@ -340,10 +340,14 @@ export default function PrintResize(options = {}) {
             newStyles[index][0].stroke.width = multiplyByFactor(style[0].stroke.width || 1);
           }
         });
-
-        viewer.setStyle(styleName, newStyles);
-        const newLayer = Layer(layerOption, viewer);
-        layer.setStyle(newLayer.getStyle());
+        const newStyle = Style.createStyle({
+          style: styleName,
+          viewer,
+          scaleToDpi: resolution
+        });
+        if (newStyle) {
+          layer.setStyle(newStyle);
+        }
       }
     }
   };
@@ -374,15 +378,6 @@ export default function PrintResize(options = {}) {
       if (styles && styles.length > 1) {
         changeWfsThemeLayer(layer, styleName, styles);
       } else if (styleName && styles && styles.length === 1) {
-        const layerName = layer.get('name');
-        const newStyles = [...styles];
-        if (!(layersOriginalStyles.some(layerInArr => layerInArr.layerName === layerName))) {
-          layersOriginalStyles.push({
-            layerName,
-            styleName,
-            styles: JSON.parse(JSON.stringify(newStyles))
-          });
-        }
         const newStyle = Style.createStyle({
           style: styleName,
           viewer,
@@ -433,20 +428,16 @@ export default function PrintResize(options = {}) {
     }
   };
 
-  // "Resets" layer by removing DPI parameter
+  // "Resets" layer by resetting the style and removing DPI parameter
   const resetLayerScale = function resetLayerScale(layer) {
     const source = layer.getSource();
-    layersOriginalStyles.forEach(item => {
-      const currentLayer = map.getLayers().getArray().find(l => l.get('name') === item.layerName);
-      if (currentLayer) {
-        const layerOption = viewer.getViewerOptions().layers.find(option => option.style && option.style === item.styleName);
-        if (layerOption) {
-          viewer.setStyle(item.styleName, item.styles);
-          const newLayer = Layer(layerOption, viewer);
-          currentLayer.setStyle(newLayer.getStyle());
-        }
+    if (isVector(layer)) {
+      let style = viewer.getStyle(layer.get('styleName'));
+      style = Style.createStyle({ style: layer.get('styleName'), viewer });
+      if (style) {
+        layer.setStyle(style);
       }
-    });
+    }
 
     if (isImage(layer) && isValidSource(source)) {
       const params = source.getParams();
@@ -472,14 +463,22 @@ export default function PrintResize(options = {}) {
   // Alters all visible layers, for when entering print preview or changing DPI
   const updateLayers = function updateLayers() {
     getVisibleLayers().forEach(layer => {
-      setLayerScale(layer);
+      if (layer instanceof LayerGroup) {
+        layer.forEach(item => item.getLayersArray().forEach(element => setLayerScale(element)));
+      } else {
+        setLayerScale(layer);
+      }
     });
   };
 
   // "Resets" all visible layers, for when exiting print preview
   const resetLayers = function resetLayers() {
     getVisibleLayers().forEach(layer => {
-      resetLayerScale(layer);
+      if (layer instanceof LayerGroup) {
+        layer.forEach(item => item.getLayersArray().forEach(element => resetLayerScale(element)));
+      } else {
+        resetLayerScale(layer);
+      }
     });
   };
 
