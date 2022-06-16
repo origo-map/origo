@@ -6,87 +6,96 @@ $flex-grow: 1;
 $flex-grow-all: 2;
 
 .flex {
-  // flex container
-  display: flex;
+    // flex container
+    display: flex;
 
-  &.row {
-    flex-direction: row;
-  }
+    &.row {
+        flex-direction: row;
+    }
 
-  &.row-reverse {
-    flex-direction: row-reverse;
-  }
+    &.row-reverse {
+        flex-direction: row-reverse;
+    }
 
-  &.column {
-    flex-direction: column;
-  }   
+    &.column {
+        flex-direction: column;
+    }
 
-  &.column-reverse {
-    flex-direction: column-reverse;
-  }
-  
-  // flex items
-  .shrink {
-    flex-shrink: $flex-shrink;
-  }
+    &.column-reverse {
+        flex-direction: column-reverse;
+    }
+    
+    // flex items
+    .shrink {
+        flex-shrink: $flex-shrink;
+    }
 
-  .grow {
-    flex-grow: $flex-grow;
-  }   
+    .grow {
+        flex-grow: $flex-grow;
+    }
 
-  .no-shrink {
-    flex-shrink: $flex-no-shrink;
-  }
+    .no-shrink {
+        flex-shrink: $flex-no-shrink;
+    }
 
-  .no-grow {
-    flex-grow: $flex-no-grow;
-  }
+    .no-grow {
+        flex-grow: $flex-no-grow;
+    }
 
-  .grow-all {
-    flex-grow: $flex-grow-all;
-  }
+    .grow-all {
+        flex-grow: $flex-grow-all;
+    }
 
-  .no-wrap {
-    flex-wrap: nowrap;
-  }
+    .no-wrap {
+        flex-wrap: nowrap;
+    }
 
-  .justify-start {
-    justify-content: flex-start;
-  }
+    .wrap {
+        flex-wrap: wrap;
+    }
+    /* Use this on an empty div to simulate a br in flex. requires that container has flex-wrap: wrap*/
+    .flex-line-break {
+        flex-basis: 100%;
+        height: 0;
+    }
 
-  .justify-end {
-    justify-content: flex-end;
-  }
+    .justify-start {
+        justify-content: flex-start;
+    }
 
-  .justify-center {
-    justify-content: center;
-  }
+    .justify-end {
+        justify-content: flex-end;
+    }
 
-  .justify-space-between {
-    justify-content: space-between;
-  }
+    .justify-center {
+        justify-content: center;
+    }
 
-  .justify-space-evenly {
-    justify-content: space-evenly;
-  }   
+    .justify-space-between {
+        justify-content: space-between;
+    }
 
-  .align-start {
-    align-items: flex-start;
-  }
+    .justify-space-evenly {
+        justify-content: space-evenly;
+    }
 
-  .align-end {
-    align-items: flex-end;
-  }
+    .align-start {
+        align-items: flex-start;
+    }
 
-  .align-center {
-    align-items: center;
-  }
+    .align-end {
+        align-items: flex-end;
+    }
 
-  .align-baseline {
-    align-items: baseline;
-  }
+    .align-center {
+        align-items: center;
+    }
 
-  .align-stretch {
-    align-items: stretch;
-  }     
+    .align-baseline {
+        align-items: baseline;
+    }
+
+    .align-stretch {
+        align-items: stretch;
+    }
 }
