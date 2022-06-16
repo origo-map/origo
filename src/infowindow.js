@@ -207,7 +207,7 @@ function createCustomExportButton(roundButtonIcon, roundButtonTooltipText) {
 
   container.appendChild(button);
   const spinner = getSpinner();
-  spinner.classList.add('spinner-custom');
+  spinner.classList.add('spinner-large');
 
   button.loadStart = () => {
     button.disabled = true;
