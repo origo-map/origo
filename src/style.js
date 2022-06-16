@@ -72,7 +72,14 @@ const editStyleOptions = {
   ]
 };
 
-function createStyleOptions(styleParams) {
+// Will become an issue if 150 dpi is no longer the "standard" dpi setting
+function multiplyByFactor(value, scaleToDpi = 150) {
+  return value * (scaleToDpi / 150);
+}
+
+function createStyleOptions(orgStyleParams, scaleToDpi) {
+  const styleParams = JSON.parse(JSON.stringify(orgStyleParams));
+  const styleScale = scaleToDpi ? multiplyByFactor(1.5, scaleToDpi) : undefined;
   const styleOptions = {};
   if (Object.prototype.hasOwnProperty.call(styleParams, 'geometry')) {
     switch (styleParams.geometry) {
@@ -101,6 +108,9 @@ function createStyleOptions(styleParams) {
     styleOptions.fill = new Fill(styleParams.fill);
   }
   if ('stroke' in styleParams) {
+    if (scaleToDpi && styleParams.stroke.width) {
+      styleParams.stroke.width = multiplyByFactor(styleParams.stroke.width, scaleToDpi);
+    }
     styleOptions.stroke = new Stroke(styleParams.stroke);
   }
   if ('text' in styleParams) {
@@ -109,24 +119,36 @@ function createStyleOptions(styleParams) {
       styleOptions.text.setFill(new Fill(styleParams.text.fill));
     }
     if ('stroke' in styleParams.text) {
+      if (scaleToDpi && styleParams.text.stroke.width) {
+        styleParams.text.stroke.width = multiplyByFactor(styleParams.text.stroke.width, scaleToDpi);
+      }
       styleOptions.text.setStroke(new Stroke(styleParams.text.stroke));
     }
   }
   if ('icon' in styleParams) {
     const styleIcon = styleParams.icon;
     styleOptions.image = new Icon(styleIcon);
+    if (scaleToDpi) {
+      const imageScale = styleParams.icon.scale ? multiplyByFactor(styleParams.icon.scale, scaleToDpi) : styleScale;
+      styleOptions.image.setScale(imageScale);
+    }
   }
   if ('circle' in styleParams) {
     styleOptions.image = new Circle({
       radius: styleParams.circle.radius,
+      scale: styleParams.circle.scale || undefined,
       fill: new Fill(styleParams.circle.fill) || undefined,
       stroke: new Stroke(styleParams.circle.stroke) || undefined
     });
+    if (scaleToDpi) {
+      const imageScale = styleParams.circle.scale ? multiplyByFactor(styleParams.circle.scale, scaleToDpi) : styleScale;
+      styleOptions.image.setScale(imageScale);
+    }
   }
   return styleOptions;
 }
 
-function createStyleList(styleOptions) {
+function createStyleList(styleOptions, scaleToDpi) {
   const styleList = [];
   // Create style for each rule
   for (let i = 0; i < styleOptions.length; i += 1) {
@@ -135,11 +157,11 @@ function createStyleList(styleOptions) {
     // Check if rule is array, ie multiple styles for the rule
     if (styleOptions[i].constructor === Array) {
       for (let j = 0; j < styleOptions[i].length; j += 1) {
-        styleOption = createStyleOptions(styleOptions[i][j]);
+        styleOption = createStyleOptions(styleOptions[i][j], scaleToDpi);
         styleRule.push(new Style(styleOption));
       }
     } else {
-      styleOption = createStyleOptions(styleOptions[i]);
+      styleOption = createStyleOptions(styleOptions[i], scaleToDpi);
       styleRule = [new Style(styleOption)];
     }
 
@@ -148,14 +170,9 @@ function createStyleList(styleOptions) {
   return styleList;
 }
 
-// Will become an issue if 150 dpi is no longer the "standard" dpi setting
-function multiplyByFactor(value, scaleToDpi = 150) {
-  return value * (scaleToDpi / 150);
-}
-
 function checkOptions(options = {}) {
   const {
-    feature, scale, styleSettings, styleList, size, scaleToDpi
+    feature, scale, styleSettings, styleList, size
   } = options;
   const s = styleSettings;
   for (let j = 0; j < s.length; j += 1) {
@@ -174,37 +191,6 @@ function checkOptions(options = {}) {
         }
         return null;
       });
-
-      if (styleList[j] && scaleToDpi) {
-        const styleScale = multiplyByFactor(1.5, scaleToDpi);
-        styleList[j].forEach((style, index) => {
-          const image = style.getImage();
-          if (image) {
-            if (s[j][index].icon) {
-              const imageScale = s[j][index].icon.scale ? multiplyByFactor(s[j][index].icon.scale, scaleToDpi) : styleScale;
-              image.setScale(imageScale);
-            } else if (s[j][index].circle) {
-              const imageScale = s[j][index].circle.scale ? multiplyByFactor(s[j][index].circle.scale, scaleToDpi) : styleScale;
-              image.setScale(imageScale);
-            } else { image.setScale(styleScale); }
-          }
-
-          const stroke = style.getStroke();
-          if (stroke) {
-            const strokeWidth = stroke.getWidth() ? multiplyByFactor(stroke.getWidth(), scaleToDpi) : styleScale;
-            stroke.setWidth(strokeWidth);
-          }
-
-          const text = style.getText();
-          if (text) {
-            if (s[j][index].text) {
-              const textScale = s[j][index].text.scale ? multiplyByFactor(s[j][index].text.scale, scaleToDpi) : styleScale;
-              text.setScale(textScale);
-            }
-          }
-        });
-      }
-
       if (Object.prototype.hasOwnProperty.call(s[j][0], 'filter')) {
         let expr;
         const exprArr = [];
@@ -352,9 +338,9 @@ function createStyle({
 
   const style = (function style() {
     // Create style for each rule
-    const styleList = createStyleList(styleSettings);
+    const styleList = createStyleList(styleSettings, scaleToDpi);
     if (clusterStyleSettings) {
-      const clusterStyleList = createStyleList(clusterStyleSettings);
+      const clusterStyleList = createStyleList(clusterStyleSettings, scaleToDpi);
       return styleFunction({
         styleSettings,
         styleList,
