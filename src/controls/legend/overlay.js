@@ -167,7 +167,7 @@ const OverlayLayer = function OverlayLayer(options) {
     } else if (exportFormat && Array.isArray(exportFormat)) {
       exportFormatArray = exportFormat;
     }
-    const formats = exportFormatArray.filter(format => format === 'geojson' || format === 'gpx' || format === 'kml');
+    const formats = exportFormatArray.map(format => format.toLowerCase()).filter(format => format === 'geojson' || format === 'gpx' || format === 'kml');
     if (formats.length === 0) { formats.push('geojson'); }
     formats.forEach((format) => {
       const exportLayerMenuItem = Component({
