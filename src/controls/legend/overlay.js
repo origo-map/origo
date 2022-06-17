@@ -160,7 +160,7 @@ const OverlayLayer = function OverlayLayer(options) {
   }
 
   if (layer.get('exportable')) {
-    const exportFormat = layer.get('exportFormat');
+    const exportFormat = layer.get('exportFormat') || layer.get('exportformat');
     let exportFormatArray = [];
     if (exportFormat && typeof exportFormat === 'string') {
       exportFormatArray.push(exportFormat);
