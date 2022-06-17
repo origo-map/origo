@@ -1,6 +1,7 @@
 import { Component, Button, dom } from '../../ui';
 import { HeaderIcon } from '../../utils/legendmaker';
 import PopupMenu from '../../ui/popupmenu';
+import exportToFile from '../../utils/exporttofile';
 
 const OverlayLayer = function OverlayLayer(options) {
   const {
@@ -156,6 +157,42 @@ const OverlayLayer = function OverlayLayer(options) {
       }
     });
     popupMenuItems.push(zoomToExtentMenuItem);
+  }
+
+  if (layer.get('exportable')) {
+    const exportFormat = layer.get('exportFormat') || layer.get('exportformat');
+    let exportFormatArray = [];
+    if (exportFormat && typeof exportFormat === 'string') {
+      exportFormatArray.push(exportFormat);
+    } else if (exportFormat && Array.isArray(exportFormat)) {
+      exportFormatArray = exportFormat;
+    }
+    const formats = exportFormatArray.map(format => format.toLowerCase()).filter(format => format === 'geojson' || format === 'gpx' || format === 'kml');
+    if (formats.length === 0) { formats.push('geojson'); }
+    formats.forEach((format) => {
+      const exportLayerMenuItem = Component({
+        onRender() {
+          const labelEl = document.getElementById(this.getId());
+          labelEl.addEventListener('click', (e) => {
+            const features = layer.getSource().getFeatures();
+            exportToFile(features, format, {
+              featureProjection: viewer.getProjection().getCode(),
+              filename: title || 'export'
+            });
+            e.preventDefault();
+          });
+        },
+        render() {
+          let exportLabel;
+          if (exportFormatArray.length > 1) {
+            exportLabel = `Spara lager (.${format})`;
+          } else { exportLabel = 'Spara lager'; }
+          const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
+          return `<li id="${this.getId()}" class="${labelCls}">${exportLabel}</li>`;
+        }
+      });
+      popupMenuItems.push(exportLayerMenuItem);
+    });
   }
 
   if (layer.get('removable')) {
