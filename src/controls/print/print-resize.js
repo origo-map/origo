@@ -55,13 +55,18 @@ export default function PrintResize(options = {}) {
   };
 
   const getCssRule = function getCssRule(selector) {
-    const rules = document.styleSheets[0].cssRules;
-    for (let i = 0; i < rules.length; i += 1) {
-      if (rules[i].selectorText === selector) {
-        return rules[i];
-      }
+    let soughtRule;
+    try {
+      Array.from(document.styleSheets).some((sheet) => Array.from(sheet.cssRules).some((cssRule) => {
+        if (cssRule.selectorText === selector) {
+          soughtRule = cssRule;
+          return true;
+        } return false;
+      }));
+    } catch (error) {
+      console.warn(error);
     }
-    return undefined;
+    return soughtRule;
   };
 
   const getVisibleLayers = function getVisibleLayers() {
