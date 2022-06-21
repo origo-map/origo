@@ -114,6 +114,12 @@ function createStyleOptions(orgStyleParams, scaleToDpi) {
     styleOptions.stroke = new Stroke(styleParams.stroke);
   }
   if ('text' in styleParams) {
+    if (scaleToDpi && styleParams.text.offsetX) {
+      styleParams.text.offsetX = multiplyByFactor(styleParams.text.offsetX, scaleToDpi * 1.5);
+    }
+    if (scaleToDpi && styleParams.text.offsetY) {
+      styleParams.text.offsetY = multiplyByFactor(styleParams.text.offsetY, scaleToDpi * 1.3);
+    }
     styleOptions.text = new Text(styleParams.text);
     if (scaleToDpi) {
       const textScale = styleParams.text.scale ? multiplyByFactor(styleParams.text.scale, scaleToDpi) : styleScale;
