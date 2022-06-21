@@ -328,9 +328,11 @@ export default function PrintResize(options = {}) {
       const features = source.getFeatures();
 
       if (styles) {
+        const clusterStyleName = layer.get('clusterStyle') ? layer.get('clusterStyle') : undefined;
         const newStyle = Style.createStyle({
           style: styleName,
           viewer,
+          clusterStyleName,
           scaleToDpi: resolution
         });
         if (newStyle) {
@@ -383,7 +385,8 @@ export default function PrintResize(options = {}) {
     const source = layer.getSource();
     if (isVector(layer)) {
       let style = viewer.getStyle(layer.get('styleName'));
-      style = Style.createStyle({ style: layer.get('styleName'), viewer });
+      const clusterStyleName = layer.get('clusterStyle') ? layer.get('clusterStyle') : undefined;
+      style = Style.createStyle({ style: layer.get('styleName'), viewer, clusterStyleName });
       if (style) {
         layer.setStyle(style);
       }

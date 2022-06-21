@@ -115,6 +115,10 @@ function createStyleOptions(orgStyleParams, scaleToDpi) {
   }
   if ('text' in styleParams) {
     styleOptions.text = new Text(styleParams.text);
+    if (scaleToDpi) {
+      const textScale = styleParams.text.scale ? multiplyByFactor(styleParams.text.scale, scaleToDpi) : styleScale;
+      styleOptions.text.setScale(textScale);
+    }
     if ('fill' in styleParams.text) {
       styleOptions.text.setFill(new Fill(styleParams.text.fill));
     }
