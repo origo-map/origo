@@ -1,12 +1,11 @@
 import { Component, Button, dom } from '../../ui';
 import { HeaderIcon } from '../../utils/legendmaker';
 import PopupMenu from '../../ui/popupmenu';
+import exportToFile from '../../utils/exporttofile';
 
 const OverlayLayer = function OverlayLayer(options) {
-  let {
-    headerIconCls = ''
-  } = options;
   const {
+    headerIconCls = '',
     cls: clsSettings = '',
     icon = '#o_list_24px',
     iconCls = 'grey-lightest',
@@ -17,9 +16,13 @@ const OverlayLayer = function OverlayLayer(options) {
   } = options;
 
   const buttons = [];
+  let headerIconClass = headerIconCls;
+
   const popupMenuItems = [];
   let layerList;
 
+  const hasStylePicker = viewer.getLayerStylePicker(layer).length > 0;
+  const layerIconCls = `round compact icon-small relative no-shrink light ${hasStylePicker ? 'style-picker' : ''}`;
   const cls = `${clsSettings} flex row align-center padding-left padding-right-smaller item`.trim();
   const title = layer.get('title') || 'Titel saknas';
   const name = layer.get('name');
@@ -39,7 +42,7 @@ const OverlayLayer = function OverlayLayer(options) {
   let headerIcon = HeaderIcon(style, opacity);
   if (!headerIcon) {
     headerIcon = icon;
-    headerIconCls = iconCls;
+    headerIconClass = iconCls;
   }
 
   const eventOverlayProps = new CustomEvent('overlayproperties', {
@@ -68,15 +71,15 @@ const OverlayLayer = function OverlayLayer(options) {
   };
 
   const layerIcon = Button({
-    cls: `${headerIconCls} round compact icon-small light relative no-shrink`,
+    cls: `${headerIconClass} ${layerIconCls}`,
     click() {
       if (!secure) {
         toggleVisible(layer.getVisible());
       }
     },
     style: {
-      height: '1.5rem',
-      width: '1.5rem'
+      height: 'calc(1.5rem + 2px)',
+      width: 'calc(1.5rem + 2px)'
     },
     ariaLabel: 'Lager ikon',
     icon: headerIcon,
@@ -132,6 +135,65 @@ const OverlayLayer = function OverlayLayer(options) {
     }
   });
   popupMenuItems.push(layerInfoMenuItem);
+
+  if (layer.get('zoomToExtent')) {
+    const zoomToExtentMenuItem = Component({
+      onRender() {
+        const labelEl = document.getElementById(this.getId());
+        labelEl.addEventListener('click', (e) => {
+          const extent = typeof layer.getSource !== 'undefined' && typeof layer.getSource().getExtent !== 'undefined' ? layer.getSource().getExtent() : layer.getExtent();
+          if (layer.getVisible()) {
+            viewer.getMap().getView().fit(extent, {
+              padding: [50, 50, 50, 50],
+              duration: 1000
+            });
+            e.preventDefault();
+          }
+        });
+      },
+      render() {
+        const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
+        return `<li id="${this.getId()}" class="${labelCls}">Zooma till</li>`;
+      }
+    });
+    popupMenuItems.push(zoomToExtentMenuItem);
+  }
+
+  if (layer.get('exportable')) {
+    const exportFormat = layer.get('exportFormat') || layer.get('exportformat');
+    let exportFormatArray = [];
+    if (exportFormat && typeof exportFormat === 'string') {
+      exportFormatArray.push(exportFormat);
+    } else if (exportFormat && Array.isArray(exportFormat)) {
+      exportFormatArray = exportFormat;
+    }
+    const formats = exportFormatArray.map(format => format.toLowerCase()).filter(format => format === 'geojson' || format === 'gpx' || format === 'kml');
+    if (formats.length === 0) { formats.push('geojson'); }
+    formats.forEach((format) => {
+      const exportLayerMenuItem = Component({
+        onRender() {
+          const labelEl = document.getElementById(this.getId());
+          labelEl.addEventListener('click', (e) => {
+            const features = layer.getSource().getFeatures();
+            exportToFile(features, format, {
+              featureProjection: viewer.getProjection().getCode(),
+              filename: title || 'export'
+            });
+            e.preventDefault();
+          });
+        },
+        render() {
+          let exportLabel;
+          if (exportFormatArray.length > 1) {
+            exportLabel = `Spara lager (.${format})`;
+          } else { exportLabel = 'Spara lager'; }
+          const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
+          return `<li id="${this.getId()}" class="${labelCls}">${exportLabel}</li>`;
+        }
+      });
+      popupMenuItems.push(exportLayerMenuItem);
+    });
+  }
 
   if (layer.get('removable')) {
     const removeLayerMenuItem = Component({
@@ -230,13 +292,23 @@ const OverlayLayer = function OverlayLayer(options) {
 
   const removeOverlayMenuItem = function removeListeners() {
     const popupMenuListEl = document.getElementById(popupMenuList.getId());
-    popupMenuListEl.remove();
+    if (popupMenuListEl) { popupMenuListEl.remove(); }
   };
 
   const onRemove = function onRemove() {
     removeOverlayMenuItem();
     const el = document.getElementById(this.getId());
     el.remove();
+  };
+
+  const onLayerStyleChange = function onLayerStyleChange() {
+    const newStyle = viewer.getStyle(layer.get('styleName'));
+    const layerIconCmp = document.getElementById(layerIcon.getId());
+    let newIcon = HeaderIcon(newStyle, opacity);
+    headerIconClass = !newIcon ? iconCls : headerIconCls;
+    newIcon = !newIcon ? icon : newIcon;
+    layerIconCmp.className = `${headerIconClass} ${layerIconCls}`;
+    layerIcon.dispatch('change', { icon: newIcon });
   };
 
   return Component({
@@ -276,6 +348,9 @@ const OverlayLayer = function OverlayLayer(options) {
           bubbles: true
         });
         document.getElementById(this.getId()).dispatchEvent(visibleEvent);
+      });
+      layer.on('change:style', () => {
+        onLayerStyleChange();
       });
     },
     render() {

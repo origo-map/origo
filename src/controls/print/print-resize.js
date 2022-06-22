@@ -23,9 +23,10 @@ export default function PrintResize(options = {}) {
   } = options;
 
   let {
-    resolution
+    resolution = 150
   } = options;
 
+  let prevResolution = resolution;
   let isActive = false;
   let layersWithChangedSource = [];
   let layersOriginalStyles = [];
@@ -33,6 +34,12 @@ export default function PrintResize(options = {}) {
   // Will become an issue if 150 dpi is no longer the "standard" dpi setting
   const multiplyByFactor = function multiplyByFactor(value) {
     return value * (resolution / 150);
+  };
+
+  // Used when we want to calculate a value that is not hard coded
+  const multiplyRelativeValueByFactor = function multiplyRelativeValueByFactor(value) {
+    if (prevResolution <= 0) return value;
+    return value * (resolution / prevResolution);
   };
 
   const isValidSource = function isValidSource(source) {
@@ -48,13 +55,18 @@ export default function PrintResize(options = {}) {
   };
 
   const getCssRule = function getCssRule(selector) {
-    const rules = document.styleSheets[0].cssRules;
-    for (let i = 0; i < rules.length; i += 1) {
-      if (rules[i].selectorText === selector) {
-        return rules[i];
-      }
+    let soughtRule;
+    try {
+      Array.from(document.styleSheets).some((sheet) => Array.from(sheet.cssRules).some((cssRule) => {
+        if (cssRule.selectorText === selector) {
+          soughtRule = cssRule;
+          return true;
+        } return false;
+      }));
+    } catch (error) {
+      console.warn(error);
     }
-    return undefined;
+    return soughtRule;
   };
 
   const getVisibleLayers = function getVisibleLayers() {
@@ -362,6 +374,7 @@ export default function PrintResize(options = {}) {
     if (isVector(layer)) {
       const styleName = layer.get('styleName');
       const styles = viewer.getStyle(styleName);
+      const features = source.getFeatures();
 
       if (styles && styles.length > 1) {
         changeWfsThemeLayer(layer, styleName, styles);
@@ -391,10 +404,33 @@ export default function PrintResize(options = {}) {
               text.setScale(textScale);
             }
           });
-          source.getFeatures().forEach(feature => {
-            feature.setStyle(newStyle);
-          });
+          layer.setStyle(newStyle);
         }
+      } else if (features) {
+        features.forEach(feature => {
+          const featureStyle = feature.getStyle();
+          if (featureStyle) {
+            const styleScale = multiplyByFactor(1.5);
+            featureStyle.forEach(style => {
+              const image = style.getImage();
+              if (image) {
+                const imageScale = image.getScale() ? multiplyRelativeValueByFactor(image.getScale()) : styleScale;
+                image.setScale(imageScale);
+              }
+              const stroke = style.getStroke();
+              if (stroke) {
+                const strokeWidth = stroke.getWidth() ? multiplyRelativeValueByFactor(stroke.getWidth()) : styleScale;
+                stroke.setWidth(strokeWidth);
+              }
+              const text = style.getText();
+              if (text) {
+                const textScale = text.getScale() ? multiplyRelativeValueByFactor(text.getScale()) : styleScale;
+                text.setScale(textScale);
+              }
+            });
+            feature.setStyle(featureStyle);
+          }
+        });
       }
     }
 
@@ -412,39 +448,9 @@ export default function PrintResize(options = {}) {
     }
   };
 
-  // "Resets" layer by changing scale to 1 or removing DPI parameter
+  // "Resets" layer by removing DPI parameter
   const resetLayerScale = function resetLayerScale(layer) {
     const source = layer.getSource();
-
-    if (isVector(layer)) {
-      const features = source.getFeatures();
-      if (features && features.length) {
-        const feature = features[0];
-
-        // Remove styles instead?
-        const styles = feature.getStyle();
-        const scale = 1;
-        if (Array.isArray(styles)) {
-          styles.forEach(style => {
-            const image = style.getImage();
-            if (image) {
-              image.setScale(scale);
-            }
-
-            const stroke = style.getStroke();
-            if (stroke) {
-              const strokeWidth = stroke.getWidth();
-              stroke.setWidth(strokeWidth * (150 / resolution));
-            }
-
-            const text = style.getText();
-            if (text) {
-              text.setScale(scale);
-            }
-          });
-        }
-      }
-    }
 
     if (isImage(layer) && isValidSource(source)) {
       const params = source.getParams();
@@ -592,6 +598,9 @@ export default function PrintResize(options = {}) {
       isActive = true;
     },
     resetLayers() {
+      prevResolution = resolution;
+      resolution = 150;
+      updateLayers();
       resetLayers();
       resetWfsThemeLayers();
       isActive = false;
@@ -599,6 +608,7 @@ export default function PrintResize(options = {}) {
       layersOriginalStyles = [];
     },
     setResolution(newResolution) {
+      prevResolution = resolution;
       resolution = newResolution;
       resizeRules();
       resizeNorthArrow(northArrowComponent.getId());

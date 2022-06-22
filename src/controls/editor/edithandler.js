@@ -34,7 +34,6 @@ let attributes;
 let title;
 let draw;
 let hasDraw;
-let hasAttribute;
 let hasSnap;
 let select;
 let modify;
@@ -42,7 +41,6 @@ let snap;
 let viewer;
 let featureInfo;
 let modal;
-let sList;
 /** Roll back copy of geometry that is currently being modified (if any) */
 let modifyGeometry;
 /** The feature that is currently being drawn (if any). Must be reset when draw is finished or abandoned as OL resuses its feature and
@@ -55,6 +53,7 @@ let allowEditAttributes;
 let allowEditGeometry;
 /** List that tracks the state when editing related tables */
 let breadcrumbs = [];
+let autoCreatedFeature = false;
 
 function isActive() {
   if (modify === undefined || select === undefined) {
@@ -112,11 +111,65 @@ function getFeaturesByIds(type, layer, ids) {
   return features;
 }
 
+/**
+ * Helper that calculates the default value for one attribute
+ * @param {any} attribConf The list entry from "attributes"-configuration that default value should be calculated for
+ * @returns The default value for provided attribute or undefined if no default value
+ */
+function getDefaultValueForAttribute(attribConf) {
+  const defaultsConfig = attribConf.defaultValue;
+  if (defaultsConfig) {
+    if (typeof defaultsConfig === 'string') {
+      return defaultsConfig;
+    }
+    // Else look for some properties
+    if (defaultsConfig.type === 'sessionStorage') {
+      return sessionStorage.getItem(defaultsConfig.key);
+    } else if (defaultsConfig.type === 'localStorage') {
+      return localStorage.getItem(defaultsConfig.key);
+    } else if (defaultsConfig.type === 'timestamp') {
+      // If an exact timestamp is needed, use a database default or trigger, this is taken when editor opens
+      const today = new Date();
+      // Can't win the timezone war. If local time is used, save it without any timezone info and hope the server does the right thing
+      const isoDate = defaultsConfig.useUTC ? today.toISOString() : new Date(today.getTime() - (today.getTimezoneOffset() * 60000)).toISOString();
+      switch (defaultsConfig.timeStampFormat) {
+        // yy-MM-dd consistent with attribute format "date"
+        case 'date':
+          return isoDate.slice(0, 10);
+        case 'time':
+          // HH:mm:ss consistent with attribute format "time"
+          return isoDate.slice(11, 19);
+        case 'datetime':
+          // "yy-MM-dd HH:mm:ss" consistent with attribute format "datetime"
+          return `${isoDate.slice(0, 10)} ${isoDate.slice(11, 19)}`;
+        default:
+          // Can be parsed to DateTime by server, skipping milliseconds and timezone info.
+          // Suitable for hidden fields that correspond to a DateTime in database
+          return isoDate.slice(0, 19);
+      }
+    }
+  } else if (attribConf.type === 'checkbox' && attribConf.config && attribConf.config.uncheckedValue) {
+    // Checkboxes defaults to unchecked value if no default value is specified. If no uncheckedValue is specified it
+    // will default to unchecked by some magic javascript falsly comparison later.
+    return attribConf.config.uncheckedValue;
+  }
+  // This attribute has no default value
+  return undefined;
+}
+
+/**
+ * Helper that calculate all default values for a layer.
+ * @param {any} attrs The "attributes"-configuration for the desired layer
+ * @returns {object} An object with attributes names as properties and the default value as value.
+ */
 function getDefaultValues(attrs) {
-  return attrs.filter(attribute => attribute.name && attribute.defaultValue)
+  return attrs.filter(attribute => attribute.name)
     .reduce((prev, curr) => {
       const previous = prev;
-      previous[curr.name] = curr.defaultValue;
+      const defaultValue = getDefaultValueForAttribute(curr);
+      if (defaultValue !== undefined) {
+        previous[curr.name] = defaultValue;
+      }
       return previous;
     }, {});
 }
@@ -216,6 +269,7 @@ async function addFeature(feature) {
   hasDraw = false;
   dispatcher.emitChangeEdit('draw', false);
   if (autoForm) {
+    autoCreatedFeature = true;
     // eslint-disable-next-line no-use-before-define
     editAttributes(feature);
   }
@@ -441,7 +495,6 @@ function setInteractions(drawType) {
   removeInteractions();
   draw = new Draw(drawOptions);
   hasDraw = false;
-  hasAttribute = false;
   select = new Select({
     layers: [editLayer]
   });
@@ -615,11 +668,6 @@ function onChangeShape(e) {
   }
 }
 
-function cancelAttribute() {
-  modal.closeModal();
-  dispatcher.emitChangeEdit('attribute', false);
-}
-
 /**
  * Refreshes the related tables section of the current edit form
  * @param {any} feature
@@ -672,6 +720,26 @@ function attributesSaveHandler(features, formEl) {
 }
 
 /**
+ * Sets up an eventlistener on the attribute editor form abort button.
+ * @param {Collection} features The features that shouldn't be updated
+ */
+function onAttributesAbort(features) {
+  const abortBtnEl = document.getElementById(`o-abort-button-${currentLayer}`);
+  if (abortBtnEl !== null) {
+    abortBtnEl.addEventListener('click', (e) => {
+      abortBtnEl.blur();
+      features.forEach((feature) => {
+        deleteFeature(feature, editLayers[currentLayer]).then(() => select.getFeatures().clear());
+      });
+      modal.closeModal();
+      // The modal does not fire close event when it is closed externally
+      onModalClosed();
+      e.preventDefault();
+    });
+  }
+}
+
+/**
  * Sets up an eventlistener on the attribute editor form save button.
  * @param {Collection} features The features that should be updated
  * @param {any} attrs Array of attributes whih values to set
@@ -699,7 +767,9 @@ function onAttributesSave(features, attrs) {
       if (!document.querySelector(containerClass) || document.querySelector(containerClass).classList.contains('o-hidden') === false) {
         // Check if checkbox. If checkbox read state.
         if (inputType === 'checkbox') {
-          editEl[attribute.name] = document.getElementById(attribute.elId).checked ? 1 : 0;
+          const checkedValue = (attribute.config && attribute.config.checkedValue) || 1;
+          const uncheckedValue = (attribute.config && attribute.config.uncheckedValue) || 0;
+          editEl[attribute.name] = document.getElementById(attribute.elId).checked ? checkedValue : uncheckedValue;
         } else { // Read value from input text, textarea or select
           editEl[attribute.name] = inputValue;
         }
@@ -862,10 +932,11 @@ function onAttributesSave(features, attrs) {
           }
           break;
         case 'searchList':
-          if (attribute.required || false) {
-            const { list } = attribute;
-            valid.searchList = validate.searchList(inputValue, list) || inputValue === '' ? inputValue : false;
-            if (!valid.searchList && inputValue !== '') {
+          if (attribute.required) {
+            // Only validate required. Validating if in list is performed in searchList as we don't have access to dynamic list
+            // and don't want to fetch it again just to validate. It's a better idea to make it impossible for user to type incorrect.
+            valid.searchList = inputValue !== '';
+            if (!valid.searchList) {
               errorOn.parentElement.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             } else if (errorMsg) {
               errorMsg.remove();
@@ -964,6 +1035,15 @@ function addBatchEditListener() {
 }
 
 /**
+ * Makes an input into an searchList (aweseome). Called after model DOM i created.
+ * @param {any} obj
+ */
+function turnIntoSearchList(obj) {
+  const el = document.getElementById(obj.elId);
+  searchList(el, { list: obj.list, config: obj.config });
+}
+
+/**
  * Edits the attributes for given feature or selection from interaction
  * @param {any} feat Feature to edit attributes for. If omitted selection will be used instead
  */
@@ -1007,7 +1087,11 @@ function editAttributes(feat) {
       attributeObjects = editableAttributes.map((attributeObject) => {
         const obj = {};
         Object.assign(obj, attributeObject);
-        obj.val = feature.get(obj.name) !== undefined ? feature.get(obj.name) : '';
+        if (obj.defaultValue && obj.defaultValue.updateOnEdit) {
+          obj.val = getDefaultValueForAttribute(obj);
+        } else {
+          obj.val = feature.get(obj.name) !== undefined ? feature.get(obj.name) : '';
+        }
         if ('constraint' in obj) {
           const constraintProps = obj.constraint.split(':');
           if (constraintProps.length === 3) {
@@ -1035,6 +1119,9 @@ function editAttributes(feat) {
         } else {
           obj.isVisible = true;
           obj.elId = `input-${currentLayer}-${obj.name}`;
+        }
+        if (obj.type === 'searchList') {
+          obj.searchListListener = turnIntoSearchList;
         }
         if (isBatchEdit && !('constraint' in obj)) {
           // Create an additional ckeckbox, that controls if this attribute should be changed
@@ -1075,7 +1162,11 @@ function editAttributes(feat) {
       attachmentsForm = `<div id="o-attach-form-${currentLayer}"></div>`;
     }
 
-    const form = `<div id="o-form">${formElement}${relatedTablesFormHTML}${attachmentsForm}<br><div class="o-form-save"><input id="o-save-button-${currentLayer}" type="button" value="Ok"></input></div></div>`;
+    let form = `<div id="o-form">${formElement}${relatedTablesFormHTML}${attachmentsForm}<br><div class="o-form-save"><input id="o-save-button-${currentLayer}" type="button" value="OK" aria-label="OK"></input></div></div>`;
+    if (autoCreatedFeature) {
+      form = `<div id="o-form">${formElement}${relatedTablesFormHTML}${attachmentsForm}<br><div class="o-form-save"><input id="o-save-button-${currentLayer}" type="button" value="Spara" aria-label="Spara"></input><input id="o-abort-button-${currentLayer}" type="button" value="Ta bort" aria-label="Ta bort"></input></div></div>`;
+      autoCreatedFeature = false;
+    }
 
     modal = Modal({
       title: dlgTitle,
@@ -1111,9 +1202,13 @@ function editAttributes(feat) {
       }
     }
 
+    // Execute the function that need the DOM objects to operate on
     attributeObjects.forEach((obj) => {
       if ('addListener' in obj) {
         obj.addListener(obj);
+      }
+      if ('searchListListener' in obj) {
+        obj.searchListListener(obj);
       }
     });
 
@@ -1125,6 +1220,7 @@ function editAttributes(feat) {
     });
 
     onAttributesSave(features, attributeObjects);
+    onAttributesAbort(features);
   }
 }
 
@@ -1139,12 +1235,7 @@ function onToggleEdit(e) {
       cancelDraw();
     }
   } else if (tool === 'attribute' && allowEditAttributes) {
-    if (hasAttribute === false) {
-      editAttributes();
-      sList = sList || new searchList();
-    } else {
-      cancelAttribute();
-    }
+    editAttributes();
   } else if (tool === 'delete' && allowDelete) {
     onDeleteSelected();
   } else if (tool === 'edit') {

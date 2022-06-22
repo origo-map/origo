@@ -215,6 +215,7 @@
 
 .export-buttons-container {
   margin: 0.5em 0.2em;
+  margin-left: 1.8em;
 }
 
 .expandable_list {
@@ -261,12 +262,6 @@
 .disabled {
   color: #888;
   cursor: not-allowed;
-}
-
-.spinner {
-  height: 1.5em;
-  margin: 0 0.3em;
-  transform: translateY(3px);
 }
 
 .hidden {

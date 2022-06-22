@@ -7,7 +7,7 @@ import GroupList from './grouplist';
  * type is grouplayer, it will be treated as a subgroup
  * with tick all and untick check boxes.
  */
-const Group = function Group(options = {}, viewer) {
+const Group = function Group(viewer, options = {}) {
   const {
     icon = '#ic_chevron_right_24px',
     cls = '',
