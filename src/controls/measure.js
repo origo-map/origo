@@ -14,6 +14,10 @@ import { Snap } from 'ol/interaction';
 import { Collection } from 'ol';
 import LayerGroup from 'ol/layer/Group';
 import { unByKey } from 'ol/Observable';
+import GeoJSON from 'ol/format/GeoJSON';
+import ol_control_Profil from 'ol-ext/control/Profile';
+import Fill from 'ol/style/Fill';
+import Stroke from 'ol/style/Stroke';
 import { Component, Icon, Element as El, Button, dom, Modal } from '../ui';
 import Style from '../style';
 import StyleTypes from '../style/styletypes';
@@ -25,6 +29,7 @@ const Measure = function Measure({
   elevationServiceURL,
   elevationTargetProjection,
   elevationAttribute,
+  elevationProfileURL,
   showSegmentLengths = false,
   showSegmentLabelButtonActive = true,
   useHectare = true,
@@ -83,6 +88,10 @@ const Measure = function Measure({
   let snapCollection;
   let snapEventListenerKeys;
   let snapActive = snapIsActive;
+  let profilePt;
+  let profileSource;
+  let profileLayer;
+  let profileStyle;
 
   function createStyle(feature) {
     const featureType = feature.getGeometry().getType();
@@ -327,6 +336,31 @@ const Measure = function Measure({
     }
   }
 
+  // Takes coordinates and feature id and places a icon feature on the map which can be clicked to show elevation profile for the referenced feature
+  function placeProfileIcon(coords, featureId) {
+    if (typeof elevationProfileURL !== 'undefined') {
+      const profileIconSize = [25, 25];
+      const profileIconText =  '<text x="5" y="40" font-size="45" font-family="Arial" fill="black">Profil</text>';
+      const svgFI = `<svg width="${profileIconSize[0]}" height="${profileIconSize[1]}" version="1.1" xmlns="http://www.w3.org/2000/svg"><rect width="${profileIconSize[0]}" height="${profileIconSize[1]}" style="fill:rgba(255,255,255,0.5);stroke-width:5;stroke:rgb(0,0,0)" /><path d="M14 6l-3.75 5 2.85 3.8-1.6 1.2C9.81 13.75 7 10 7 10l-6 8h22L14 6z"/></svg>`;
+      const iconStyle = new Origo.ol.style.Style({
+        image: new Origo.ol.style.Icon({
+          src: `data:image/svg+xml;utf8,${svgFI}`,
+          anchor: [0.5, -20],
+          anchorXUnits: 'fraction',
+          anchorYUnits: 'pixels',
+          scale: 1
+        })
+      });
+      const iconFeature = new Origo.ol.Feature({
+        geometry: new Origo.ol.geom.Point(coords[coords.length - 1]),
+        name: 'Markhöjd profil',
+        featureId
+      });
+      iconFeature.setStyle(iconStyle);
+      source.addFeature(iconFeature);
+    }
+  }
+
   // Takes a Polygon as input and adds area measurements on it
   function addArea(area) {
     const tempFeature = new Feature(area);
@@ -373,6 +407,114 @@ const Measure = function Measure({
         sketch.getGeometry().setCoordinates(sketchCoord);
       }
     }
+  }
+
+  // Check if the click in map is on a icon for profile and if so show the elevation profile for the linked feature.
+  function showProfile(clickGeom) {
+    let clickedOnProfile = false;
+    let pixel;
+    let coords;
+
+    function drawPoint(e) {
+      if (!profilePt) return;
+      if (e.type === 'over') {
+        profilePt.setGeometry(new Point(e.coord));
+        profilePt.setStyle(null);
+      } else {
+        profilePt.setStyle([]);
+      }
+    }
+    function roundOfHeight(geojson, decimals) {
+      let rounded = geojson;
+      if (rounded.geometry.type === 'LineString') {
+        rounded.geometry.coordinates.forEach((coord, i) => {
+          rounded.geometry.coordinates[i][2] = Math.round(coord[2] * 10) / 10;
+        });
+      } else {
+        rounded.geometry.coordinates[0].forEach((coord, i) => {
+          rounded.geometry.coordinates[0][i][2] = Math.round(coord[2] * 10) / 10;
+        });
+      }
+      return rounded;
+    }
+    if (clickGeom.getType() === 'Point') {
+      return false;
+    } else if (clickGeom.getType() === 'LineString') {
+      pixel = map.getPixelFromCoordinate(clickGeom.getCoordinates()[0]);
+      coords = clickGeom.getCoordinates()[0];
+    } else {
+      pixel = map.getPixelFromCoordinate(clickGeom.getCoordinates()[0][0]);
+      coords = clickGeom.getCoordinates()[0][0];
+    }
+    map.forEachFeatureAtPixel(pixel,
+      (feature) => {
+        if (feature.getProperties().name === 'Markhöjd profil') {
+          const featureId = feature.get('featureId');
+          const features = source.getFeatures()
+          features.forEach(feature => {
+            const fid = feature.getId() != null ? feature.getId() : feature.ol_uid;
+            if (fid === featureId) {
+              clickedOnProfile = true;
+              const featureGeom = feature.getGeometry();
+              let geometry = {};
+              if (featureGeom.getType() === 'Polygon') {
+                geometry = { type: 'LineString', coordinates: featureGeom.getCoordinates()[0] };
+              } else if (featureGeom.getType() === 'LineString') {
+                geometry = { type: 'LineString', coordinates: featureGeom.getCoordinates() };
+              }
+              const projCode = viewer.getProjectionCode();
+              const projCodeArr = projCode.split(':');
+              (async () => {
+                const rawResponse = await fetch(`${elevationProfileURL}/${projCodeArr[1]}`, {
+                  method: 'POST',
+                  headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(geometry)
+                });
+                const content = await rawResponse.json();
+                if (typeof content.error !== 'undefined') {
+                  alert(content.error.errors);
+                } else {
+                  const contentRounded = roundOfHeight(content, 1);
+                  var newGeom = new LineString(contentRounded.geometry.coordinates);
+                  const profileList = document.createElement('li');
+                  const profile = new ol_control_Profil({
+                    target: profileList,
+                    width: 220,
+                    feature: feature,
+                    info: {
+                      zmin: 'Min höjd',
+                      zmax: 'Max höjd',
+                      altitudeUnits: 'm',
+                      ytitle: 'Höjd (m)',
+                      xtitle: 'Distans (km)',
+                      time: 'Tid',
+                      altitude: 'Höjd',
+                      distance: 'Distans',
+                      distanceUnitsM: 'm',
+                      distanceUnitsKM: 'km'
+                    }
+                  });
+                  map.addControl(profile);
+                  profile.setGeometry(newGeom);
+                  profile.on(['over', 'out'], drawPoint);
+                  const featureInfo = viewer.getControlByName('featureInfo');
+                  const obj = {};
+                  obj.feature = feature;
+                  obj.title = 'Markhöjd profil';
+                  obj.content = profileList;
+                  const topleft = Extent.getTopLeft(newGeom.getExtent());
+                  const center = Extent.getCenter(newGeom.getExtent());
+                  featureInfo.render([obj], 'overlay', [center[0],topleft[1]], { ignorePan: true });
+                }
+              })();
+            }
+          });
+        }
+      });
+      return clickedOnProfile;
   }
 
   // Display and move tooltips with pointer
@@ -450,6 +592,9 @@ const Measure = function Measure({
       } else {
         output = totalLength;
         label += totalLength;
+      }
+      if (evt.type === 'drawend' && !(geom instanceof Point)) {
+        placeProfileIcon(coords, sketch.ol_uid);
       }
 
       measureTooltipElement.innerHTML = output;
@@ -692,18 +837,22 @@ const Measure = function Measure({
     }
 
     measure.on('drawstart', (evt) => {
-      measure.getOverlay().getSource().getFeatures()[1].setStyle([]);
-      sketch = evt.feature;
-      sketch.on('change', pointerMoveHandler);
-      if (touchMode) {
-        map.getView().on('change:center', centerSketch);
+      if (showProfile(evt.feature.getGeometry())) {
+        abort();
       } else {
-        pointerMoveHandler(evt);
-      }
-      document.getElementsByClassName('o-tooltip-measure')[1].remove();
+        measure.getOverlay().getSource().getFeatures()[1].setStyle([]);
+        sketch = evt.feature;
+        sketch.on('change', pointerMoveHandler);
+        if (touchMode) {
+          map.getView().on('change:center', centerSketch);
+        } else {
+          pointerMoveHandler(evt);
+        }
+        document.getElementsByClassName('o-tooltip-measure')[1].remove();
 
-      if (type === 'LineString' || type === 'Polygon') {
-        document.getElementById(undoButton.getId()).classList.remove('hidden');
+        if (type === 'LineString' || type === 'Polygon') {
+          document.getElementById(undoButton.getId()).classList.remove('hidden');
+        }
       }
     }, this);
 
@@ -1003,6 +1152,33 @@ const Measure = function Measure({
           disableInteraction();
         }
       });
+      profileStyle = [
+        new Origo.ol.style.Style({
+          image: new Origo.ol.style.Circle({
+            radius: 8,
+            fill: new Fill({
+              color: [0, 153, 255]
+            }),
+            stroke: new Stroke({
+              color: [255, 255, 255],
+              width: 2
+            })
+          }),
+          zIndex: Infinity
+        })
+      ];
+      profilePt = new Feature(new Point([0, 0]));
+      profileSource = new VectorSource();
+      profileLayer = new VectorLayer({
+        group: 'none',
+        source: profileSource,
+        profileStyle,
+        name: 'elevationProfile',
+        visible: true
+      });
+      profilePt.setStyle([]);
+      map.addLayer(profileLayer);
+      profileSource.addFeature(profilePt);
     },
     onInit() {
       lengthTool = measureTools.indexOf('length') >= 0;
