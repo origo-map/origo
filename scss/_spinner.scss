@@ -5,3 +5,11 @@ img.spinner {
     transform: translateY(3px);
     width: auto; // o-modal sets width to 100%, we don't want that.
 }
+
+img.spinner-large {
+    height: 2.1em;
+    margin-right: 1.18em;
+    margin-left: 0.22em;
+    bottom: -3px;
+    position: relative;
+}
