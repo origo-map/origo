@@ -351,8 +351,8 @@ const Measure = function Measure({
           scale: 1
         })
       });
-      const iconFeature = new Origo.ol.Feature({
-        geometry: new Origo.ol.geom.Point(coords[coords.length - 1]),
+      const iconFeature = new Feature({
+        geometry: new Point(coords[coords.length - 1]),
         name: 'Markhöjd profil',
         featureId
       });
@@ -362,7 +362,7 @@ const Measure = function Measure({
   }
 
   // Takes a Polygon as input and adds area measurements on it
-  function addArea(area) {
+  function addArea(area, showProfiles) {
     const tempFeature = new Feature(area);
     const areaLabel = formatArea(area);
     tempFeature.setStyle(style.createStyleRule(measureStyleOptions.polygon));
@@ -376,10 +376,12 @@ const Measure = function Measure({
     }
     const totalLength = formatLength(new LineString(flatCoords[0]));
     tempFeature.getStyle()[0].getText().setText(`${areaLabel}\n${totalLength}`);
+    const featureId = tempFeature.getId() != null ? tempFeature.getId() : tempFeature.ol_uid;
+    placeProfileIcon([flatCoords[0][flatCoords[0].length-1]], featureId);
   }
 
   // Takes a LineString as input and adds length measurements on it
-  function addLength(line) {
+  function addLength(line, showProfiles) {
     const tempFeature = new Feature(line);
     const totalLength = formatLength(line);
     tempFeature.setStyle(style.createStyleRule(measureStyleOptions.linestring));
@@ -392,6 +394,8 @@ const Measure = function Measure({
       }
     }
     tempFeature.getStyle()[0].getText().setText(totalLength);
+    const featureId = tempFeature.getId() != null ? tempFeature.getId() : tempFeature.ol_uid;
+    placeProfileIcon([flatCoords[flatCoords.length-1]], featureId);
   }
 
   function centerSketch() {
@@ -985,6 +989,8 @@ const Measure = function Measure({
       const elevation = [];
       const buffer = [];
       const bufferRadius = [];
+      const profile = [];
+      let showProfiles = false;
       features.forEach((feature) => {
         switch (feature.getGeometry().getType()) {
           case 'LineString':
@@ -994,10 +1000,13 @@ const Measure = function Measure({
             area.push(feature.getGeometry().getCoordinates());
             break;
           case 'Point':
-            if (feature.getStyle()[0].getText().getText() === 'o') {
+            const featStyle = feature.getStyle()[0] ? feature.getStyle()[0] : undefined;
+            if (typeof featStyle === 'undefined') {
+              showProfiles = true;
+            } else if (featStyle.getText().getText() === 'o') {
               buffer.push(feature.getGeometry().getCoordinates());
-            } else if (feature.getStyle()[0].getText().getPlacement() === 'line') {
-              bufferRadius.push(feature.getStyle()[0].getText().getText());
+            } else if (featStyle.getText().getPlacement() === 'line') {
+              bufferRadius.push(featStyle.getText().getText());
             } else {
               elevation.push(feature.getGeometry().getCoordinates());
             }
@@ -1022,6 +1031,7 @@ const Measure = function Measure({
       if (bufferRadius.length > 0) {
         returnValue.bufferRadius = bufferRadius;
       }
+      returnValue.showProfiles = showProfiles;
       returnValue.showSegmentLabels = showSegmentLabels;
       returnValue.isActive = isActive;
       if (Object.keys(returnValue).length !== 0) {
@@ -1033,15 +1043,22 @@ const Measure = function Measure({
   }
 
   function restoreState(params) {
+    let showProfiles = false;
     if (params && params.controls && params.controls.measure) {
       if (params.controls.measure.measureState.isActive) {
         enableInteraction();
+      }
+      // Restore showSegmentLabels state
+      if (params.controls.measure.measureState) {
+        if (params.controls.measure.measureState.showProfiles === true) {
+          showProfiles = true;
+        }
       }
       // Restore areas
       if (params.controls.measure.measureState && params.controls.measure.measureState.area && params.controls.measure.measureState.area.length > 0) {
         if (Array.isArray(params.controls.measure.measureState.area)) {
           params.controls.measure.measureState.area.forEach((item) => {
-            addArea(new Polygon(item));
+            addArea(new Polygon(item), showProfiles);
           });
         }
       }
@@ -1049,7 +1066,7 @@ const Measure = function Measure({
       if (params.controls.measure.measureState && params.controls.measure.measureState.length && params.controls.measure.measureState.length.length > 0) {
         if (Array.isArray(params.controls.measure.measureState.length)) {
           params.controls.measure.measureState.length.forEach((item) => {
-            addLength(new LineString(item));
+            addLength(new LineString(item), showProfiles);
           });
         }
       }
