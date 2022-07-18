@@ -15,6 +15,7 @@ const Legend = function Legend(options = {}) {
     expanded = true,
     contentCls,
     contentStyle,
+    turnOnLayersControl = false,
     name = 'legend',
     labelOpacitySlider = '',
     visibleLayersControl = false,
@@ -132,6 +133,15 @@ const Legend = function Legend(options = {}) {
     });
   };
 
+  const turnOnAllLayers = function turnOnAllLayers() {
+    const layers = viewer.getLayers();
+    layers.forEach((el) => {
+      if (!(['none', 'background'].includes(el.get('group')))) {
+        el.setVisible(true);
+      }
+    });
+  };
+
   const divider = El({
     cls: 'divider margin-x-small',
     style: {
@@ -213,6 +223,22 @@ const Legend = function Legend(options = {}) {
   const toggleShowVisibleLayers = function toggleShowVisibleLayers() {
     setVisibleLayersViewActive(!visibleLayersViewActive);
   };
+
+  const turnOnLayersButton = Button({
+    cls: 'round compact icon-small margin-x-smaller',
+    title: 'Tänd alla lager',
+    click() {
+      viewer.dispatch('active:turnonlayers');
+    },
+    style: {
+      'align-self': 'center',
+      'padding-right': '6px'
+    },
+    icon: '#ic_visibility_24px',
+    iconStyle: {
+      fill: '#7a7a7a'
+    }
+  });
 
   const layerSearchInput = Input({
     cls: 'o-search-layer-field placeholder-text-smaller smaller',
@@ -423,12 +449,14 @@ const Legend = function Legend(options = {}) {
       restoreState(params);
     },
     getuseGroupIndication() { return useGroupIndication; },
-    addButtonToTools(button) {
+    addButtonToTools(button, addDiveder = true) {
       const toolsEl = document.getElementById(toolsCmp.getId());
       toolsEl.classList.remove('hidden');
       if (toolsCmp.getComponents().length > 0) {
-        toolsEl.style.justifyContent = 'space-between';
-        toolsEl.insertBefore(dom.html(divider.render()), toolsEl.firstChild);
+        toolsEl.style.justifyContent = 'right';
+        if (addDiveder) {
+          toolsEl.insertBefore(dom.html(divider.render()), toolsEl.firstChild);
+        }
         toolsEl.insertBefore(dom.html(button.render()), toolsEl.firstChild);
       } else {
         toolsEl.appendChild(dom.html(button.render()));
@@ -441,7 +469,12 @@ const Legend = function Legend(options = {}) {
     },
     onAdd(evt) {
       viewer = evt.target;
-      viewer.on('active:turnofflayers', turnOffAllLayers);
+      if (turnOffLayersControl) {
+        viewer.on('active:turnofflayers', turnOffAllLayers);
+      }
+      if (turnOnLayersControl) {
+        viewer.on('active:turnonlayers', turnOnAllLayers);
+      }
       viewer.on('active:togglevisibleLayers', toggleShowVisibleLayers);
 
       const backgroundLayers = viewer.getLayersByProperty('group', 'background').reverse();
@@ -456,11 +489,6 @@ const Legend = function Legend(options = {}) {
       viewer.getMap().on('click', onMapClick);
     },
     onRender() {
-      const layerControlCmps = [];
-      if (turnOffLayersControl) layerControlCmps.push(turnOffLayersButton);
-      const layerControl = El({
-        components: layerControlCmps
-      });
       mainContainerEl = document.getElementById(mainContainerCmp.getId());
       layerButtonEl = document.getElementById(layerButton.getId());
       layerSwitcherEl.addEventListener('collapse:toggle', (e) => {
@@ -469,7 +497,8 @@ const Legend = function Legend(options = {}) {
         toggleVisibility();
       });
       window.addEventListener('resize', updateMaxHeight);
-      if (layerControlCmps.length > 0) this.addButtonToTools(layerControl);
+      if (turnOffLayersControl) this.addButtonToTools(turnOffLayersButton, false);
+      if (turnOnLayersControl) this.addButtonToTools(turnOnLayersButton, false);
       if (searchLayersControl) this.addButtonToTools(layerSearchInput);
       initAutocomplete();
       bindUIActions();
