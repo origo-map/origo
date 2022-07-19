@@ -449,14 +449,12 @@ const Legend = function Legend(options = {}) {
       restoreState(params);
     },
     getuseGroupIndication() { return useGroupIndication; },
-    addButtonToTools(button, addDiveder = true) {
+    addButtonToTools(button) {
       const toolsEl = document.getElementById(toolsCmp.getId());
       toolsEl.classList.remove('hidden');
       if (toolsCmp.getComponents().length > 0) {
-        toolsEl.style.justifyContent = 'right';
-        if (addDiveder) {
-          toolsEl.insertBefore(dom.html(divider.render()), toolsEl.firstChild);
-        }
+        toolsEl.style.justifyContent = 'space-between';
+        toolsEl.insertBefore(dom.html(divider.render()), toolsEl.firstChild);
         toolsEl.insertBefore(dom.html(button.render()), toolsEl.firstChild);
       } else {
         toolsEl.appendChild(dom.html(button.render()));
@@ -489,6 +487,14 @@ const Legend = function Legend(options = {}) {
       viewer.getMap().on('click', onMapClick);
     },
     onRender() {
+      const layerControlCmps = [];
+      if (searchLayersControl) layerControlCmps.push(layerSearchInput);
+      if (turnOnLayersControl) layerControlCmps.push(turnOnLayersButton);
+      if (turnOffLayersControl) layerControlCmps.push(turnOffLayersButton);
+      const layerControl = El({
+        cls: 'grow flex justify-end align-center no-shrink',
+        components: layerControlCmps
+      });
       mainContainerEl = document.getElementById(mainContainerCmp.getId());
       layerButtonEl = document.getElementById(layerButton.getId());
       layerSwitcherEl.addEventListener('collapse:toggle', (e) => {
@@ -497,9 +503,7 @@ const Legend = function Legend(options = {}) {
         toggleVisibility();
       });
       window.addEventListener('resize', updateMaxHeight);
-      if (turnOffLayersControl) this.addButtonToTools(turnOffLayersButton, false);
-      if (turnOnLayersControl) this.addButtonToTools(turnOnLayersButton, false);
-      if (searchLayersControl) this.addButtonToTools(layerSearchInput);
+      if (layerControlCmps.length > 0) this.addButtonToTools(layerControl);
       initAutocomplete();
       bindUIActions();
       setTabIndex();
