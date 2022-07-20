@@ -337,10 +337,10 @@ const Measure = function Measure({
   }
 
   // Takes coordinates and feature id and places a icon feature on the map which can be clicked to show elevation profile for the referenced feature
-  function placeProfileIcon(coords, featureId) {
+  function placeProfileIcon(coords, featureId, showProfiles = false) {
     elevationProfile = viewer.getControlByName('elevationProfile');
 
-    if (typeof elevationProfileURL !== 'undefined' &&  elevationProfile !== null) {
+    if (typeof elevationProfileURL !== 'undefined' && (elevationProfile !== null || showProfiles)) {
       const profileIconSize = [25, 25];
       const profileIconText =  '<text x="5" y="40" font-size="45" font-family="Arial" fill="black">Profil</text>';
       const svgFI = `<svg width="${profileIconSize[0]}" height="${profileIconSize[1]}" version="1.1" xmlns="http://www.w3.org/2000/svg"><rect width="${profileIconSize[0]}" height="${profileIconSize[1]}" style="fill:rgba(255,255,255,0.5);stroke-width:5;stroke:rgb(0,0,0)" /><path d="M14 6l-3.75 5 2.85 3.8-1.6 1.2C9.81 13.75 7 10 7 10l-6 8h22L14 6z"/></svg>`;
@@ -379,7 +379,7 @@ const Measure = function Measure({
     const totalLength = formatLength(new LineString(flatCoords[0]));
     tempFeature.getStyle()[0].getText().setText(`${areaLabel}\n${totalLength}`);
     const featureId = tempFeature.getId() != null ? tempFeature.getId() : tempFeature.ol_uid;
-    placeProfileIcon([flatCoords[0][flatCoords[0].length-1]], featureId);
+    placeProfileIcon([flatCoords[0][flatCoords[0].length-1]], featureId, showProfiles);
   }
 
   // Takes a LineString as input and adds length measurements on it
@@ -397,7 +397,7 @@ const Measure = function Measure({
     }
     tempFeature.getStyle()[0].getText().setText(totalLength);
     const featureId = tempFeature.getId() != null ? tempFeature.getId() : tempFeature.ol_uid;
-    placeProfileIcon([flatCoords[flatCoords.length-1]], featureId);
+    placeProfileIcon([flatCoords[flatCoords.length-1]], featureId, showProfiles);
   }
 
   function centerSketch() {
@@ -452,9 +452,10 @@ const Measure = function Measure({
       pixel = map.getPixelFromCoordinate(clickGeom.getCoordinates()[0][0]);
       coords = clickGeom.getCoordinates()[0][0];
     }
+    elevationProfile = viewer.getControlByName('elevationProfile');
     map.forEachFeatureAtPixel(pixel,
       (feature) => {
-        if (feature.getProperties().name === 'Markhöjd profil') {
+        if (feature.getProperties().name === 'Markhöjd profil' && elevationProfile !== null) {
           const featureId = feature.get('featureId');
           const features = source.getFeatures()
           features.forEach(feature => {
@@ -1144,33 +1145,6 @@ const Measure = function Measure({
           disableInteraction();
         }
       });
-      profileStyle = [
-        new Origo.ol.style.Style({
-          image: new Origo.ol.style.Circle({
-            radius: 8,
-            fill: new Fill({
-              color: [0, 153, 255]
-            }),
-            stroke: new Stroke({
-              color: [255, 255, 255],
-              width: 2
-            })
-          }),
-          zIndex: Infinity
-        })
-      ];
-      profilePt = new Feature(new Point([0, 0]));
-      profileSource = new VectorSource();
-      profileLayer = new VectorLayer({
-        group: 'none',
-        source: profileSource,
-        profileStyle,
-        name: 'elevationProfile',
-        visible: true
-      });
-      profilePt.setStyle([]);
-      map.addLayer(profileLayer);
-      profileSource.addFeature(profilePt);
     },
     onInit() {
       lengthTool = measureTools.indexOf('length') >= 0;
