@@ -15,7 +15,6 @@ import { Collection } from 'ol';
 import LayerGroup from 'ol/layer/Group';
 import { unByKey } from 'ol/Observable';
 import GeoJSON from 'ol/format/GeoJSON';
-import ol_control_Profil from 'ol-ext/control/Profile';
 import Fill from 'ol/style/Fill';
 import Stroke from 'ol/style/Stroke';
 import { Component, Icon, Element as El, Button, dom, Modal } from '../ui';
@@ -92,6 +91,7 @@ const Measure = function Measure({
   let profileSource;
   let profileLayer;
   let profileStyle;
+  let elevationProfile;
 
   function createStyle(feature) {
     const featureType = feature.getGeometry().getType();
@@ -338,7 +338,9 @@ const Measure = function Measure({
 
   // Takes coordinates and feature id and places a icon feature on the map which can be clicked to show elevation profile for the referenced feature
   function placeProfileIcon(coords, featureId) {
-    if (typeof elevationProfileURL !== 'undefined') {
+    elevationProfile = viewer.getControlByName('elevationProfile');
+
+    if (typeof elevationProfileURL !== 'undefined' &&  elevationProfile !== null) {
       const profileIconSize = [25, 25];
       const profileIconText =  '<text x="5" y="40" font-size="45" font-family="Arial" fill="black">Profil</text>';
       const svgFI = `<svg width="${profileIconSize[0]}" height="${profileIconSize[1]}" version="1.1" xmlns="http://www.w3.org/2000/svg"><rect width="${profileIconSize[0]}" height="${profileIconSize[1]}" style="fill:rgba(255,255,255,0.5);stroke-width:5;stroke:rgb(0,0,0)" /><path d="M14 6l-3.75 5 2.85 3.8-1.6 1.2C9.81 13.75 7 10 7 10l-6 8h22L14 6z"/></svg>`;
@@ -483,35 +485,8 @@ const Measure = function Measure({
                 } else {
                   const contentRounded = roundOfHeight(content, 1);
                   var newGeom = new LineString(contentRounded.geometry.coordinates);
-                  const profileList = document.createElement('li');
-                  const profile = new ol_control_Profil({
-                    target: profileList,
-                    width: 220,
-                    feature: feature,
-                    info: {
-                      zmin: 'Min höjd',
-                      zmax: 'Max höjd',
-                      altitudeUnits: 'm',
-                      ytitle: 'Höjd (m)',
-                      xtitle: 'Distans (km)',
-                      time: 'Tid',
-                      altitude: 'Höjd',
-                      distance: 'Distans',
-                      distanceUnitsM: 'm',
-                      distanceUnitsKM: 'km'
-                    }
-                  });
-                  map.addControl(profile);
-                  profile.setGeometry(newGeom);
-                  profile.on(['over', 'out'], drawPoint);
-                  const featureInfo = viewer.getControlByName('featureInfo');
-                  const obj = {};
-                  obj.feature = feature;
-                  obj.title = 'Markhöjd profil';
-                  obj.content = profileList;
-                  const topleft = Extent.getTopLeft(newGeom.getExtent());
-                  const center = Extent.getCenter(newGeom.getExtent());
-                  featureInfo.render([obj], 'overlay', [center[0],topleft[1]], { ignorePan: true });
+                  feature.setGeometry(newGeom);
+                  elevationProfile.onShowElevationProfile(feature);
                 }
               })();
             }
