@@ -5,7 +5,6 @@ import VectorLayer from 'ol/layer/Vector';
 import VectorImageLayer from 'ol/layer/VectorImage';
 import { OSM, WMTS, XYZ, ImageWMS, ImageArcGISRest, Cluster } from 'ol/source';
 import TileArcGISRest from 'ol/source/TileArcGISRest';
-import Layer from '../../layer';
 import agsMap from '../../layer/agsmap';
 import Style from '../../style';
 import { Component } from '../../ui';
@@ -29,7 +28,6 @@ export default function PrintResize(options = {}) {
   let prevResolution = resolution;
   let isActive = false;
   let layersWithChangedSource = [];
-  let layersOriginalStyles = [];
 
   // Will become an issue if 150 dpi is no longer the "standard" dpi setting
   const multiplyByFactor = function multiplyByFactor(value) {
@@ -325,48 +323,6 @@ export default function PrintResize(options = {}) {
     }
   };
 
-  const changeWfsThemeLayer = function changeWfsThemeLayer(layer, styleName, styles) {
-    const layerOption = viewer.getViewerOptions().layers.find(option => option.style && option.style === styleName);
-    const newStyles = [...styles];
-    if (layerOption) {
-      const layerName = layer.get('name');
-      if (!(layersOriginalStyles.some(layerInArr => layerInArr.layerName === layerName))) {
-        layersOriginalStyles.push({
-          layerName,
-          styleName,
-          styles: JSON.parse(JSON.stringify(newStyles))
-        });
-      }
-
-      const originalStyle = layersOriginalStyles.find(item => item.layerName === layerName);
-      if (originalStyle) {
-        originalStyle.styles.forEach((style, index) => {
-          if (style[0].stroke) {
-            newStyles[index][0].stroke.width = multiplyByFactor(style[0].stroke.width || 1);
-          }
-        });
-
-        viewer.setStyle(styleName, newStyles);
-        const newLayer = Layer(layerOption, viewer);
-        layer.setStyle(newLayer.getStyle());
-      }
-    }
-  };
-
-  const resetWfsThemeLayers = function resetWfsThemeLayers() {
-    layersOriginalStyles.forEach(item => {
-      const currentLayer = map.getLayers().getArray().find(layer => layer.get('name') === item.layerName && layer.get('type') === 'WFS');
-      if (currentLayer) {
-        const layerOption = viewer.getViewerOptions().layers.find(option => option.style && option.style === item.styleName);
-        if (layerOption) {
-          viewer.setStyle(item.styleName, item.styles);
-          const newLayer = Layer(layerOption, viewer);
-          currentLayer.setStyle(newLayer.getStyle());
-        }
-      }
-    });
-  };
-
   // Alters layer in map, if vector then set scale for feature, if image set DPI parameter for source
   const setLayerScale = function setLayerScale(layer) {
     const source = layer.getSource();
@@ -376,34 +332,15 @@ export default function PrintResize(options = {}) {
       const styles = viewer.getStyle(styleName);
       const features = source.getFeatures();
 
-      if (styles && styles.length > 1) {
-        changeWfsThemeLayer(layer, styleName, styles);
-      } else if (styleName && styles && styles.length === 1) {
+      if (styles) {
+        const clusterStyleName = layer.get('clusterStyle') ? layer.get('clusterStyle') : undefined;
         const newStyle = Style.createStyle({
           style: styleName,
-          viewer
-        })();
+          viewer,
+          clusterStyleName,
+          scaleToDpi: resolution
+        });
         if (newStyle) {
-          const styleScale = multiplyByFactor(1.5);
-          newStyle.forEach(style => {
-            const image = style.getImage();
-            if (image) {
-              const imageScale = image.getScale() ? multiplyByFactor(image.getScale()) : styleScale;
-              image.setScale(imageScale);
-            }
-
-            const stroke = style.getStroke();
-            if (stroke) {
-              const strokeWidth = stroke.getWidth() ? multiplyByFactor(stroke.getWidth()) : styleScale;
-              stroke.setWidth(strokeWidth);
-            }
-
-            const text = style.getText();
-            if (text) {
-              const textScale = text.getScale() ? multiplyByFactor(text.getScale()) : styleScale;
-              text.setScale(textScale);
-            }
-          });
           layer.setStyle(newStyle);
         }
       } else if (features) {
@@ -448,9 +385,17 @@ export default function PrintResize(options = {}) {
     }
   };
 
-  // "Resets" layer by removing DPI parameter
+  // "Resets" layer by resetting the style and removing DPI parameter
   const resetLayerScale = function resetLayerScale(layer) {
     const source = layer.getSource();
+    if (isVector(layer)) {
+      let style = viewer.getStyle(layer.get('styleName'));
+      const clusterStyleName = layer.get('clusterStyle') ? layer.get('clusterStyle') : undefined;
+      style = Style.createStyle({ style: layer.get('styleName'), viewer, clusterStyleName });
+      if (style) {
+        layer.setStyle(style);
+      }
+    }
 
     if (isImage(layer) && isValidSource(source)) {
       const params = source.getParams();
@@ -476,14 +421,22 @@ export default function PrintResize(options = {}) {
   // Alters all visible layers, for when entering print preview or changing DPI
   const updateLayers = function updateLayers() {
     getVisibleLayers().forEach(layer => {
-      setLayerScale(layer);
+      if (layer instanceof LayerGroup) {
+        layer.forEach(item => item.getLayersArray().forEach(element => setLayerScale(element)));
+      } else {
+        setLayerScale(layer);
+      }
     });
   };
 
   // "Resets" all visible layers, for when exiting print preview
   const resetLayers = function resetLayers() {
     getVisibleLayers().forEach(layer => {
-      resetLayerScale(layer);
+      if (layer instanceof LayerGroup) {
+        layer.forEach(item => item.getLayersArray().forEach(element => resetLayerScale(element)));
+      } else {
+        resetLayerScale(layer);
+      }
     });
   };
 
@@ -602,10 +555,8 @@ export default function PrintResize(options = {}) {
       resolution = 150;
       updateLayers();
       resetLayers();
-      resetWfsThemeLayers();
       isActive = false;
       layersWithChangedSource = [];
-      layersOriginalStyles = [];
     },
     setResolution(newResolution) {
       prevResolution = resolution;
