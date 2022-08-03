@@ -236,8 +236,9 @@ const OverlayLayer = function OverlayLayer(options) {
     };
     const offsetTop = moreInfoButtonEl.getBoundingClientRect().height + moreInfoButtonEl.parentElement.offsetTop + 5;
     popupMenu = PopupMenu({ onUnfocus });
-    document.getElementById('legendCollapse').appendChild(dom.html(popupMenu.render()));
-    document.getElementById('legendCollapse').style.minHeight = '100px';
+    const containerId = viewer.getControlByName('legend').getOverlaysCollapse().containerId;
+    document.getElementById(containerId).appendChild(dom.html(popupMenu.render()));
+    document.getElementById(containerId).style.minHeight = '100px';
     popupMenu.setContent(popupMenuList.render());
     popupMenuList.dispatch('render');
     popupMenu.setPosition({ right: '5px', top: `${offsetTop}px` });
@@ -248,13 +249,15 @@ const OverlayLayer = function OverlayLayer(options) {
     if (!popupMenu) {
       createPopupMenu();
     } else if (!popupMenu.getVisibility()) {
-      document.getElementById('legendCollapse').style.minHeight = '100px';
+      const containerId = viewer.getControlByName('legend').getOverlaysCollapse().containerId;
+      document.getElementById(containerId).style.minHeight = '100px';
       const moreInfoButtonEl = document.getElementById(moreInfoButton.getId());
       const offsetTop = moreInfoButtonEl.getBoundingClientRect().height + moreInfoButtonEl.parentElement.offsetTop + 5;
       popupMenu.setPosition({ right: '5px', top: `${offsetTop}px` });
       popupMenu.setVisibility(true);
     } else {
-      document.getElementById('legendCollapse').style.minHeight = '';
+      const containerId = viewer.getControlByName('legend').getOverlaysCollapse().containerId;
+      document.getElementById(containerId).style.minHeight = '';
       popupMenu.setVisibility(false);
     }
   };

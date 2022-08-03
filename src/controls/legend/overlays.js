@@ -64,7 +64,8 @@ const Overlays = function Overlays(options) {
     secondaryComponent: layerProps,
     cls: 'right flex width-100',
     style: { width: '100%' },
-    legendSlideNav: true
+    legendSlideNav: true,
+    viewer
   });
 
   const navContainer = Component({
@@ -242,6 +243,7 @@ const Overlays = function Overlays(options) {
     onAddGroup,
     onChangeLayer,
     slidenav,
+    overlaysCollapse,
     onInit() {
       this.addComponent(overlaysCollapse);
       readOverlays();

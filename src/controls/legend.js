@@ -423,6 +423,7 @@ const Legend = function Legend(options = {}) {
       restoreState(params);
     },
     getuseGroupIndication() { return useGroupIndication; },
+    getOverlaysCollapse() { return overlaysCmp.overlaysCollapse; },
     addButtonToTools(button) {
       const toolsEl = document.getElementById(toolsCmp.getId());
       toolsEl.classList.remove('hidden');
