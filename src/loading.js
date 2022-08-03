@@ -2,14 +2,14 @@
  * Show the global loading indicator
  */
 export function showLoading() {
-  document.getElementById("loading").classList.remove("hide");
+  document.getElementById('loading').classList.remove('hide');
 }
 
 /**
  * Hide the global loading indicator
  */
 export function hideLoading() {
-  document.getElementById("loading").classList.add("hide");
+  document.getElementById('loading').classList.add('hide');
 }
 
 /**

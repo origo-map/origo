@@ -18,7 +18,7 @@ import { downloadPNG, downloadPDF, printToScalePDF } from '../../utils/download'
 import { afterRender, beforeRender } from './download-callback';
 import maputils from '../../maputils';
 import PrintResize from './print-resize';
-import { withLoading } from "../../loading";
+import { withLoading } from '../../loading';
 /** Backup of original OL function */
 const original = PluggableMap.prototype.getEventPixel;
 
@@ -334,7 +334,7 @@ const PrintComponent = function PrintComponent(options = {}) {
   const printToolbar = PrintToolbar();
   map.getAllLayers().forEach((l) => {
     // if we begin loading any data we want to disable the print buttons...
-    l.getSource().on(["tileloadstart", "imageloadstart"], () => printToolbar.setDisabled(true));
+    l.getSource().on(['tileloadstart', 'imageloadstart'], () => printToolbar.setDisabled(true));
   });
   // ...they then get re-enabled when the map has finished rendering
   map.on('rendercomplete', () => printToolbar.setDisabled(false));
@@ -540,19 +540,17 @@ const PrintComponent = function PrintComponent(options = {}) {
       }
       widthImage = orientation === 'portrait' ? Math.round((sizes[size][1] * resolution) / 25.4) : Math.round((sizes[size][0] * resolution) / 25.4);
       heightImage = orientation === 'portrait' ? Math.round((sizes[size][0] * resolution) / 25.4) : Math.round((sizes[size][1] * resolution) / 25.4);
-      await withLoading(() =>
-        printToScalePDF({
-          el: pageElement,
-          filename,
-          height,
-          orientation: pdfOrientation,
-          size,
-          width,
-          printScale,
-          widthImage,
-          heightImage
-        })
-      );
+      await withLoading(() => printToScalePDF({
+        el: pageElement,
+        filename,
+        height,
+        orientation: pdfOrientation,
+        size,
+        width,
+        printScale,
+        widthImage,
+        heightImage
+      }));
     },
     async onRender() {
       // Monkey patch OL
