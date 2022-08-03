@@ -227,23 +227,6 @@ const OverlayLayer = function OverlayLayer(options) {
     }
   });
 
-  const getElementOffset = function getElementOffset(el, rootParentEl) {
-    let left = 0;
-    let top = 0;
-    let currentEl = el;
-    while (
-      currentEl
-      && !Number.isNaN(currentEl.offsetLeft)
-      && !Number.isNaN(currentEl.offsetTop)
-      && currentEl.id !== rootParentEl.id
-    ) {
-      left += currentEl.offsetLeft - currentEl.scrollLeft;
-      top += currentEl.offsetTop - currentEl.scrollTop;
-      currentEl = currentEl.offsetParent;
-    }
-    return { top, left };
-  };
-
   const createPopupMenu = function createPopupMenu() {
     const moreInfoButtonEl = document.getElementById(moreInfoButton.getId());
     const onUnfocus = (e) => {
@@ -251,22 +234,28 @@ const OverlayLayer = function OverlayLayer(options) {
         popupMenu.setVisibility(false);
       }
     };
-    const viewerEl = document.getElementById(viewer.getId());
-    const { top, left } = getElementOffset(moreInfoButtonEl, viewerEl);
-    const right = viewerEl.offsetWidth - left - moreInfoButtonEl.offsetWidth;
-    const targetRect = moreInfoButtonEl.getBoundingClientRect();
+    const offsetTop = moreInfoButtonEl.getBoundingClientRect().height + moreInfoButtonEl.parentElement.offsetTop + 5;
     popupMenu = PopupMenu({ onUnfocus });
-    document.getElementById(viewer.getId()).appendChild(dom.html(popupMenu.render()));
+    document.getElementById('legendCollapse').appendChild(dom.html(popupMenu.render()));
+    document.getElementById('legendCollapse').style.minHeight = '100px';
     popupMenu.setContent(popupMenuList.render());
     popupMenuList.dispatch('render');
-    popupMenu.setPosition({ right: `${right}px`, top: `${top + targetRect.height}px` });
+    popupMenu.setPosition({ right: '5px', top: `${offsetTop}px` });
+    popupMenu.setVisibility(true);
   };
 
   const togglePopupMenu = function togglePopupMenu() {
     if (!popupMenu) {
       createPopupMenu();
+    } else if (!popupMenu.getVisibility()) {
+      document.getElementById('legendCollapse').style.minHeight = '100px';
+      const moreInfoButtonEl = document.getElementById(moreInfoButton.getId());
+      const offsetTop = moreInfoButtonEl.getBoundingClientRect().height + moreInfoButtonEl.parentElement.offsetTop + 5;
+      popupMenu.setPosition({ right: '5px', top: `${offsetTop}px` });
+      popupMenu.setVisibility(true);
     } else {
-      popupMenu.toggleVisibility();
+      document.getElementById('legendCollapse').style.minHeight = '';
+      popupMenu.setVisibility(false);
     }
   };
 

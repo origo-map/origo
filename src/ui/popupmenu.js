@@ -20,6 +20,10 @@ export default function popup(options = {}) {
     if (position.right) el.style.right = position.right;
   }
 
+  function getVisibility() {
+    return isVisible;
+  }
+
   function setVisibility(visible) {
     isVisible = visible;
     const el = getEl();
@@ -51,6 +55,7 @@ export default function popup(options = {}) {
     },
     getEl,
     setPosition,
+    getVisibility,
     setVisibility,
     toggleVisibility,
     setContent,
