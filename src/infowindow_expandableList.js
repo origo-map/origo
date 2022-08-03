@@ -1,17 +1,14 @@
 import { simpleExportHandler, layerSpecificExportHandler } from './infowindow_exporthandler';
 import exportToFile from './utils/exporttofile';
-import { dom, Button } from './ui';
-import getSpinner from './utils/spinner';
-import Icon from './ui/icon';
+import { Component, Collapse, CollapseHeader, dom, Button } from './ui';
 
 let parentElement;
 let mainContainer;
 let urvalContainer;
-let listContainer;
-let exportContainer;
 let sublists;
 let subexports;
 let urvalElements;
+let urvalElementContents;
 let expandableContents;
 let exportOptions;
 let activeSelectionGroup;
@@ -33,11 +30,40 @@ function createSvgElement(id, className) {
   return svgContainer;
 }
 
+const debounceTimeout = [];
+function debounce(func, id) {
+  if (debounceTimeout[id]) clearTimeout(debounceTimeout[id]);
+  debounceTimeout[id] = setTimeout(() => {
+    func();
+  }, 50);
+}
+
+function toggleExpandCollapse() {
+  const visibleGroups = [];
+  urvalElements.forEach(cmp => {
+    const el = document.getElementById(cmp.getId());
+    if (!el.classList.contains('hidden')) {
+      visibleGroups.push({ cmp, el });
+    }
+  });
+
+  visibleGroups.forEach(group => {
+    if (visibleGroups.length === 1) {
+      // Debounce needed due to race condition in rendering expand/collaps animation.
+      debounce(() => group.cmp.getComponents()[0].expand(), group.cmp.getId());
+    } else {
+      // Debounce needed due to race condition in rendering expand/collaps animation.
+      debounce(() => group.cmp.getComponents()[0].collapse(), group.cmp.getId());
+    }
+  });
+}
+
 function hideInfowindow() {
   mainContainer.classList.add('hidden');
 }
 
 function showInfowindow() {
+  toggleExpandCollapse();
   mainContainer.classList.remove('hidden');
 }
 
@@ -108,28 +134,18 @@ function createCloseButton() {
 function render(viewerId) {
   mainContainer = document.createElement('div');
   setInfowindowStyle();
-  mainContainer.classList.add('sidebarcontainer');
-  mainContainer.id = 'sidebarcontainer';
+  mainContainer.classList.add('sidebarcontainer', 'expandable_list');
+  mainContainer.id = 'sidebarcontainer-draggable';
   urvalContainer = document.createElement('div');
   urvalContainer.classList.add('urvalcontainer');
-  // We add this so that urvalcontainer can become draggable
-  urvalContainer.id = 'sidebarcontainer-draggable';
   const urvalTextNodeContainer = document.createElement('div');
   urvalTextNodeContainer.classList.add('urval-textnode-container');
   const urvalTextNode = document.createTextNode(infowindowOptions.title || 'Träffar');
   urvalTextNodeContainer.appendChild(urvalTextNode);
-  urvalContainer.appendChild(urvalTextNodeContainer);
+  mainContainer.appendChild(urvalTextNodeContainer);
   const closeButton = createCloseButton();
-  urvalContainer.appendChild(dom.html(closeButton.render()));
-  listContainer = document.createElement('div');
-  listContainer.classList.add('listcontainer');
-
-  exportContainer = document.createElement('div');
-  exportContainer.classList.add('exportcontainer');
-
+  mainContainer.appendChild(dom.html(closeButton.render()));
   mainContainer.appendChild(urvalContainer);
-  mainContainer.appendChild(listContainer);
-  mainContainer.appendChild(exportContainer);
 
   parentElement = document.getElementById(viewerId);
   parentElement.appendChild(mainContainer);
@@ -155,92 +171,33 @@ function showSelectedList(selectionGroup) {
   }
 
   activeSelectionGroup = selectionGroup;
-  while (listContainer.firstChild) {
-    listContainer.removeChild(listContainer.firstChild);
-  }
-  const sublistToAppend = sublists.get(selectionGroup);
-  listContainer.appendChild(sublistToAppend);
-
-  while (exportContainer.firstChild) {
-    exportContainer.removeChild(exportContainer.firstChild);
-  }
-  const subexportToAppend = subexports.get(selectionGroup);
-  exportContainer.appendChild(subexportToAppend);
-
-  urvalElements.forEach((value, key) => {
-    if (key === selectionGroup) {
-      value.classList.add('selectedurvalelement');
-    } else {
-      value.classList.remove('selectedurvalelement');
-    }
-  });
 }
 
 function createExportButton(buttonText) {
   const container = document.createElement('div');
 
-  const spinner = getSpinner();
+  const spinner = document.createElement('img');
+  spinner.src = 'img/loading.gif';
+  spinner.classList.add('spinner');
   spinner.style.visibility = 'hidden';
 
   const button = document.createElement('button');
   button.classList.add('export-button');
   button.textContent = buttonText;
 
-  container.appendChild(button);
   container.appendChild(spinner);
+  container.appendChild(button);
 
-  button.loadStart = () => {
+  container.loadStart = () => {
     button.disabled = true;
     button.classList.add('disabled');
     spinner.style.visibility = 'visible';
   };
 
-  button.loadStop = () => {
+  container.loadStop = () => {
     button.disabled = false;
     button.classList.remove('disabled');
     spinner.style.visibility = 'hidden';
-  };
-
-  return container;
-}
-
-function createCustomExportButton(roundButtonIcon, roundButtonTooltipText) {
-  const container = document.createElement('div');
-  container.classList.add('inline-block', 'padding-smallest');
-
-  const iconComponent = Icon({
-    icon: roundButtonIcon,
-    title: ''
-  });
-  const button = document.createElement('button');
-  button.classList.add(
-    'padding-small',
-    'margin-bottom-smaller',
-    'icon-smaller',
-    'round',
-    'light',
-    'box-shadow',
-    'o-tooltip',
-    'margin-right-small'
-  );
-  button.style = 'position: relative';
-
-  button.innerHTML = `<span class="icon" style="z-index: 10000">${iconComponent.render()}</span><span data-tooltip="${roundButtonTooltipText}" data-placement="south"></span>`;
-
-  container.appendChild(button);
-  const spinner = getSpinner();
-  spinner.classList.add('spinner-large');
-
-  button.loadStart = () => {
-    button.disabled = true;
-    button.classList.add('disabled');
-    button.replaceWith(spinner);
-  };
-
-  button.loadStop = () => {
-    button.disabled = false;
-    button.classList.remove('disabled');
-    spinner.replaceWith(button);
   };
 
   return container;
@@ -273,141 +230,84 @@ function createToaster(status, message) {
   }, 5000);
 }
 
-function createExportButtons(
-  obj,
-  attributesToSendToExportPerLayer,
-  selectionGroup,
-  activeLayer
-) {
-  const roundButton = obj.button.roundButton || false;
-  const buttonText = obj.button.buttonText || 'Export';
-  const url = obj.url;
-  const layerSpecificExportedFileName = obj.exportedFileName;
-  const attributesToSendToExport = obj.attributesToSendToExport
-    ? obj.attributesToSendToExport
-    : attributesToSendToExportPerLayer;
-  const exportBtn = roundButton
-    ? createCustomExportButton(
-      obj.button.roundButtonIcon,
-      obj.button.roundButtonTooltipText
-    )
-    : createExportButton(buttonText);
-  const btn = exportBtn.querySelector('button');
-  btn.addEventListener('click', () => {
-    if (!url) {
-      createToaster('fail');
-      return;
-    }
-    btn.loadStart();
-    const selectedItems = selectionManager.getSelectedItemsForASelectionGroup(selectionGroup);
-    layerSpecificExportHandler(
-      url,
-      activeLayer,
-      selectedItems,
-      attributesToSendToExport,
-      layerSpecificExportedFileName
-    )
-      .then((data) => {
-        if (data) {
-          switch (data.status) {
-            case 'ok':
-              createToaster('ok');
-              break;
-            case 'fail':
-              createToaster('fail');
-              break;
-            default:
-              break;
-          }
-        }
-        btn.loadStop();
-      })
-      .catch((err) => {
-        console.error(err);
-        createToaster('fail');
-        btn.loadStop();
-      });
-  });
-  return exportBtn;
-}
-
 function createSubexportComponent(selectionGroup) {
   // OBS! selectionGroup corresponds to a layer with the same name in most cases, but in case of a group layer it can contain selected items from all the layers in that GroupLayer.
+
   let layerSpecificExportOptions;
+  const simpleExportLayers = exportOptions.simpleExportLayers ? exportOptions.simpleExportLayers : [];
+  const simpleExportUrl = exportOptions.simpleExportUrl;
+  const simpleExportButtonText = exportOptions.simpleExportButtonText || 'Export';
+  const exportedFileName = exportOptions.exportedFileName;
   const activeLayer = viewer.getLayer(selectionGroup);
 
   const subexportContainer = document.createElement('div');
   subexportContainer.classList.add('export-buttons-container');
 
   if (exportOptions.layerSpecificExport) {
-    layerSpecificExportOptions = exportOptions.layerSpecificExport.find(
-      (i) => i.layer === selectionGroup
-    );
+    layerSpecificExportOptions = exportOptions.layerSpecificExport.find((i) => i.layer === selectionGroup);
   }
+
   if (layerSpecificExportOptions) {
     const exportUrls = layerSpecificExportOptions.exportUrls || [];
     const attributesToSendToExportPerLayer = layerSpecificExportOptions.attributesToSendToExport;
-    const customButtonExportUrls = exportUrls.filter(
-      (e) => e.button.roundButton
-    );
-    const standardButtonExportUrls = exportUrls.filter(
-      (e) => !e.button.roundButton
-    );
 
-    customButtonExportUrls.forEach((obj) => {
-      const button = createExportButtons(
-        obj,
-        attributesToSendToExportPerLayer,
-        selectionGroup,
-        activeLayer
-      );
-      subexportContainer.appendChild(button);
+    exportUrls.forEach((obj) => {
+      const buttonText = obj.buttonText || 'Export';
+      const url = obj.url;
+      const layerSpecificExportedFileName = obj.exportedFileName;
+      const attributesToSendToExport = obj.attributesToSendToExport ? obj.attributesToSendToExport : attributesToSendToExportPerLayer;
+      const exportBtn = createExportButton(buttonText);
+      const btn = exportBtn.querySelector('button');
+      btn.addEventListener('click', () => {
+        if (!url) {
+          createToaster('fail');
+          return;
+        }
+        exportBtn.loadStart();
+        const selectedItems = selectionManager.getSelectedItemsForASelectionGroup(selectionGroup);
+        layerSpecificExportHandler(url, activeLayer, selectedItems, attributesToSendToExport, layerSpecificExportedFileName).then((data) => {
+          if (data) {
+            switch (data.status) {
+              case 'ok':
+                createToaster('ok');
+                break;
+
+              case 'fail':
+                createToaster('fail');
+                break;
+
+              default:
+                break;
+            }
+          }
+          exportBtn.loadStop();
+        }).catch((err) => {
+          console.error(err);
+          createToaster('fail');
+          exportBtn.loadStop();
+        });
+      });
+      subexportContainer.appendChild(exportBtn);
     });
-    standardButtonExportUrls.forEach((obj) => {
-      const button = createExportButtons(
-        obj,
-        attributesToSendToExportPerLayer,
-        selectionGroup,
-        activeLayer
-      );
-      subexportContainer.appendChild(button);
-    });
-  } else if (exportOptions.simpleExport) {
-    const simpleExportLayers = exportOptions.simpleExport.layers ? exportOptions.simpleExport.layers : [];
-    const simpleExportUrl = exportOptions.simpleExport.url || false;
-    const simpleExportButtonText = exportOptions.simpleExport.button.buttonText || 'Export';
+  } else if (simpleExportLayers.length) {
     const exportAllowed = simpleExportLayers.find((l) => l === selectionGroup);
     if (exportAllowed) {
-      const exportedFileName = `${exportAllowed}.xlsx`;
-      const roundButton = exportOptions.simpleExport.button.roundButton || false;
-      const exportBtn = roundButton
-        ? createCustomExportButton(
-          exportOptions.simpleExport.button.roundButtonIcon,
-          exportOptions.simpleExport.button.roundButtonTooltipText
-        )
-        : createExportButton(simpleExportButtonText);
+      const exportBtn = createExportButton(simpleExportButtonText);
       const btn = exportBtn.querySelector('button');
       btn.addEventListener('click', () => {
         if (!simpleExportUrl) {
           createToaster('fail');
           return;
         }
-        btn.loadStart();
+        exportBtn.loadStart();
         const selectedItems = selectionManager.getSelectedItemsForASelectionGroup(selectionGroup);
-        simpleExportHandler(
-          simpleExportUrl,
-          activeLayer,
-          selectedItems,
-          exportedFileName
-        )
-          .then(() => {
-            btn.loadStop();
-          })
-          .catch((err) => {
-            console.error(err);
-            createToaster('fail');
-            btn.loadStop();
-          });
+        simpleExportHandler(simpleExportUrl, activeLayer, selectedItems, exportedFileName).then(() => {
+          exportBtn.loadStop();
+        }).catch((err) => {
+          console.error(err);
+          createToaster('fail');
+          exportBtn.loadStop();
+        });
       });
       subexportContainer.appendChild(exportBtn);
     }
@@ -415,25 +315,17 @@ function createSubexportComponent(selectionGroup) {
     const conf = exportOptions.clientExport;
     const exportAllowed = !conf.layers || conf.layers.find((l) => l === selectionGroup);
     if (exportAllowed) {
-      const roundButton = conf.button.roundButton || false;
-      const buttonText = conf.button.buttonText || 'Exportera';
-      const exportBtn = roundButton
-        ? createCustomExportButton(
-          conf.button.roundButtonIcon,
-          conf.button.roundButtonTooltipText
-        )
-        : createExportButton(buttonText);
-
+      const exportBtn = createExportButton(conf.buttonText || 'Exportera');
       const btn = exportBtn.querySelector('button');
       btn.addEventListener('click', () => {
-        btn.loadStart();
+        exportBtn.loadStart();
         const selectedItems = selectionManager.getSelectedItemsForASelectionGroup(selectionGroup);
         const features = selectedItems.map(i => i.getFeature());
         exportToFile(features, conf.format, {
           featureProjection: viewer.getProjection().getCode(),
           filename: selectionGroup
         });
-        btn.loadStop();
+        exportBtn.loadStop();
       });
       subexportContainer.appendChild(exportBtn);
     }
@@ -443,21 +335,46 @@ function createSubexportComponent(selectionGroup) {
 }
 
 function createUrvalElement(selectionGroup, selectionGroupTitle) {
-  const urvalElement = document.createElement('div');
-  urvalElement.classList.add('urvalelement');
-  const textNode = document.createTextNode(selectionGroupTitle);
-  urvalElement.appendChild(textNode);
-  urvalContainer.appendChild(urvalElement);
-  urvalElements.set(selectionGroup, urvalElement);
-  urvalElement.addEventListener('click', () => {
-    showSelectedList(selectionGroup);
-  });
-
-  const sublistContainter = document.createElement('div');
-  sublists.set(selectionGroup, sublistContainter);
+  const sublistContainer = document.createElement('div');
+  sublistContainer.classList.add('sublist');
+  sublists.set(selectionGroup, sublistContainer);
 
   const subexportComponent = createSubexportComponent(selectionGroup);
+  subexportComponent.classList.add('sublist');
   subexports.set(selectionGroup, subexportComponent);
+
+  const urvalContentCmp = Component({
+    render() {
+      return `<div class="urvalcontent" id="${this.getId()}"></div>`;
+    }
+  });
+
+  const groupCmp = Collapse({
+    cls: '',
+    expanded: false,
+    headerComponent: CollapseHeader({
+      cls: 'hover padding-x padding-y-small grey-lightest border-bottom text-small',
+      icon: '#ic_chevron_right_24px',
+      title: selectionGroupTitle
+    }),
+    contentComponent: urvalContentCmp,
+    collapseX: false
+  });
+
+  const urvalCmp = Component({
+    onInit() {
+      this.addComponent(groupCmp);
+    },
+    render() {
+      return `<div class="urvalelement" id="${this.getId()}">${groupCmp.render()}</div>`;
+    }
+  });
+
+  urvalContainer.appendChild(dom.html(urvalCmp.render()));
+  urvalCmp.dispatch('render');
+  urvalElements.set(selectionGroup, urvalCmp);
+  const urvalContentEl = document.getElementById(urvalContentCmp.getId());
+  urvalElementContents.set(selectionGroup, urvalContentEl);
 }
 
 function highlightListElement(featureId) {
@@ -542,7 +459,8 @@ function createExpandableContent(listElementContentContainer, content, elementId
 }
 
 function showUrvalElement(selectionGroup) {
-  const urvalElement = urvalElements.get(selectionGroup);
+  const urvalCmp = urvalElements.get(selectionGroup);
+  const urvalElement = document.getElementById(urvalCmp.getId());
   urvalElement.classList.remove('hidden');
 }
 
@@ -564,6 +482,12 @@ function createListElement(item) {
   const sublist = sublists.get(item.getSelectionGroup());
   sublist.appendChild(listElement);
   showUrvalElement(item.getSelectionGroup());
+
+  const urvalContent = urvalElementContents.get(item.getSelectionGroup());
+  urvalContent.replaceChildren(sublist);
+
+  const subexportToAppend = subexports.get(item.getSelectionGroup());
+  urvalContent.appendChild(subexportToAppend);
 }
 
 function expandListElement(featureId) {
@@ -590,27 +514,7 @@ function expandListElement(featureId) {
 }
 
 function scrollListElementToView(featureId) {
-  sublists.forEach((sublist) => {
-    const elements = sublist.getElementsByClassName('listelement');
-    for (let index = 0; index < elements.length; index += 1) {
-      const element = elements[index];
-      if (element.id === featureId) {
-        // time out is set so that element gets the time to expand first, otherwise it will be scrolled halfway to the view
-        setTimeout(() => {
-          const elementBoundingBox = element.getBoundingClientRect();
-          const listContainer2 = document.getElementsByClassName('listcontainer')[0];
-          const listContainerBoundingBox = listContainer2.getBoundingClientRect();
-          if (elementBoundingBox.top < listContainerBoundingBox.top) {
-            const scrollDownValue = listContainerBoundingBox.top - elementBoundingBox.top;
-            listContainer2.scrollTop -= scrollDownValue;
-          } else if (elementBoundingBox.bottom > listContainerBoundingBox.bottom) {
-            const scrollUpValue = elementBoundingBox.bottom - listContainerBoundingBox.bottom;
-            listContainer2.scrollTop += scrollUpValue;
-          }
-        }, 500);
-      }
-    }
-  });
+  // Do nothing
 }
 
 function removeListElement(item) {
@@ -633,14 +537,16 @@ function removeListElement(item) {
 }
 
 function hideUrvalElement(selectionGroup) {
-  const urvalElement = urvalElements.get(selectionGroup);
+  const urvalCmp = urvalElements.get(selectionGroup);
+  const urvalElement = document.getElementById(urvalCmp.getId());
   urvalElement.classList.add('hidden');
 }
 
 function updateUrvalElementText(selectionGroup, selectionGroupTitle, sum) {
-  const urvalElement = urvalElements.get(selectionGroup);
+  const urvalCmp = urvalElements.get(selectionGroup);
+  const urvalElement = document.getElementById(urvalCmp.getId());
   const newNodeValue = `${selectionGroupTitle} (${sum})`;
-  urvalElement.childNodes[0].nodeValue = newNodeValue;
+  urvalElement.getElementsByTagName('span')[0].innerText = newNodeValue;
 }
 
 function init(options) {
@@ -649,9 +555,11 @@ function init(options) {
 
   infowindowOptions = options.infowindowOptions ? options.infowindowOptions : {};
   exportOptions = infowindowOptions.export || {};
+
   sublists = new Map();
   subexports = new Map();
   urvalElements = new Map();
+  urvalElementContents = new Map();
   expandableContents = new Map();
 
   render(options.viewer.getId());
