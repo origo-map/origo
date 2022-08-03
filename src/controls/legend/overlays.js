@@ -89,7 +89,6 @@ const Overlays = function Overlays(options) {
   });
 
   const overlaysCollapse = Collapse({
-    legendCollapse: true,
     bubble: true,
     collapseX: false,
     cls: 'flex column overflow-hidden width-100',
