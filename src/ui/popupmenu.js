@@ -2,7 +2,9 @@ import { Component } from '.';
 
 export default function popup(options = {}) {
   const {
-    onUnfocus = () => {}
+    onUnfocus = () => {},
+    style,
+    cls
   } = options;
 
   let id;
@@ -60,7 +62,7 @@ export default function popup(options = {}) {
     toggleVisibility,
     setContent,
     render() {
-      return `<div id="${this.getId()}" class="popup-menu z-index-ontop-high"></div>`;
+      return `<div id="${this.getId()}" class="popup-menu z-index-ontop-high ${cls}" style="${style}"></div>`;
     }
   });
 }

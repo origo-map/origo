@@ -23,7 +23,7 @@ const OverlayLayer = function OverlayLayer(options) {
 
   const hasStylePicker = viewer.getLayerStylePicker(layer).length > 0;
   const layerIconCls = `round compact icon-small relative no-shrink light ${hasStylePicker ? 'style-picker' : ''}`;
-  const cls = `${clsSettings} flex row align-center padding-left padding-right-smaller item`.trim();
+  const cls = `${clsSettings} flex row align-center padding-left padding-right-smaller item wrap`.trim();
   const title = layer.get('title') || 'Titel saknas';
   const name = layer.get('name');
   const secure = layer.get('secure');
@@ -97,7 +97,7 @@ const OverlayLayer = function OverlayLayer(options) {
       });
     },
     render() {
-      const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
+      const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden basis-50';
       return `<div id="${this.getId()}" class="${labelCls}">${title}</div>`;
     }
   });
@@ -234,31 +234,18 @@ const OverlayLayer = function OverlayLayer(options) {
         popupMenu.setVisibility(false);
       }
     };
-    const offsetTop = moreInfoButtonEl.getBoundingClientRect().height + moreInfoButtonEl.parentElement.offsetTop + 5;
-    popupMenu = PopupMenu({ onUnfocus });
-    const containerId = viewer.getControlByName('legend').getOverlaysCollapse().containerId;
-    document.getElementById(containerId).appendChild(dom.html(popupMenu.render()));
-    document.getElementById(containerId).style.minHeight = '100px';
+    popupMenu = PopupMenu({ onUnfocus, style:'position:relative;margin-left:auto;margin-right:5px;' });
+    moreInfoButtonEl.parentElement.appendChild(dom.html(popupMenu.render()));
     popupMenu.setContent(popupMenuList.render());
     popupMenuList.dispatch('render');
-    popupMenu.setPosition({ right: '5px', top: `${offsetTop}px` });
     popupMenu.setVisibility(true);
   };
 
   const togglePopupMenu = function togglePopupMenu() {
     if (!popupMenu) {
       createPopupMenu();
-    } else if (!popupMenu.getVisibility()) {
-      const containerId = viewer.getControlByName('legend').getOverlaysCollapse().containerId;
-      document.getElementById(containerId).style.minHeight = '100px';
-      const moreInfoButtonEl = document.getElementById(moreInfoButton.getId());
-      const offsetTop = moreInfoButtonEl.getBoundingClientRect().height + moreInfoButtonEl.parentElement.offsetTop + 5;
-      popupMenu.setPosition({ right: '5px', top: `${offsetTop}px` });
-      popupMenu.setVisibility(true);
     } else {
-      const containerId = viewer.getControlByName('legend').getOverlaysCollapse().containerId;
-      document.getElementById(containerId).style.minHeight = '';
-      popupMenu.setVisibility(false);
+      popupMenu.toggleVisibility()
     }
   };
 
@@ -346,7 +333,7 @@ const OverlayLayer = function OverlayLayer(options) {
       });
     },
     render() {
-      return `<li id="${this.getId()}" class="${cls}">${ButtonsHtml}</li>`;
+      return `<li id="${this.getId()}" class="${cls}">${ButtonsHtml}<div class="basis-100"></div></li>`;
     }
   });
 };
