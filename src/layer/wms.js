@@ -90,7 +90,7 @@ const wms = function wms(layerOptions, viewer) {
     if (wmsOptions.styleName === 'default') {
       wmsOptions.styleName = createDefaultStyle(wmsOptions, source, viewer);
     }
-    return image(wmsOptions, createImageSource(sourceOptions));
+    return image(wmsOptions, source);
   }
 
   const source = createTileSource(sourceOptions);
