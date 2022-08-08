@@ -3,8 +3,8 @@ import { Component } from '.';
 export default function popup(options = {}) {
   const {
     onUnfocus = () => {},
-    style,
-    cls
+    style = '',
+    cls = ''
   } = options;
 
   let id;

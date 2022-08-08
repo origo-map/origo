@@ -258,7 +258,11 @@ const OverlayLayer = function OverlayLayer(options) {
       }
     };
     popupMenu = PopupMenu({ onUnfocus, style: 'position:relative;margin-left:auto;margin-right:5px;' });
-    moreInfoButtonEl.parentElement.appendChild(dom.html(popupMenu.render()));
+    const fragment = dom.html(popupMenu.render());
+    const newDiv = document.createElement('div');
+    newDiv.className = 'flex-line-break';
+    moreInfoButtonEl.insertAdjacentElement('afterend', newDiv);
+    newDiv.insertAdjacentElement('afterend', fragment.children[0]);
     popupMenu.setContent(popupMenuList.render());
     popupMenuList.dispatch('render');
     popupMenu.setVisibility(true);
@@ -366,7 +370,7 @@ const OverlayLayer = function OverlayLayer(options) {
     render() {
       let extendedLegendHtml = '';
       // Inject the extended legend in the same li element to avoid problems with callers that assumes that each layer is one li, but add a linebreak
-      extendedLegendHtml = `<div class="flex-line-break"></div>${extendedLegendCmp.render()}<div class="flex-line-break"></div>`;
+      extendedLegendHtml = `<div class="flex-line-break"></div>${extendedLegendCmp.render()}`;
       return `<li id="${this.getId()}" class="${cls}">${ButtonsHtml}${extendedLegendHtml}</li>`;
     }
   });
