@@ -15,6 +15,8 @@ export default function wfs(layerOptions, viewer) {
   sourceOptions.geometryName = wfsOptions.geometryName;
   sourceOptions.filter = wfsOptions.filter;
   sourceOptions.attribution = wfsOptions.attribution;
+  sourceOptions.customExtent = wfsOptions.extent;
+  wfsOptions.extent = undefined;
   sourceOptions.resolutions = viewer.getResolutions();
   sourceOptions.projectionCode = viewer.getProjectionCode();
   if (wfsOptions.projection) {
