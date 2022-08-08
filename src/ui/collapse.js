@@ -100,12 +100,12 @@ export default function Collapse(options = {}) {
     data,
     expand,
     onInit() {
-      if ((headerComponent || footerComponent) && contentComponent) {
+      if (contentComponent) {
         if (headerComponent) { this.addComponent(headerComponent); }
         if (footerComponent) { this.addComponent(footerComponent); }
         this.addComponent(contentComponent);
       } else {
-        throw new Error('Header or content component is missing in collapse');
+        throw new Error('Content component is missing in collapse');
       }
     },
     onRender() {
