@@ -215,7 +215,7 @@ const LayerRow = function LayerRow(options) {
     if (!json) {
       return getTitleWithIcon(title, '');
     }
-    const legendLayer = json.layers.find((l) => l.layerId === id || l.layerName === id);
+    const legendLayer = json.layers.find((l) => +l.layerId === +id || l.layerName === id);
     if (!legendLayer) {
       return getTitleWithIcon(title, '');
     }
