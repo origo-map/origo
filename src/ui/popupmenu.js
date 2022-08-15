@@ -49,7 +49,7 @@ export default function popup(options = {}) {
       id = this.getId();
       window.addEventListener('click', (e) => {
         const popupMenuEl = document.getElementById(id);
-        if (!popupMenuEl.contains(e.target)) {
+        if (popupMenuEl && !popupMenuEl.contains(e.target)) {
           onUnfocus(e);
           e.preventDefault();
         }
