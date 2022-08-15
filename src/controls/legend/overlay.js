@@ -257,12 +257,11 @@ const OverlayLayer = function OverlayLayer(options) {
         popupMenu.setVisibility(false);
       }
     };
-    popupMenu = PopupMenu({ onUnfocus, style: 'position:relative;margin-left:auto;margin-right:5px;' });
-    const fragment = dom.html(popupMenu.render());
+    popupMenu = PopupMenu({ onUnfocus, cls: 'overlay-popup' });
     const newDiv = document.createElement('div');
-    newDiv.className = 'flex-line-break';
+    newDiv.classList.add('justify-end', 'flex', 'relative', 'basis-100');
     moreInfoButtonEl.insertAdjacentElement('afterend', newDiv);
-    newDiv.insertAdjacentElement('afterend', fragment.children[0]);
+    newDiv.appendChild(dom.html(popupMenu.render()));
     popupMenu.setContent(popupMenuList.render());
     popupMenuList.dispatch('render');
     popupMenu.setVisibility(true);
