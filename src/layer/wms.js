@@ -89,6 +89,7 @@ const wms = function wms(layerOptions, viewer) {
     const source = createImageSource(sourceOptions);
     if (wmsOptions.styleName === 'default') {
       wmsOptions.styleName = createDefaultStyle(wmsOptions, source, viewer);
+      wmsOptions.style = wmsOptions.styleName;
     }
     return image(wmsOptions, source);
   }
@@ -97,6 +98,7 @@ const wms = function wms(layerOptions, viewer) {
 
   if (wmsOptions.styleName === 'default') {
     wmsOptions.styleName = createDefaultStyle(wmsOptions, source, viewer);
+    wmsOptions.style = wmsOptions.styleName;
   }
   return tile(wmsOptions, source);
 };
