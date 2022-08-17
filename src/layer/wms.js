@@ -37,6 +37,20 @@ function createImageSource(options) {
   }));
 }
 
+function createDefaultStyle(wmsOptions, source, viewer) {
+  const maxResolution = viewer.getResolutions()[viewer.getResolutions().length - 1];
+  const styleName = `${wmsOptions.name}_WMSDefault`;
+  const getLegendString = source.getLegendUrl(maxResolution, wmsOptions.legendParams);
+  const style = [[{
+    icon: {
+      src: `${getLegendString}`
+    },
+    extendedLegend: wmsOptions.hasThemeLegend || false
+  }]];
+  viewer.addStyle(styleName, style);
+  return styleName;
+}
+
 const wms = function wms(layerOptions, viewer) {
   const wmsDefault = {
     featureinfoLayer: null
@@ -54,7 +68,6 @@ const wms = function wms(layerOptions, viewer) {
   sourceOptions.projection = viewer.getProjection();
   sourceOptions.id = wmsOptions.id;
   sourceOptions.format = wmsOptions.format ? wmsOptions.format : sourceOptions.format;
-
   const styleSettings = viewer.getStyle(wmsOptions.styleName);
   const wmsStyleObject = styleSettings ? styleSettings[0].find(s => s.wmsStyle) : undefined;
   sourceOptions.style = wmsStyleObject ? wmsStyleObject.wmsStyle : '';
@@ -73,9 +86,21 @@ const wms = function wms(layerOptions, viewer) {
   }
 
   if (renderMode === 'image') {
-    return image(wmsOptions, createImageSource(sourceOptions));
+    const source = createImageSource(sourceOptions);
+    if (wmsOptions.styleName === 'default') {
+      wmsOptions.styleName = createDefaultStyle(wmsOptions, source, viewer);
+      wmsOptions.style = wmsOptions.styleName;
+    }
+    return image(wmsOptions, source);
   }
-  return tile(wmsOptions, createTileSource(sourceOptions));
+
+  const source = createTileSource(sourceOptions);
+
+  if (wmsOptions.styleName === 'default') {
+    wmsOptions.styleName = createDefaultStyle(wmsOptions, source, viewer);
+    wmsOptions.style = wmsOptions.styleName;
+  }
+  return tile(wmsOptions, source);
 };
 
 export default wms;
