@@ -138,11 +138,10 @@ const OverlayLayer = function OverlayLayer(options) {
       });
     },
     render() {
-      const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
+      const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden basis-50';
       return `<div id="${this.getId()}" class="${labelCls}">${title}</div>`;
     }
   });
-
 
   const layerInfoMenuItem = Component({
     onRender() {
@@ -251,23 +250,6 @@ const OverlayLayer = function OverlayLayer(options) {
     }
   });
 
-  const getElementOffset = function getElementOffset(el, rootParentEl) {
-    let left = 0;
-    let top = 0;
-    let currentEl = el;
-    while (
-      currentEl
-      && !Number.isNaN(currentEl.offsetLeft)
-      && !Number.isNaN(currentEl.offsetTop)
-      && currentEl.id !== rootParentEl.id
-    ) {
-      left += currentEl.offsetLeft - currentEl.scrollLeft;
-      top += currentEl.offsetTop - currentEl.scrollTop;
-      currentEl = currentEl.offsetParent;
-    }
-    return { top, left };
-  };
-
   const createPopupMenu = function createPopupMenu() {
     const moreInfoButtonEl = document.getElementById(moreInfoButton.getId());
     const onUnfocus = (e) => {
@@ -275,15 +257,14 @@ const OverlayLayer = function OverlayLayer(options) {
         popupMenu.setVisibility(false);
       }
     };
-    const viewerEl = document.getElementById(viewer.getId());
-    const { top, left } = getElementOffset(moreInfoButtonEl, viewerEl);
-    const right = viewerEl.offsetWidth - left - moreInfoButtonEl.offsetWidth;
-    const targetRect = moreInfoButtonEl.getBoundingClientRect();
-    popupMenu = PopupMenu({ onUnfocus });
-    document.getElementById(viewer.getId()).appendChild(dom.html(popupMenu.render()));
+    popupMenu = PopupMenu({ onUnfocus, cls: 'overlay-popup' });
+    const newDiv = document.createElement('div');
+    newDiv.classList.add('justify-end', 'flex', 'relative', 'basis-100');
+    moreInfoButtonEl.insertAdjacentElement('afterend', newDiv);
+    newDiv.appendChild(dom.html(popupMenu.render()));
     popupMenu.setContent(popupMenuList.render());
     popupMenuList.dispatch('render');
-    popupMenu.setPosition({ right: `${right}px`, top: `${top + targetRect.height}px` });
+    popupMenu.setVisibility(true);
   };
 
   const togglePopupMenu = function togglePopupMenu() {

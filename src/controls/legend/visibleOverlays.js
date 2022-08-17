@@ -51,7 +51,8 @@ const Overlays = function Overlays(options) {
     secondaryComponent: layerProps,
     cls: 'right flex width-100',
     style: { width: '100%' },
-    legendSlideNav: false
+    legendSlideNav: false,
+    viewer
   });
 
   const navContainer = Component({
