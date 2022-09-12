@@ -5,7 +5,7 @@ import TileImage from 'ol/source/TileImage';
 import TileWMSSource from 'ol/source/TileWMS';
 import TileGrid from 'ol/tilegrid/TileGrid';
 import { Group } from 'ol/layer';
-import PluggableMap from 'ol/PluggableMap';
+import OlMap from 'ol/Map';
 import {
   Button, Component, cuid, dom
 } from '../../ui';
@@ -20,7 +20,7 @@ import maputils from '../../maputils';
 import PrintResize from './print-resize';
 import { withLoading } from '../../loading';
 /** Backup of original OL function */
-const original = PluggableMap.prototype.getEventPixel;
+const original = OlMap.prototype.getEventPixel;
 
 /**
  * Recalculates the event position to account for transform: scale in the container as OL does not do that.
@@ -466,7 +466,7 @@ const PrintComponent = function PrintComponent(options = {}) {
       // Restore monkey patch
       // WORKAROUND: Remove when OL supports transform: scale
       // See https://github.com/openlayers/openlayers/issues/13283
-      PluggableMap.prototype.getEventPixel = original;
+      OlMap.prototype.getEventPixel = original;
       // Restore scales
       if (!supressResolutionsRecalculation) {
         const viewerResolutions = viewer.getResolutions();
@@ -556,7 +556,7 @@ const PrintComponent = function PrintComponent(options = {}) {
       // Monkey patch OL
       // WORKAROUND: Remove when OL supports transform: scale
       // See https://github.com/openlayers/openlayers/issues/13283
-      PluggableMap.prototype.getEventPixel = getEventPixelScale;
+      OlMap.prototype.getEventPixel = getEventPixelScale;
       printScale = 0;
       today = new Date(Date.now());
       viewerMapTarget = map.getTarget();
