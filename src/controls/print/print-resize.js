@@ -348,7 +348,7 @@ export default function PrintResize(options = {}) {
           const featureStyle = feature.getStyle();
           if (featureStyle) {
             const styleScale = multiplyByFactor(1.5);
-            featureStyle.forEach(style => {
+            Array.from(featureStyle).forEach(style => {
               const image = style.getImage();
               if (image) {
                 const imageScale = image.getScale() ? multiplyRelativeValueByFactor(image.getScale()) : styleScale;
