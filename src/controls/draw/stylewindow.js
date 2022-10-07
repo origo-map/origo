@@ -24,6 +24,10 @@ const swDefaults = {
   textFont: '"Helvetica Neue", Helvetica, Arial, sans-serif'
 };
 
+function escapeQuotes(s) {
+  return s.replace(/'/g, "''");
+}
+
 function rgbToArray(colorString, opacity = 1) {
   const colorArray = colorString.replace(/[^\d,.]/g, '').split(',');
   colorArray[3] = opacity;
@@ -298,44 +302,45 @@ function bindUIActions() {
   }
 
   document.getElementById('o-draw-style-fillOpacitySlider').addEventListener('input', function e() {
-    swStyle.fillOpacity = this.value;
+    console.log(this)
+    swStyle.fillOpacity = escapeQuotes(this.value);
     setFillColor(swStyle.fillColor);
     styleFeature();
   });
 
   document.getElementById('o-draw-style-strokeOpacitySlider').addEventListener('input', function e() {
-    swStyle.strokeOpacity = this.value;
+    swStyle.strokeOpacity = escapeQuotes(this.value);
     setStrokeColor(swStyle.strokeColor);
     styleFeature();
   });
 
   document.getElementById('o-draw-style-strokeWidthSlider').addEventListener('input', function e() {
-    swStyle.strokeWidth = this.value;
+    swStyle.strokeWidth = escapeQuotes(this.value);
     styleFeature();
   });
 
   document.getElementById('o-draw-style-strokeType').addEventListener('change', function e() {
-    swStyle.strokeType = this.value;
+    swStyle.strokeType = escapeQuotes(this.value);
     styleFeature();
   });
 
   document.getElementById('o-draw-style-pointType').addEventListener('change', function e() {
-    swStyle.pointType = this.value;
+    swStyle.pointType = escapeQuotes(this.value);
     styleFeature();
   });
 
   document.getElementById('o-draw-style-pointSizeSlider').addEventListener('input', function e() {
-    swStyle.pointSize = this.value;
+    swStyle.pointSize = escapeQuotes(this.value);
     styleFeature();
   });
 
   document.getElementById('o-draw-style-textString').addEventListener('input', function e() {
-    swStyle.textString = this.value;
+    swStyle.textString = escapeQuotes(this.value);
     styleFeature();
   });
 
   document.getElementById('o-draw-style-textSizeSlider').addEventListener('input', function e() {
-    swStyle.textSize = this.value;
+    swStyle.textSize = escapeQuotes(this.value);
     styleFeature();
   });
 }
