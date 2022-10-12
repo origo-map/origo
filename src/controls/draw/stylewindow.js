@@ -7,6 +7,7 @@ import RegularShape from 'ol/style/RegularShape';
 import { Component, Button, Element, dom } from '../../ui';
 import styleTemplate from './styletemplate';
 import drawHandler from './drawhandler';
+import escapeQuotes from '../../utils/escapequotes';
 
 let annotationField;
 let swStyle = {};
@@ -23,10 +24,6 @@ const swDefaults = {
   textString: 'Text',
   textFont: '"Helvetica Neue", Helvetica, Arial, sans-serif'
 };
-
-function escapeQuotes(s) {
-  return s.replace(/'/g, "''");
-}
 
 function rgbToArray(colorString, opacity = 1) {
   const colorArray = colorString.replace(/[^\d,.]/g, '').split(',');
@@ -302,7 +299,6 @@ function bindUIActions() {
   }
 
   document.getElementById('o-draw-style-fillOpacitySlider').addEventListener('input', function e() {
-    console.log(this)
     swStyle.fillOpacity = escapeQuotes(this.value);
     setFillColor(swStyle.fillColor);
     styleFeature();
