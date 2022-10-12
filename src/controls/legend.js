@@ -424,7 +424,7 @@ const Legend = function Legend(options = {}) {
     },
     getuseGroupIndication() { return useGroupIndication; },
     getOverlaysCollapse() { return overlaysCmp.overlaysCollapse; },
-    resetVisibleLayersView() { setVisibleLayersViewActive(true); },
+    setVisibleLayersViewActive,
     addButtonToTools(button) {
       const toolsEl = document.getElementById(toolsCmp.getId());
       toolsEl.classList.remove('hidden');
