@@ -488,7 +488,6 @@ const Legend = function Legend(options = {}) {
     },
     onRender() {
       const layerControlCmps = [];
-      if (searchLayersControl) layerControlCmps.push(layerSearchInput);
       if (turnOnLayersControl) layerControlCmps.push(turnOnLayersButton);
       if (turnOffLayersControl) layerControlCmps.push(turnOffLayersButton);
       const layerControl = El({
@@ -504,6 +503,7 @@ const Legend = function Legend(options = {}) {
       });
       window.addEventListener('resize', updateMaxHeight);
       if (layerControlCmps.length > 0) this.addButtonToTools(layerControl);
+      if (searchLayersControl) this.addButtonToTools(layerSearchInput);
       initAutocomplete();
       bindUIActions();
       setTabIndex();
