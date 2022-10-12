@@ -137,7 +137,14 @@ const Legend = function Legend(options = {}) {
     const layers = viewer.getLayers();
     layers.forEach((el) => {
       if (!(['none', 'background'].includes(el.get('group')))) {
-        el.setVisible(true);
+        const group = viewer.getGroups().find((item) => item.name === el.get('group'));
+        if (typeof group !== 'undefined') {
+          if (!group.exclusive) {
+            el.setVisible(true);
+          }
+        } else {
+          el.setVisible(true);
+        }
       }
     });
   };
