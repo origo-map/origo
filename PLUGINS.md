@@ -2,6 +2,17 @@
 # Origo plugins
 More information about how to develop and utilize plugins with Origo will be added soon.
 
+## When to develop a plugin
+
+Plugins are to be developed when a feature or function is not appropriate to be included in the origo-core. Common reasons are external dependencies or a specific feature or function not requested by the average user. 
+## Guidelines development
+
+**[Barebone](https://github.com/origo-map/barebone-plugin)** is an example plugin to provide an initial structure of how you can start developing your plugin. 
+
+Origo-core has a lot of dependencies by default which are available to use from the plugins. They should be utilized first before loading more external libraries.
+
+Smaller adjustment to the core might be necessary but should be avoided to make the plugin as standalone as possible. 
+
 ## Available plugins
 Below is a list of available plugins. More information about each plugin can be found in the plugin's own repository.
 
