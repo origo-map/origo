@@ -9,6 +9,8 @@ const Splash = function Splash(options = {}) {
   let hideButton;
   let modal;
   let component;
+  let contentKey;
+  let visibilityKey;
 
   let {
     title,
@@ -30,16 +32,16 @@ const Splash = function Splash(options = {}) {
   };
 
   const clearLocalStorage = function clearLocalStorage() {
-    localStorage.removeItem('splashVisibility');
-    localStorage.removeItem('splashContent');
+    localStorage.removeItem(visibilityKey);
+    localStorage.removeItem(contentKey);
   };
 
   const setLocalStorage = function setLocalStorage() {
-    const newContent = localStorage.getItem('splashContent') !== content;
-    if (localStorage.getItem('splashVisibility') !== 'false' || newContent) {
-      localStorage.setItem('splashContent', content);
+    const newContent = localStorage.getItem(contentKey) !== content;
+    if (localStorage.getItem(visibilityKey) !== 'false' || content) {
+      localStorage.setItem(contentKey, content);
       if (newContent) {
-        localStorage.setItem('splashVisibility', 'true');
+        localStorage.setItem(visibilityKey, 'true');
       }
     }
   };
@@ -55,7 +57,7 @@ const Splash = function Splash(options = {}) {
       clearLocalStorage();
     }
 
-    if (localStorage.getItem('splashVisibility') !== 'false') {
+    if (localStorage.getItem(visibilityKey) !== 'false') {
       modal = Modal({
         title,
         content,
@@ -86,7 +88,7 @@ const Splash = function Splash(options = {}) {
             const proceed = window.confirm(confirmText);
             if (proceed) {
               modal.closeModal();
-              localStorage.setItem('splashVisibility', false);
+              localStorage.setItem(visibilityKey, false);
             }
           }
         });
@@ -96,6 +98,8 @@ const Splash = function Splash(options = {}) {
       component = this;
       viewer = evt.target;
       target = viewer.getId();
+      contentKey = `splashContent;${window.location.pathname};${viewer.getMapName().split('.')[0]}`;
+      visibilityKey = `splashVisibility;${window.location.pathname};${viewer.getMapName().split('.')[0]}`;
       if (!title) title = defaultTitle;
       if (!content) content = defaultContent;
 
