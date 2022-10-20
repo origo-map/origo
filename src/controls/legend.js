@@ -79,7 +79,7 @@ const Legend = function Legend(options = {}) {
   const addBackgroundButton = function addBackgroundButton(layer) {
     const styleName = layer.get('styleName') || 'default';
     const icon = viewer.getStyle(styleName) ? imageSource(viewer.getStyle(styleName)) : 'img/png/farg.png';
-    backgroundLayerButtons.push(Button({
+    const backgroundLayerButton = Button({
       icon,
       cls: 'round smallest border icon-small icon-bg',
       title: layer.get('title'),
@@ -101,7 +101,15 @@ const Legend = function Legend(options = {}) {
           }
         }
       }
-    }));
+    });
+    layer.on('change:visible', () => {
+      if (layer.getVisible() === true) {
+        backgroundLayerButton.setState('active');
+      } else {
+        backgroundLayerButton.setState('initial');
+      }
+    });
+    backgroundLayerButtons.push(backgroundLayerButton);
   };
 
   const addBackgroundButtons = function addBackgroundButtons(layers) {
@@ -260,6 +268,12 @@ const Legend = function Legend(options = {}) {
     if (name) {
       // Todo
       const layer = viewer.getLayer(label);
+      const layerGroup = layer.get('group');
+      const groupExclusive = (viewer.getGroup(layerGroup) && (viewer.getGroup(layerGroup).exclusive || viewer.getGroup(layerGroup).name === 'background'));
+      if (groupExclusive) {
+        const layers = viewer.getLayersByProperty('group', layerGroup);
+        layers.forEach(l => l.setVisible(false));
+      }
       layer.setVisible(true);
       document.getElementsByClassName('o-search-layer-field')[0].value = '';
     } else {
