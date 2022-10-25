@@ -6,7 +6,6 @@ import {
   Style,
   Text
 } from 'ol/style';
-
 import { getArea, getLength } from 'ol/sphere';
 import { LineString, Point } from 'ol/geom';
 
@@ -330,4 +329,19 @@ const measure = {
   }]
 };
 
-export { getBufferLabelStyle, getBufferPointStyle, getSegmentLabelStyle, getLabelStyle, measureStyle, labelStyle, tipStyle, modifyStyle, segmentStyle, bufferStyleFunction, formatLength, formatArea, formatRadius, measure };
+export {
+  bufferStyleFunction,
+  getBufferLabelStyle,
+  getBufferPointStyle,
+  getLabelStyle,
+  getSegmentLabelStyle,
+  labelStyle,
+  measureStyle,
+  modifyStyle,
+  segmentStyle,
+  tipStyle,
+  formatLength,
+  formatArea,
+  formatRadius,
+  measure
+};
