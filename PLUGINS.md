@@ -27,3 +27,9 @@ Search for Lantmäteriet Direct services via Origoserver API.
 
 **[Multiselect plugin](https://github.com/origo-map/multiselect-plugin)**
 Plugin to select features with different methods such as circle, polygon and buffer.
+
+**[OIDC plugin](https://github.com/SigtunaGIS/oidc-plugin)**
+A plugin for openid connect authorization with Origo.
+
+**[Swiper plugin](https://github.com/SigtunaGIS/swiper-plugin)**
+A plugin to compare two different views.

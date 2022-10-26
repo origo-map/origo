@@ -3,6 +3,7 @@
 import VectorSource from 'ol/source/Vector';
 import GeoJSONFormat from 'ol/format/GeoJSON';
 import * as LoadingStrategy from 'ol/loadingstrategy';
+import { getIntersection } from 'ol/extent';
 import { transformExtent } from 'ol/proj';
 import replacer from '../utils/replacer';
 
@@ -88,11 +89,12 @@ class WfsSource extends VectorSource {
       queryFilter = cqlfilter ? `&CQL_FILTER=${cqlfilter}` : '';
     } else {
       // Extent should be used. Depending if there also is a filter, the queryfilter looks different
+      const ext = getIntersection(this._options.customExtent, extent) || extent;
       let requestExtent;
       if (this._options.dataProjection !== this._options.projectionCode) {
-        requestExtent = transformExtent(extent, this._options.projectionCode, this._options.dataProjection);
+        requestExtent = transformExtent(ext, this._options.projectionCode, this._options.dataProjection);
       } else {
-        requestExtent = extent;
+        requestExtent = ext;
       }
       if (cqlfilter) {
         queryFilter = `&CQL_FILTER=${cqlfilter} AND BBOX(${this._options.geometryName},${requestExtent.join(',')},'${this._options.dataProjection}')`;

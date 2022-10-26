@@ -1,7 +1,8 @@
 import Collection from 'ol/Collection';
 import { Component } from './ui';
 import featurelayer from './featurelayer';
-import infowindowManager from './infowindow';
+import infowindowManagerV1 from './infowindow';
+import infowindowManagerV2 from './infowindow_expandableList';
 import Style from './style';
 import StyleTypes from './style/styletypes';
 
@@ -21,6 +22,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
 
   const multiselectStyleOptions = options.multiSelectionStyles || styleTypes.getStyle('multiselection');
   const isInfowindow = options.infowindow === 'infowindow' || false;
+  const infowindowManager = options.infowindowOptions && options.infowindowOptions.listLayout ? infowindowManagerV2 : infowindowManagerV1;
 
   function alreadyExists(item) {
     return selectedItems.getArray().some((i) => item.getId() === i.getId() && item.selectionGroup === i.selectionGroup);
@@ -168,12 +170,12 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     urval.get(selectionGroup).addFeature(item.getFeature());
     infowindow.createListElement(item);
 
-    const sum = urval.get(selectionGroup).getFeatures().length;
-    infowindow.updateUrvalElementText(selectionGroup, selectionGroupTitle, sum);
-
     if (isInfowindow) {
       infowindow.show();
     }
+
+    const sum = urval.get(selectionGroup).getFeatures().length;
+    infowindow.updateUrvalElementText(selectionGroup, selectionGroupTitle, sum);
   }
 
   function onItemRemoved(event) {
