@@ -123,6 +123,15 @@ button.ol-zoom-out {
   padding: 0 2px;
   text-align: center;
 }
+
+.ol-scale-singlebar-even{
+  background-color: #000000;
+}
+
+.ol-scale-singlebar-odd{
+  background-color: #FFFFFF;
+}
+
 /* invisible but not hidden */
 .ol-has-tooltip [role=tooltip] {
   border: 0;
