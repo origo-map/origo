@@ -233,7 +233,7 @@ const Legend = function Legend(options = {}) {
 
   const turnOnLayersButton = Button({
     cls: 'round compact icon-small margin-x-smaller',
-    title: 'Tänd alla lager',
+    title: 'Tänd alla lager utom bakgrundslager',
     click() {
       viewer.dispatch('active:turnonlayers');
     },
