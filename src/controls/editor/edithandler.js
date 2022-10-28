@@ -1333,7 +1333,6 @@ async function onAddChild(e) {
 function editAttributesDialogApi(featureId, layerName = null) {
   const layer = viewer.getLayer(layerName);
   const feature = layer.getSource().getFeatureById(featureId);
-  // TODO: Should we check anything? Layer editable, tool allowed?
   // Hijack the current layer for a while. If there's a modal visible it is closed (without saving) as editAttributes can not handle
   // multiple dialogs for the same layer so to be safe we always close. Technically the user can not
   // call this function when a modal is visible, as they can't click anywhere.
@@ -1362,15 +1361,11 @@ function editAttributesDialogApi(featureId, layerName = null) {
  * the feature has been saved and thus will have a permanent database Id. If not autosave it returns immediately (async of course) and
  * the id will be a temporary Guid that can be used until the feature is saved, then it will be replaced. Keeping a reference to the feature
  * itself will still work.
- * @param {any} layerName
+ * @param {any} layerName Name of layer to add a feature to
+ * @param {any} geometry A geomtry to add to the feature that will be created
  * @returns {Feature} the newly created feature
  */
 async function createFeatureApi(layerName, geometry = null) {
-  // TODO: Should we check anything?  editor active, something selected, attribute editor active, draw active, tool allowed?
-  //       If toolbar is not visible and not autosave, it will be pretty anonymous
-  // TODO: add parameter for geometry, or should that be added later manually?
-  //       If autosave, there is no later, as changes made outside editor will not end up in edit store (altough if it ends up there for some other reason
-  //       changes will be saved as editstore only keeps a reference to the feature itself, not the edits made)
   const editLayer = editLayers[layerName];
   if (!editLayer) {
     throw new Error('Ej redigerbart lager');
@@ -1393,15 +1388,12 @@ async function createFeatureApi(layerName, geometry = null) {
 
 async function deleteFeatureApi(featureId, layerName) {
   const feature = viewer.getLayer(layerName).getSource().getFeatureById(featureId);
-  // TODO: Should we check anything? Layer editable, tool allowed?
-  //       If toolbar is not visible and not autosave, it will be pretty anonymous
   const layer = viewer.getLayer(layerName);
   await deleteFeature(feature, layer);
 }
 
 function setActiveLayerApi(layerName) {
   const layer = editLayers[layerName];
-  // TODO: Move check to editor?
   if (!layer || layer.get('isTable')) {
     // Can't set tables as active in editor as the editor can't handle them. They are in list though, as they may
     // be edited through api
