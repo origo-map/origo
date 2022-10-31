@@ -168,8 +168,8 @@ const Position = function Position(options = {}) {
     if (currentConfig.dms) {
       // Assume that input logic enforces a correct format
       const coordArray = strCoords.match(/\d*\.?\d+/g);
-      const lat = parseInt(coordArray[0], 10) + parseInt(coordArray[1], 10) / 60 + parseFloat(coordArray[2]) * 3600;
-      const lon = parseInt(coordArray[3], 10) + parseInt(coordArray[4], 10) / 60 + parseFloat(coordArray[5]) * 3600;
+      const lat = parseInt(coordArray[0], 10) + parseInt(coordArray[1], 10) / 60 + parseFloat(coordArray[2]) / 3600;
+      const lon = parseInt(coordArray[3], 10) + parseInt(coordArray[4], 10) / 60 + parseFloat(coordArray[5]) / 3600;
       coords = [lon, lat];
     } else {
       // validate numbers
