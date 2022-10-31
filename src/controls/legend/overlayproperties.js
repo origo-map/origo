@@ -63,7 +63,10 @@ const OverlayProperties = function OverlayProperties(options = {}) {
   }
 
   function getStyleDisplayName(styleName) {
-    const altStyle = stylePicker.find(s => s.style === styleName);
+    let altStyle = stylePicker.find(s => s.style === styleName);
+    if (!altStyle) {
+      altStyle = stylePicker.find(s => s.default);
+    }
     return (altStyle && altStyle.title) || styleName;
   }
 
@@ -71,12 +74,38 @@ const OverlayProperties = function OverlayProperties(options = {}) {
     const altStyleIndex = stylePicker.findIndex(s => s.title === styleTitle);
     const altStyle = stylePicker[altStyleIndex];
     styleSelection.setButtonText(styleTitle);
-    const newStyle = Style.createStyle({ style: altStyle.style, clusterStyleName: altStyle.clusterStyle, viewer });
     const legendCmp = document.getElementById(legendComponent.getId());
-    legendCmp.innerHTML = Legend(viewer.getStyle(altStyle.style), opacity);
     if (!layer.get('defaultStyle')) layer.setProperties({ defaultStyle: layer.get('styleName') });
     layer.setProperties({ altStyleIndex });
-    layer.setProperties({ styleName: altStyle.style });
+    if (layer.get('type') === 'WMS') {
+      const layerSource = layer.get('source');
+      const sourceParams = layerSource.getParams();
+      let styleToSet = altStyle.style;
+      if (altStyle.default) {
+        sourceParams.STYLES = altStyle.style;
+        styleToSet = layer.get('defaultStyle');
+      } else {
+        sourceParams.STYLES = styleToSet;
+      }
+      layerSource.refresh();
+      layer.set('styleName', styleToSet);
+      const maxResolution = viewer.getResolutions()[viewer.getResolutions().length - 1];
+      const getLegendString = layerSource.getLegendUrl(maxResolution, { STYLE: styleToSet });
+      const newWmsStyle = [[{
+        icon: {
+          src: `${getLegendString}`
+        },
+        extendedLegend: altStyle.hasThemeLegend || false
+      }]];
+      viewer.addStyle(styleToSet, newWmsStyle);
+
+      legendCmp.innerHTML = Legend(viewer.getStyle(styleToSet), opacity);
+      layer.dispatchEvent('change:style');
+      return;
+    }
+    layer.set('styleName', altStyle.style);
+    legendCmp.innerHTML = Legend(viewer.getStyle(altStyle.style), opacity);
+    const newStyle = Style.createStyle({ style: altStyle.style, clusterStyleName: altStyle.clusterStyle, viewer });
     layer.setStyle(newStyle);
     layer.dispatchEvent('change:style');
   };
