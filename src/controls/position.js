@@ -138,7 +138,7 @@ const Position = function Position(options = {}) {
   }
 
   /**
-   * Update coords in input, transformin if necessary.
+   * Update coords in input, transforming if necessary.
    * @param {any} sourceCoords
    */
   function updateCoords(sourceCoords) {
@@ -254,7 +254,7 @@ const Position = function Position(options = {}) {
       } else if (e.which === 13) {
         findCoordinate();
       }
-      // For DMS, we handle everything ourselves. Ignore all keypresses (including current key) i order to keep browser not interfering
+      // For DMS, we handle everything ourselves. Ignore all keypresses (including current key) in order to keep browser from interfering
       e.preventDefault();
     } else if (e.which === 13) {
       findCoordinate();
