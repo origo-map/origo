@@ -1,7 +1,7 @@
 import MousePosition from 'ol/control/MousePosition';
 import Feature from 'ol/Feature';
 import Point from 'ol/geom/Point';
-import { createStringXY } from 'ol/coordinate';
+import { createStringXY, toStringHDMS } from 'ol/coordinate';
 import { Component, Icon, Button, Element as El, dom } from '../ui';
 
 const Position = function Position(options = {}) {
@@ -18,10 +18,8 @@ const Position = function Position(options = {}) {
   let view;
   const characterError = 'Ogiltigt tecken för koordinat, vänligen försök igen.';
   const extentError = 'Angivna koordinater ligger inte inom kartans utsträckning, vänligen försök igen.';
-  let currentProjection;
-  let projections;
-  let projectionCodes;
-  let projection;
+
+  /** Current Map projection code */
   let mapProjection;
   let precision;
   let mousePositionActive;
@@ -33,6 +31,11 @@ const Position = function Position(options = {}) {
   let coordsElement;
   let coordsFindElement;
   let containerElement;
+  let currentConfig;
+  let currentConfigIndex = 0;
+  let configArray = [];
+  let currentCaretPos;
+  let inputEl;
 
   function placeholder() {
     return noPositionText.length === 0 ? noPositionText === false : noPositionText;
@@ -71,10 +74,28 @@ const Position = function Position(options = {}) {
     });
   }
 
+  /**
+   *  Returns a function that formats a coordinate to HDMS format
+   * @param {any} fractionDigits
+   */
+  function createStringHDMS(fractionDigits) {
+    return (
+      (coord) => toStringHDMS(coord, fractionDigits)
+    );
+  }
+
+  /**
+   * Returns a funtion that formats a coordinate to a string depending on configuration
+   * */
+  function getStringifyFunction() {
+    return currentConfig.dms ? createStringHDMS(precision) : createStringXY(precision);
+  }
+
   function addMousePosition() {
+    const currentProjectionCode = currentConfig.projectionCode;
     mousePositionControl = new MousePosition({
-      coordinateFormat: createStringXY(precision),
-      projection: currentProjection,
+      coordinateFormat: getStringifyFunction(),
+      projection: currentProjectionCode,
       target: document.getElementById(`${coordsElement.getId()}`),
       placeholder: placeholder()
     });
@@ -101,8 +122,12 @@ const Position = function Position(options = {}) {
     document.getElementById(`${viewer.getId()}`).appendChild(markerElement);
   }
 
+  /**
+   * Write coords to input field.
+   * @param {any} coords
+   */
   function writeCoords(coords) {
-    document.getElementById(`${coordsFindElement.getId()}`).value = coords;
+    inputEl.value = coords;
   }
 
   function transformCoords(coords, source, destination) {
@@ -112,47 +137,58 @@ const Position = function Position(options = {}) {
     return geometry.transform(source, destination).getCoordinates();
   }
 
-  function round(coords) {
-    if (precision) {
-      return coords.map(coord => coord.toFixed(precision));
-    }
-    return coords.map(coord => Math.round(coord));
-  }
-
+  /**
+   * Update coords in input, transforming if necessary.
+   * @param {any} sourceCoords
+   */
   function updateCoords(sourceCoords) {
     let coords = sourceCoords;
-    if (currentProjection !== mapProjection) {
-      coords = transformCoords(coords, projection, currentProjection);
+    const currentProjectionCode = currentConfig.projectionCode;
+    if (currentProjectionCode !== mapProjection) {
+      coords = transformCoords(coords, mapProjection, currentProjectionCode);
     }
-    coords = round(coords);
-    const center = coords.join(', ') + suffix;
-    writeCoords(center);
+    const formattedCoords = getStringifyFunction()(coords);
+    writeCoords(formattedCoords);
   }
-
+  /**
+   * Eventhandler that is called when map pans.
+   * */
   function onChangeCenter() {
     updateCoords(view.getCenter());
   }
 
+  /**
+   * Parses a coordinate string and transforms it to map projection if necessary and returns a valid coordinate
+   * @param {any} strCoords
+   */
   function validateCoordinate(strCoords) {
     const extent = viewer.getExtent() || view.getProjection().getExtent();
     let inExtent;
-
-    // validate numbers
-    let coords = strCoords.split(',').map(coord => parseFloat(coord))
-      .filter((coord) => {
-        if (!Number.isNaN(coord)) {
-          return coord;
-        }
-        return null;
-      });
-    if (coords.length !== 2) {
-      alert(characterError);
-      return [];
+    let coords;
+    if (currentConfig.dms) {
+      // Assume that input logic enforces a correct format
+      const coordArray = strCoords.match(/\d*\.?\d+/g);
+      const lat = parseInt(coordArray[0], 10) + parseInt(coordArray[1], 10) / 60 + parseFloat(coordArray[2]) / 3600;
+      const lon = parseInt(coordArray[3], 10) + parseInt(coordArray[4], 10) / 60 + parseFloat(coordArray[5]) / 3600;
+      coords = [lon, lat];
+    } else {
+      // validate numbers
+      coords = strCoords.split(',').map(coord => parseFloat(coord))
+        .filter((coord) => {
+          if (!Number.isNaN(coord)) {
+            return coord;
+          }
+          return null;
+        });
+      if (coords.length !== 2) {
+        alert(characterError);
+        return [];
+      }
     }
 
     // transform
-    if (currentProjection !== mapProjection) {
-      coords = transformCoords(coords, currentProjection, mapProjection);
+    if (currentConfig.projectionCode !== mapProjection) {
+      coords = transformCoords(coords, currentConfig.projectionCode, mapProjection);
     }
 
     // validate coords within extent
@@ -165,8 +201,9 @@ const Position = function Position(options = {}) {
     return [];
   }
 
+  /** Centers the map on the coordinates provided by user i textbox */
   function findCoordinate() {
-    const coords = document.getElementById(`${coordsFindElement.getId()}`).value;
+    const coords = inputEl.value;
     const validated = validateCoordinate(coords);
     if (validated.length === 2) {
       map.getView().animate({
@@ -176,11 +213,66 @@ const Position = function Position(options = {}) {
     }
   }
 
+  /** Eventhandler that is called when input field gets focus */
+  function onFindFocus() {
+    if (currentConfig.dms) {
+      // Always mark first digit to keep user out of trouble
+      inputEl.setSelectionRange(0, 1);
+      currentCaretPos = 0;
+    }
+  }
+
+  /**
+   * Move the selection in input field in indicated direction to next position where there is a digit
+   * @param {any} left True if move left, otherwise move right
+   */
+  function moveCaret(left) {
+    const step = left ? -1 : 1;
+    if (currentCaretPos + step < 0 || currentCaretPos + step > inputEl.value.length - 4) {
+      return;
+    }
+    // Stop on next digit. As we already tested if we're on first or last digit, there must be at least one more digit in this direction
+    currentCaretPos += step;
+    while (!/\d/.test(inputEl.value[currentCaretPos])) {
+      currentCaretPos += step;
+    }
+    inputEl.setSelectionRange(currentCaretPos, currentCaretPos + 1);
+  }
+  /**
+   * Eventhandler called when user enters something in the coordinate textbox
+   * @param {any} e
+   */
   function onFind(e) {
-    if (e.which === 13) {
+    if (currentConfig.dms) {
+      if (e.which === 37) {
+        moveCaret(true);
+      } else if (e.which === 39) {
+        moveCaret(false);
+      } else if (e.which >= 48 && e.which <= 57) {
+        inputEl.value = inputEl.value.substring(0, currentCaretPos) + (e.which - 48) + inputEl.value.substring(currentCaretPos + 1);
+        moveCaret(false);
+      } else if (e.which === 13) {
+        findCoordinate();
+      }
+      // For DMS, we handle everything ourselves. Ignore all keypresses (including current key) in order to keep browser from interfering
+      e.preventDefault();
+    } else if (e.which === 13) {
       findCoordinate();
     }
   }
+
+  /**
+   * Eventhandler that is called when users clicks input field. Is only called if input already has focus.
+   * @param {any} e
+   */
+  function onFindClick() {
+    if (currentConfig.dms) {
+      // Select first digit in order to keep user out of trouble by accidently clicking a non-digit and mess up the string
+      currentCaretPos = 0;
+      inputEl.setSelectionRange(currentCaretPos, currentCaretPos + 1);
+    }
+  }
+
   function addCenterPosition() {
     renderMarker();
 
@@ -190,7 +282,9 @@ const Position = function Position(options = {}) {
     updateCoords(view.getCenter());
     view.on('change:center', onChangeCenter);
 
-    document.getElementById(`${coordsFindElement.getId()}`).addEventListener('keypress', onFind);
+    inputEl.addEventListener('keydown', onFind);
+    inputEl.addEventListener('focus', onFindFocus);
+    inputEl.addEventListener('click', onFindClick);
   }
 
   function clear() {
@@ -200,12 +294,14 @@ const Position = function Position(options = {}) {
   function removeCenterPosition() {
     view.un('change:center', onChangeCenter);
     clear();
-    document.getElementById(`${coordsFindElement.getId()}`).removeEventListener('keypress', onFind);
+    inputEl.removeEventListener('keydown', onFind);
+    inputEl.removeEventListener('focus', onFindFocus);
+    inputEl.removeEventListener('click', onFindClick);
 
     const markerIconElement = document.getElementById(`${markerIcon.getId()}`);
     markerIconElement.parentNode.removeChild(markerIconElement);
     document.getElementById(`${centerButton.getId()}`).classList.remove('o-active');
-    document.getElementById(`${coordsFindElement.getId()}`).classList.remove('o-active');
+    inputEl.classList.remove('o-active');
   }
 
   function onTogglePosition() {
@@ -219,35 +315,37 @@ const Position = function Position(options = {}) {
     }
   }
 
-  function toggleProjectionVal(val) {
-    let proj;
-    const index = projectionCodes.indexOf(val);
-    if (index === projectionCodes.length - 1) {
-      proj = projectionCodes[0];
-    } else if (index < projectionCodes.length - 1) {
-      proj = projectionCodes[index + 1];
+  function toggleProjectionVal() {
+    currentConfigIndex += 1;
+    if (currentConfigIndex === configArray.length) {
+      currentConfigIndex = 0;
     }
-    return proj;
+    currentConfig = configArray[currentConfigIndex];
   }
 
   function setPrecision() {
-    if (currentProjection === 'EPSG:4326') {
+    if (currentConfig.precision) {
+      precision = currentConfig.precision;
+    } else if (currentConfig.projectionCode === 'EPSG:4326' && !currentConfig.dms) {
       precision = 5;
     } else {
       precision = 0;
     }
+    const exampleCoord = getStringifyFunction()(view.getCenter());
+    inputEl.setAttribute('size', exampleCoord.length);
   }
 
   function writeProjection() {
-    document.getElementById(`${projButton.getId()}`).value = currentProjection;
-    document.getElementById(`${projButton.getId()}`).textContent = projections[currentProjection];
+    document.getElementById(`${projButton.getId()}`).value = currentConfig.projectionCode;
+    document.getElementById(`${projButton.getId()}`).textContent = currentConfig.projectionLabel;
   }
 
+  /** Eventhandler that is called when user clicks toggle button */
   function onToggleProjection() {
     removeNoCoordsEl();
-    currentProjection = toggleProjectionVal(document.getElementById(`${projButton.getId()}`).value);
+    toggleProjectionVal();
     setPrecision();
-    writeProjection(currentProjection);
+    writeProjection();
     if (mousePositionActive) {
       removeMousePosition();
       addMousePosition();
@@ -264,20 +362,24 @@ const Position = function Position(options = {}) {
       viewer = evt.target;
       map = viewer.getMap();
       view = map.getView();
-      projection = view.getProjection();
       mapProjection = viewer.getProjectionCode();
-      projections = options.projections || {};
-      projectionCodes = Object.getOwnPropertyNames(projections);
-      if (title) {
-        currentProjection = mapProjection;
-        projections[currentProjection] = title;
-        projectionCodes.unshift(mapProjection);
-      } else if (projectionCodes.length) {
-        currentProjection = projectionCodes[0];
+      // For backwards compatibility, we also accept an object with epsg codes as keys
+      // New config format must be an array, as same epsg code can be used several times
+      if (options.projections instanceof Array) {
+        configArray = options.projections;
       } else {
-        alert('No title or projection is set for position');
+        Object.keys(options.projections).forEach(currKey => configArray.push({ projectionCode: currKey, projectionLabel: options.projections[currKey] }));
       }
 
+      // If title is set, add the map projection as first and active setting.
+      if (title) {
+        configArray.unshift({ projectionCode: mapProjection, projectionLabel: title });
+      }
+
+      if (configArray.length === 0) {
+        alert('No title or projection is set for position');
+      }
+      currentConfig = configArray[0];
       if (!suffix) suffix = '';
       if (!title) title = undefined;
 
@@ -319,9 +421,9 @@ const Position = function Position(options = {}) {
     render() {
       const el = dom.html(containerElement.render());
       document.getElementById(viewer.getFooter().getId()).firstElementChild.appendChild(el);
+      inputEl = document.getElementById(`${coordsFindElement.getId()}`);
 
-      document.getElementById(`${projButton.getId()}`).value = currentProjection;
-      document.getElementById(`${projButton.getId()}`).textContent = projections[currentProjection];
+      writeProjection();
 
       setPrecision();
       addMousePosition();
