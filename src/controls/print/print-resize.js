@@ -46,44 +46,48 @@ export default function PrintResize(options = {}) {
 
   // Resize features when DPI changes
   const resizeFeature = function resizeFeature(style, feature, styleScale) {
-    const image = style.getImage();
-    if (image) {
-      imageSavedScale[feature.ol_uid] = { scale: image.getScale() ? image.getScale() / image.getScale() : undefined };
-      const imageScale = image.getScale() ? multiplyRelativeValueByFactor(image.getScale()) : styleScale;
-      image.setScale(imageScale);
-    }
-    const stroke = style.getStroke();
-    if (stroke) {
-      strokeSavedWidth[feature.ol_uid] = { width: stroke.getWidth() ? stroke.getWidth() : undefined };
-      const strokeWidth = stroke.getWidth() ? multiplyRelativeValueByFactor(stroke.getWidth()) : styleScale;
-      stroke.setWidth(strokeWidth);
-    }
-    const text = style.getText();
-    if (text) {
-      textSavedScale[feature.ol_uid] = { scale: text.getScale() ? text.getScale() / text.getScale() : undefined };
-      const textScale = text.getScale() ? multiplyRelativeValueByFactor(text.getScale()) : styleScale;
-      text.setScale(textScale);
+    if (!Array.isArray(style)) {
+      const image = style.getImage();
+      if (image) {
+        imageSavedScale[feature.ol_uid] = { scale: image.getScale() ? image.getScale() / image.getScale() : undefined };
+        const imageScale = image.getScale() ? multiplyRelativeValueByFactor(image.getScale()) : styleScale;
+        image.setScale(imageScale);
+      }
+      const stroke = style.getStroke();
+      if (stroke) {
+        strokeSavedWidth[feature.ol_uid] = { width: stroke.getWidth() ? stroke.getWidth() : undefined };
+        const strokeWidth = stroke.getWidth() ? multiplyRelativeValueByFactor(stroke.getWidth()) : styleScale;
+        stroke.setWidth(strokeWidth);
+      }
+      const text = style.getText();
+      if (text) {
+        textSavedScale[feature.ol_uid] = { scale: text.getScale() ? text.getScale() / text.getScale() : undefined };
+        const textScale = text.getScale() ? multiplyRelativeValueByFactor(text.getScale()) : styleScale;
+        text.setScale(textScale);
+      }
     }
   };
 
   // Reset features that was resized in DPI changes
   const resetFeature = function resetFeature(style, layer, feature) {
-    const image = style.getImage();
-    if (image) {
-      if (typeof layersSaveStyle[layer.get('name')].imageScale[feature.ol_uid].scale !== 'undefined') {
-        image.setScale(layersSaveStyle[layer.get('name')].imageScale[feature.ol_uid].scale);
+    if (!Array.isArray(style)) {
+      const image = style.getImage();
+      if (image) {
+        if (typeof layersSaveStyle[layer.get('name')].imageScale[feature.ol_uid].scale !== 'undefined') {
+          image.setScale(layersSaveStyle[layer.get('name')].imageScale[feature.ol_uid].scale);
+        }
       }
-    }
-    const stroke = style.getStroke();
-    if (stroke) {
-      if (typeof layersSaveStyle[layer.get('name')].strokeWidth[feature.ol_uid].width !== 'undefined') {
-        stroke.setWidth(layersSaveStyle[layer.get('name')].strokeWidth[feature.ol_uid].width);
+      const stroke = style.getStroke();
+      if (stroke) {
+        if (typeof layersSaveStyle[layer.get('name')].strokeWidth[feature.ol_uid].width !== 'undefined') {
+          stroke.setWidth(layersSaveStyle[layer.get('name')].strokeWidth[feature.ol_uid].width);
+        }
       }
-    }
-    const text = style.getText();
-    if (text) {
-      if (typeof layersSaveStyle[layer.get('name')].textScale[feature.ol_uid].scale !== 'undefined') {
-        text.setScale(layersSaveStyle[layer.get('name')].textScale[feature.ol_uid].scale);
+      const text = style.getText();
+      if (text) {
+        if (typeof layersSaveStyle[layer.get('name')].textScale[feature.ol_uid].scale !== 'undefined') {
+          text.setScale(layersSaveStyle[layer.get('name')].textScale[feature.ol_uid].scale);
+        }
       }
     }
   };
