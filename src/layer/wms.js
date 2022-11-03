@@ -37,15 +37,20 @@ function createImageSource(options) {
   }));
 }
 
-function createDefaultStyle(wmsOptions, source, viewer) {
+function createWmsStyle(wmsOptions, source, viewer, defaultStyle = true) {
   const maxResolution = viewer.getResolutions()[viewer.getResolutions().length - 1];
-  const styleName = `${wmsOptions.name}_WMSDefault`;
-  const getLegendString = source.getLegendUrl(maxResolution, wmsOptions.legendParams);
+  const styleName = defaultStyle ? `${wmsOptions.name}_WMSDefault` : wmsOptions.styleName;
+  const getLegendString = defaultStyle ? source.getLegendUrl(maxResolution, wmsOptions.legendParams) : source.getLegendUrl(maxResolution, { STYLE: styleName });
+  let hasThemeLegend = wmsOptions.hasThemeLegend || false;
+  if (!defaultStyle) {
+    hasThemeLegend = wmsOptions.stylePicker[wmsOptions.altStyleIndex].hasThemeLegend || false;
+  }
+
   const style = [[{
     icon: {
       src: `${getLegendString}`
     },
-    extendedLegend: wmsOptions.hasThemeLegend || false
+    extendedLegend: hasThemeLegend
   }]];
   viewer.addStyle(styleName, style);
   return styleName;
@@ -88,7 +93,7 @@ const wms = function wms(layerOptions, viewer) {
   if (renderMode === 'image') {
     const source = createImageSource(sourceOptions);
     if (wmsOptions.styleName === 'default') {
-      wmsOptions.styleName = createDefaultStyle(wmsOptions, source, viewer);
+      wmsOptions.styleName = createWmsStyle(wmsOptions, source, viewer);
       wmsOptions.style = wmsOptions.styleName;
     }
     return image(wmsOptions, source);
@@ -97,8 +102,13 @@ const wms = function wms(layerOptions, viewer) {
   const source = createTileSource(sourceOptions);
 
   if (wmsOptions.styleName === 'default') {
-    wmsOptions.styleName = createDefaultStyle(wmsOptions, source, viewer);
+    wmsOptions.styleName = createWmsStyle(wmsOptions, source, viewer);
     wmsOptions.style = wmsOptions.styleName;
+  } else if (wmsOptions.altStyleIndex > -1) {
+    wmsOptions.defaultStyle = createWmsStyle(wmsOptions, source, viewer);
+    wmsOptions.styleName = createWmsStyle(wmsOptions, source, viewer, false);
+    wmsOptions.style = wmsOptions.styleName;
+    source.getParams().STYLES = wmsOptions.styleName;
   }
   return tile(wmsOptions, source);
 };
