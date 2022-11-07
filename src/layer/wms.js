@@ -56,6 +56,20 @@ function createWmsStyle(wmsOptions, source, viewer, defaultStyle = true) {
   return styleName;
 }
 
+function createWmsLayer(wmsOptions, source, viewer) {
+  const wmsOpts = wmsOptions;
+  const wmsSource = source;
+  if (wmsOpts.styleName === 'default') {
+    wmsOpts.styleName = createWmsStyle(wmsOptions, source, viewer);
+    wmsOpts.style = wmsOptions.styleName;
+  } else if (wmsOptions.altStyleIndex > -1) {
+    wmsOpts.defaultStyle = createWmsStyle(wmsOptions, source, viewer);
+    wmsOpts.styleName = createWmsStyle(wmsOptions, source, viewer, false);
+    wmsOpts.style = wmsOptions.styleName;
+    wmsSource.getParams().STYLES = wmsOptions.styleName;
+  }
+}
+
 const wms = function wms(layerOptions, viewer) {
   const wmsDefault = {
     featureinfoLayer: null
@@ -92,24 +106,12 @@ const wms = function wms(layerOptions, viewer) {
 
   if (renderMode === 'image') {
     const source = createImageSource(sourceOptions);
-    if (wmsOptions.styleName === 'default') {
-      wmsOptions.styleName = createWmsStyle(wmsOptions, source, viewer);
-      wmsOptions.style = wmsOptions.styleName;
-    }
+    createWmsLayer(wmsOptions, source, viewer);
     return image(wmsOptions, source);
   }
 
   const source = createTileSource(sourceOptions);
-
-  if (wmsOptions.styleName === 'default') {
-    wmsOptions.styleName = createWmsStyle(wmsOptions, source, viewer);
-    wmsOptions.style = wmsOptions.styleName;
-  } else if (wmsOptions.altStyleIndex > -1) {
-    wmsOptions.defaultStyle = createWmsStyle(wmsOptions, source, viewer);
-    wmsOptions.styleName = createWmsStyle(wmsOptions, source, viewer, false);
-    wmsOptions.style = wmsOptions.styleName;
-    source.getParams().STYLES = wmsOptions.styleName;
-  }
+  createWmsLayer(wmsOptions, source, viewer);
   return tile(wmsOptions, source);
 };
 
