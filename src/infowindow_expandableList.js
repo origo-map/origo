@@ -135,10 +135,12 @@ function render(viewerId) {
   mainContainer = document.createElement('div');
   setInfowindowStyle();
   mainContainer.classList.add('sidebarcontainer', 'expandable_list');
-  mainContainer.id = 'sidebarcontainer-draggable';
+  mainContainer.id = 'sidebarcontainer';
   urvalContainer = document.createElement('div');
   urvalContainer.classList.add('urvalcontainer');
+
   const urvalTextNodeContainer = document.createElement('div');
+  urvalTextNodeContainer.id = 'sidebarcontainer-draggable';
   urvalTextNodeContainer.classList.add('urval-textnode-container');
   const urvalTextNode = document.createTextNode(infowindowOptions.title || 'Träffar');
   urvalTextNodeContainer.appendChild(urvalTextNode);
