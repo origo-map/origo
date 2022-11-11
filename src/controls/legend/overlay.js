@@ -295,14 +295,16 @@ const OverlayLayer = function OverlayLayer(options) {
   buttons.push(moreInfoButton);
   const ButtonsHtml = `${layerIcon.render()}${label.render()}${toggleButton.render()}${moreInfoButton.render()}`;
 
-  const removeOverlayMenuItem = function removeListeners() {
-    const popupMenuListEl = document.getElementById(popupMenuList.getId());
-    if (popupMenuListEl) { popupMenuListEl.remove(); }
+  const removeOverlayMenuItem = function removeOverlayMenuItem() {
+    const popupMenuListEl = popupMenuList.getEl();
+    if (popupMenuListEl) {
+      popupMenuListEl.remove();
+    }
   };
 
   const onRemove = function onRemove() {
     removeOverlayMenuItem();
-    const el = document.getElementById(this.getId());
+    const el = this.getEl();
     el.remove();
   };
 

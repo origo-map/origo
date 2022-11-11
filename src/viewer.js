@@ -19,6 +19,7 @@ import isEmbedded from './utils/isembedded';
 import permalink from './permalink/permalink';
 
 const Viewer = function Viewer(targetOption, options = {}) {
+  /** @type Map */
   let map;
   let tileGrid;
   let featureinfo;
@@ -189,7 +190,15 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
   const getLayers = () => map.getLayers().getArray();
 
-  const getLayersByProperty = function getLayersByProperty(key, val, byName) {
+  /**
+   * Returns layers that match a given property value
+   *
+   * @param {string} key
+   * @param {any} val
+   * @param {boolean} byName - Only returns layer names if true
+   * @returns {import("ol/layer/Base").default[]|string[]}
+   */
+  const getLayersByProperty = function getLayersByProperty(key, val, byName = false) {
     const layers = map.getLayers().getArray().filter(layer => layer.get(key) && layer.get(key) === val);
 
     if (byName) {
@@ -211,13 +220,11 @@ const Viewer = function Viewer(targetOption, options = {}) {
   };
 
   const getQueryableLayers = function getQueryableLayers() {
-    const queryableLayers = getLayers().filter(layer => layer.get('queryable') && layer.getVisible());
-    return queryableLayers;
+    return getLayers().filter(layer => layer.get('queryable') && layer.getVisible());
   };
 
   const getGroupLayers = function getGroupLayers() {
-    const groupLayers = getLayers().filter(layer => layer.get('type') === 'GROUP');
-    return groupLayers;
+    return getLayers().filter(layer => layer.get('type') === 'GROUP');
   };
 
   const getSearchableLayers = function getSearchableLayers(searchableDefault) {
@@ -356,6 +363,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     }
   };
 
+  /** @param {Map} newMap */
   const setMap = function setMap(newMap) {
     map = newMap;
   };
@@ -387,13 +395,23 @@ const Viewer = function Viewer(targetOption, options = {}) {
     }
   };
 
-  const addLayer = function addLayer(layerProps) {
+  const addLayer = function addLayer(layerProps, insertBefore) {
     const layer = Layer(layerProps, this);
     addLayerStylePicker(layerProps);
-    map.addLayer(layer);
-    this.dispatch('addlayer', {
+    if (insertBefore) {
+      map.getLayers().insertAt(map.getLayers().getArray().indexOf(insertBefore), layer);
+    } else {
+      map.addLayer(layer);
+    }
+    this.dispatch('add:layer', {
       layerName: layerProps.name
     });
+    return layer;
+  };
+
+  const removeLayer = function removeLayer(layer) {
+    this.dispatch('remove:layer', { layerName: layer.get('name') });
+    map.removeLayer(layer);
   };
 
   const addLayers = function addLayers(layersProps) {
@@ -483,7 +501,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
       tileGrid = maputils.tileGrid(tileGridSettings);
 
-      setMap(Map(Object.assign(options, { projection, center, zoom, target: this.getId() })));
+      setMap(new Map({ ...options, projection, center, zoom, target: this.getId() }));
 
       mergeSavedLayerProps(layerOptions, urlParams.layers)
         .then(layerProps => {
@@ -636,6 +654,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getUrlParams,
     getViewerOptions,
     removeGroup,
+    removeLayer,
     removeOverlays,
     setStyle,
     zoomToExtent,

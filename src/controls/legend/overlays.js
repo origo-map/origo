@@ -206,13 +206,11 @@ const Overlays = function Overlays(options) {
     const layer = evt.element;
     const layerName = layer.get('name');
     const groupName = layer.get('group');
-    if (groupName) {
-      const groupCmp = groupCmps.find((cmp) => cmp.name === groupName);
-      if (groupCmp) {
-        groupCmp.removeOverlay(layerName);
-        if (emptyGroupCheck(groupName)) {
-          document.getElementById(groupCmp.getId()).classList.add('hidden');
-        }
+    const groupCmp = groupCmps.find((cmp) => cmp.name === groupName);
+    if (groupName && groupCmp) {
+      groupCmp.removeOverlay(layerName);
+      if (emptyGroupCheck(groupName)) {
+        document.getElementById(groupCmp.getId()).classList.add('hidden');
       }
     } else {
       rootGroup.removeOverlay(layerName);
