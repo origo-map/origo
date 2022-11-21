@@ -59,6 +59,10 @@ const LayerRow = function LayerRow(options) {
   const getWMSLegendUrl = (aLayer, format) => {
     const url = getOneUrl(aLayer);
     const layerName = aLayer.get('name');
+    const style = viewer.getStyle(aLayer.get('styleName'));
+    if (style && style[0] && style[0][0] && style[0][0].icon) {
+      return `${style[0][0].icon.src}&format=${format}`;
+    }
     return `${url}?SERVICE=WMS&layer=${layerName}&format=${format}&version=1.1.1&request=getLegendGraphic&scale=401&legend_options=dpi:300`;
   };
 
