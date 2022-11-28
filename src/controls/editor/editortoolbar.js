@@ -14,6 +14,7 @@ let $editLayers;
 let $editSave;
 let viewer;
 let layerSelector;
+let drawToolsSelector;
 
 function render() {
   const { body: editortemplateHTML } = new DOMParser().parseFromString(editortemplate, 'text/html');
@@ -152,6 +153,11 @@ function toggleSave(e) {
   }
 }
 
+function changeLayerInternal(layer) {
+  currentLayer = layer;
+  setAllowedTools();
+}
+
 /**
  * Called when toggleEdit event is raised
  * @param {any} e Custom event
@@ -161,8 +167,7 @@ function onToggleEdit(e) {
   // If the event contains a currentLayer, the currentLayer has either changed
   // or the editor toolbar is activated and should display the last edited layer or default if first time
   if (tool === 'edit' && e.detail.currentLayer) {
-    currentLayer = e.detail.currentLayer;
-    setAllowedTools();
+    changeLayerInternal(e.detail.currentLayer);
   }
   e.stopPropagation();
 }
@@ -184,7 +189,7 @@ function init(options, v) {
   layerSelector = editorLayers(editableLayers, v, {
     activeLayer: currentLayer
   });
-  drawTools(options.drawTools, currentLayer, v);
+  drawToolsSelector = drawTools(options.drawTools, currentLayer, v);
 
   document.addEventListener('enableInteraction', onEnableInteraction);
   document.addEventListener('changeEdit', onChangeEdit);
@@ -207,8 +212,9 @@ export default (function exportInit() {
    * @param {any} layerName
    */
     changeActiveLayer: (layerName) => {
-      currentLayer = layerName;
+      changeLayerInternal(layerName);
       layerSelector.changeLayer(layerName);
+      drawToolsSelector.updateTools(layerName);
     }
   };
 }());
