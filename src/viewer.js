@@ -100,8 +100,10 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
   const addControl = function addControl(control) {
     if (control.onAdd && control.dispatch) {
-      this.addComponent(control);
       if (control.options.hideWhenEmbedded && isEmbedded(this.getTarget())) {
+        if (!['sharemap', 'link', 'about', 'print', 'draganddrop'].includes(control.name)) {
+          this.addComponent(control);
+        }
         if(typeof control.hide === 'function') {
           control.hide();
         } else {
@@ -112,6 +114,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
             }
           });
         }
+      } else {
+        this.addComponent(control);
       }
     } else {
       throw new Error('Valid control must have onAdd and dispatch methods');
