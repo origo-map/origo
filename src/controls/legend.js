@@ -470,6 +470,9 @@ const Legend = function Legend(options = {}) {
       this.dispatch('render');
       viewer.getMap().on('click', onMapClick);
     },
+    hide() {
+      document.getElementById(mainContainerCmp.getId()).classList.toggle("hidden");
+    },
     onRender() {
       const layerControlCmps = [];
       if (turnOffLayersControl) layerControlCmps.push(turnOffLayersButton);

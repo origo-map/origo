@@ -10,6 +10,7 @@ const Editor = function Editor(options = {}) {
   let editorButton;
   let target;
   let viewer;
+  let hidden = false;
 
   const toggleState = function toggleState() {
     const detail = {
@@ -68,6 +69,11 @@ const Editor = function Editor(options = {}) {
           initial: onInitial
         }
       });
+    },
+    hide() {
+      document.getElementById(editorButton.getId()).classList.toggle("hidden");
+      editorToolbar.toggleToolbar(hidden);
+      hidden = hidden ? false : true;
     },
     render() {
       const htmlString = editorButton.render();

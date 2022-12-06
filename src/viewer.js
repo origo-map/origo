@@ -100,8 +100,18 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
   const addControl = function addControl(control) {
     if (control.onAdd && control.dispatch) {
-      if (!control.options.hideWhenEmbedded || !isEmbedded(this.getTarget())) {
-        this.addComponent(control);
+      this.addComponent(control);
+      if (control.options.hideWhenEmbedded && isEmbedded(this.getTarget())) {
+        if(typeof control.hide === 'function') {
+          control.hide();
+        } else {
+          // If there is no hide function on control, try hide the components instead.
+          control.getComponents().forEach((comp) => {
+            if (document.getElementById(comp.getId()) !== null) {
+              document.getElementById(comp.getId()).classList.add("hidden");
+            }
+          });
+        }
       }
     } else {
       throw new Error('Valid control must have onAdd and dispatch methods');
@@ -579,7 +589,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
                               ${footer.render()}
                             </div>
                           </div>
-                              
+
                           <div id="loading" class="hide">
                             <div class="loading-spinner"></div>
                           </div>`;

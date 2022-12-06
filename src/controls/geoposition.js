@@ -146,6 +146,9 @@ const Geoposition = function Geoposition(options = {}) {
         }
       });
     },
+    hide() {
+      document.getElementById(positionButton.getId()).classList.toggle("hidden");
+    },
     render() {
       const htmlString = positionButton.render();
       if (active) {

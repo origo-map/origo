@@ -54,6 +54,9 @@ const Scalepicker = function Scalepicker(options = {}) {
         buttonIconCls: 'white'
       });
     },
+    hide() {
+      document.getElementById(dropdown.getId()).classList.toggle("hidden");
+    },
     render() {
       const el = dom.html(dropdown.render());
       document.getElementById(viewer.getFooter().getId()).firstElementChild.appendChild(el);

@@ -1142,6 +1142,9 @@ const Measure = function Measure({
         }
       }
     },
+    hide() {
+      document.getElementById(measureElement.getId()).classList.toggle("hidden");
+    },
     render() {
       let htmlString = `${measureElement.render()}`;
       let el = dom.html(htmlString);

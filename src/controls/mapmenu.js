@@ -141,6 +141,9 @@ const Mapmenu = function Mapmenu({
         components: [headerComponent, contentComponent]
       });
     },
+    hide() {
+      document.getElementById(menuButton.getId()).classList.toggle("hidden");
+    },
     render() {
       const menuEl = dom.html(mapMenu.render());
       target.appendChild(menuEl);

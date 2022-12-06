@@ -415,7 +415,9 @@ const Search = function Search(options = {}) {
         }
       });
     },
-
+    hide() {
+      document.getElementById(wrapperElement.getId()).classList.toggle("hidden");
+    },
     render() {
       const mapEl = document.getElementById(viewer.getMain().getId());
 

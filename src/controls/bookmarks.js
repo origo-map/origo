@@ -159,6 +159,10 @@ const Bookmarks = function Bookmarks(options = {}) {
         components: [headerComponent, contentComponent]
       });
     },
+    hide() {
+      document.getElementById(bookmarksButton.getId()).classList.toggle("hidden");
+      document.getElementById(bookmarks.getId()).classList.toggle("hidden");
+    },
     render() {
       const bmEl = dom.html(bookmarks.render());
       document.getElementById(viewer.getMain().getId()).appendChild(bmEl);

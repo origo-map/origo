@@ -51,6 +51,9 @@ const Scale = function Scale(options = {}) {
         style: 'display: inline-block'
       });
     },
+    hide() {
+      document.getElementById(container.getId()).classList.toggle("hidden");
+    },
     render() {
       const el = dom.html(container.render());
       document.getElementById(viewer.getFooter().getId()).firstElementChild.appendChild(el);

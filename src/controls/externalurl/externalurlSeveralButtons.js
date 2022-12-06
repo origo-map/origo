@@ -85,6 +85,9 @@ const externalurlSeveralButtons = function externalurlSeveralButtons(options = {
       this.addComponents(buttons);
       this.render();
     },
+    hide() {
+      document.getElementById(containerElement.getId()).classList.toggle("hidden");
+    },
     render() {
       let htmlString = `${containerElement.render()}`;
       let el = dom.html(htmlString);

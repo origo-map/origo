@@ -64,6 +64,9 @@ const ExternalurlSingleButton = function ExternalurlSingleButton(options = {}) {
       this.addComponents(buttons);
       this.render();
     },
+    hide() {
+      document.getElementById(exUrlElement.getId()).classList.toggle("hidden");
+    },
     render() {
       let htmlString = `${exUrlElement.render()}`;
       let el = dom.html(htmlString);

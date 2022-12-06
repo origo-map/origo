@@ -41,6 +41,9 @@ const Home = function Home(options = {}) {
         tooltipPlacement: 'east'
       });
     },
+    hide() {
+      document.getElementById(homeButton.getId()).classList.toggle("hidden");
+    },
     render() {
       const htmlString = homeButton.render();
       const el = dom.html(htmlString);
