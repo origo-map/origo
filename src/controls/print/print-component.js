@@ -496,12 +496,13 @@ const PrintComponent = function PrintComponent(options = {}) {
       if (map.getView().getRotation() !== 0) {
         map.getView().setRotation(0);
       }
+      const printElement = document.getElementById(this.getId());
       map.setTarget(viewerMapTarget);
       if (printInteractionToggle) {
         printInteractionToggle.restoreInteractions();
       }
       this.restoreViewerControls();
-      this.getEl().remove();
+      printElement.remove();
     },
     async downloadPNG() {
       await withLoading(() => downloadPNG({

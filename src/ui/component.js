@@ -29,7 +29,6 @@ const Base = function Base() {
     },
     getComponents: () => components,
     getId: () => id,
-    getEl: () => document.getElementById(id),
     removeComponent(component) {
       const index = components.indexOf(component);
       if (index > -1) {

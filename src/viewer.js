@@ -19,7 +19,6 @@ import isEmbedded from './utils/isembedded';
 import permalink from './permalink/permalink';
 
 const Viewer = function Viewer(targetOption, options = {}) {
-  /** @type Map */
   let map;
   let tileGrid;
   let featureinfo;
@@ -363,7 +362,6 @@ const Viewer = function Viewer(targetOption, options = {}) {
     }
   };
 
-  /** @param {Map} newMap */
   const setMap = function setMap(newMap) {
     map = newMap;
   };
@@ -403,14 +401,14 @@ const Viewer = function Viewer(targetOption, options = {}) {
     } else {
       map.addLayer(layer);
     }
-    this.dispatch('add:layer', {
+    this.dispatch('addLayer', {
       layerName: layerProps.name
     });
     return layer;
   };
 
   const removeLayer = function removeLayer(layer) {
-    this.dispatch('remove:layer', { layerName: layer.get('name') });
+    this.dispatch('removeLayer', { layerName: layer.get('name') });
     map.removeLayer(layer);
   };
 
@@ -501,7 +499,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
       tileGrid = maputils.tileGrid(tileGridSettings);
 
-      setMap(new Map({ ...options, projection, center, zoom, target: this.getId() }));
+      setMap(Map(Object.assign(options, { projection, center, zoom, target: this.getId() })));
 
       mergeSavedLayerProps(layerOptions, urlParams.layers)
         .then(layerProps => {
