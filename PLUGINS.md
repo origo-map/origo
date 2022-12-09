@@ -1,9 +1,4 @@
-
 # Origo plugins
-More information about how to develop and utilize plugins with Origo will be added soon.
-
-## When to develop a plugin
-
 Plugins are to be developed when a feature or function is not appropriate to be included in the origo-core. Common reasons are external dependencies or a specific feature or function not requested by the average user. 
 ## Guidelines development
 
