@@ -189,15 +189,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
   const getLayers = () => map.getLayers().getArray();
 
-  /**
-   * Returns layers that match a given property value
-   *
-   * @param {string} key
-   * @param {any} val
-   * @param {boolean} byName - Only returns layer names if true
-   * @returns {import("ol/layer/Base").default[]|string[]}
-   */
-  const getLayersByProperty = function getLayersByProperty(key, val, byName = false) {
+  const getLayersByProperty = function getLayersByProperty(key, val, byName) {
     const layers = map.getLayers().getArray().filter(layer => layer.get(key) && layer.get(key) === val);
 
     if (byName) {
@@ -219,11 +211,13 @@ const Viewer = function Viewer(targetOption, options = {}) {
   };
 
   const getQueryableLayers = function getQueryableLayers() {
-    return getLayers().filter(layer => layer.get('queryable') && layer.getVisible());
+    const queryableLayers = getLayers().filter(layer => layer.get('queryable') && layer.getVisible());
+    return queryableLayers;
   };
 
   const getGroupLayers = function getGroupLayers() {
-    return getLayers().filter(layer => layer.get('type') === 'GROUP');
+    const groupLayers = getLayers().filter(layer => layer.get('type') === 'GROUP');
+    return groupLayers;
   };
 
   const getSearchableLayers = function getSearchableLayers(searchableDefault) {
@@ -401,14 +395,14 @@ const Viewer = function Viewer(targetOption, options = {}) {
     } else {
       map.addLayer(layer);
     }
-    this.dispatch('addLayer', {
+    this.dispatch('addlayer', {
       layerName: layerProps.name
     });
     return layer;
   };
 
   const removeLayer = function removeLayer(layer) {
-    this.dispatch('removeLayer', { layerName: layer.get('name') });
+    this.dispatch('removelayer', { layerName: layer.get('name') });
     map.removeLayer(layer);
   };
 
