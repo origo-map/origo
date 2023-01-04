@@ -438,6 +438,7 @@ const Legend = function Legend(options = {}) {
     },
     getuseGroupIndication() { return useGroupIndication; },
     getOverlaysCollapse() { return overlaysCmp.overlaysCollapse; },
+    setVisibleLayersViewActive,
     addButtonToTools(button) {
       const toolsEl = document.getElementById(toolsCmp.getId());
       toolsEl.classList.remove('hidden');
