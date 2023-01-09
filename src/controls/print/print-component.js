@@ -5,7 +5,6 @@ import TileImage from 'ol/source/TileImage';
 import TileWMSSource from 'ol/source/TileWMS';
 import TileGrid from 'ol/tilegrid/TileGrid';
 import { Group } from 'ol/layer';
-import PluggableMap from 'ol/PluggableMap';
 import {
   Button, Component, cuid, dom
 } from '../../ui';
@@ -19,34 +18,6 @@ import { afterRender, beforeRender } from './download-callback';
 import maputils from '../../maputils';
 import PrintResize from './print-resize';
 import { withLoading } from '../../loading';
-/** Backup of original OL function */
-const original = PluggableMap.prototype.getEventPixel;
-
-/**
- * Recalculates the event position to account for transform: scale in the container as OL does not do that.
- * Used to monkey patch OL.
- * @param {any} event
- */
-const getEventPixelScale = function monkeyPatch(event) {
-  // This is internal in OL, nust allow
-  // eslint-disable-next-line no-underscore-dangle
-  const viewportPosition = this.viewport_.getBoundingClientRect();
-  let size = [viewportPosition.width, viewportPosition.height];
-  const view = this.getView();
-  if (view) {
-    // This is internal in OL, nust allow
-    // eslint-disable-next-line no-underscore-dangle
-    size = view.getViewportSize_();
-  }
-  const eventPosition = 'changedTouches' in event ? event.changedTouches[0] : event;
-
-  return [
-    ((eventPosition.clientX - viewportPosition.left) * size[0])
-    / viewportPosition.width,
-    ((eventPosition.clientY - viewportPosition.top) * size[1])
-    / viewportPosition.height
-  ];
-};
 
 const PrintComponent = function PrintComponent(options = {}) {
   const {
@@ -463,10 +434,6 @@ const PrintComponent = function PrintComponent(options = {}) {
         printResize.resetLayers();
         printResize.setResolution(150);
       }
-      // Restore monkey patch
-      // WORKAROUND: Remove when OL supports transform: scale
-      // See https://github.com/openlayers/openlayers/issues/13283
-      PluggableMap.prototype.getEventPixel = original;
       // Restore scales
       if (!supressResolutionsRecalculation) {
         const viewerResolutions = viewer.getResolutions();
@@ -553,10 +520,6 @@ const PrintComponent = function PrintComponent(options = {}) {
       }));
     },
     async onRender() {
-      // Monkey patch OL
-      // WORKAROUND: Remove when OL supports transform: scale
-      // See https://github.com/openlayers/openlayers/issues/13283
-      PluggableMap.prototype.getEventPixel = getEventPixelScale;
       printScale = 0;
       today = new Date(Date.now());
       viewerMapTarget = map.getTarget();
