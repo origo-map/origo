@@ -181,19 +181,27 @@ function getFeatureInfoRequests({
   coordinate,
   pixel
 }, viewer) {
+  const imageFeatureInfoMode = viewer.getViewerOptions().featureinfoOptions.imageFeatureInfoMode || 'location';
   const requests = [];
   const layerArray = [];
-  const layerGroups = viewer.getQueryableLayers().filter(layer => layer instanceof LayerGroup);
+  const layerGroups = viewer.getLayersByProperty('queryable', true).filter(layer => layer instanceof LayerGroup);
   if (layerGroups) { layerGroups.forEach(item => item.getLayersArray().forEach(element => layerArray.push(element))); }
-  const layers = viewer.getQueryableLayers().filter(layer => layer instanceof BaseTileLayer || layer instanceof ImageLayer);
+  const layers = viewer.getLayersByProperty('queryable', true).filter(layer => layer instanceof BaseTileLayer || layer instanceof ImageLayer);
   if (layers) { layers.forEach(element => layerArray.push(element)); }
   layerArray.forEach(layer => {
-    const pixelVal = layer.getData(pixel);
-    if (pixelVal instanceof Uint8ClampedArray && pixelVal[3] > 0) {
-      const item = getGetFeatureInfoRequest({ layer, coordinate }, viewer);
-      if (item) {
-        requests.push(item);
+    let item;
+    if (imageFeatureInfoMode === 'location') {
+      const pixelVal = layer.getData(pixel);
+      if (pixelVal instanceof Uint8ClampedArray && pixelVal[3] > 0) {
+        item = getGetFeatureInfoRequest({ layer, coordinate }, viewer);
       }
+    } else if (imageFeatureInfoMode === 'visible') {
+      if (layer.get('visible')) {
+        item = getGetFeatureInfoRequest({ layer, coordinate }, viewer);
+      }
+    } else if (imageFeatureInfoMode === 'always') item = getGetFeatureInfoRequest({ layer, coordinate }, viewer);
+    if (item) {
+      requests.push(item);
     }
   });
   return requests;
