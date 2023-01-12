@@ -49,19 +49,25 @@ export default function PrintResize(options = {}) {
     if (!Array.isArray(style)) {
       const image = style.getImage();
       if (image) {
-        imageSavedScale[feature.ol_uid] = { scale: image.getScale() ? image.getScale() / image.getScale() : undefined };
+        if (!(feature.ol_uid in imageSavedScale)) {
+          imageSavedScale[feature.ol_uid] = { scale: image.getScale() ? image.getScale() / image.getScale() : undefined };
+        }
         const imageScale = image.getScale() ? multiplyRelativeValueByFactor(image.getScale()) : styleScale;
         image.setScale(imageScale);
       }
       const stroke = style.getStroke();
       if (stroke) {
-        strokeSavedWidth[feature.ol_uid] = { width: stroke.getWidth() ? stroke.getWidth() : undefined };
+        if (!(feature.ol_uid in strokeSavedWidth)) {
+          strokeSavedWidth[feature.ol_uid] = { width: stroke.getWidth() ? stroke.getWidth() : undefined };
+        }
         const strokeWidth = stroke.getWidth() ? multiplyRelativeValueByFactor(stroke.getWidth()) : styleScale;
         stroke.setWidth(strokeWidth);
       }
       const text = style.getText();
       if (text) {
-        textSavedScale[feature.ol_uid] = { scale: text.getScale() ? text.getScale() / text.getScale() : undefined };
+        if (!(feature.ol_uid in textSavedScale)) {
+          textSavedScale[feature.ol_uid] = { scale: text.getScale() ? text.getScale() / text.getScale() : undefined };
+        }
         const textScale = text.getScale() ? multiplyRelativeValueByFactor(text.getScale()) : styleScale;
         text.setScale(textScale);
       }
