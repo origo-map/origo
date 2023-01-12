@@ -28,6 +28,10 @@ export default function PrintResize(options = {}) {
   let prevResolution = resolution;
   let isActive = false;
   let layersWithChangedSource = [];
+  let layersSaveStyle = {};
+  let imageSavedScale = {};
+  let strokeSavedWidth = {};
+  let textSavedScale = {};
 
   // Will become an issue if 150 dpi is no longer the "standard" dpi setting
   const multiplyByFactor = function multiplyByFactor(value) {
@@ -38,6 +42,60 @@ export default function PrintResize(options = {}) {
   const multiplyRelativeValueByFactor = function multiplyRelativeValueByFactor(value) {
     if (prevResolution <= 0) return value;
     return value * (resolution / prevResolution);
+  };
+
+  // Resize features when DPI changes
+  const resizeFeature = function resizeFeature(style, feature, styleScale) {
+    if (!Array.isArray(style)) {
+      const image = style.getImage();
+      if (image) {
+        if (!(feature.ol_uid in imageSavedScale)) {
+          imageSavedScale[feature.ol_uid] = { scale: image.getScale() ? image.getScale() / image.getScale() : undefined };
+        }
+        const imageScale = image.getScale() ? multiplyRelativeValueByFactor(image.getScale()) : styleScale;
+        image.setScale(imageScale);
+      }
+      const stroke = style.getStroke();
+      if (stroke) {
+        if (!(feature.ol_uid in strokeSavedWidth)) {
+          strokeSavedWidth[feature.ol_uid] = { width: stroke.getWidth() ? stroke.getWidth() : undefined };
+        }
+        const strokeWidth = stroke.getWidth() ? multiplyRelativeValueByFactor(stroke.getWidth()) : styleScale;
+        stroke.setWidth(strokeWidth);
+      }
+      const text = style.getText();
+      if (text) {
+        if (!(feature.ol_uid in textSavedScale)) {
+          textSavedScale[feature.ol_uid] = { scale: text.getScale() ? text.getScale() / text.getScale() : undefined };
+        }
+        const textScale = text.getScale() ? multiplyRelativeValueByFactor(text.getScale()) : styleScale;
+        text.setScale(textScale);
+      }
+    }
+  };
+
+  // Reset features that was resized in DPI changes
+  const resetFeature = function resetFeature(style, layer, feature) {
+    if (!Array.isArray(style)) {
+      const image = style.getImage();
+      if (image) {
+        if (typeof layersSaveStyle[layer.get('name')].imageScale[feature.ol_uid].scale !== 'undefined') {
+          image.setScale(layersSaveStyle[layer.get('name')].imageScale[feature.ol_uid].scale);
+        }
+      }
+      const stroke = style.getStroke();
+      if (stroke) {
+        if (typeof layersSaveStyle[layer.get('name')].strokeWidth[feature.ol_uid].width !== 'undefined') {
+          stroke.setWidth(layersSaveStyle[layer.get('name')].strokeWidth[feature.ol_uid].width);
+        }
+      }
+      const text = style.getText();
+      if (text) {
+        if (typeof layersSaveStyle[layer.get('name')].textScale[feature.ol_uid].scale !== 'undefined') {
+          text.setScale(layersSaveStyle[layer.get('name')].textScale[feature.ol_uid].scale);
+        }
+      }
+    }
   };
 
   const isValidSource = function isValidSource(source) {
@@ -348,26 +406,17 @@ export default function PrintResize(options = {}) {
           const featureStyle = feature.getStyle();
           if (featureStyle) {
             const styleScale = multiplyByFactor(1.5);
-            Array.from(featureStyle).forEach(style => {
-              const image = style.getImage();
-              if (image) {
-                const imageScale = image.getScale() ? multiplyRelativeValueByFactor(image.getScale()) : styleScale;
-                image.setScale(imageScale);
-              }
-              const stroke = style.getStroke();
-              if (stroke) {
-                const strokeWidth = stroke.getWidth() ? multiplyRelativeValueByFactor(stroke.getWidth()) : styleScale;
-                stroke.setWidth(strokeWidth);
-              }
-              const text = style.getText();
-              if (text) {
-                const textScale = text.getScale() ? multiplyRelativeValueByFactor(text.getScale()) : styleScale;
-                text.setScale(textScale);
-              }
-            });
+            if (Array.from(featureStyle).length === 0) {
+              resizeFeature(featureStyle, feature, styleScale);
+            } else {
+              Array.from(featureStyle).forEach(style => {
+                resizeFeature(style, feature);
+              });
+            }
             feature.setStyle(featureStyle);
           }
         });
+        layersSaveStyle[layer.get('name')] = { imageScale: imageSavedScale, strokeWidth: strokeSavedWidth, textScale: textSavedScale };
       }
     }
 
@@ -389,11 +438,29 @@ export default function PrintResize(options = {}) {
   const resetLayerScale = function resetLayerScale(layer) {
     const source = layer.getSource();
     if (isVector(layer)) {
+      const features = source.getFeatures();
+
       let style = viewer.getStyle(layer.get('styleName'));
+
       const clusterStyleName = layer.get('clusterStyle') ? layer.get('clusterStyle') : undefined;
-      style = Style.createStyle({ style: layer.get('styleName'), viewer, clusterStyleName });
+      if (typeof layer.get('styleName') !== 'undefined') {
+        style = Style.createStyle({ style: layer.get('styleName'), viewer, clusterStyleName });
+      }
       if (style) {
         layer.setStyle(style);
+      }  else if (features) {
+        features.forEach(feature => {
+          const featureStyle = feature.getStyle();
+          if (featureStyle) {
+            if (Array.from(featureStyle).length === 0) {
+              resetFeature(featureStyle, layer, feature);
+            } else {
+              Array.from(featureStyle).forEach(style => {
+                resetFeature(style, layer, feature);
+              });
+            }
+          }
+        });
       }
     }
 
