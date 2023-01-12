@@ -56,6 +56,9 @@ let breadcrumbs = [];
 let autoCreatedFeature = false;
 
 function isActive() {
+  // FIXME: this only happens at startup as they are set to null on closing. If checking for null/falsley/not truely it could work as isVisible with
+  // the exption that it can not determine if it is visble before interactions are set, i.e. it can't be used to determine if interactions should be set.
+  // Right now it does not matter as it is not used anywhere critical.
   if (modify === undefined || select === undefined) {
     return false;
   }
@@ -80,10 +83,10 @@ function setActive(editType) {
       select.setActive(false);
       break;
     default:
-      draw.setActive(false);
-      hasDraw = false;
+      if (draw) draw.setActive(false);
       if (modify) modify.setActive(true);
-      select.setActive(true);
+      if (select) select.setActive(true);
+      hasDraw = false;
       break;
   }
 }
@@ -526,11 +529,21 @@ function setInteractions(drawType) {
   }
 }
 
+function closeAllModals() {
+  // Close all modals first to get rid of tags in DOM
+  if (modal) modal.closeModal();
+  modal = null;
+  breadcrumbs.forEach(br => {
+    if (br.modal) br.modal.closeModal();
+  });
+  breadcrumbs = [];
+}
+
 function setEditLayer(layerName) {
   // It is not possible to actually change layer while having breadcrubs as all modals must be closed, which will
   // pop off all breadcrumbs.
   // But just in case something changes, reset the breadcrumbs when a new layer is edited.
-  breadcrumbs = [];
+  closeAllModals();
   currentLayer = layerName;
   setAllowedOperations();
   setInteractions();
@@ -689,8 +702,15 @@ function onModalClosed() {
     attributes = lastBread.attributes;
 
     // State is restored, now show parent modal instead and refresh as the title attribute might have changed
-    modal.show();
-    refreshRelatedTablesForm(lastBread.feature);
+    if (modal) {
+      modal.show();
+    }
+    if (lastBread.feature) {
+      refreshRelatedTablesForm(lastBread.feature);
+    }
+  } else {
+    // last modal to be closed. Set to null so we can check if there is an modal.
+    modal = null;
   }
 }
 
@@ -729,7 +749,9 @@ function onAttributesAbort(features) {
     abortBtnEl.addEventListener('click', (e) => {
       abortBtnEl.blur();
       features.forEach((feature) => {
-        deleteFeature(feature, editLayers[currentLayer]).then(() => select.getFeatures().clear());
+        deleteFeature(feature, viewer.getLayer(currentLayer)).then(() => {
+          if (select) select.getFeatures().clear();
+        });
       });
       modal.closeModal();
       // The modal does not fire close event when it is closed externally
@@ -1304,6 +1326,82 @@ async function onAddChild(e) {
 }
 
 /**
+ * Opens the attribute editor dialog for a feature. The dialog excutes asynchronously and never returns anything.
+ * @param {any} feature
+ * @param {any} layer
+ */
+function editAttributesDialogApi(featureId, layerName = null) {
+  const layer = viewer.getLayer(layerName);
+  const feature = layer.getSource().getFeatureById(featureId);
+  // Hijack the current layer for a while. If there's a modal visible it is closed (without saving) as editAttributes can not handle
+  // multiple dialogs for the same layer so to be safe we always close. Technically the user can not
+  // call this function when a modal is visible, as they can't click anywhere.
+  // Restoring currentLayer is performed in onModalClosed(), as we can't await the modal.
+  // Close all modals and eat all breadcrumbs
+  closeAllModals();
+  // If editing in another layer, add a breadcrumb to restore layer when modal is closed.
+  if (layerName && layerName !== currentLayer) {
+    const newBreadcrumb = {
+      layerName: currentLayer,
+      title,
+      attributes
+    };
+    breadcrumbs.push(newBreadcrumb);
+    title = layer.get('title');
+    attributes = layer.get('attributes');
+    // Don't call setEditLayer, as that would change tools which requires that editor is active,
+    // and if it is a table it would probably crash on somehing geometry related.
+    currentLayer = layerName;
+  }
+  editAttributes(feature);
+}
+
+/**
+ * Creates a new feature and adds it to a layer. Default values are set. If autosave is set, it returns when
+ * the feature has been saved and thus will have a permanent database Id. If not autosave it returns immediately (async of course) and
+ * the id will be a temporary Guid that can be used until the feature is saved, then it will be replaced. Keeping a reference to the feature
+ * itself will still work.
+ * @param {any} layerName Name of layer to add a feature to
+ * @param {any} geometry A geomtry to add to the feature that will be created
+ * @returns {Feature} the newly created feature
+ */
+async function createFeatureApi(layerName, geometry = null) {
+  const editLayer = editLayers[layerName];
+  if (!editLayer) {
+    throw new Error('Ej redigerbart lager');
+  }
+  const newfeature = new Feature();
+  if (geometry) {
+    if (geometry.getType() !== editLayer.get('geometryType')) {
+      throw new Error('Kan inte lägga till en geometri av den typen i det lagret');
+    }
+    newfeature.setGeometryName(editLayer.get('geometryName'));
+    newfeature.setGeometry(geometry);
+  }
+  await addFeatureToLayer(newfeature, layerName);
+  if (autoForm) {
+    autoCreatedFeature = true;
+    editAttributesDialogApi(newfeature.getId(), layerName);
+  }
+  return newfeature;
+}
+
+async function deleteFeatureApi(featureId, layerName) {
+  const feature = viewer.getLayer(layerName).getSource().getFeatureById(featureId);
+  const layer = viewer.getLayer(layerName);
+  await deleteFeature(feature, layer);
+}
+
+function setActiveLayerApi(layerName) {
+  const layer = editLayers[layerName];
+  if (!layer || layer.get('isTable')) {
+    // Can't set tables as active in editor as the editor can't handle them. They are in list though, as they may
+    // be edited through api
+    throw new Error(`Layer ${layerName} är inte redigerbart`);
+  }
+  setEditLayer(layerName);
+}
+/**
  * Eventhandler called from relatedTableForm when delete button is pressed
  * @param { any } e Event containing layers and features necessary
  */
@@ -1311,6 +1409,12 @@ function onDeleteChild(e) {
   deleteFeature(e.detail.feature, e.detail.layer).then(() => refreshRelatedTablesForm(e.detail.parentFeature));
 }
 
+/**
+ * Creates the handler. It is used as sort of a singelton, but in theory there could be many handlers.
+ * It communicates with the editor toolbar and forms using DOM events, which makes it messy to have more than one instance as they would use the same events.
+ * @param {any} options
+ * @param {any} v The viewer object
+ */
 export default function editHandler(options, v) {
   viewer = v;
   featureInfo = viewer.getControlByName('featureInfo');
@@ -1331,6 +1435,8 @@ export default function editHandler(options, v) {
   autoSave = options.autoSave;
   autoForm = options.autoForm;
   validateOnDraw = options.validateOnDraw;
+
+  // Listen to DOM events from menus and forms
   document.addEventListener('toggleEdit', onToggleEdit);
   document.addEventListener('changeEdit', onChangeEdit);
   document.addEventListener('editorShapes', onChangeShape);
@@ -1338,4 +1444,12 @@ export default function editHandler(options, v) {
   document.addEventListener(dispatcher.EDIT_CHILD_EVENT, onEditChild);
   document.addEventListener(dispatcher.ADD_CHILD_EVENT, onAddChild);
   document.addEventListener(dispatcher.DELETE_CHILD_EVENT, onDeleteChild);
+
+  return {
+    // These functions are called from Editor Component, possibly from its Api so change these calls with caution.
+    createFeature: createFeatureApi,
+    editAttributesDialog: editAttributesDialogApi,
+    deleteFeature: deleteFeatureApi,
+    setActiveLayer: setActiveLayerApi
+  };
 }
