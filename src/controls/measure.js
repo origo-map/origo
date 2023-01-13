@@ -1143,7 +1143,10 @@ const Measure = function Measure({
       }
     },
     hide() {
-      document.getElementById(measureElement.getId()).classList.toggle("hidden");
+      document.getElementById(measureElement.getId()).classList.add("hidden");
+    },
+    unhide() {
+      document.getElementById(measureElement.getId()).classList.remove("hidden");
     },
     render() {
       let htmlString = `${measureElement.render()}`;

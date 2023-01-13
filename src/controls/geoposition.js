@@ -147,7 +147,10 @@ const Geoposition = function Geoposition(options = {}) {
       });
     },
     hide() {
-      document.getElementById(positionButton.getId()).classList.toggle("hidden");
+      document.getElementById(positionButton.getId()).classList.add("hidden");
+    },
+    unhide() {
+      document.getElementById(positionButton.getId()).classList.remove("hidden");
     },
     render() {
       const htmlString = positionButton.render();

@@ -472,7 +472,10 @@ const Legend = function Legend(options = {}) {
       viewer.getMap().on('click', onMapClick);
     },
     hide() {
-      document.getElementById(mainContainerCmp.getId()).classList.toggle("hidden");
+      document.getElementById(mainContainerCmp.getId()).classList.add("hidden");
+    },
+    unhide() {
+      document.getElementById(mainContainerCmp.getId()).classList.remove("hidden");
     },
     onRender() {
       const layerControlCmps = [];

@@ -416,7 +416,10 @@ const Search = function Search(options = {}) {
       });
     },
     hide() {
-      document.getElementById(wrapperElement.getId()).classList.toggle("hidden");
+      document.getElementById(wrapperElement.getId()).classList.add("hidden");
+    },
+    unhide() {
+      document.getElementById(wrapperElement.getId()).classList.remove("hidden");
     },
     render() {
       const mapEl = document.getElementById(viewer.getMain().getId());

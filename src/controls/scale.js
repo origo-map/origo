@@ -52,7 +52,10 @@ const Scale = function Scale(options = {}) {
       });
     },
     hide() {
-      document.getElementById(container.getId()).classList.toggle("hidden");
+      document.getElementById(container.getId()).classList.add("hidden");
+    },
+    unhide() {
+      document.getElementById(container.getId()).classList.remove("hidden");
     },
     render() {
       const el = dom.html(container.render());
