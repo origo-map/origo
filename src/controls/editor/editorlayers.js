@@ -5,6 +5,7 @@ import utils from '../../utils';
 const createElement = utils.createElement;
 
 let viewer;
+let dropdown;
 
 export default function editorLayers(editableLayers, v, optOptions = {}) {
   viewer = v;
@@ -35,7 +36,7 @@ export default function editorLayers(editableLayers, v, optOptions = {}) {
     });
     const { body: popoverHTML } = new DOMParser().parseFromString(popover, 'text/html');
     document.getElementById('o-editor-layers').insertAdjacentElement('afterend', popoverHTML);
-    dropDown(options.target, options.selectOptions, {
+    dropdown = dropDown(options.target, options.selectOptions, {
       dataAttribute: 'layer',
       active: options.activeLayer
     });
@@ -83,6 +84,17 @@ export default function editorLayers(editableLayers, v, optOptions = {}) {
     document.addEventListener('changeEdit', onChangeEdit);
   }
 
+  /**
+   * Updates layer selection list to reflect the current setting
+   * @param {any} layerName
+   */
+  function changeLayer(layerName) {
+    dropdown.select(layerName);
+  }
+
   render(renderOptions);
   addListener(target);
+  return {
+    changeLayer
+  };
 }
