@@ -40,6 +40,12 @@ const Fullscreen = function Fullscreen(options = {}) {
     },
     onInit() {
     },
+    hide() {
+      document.getElementById(fullscreenButton.getId()).classList.add("hidden");
+    },
+    unhide() {
+      document.getElementById(fullscreenButton.getId()).classList.remove("hidden");
+    },
     render() {
       const htmlString = fullscreenButton.render();
       const el = dom.html(htmlString);

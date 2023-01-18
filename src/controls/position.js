@@ -418,6 +418,12 @@ const Position = function Position(options = {}) {
         components: [centerButton, projButton, coordsElement, coordsFindElement]
       });
     },
+    hide() {
+      document.getElementById(containerElement.getId()).classList.add("hidden");
+    },
+    unhide() {
+      document.getElementById(containerElement.getId()).classList.remove("hidden");
+    },
     render() {
       const el = dom.html(containerElement.render());
       document.getElementById(viewer.getFooter().getId()).firstElementChild.appendChild(el);

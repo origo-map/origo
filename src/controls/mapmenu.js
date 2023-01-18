@@ -141,6 +141,12 @@ const Mapmenu = function Mapmenu({
         components: [headerComponent, contentComponent]
       });
     },
+    hide() {
+      document.getElementById(menuButton.getId()).classList.add("hidden");
+    },
+    unhide() {
+      document.getElementById(menuButton.getId()).classList.remove("hidden");
+    },
     render() {
       const menuEl = dom.html(mapMenu.render());
       target.appendChild(menuEl);

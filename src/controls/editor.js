@@ -11,7 +11,9 @@ const Editor = function Editor(options = {}) {
   let editorButton;
   let target;
   let viewer;
+  let hidden = false;
   let isVisible = isActive;
+  let toolbarVisible = false;
 
   /** The handler were all state is kept */
   let editHandler;
@@ -29,10 +31,12 @@ const Editor = function Editor(options = {}) {
 
   const onActive = function onActive() {
     editorToolbar.toggleToolbar(true);
+    toolbarVisible = true;
   };
 
   const onInitial = function onInitial() {
     editorToolbar.toggleToolbar(false);
+    toolbarVisible = false;
   };
 
   async function createFeature(layerName, geometry = null) {
@@ -98,6 +102,18 @@ const Editor = function Editor(options = {}) {
           initial: onInitial
         }
       });
+    },
+    hide() {
+      document.getElementById(editorButton.getId()).classList.add("hidden");
+      if (toolbarVisible) {
+        editorToolbar.toggleToolbar(false);
+      }
+    },
+    unhide() {
+      document.getElementById(editorButton.getId()).classList.remove("hidden");
+      if (toolbarVisible) {
+        editorToolbar.toggleToolbar(true);
+      }
     },
     render() {
       const htmlString = editorButton.render();

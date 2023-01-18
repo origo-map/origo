@@ -100,7 +100,15 @@ const Viewer = function Viewer(targetOption, options = {}) {
 
   const addControl = function addControl(control) {
     if (control.onAdd && control.dispatch) {
-      if (!control.options.hideWhenEmbedded || !isEmbedded(this.getTarget())) {
+      if (control.options.hideWhenEmbedded && isEmbedded(this.getTarget())) {
+        if(typeof control.hide === 'function') {
+          // Exclude these controls in the array since they can't be hidden and the solution is to not add them. If the control hasn't a hide method don't add the control.
+          if (!['sharemap', 'link', 'about', 'print', 'draganddrop'].includes(control.name)) {
+            this.addComponent(control);
+          }
+          control.hide();
+        }
+      } else {
         this.addComponent(control);
       }
     } else {
@@ -579,7 +587,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
                               ${footer.render()}
                             </div>
                           </div>
-                              
+
                           <div id="loading" class="hide">
                             <div class="loading-spinner"></div>
                           </div>`;

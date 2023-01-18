@@ -51,6 +51,12 @@ const Scale = function Scale(options = {}) {
         style: 'display: inline-block'
       });
     },
+    hide() {
+      document.getElementById(container.getId()).classList.add("hidden");
+    },
+    unhide() {
+      document.getElementById(container.getId()).classList.remove("hidden");
+    },
     render() {
       const el = dom.html(container.render());
       document.getElementById(viewer.getFooter().getId()).firstElementChild.appendChild(el);
