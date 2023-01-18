@@ -18,7 +18,11 @@ import getAttributes, { getContent } from './getattributes';
 import relatedtables from './utils/relatedtables';
 
 const styleTypes = StyleTypes();
+
+// These are "static". Possibly because popup doesn't use same "instance" of featureInfo as viewer does.
 let selectionLayer;
+let lastSelectedItem;
+
 
 const Featureinfo = function Featureinfo(options = {}) {
   const {
@@ -65,13 +69,18 @@ const Featureinfo = function Featureinfo(options = {}) {
     }
   }
 
-  const clear = function clear() {
+  // TODO: rename and wrap
+  const clear = function clear(keepLastSelectedItem) {
     selectionLayer.clear();
     // check needed for when sidebar or overlay are selected.
     if (selectionManager) selectionManager.clearSelection();
     sidebar.setVisibility(false);
     if (overlay) {
       viewer.removeOverlays(overlay);
+    }
+    if (!keepLastSelectedItem) {
+      lastSelectedItem = null;
+      console.log('unsetting');
     }
   };
 
@@ -122,7 +131,14 @@ const Featureinfo = function Featureinfo(options = {}) {
     }
   };
 
+  function getLastSelectedItem() {
+    return lastSelectedItem;
+  }
+
+  // TODO: rename and wrap original function
   const dispatchToggleFeatureEvent = function dispatchToggleFeatureEvent(currentItem) {
+    lastSelectedItem = currentItem;
+    console.log("Seeting");
     const toggleFeatureinfo = new CustomEvent('toggleFeatureinfo', {
       detail: {
         type: 'toggleFeatureinfo',
@@ -613,12 +629,15 @@ const Featureinfo = function Featureinfo(options = {}) {
     }
   };
 
-  const setActive = function setActive(state) {
+  const setActive = function setActive(state, keepLastSelectedItem) {
     const map = viewer.getMap();
     if (state) {
       map.on(clickEvent, onClick);
     } else {
-      clear();
+      // TODO: This sucker removes selection before editor can access selection, must be able to leave selection,
+      // possibly only to configured named controls ... Ideally that config should be taken from the other controls
+      // instead of configuring featureInfo as that's a bit backwards for the user.
+      clear(keepLastSelectedItem);
       map.un(clickEvent, onClick);
     }
   };
@@ -645,10 +664,15 @@ const Featureinfo = function Featureinfo(options = {}) {
       }
       map.on(clickEvent, onClick);
       viewer.on('toggleClickInteraction', (detail) => {
+        // This line of beauty makes feature info active if another control yields active state.
         if ((detail.name === 'featureinfo' && detail.active) || (detail.name !== 'featureinfo' && !detail.active)) {
           setActive(true);
         } else {
-          setActive(false);
+          // If we got deactivated by someone else taking control, we should keep lastSelectedItem as the active control may want to
+          // get what was last selected. It would otherwise be lost as featureinfo always clears before next control is activated.
+          // If a control yielded, it should be removed as Infowindow closes its window by yielding control 'multiselect'
+          // and that indicates that user disposed selection.
+          setActive(false, detail.active);
         }
       });
 
@@ -693,7 +717,10 @@ const Featureinfo = function Featureinfo(options = {}) {
     },
     render,
     showInfo,
-    showFeatureInfo
+    showFeatureInfo,
+    getLastSelectedItem,
+    /** Clears the lastSelectedItem so getLastSelectedItem returns null*/
+    clearLastSelectedItem: ()=> lastSelectedItem = null
   });
 };
 

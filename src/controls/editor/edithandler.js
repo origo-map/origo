@@ -22,6 +22,7 @@ import topology from '../../utils/topology';
 import attachmentsform from './attachmentsform';
 import relatedTablesForm from './relatedtablesform';
 import relatedtables from '../../utils/relatedtables';
+import SelectedItem from '../../models/SelectedItem';
 
 const editsStore = store();
 let editLayers = {};
@@ -498,6 +499,12 @@ function setInteractions(drawType) {
   select = new Select({
     layers: [editLayer]
   });
+  let alreadySelectedFeatureFromFeatureInfo = featureInfo.getLastSelectedItem();
+  if (alreadySelectedFeatureFromFeatureInfo instanceof SelectedItem
+    && alreadySelectedFeatureFromFeatureInfo.getLayer().get('name') == currentLayer) {
+    select.getFeatures().push(alreadySelectedFeatureFromFeatureInfo.getFeature());
+  }
+  featureInfo.clearLastSelectedItem();
   if (allowEditGeometry) {
     modify = new Modify({
       features: select.getFeatures()
@@ -519,6 +526,7 @@ function setInteractions(drawType) {
   // If snap should be active then add snap internactions for all snap layers
   hasSnap = editLayer.get('snap');
   if (hasSnap) {
+    // FIXME: selection will almost certainly be empty as featureInfo is cleared
     const selectionSource = featureInfo.getSelectionLayer().getSource();
     const snapSources = editLayer.get('snapLayers') ? getSnapSources(editLayer.get('snapLayers')) : [editLayer.get('source')];
     snapSources.push(selectionSource);
