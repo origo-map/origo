@@ -181,25 +181,31 @@ function getFeatureInfoRequests({
   coordinate,
   pixel
 }, viewer) {
-  const imageFeatureInfoMode = viewer.getViewerOptions().featureinfoOptions.imageFeatureInfoMode || 'location';
+  const imageFeatureInfoMode = viewer.getViewerOptions().featureinfoOptions.imageFeatureInfoMode || 'pixel';
   const requests = [];
-  const layerArray = [];
-  const layerGroups = viewer.getLayersByProperty('queryable', true).filter(layer => layer instanceof LayerGroup);
-  if (layerGroups) { layerGroups.forEach(item => item.getLayersArray().forEach(element => layerArray.push(element))); }
-  const layers = viewer.getLayersByProperty('queryable', true).filter(layer => layer instanceof BaseTileLayer || layer instanceof ImageLayer);
-  if (layers) { layers.forEach(element => layerArray.push(element)); }
-  layerArray.forEach(layer => {
+  const queryableLayers = viewer.getLayersByProperty('queryable', true);
+  const layerGroups = queryableLayers.filter(layer => layer instanceof LayerGroup);
+  if (layerGroups) { layerGroups.forEach(item => item.getLayersArray().forEach(element => queryableLayers.push(element))); }
+  const imageLayers = queryableLayers.map(layer => layer instanceof BaseTileLayer || layer instanceof ImageLayer);
+
+  imageLayers.forEach(layer => {
     let item;
-    if (imageFeatureInfoMode === 'location') {
+    let imageInfoMode;
+
+    if (layer.get('imageFeatureInfoMode')) {
+      imageInfoMode = layer.get('imageFeatureInfoMode');
+    } else imageInfoMode = imageFeatureInfoMode;
+
+    if (imageInfoMode === 'pixel') {
       const pixelVal = layer.getData(pixel);
       if (pixelVal instanceof Uint8ClampedArray && pixelVal[3] > 0) {
         item = getGetFeatureInfoRequest({ layer, coordinate }, viewer);
       }
-    } else if (imageFeatureInfoMode === 'visible') {
-      if (layer.get('visible')) {
-        item = getGetFeatureInfoRequest({ layer, coordinate }, viewer);
-      }
-    } else if (imageFeatureInfoMode === 'always') item = getGetFeatureInfoRequest({ layer, coordinate }, viewer);
+    } else if (imageInfoMode === 'visible' && layer.get('visible') === true) {
+      item = getGetFeatureInfoRequest({ layer, coordinate }, viewer);
+    } else if (imageInfoMode === 'always') {
+      item = getGetFeatureInfoRequest({ layer, coordinate }, viewer);
+    }
     if (item) {
       requests.push(item);
     }
