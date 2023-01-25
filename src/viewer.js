@@ -386,7 +386,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
   };
 
   const getLayerStylePicker = function getLayerStylePicker(layer) {
-    return layerStylePicker[layer.get('name')] || [];
+    return layerStylePicker[layer.get('id')] || [];
   };
 
   const addLayerStylePicker = function addLayerStylePicker(layerProps) {
