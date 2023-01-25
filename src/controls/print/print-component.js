@@ -432,9 +432,6 @@ const PrintComponent = function PrintComponent(options = {}) {
     printMargin() {
       return showMargins ? 'print-margin' : '';
     },
-    styleMargin() {
-      return showMargins ? `padding: ${(10 * resolution) / 150}mm ${(15 * resolution) / 150}mm;` : '';
-    },
     getPrintPadding() {
       return showMargins ? `${(10 * resolution) / 150}mm ${(15 * resolution) / 150}mm` : '';
     },
