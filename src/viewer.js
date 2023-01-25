@@ -395,13 +395,23 @@ const Viewer = function Viewer(targetOption, options = {}) {
     }
   };
 
-  const addLayer = function addLayer(layerProps) {
+  const addLayer = function addLayer(layerProps, insertBefore) {
     const layer = Layer(layerProps, this);
     addLayerStylePicker(layerProps);
-    map.addLayer(layer);
+    if (insertBefore) {
+      map.getLayers().insertAt(map.getLayers().getArray().indexOf(insertBefore), layer);
+    } else {
+      map.addLayer(layer);
+    }
     this.dispatch('addlayer', {
       layerName: layerProps.name
     });
+    return layer;
+  };
+
+  const removeLayer = function removeLayer(layer) {
+    this.dispatch('removelayer', { layerName: layer.get('name') });
+    map.removeLayer(layer);
   };
 
   const addLayers = function addLayers(layersProps) {
@@ -644,6 +654,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getUrlParams,
     getViewerOptions,
     removeGroup,
+    removeLayer,
     removeOverlays,
     setStyle,
     zoomToExtent,
