@@ -792,6 +792,12 @@ function onAttributesSave(features, attrs) {
           const checkedValue = (attribute.config && attribute.config.checkedValue) || 1;
           const uncheckedValue = (attribute.config && attribute.config.uncheckedValue) || 0;
           editEl[attribute.name] = document.getElementById(attribute.elId).checked ? checkedValue : uncheckedValue;
+        } else if (attribute.type === 'searchList') {
+          // SearchList may have its value in another place than the input element itself. Query the "Component" instead.
+          // Note that inputValue still contains the value of the input element, which is  used to validate required.
+          // No other validation is performed on searchList as the only thing that can be checked now is that value is in list
+          // and that is handled inside the searchList itself.
+          editEl[attribute.name] = attribute.searchList.getValue();
         } else { // Read value from input text, textarea or select
           editEl[attribute.name] = inputValue;
         }
@@ -953,20 +959,7 @@ function onAttributesSave(features, attrs) {
             errorMsg.remove();
           }
           break;
-        case 'searchList':
-          if (attribute.required) {
-            // Only validate required. Validating if in list is performed in searchList as we don't have access to dynamic list
-            // and don't want to fetch it again just to validate. It's a better idea to make it impossible for user to type incorrect.
-            valid.searchList = inputValue !== '';
-            if (!valid.searchList) {
-              errorOn.parentElement.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
-            } else if (errorMsg) {
-              errorMsg.remove();
-            }
-          } else {
-            valid.searchList = true;
-          }
-          break;
+
         default:
       }
       valid.validates = !Object.values(valid).includes(false);
@@ -1062,7 +1055,7 @@ function addBatchEditListener() {
  */
 function turnIntoSearchList(obj) {
   const el = document.getElementById(obj.elId);
-  searchList(el, { list: obj.list, config: obj.config });
+  return searchList(el, { list: obj.list, config: obj.config });
 }
 
 /**
@@ -1230,7 +1223,8 @@ function editAttributes(feat) {
         obj.addListener(obj);
       }
       if ('searchListListener' in obj) {
-        obj.searchListListener(obj);
+        // eslint-disable-next-line no-param-reassign
+        obj.searchList = obj.searchListListener(obj);
       }
     });
 
