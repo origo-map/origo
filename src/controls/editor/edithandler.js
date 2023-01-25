@@ -760,7 +760,7 @@ function onAttributesSave(features, attrs) {
       const inputName = document.getElementById(attribute.elId).getAttribute('name');
       const inputId = document.getElementById(attribute.elId).getAttribute('id');
       const inputRequired = document.getElementById(attribute.elId).required;
-     
+
       // If hidden element it should be excluded
       // By sheer luck, this prevents attributes to be changed in batch edit mode when checkbox is not checked.
       // If this code is changed, it may be necessary to excplict check if the batch edit checkbox is checked for this attribute.
@@ -937,7 +937,7 @@ function onAttributesSave(features, attrs) {
             errorMsg.remove();
           }
           break;
-        
+
         default:
       }
       valid.validates = !Object.values(valid).includes(false);

@@ -72,9 +72,10 @@ function searchList(input, conf) {
   // useBackingValue implies allowOnlyFromList, otherwise it would be rather silly.
   const allowOnlyFromList = searchListConfig.allowOnlyFromList || searchListConfig.useBackingValue;
   // Set up default config for awesome
+  searchListConfig.minChars = searchListConfig.minChars === undefined ? 2 : searchListConfig.minChars;
   const awesomeConfig = {
     minChars: searchListConfig.minChars,
-    maxItems: searchListConfig.maxItems,
+    maxItems: searchListConfig.maxItems || 10,
     filter,
     item: imageItemFormatter
   };
@@ -117,6 +118,20 @@ function searchList(input, conf) {
   }
   /** Keep track of ongoing requests */
   let abortControllers = [];
+
+  /**
+   * Looks up the label for inputs current backingValue.
+   * @returns {string} The label or empty string is not found
+   * */
+  function getLabelForBackingValue() {
+    let label = '';
+    // input.value is always string as it is roundtripped in DOM using default toString.
+    const listitem = olist.find(item => item.backingValue.toString() === input.value);
+    if (listitem) {
+      label = listitem.value;
+    }
+    return label;
+  }
   /**
    * Calls the remote server
    * @param {any} url Url to call.
@@ -287,11 +302,7 @@ function searchList(input, conf) {
       awesome.list = olist;
       hideMessage();
       if (searchListConfig.useBackingValue) {
-        let label = '';
-        const listitem = olist.find(item => item.backingValue === input.value);
-        if (listitem) {
-          label = listitem.value;
-        }
+        const label = getLabelForBackingValue();
         updateAfterReverseLookup(label);
       }
     })
@@ -390,11 +401,7 @@ function searchList(input, conf) {
       });
     } else if (!searchListConfig.url) {
       // If there is an Url, but not dynamic, the list is fetched once earlier, and the reverse look up is already performed in that fetch.
-      let label = '';
-      const listitem = olist.find(item => item.backingValue === input.value);
-      if (listitem) {
-        label = listitem.value;
-      }
+      const label = getLabelForBackingValue();
       updateAfterReverseLookup(label);
     }
   }
