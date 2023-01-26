@@ -38,9 +38,24 @@ function createImageSource(options) {
 }
 
 function createWmsStyle(wmsOptions, source, viewer, defaultStyle = true) {
-  const maxResolution = viewer.getResolutions()[viewer.getResolutions().length - 1];
+  let altStyleLegendParams;
+  let maxResolution = viewer.getResolutions()[viewer.getResolutions().length - 1];
+
+  if (!(defaultStyle) && (wmsOptions.stylePicker)) {
+    const altStyle = wmsOptions.stylePicker.find(style => style.style === wmsOptions.styleName);
+    if (altStyle.legendParams) {
+      altStyleLegendParams = altStyle.legendParams;
+      if (Object.keys(altStyle.legendParams).find(key => key.toUpperCase() === 'SCALE')) {
+        maxResolution = null;
+      }
+    }
+  }
+
   const styleName = defaultStyle ? `${wmsOptions.name}_WMSDefault` : wmsOptions.styleName;
-  const getLegendString = defaultStyle ? source.getLegendUrl(maxResolution, wmsOptions.legendParams) : source.getLegendUrl(maxResolution, { STYLE: styleName });
+  const getLegendString = defaultStyle ? source.getLegendUrl(maxResolution, wmsOptions.legendParams) : source.getLegendUrl(maxResolution, {
+    STYLE: styleName,
+    ...altStyleLegendParams
+  });
   let hasThemeLegend = wmsOptions.hasThemeLegend || false;
   if (!defaultStyle) {
     hasThemeLegend = wmsOptions.stylePicker[wmsOptions.altStyleIndex].hasThemeLegend || false;
