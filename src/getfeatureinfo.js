@@ -194,7 +194,7 @@ function getFeatureInfoRequests({
       });
     } else {
       layerGroup.getLayersArray().forEach(layer => {
-        if (layer.get('queryable') && (layer.get('imageFeatureInfoMode')) && (layer.get('imageFeatureInfoMode') === 'always')) {
+        if (layer.get('queryable') && ((layer.get('imageFeatureInfoMode') && layer.get('imageFeatureInfoMode') === 'always') || (!layer.get('imageFeatureInfoMode') && imageFeatureInfoMode === 'always'))) {
           queryableLayers.push(layer);
         }
       });
