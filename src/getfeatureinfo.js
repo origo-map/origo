@@ -184,11 +184,8 @@ function getFeatureInfoRequests({
   const imageFeatureInfoMode = viewer.getViewerOptions().featureinfoOptions.imageFeatureInfoMode || 'pixel';
   const requests = [];
   const queryableLayers = viewer.getLayersByProperty('queryable', true);
-  console.log(queryableLayers);
   const layerGroups = queryableLayers.filter(layer => layer instanceof LayerGroup);
   layerGroups.forEach(layerGroup => {
-    console.log(layerGroup);
-    console.log(layerGroup.get('visible'));
     if (layerGroup.get('visible')) {
       layerGroup.getLayersArray().forEach(layer => {
         if ((layer.get('queryable'))) {
