@@ -436,8 +436,8 @@ const PrintComponent = function PrintComponent(options = {}) {
       return showMargins ? `${(10 * resolution) / 150}mm ${(15 * resolution) / 150}mm` : '';
     },
     toggleMargin() {
-      pageElement.classList.toggle(printMarginClass);
       showMargins = !showMargins;
+      pageElement.style.padding = this.getPrintPadding();
       this.updatePageSize();
     },
     toggleCreated() {
@@ -572,8 +572,13 @@ const PrintComponent = function PrintComponent(options = {}) {
       const qH = (window.innerHeight - 32) / pageContainerElement.clientHeight;
       const qW = (window.innerWidth - 32) / pageContainerElement.clientWidth;
       pageContainerElement.style.transform = `scale(${qH > qW ? qW : qH})`;
+      if(window.innerWidth <= 1000){
       pageContainerElement.style.transformOrigin = 'top left';
-      pageElement.style.padding = this.getPrintPadding();
+      pageContainerElement.style.marginLeft = '16px';
+      pageContainerElement.style.marginRight = '16px';
+      } else {
+      pageContainerElement.style.transformOrigin = 'top center';
+      }
       this.updateMapSize();
       if (printScale > 0) {
         this.changeScale({ scale: printScale });
@@ -599,11 +604,11 @@ const PrintComponent = function PrintComponent(options = {}) {
         <div
           id="${pageContainerId}"
           class="flex column no-shrink margin-top-large margin-x-auto box-shadow bg-white border-box"
-          style="margin-bottom: 4rem; margin-left: 16px; margin-right: 16px;">
+          style="margin-bottom: 4rem;">
           <div
             id="${pageId}"
             class="o-print-page flex column no-shrink no-margin width-full height-full bg-white}"
-            style="margin-bottom: 4rem;">
+            style="margin-bottom: 4rem; ${showMargins ? `padding: ${this.getPrintPadding()}` : ''}">
             <div class="flex column no-margin width-full height-full overflow-hidden">
   ${pageTemplate({
     descriptionComponent, printMapComponent, titleComponent, footerComponent
