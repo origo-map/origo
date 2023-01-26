@@ -77,7 +77,6 @@ const PrintComponent = function PrintComponent(options = {}) {
   let titleAlign = `text-align-${titleAlignment}`;
   let descriptionAlign = `text-align-${descriptionAlignment}`;
   let viewerMapTarget;
-  const printMarginClass = 'print-margin';
   let today = new Date(Date.now());
   let printScale = 0;
   let widthImage = 0;
@@ -215,6 +214,10 @@ const PrintComponent = function PrintComponent(options = {}) {
     }
   };
 
+  const getPrintPadding = function getPrintPadding() {
+    return showMargins ? `${(10 * resolution) / 150}mm ${(10 * resolution) / 150}mm` : '';
+  };
+
   const created = function created() {
     return showCreated ? `${createdPrefix}${today.toLocaleDateString()} ${today.toLocaleTimeString()}` : '';
   };
@@ -281,6 +284,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     const scaleWidth = widthImage;
     pageElement.style.transform = `scale(${((widthInMm * 3.779527559055) / scaleWidth)})`;
     pageElement.style.transformOrigin = 'top left';
+    pageElement.style.padding = getPrintPadding();
     map.updateSize();
     map.getView().setResolution(scaleResolution);
   };
@@ -429,15 +433,8 @@ const PrintComponent = function PrintComponent(options = {}) {
     changeScale(evt) {
       setScale(evt.scale);
     },
-    printMargin() {
-      return showMargins ? 'print-margin' : '';
-    },
-    getPrintPadding() {
-      return showMargins ? `${(10 * resolution) / 150}mm ${(15 * resolution) / 150}mm` : '';
-    },
     toggleMargin() {
       showMargins = !showMargins;
-      pageElement.style.padding = this.getPrintPadding();
       this.updatePageSize();
     },
     toggleCreated() {
@@ -569,7 +566,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     updatePageSize() {
       pageContainerElement.style.height = orientation === 'portrait' ? `${sizes[size][0]}mm` : `${sizes[size][1]}mm`;
       pageContainerElement.style.width = orientation === 'portrait' ? `${sizes[size][1]}mm` : `${sizes[size][0]}mm`;
-      const qH = (window.innerHeight - 32) / pageContainerElement.clientHeight;
+      const qH = (window.innerHeight - 78) / pageContainerElement.clientHeight;
       const qW = (window.innerWidth - 32) / pageContainerElement.clientWidth;
       pageContainerElement.style.transform = `scale(${qH > qW ? qW : qH})`;
       if (window.innerWidth <= 1000) {
@@ -608,7 +605,7 @@ const PrintComponent = function PrintComponent(options = {}) {
           <div
             id="${pageId}"
             class="o-print-page flex column no-shrink no-margin width-full height-full bg-white}"
-            style="margin-bottom: 4rem; ${showMargins ? `padding: ${this.getPrintPadding()}` : ''}">
+            style="margin-bottom: 4rem; ${showMargins ? `padding: ${getPrintPadding()}` : ''}">
             <div class="flex column no-margin width-full height-full overflow-hidden">
   ${pageTemplate({
     descriptionComponent, printMapComponent, titleComponent, footerComponent
