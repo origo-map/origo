@@ -184,19 +184,25 @@ function getFeatureInfoRequests({
   const imageFeatureInfoMode = viewer.getViewerOptions().featureinfoOptions.imageFeatureInfoMode || 'pixel';
   const requests = [];
   const queryableLayers = viewer.getLayersByProperty('queryable', true);
+  console.log(queryableLayers);
   const layerGroups = queryableLayers.filter(layer => layer instanceof LayerGroup);
-  if (layerGroups) {
-    const visibleGroups = layerGroups.filter(group => group.get('visible') === true);
-    if (visibleGroups.length) {
-      visibleGroups.forEach(visibleGroup => visibleGroup.getLayersArray().forEach(layer => queryableLayers.push(layer)));
-    } else {
-      layerGroups.forEach(layerGroup => layerGroup.getLayersArray().forEach(layer => {
-        if ((layer.get('imageFeatureInfoMode')) && (layer.get('imageFeatureInfoMode') === 'always')) {
+  layerGroups.forEach(layerGroup => {
+    console.log(layerGroup);
+    console.log(layerGroup.get('visible'));
+    if (layerGroup.get('visible')) {
+      layerGroup.getLayersArray().forEach(layer => {
+        if ((layer.get('queryable'))) {
           queryableLayers.push(layer);
         }
-      }));
+      });
+    } else {
+      layerGroup.getLayersArray().forEach(layer => {
+        if (layer.get('queryable') && (layer.get('imageFeatureInfoMode')) && (layer.get('imageFeatureInfoMode') === 'always')) {
+          queryableLayers.push(layer);
+        }
+      });
     }
-  }
+  });
 
   const imageLayers = queryableLayers.filter(layer => layer instanceof BaseTileLayer || layer instanceof ImageLayer);
   imageLayers.forEach(layer => {
