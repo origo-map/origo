@@ -56,6 +56,25 @@ export default function dropDown(target, items, options) {
     });
   }
 
+  /**
+   * Marks the provided value as selected. Does NOT fire the changeDropdown event as it is assumed that caller controls this control and
+   * already knows what to do.
+   * @param {any} value
+   */
+  function select(value) {
+    const optionslist = targetEl.getElementsByTagName('ul').item(0).getElementsByTagName('li');
+    const length = optionslist.length;
+    for (let ix = 0; ix < length; ix += 1) {
+      if (optionslist.item(ix).attributes[dataAttribute].value === value) {
+        toggleActive(optionslist.item(ix));
+      }
+    }
+  }
+
   render();
   addListener();
+
+  return {
+    select
+  };
 }

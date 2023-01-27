@@ -5,7 +5,6 @@ import TileImage from 'ol/source/TileImage';
 import TileWMSSource from 'ol/source/TileWMS';
 import TileGrid from 'ol/tilegrid/TileGrid';
 import { Group } from 'ol/layer';
-import PluggableMap from 'ol/PluggableMap';
 import {
   Button, Component, cuid, dom
 } from '../../ui';
@@ -19,34 +18,6 @@ import { afterRender, beforeRender } from './download-callback';
 import maputils from '../../maputils';
 import PrintResize from './print-resize';
 import { withLoading } from '../../loading';
-/** Backup of original OL function */
-const original = PluggableMap.prototype.getEventPixel;
-
-/**
- * Recalculates the event position to account for transform: scale in the container as OL does not do that.
- * Used to monkey patch OL.
- * @param {any} event
- */
-const getEventPixelScale = function monkeyPatch(event) {
-  // This is internal in OL, nust allow
-  // eslint-disable-next-line no-underscore-dangle
-  const viewportPosition = this.viewport_.getBoundingClientRect();
-  let size = [viewportPosition.width, viewportPosition.height];
-  const view = this.getView();
-  if (view) {
-    // This is internal in OL, nust allow
-    // eslint-disable-next-line no-underscore-dangle
-    size = view.getViewportSize_();
-  }
-  const eventPosition = 'changedTouches' in event ? event.changedTouches[0] : event;
-
-  return [
-    ((eventPosition.clientX - viewportPosition.left) * size[0])
-    / viewportPosition.width,
-    ((eventPosition.clientY - viewportPosition.top) * size[1])
-    / viewportPosition.height
-  ];
-};
 
 const PrintComponent = function PrintComponent(options = {}) {
   const {
@@ -459,14 +430,18 @@ const PrintComponent = function PrintComponent(options = {}) {
       printMapComponent.dispatch('change:togglePrintLegend', { showPrintLegend });
     },
     close() {
+      // GH-1537: remove layers temporarily added for print and unhide layers hidden for print
+      viewer.getLayersByProperty('added-for-print', true).forEach((l) => viewer.removeLayer(l));
+      viewer.getLayersByProperty('hidden-for-print', true).forEach((l) => {
+        l.setVisible(true);
+        l.unset('hidden-for-print');
+      });
+
       if (suppressNewDPIMethod === false) {
         printResize.resetLayers();
         printResize.setResolution(150);
       }
-      // Restore monkey patch
-      // WORKAROUND: Remove when OL supports transform: scale
-      // See https://github.com/openlayers/openlayers/issues/13283
-      PluggableMap.prototype.getEventPixel = original;
+
       // Restore scales
       if (!supressResolutionsRecalculation) {
         const viewerResolutions = viewer.getResolutions();
@@ -553,10 +528,6 @@ const PrintComponent = function PrintComponent(options = {}) {
       }));
     },
     async onRender() {
-      // Monkey patch OL
-      // WORKAROUND: Remove when OL supports transform: scale
-      // See https://github.com/openlayers/openlayers/issues/13283
-      PluggableMap.prototype.getEventPixel = getEventPixelScale;
       printScale = 0;
       today = new Date(Date.now());
       viewerMapTarget = map.getTarget();
@@ -565,6 +536,28 @@ const PrintComponent = function PrintComponent(options = {}) {
       map.setTarget(printMapComponent.getId());
       this.removeViewerControls();
       await printMapComponent.addPrintControls();
+
+      // GH-1537: temporarily add layers for print and hide their original versions
+      viewer.getLayersByProperty('printRenderMode', 'image').forEach((layer) => {
+        if (layer.getVisible() && !layer.get('added-for-print') && !layer.get('hidden-for-print')) {
+          // hide the original, tiled, layer
+          layer.setVisible(false);
+          layer.set('hidden-for-print', true);
+
+          // create a duplicate of the layer with a different renderMode
+          const { map: _, type, name, sourceName, ...properties } = layer.getProperties();
+          const newLayer = viewer.addLayer({
+            ...properties,
+            source: sourceName,
+            renderMode: 'image',
+            type: type === 'AGS_TILE' ? 'AGS_MAP' : type,
+            name: `${name}-forPrint`,
+            visible: true
+          }, layer);
+          newLayer.set('added-for-print', true);
+        }
+      });
+
       if (!supressResolutionsRecalculation) {
         updateResolutions();
       }

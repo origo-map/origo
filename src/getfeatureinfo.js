@@ -181,19 +181,44 @@ function getFeatureInfoRequests({
   coordinate,
   pixel
 }, viewer) {
+  const imageFeatureInfoMode = viewer.getViewerOptions().featureinfoOptions.imageFeatureInfoMode || 'pixel';
   const requests = [];
-  const layerArray = [];
-  const layerGroups = viewer.getQueryableLayers().filter(layer => layer instanceof LayerGroup);
-  if (layerGroups) { layerGroups.forEach(item => item.getLayersArray().forEach(element => layerArray.push(element))); }
-  const layers = viewer.getQueryableLayers().filter(layer => layer instanceof BaseTileLayer || layer instanceof ImageLayer);
-  if (layers) { layers.forEach(element => layerArray.push(element)); }
-  layerArray.forEach(layer => {
-    const pixelVal = layer.getData(pixel);
-    if (pixelVal instanceof Uint8ClampedArray && pixelVal[3] > 0) {
-      const item = getGetFeatureInfoRequest({ layer, coordinate }, viewer);
-      if (item) {
-        requests.push(item);
+  const queryableLayers = viewer.getLayersByProperty('queryable', true);
+  const layerGroups = queryableLayers.filter(layer => layer instanceof LayerGroup);
+  if (layerGroups) {
+    const visibleGroups = layerGroups.filter(group => group.get('visible') === true);
+    if (visibleGroups.length) {
+      visibleGroups.forEach(visibleGroup => visibleGroup.getLayersArray().forEach(layer => queryableLayers.push(layer)));
+    } else {
+      layerGroups.forEach(layerGroup => layerGroup.getLayersArray().forEach(layer => {
+        if ((layer.get('imageFeatureInfoMode')) && (layer.get('imageFeatureInfoMode') === 'always')) {
+          queryableLayers.push(layer);
+        }
+      }));
+    }
+  }
+
+  const imageLayers = queryableLayers.filter(layer => layer instanceof BaseTileLayer || layer instanceof ImageLayer);
+  imageLayers.forEach(layer => {
+    let item;
+    let imageInfoMode;
+
+    if (layer.get('imageFeatureInfoMode')) {
+      imageInfoMode = layer.get('imageFeatureInfoMode');
+    } else imageInfoMode = imageFeatureInfoMode;
+
+    if (imageInfoMode === 'pixel') {
+      const pixelVal = layer.getData(pixel);
+      if (pixelVal instanceof Uint8ClampedArray && pixelVal[3] > 0) {
+        item = getGetFeatureInfoRequest({ layer, coordinate }, viewer);
       }
+    } else if ((imageInfoMode === 'visible') && (layer.get('visible') === true)) {
+      item = getGetFeatureInfoRequest({ layer, coordinate }, viewer);
+    } else if (imageInfoMode === 'always') {
+      item = getGetFeatureInfoRequest({ layer, coordinate }, viewer);
+    }
+    if (item) {
+      requests.push(item);
     }
   });
   return requests;

@@ -159,6 +159,14 @@ const Bookmarks = function Bookmarks(options = {}) {
         components: [headerComponent, contentComponent]
       });
     },
+    hide() {
+      document.getElementById(bookmarksButton.getId()).classList.add("hidden");
+      document.getElementById(bookmarks.getId()).classList.add("hidden");
+    },
+    unhide() {
+      document.getElementById(bookmarksButton.getId()).classList.remove("hidden");
+      document.getElementById(bookmarks.getId()).classList.remove("hidden");
+    },
     render() {
       const bmEl = dom.html(bookmarks.render());
       document.getElementById(viewer.getMain().getId()).appendChild(bmEl);

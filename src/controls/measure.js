@@ -1142,6 +1142,12 @@ const Measure = function Measure({
         }
       }
     },
+    hide() {
+      document.getElementById(measureElement.getId()).classList.add("hidden");
+    },
+    unhide() {
+      document.getElementById(measureElement.getId()).classList.remove("hidden");
+    },
     render() {
       let htmlString = `${measureElement.render()}`;
       let el = dom.html(htmlString);

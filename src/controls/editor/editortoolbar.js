@@ -1,6 +1,5 @@
 import editortemplate from './editortemplate';
 import dispatcher from './editdispatcher';
-import editHandler from './edithandler';
 import editorLayers from './editorlayers';
 import drawTools from './drawtools';
 
@@ -14,6 +13,8 @@ let $editDelete;
 let $editLayers;
 let $editSave;
 let viewer;
+let layerSelector;
+let drawToolsSelector;
 
 function render() {
   const { body: editortemplateHTML } = new DOMParser().parseFromString(editortemplate, 'text/html');
@@ -152,6 +153,11 @@ function toggleSave(e) {
   }
 }
 
+function changeLayerInternal(layer) {
+  currentLayer = layer;
+  setAllowedTools();
+}
+
 /**
  * Called when toggleEdit event is raised
  * @param {any} e Custom event
@@ -161,8 +167,7 @@ function onToggleEdit(e) {
   // If the event contains a currentLayer, the currentLayer has either changed
   // or the editor toolbar is activated and should display the last edited layer or default if first time
   if (tool === 'edit' && e.detail.currentLayer) {
-    currentLayer = e.detail.currentLayer;
-    setAllowedTools();
+    changeLayerInternal(e.detail.currentLayer);
   }
   e.stopPropagation();
 }
@@ -172,7 +177,6 @@ function init(options, v) {
   editableLayers = options.editableLayers;
   // Keep a reference to viewer. Used later.
   viewer = v;
-  editHandler(options, v);
   render();
   // Hide layers choice button if only 1 layer in editable
   if (editableLayers.length < 2) {
@@ -182,10 +186,10 @@ function init(options, v) {
   if (options.autoSave) {
     $editSave.classList.add('o-hidden');
   }
-  editorLayers(editableLayers, v, {
+  layerSelector = editorLayers(editableLayers, v, {
     activeLayer: currentLayer
   });
-  drawTools(options.drawTools, currentLayer, v);
+  drawToolsSelector = drawTools(options.drawTools, currentLayer, v);
 
   document.addEventListener('enableInteraction', onEnableInteraction);
   document.addEventListener('changeEdit', onChangeEdit);
@@ -202,6 +206,15 @@ function init(options, v) {
 export default (function exportInit() {
   return {
     init,
-    toggleToolbar
+    toggleToolbar,
+    /**
+   * Updates layer selection list to reflect the current setting
+   * @param {any} layerName
+   */
+    changeActiveLayer: (layerName) => {
+      changeLayerInternal(layerName);
+      layerSelector.changeLayer(layerName);
+      drawToolsSelector.updateTools(layerName);
+    }
   };
 }());
