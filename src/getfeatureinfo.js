@@ -1,7 +1,6 @@
 import EsriJSON from 'ol/format/EsriJSON';
 import BaseTileLayer from 'ol/layer/BaseTile';
 import ImageLayer from 'ol/layer/Image';
-import LayerGroup from 'ol/layer/Group';
 import maputils from './maputils';
 import SelectedItem from './models/SelectedItem';
 
@@ -184,19 +183,22 @@ function getFeatureInfoRequests({
   const imageFeatureInfoMode = viewer.getViewerOptions().featureinfoOptions.imageFeatureInfoMode || 'pixel';
   const requests = [];
   const queryableLayers = viewer.getLayersByProperty('queryable', true);
-  const layerGroups = queryableLayers.filter(layer => layer instanceof LayerGroup);
-  if (layerGroups) {
-    const visibleGroups = layerGroups.filter(group => group.get('visible') === true);
-    if (visibleGroups.length) {
-      visibleGroups.forEach(visibleGroup => visibleGroup.getLayersArray().forEach(layer => queryableLayers.push(layer)));
-    } else {
-      layerGroups.forEach(layerGroup => layerGroup.getLayersArray().forEach(layer => {
-        if ((layer.get('imageFeatureInfoMode')) && (layer.get('imageFeatureInfoMode') === 'always')) {
+  const layerGroups = viewer.getGroupLayers();
+  layerGroups.forEach(layerGroup => {
+    if (layerGroup.get('visible')) {
+      layerGroup.getLayersArray().forEach(layer => {
+        if ((layer.get('queryable'))) {
           queryableLayers.push(layer);
         }
-      }));
+      });
+    } else {
+      layerGroup.getLayersArray().forEach(layer => {
+        if (layer.get('queryable') && ((layer.get('imageFeatureInfoMode') && layer.get('imageFeatureInfoMode') === 'always') || (!layer.get('imageFeatureInfoMode') && imageFeatureInfoMode === 'always'))) {
+          queryableLayers.push(layer);
+        }
+      });
     }
-  }
+  });
 
   const imageLayers = queryableLayers.filter(layer => layer instanceof BaseTileLayer || layer instanceof ImageLayer);
   imageLayers.forEach(layer => {
