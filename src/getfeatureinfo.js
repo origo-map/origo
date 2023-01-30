@@ -1,7 +1,6 @@
 import EsriJSON from 'ol/format/EsriJSON';
 import BaseTileLayer from 'ol/layer/BaseTile';
 import ImageLayer from 'ol/layer/Image';
-import LayerGroup from 'ol/layer/Group';
 import maputils from './maputils';
 import SelectedItem from './models/SelectedItem';
 
@@ -184,7 +183,7 @@ function getFeatureInfoRequests({
   const imageFeatureInfoMode = viewer.getViewerOptions().featureinfoOptions.imageFeatureInfoMode || 'pixel';
   const requests = [];
   const queryableLayers = viewer.getLayersByProperty('queryable', true);
-  const layerGroups = queryableLayers.filter(layer => layer instanceof LayerGroup);
+  const layerGroups = viewer.getGroupLayers();
   layerGroups.forEach(layerGroup => {
     if (layerGroup.get('visible')) {
       layerGroup.getLayersArray().forEach(layer => {
