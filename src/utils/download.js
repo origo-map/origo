@@ -53,7 +53,7 @@ export const html2canvas = function html2canvas(el) {
   return convertHtml2canvas(el, {
     useCORS: true,
     allowTaint: true,
-    backgroundColor: null,
+    backgroundColor: '#FFFFFF',
     logging: false,
     height: el.offsetHeight,
     width: el.offsetWidth
@@ -62,11 +62,17 @@ export const html2canvas = function html2canvas(el) {
 
 export const getImageBlob = async function getImageBlob(el) {
   if (el) {
-    const transformScale = el.style.transform;
-    const printEl = el;
-    printEl.style.transform = 'scale(1)';
-    const canvas = await html2canvas(printEl);
-    printEl.style.transform = transformScale;
+    const mapEl = el;
+    const parentEl = mapEl.parentElement;
+    const styleAttributes = mapEl.getAttribute('style');
+    const parentStyleAttributes = parentEl.getAttribute('style');
+    mapEl.style.transform = 'unset';
+    mapEl.style.transformOrigin = 'unset';
+    parentEl.style.transform = 'unset';
+    parentEl.style.transformOrigin = 'unset';
+    const canvas = await html2canvas(mapEl);
+    mapEl.setAttribute('style', styleAttributes); // Restore scaling
+    parentEl.setAttribute('style', parentStyleAttributes); // Restore scaling
     const blob = await canvasToBlob(canvas);
     return blob;
   }
