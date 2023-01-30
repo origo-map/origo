@@ -18,6 +18,7 @@ import { afterRender, beforeRender } from './download-callback';
 import maputils from '../../maputils';
 import PrintResize from './print-resize';
 import { withLoading } from '../../loading';
+import isOnIos from '../../utils/browser';
 
 const PrintComponent = function PrintComponent(options = {}) {
   const {
@@ -41,7 +42,6 @@ const PrintComponent = function PrintComponent(options = {}) {
     sizeCustomMaxHeight,
     sizeCustomMinWidth,
     sizeCustomMaxWidth,
-    resolutions,
     scaleInitial,
     createdPrefix,
     rotation,
@@ -60,6 +60,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     size,
     orientation,
     resolution,
+    resolutions,
     scales,
     showMargins,
     showCreated,
@@ -76,16 +77,33 @@ const PrintComponent = function PrintComponent(options = {}) {
   let titleAlign = `text-align-${titleAlignment}`;
   let descriptionAlign = `text-align-${descriptionAlignment}`;
   let viewerMapTarget;
-  const printMarginClass = 'print-margin';
   let today = new Date(Date.now());
   let printScale = 0;
   let widthImage = 0;
   let heightImage = 0;
   const originalResolutions = viewer.getResolutions().map(item => item);
   const originalGrids = new Map();
+  const deviceOnIos = isOnIos();
 
   if (!Array.isArray(scales) || scales.length === 0) {
     scales = originalResolutions.map(currRes => maputils.resolutionToFormattedScale(currRes, viewer.getProjection()));
+  }
+
+  const calcMaxRes = function calcMaxRes() {
+    const devicePixelRatio = window.devicePixelRatio;
+    const maxSize = 16777216;
+    const maxRes = Math.floor((Math.sqrt(maxSize / (sizes[size][1] * sizes[size][0])) * 25.4) / devicePixelRatio);
+    return maxRes;
+  };
+
+  const setMaxRes = function setMaxRes() {
+    const res = calcMaxRes();
+    resolutions = [{ label: 'Hög', value: res }];
+    resolution = res;
+  };
+
+  if (deviceOnIos) {
+    setMaxRes();
   }
 
   /**
@@ -196,6 +214,10 @@ const PrintComponent = function PrintComponent(options = {}) {
     }
   };
 
+  const getPrintPadding = function getPrintPadding() {
+    return showMargins ? `${(10 * resolution) / 150}mm ${(10 * resolution) / 150}mm` : '';
+  };
+
   const created = function created() {
     return showCreated ? `${createdPrefix}${today.toLocaleDateString()} ${today.toLocaleTimeString()}` : '';
   };
@@ -259,9 +281,10 @@ const PrintComponent = function PrintComponent(options = {}) {
     pageElement.style.width = `${widthImage}px`;
     pageElement.style.height = `${heightImage}px`;
     // Scale the printed map to make it fit in the preview
-    const scaleWidth = orientation === 'portrait' ? widthImage : heightImage;
-    const scaleFactor = `;transform: scale(${((widthInMm * 3.779527559055) / scaleWidth)});transform-origin: top left;`;
-    pageElement.setAttribute('style', pageElement.getAttribute('style') + scaleFactor);
+    const scaleWidth = widthImage;
+    pageElement.style.transform = `scale(${((widthInMm * 3.779527559055) / scaleWidth)})`;
+    pageElement.style.transformOrigin = 'top left';
+    pageElement.style.padding = getPrintPadding();
     map.updateSize();
     map.getView().setResolution(scaleResolution);
   };
@@ -362,10 +385,16 @@ const PrintComponent = function PrintComponent(options = {}) {
     },
     changeSize(evt) {
       size = evt.size;
+      if (deviceOnIos) {
+        setMaxRes();
+      }
       this.updatePageSize();
     },
     changeCustomSize(evt) {
       setCustomSize(evt);
+      if (deviceOnIos) {
+        setMaxRes();
+      }
       this.updatePageSize();
     },
     changeOrientation(evt) {
@@ -404,11 +433,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     changeScale(evt) {
       setScale(evt.scale);
     },
-    printMargin() {
-      return showMargins ? 'print-margin' : '';
-    },
     toggleMargin() {
-      pageElement.classList.toggle(printMarginClass);
       showMargins = !showMargins;
       this.updatePageSize();
     },
@@ -515,6 +540,7 @@ const PrintComponent = function PrintComponent(options = {}) {
       }
       widthImage = orientation === 'portrait' ? Math.round((sizes[size][1] * resolution) / 25.4) : Math.round((sizes[size][0] * resolution) / 25.4);
       heightImage = orientation === 'portrait' ? Math.round((sizes[size][0] * resolution) / 25.4) : Math.round((sizes[size][1] * resolution) / 25.4);
+
       await withLoading(() => printToScalePDF({
         el: pageElement,
         filename,
@@ -570,6 +596,16 @@ const PrintComponent = function PrintComponent(options = {}) {
     updatePageSize() {
       pageContainerElement.style.height = orientation === 'portrait' ? `${sizes[size][0]}mm` : `${sizes[size][1]}mm`;
       pageContainerElement.style.width = orientation === 'portrait' ? `${sizes[size][1]}mm` : `${sizes[size][0]}mm`;
+      const qH = (window.innerHeight - 78) / pageContainerElement.clientHeight;
+      const qW = (window.innerWidth - 32) / pageContainerElement.clientWidth;
+      pageContainerElement.style.transform = `scale(${qH > qW ? qW : qH})`;
+      if (window.innerWidth <= 1000) {
+        pageContainerElement.style.transformOrigin = 'top left';
+        pageContainerElement.style.marginLeft = '16px';
+        pageContainerElement.style.marginRight = '16px';
+      } else {
+        pageContainerElement.style.transformOrigin = 'top center';
+      }
       this.updateMapSize();
       if (printScale > 0) {
         this.changeScale({ scale: printScale });
@@ -598,8 +634,8 @@ const PrintComponent = function PrintComponent(options = {}) {
           style="margin-bottom: 4rem;">
           <div
             id="${pageId}"
-            class="o-print-page flex column no-shrink no-margin width-full height-full bg-white ${this.printMargin()}"
-            style="margin-bottom: 4rem;">
+            class="o-print-page flex column no-shrink no-margin width-full height-full bg-white}"
+            style="margin-bottom: 4rem; ${showMargins ? `padding: ${getPrintPadding()}` : ''}">
             <div class="flex column no-margin width-full height-full overflow-hidden">
   ${pageTemplate({
     descriptionComponent, printMapComponent, titleComponent, footerComponent

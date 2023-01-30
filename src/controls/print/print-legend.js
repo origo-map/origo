@@ -301,7 +301,7 @@ export default function PrintLegend(options = {}) {
 
       return `
         <div id="legendContainer">
-          <div class="control overflow-hidden flex row o-legend">
+          <div class="control overflow-hidden flex row o-legend o-no-boxshadow">
             <div class="flex column overflow-hidden relative">
               ${await overlaysCmp.render()}
             </div>
