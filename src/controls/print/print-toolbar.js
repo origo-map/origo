@@ -37,8 +37,17 @@ const PrintToolbar = function PrintToolbar() {
       </div>`;
     },
     setDisabled(disabled) {
-      pngButton.setState(disabled ? 'disabled' : 'initial');
-      pdfButton.setState(disabled ? 'disabled' : 'initial');
+      if (disabled) {
+        pngButton.setState('disabled');
+        document.getElementById(pngButton.getId()).classList.add('print-button-disable');
+        pdfButton.setState('disabled');
+        document.getElementById(pdfButton.getId()).classList.add('print-button-disable');
+      } else {
+        pngButton.setState('initial');
+        document.getElementById(pngButton.getId()).classList.remove('print-button-disable');
+        pdfButton.setState('initial');
+        document.getElementById(pdfButton.getId()).classList.remove('print-button-disable');
+      }
     }
   });
 };

@@ -16,6 +16,11 @@ $print-scale-line-font-size: $font-size-smallest;
   overflow: hidden;
 }
 
+// for print buttons while print preview map is loading
+.print-button-disable {
+  pointer-events: none;
+}
+
 // scale-line
 .print-scale-line {
   background: $print-control-bg-color;
