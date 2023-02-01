@@ -18,10 +18,10 @@ const PrintToolbar = function PrintToolbar() {
       pdfButton.on('click', this.dispatchPrint.bind(this));
     },
     dispatchExport() {
-      this.dispatch('PNG');
+      if (pngButton.getState() !== 'disabled') this.dispatch('PNG');
     },
     dispatchPrint() {
-      this.dispatch('PDF');
+      if (pdfButton.getState() !== 'disabled') this.dispatch('PDF');
     },
     onRender() {
       this.dispatch('render');
@@ -39,14 +39,10 @@ const PrintToolbar = function PrintToolbar() {
     setDisabled(disabled) {
       if (disabled) {
         pngButton.setState('disabled');
-        document.getElementById(pngButton.getId()).classList.add('print-button-disable');
         pdfButton.setState('disabled');
-        document.getElementById(pdfButton.getId()).classList.add('print-button-disable');
       } else {
         pngButton.setState('initial');
-        document.getElementById(pngButton.getId()).classList.remove('print-button-disable');
         pdfButton.setState('initial');
-        document.getElementById(pdfButton.getId()).classList.remove('print-button-disable');
       }
     }
   });
