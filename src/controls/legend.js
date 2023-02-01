@@ -257,7 +257,7 @@ const Legend = function Legend(options = {}) {
 
   const layerSearchInput = Input({
     cls: 'o-search-layer-field placeholder-text-smaller smaller',
-    style: { height: '1.5rem', margin: 0, width: '100%' },
+    style: { height: '1.5rem', margin: 0, width: '180px' },
     placeholderText: searchLayersPlaceholderText,
     value: ''
   });
