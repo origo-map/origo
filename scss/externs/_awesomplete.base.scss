@@ -20,7 +20,7 @@
   flex-direction: row;
   flex-grow: 1;
   position: fixed;
-  min-width: 180px;
+  min-width: 100%;
 }
 
 .awesomplete > input {
@@ -47,7 +47,7 @@
   left: 0px;
   list-style: none;
   margin: 0;
-  min-width: 180px;
+  min-width: 100%;
   padding: 0;
   position: absolute;
   top: auto;

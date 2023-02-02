@@ -480,7 +480,14 @@ const Legend = function Legend(options = {}) {
         toolsEl.insertBefore(dom.html(divider.render()), toolsEl.firstChild);
         toolsEl.insertBefore(dom.html(button.render()), toolsEl.firstChild);
       } else {
-        toolsEl.appendChild(dom.html(button.render()));
+        if (typeof button.getValue === 'function') {
+          const node = document.createElement("div");
+          node.classList.add("grow");
+          toolsEl.appendChild(node);
+          node.appendChild(dom.html(button.render()));
+        } else {
+          toolsEl.appendChild(dom.html(button.render()));
+        }
       }
       toolsCmp.addComponent(button);
       button.onRender();
