@@ -90,7 +90,7 @@ const OverlayProperties = function OverlayProperties(options = {}) {
       layerSource.refresh();
       layer.set('styleName', styleToSet);
       let maxResolution;
-      if (!(altStyle.legendParams) || !(Object.keys(altStyle.legendParams).find(k => k.toUpperCase() === 'SCALE'))) {
+      if (!(altStyle.legendParams) || !(Object.keys(altStyle.legendParams).find(key => key.toUpperCase() === 'SCALE'))) {
         maxResolution = viewer.getResolutions()[viewer.getResolutions().length - 1];
       }
 
