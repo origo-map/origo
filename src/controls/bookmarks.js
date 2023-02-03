@@ -160,12 +160,12 @@ const Bookmarks = function Bookmarks(options = {}) {
       });
     },
     hide() {
-      document.getElementById(bookmarksButton.getId()).classList.add("hidden");
-      document.getElementById(bookmarks.getId()).classList.add("hidden");
+      document.getElementById(bookmarksButton.getId()).classList.add('hidden');
+      document.getElementById(bookmarks.getId()).classList.add('hidden');
     },
     unhide() {
-      document.getElementById(bookmarksButton.getId()).classList.remove("hidden");
-      document.getElementById(bookmarks.getId()).classList.remove("hidden");
+      document.getElementById(bookmarksButton.getId()).classList.remove('hidden');
+      document.getElementById(bookmarks.getId()).classList.remove('hidden');
     },
     render() {
       const bmEl = dom.html(bookmarks.render());

@@ -42,10 +42,10 @@ const Home = function Home(options = {}) {
       });
     },
     hide() {
-      document.getElementById(homeButton.getId()).classList.add("hidden");
+      document.getElementById(homeButton.getId()).classList.add('hidden');
     },
     unhide() {
-      document.getElementById(homeButton.getId()).classList.remove("hidden");
+      document.getElementById(homeButton.getId()).classList.remove('hidden');
     },
     render() {
       const htmlString = homeButton.render();
