@@ -142,10 +142,10 @@ const Mapmenu = function Mapmenu({
       });
     },
     hide() {
-      document.getElementById(menuButton.getId()).classList.add("hidden");
+      document.getElementById(menuButton.getId()).classList.add('hidden');
     },
     unhide() {
-      document.getElementById(menuButton.getId()).classList.remove("hidden");
+      document.getElementById(menuButton.getId()).classList.remove('hidden');
     },
     render() {
       const menuEl = dom.html(mapMenu.render());
