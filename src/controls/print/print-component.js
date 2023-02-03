@@ -84,6 +84,7 @@ const PrintComponent = function PrintComponent(options = {}) {
   const originalResolutions = viewer.getResolutions().map(item => item);
   const originalGrids = new Map();
   const deviceOnIos = isOnIos();
+  const olPixelRatio = map.pixelRatio_;
 
   if (!Array.isArray(scales) || scales.length === 0) {
     scales = originalResolutions.map(currRes => maputils.resolutionToFormattedScale(currRes, viewer.getProjection()));
@@ -337,7 +338,6 @@ const PrintComponent = function PrintComponent(options = {}) {
     name: 'printComponent',
     onInit() {
       this.on('render', this.onRender);
-
       this.addComponent(printSettings);
       this.addComponent(printInteractionToggle);
       this.addComponent(printToolbar);
@@ -455,6 +455,11 @@ const PrintComponent = function PrintComponent(options = {}) {
       printMapComponent.dispatch('change:togglePrintLegend', { showPrintLegend });
     },
     close() {
+      if (deviceOnIos) {
+        // Reset pixelRatio
+        // eslint-disable-next-line no-underscore-dangle
+        map.pixelRatio_ = olPixelRatio;
+      }
       // GH-1537: remove layers temporarily added for print and unhide layers hidden for print
       viewer.getLayersByProperty('added-for-print', true).forEach((l) => viewer.removeLayer(l));
       viewer.getLayersByProperty('hidden-for-print', true).forEach((l) => {
@@ -625,9 +630,14 @@ const PrintComponent = function PrintComponent(options = {}) {
       if (draganddropControl) draganddropControl.addInteraction();
     },
     render() {
+      if (deviceOnIos) {
+        // If user is on iOS we have to make sure the canvas ain't too heavy and make the browser crash
+        // eslint-disable-next-line no-underscore-dangle
+        map.pixelRatio_ = 1;
+      }
       targetElement = document.getElementById(target);
       const htmlString = `
-      <div id="${this.getId()}" class="absolute flex no-wrap fade-in no-margin width-full height-full z-index-ontop-low bg-grey-lightest overflow-auto">
+      <div id="${this.getId()}" class="absolute flex no-wrap fade-in no-margin width-full height-full z-index-ontop-low bg-grey-lightest overflow-auto" style="touch-action:none">
         <div
           id="${pageContainerId}"
           class="flex column no-shrink margin-top-large margin-x-auto box-shadow bg-white border-box"
