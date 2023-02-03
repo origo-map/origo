@@ -55,10 +55,10 @@ const Scalepicker = function Scalepicker(options = {}) {
       });
     },
     hide() {
-      document.getElementById(dropdown.getId()).classList.add("hidden");
+      document.getElementById(dropdown.getId()).classList.add('hidden');
     },
     unhide() {
-      document.getElementById(dropdown.getId()).classList.remove("hidden");
+      document.getElementById(dropdown.getId()).classList.remove('hidden');
     },
     render() {
       const el = dom.html(dropdown.render());

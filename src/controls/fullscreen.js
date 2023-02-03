@@ -41,10 +41,10 @@ const Fullscreen = function Fullscreen(options = {}) {
     onInit() {
     },
     hide() {
-      document.getElementById(fullscreenButton.getId()).classList.add("hidden");
+      document.getElementById(fullscreenButton.getId()).classList.add('hidden');
     },
     unhide() {
-      document.getElementById(fullscreenButton.getId()).classList.remove("hidden");
+      document.getElementById(fullscreenButton.getId()).classList.remove('hidden');
     },
     render() {
       const htmlString = fullscreenButton.render();
