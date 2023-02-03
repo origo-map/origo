@@ -84,6 +84,8 @@ const PrintComponent = function PrintComponent(options = {}) {
   const originalResolutions = viewer.getResolutions().map(item => item);
   const originalGrids = new Map();
   const deviceOnIos = isOnIos();
+
+  // eslint-disable-next-line no-underscore-dangle
   const olPixelRatio = map.pixelRatio_;
 
   if (!Array.isArray(scales) || scales.length === 0) {
