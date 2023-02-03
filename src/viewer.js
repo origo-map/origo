@@ -25,7 +25,9 @@ const Viewer = function Viewer(targetOption, options = {}) {
   let selectionmanager;
 
   let {
-    projection,
+    projection
+  } = options;
+  const {
     breakPoints,
     breakPointsPrefix,
     clsOptions = '',
