@@ -89,8 +89,15 @@ const OverlayProperties = function OverlayProperties(options = {}) {
       }
       layerSource.refresh();
       layer.set('styleName', styleToSet);
-      const maxResolution = viewer.getResolutions()[viewer.getResolutions().length - 1];
-      const getLegendString = layerSource.getLegendUrl(maxResolution, { STYLE: styleToSet });
+      let maxResolution;
+      if (!(altStyle.legendParams) || !(Object.keys(altStyle.legendParams).find(key => key.toUpperCase() === 'SCALE'))) {
+        maxResolution = viewer.getResolutions()[viewer.getResolutions().length - 1];
+      }
+
+      const getLegendString = layerSource.getLegendUrl(maxResolution, {
+        STYLE: styleToSet,
+        ...altStyle.legendParams
+      });
       const newWmsStyle = [[{
         icon: {
           src: `${getLegendString}`
