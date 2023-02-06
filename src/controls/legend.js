@@ -55,6 +55,7 @@ const Legend = function Legend(options = {}) {
   let closeButton;
   let layerButton;
   let layerButtonEl;
+  let layerSwitcherCmp;
   let isExpanded;
   let toolsCmp;
   const cls = `${clsSettings} control bottom-right box overflow-hidden flex row o-legend`.trim();
@@ -463,6 +464,9 @@ const Legend = function Legend(options = {}) {
 
   return Component({
     name,
+    getLayerSwitcherCmp() {
+      return layerSwitcherCmp;
+    },
     getState() {
       return getState();
     },
@@ -618,7 +622,8 @@ const Legend = function Legend(options = {}) {
       });
 
       const layerSwitcherCls = isExpanded ? '' : ' faded';
-      const layerSwitcherCmp = El({
+      layerSwitcherCmp = El({
+        name: 'layerSwitcher',
         style,
         cls: `${cls}${layerSwitcherCls}`,
         components: [mainContainerCmp],
