@@ -1,5 +1,6 @@
 import olAttribution from 'ol/control/Attribution';
 import olScaleLine from 'ol/control/ScaleLine';
+import { unByKey } from 'ol/Observable';
 import { getPointResolution } from 'ol/proj';
 import TileImage from 'ol/source/TileImage';
 import TileWMSSource from 'ol/source/TileWMS';
@@ -329,12 +330,16 @@ const PrintComponent = function PrintComponent(options = {}) {
   const printInteractionToggle = PrintInteractionToggle({ map, target, mapInteractionsActive, pageSettings: viewer.getViewerOptions().pageSettings });
 
   const printToolbar = PrintToolbar();
-  map.getAllLayers().forEach((l) => {
-    // if we begin loading any data we want to disable the print buttons...
-    l.getSource().on(['tileloadstart', 'imageloadstart'], () => printToolbar.setDisabled(true));
-  });
-  // ...they then get re-enabled when the map has finished rendering
-  map.on('rendercomplete', () => printToolbar.setDisabled(false));
+
+  let mapLoadListenRefs;
+
+  function disablePrintToolbar() {
+    printToolbar.setDisabled(true);
+  }
+
+  function enablePrintToolbar() {
+    printToolbar.setDisabled(false);
+  }
 
   return Component({
     name: 'printComponent',
@@ -462,6 +467,8 @@ const PrintComponent = function PrintComponent(options = {}) {
         // eslint-disable-next-line no-underscore-dangle
         map.pixelRatio_ = olPixelRatio;
       }
+      unByKey(mapLoadListenRefs[0]);
+      unByKey(mapLoadListenRefs[1]);
       // GH-1537: remove layers temporarily added for print and unhide layers hidden for print
       viewer.getLayersByProperty('added-for-print', true).forEach((l) => viewer.removeLayer(l));
       viewer.getLayersByProperty('hidden-for-print', true).forEach((l) => {
@@ -561,6 +568,12 @@ const PrintComponent = function PrintComponent(options = {}) {
       }));
     },
     async onRender() {
+      function addMapLoadListeners() {
+        const startEvRef = map.on('loadstart', disablePrintToolbar);
+        const endEvRef = map.on('loadend', enablePrintToolbar);
+        return [startEvRef, endEvRef];
+      }
+      mapLoadListenRefs = addMapLoadListeners();
       printScale = 0;
       today = new Date(Date.now());
       viewerMapTarget = map.getTarget();
