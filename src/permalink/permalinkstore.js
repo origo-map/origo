@@ -4,7 +4,7 @@ let getPin;
 const permalinkStore = {};
 const additionalMapStateParams = {};
 
-function getSaveLayers(layers) {
+permalinkStore.getSaveLayers = function getSaveLayers(layers) {
   const saveLayers = [];
   layers.forEach((layer) => {
     const saveLayer = {};
