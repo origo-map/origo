@@ -8,6 +8,7 @@ import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import Style from '../style';
 import { Component } from '../ui';
+import { getStylewindowStyle } from './editor/stylewindow';
 
 const DragAndDrop = function DragAndDrop(options = {}) {
   let dragAndDrop;
@@ -21,6 +22,7 @@ const DragAndDrop = function DragAndDrop(options = {}) {
       map = viewer.getMap();
       const groupName = options.groupName || 'egna-lager';
       const groupTitle = options.groupTitle || 'Egna lager';
+      const styleByAttribute = options.styleByAttribute || false;
       const featureStyles = options.featureStyles || {
         Point: [{
           circle: {
@@ -95,6 +97,12 @@ const DragAndDrop = function DragAndDrop(options = {}) {
         }
         vectorSource = new VectorSource({
           features: event.features
+        });
+        vectorSource.forEachFeature((feature) => {
+          if (feature.get('style') && styleByAttribute) {
+            const featureStyle = getStylewindowStyle(feature, feature.get('style'));
+            feature.setStyle(featureStyle);
+          }
         });
         if (!viewer.getGroup(groupName)) {
           viewer.addGroup({ title: groupTitle, name: groupName, expanded: true });
