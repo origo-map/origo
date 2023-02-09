@@ -64,6 +64,23 @@ class WfsSource extends VectorSource {
   }
 
   /**
+   * Set filter on layer
+   * @param {any} cql
+   */
+  setFilter(cql) {
+    this._options.filter = cql;
+    this.refresh();
+  }
+
+  /**
+   * Clear filter on layer
+   */
+  clearFilter() {
+    this._options.filter = '';
+    this.refresh();
+  }
+
+  /**
    * Helper to reuse code. Consider it to be private to this class
    * @param {any} extent
    * @param {any} cql if provided, extent is ignored
