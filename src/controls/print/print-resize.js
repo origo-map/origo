@@ -28,10 +28,10 @@ export default function PrintResize(options = {}) {
   let prevResolution = resolution;
   let isActive = false;
   let layersWithChangedSource = [];
-  let layersSaveStyle = {};
-  let imageSavedScale = {};
-  let strokeSavedWidth = {};
-  let textSavedScale = {};
+  const layersSaveStyle = {};
+  const imageSavedScale = {};
+  const strokeSavedWidth = {};
+  const textSavedScale = {};
 
   // Will become an issue if 150 dpi is no longer the "standard" dpi setting
   const multiplyByFactor = function multiplyByFactor(value) {
@@ -448,15 +448,15 @@ export default function PrintResize(options = {}) {
       }
       if (style) {
         layer.setStyle(style);
-      }  else if (features) {
+      } else if (features) {
         features.forEach(feature => {
           const featureStyle = feature.getStyle();
           if (featureStyle) {
             if (Array.from(featureStyle).length === 0) {
               resetFeature(featureStyle, layer, feature);
             } else {
-              Array.from(featureStyle).forEach(style => {
-                resetFeature(style, layer, feature);
+              Array.from(featureStyle).forEach(thisStyle => {
+                resetFeature(thisStyle, layer, feature);
               });
             }
           }

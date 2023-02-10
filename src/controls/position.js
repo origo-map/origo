@@ -419,10 +419,10 @@ const Position = function Position(options = {}) {
       });
     },
     hide() {
-      document.getElementById(containerElement.getId()).classList.add("hidden");
+      document.getElementById(containerElement.getId()).classList.add('hidden');
     },
     unhide() {
-      document.getElementById(containerElement.getId()).classList.remove("hidden");
+      document.getElementById(containerElement.getId()).classList.remove('hidden');
     },
     render() {
       const el = dom.html(containerElement.render());

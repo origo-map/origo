@@ -65,10 +65,10 @@ const ExternalurlSingleButton = function ExternalurlSingleButton(options = {}) {
       this.render();
     },
     hide() {
-      document.getElementById(exUrlElement.getId()).classList.add("hidden");
+      document.getElementById(exUrlElement.getId()).classList.add('hidden');
     },
     unhide() {
-      document.getElementById(exUrlElement.getId()).classList.remove("hidden");
+      document.getElementById(exUrlElement.getId()).classList.remove('hidden');
     },
     render() {
       let htmlString = `${exUrlElement.render()}`;
