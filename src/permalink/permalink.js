@@ -33,10 +33,42 @@ export default (() => ({
     urlParts.forEach((part) => {
       const key = part.split('=')[0];
       const val = part.split('=')[1];
-      if (Object.prototype.hasOwnProperty.call(permalinkParser, key)) {
-        if (typeof permalinkParser[key] === 'function') {
-          urlAsObj[key] = permalinkParser[key](val);
-        }
+      switch (key) {
+        case 'layers':
+          urlAsObj.layers = permalinkParser.layers(val);
+          break;
+        case 'zoom':
+          urlAsObj.zoom = permalinkParser.zoom(val);
+          break;
+        case 'center':
+          urlAsObj.center = permalinkParser.center(val);
+          break;
+        case 'selection':
+          urlAsObj.selection = permalinkParser.selection(val);
+          break;
+        case 'feature':
+          urlAsObj.feature = permalinkParser.feature(val);
+          break;
+        case 'pin':
+          urlAsObj.pin = permalinkParser.pin(val);
+          break;
+        case 'map':
+          urlAsObj.map = permalinkParser.map(val);
+          break;
+        case 'controls':
+          urlAsObj.controls = permalinkParser.controls(val);
+          break;
+        case 'controlDraw':
+          urlAsObj.controlDraw = permalinkParser.controlDraw(val);
+          break;
+        case 'legend':
+          urlAsObj.legend = permalinkParser.legend(val);
+          break;
+        case 'controlMeasure':
+          urlAsObj.controlMeasure = permalinkParser.controlMeasure(val);
+          break;
+        default:
+          break;
       }
     });
     return urlAsObj || false;
