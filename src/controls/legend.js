@@ -257,7 +257,7 @@ const Legend = function Legend(options = {}) {
 
   const layerSearchInput = Input({
     cls: 'o-search-layer-field placeholder-text-smaller smaller',
-    style: { height: '1.5rem', margin: 0, width: '100%' },
+    style: { height: '1.5rem', margin: 0, width: '180px' },
     placeholderText: searchLayersPlaceholderText,
     value: ''
   });
@@ -480,7 +480,14 @@ const Legend = function Legend(options = {}) {
         toolsEl.insertBefore(dom.html(divider.render()), toolsEl.firstChild);
         toolsEl.insertBefore(dom.html(button.render()), toolsEl.firstChild);
       } else {
-        toolsEl.appendChild(dom.html(button.render()));
+        const node = document.createElement('div');
+        if (typeof button.getValue === 'function') {
+          node.classList.add('grow');
+          toolsEl.appendChild(node);
+          node.appendChild(dom.html(button.render()));
+        } else {
+          toolsEl.appendChild(dom.html(button.render()));
+        }
       }
       toolsCmp.addComponent(button);
       button.onRender();
