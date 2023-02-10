@@ -7,18 +7,73 @@ import TopoJSONFormat from 'ol/format/TopoJSON';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import Style from '../style';
-import { Component } from '../ui';
+import { Component, InputFile, Button, Element as El } from '../ui';
 
 const DragAndDrop = function DragAndDrop(options = {}) {
   let dragAndDrop;
   let viewer;
   let map;
+  let legendButton;
 
+  if (options.showLegendButton) {
+    const fileInput = InputFile({
+      labelCls: 'hidden',
+      inputCls: 'hidden',
+      change(e) {
+        const filesToDrop = e.target.files;
+
+        function fakeIt(file) {
+          this.dropEffect = 'copy';
+          this.effectAllowed = 'all';
+          this.items = [];
+          this.types = [];
+          this.getData = function getData() {
+            return file;
+          };
+          this.files = file;
+        }
+
+        const fakeEvent = new DragEvent('drop');
+        Object.defineProperty(fakeEvent, 'dataTransfer', {
+          value: new fakeIt(filesToDrop)
+        });
+        viewer.getMap().getViewport().dispatchEvent(fakeEvent);
+      },
+      style: {
+        'align-self': 'center'
+      },
+      icon: '#o_add_24px',
+      iconStyle: {
+        fill: '#fff'
+      }
+    });
+
+    const openBtn = Button({
+      cls: 'round compact danger icon-small margin-x-smaller',
+      click() {
+        document.getElementById(fileInput.getId()).click();
+      },
+      title: 'Importera fil',
+      style: {
+        'align-self': 'center'
+      },
+      icon: '#o_add_24px',
+      iconStyle: {
+        fill: '#fff'
+      }
+    });
+
+    legendButton = El({
+      components: [fileInput, openBtn]
+    });
+  }
   return Component({
     name: 'draganddrop',
     onAdd(evt) {
       viewer = evt.target;
       map = viewer.getMap();
+      const legend = viewer.getControlByName('legend');
+      if (options.showLegendButton) { legend.addButtonToTools(legendButton); }
       const groupName = options.groupName || 'egna-lager';
       const groupTitle = options.groupTitle || 'Egna lager';
       const featureStyles = options.featureStyles || {
