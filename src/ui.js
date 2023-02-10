@@ -17,6 +17,7 @@ export { default as InputRange } from './ui/input-range';
 export { default as InputFile } from './ui/input-file';
 export { default as Textarea } from './ui/textarea';
 export { default as Modal } from './ui/modal';
+export { default as PopupMenu } from './ui/popupmenu';
 export { default as Slidenav } from './ui/slidenav';
 export { default as ToggleGroup } from './ui/togglegroup';
 export { default as Component } from './ui/component';
