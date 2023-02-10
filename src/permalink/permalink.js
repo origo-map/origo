@@ -34,7 +34,9 @@ export default (() => ({
       const key = part.split('=')[0];
       const val = part.split('=')[1];
       if (Object.prototype.hasOwnProperty.call(permalinkParser, key)) {
-        urlAsObj[key] = permalinkParser[key](val);
+        if (typeof permalinkParser[key] === 'function') {
+          urlAsObj[key] = permalinkParser[key](val);
+        }
       }
     });
     return urlAsObj || false;
