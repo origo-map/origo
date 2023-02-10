@@ -1,5 +1,4 @@
 import Component from './component';
-import createStyle from './dom/createstyle';
 
 export default function Input(options = {}) {
   const {

@@ -6,7 +6,7 @@ let saveOnServerServiceEndPoint = '';
 
 export default (() => ({
   getSaveLayers: function getSaveLayers(layers) {
-    return urlparser.formatUrl({layers: permalinkStore.getSaveLayers(layers)});
+    return urlparser.formatUrl({ layers: permalinkStore.getSaveLayers(layers) });
   },
   getHash: function getHash(viewer) {
     return (urlparser.formatUrl(permalinkStore.getState(viewer)));
