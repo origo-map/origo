@@ -72,7 +72,7 @@ const drawToolsSelector = function drawToolsSelector(tools, v) {
       }
     } else {
       active = false;
-      if (tool && tool !== 'cancel') {
+      if (tool && tool !== 'cancel' && document.querySelector(`[id^="${target}-${tool}"]`)) {
         document.querySelector(`[id^="${target}-${tool}"]`).classList.remove(activeCls);
       }
       map.un('click', close);

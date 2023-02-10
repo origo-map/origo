@@ -143,7 +143,7 @@ function restoreState(params) {
 
 function init(optOptions) {
   const options = optOptions || {};
-  const extraTools = options.options.drawTools;
+  const extraTools = options.options.drawTools || [];
   viewer = options.viewer;
   target = 'o-tools-bottom';
   drawHandler.init(options);
