@@ -51,7 +51,9 @@ const DragAndDrop = function DragAndDrop(options = {}) {
     const openBtn = Button({
       cls: 'round compact danger icon-small margin-x-smaller',
       click() {
-        document.getElementById(fileInput.getId()).click();
+        const inputEl = document.getElementById(fileInput.getId());
+        inputEl.value = null;
+        inputEl.click();
       },
       title: 'Importera fil',
       style: {
