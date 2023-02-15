@@ -13,6 +13,7 @@ import utils from './utils';
 import Layer from './layer';
 import Main from './components/main';
 import Footer from './components/footer';
+import CenterMarker from './components/centermarker';
 import flattenGroups from './utils/flattengroups';
 import getcenter from './geometry/getcenter';
 import isEmbedded from './utils/isembedded';
@@ -99,6 +100,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
   const footer = Footer({
     data: footerData
   });
+  const centerMarker = CenterMarker();
   let mapSize;
 
   const addControl = function addControl(control) {
@@ -588,6 +590,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
           featureinfo = Featureinfo(featureinfoOptions);
           this.addComponent(selectionmanager);
           this.addComponent(featureinfo);
+          this.addComponent(centerMarker);
 
           this.addControls();
           this.dispatch('loaded');
@@ -663,7 +666,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
     zoomToExtent,
     getSelectionManager,
     getEmbedded,
-    permalink
+    permalink,
+    centerMarker
   });
 };
 

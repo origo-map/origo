@@ -17,6 +17,7 @@ const externalurlSeveralButtons = function externalurlSeveralButtons(options = {
   function toggleMainButton() {
     if (!isMainButtonActive) {
       document.getElementById(externalUrlMainButton.getId()).classList.add('active');
+      viewer.centerMarker.show();
       subButtons.forEach((button) => {
         document.getElementById(button.getId()).classList.remove('hidden');
       });
@@ -24,6 +25,7 @@ const externalurlSeveralButtons = function externalurlSeveralButtons(options = {
       isMainButtonActive = true;
     } else {
       document.getElementById(externalUrlMainButton.getId()).classList.remove('active');
+      viewer.centerMarker.hide();
       subButtons.forEach((button) => {
         document.getElementById(button.getId()).classList.add('hidden');
       });
