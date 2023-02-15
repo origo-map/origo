@@ -38,30 +38,20 @@ const DragAndDrop = function DragAndDrop(options = {}) {
           value: new fakeIt(filesToDrop)
         });
         viewer.getMap().getViewport().dispatchEvent(fakeEvent);
-      },
-      style: {
-        'align-self': 'center'
-      },
-      icon: '#o_add_24px',
-      iconStyle: {
-        fill: '#fff'
       }
     });
 
     const openBtn = Button({
-      cls: 'round compact danger icon-small margin-x-smaller',
+      cls: 'round compact icon-small margin-x-smaller',
       click() {
         const inputEl = document.getElementById(fileInput.getId());
         inputEl.value = null;
         inputEl.click();
       },
       title: 'Importera fil',
-      style: {
-        'align-self': 'center'
-      },
-      icon: '#o_add_24px',
+      icon: '#ic_upload_file_24px',
       iconStyle: {
-        fill: '#fff'
+        fill: '#4a4a4a'
       }
     });
 
