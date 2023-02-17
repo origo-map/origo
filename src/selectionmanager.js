@@ -12,6 +12,11 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   const {
     toggleSelectOnClick = false
   } = options;
+
+  let aggregations = [];
+  if (options.infowindowOptions && options.infowindowOptions.groupAggregations) {
+    aggregations = options.infowindowOptions.groupAggregations;
+  }
   let viewer;
   let selectedItems;
   let urval;
@@ -157,6 +162,79 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     infowindow.createUrvalElement(selectionGroup, selectionGroupTitle);
   }
 
+  /**
+   * Calculates all configured aggregations for one selectionGroup
+   * @param {any} selectionGroup
+   */
+  function calculateGroupAggregations(selectionGroup) {
+    const retval = [];
+    // function pointer to a function that takes an array as argumnet
+    let aggregationFn;
+
+    aggregations.forEach(currAggregation => {
+      if (!currAggregation.layer || currAggregation.layer === selectionGroup) {
+        let valFound = false;
+        // Suck out the attribute to aggregate.
+        const values = urval.get(selectionGroup).getFeatures().map(currFeature => {
+          let val = 0;
+          if (currAggregation.attribute.startsWith('@')) {
+            const helperName = currAggregation.attribute.substring(1);
+            const geometry = currFeature.getGeometry();
+            if (helperName === 'area') {
+              if (geometry.getArea) {
+                val = geometry.getArea();
+                valFound = true;
+              }
+            } else if (helperName === 'length') {
+              if (geometry.getLength) {
+                val = geometry.getLength();
+                valFound = true;
+              }
+            } else {
+              console.error(`Unsupported geometry operation: ${helperName}`);
+            }
+          } else {
+            val = currFeature.get(currAggregation.attribute);
+            if (val !== undefined) {
+              valFound = true;
+            }
+          }
+          return val;
+        });
+
+        // Only add the aggregation if this layer has the attribute (or function)
+        if (valFound) {
+          switch (currAggregation.function) {
+            case 'sum':
+              // Define the "sum" aggregation.
+              // To be honest, we could have just performed the aggregation here
+              // but it is cool to use function pointers.
+              // javascript does not provide a sum function. Define our own.
+              aggregationFn = (arr) => arr.reduce((a, b) => (Number(a) || 0) + (Number(b) || 0), 0);
+              break;
+            default:
+              console.error(`Unsupported aggregation function: ${currAggregation.function}`);
+              return; // Return from labmda. Skips this aggregation
+          }
+
+          let result = aggregationFn(values);
+          if (currAggregation.scalefactor) {
+            result *= currAggregation.scalefactor;
+          }
+          const decimals = currAggregation.decimals !== undefined ? currAggregation.decimals : 2;
+          const resultstring = result.toFixed(decimals);
+          const prefix = currAggregation.label || `${currAggregation.function}(${currAggregation.attribute}): `;
+          const suffix = currAggregation.suffix || '';
+          const line = `${prefix}${resultstring}${suffix}`;
+          retval.push(line);
+        }
+      }
+    });
+
+    // Return all aggregations in one multiline string
+    return retval.join('<br>');
+  }
+
   function onItemAdded(event) {
     const item = event.element;
 
@@ -176,6 +254,8 @@ const Selectionmanager = function Selectionmanager(options = {}) {
 
     const sum = urval.get(selectionGroup).getFeatures().length;
     infowindow.updateUrvalElementText(selectionGroup, selectionGroupTitle, sum);
+    const aggregationstring = calculateGroupAggregations(selectionGroup);
+    infowindow.updateSelectionGroupFooter(selectionGroup, aggregationstring);
   }
 
   function onItemRemoved(event) {
@@ -193,6 +273,8 @@ const Selectionmanager = function Selectionmanager(options = {}) {
 
     const sum = urval.get(selectionGroup).getFeatures().length;
     infowindow.updateUrvalElementText(selectionGroup, selectionGroupTitle, sum);
+    const aggregationstring = calculateGroupAggregations(selectionGroup);
+    infowindow.updateSelectionGroupFooter(selectionGroup, aggregationstring);
 
     if (urval.get(selectionGroup).getFeatures().length < 1) {
       infowindow.hideUrvalElement(selectionGroup);
