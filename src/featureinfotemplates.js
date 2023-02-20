@@ -1,7 +1,13 @@
 import defaultTemplate from './templates/featureinfotemplate';
+import templateHelpers from './utils/templatehelpers';
 
 const templates = {};
 templates.default = defaultTemplate;
+
+function addFeatureinfotemplate(name, fn) {
+  templates[name] = fn;
+  return true;
+}
 
 function renameKeys(obj, newKeys) {
   const keyValues = Object.keys(obj).map(key => {
@@ -11,7 +17,7 @@ function renameKeys(obj, newKeys) {
   return Object.assign({}, ...keyValues);
 }
 
-function featureinfotemplates(template, featureAttributes, attributeAlias) {
+function getFromTemplate(template, featureAttributes, attributeAlias) {
   const attributes = featureAttributes;
   if (attributes.url) {
     attributes.url = `<a href="${attributes.url}" target="_blank">${attributes.url}</a>`;
@@ -19,4 +25,5 @@ function featureinfotemplates(template, featureAttributes, attributeAlias) {
   const renamedObj = renameKeys(attributes, attributeAlias);
   return templates[template](renamedObj);
 }
-export default featureinfotemplates;
+
+export default { getFromTemplate, addFeatureinfotemplate, templateHelpers };
