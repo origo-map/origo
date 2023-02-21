@@ -10,6 +10,7 @@ import SizeControl from './size-control';
 import TitleControl from './title-control';
 import CreatedControl from './created-control';
 import NorthArrowControl from './north-arrow-control';
+import PrintLegendControl from './print-legend-control';
 import RotationControl from './rotation-control';
 import SetScaleControl from './set-scale-control';
 import ResolutionControl from './resolution-control';
@@ -47,6 +48,7 @@ const PrintSettings = function PrintSettings(options = {}) {
     showCreated,
     showScale,
     showNorthArrow,
+    showPrintLegend,
     rotation,
     rotationStep
   } = options;
@@ -58,6 +60,7 @@ const PrintSettings = function PrintSettings(options = {}) {
   let printSettingsContainer;
   let customSizeControl;
   let northArrowControl;
+  let printLegendControl;
   let rotationControl;
   let setScaleControl;
 
@@ -158,12 +161,13 @@ const PrintSettings = function PrintSettings(options = {}) {
       });
       const marginControl = MarginControl({ checked: showMargins });
       const createdControl = CreatedControl({ checked: showCreated });
-      const resolutionControl = ResolutionControl({
+      const resolutionControl = resolutions.length > 1 ? ResolutionControl({
         initialResolution: resolution,
         resolutions
-      });
+      }) : undefined;
       const showScaleControl = ShowScaleControl({ checked: showScale });
       northArrowControl = NorthArrowControl({ showNorthArrow });
+      printLegendControl = PrintLegendControl({ showPrintLegend });
       rotationControl = map.getView().getConstraints().rotation(180) === 180 ? RotationControl({ rotation, rotationStep, map }) : undefined;
       customSizeControl = CustomSizeControl({
         minHeight: sizeCustomMinHeight,
@@ -174,10 +178,10 @@ const PrintSettings = function PrintSettings(options = {}) {
         width: sizes.custom ? sizes.custom[1] : sizeCustomMinWidth,
         state: size === 'custom' ? 'active' : 'initial'
       });
-      setScaleControl = SetScaleControl({
+      setScaleControl = SetScaleControl(map, {
         scales,
         initialScale: scaleInitial
-      }, map);
+      });
 
       contentComponent = Component({
         onRender() { this.dispatch('render'); },
@@ -195,12 +199,14 @@ const PrintSettings = function PrintSettings(options = {}) {
             rotationControl,
             setScaleControl,
             resolutionControl,
-            showScaleControl
+            showScaleControl,
+            printLegendControl
           });
         }
       });
-      const components = [customSizeControl, marginControl, orientationControl, sizeControl, titleControl, descriptionControl, createdControl, northArrowControl, setScaleControl, resolutionControl, showScaleControl];
+      const components = [customSizeControl, marginControl, orientationControl, sizeControl, titleControl, descriptionControl, createdControl, northArrowControl, printLegendControl, setScaleControl, showScaleControl];
       if (rotationControl) { components.push(rotationControl); }
+      if (resolutions.length > 1) { components.push(resolutionControl); }
       contentComponent.addComponents(components);
       printSettingsContainer = Collapse({
         cls: 'flex column',
@@ -226,7 +232,10 @@ const PrintSettings = function PrintSettings(options = {}) {
       titleControl.on('change:titleAlign', (evt) => this.dispatch('change:titleAlign', evt));
       createdControl.on('change:check', (evt) => this.dispatch('change:created', evt));
       northArrowControl.on('change:check', (evt) => this.dispatch('change:northarrow', evt));
-      resolutionControl.on('change:resolution', (evt) => this.dispatch('change:resolution', evt));
+      printLegendControl.on('change:check', (evt) => this.dispatch('change:printlegend', evt));
+      if (resolutionControl) {
+        resolutionControl.on('change:resolution', (evt) => this.dispatch('change:resolution', evt));
+      }
       setScaleControl.on('change:scale', (evt) => this.dispatch('change:scale', evt));
       showScaleControl.on('change:check', (evt) => this.dispatch('change:showscale', evt));
     },

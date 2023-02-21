@@ -11,7 +11,8 @@ export default function printTemplate({
   rotationControl,
   setScaleControl,
   resolutionControl,
-  showScaleControl
+  showScaleControl,
+  printLegendControl
 }) {
   return `
   <div id="${id}" class="flex column no-print padding-x overflow-auto max-height-100">
@@ -26,9 +27,7 @@ export default function printTemplate({
     <div class="padding-top"></div>
     <h6>Orientering</h6>
     ${orientationControl.render()}
-    <div class="padding-top"></div>
-    <h6>Upplösning</h6>
-    ${resolutionControl.render()}
+    ${resolutionControl ? `<div class="padding-top"></div><h6>Upplösning</h6>${resolutionControl.render()}` : ''}
     <div class="padding-top"></div>
       ${setScaleControl.render()}
     <div class="padding-top-large"></div>
@@ -50,6 +49,11 @@ export default function printTemplate({
     <div class="flex padding-right-small">
       <div class="grow text-normal">Visa norrpil</div>
       ${northArrowControl.render()}
+    </div>
+    <div class="padding-top-large"></div>
+    <div class="flex padding-right-small">
+      <div class="grow text-normal">Visa legend</div>
+      ${printLegendControl.render()}
     </div>
     <div class="padding-bottom-large">
       ${rotationControl ? rotationControl.render() : ''}

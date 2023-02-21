@@ -10,13 +10,15 @@ import Style from '../style';
 import { Component } from '../ui';
 
 const DragAndDrop = function DragAndDrop(options = {}) {
+  let dragAndDrop;
   let viewer;
+  let map;
 
   return Component({
     name: 'draganddrop',
     onAdd(evt) {
       viewer = evt.target;
-      const map = viewer.getMap();
+      map = viewer.getMap();
       const groupName = options.groupName || 'egna-lager';
       const groupTitle = options.groupTitle || 'Egna lager';
       const featureStyles = options.featureStyles || {
@@ -65,7 +67,7 @@ const DragAndDrop = function DragAndDrop(options = {}) {
       let vectorSource;
       let vectorLayer;
       const vectorStyles = Style.createGeometryStyle(featureStyles);
-      const dragAndDrop = new olDragAndDrop({
+      dragAndDrop = new olDragAndDrop({
         formatConstructors: [
           GPXFormat,
           GeoJSONFormat,
@@ -75,9 +77,22 @@ const DragAndDrop = function DragAndDrop(options = {}) {
         ]
       });
 
-      map.addInteraction(dragAndDrop);
+      this.addInteraction();
 
       dragAndDrop.on('addfeatures', (event) => {
+        let layerName = event.file.name.split('.')[0].replace(/\W/g, '');
+        let layerTitle = event.file.name.split('.')[0];
+        if (viewer.getLayer(layerName)) {
+          let i = 1;
+          while (i < 99) {
+            if (!viewer.getLayer(`${layerName}-${i}`)) {
+              layerName = `${layerName}-${i}`;
+              layerTitle = `${layerTitle} ${i}`;
+              break;
+            }
+            i += 1;
+          }
+        }
         vectorSource = new VectorSource({
           features: event.features
         });
@@ -86,9 +101,9 @@ const DragAndDrop = function DragAndDrop(options = {}) {
         }
         vectorLayer = new VectorLayer({
           source: vectorSource,
-          name: event.file.name.split('.')[0].replace(/\W/g, ''),
+          name: layerName,
           group: groupName,
-          title: event.file.name.split('.')[0],
+          title: layerTitle,
           queryable: true,
           removable: true,
           style: vectorStyles[event.features[0].getGeometry().getType()]
@@ -103,6 +118,9 @@ const DragAndDrop = function DragAndDrop(options = {}) {
     },
     render() {
       this.dispatch('render');
+    },
+    addInteraction() {
+      map.addInteraction(dragAndDrop);
     }
   });
 };

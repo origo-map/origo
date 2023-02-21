@@ -7,7 +7,7 @@ import GroupList from './grouplist';
  * type is grouplayer, it will be treated as a subgroup
  * with tick all and untick check boxes.
  */
-const Group = function Group(options = {}, viewer) {
+const Group = function Group(viewer, options = {}) {
   const {
     icon = '#ic_chevron_right_24px',
     cls = '',
@@ -96,10 +96,10 @@ const Group = function Group(options = {}, viewer) {
         });
       },
       render() {
-        return `<div class="flex row align-center padding-left padding-right text-smaller pointer collapse-header" style="width: 100%;">
+        return `<div class="flex row align-center padding-left text-smaller pointer collapse-header" style="width: 100%; padding-right: 1.875rem">
                 <div id="${this.getId()}" class="flex row align-center grow">
                    ${expandButton.render()}
-                    <span class="grow padding-x-small">${title}</span>
+                    <span class="grow padding-x-small" style="word-break: break-all;">${title}</span>
                 </div>
                 ${tickButton ? tickButton.render() : ''}
               </div>`;

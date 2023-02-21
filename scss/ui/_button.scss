@@ -225,12 +225,21 @@ button:focus,
   &.icon-smaller:focus {
     border: 1px solid $black;
   }
+
+  &.icon-smallest:focus {
+    border: 1px solid $black;
+  }
 }
 
 button:focus:not(:focus-visible),
 .button:focus:not(:focus-visible) {
   &.light:focus:not(:focus-visible) {
     background-color: $light-color;
+    border: 0;
+  }
+
+  &.light:focus:not([class*='icon']):not(:focus-visible) {
+    background-color: $grey-lighter;
     border: 0;
   }
 
@@ -263,7 +272,15 @@ button:focus:not(:focus-visible),
     border: 0;
   }
 
+  &.icon-bg:focus:not(:focus-visible) {
+    border: 2px solid $grey-light;
+  }
+
   &.icon-smaller:focus:not(:focus-visible) {
+    border: 0;
+  }
+
+  &.icon-smallest:focus:not(:focus-visible) {
     border: 0;
   }
 }

@@ -1,20 +1,20 @@
-#searchList .awesomplete {
+.searchList .awesomplete {
   width: 100%;
 }
 
-#searchList .awesomplete>input {
+.searchList .awesomplete>input {
   height: 100%;
   width: 100%;
 }
 
-#searchList .button {
+.searchList .button {
   background: linear-gradient(hsl(40, 70%, 80%), hsl(40, 70%, 70%));
   border: 1px solid rgba(0, 0, 0, 0.3);
   border-radius: 0.3em;
   padding: 0.5em 5em;
 }
 
-#searchList .awesomplete .dropdown-btn {
+.searchList .awesomplete .dropdown-btn {
   border-radius: 5px;
   line-height: initial;
   padding: 0.75em 1em;
@@ -26,7 +26,7 @@
   border: 1px solid rgba(213, 213, 213, 0.6);
 }
 
-#searchList .caret {
+.searchList .caret {
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
   border-top: 4px solid;
@@ -37,17 +37,17 @@
   width: 0;
 }
 
-#searchList .awesomplete>ul {
+.searchList .awesomplete>ul {
   background-color: $white;
   min-width: 85%;
 }
 
-#searchList .awesomplete>ul>li:first-child {
+.searchList .awesomplete>ul>li:first-child {
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
 }
 
-#searchList .awesomplete>ul>li {
+.searchList .awesomplete>ul>li {
   border-bottom: 1px solid rgba(213, 213, 213, 0.2);
   font-size: .875em;
   left: 1.2em;
@@ -57,21 +57,21 @@
   position: relative;
 }
 
-#searchList .awesomplete>ul>li:last-child {
+.searchList .awesomplete>ul>li:last-child {
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
 }
 
 
-#searchList .awesomplete>ul>li:hover {
+.searchList .awesomplete>ul>li:hover {
   background: rgba(213, 213, 213, 0.7);
 }
 
-#searchList .highlight {
-  background: rgba(213, 213, 213, 0.7);
+.searchList li[aria-selected="true"] {
+    background: rgba(0, 213, 213, 0.7);
 }
 
-#searchList .awesomplete mark {
+.searchList .awesomplete mark {
   background: hsl(65, 100%, 50%);
 }
 

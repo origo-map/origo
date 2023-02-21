@@ -37,6 +37,54 @@ function createImageSource(options) {
   }));
 }
 
+function createWmsStyle(wmsOptions, source, viewer, defaultStyle = true) {
+  let altStyleLegendParams;
+  let maxResolution = viewer.getResolutions()[viewer.getResolutions().length - 1];
+
+  if (!(defaultStyle) && (wmsOptions.stylePicker)) {
+    const altStyle = wmsOptions.stylePicker.find(style => style.style === wmsOptions.styleName);
+    if (altStyle.legendParams) {
+      altStyleLegendParams = altStyle.legendParams;
+      if (Object.keys(altStyle.legendParams).find(key => key.toUpperCase() === 'SCALE')) {
+        maxResolution = null;
+      }
+    }
+  }
+
+  const styleName = defaultStyle ? `${wmsOptions.name}_WMSDefault` : wmsOptions.styleName;
+  const getLegendString = defaultStyle ? source.getLegendUrl(maxResolution, wmsOptions.legendParams) : source.getLegendUrl(maxResolution, {
+    STYLE: styleName,
+    ...altStyleLegendParams
+  });
+  let hasThemeLegend = wmsOptions.hasThemeLegend || false;
+  if (!defaultStyle) {
+    hasThemeLegend = wmsOptions.stylePicker[wmsOptions.altStyleIndex].hasThemeLegend || false;
+  }
+
+  const style = [[{
+    icon: {
+      src: `${getLegendString}`
+    },
+    extendedLegend: hasThemeLegend
+  }]];
+  viewer.addStyle(styleName, style);
+  return styleName;
+}
+
+function createWmsLayer(wmsOptions, source, viewer) {
+  const wmsOpts = wmsOptions;
+  const wmsSource = source;
+  if (wmsOpts.styleName === 'default') {
+    wmsOpts.styleName = createWmsStyle(wmsOptions, source, viewer);
+    wmsOpts.style = wmsOptions.styleName;
+  } else if (wmsOptions.altStyleIndex > -1) {
+    wmsOpts.defaultStyle = createWmsStyle(wmsOptions, source, viewer);
+    wmsOpts.styleName = createWmsStyle(wmsOptions, source, viewer, false);
+    wmsOpts.style = wmsOptions.styleName;
+    wmsSource.getParams().STYLES = wmsOptions.styleName;
+  }
+}
+
 const wms = function wms(layerOptions, viewer) {
   const wmsDefault = {
     featureinfoLayer: null
@@ -54,7 +102,6 @@ const wms = function wms(layerOptions, viewer) {
   sourceOptions.projection = viewer.getProjection();
   sourceOptions.id = wmsOptions.id;
   sourceOptions.format = wmsOptions.format ? wmsOptions.format : sourceOptions.format;
-
   const styleSettings = viewer.getStyle(wmsOptions.styleName);
   const wmsStyleObject = styleSettings ? styleSettings[0].find(s => s.wmsStyle) : undefined;
   sourceOptions.style = wmsStyleObject ? wmsStyleObject.wmsStyle : '';
@@ -73,9 +120,14 @@ const wms = function wms(layerOptions, viewer) {
   }
 
   if (renderMode === 'image') {
-    return image(wmsOptions, createImageSource(sourceOptions));
+    const source = createImageSource(sourceOptions);
+    createWmsLayer(wmsOptions, source, viewer);
+    return image(wmsOptions, source);
   }
-  return tile(wmsOptions, createTileSource(sourceOptions));
+
+  const source = createTileSource(sourceOptions);
+  createWmsLayer(wmsOptions, source, viewer);
+  return tile(wmsOptions, source);
 };
 
 export default wms;

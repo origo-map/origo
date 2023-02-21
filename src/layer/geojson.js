@@ -12,6 +12,9 @@ function createSource(options) {
         const numFeatures = vectorSource.getFeatures().length;
         for (let i = 0; i < numFeatures; i += 1) {
           vectorSource.forEachFeature((feature) => {
+            if (!feature.getGeometry().intersectsExtent(options.customExtent)) {
+              vectorSource.removeFeature(feature);
+            }
             if (!feature.getId()) {
               if (feature.get(options.idField)) {
                 feature.setId(feature.get(options.idField));
@@ -39,6 +42,8 @@ const geojson = function geojson(layerOptions, viewer) {
   const geojsonOptions = Object.assign(geojsonDefault, layerOptions);
   const sourceOptions = {};
   sourceOptions.attribution = geojsonOptions.attribution;
+  sourceOptions.customExtent = geojsonOptions.extent;
+  geojsonOptions.extent = undefined;
   sourceOptions.projectionCode = viewer.getProjectionCode();
   sourceOptions.idField = layerOptions.idField || 'id';
   if (geojsonOptions.projection) {

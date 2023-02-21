@@ -1,5 +1,6 @@
-import { Component, InputRange } from '../../ui';
+import { Component, InputRange, Dropdown } from '../../ui';
 import { Legend } from '../../utils/legendmaker';
+import Style from '../../style';
 
 const OverlayProperties = function OverlayProperties(options = {}) {
   const {
@@ -15,6 +16,15 @@ const OverlayProperties = function OverlayProperties(options = {}) {
   const opacityControl = layer.get('opacityControl') !== false;
   const style = viewer.getStyle(layer.get('styleName'));
   const legend = Legend(style, opacity);
+  const stylePicker = viewer.getLayerStylePicker(layer);
+
+  const legendComponent = Component({
+    render() {
+      return `<div id=${this.getId()}>${legend}</div>`;
+    }
+  });
+
+  let styleSelection;
   let overlayEl;
   let sliderEl;
   let label = '';
@@ -31,6 +41,10 @@ const OverlayProperties = function OverlayProperties(options = {}) {
     label
   });
 
+  function hasStylePicker() {
+    return stylePicker.length > 0;
+  }
+
   function extendedLegendZoom(e) {
     const parentOverlay = document.getElementById(options.parent.getId());
 
@@ -43,14 +57,89 @@ const OverlayProperties = function OverlayProperties(options = {}) {
     }
   }
 
+  function renderStyleSelection() {
+    const html = `<div class="o-stylepicker-header text-small padding-small">Välj stil</div>${styleSelection.render()}`;
+    return hasStylePicker() ? html : '';
+  }
+
+  function getStyleDisplayName(styleName) {
+    let altStyle = stylePicker.find(s => s.style === styleName);
+    if (!altStyle) {
+      altStyle = stylePicker.find(s => s.default);
+    }
+    return (altStyle && altStyle.title) || styleName;
+  }
+
+  const onSelectStyle = (styleTitle) => {
+    const altStyleIndex = stylePicker.findIndex(s => s.title === styleTitle);
+    const altStyle = stylePicker[altStyleIndex];
+    styleSelection.setButtonText(styleTitle);
+    const legendCmp = document.getElementById(legendComponent.getId());
+    if (!layer.get('defaultStyle')) layer.setProperties({ defaultStyle: layer.get('styleName') });
+    layer.setProperties({ altStyleIndex });
+    if (layer.get('type') === 'WMS') {
+      const layerSource = layer.get('source');
+      const sourceParams = layerSource.getParams();
+      let styleToSet = altStyle.style;
+      if (altStyle.default) {
+        sourceParams.STYLES = altStyle.style;
+        styleToSet = layer.get('defaultStyle');
+      } else {
+        sourceParams.STYLES = styleToSet;
+      }
+      layerSource.refresh();
+      layer.set('styleName', styleToSet);
+      let maxResolution;
+      if (!(altStyle.legendParams) || !(Object.keys(altStyle.legendParams).find(key => key.toUpperCase() === 'SCALE'))) {
+        maxResolution = viewer.getResolutions()[viewer.getResolutions().length - 1];
+      }
+
+      const getLegendString = layerSource.getLegendUrl(maxResolution, {
+        STYLE: styleToSet,
+        ...altStyle.legendParams
+      });
+      const newWmsStyle = [[{
+        icon: {
+          src: `${getLegendString}`
+        },
+        extendedLegend: altStyle.hasThemeLegend || false
+      }]];
+      viewer.addStyle(styleToSet, newWmsStyle);
+
+      legendCmp.innerHTML = Legend(viewer.getStyle(styleToSet), opacity);
+      layer.dispatchEvent('change:style');
+      return;
+    }
+    layer.set('styleName', altStyle.style);
+    legendCmp.innerHTML = Legend(viewer.getStyle(altStyle.style), opacity);
+    const newStyle = Style.createStyle({ style: altStyle.style, clusterStyleName: altStyle.clusterStyle, viewer });
+    layer.setStyle(newStyle);
+    layer.dispatchEvent('change:style');
+  };
+
   return Component({
     onInit() {
-      this.addComponents([transparencySlider]);
+      styleSelection = Dropdown({
+        direction: 'up',
+        cls: 'o-stylepicker text-black flex',
+        contentCls: 'bg-grey-lighter text-smaller rounded',
+        buttonCls: 'bg-white border text-black box-shadow',
+        buttonTextCls: 'text-smaller',
+        text: getStyleDisplayName(layer.get('styleName')),
+        buttonIconCls: 'black',
+        ariaLabel: 'Välj stil'
+      });
+      const components = [transparencySlider];
+      if (hasStylePicker()) {
+        components.push(styleSelection);
+      }
+      this.addComponents(components);
       this.on('click', (e) => {
         extendedLegendZoom(e);
       });
     },
     onRender() {
+      this.dispatch('render');
       sliderEl = document.getElementById(transparencySlider.getId());
       overlayEl = document.getElementById(this.getId());
       overlayEl.addEventListener('click', (e) => {
@@ -66,10 +155,21 @@ const OverlayProperties = function OverlayProperties(options = {}) {
           layer.setOpacity(sliderEl.valueAsNumber);
         });
       }
+      if (hasStylePicker()) {
+        styleSelection.setItems(stylePicker.map(altStyle => altStyle.title));
+        const styleSelectionEl = document.getElementById(styleSelection.getId());
+        styleSelectionEl.addEventListener('dropdown:select', (evt) => {
+          onSelectStyle(evt.target.textContent);
+        });
+      }
     },
     render() {
       return `<div id="${this.getId()}" class="${cls} border-bottom">
-                <div class="padding-small">${legend}${transparencySlider.render()}</div>
+                <div class="padding-small">
+                  ${legendComponent.render()}
+                  ${renderStyleSelection()}
+                  ${transparencySlider.render()}
+                </div>
                 ${abstract ? `<div class="padding-small padding-x text-small">${abstract}</div>` : ''}
               </div>`;
     },

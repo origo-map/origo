@@ -13,20 +13,17 @@ import utils from './utils';
 import Layer from './layer';
 import Main from './components/main';
 import Footer from './components/footer';
+import CenterMarker from './components/centermarker';
 import flattenGroups from './utils/flattengroups';
-import getAttributes from './getattributes';
 import getcenter from './geometry/getcenter';
 import isEmbedded from './utils/isembedded';
+import permalink from './permalink/permalink';
 
 const Viewer = function Viewer(targetOption, options = {}) {
   let map;
   let tileGrid;
   let featureinfo;
   let selectionmanager;
-
-  let {
-    projection
-  } = options;
 
   const {
     breakPoints,
@@ -56,11 +53,16 @@ const Viewer = function Viewer(targetOption, options = {}) {
     url
   } = options;
 
+  let {
+    projection
+  } = options;
+
   const viewerOptions = Object.assign({}, options);
   const target = targetOption;
   const center = urlParams.center || centerOption;
   const zoom = urlParams.zoom || zoomOption;
   const groups = flattenGroups(groupOptions);
+  const layerStylePicker = {};
 
   const getCapabilitiesLayers = () => {
     const capabilitiesPromises = [];
@@ -98,11 +100,20 @@ const Viewer = function Viewer(targetOption, options = {}) {
   const footer = Footer({
     data: footerData
   });
+  const centerMarker = CenterMarker();
   let mapSize;
 
   const addControl = function addControl(control) {
     if (control.onAdd && control.dispatch) {
-      if (!control.options.hideWhenEmbedded || !isEmbedded(this.getTarget())) {
+      if (control.options.hideWhenEmbedded && isEmbedded(this.getTarget())) {
+        if (typeof control.hide === 'function') {
+          // Exclude these controls in the array since they can't be hidden and the solution is to not add them. If the control hasn't a hide method don't add the control.
+          if (!['sharemap', 'link', 'about', 'print', 'draganddrop'].includes(control.name)) {
+            this.addComponent(control);
+          }
+          control.hide();
+        }
+      } else {
         this.addComponent(control);
       }
     } else {
@@ -149,6 +160,12 @@ const Viewer = function Viewer(targetOption, options = {}) {
       return styles[styleName];
     }
     return null;
+  };
+
+  const setStyle = (styleName, style) => {
+    if (styleName in styles) {
+      styles[styleName] = style;
+    }
   };
 
   const getStyles = () => styles;
@@ -321,6 +338,13 @@ const Viewer = function Viewer(targetOption, options = {}) {
             visible: false,
             legend: false
           };
+          // Apply changed style
+          if (savedLayerProps[layerName] && savedLayerProps[layerName].altStyleIndex > -1) {
+            const altStyle = initialProps.stylePicker[savedLayerProps[layerName].altStyleIndex];
+            savedProps.clusterStyle = altStyle.clusterStyle;
+            savedProps.style = altStyle.style;
+            savedProps.defaultStyle = initialProps.style;
+          }
           savedProps.name = initialProps.name;
           const mergedProps = Object.assign({}, initialProps, savedProps);
           acc.push(mergedProps);
@@ -366,12 +390,33 @@ const Viewer = function Viewer(targetOption, options = {}) {
     return false;
   };
 
-  const addLayer = function addLayer(layerProps) {
+  const getLayerStylePicker = function getLayerStylePicker(layer) {
+    return layerStylePicker[layer.get('id')] || [];
+  };
+
+  const addLayerStylePicker = function addLayerStylePicker(layerProps) {
+    if (!layerStylePicker[layerProps.name]) {
+      layerStylePicker[layerProps.name] = layerProps.stylePicker;
+    }
+  };
+
+  const addLayer = function addLayer(layerProps, insertBefore) {
     const layer = Layer(layerProps, this);
-    map.addLayer(layer);
+    addLayerStylePicker(layerProps);
+    if (insertBefore) {
+      map.getLayers().insertAt(map.getLayers().getArray().indexOf(insertBefore), layer);
+    } else {
+      map.addLayer(layer);
+    }
     this.dispatch('addlayer', {
       layerName: layerProps.name
     });
+    return layer;
+  };
+
+  const removeLayer = function removeLayer(layer) {
+    this.dispatch('removelayer', { layerName: layer.get('name') });
+    map.removeLayer(layer);
   };
 
   const addLayers = function addLayers(layersProps) {
@@ -474,25 +519,38 @@ const Viewer = function Viewer(targetOption, options = {}) {
           });
 
           if (urlParams.feature) {
-            let featureId = urlParams.feature;
+            const featureId = urlParams.feature;
             const layerName = featureId.split('.')[0];
             const layer = getLayer(layerName);
-            const type = layer.get('type');
-
-            if (layer && type !== 'GROUP') {
-              const clusterSource = layer.getSource().source;
-              const id = featureId.split('.')[1];
+            const layerType = layer.get('type');
+            if (layer && layerType !== 'GROUP') {
+              // FIXME: postrender event is only emitted if any features from a layer is actually drawn, which means there is no feature in the default extent,
+              // it will not be triggered until map is panned or zoomed where a feature exists.
               layer.once('postrender', () => {
+                const clusterSource = layer.getSource().source;
+                // Assume that id is just the second part of the argumment and adjust it for special cases later.
+                let id = featureId.split('.')[1];
                 let feature;
 
-                if (type === 'WFS' && clusterSource) {
-                  feature = clusterSource.getFeatureById(featureId);
-                } else if (type === 'WFS') {
-                  if (featureId.includes('__')) {
-                    featureId = featureId.replace(featureId.substring(featureId.lastIndexOf('__'), featureId.lastIndexOf('.')), '');
+                if (layerType === 'WFS') {
+                  // WFS uses the layername as a part of the featureId. Problem is that it what the server think is the name that matters.
+                  // First we assume that the layername is actually correct, then take the special cases
+                  let idLayerPart = layerName;
+                  const layerId = layer.get('id');
+                  if (layerId) {
+                    // if layer explicitly has set the id it takes precedense over name
+                    // layer name already have popped the namespace part, but id is untouched.
+                    idLayerPart = layerId.split(':').pop();
+                  } else if (layerName.includes('__')) {
+                    // If using the __-notation to use same layer several times, we must only use the actual layer name
+                    idLayerPart = layerName.split('__')[0];
                   }
-                  feature = layer.getSource().getFeatureById(featureId);
-                } else if (clusterSource) {
+                  // Build the correct WFS id
+                  id = `${idLayerPart}.${id}`;
+                }
+                // FIXME: ensure that feature is loaded. If using bbox and feature is outside default extent it will not be found.
+                // Workaround is to have a default extent covering the entire map with the layer in visible range or use strategy all
+                if (clusterSource) {
                   feature = clusterSource.getFeatureById(id);
                 } else {
                   feature = layer.getSource().getFeatureById(id);
@@ -501,12 +559,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
                 if (feature) {
                   const obj = {};
                   obj.feature = feature;
-                  obj.title = layer.get('title');
-                  obj.content = getAttributes(feature, layer);
-                  obj.layer = layer;
-                  const centerGeometry = getcenter(feature.getGeometry());
-                  const infowindowType = featureinfoOptions.showOverlay === false ? 'sidebar' : 'overlay';
-                  featureinfo.render([obj], infowindowType, centerGeometry);
+                  obj.layerName = layerName;
+                  featureinfo.showFeatureInfo(obj);
                   map.getView().fit(feature.getGeometry(), {
                     maxZoom: getResolutions().length - 2,
                     padding: [15, 15, 40, 15],
@@ -533,10 +587,10 @@ const Viewer = function Viewer(targetOption, options = {}) {
           featureinfoOptions.viewer = this;
 
           selectionmanager = Selectionmanager(featureinfoOptions);
-          this.addComponent(selectionmanager);
-
           featureinfo = Featureinfo(featureinfoOptions);
+          this.addComponent(selectionmanager);
           this.addComponent(featureinfo);
+          this.addComponent(centerMarker);
 
           this.addControls();
           this.dispatch('loaded');
@@ -548,6 +602,10 @@ const Viewer = function Viewer(targetOption, options = {}) {
                               ${main.render()}
                               ${footer.render()}
                             </div>
+                          </div>
+
+                          <div id="loading" class="hide">
+                            <div class="loading-spinner"></div>
                           </div>`;
       const el = document.querySelector(target);
       el.innerHTML = htmlString;
@@ -584,6 +642,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getSearchableLayers,
     getSize,
     getLayer,
+    getLayerStylePicker,
     getLayers,
     getLayersByProperty,
     getMap,
@@ -601,10 +660,14 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getUrlParams,
     getViewerOptions,
     removeGroup,
+    removeLayer,
     removeOverlays,
+    setStyle,
     zoomToExtent,
     getSelectionManager,
-    getEmbedded
+    getEmbedded,
+    permalink,
+    centerMarker
   });
 };
 

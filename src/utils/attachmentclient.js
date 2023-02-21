@@ -3,7 +3,6 @@
  * In addition to the ArcGis specification the server may support optional features if configured with format='origo'
  */
 
-import getAttributes from '../getattributes';
 import groupBy from './groupby';
 
 /** Just about anything for creating a dummy group */
@@ -105,42 +104,6 @@ const attachmentclient = function attachmentclient(layer) {
   };
 
   /**
-   * Fetches all attachments for a given SelectedItem and updates its linkAttribute and fileNameAttribute with as semicolon separated lists
-   * It also rebuilds the featureInfo HTML content to inlude attachments
-   * @param {any} item A SelectedItem to update. The Item must reside in the same layer as the attachmentclient is created from.
-   * @param {any} map The map
-   * @returns A promise when resolved returns the raw resonse from server
-   */
-  const populatePseudoAttributes = function populatePseudoAttributes(item, map) {
-    const feature = item.getFeature();
-    return getAttachments(feature).then(data => {
-      // Have to loop through config to make sure attrib is added even when no attachments in that group
-      groups.forEach(currAttrib => {
-        let val = '';
-        let texts = '';
-        if (data.has(currAttrib.name)) {
-          const group = data.get(currAttrib.name);
-          val = group.map(g => g.url).join(';');
-          texts = group.map(g => g.filename).join(';');
-        }
-        if (currAttrib.linkAttribute) {
-          feature.set(currAttrib.linkAttribute, val);
-        }
-        if (currAttrib.fileNameAttribute) {
-          feature.set(currAttrib.fileNameAttribute, texts);
-        }
-        // Have to rebuild the visual representation as new attribs have been added
-        // Ideally this should have been made before SelectedItem was created, but that changes so much
-        // in the code flow as the getAttachment is async-ish
-        const content = getAttributes(feature, layer, map);
-        item.setContent(content);
-      });
-      return data;
-    });
-    // No error handling, let caller deal with that
-  };
-
-  /**
    * Posts a new attachment to the server
    * @param {any} feature The feature the attachments belongs to
    * @param {any} file The actual file object
@@ -197,7 +160,6 @@ const attachmentclient = function attachmentclient(layer) {
   return {
     getAttachments,
     addAttachment,
-    populatePseudoAttributes,
     deleteAttachment,
     getGroups
   };

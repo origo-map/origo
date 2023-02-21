@@ -1,0 +1,27 @@
+$popup-background-color: $white !default;
+$popup-radius: $radius-base;
+$popup-border-color: $grey-light;
+
+.popup-menu {
+  position: absolute;
+  background-color: $popup-background-color;
+  border-radius: $popup-radius;
+  box-shadow: $shadow;
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
+.popup-menu > ul {
+
+  > li {
+    margin: $margin-small;
+  }
+}
+
+.popup-menu.overlay-popup {
+  position: relative;
+  text-align: right;
+  right: 30px;
+  margin-top: -30px;
+  width: max-content;
+}

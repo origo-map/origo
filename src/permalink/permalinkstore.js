@@ -11,6 +11,8 @@ function getSaveLayers(layers) {
     saveLayer.v = layer.getVisible() === true ? 1 : 0;
     saveLayer.s = layer.get('legend') === true ? 1 : 0;
     saveLayer.o = Number(layer.get('opacity')) * 100;
+    // Only get style for layer styles that have changed
+    if (layer.get('defaultStyle') && layer.get('defaultStyle') !== layer.get('styleName')) saveLayer.sn = layer.get('altStyleIndex');
     if (saveLayer.s || saveLayer.v) {
       saveLayer.name = layer.get('name');
       if (saveLayer.name !== 'measure') {
@@ -34,17 +36,47 @@ permalinkStore.getState = function getState(viewer, isExtended) {
   state.center = view.getCenter().map(coord => Math.round(coord)).join();
   state.zoom = view.getZoom().toString();
 
+  const legend = viewer.getControlByName('legend');
+  if (legend) {
+    const legendState = [];
+    if (legend.getState().expanded) legendState.push('expanded');
+    if (legend.getState().visibleLayersViewActive) legendState.push('visibleLayersViewActive');
+    state.legend = legendState.join(',');
+  }
+
   if (isExtended) {
+    state.controls = {};
     const draw = viewer.getControlByName('draw');
+    const measure = viewer.getControlByName('measure');
+    state.controls = {};
     if (draw) {
-      state.controls = {
-        draw: draw.getState()
-      };
+      state.controls.draw = draw.getState();
+    }
+    if (measure) {
+      state.controls.measure = measure.getState();
     }
   }
 
   if (featureinfo.getSelection().id && (type === 'AGS_FEATURE' || type === 'WFS' || type === 'GEOJSON' || type === 'TOPOJSON')) {
     state.feature = featureinfo.getSelection().id;
+  } else {
+    const selectedItems = viewer.getSelectionManager().getSelectedItems().getArray();
+    if (selectedItems.length > 0) {
+      const layer = selectedItems[0].getLayer();
+      const layerType = layer.get('type');
+      const layerName = layer.get('name');
+      if (layerType === 'AGS_FEATURE' || layerType === 'WFS' || layerType === 'GEOJSON' || layerType === 'TOPOJSON') {
+        const id = selectedItems[0].getId() || selectedItems[0].ol_uid;
+        if (layerType === 'WFS') {
+          const idSuffix = id.substring(id.lastIndexOf('.') + 1, id.length);
+          state.feature = `${layerName}.${idSuffix}`;
+        } else if (layerType !== 'WFS') {
+          state.feature = `${layerName}.${id}`;
+        } else {
+          state.feature = id;
+        }
+      }
+    }
   }
 
   if (getPin()) {

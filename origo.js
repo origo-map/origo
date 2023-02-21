@@ -7,7 +7,6 @@ import * as olLayer from 'ol/layer';
 import * as olSource from 'ol/source';
 import * as olStyle from 'ol/style';
 import * as olFormat from 'ol/format';
-import polyfill from './src/utils/polyfill';
 import * as ui from './src/ui';
 import Viewer from './src/viewer';
 import loadResources from './src/loadresources';
@@ -24,11 +23,13 @@ import * as Utils from './src/utils';
 import dropdown from './src/dropdown';
 import { renderSvgIcon } from './src/utils/legendmaker';
 import SelectedItem from './src/models/SelectedItem';
-import 'core-js/stable';
-import 'regenerator-runtime/runtime';
 import 'elm-pep';
+import 'pepjs';
+import permalink from './src/permalink/permalink';
 
 const Origo = function Origo(configPath, options = {}) {
+  /** Reference to the returned Component */
+  let origo;
   let viewer;
   const origoConfig = {
     controls: [],
@@ -59,7 +60,6 @@ const Origo = function Origo(configPath, options = {}) {
     renderError('browser', el);
     return null;
   }
-  polyfill();
 
   const initControls = (controlDefs) => {
     const controls = [];
@@ -95,6 +95,33 @@ const Origo = function Origo(configPath, options = {}) {
   const api = () => viewer;
   const getConfig = () => origoConfig;
 
+  /** Helper that initialises a new viewer  */
+  const initViewer = () => {
+    const defaultConfig = Object.assign({}, origoConfig, options);
+    loadResources(configPath, defaultConfig)
+      .then((data) => {
+        const viewerOptions = data.options;
+        viewerOptions.controls = initControls(viewerOptions.controls);
+        viewerOptions.extensions = initExtensions(viewerOptions.extensions || []);
+        const target = viewerOptions.target;
+        viewer = Viewer(target, viewerOptions);
+        viewer.on('loaded', () => {
+          // Inform listeners that there is a new Viewer in town
+          origo.dispatch('load', viewer);
+        });
+      })
+      .catch(error => console.error(error));
+  };
+  // Add a listener to handle a new sharemap when using hash format.
+  window.addEventListener('hashchange', (ev) => {
+    const newParams = permalink.parsePermalink(ev.newURL);
+
+    if (newParams.map) {
+      // "Reboot" the application by creating a new viewer instance using the original configuration and the new sharemap state
+      initViewer();
+    }
+  });
+
   return ui.Component({
     api,
     getConfig,
@@ -103,19 +130,8 @@ const Origo = function Origo(configPath, options = {}) {
       const base = document.createElement('base');
       base.href = defaultConfig.baseUrl;
       document.getElementsByTagName('head')[0].appendChild(base);
-      loadResources(configPath, defaultConfig)
-        .then((data) => {
-          const viewerOptions = data.options;
-          viewerOptions.controls = initControls(viewerOptions.controls);
-          viewerOptions.extensions = initExtensions(viewerOptions.extensions || []);
-          const target = viewerOptions.target;
-          viewer = Viewer(target, viewerOptions);
-          const origo = this;
-          viewer.on('loaded', () => {
-            origo.dispatch('load', viewer);
-          });
-        })
-        .catch(error => console.error(error));
+      origo = this;
+      initViewer();
     }
   });
 };

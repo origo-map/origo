@@ -14,4 +14,22 @@
   input:invalid {
     border-color: $orange;
   }
+
+  textarea:required:invalid {
+    border-color: $orange;
+  }
+
+  select:required:invalid {
+    border-color: $orange;
+  }
+
+  select:required:invalid {
+    border-color: $orange;
+  }
 }
+
+// Awesome input is not direct child of .validate, needs special treatment.
+input.awesome:required:invalid {
+    border-color: $orange;
+}
+

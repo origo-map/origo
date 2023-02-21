@@ -15,6 +15,14 @@
   width: 100%;
 }
 
+.awesomplete.black {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  position: fixed;
+  min-width: 100%;
+}
+
 .awesomplete > input {
   display: block;
 }
@@ -39,7 +47,9 @@
   left: 0px;
   list-style: none;
   margin: 0;
-  min-width: 100%;
+  min-width: 180px;
+  max-width: 220px;
+  overflow-wrap: break-word;
   padding: 0;
   position: absolute;
   top: auto;

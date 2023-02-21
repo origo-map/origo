@@ -4,6 +4,7 @@ import {
 } from '../ui';
 import imageSource from './legend/imagesource';
 import Overlays from './legend/overlays';
+import VisibleOverlays from './legend/visibleOverlays';
 import LayerProperties from './legend/overlayproperties';
 
 const Legend = function Legend(options = {}) {
@@ -14,15 +15,23 @@ const Legend = function Legend(options = {}) {
     expanded = true,
     contentCls,
     contentStyle,
-    turnOffLayersControl = false,
+    turnOnLayersControl = false,
     name = 'legend',
     labelOpacitySlider = '',
+    visibleLayersControl = false,
+    turnOffLayersControl = false,
     useGroupIndication = true,
     searchLayersControl = false,
     searchLayersMinLength = 2,
     searchLayersLimit = 10,
-    searchLayersParameters = ['name', 'title']
+    searchLayersParameters = ['name', 'title'],
+    searchLayersPlaceholderText = 'Sök lager'
   } = options;
+
+  let {
+    visibleLayersViewActive = false
+  } = options;
+
   const keyCodes = {
     9: 'tab',
     27: 'esc',
@@ -38,6 +47,7 @@ const Legend = function Legend(options = {}) {
   let awesomplete;
   let mainContainerCmp;
   let overlaysCmp;
+  let visibleOverlaysCmp;
   let mainContainerEl;
   const backgroundLayerButtons = [];
   let toggleGroup;
@@ -70,9 +80,9 @@ const Legend = function Legend(options = {}) {
   const addBackgroundButton = function addBackgroundButton(layer) {
     const styleName = layer.get('styleName') || 'default';
     const icon = viewer.getStyle(styleName) ? imageSource(viewer.getStyle(styleName)) : 'img/png/farg.png';
-    backgroundLayerButtons.push(Button({
+    const backgroundLayerButton = Button({
       icon,
-      cls: 'round smallest border icon-small',
+      cls: 'round smallest border icon-small icon-bg',
       title: layer.get('title'),
       state: layer.get('visible') ? 'active' : undefined,
       methods: {
@@ -80,18 +90,27 @@ const Legend = function Legend(options = {}) {
         initial: () => layer.setVisible(false)
       },
       click() {
-        if (overlaysCmp.slidenav.getState() === 'initial') {
-          const slided = document.getElementById(overlaysCmp.slidenav.getId()).classList.contains('slide-secondary');
+        const overlayComponent = visibleLayersControl && visibleLayersViewActive ? visibleOverlaysCmp : overlaysCmp;
+        if (overlayComponent.slidenav.getState() === 'initial') {
+          const slided = document.getElementById(overlayComponent.slidenav.getId()).classList.contains('slide-secondary');
           if (this.getState() === 'active' && !slided) {
             const layerProperties = LayerProperties({ layer, viewer, parent: this });
-            overlaysCmp.slidenav.setSecondary(layerProperties);
-            overlaysCmp.slidenav.slideToSecondary();
+            overlayComponent.slidenav.setSecondary(layerProperties);
+            overlayComponent.slidenav.slideToSecondary();
           } else if (slided) {
-            overlaysCmp.slidenav.slideToMain();
+            overlayComponent.slidenav.slideToMain();
           }
         }
       }
-    }));
+    });
+    layer.on('change:visible', () => {
+      if (layer.getVisible() === true) {
+        backgroundLayerButton.setState('active');
+      } else {
+        backgroundLayerButton.setState('initial');
+      }
+    });
+    backgroundLayerButtons.push(backgroundLayerButton);
   };
 
   const addBackgroundButtons = function addBackgroundButtons(layers) {
@@ -122,6 +141,22 @@ const Legend = function Legend(options = {}) {
     });
   };
 
+  const turnOnAllLayers = function turnOnAllLayers() {
+    const layers = viewer.getLayers();
+    layers.forEach((el) => {
+      if (!(['none', 'background'].includes(el.get('group')))) {
+        const group = viewer.getGroups().find((item) => item.name === el.get('group'));
+        if (typeof group !== 'undefined') {
+          if (!group.exclusive) {
+            el.setVisible(true);
+          }
+        } else {
+          el.setVisible(true);
+        }
+      }
+    });
+  };
+
   const divider = El({
     cls: 'divider margin-x-small',
     style: {
@@ -147,10 +182,83 @@ const Legend = function Legend(options = {}) {
     }
   });
 
+  const showVisibleLayersButton = Button({
+    cls: 'compact icon-smaller margin-x-small hidden',
+    title: 'Visa endast tända lager',
+    click() {
+      viewer.dispatch('active:togglevisibleLayers');
+    },
+    style: {
+      'align-self': 'right',
+      'padding-right': '6px'
+    },
+    icon: '#ic_close_fullscreen_24px',
+    iconStyle: {
+      fill: '#4a4a4a'
+    }
+  });
+
+  const showAllVisibleLayersButton = Button({
+    cls: 'compact icon-smaller margin-x-small hidden',
+    title: 'Visa alla lager',
+    click() {
+      viewer.dispatch('active:togglevisibleLayers');
+    },
+    style: {
+      'align-self': 'right',
+      'padding-right': '6px'
+    },
+    icon: '#ic_open_in_full_24px',
+    iconStyle: {
+      fill: '#4a4a4a'
+    }
+  });
+
+  const setVisibleLayersViewActive = function setVisibleLayersViewActive(active) {
+    if (!visibleLayersControl) return;
+    visibleLayersViewActive = active;
+    if (visibleLayersViewActive) {
+      document.getElementById(overlaysCmp.getId()).classList.add('hidden');
+      document.getElementById(visibleOverlaysCmp.getId()).classList.remove('hidden');
+      document.getElementById(showAllVisibleLayersButton.getId()).classList.remove('hidden');
+      document.getElementById(showVisibleLayersButton.getId()).classList.add('hidden');
+      visibleOverlaysCmp.dispatch('readOverlays');
+      document.getElementById(toolsCmp.getId()).classList.add('hidden');
+    } else {
+      document.getElementById(overlaysCmp.getId()).classList.remove('hidden');
+      document.getElementById(visibleOverlaysCmp.getId()).classList.add('hidden');
+      document.getElementById(showAllVisibleLayersButton.getId()).classList.add('hidden');
+      document.getElementById(showVisibleLayersButton.getId()).classList.remove('hidden');
+      if (toolsCmp.getComponents().length > 0) {
+        document.getElementById(toolsCmp.getId()).classList.remove('hidden');
+      }
+    }
+  };
+
+  const toggleShowVisibleLayers = function toggleShowVisibleLayers() {
+    setVisibleLayersViewActive(!visibleLayersViewActive);
+  };
+
+  const turnOnLayersButton = Button({
+    cls: 'round compact icon-small margin-x-smaller',
+    title: 'Tänd alla lager utom bakgrundslager',
+    click() {
+      viewer.dispatch('active:turnonlayers');
+    },
+    style: {
+      'align-self': 'center',
+      'padding-right': '6px'
+    },
+    icon: '#ic_visibility_24px',
+    iconStyle: {
+      fill: '#7a7a7a'
+    }
+  });
+
   const layerSearchInput = Input({
     cls: 'o-search-layer-field placeholder-text-smaller smaller',
-    style: { height: '1.5rem', margin: 0, width: '100%' },
-    placeholderText: 'Sök lager',
+    style: { height: '1.5rem', margin: 0, width: '180px' },
+    placeholderText: searchLayersPlaceholderText,
     value: ''
   });
 
@@ -193,6 +301,12 @@ const Legend = function Legend(options = {}) {
     if (name) {
       // Todo
       const layer = viewer.getLayer(label);
+      const layerGroup = layer.get('group');
+      const groupExclusive = (viewer.getGroup(layerGroup) && (viewer.getGroup(layerGroup).exclusive || viewer.getGroup(layerGroup).name === 'background'));
+      if (groupExclusive) {
+        const layers = viewer.getLayersByProperty('group', layerGroup);
+        layers.forEach(l => l.setVisible(false));
+      }
       layer.setVisible(true);
       document.getElementsByClassName('o-search-layer-field')[0].value = '';
     } else {
@@ -328,9 +442,36 @@ const Legend = function Legend(options = {}) {
     }
   }
 
+  function getState() {
+    return {
+      expanded: isExpanded,
+      visibleLayersViewActive
+    };
+  }
+
+  function restoreState(params) {
+    if (params && params.legend) {
+      const legendState = params.legend;
+      if (legendState.expanded != null && legendState.expanded !== isExpanded) {
+        toggleVisibility();
+      }
+      if (legendState.visibleLayersViewActive != null) {
+        setVisibleLayersViewActive(legendState.visibleLayersViewActive);
+      }
+    }
+  }
+
   return Component({
     name,
+    getState() {
+      return getState();
+    },
+    restoreState(params) {
+      restoreState(params);
+    },
     getuseGroupIndication() { return useGroupIndication; },
+    getOverlaysCollapse() { return overlaysCmp.overlaysCollapse; },
+    setVisibleLayersViewActive,
     addButtonToTools(button) {
       const toolsEl = document.getElementById(toolsCmp.getId());
       toolsEl.classList.remove('hidden');
@@ -339,7 +480,14 @@ const Legend = function Legend(options = {}) {
         toolsEl.insertBefore(dom.html(divider.render()), toolsEl.firstChild);
         toolsEl.insertBefore(dom.html(button.render()), toolsEl.firstChild);
       } else {
-        toolsEl.appendChild(dom.html(button.render()));
+        const node = document.createElement('div');
+        if (typeof button.getValue === 'function') {
+          node.classList.add('grow');
+          toolsEl.appendChild(node);
+          node.appendChild(dom.html(button.render()));
+        } else {
+          toolsEl.appendChild(dom.html(button.render()));
+        }
       }
       toolsCmp.addComponent(button);
       button.onRender();
@@ -352,6 +500,11 @@ const Legend = function Legend(options = {}) {
       if (turnOffLayersControl) {
         viewer.on('active:turnofflayers', turnOffAllLayers);
       }
+      if (turnOnLayersControl) {
+        viewer.on('active:turnonlayers', turnOnAllLayers);
+      }
+      viewer.on('active:togglevisibleLayers', toggleShowVisibleLayers);
+
       const backgroundLayers = viewer.getLayersByProperty('group', 'background').reverse();
       addBackgroundButtons(backgroundLayers);
       toggleGroup = ToggleGroup({
@@ -363,7 +516,20 @@ const Legend = function Legend(options = {}) {
       this.dispatch('render');
       viewer.getMap().on('click', onMapClick);
     },
+    hide() {
+      document.getElementById(mainContainerCmp.getId()).classList.add('hidden');
+    },
+    unhide() {
+      document.getElementById(mainContainerCmp.getId()).classList.remove('hidden');
+    },
     onRender() {
+      const layerControlCmps = [];
+      if (turnOnLayersControl) layerControlCmps.push(turnOnLayersButton);
+      if (turnOffLayersControl) layerControlCmps.push(turnOffLayersButton);
+      const layerControl = El({
+        cls: 'grow flex justify-end align-center no-shrink',
+        components: layerControlCmps
+      });
       mainContainerEl = document.getElementById(mainContainerCmp.getId());
       layerButtonEl = document.getElementById(layerButton.getId());
       layerSwitcherEl.addEventListener('collapse:toggle', (e) => {
@@ -372,11 +538,13 @@ const Legend = function Legend(options = {}) {
         toggleVisibility();
       });
       window.addEventListener('resize', updateMaxHeight);
-      if (turnOffLayersControl) this.addButtonToTools(turnOffLayersButton);
+      if (layerControlCmps.length > 0) this.addButtonToTools(layerControl);
       if (searchLayersControl) this.addButtonToTools(layerSearchInput);
       initAutocomplete();
       bindUIActions();
       setTabIndex();
+      setVisibleLayersViewActive(visibleLayersViewActive);
+      restoreState(viewer.getUrlParams());
     },
     render() {
       const size = viewer.getSize();
@@ -385,6 +553,9 @@ const Legend = function Legend(options = {}) {
       const maxHeight = calcMaxHeight(getTargetHeight());
       overlaysCmp = Overlays({
         viewer, cls: contentCls, style: contentStyle, labelOpacitySlider
+      });
+      visibleOverlaysCmp = VisibleOverlays({
+        viewer, cls: `${contentCls} hidden`, style: contentStyle, labelOpacitySlider
       });
       const baselayerCmps = [toggleGroup];
 
@@ -398,18 +569,52 @@ const Legend = function Legend(options = {}) {
         }
       });
 
+      const closeButtonState = isExpanded ? 'initial' : 'hidden';
+      closeButton = Button({
+        cls: 'icon-smaller small round grey-lightest',
+        icon: '#ic_close_24px',
+        state: closeButtonState,
+        validStates: ['initial', 'hidden'],
+        ariaLabel: 'Stäng',
+        click() {
+          toggleVisibility();
+        }
+      });
+
+      const legendControlDivider = El({
+        cls: `divider margin-x-small ${!visibleLayersControl && 'hidden'}`,
+        style: {
+          height: '100%',
+          'border-width': '2px'
+        }
+      });
+
+      const legendControlCmps = [];
+
+      legendControlCmps.push(legendControlDivider);
+      legendControlCmps.push(showVisibleLayersButton);
+      legendControlCmps.push(showAllVisibleLayersButton);
+
+      legendControlCmps.push(closeButton);
+
+      const legendControlCmp = El({
+        cls: 'grow flex justify-end align-center no-shrink',
+        components: legendControlCmps
+      });
+
+      baselayerCmps.push(legendControlCmp);
+
       const baselayersCmp = El({
         cls: 'flex padding-small no-shrink',
         style: {
           'background-color': '#fff',
           height: '50px',
-          'padding-right': '30px',
           'border-top': '1px solid #dbdbdb'
         },
         components: baselayerCmps
       });
 
-      const mainContainerComponents = [overlaysCmp, toolsCmp, baselayersCmp];
+      const mainContainerComponents = [overlaysCmp, visibleOverlaysCmp, toolsCmp, baselayersCmp];
 
       mainContainerCmp = El({
         cls: 'flex column overflow-hidden relative',
@@ -442,22 +647,9 @@ const Legend = function Legend(options = {}) {
           }
         }
       });
-      const closeButtonState = isExpanded ? 'initial' : 'hidden';
-      closeButton = Button({
-        cls: 'icon-smaller small round absolute margin-bottom margin-right grey-lightest bottom-right z-index-top',
-        icon: '#ic_close_24px',
-        state: closeButtonState,
-        validStates: ['initial', 'hidden'],
-        ariaLabel: 'Stäng',
-        click() {
-          toggleVisibility();
-        }
-      });
+
       this.addComponent(layerButton);
-      this.addComponent(closeButton);
-      let el = dom.html(layerButton.render());
-      target.appendChild(el);
-      el = dom.html(closeButton.render());
+      const el = dom.html(layerButton.render());
       target.appendChild(el);
     }
   });
