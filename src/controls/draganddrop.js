@@ -42,30 +42,33 @@ const DragAndDrop = function DragAndDrop(options = {}) {
     });
 
     const openBtn = Button({
-      cls: 'round compact icon-small margin-x-smaller',
+      cls: 'text-medium',
       click() {
         const inputEl = document.getElementById(fileInput.getId());
         inputEl.value = null;
         inputEl.click();
       },
-      title: 'Importera fil',
-      icon: '#ic_upload_file_24px',
-      iconStyle: {
-        fill: '#4a4a4a'
-      }
+      text: 'Lägg till från fil',
+      ariaLabel: 'Lägg till från fil'
     });
 
     legendButton = El({
+      cls: 'padding-small',
       components: [fileInput, openBtn]
     });
+
+    legendButton.on('click', () => {
+      openBtn.dispatch('click');
+    });
   }
+
   return Component({
     name: 'draganddrop',
     onAdd(evt) {
       viewer = evt.target;
       map = viewer.getMap();
       const legend = viewer.getControlByName('legend');
-      if (options.showLegendButton) { legend.addButtonToTools(legendButton); }
+      if (options.showLegendButton) { legend.addButtonToTools(legendButton, 'addLayerButton'); }
       const groupName = options.groupName || 'egna-lager';
       const groupTitle = options.groupTitle || 'Egna lager';
       const featureStyles = options.featureStyles || {

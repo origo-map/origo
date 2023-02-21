@@ -6,6 +6,7 @@ import imageSource from './legend/imagesource';
 import Overlays from './legend/overlays';
 import VisibleOverlays from './legend/visibleOverlays';
 import LayerProperties from './legend/overlayproperties';
+import PopupMenu from '../ui/popupmenu';
 
 const Legend = function Legend(options = {}) {
   const {
@@ -52,13 +53,17 @@ const Legend = function Legend(options = {}) {
   const backgroundLayerButtons = [];
   let toggleGroup;
   let layerSwitcherEl;
+  let addLayerButton;
   let closeButton;
   let layerButton;
   let layerButtonEl;
   let isExpanded;
   let toolsCmp;
-  const cls = `${clsSettings} control bottom-right box overflow-hidden flex row o-legend`.trim();
-  const style = dom.createStyle(Object.assign({}, { width: 'auto' }, styleSettings));
+  const cls = `${clsSettings} control bottom-right box flex row o-legend`.trim();
+  const style = dom.createStyle(Object.assign({}, { width: 'auto', overflow: 'unset' }, styleSettings));
+
+  const popupMenuItems = [];
+  let popupMenu;
 
   const setTabIndex = function setTabIndex() {
     let idx = -1;
@@ -253,6 +258,76 @@ const Legend = function Legend(options = {}) {
     iconStyle: {
       fill: '#7a7a7a'
     }
+  });
+
+  const addPopupMenuItems = function addPopupMenuItems(button, cmp) {
+    if (addLayerButton.getState() === 'hidden') {
+      cmp.addButtonToTools(addLayerButton);
+      addLayerButton.setState('initial');
+    }
+    popupMenuItems.push(button);
+  };
+
+  const popupMenuList = Component({
+    render() {
+      this.addComponents(popupMenuItems);
+      let html = `<ul id="${this.getId()}">`;
+      popupMenuItems.forEach((item) => {
+        html += `${item.render()}`;
+      });
+      html += '</ul>';
+      return html;
+    }
+  });
+
+  const createPopupMenu = function createPopupMenu() {
+    const newDiv = document.createElement('div');
+    newDiv.classList.add('relative');
+    const addLayerButtonEl = document.getElementById(addLayerButton.getId());
+    const onUnfocus = (e) => {
+      if (!addLayerButtonEl.contains(e.target)) {
+        popupMenu.setVisibility(false);
+      }
+    };
+    popupMenu = PopupMenu({ onUnfocus, cls: 'button-popup' });
+    addLayerButtonEl.insertAdjacentElement('afterend', newDiv);
+    newDiv.appendChild(dom.html(popupMenu.render()));
+    newDiv.addEventListener('click', () => { popupMenu.setVisibility(false); });
+    popupMenu.setContent(popupMenuList.render());
+    popupMenuList.dispatch('render');
+    if (popupMenuItems.length > 1) {
+      popupMenu.setVisibility(true);
+    } else {
+      popupMenu.setVisibility(false);
+      popupMenuItems[0].dispatch('click');
+    }
+  };
+
+  const togglePopupMenu = function togglePopupMenu() {
+    if (!popupMenu) {
+      createPopupMenu();
+    } else if (popupMenuItems.length > 1) {
+      popupMenu.toggleVisibility();
+    } else {
+      popupMenu.setVisibility(false);
+      popupMenuItems[0].dispatch('click');
+    }
+  };
+
+  addLayerButton = Button({
+    cls: 'round compact boxshadow-subtle icon-small primary',
+    click() {
+      togglePopupMenu();
+    },
+    style: {
+      'align-self': 'center'
+    },
+    icon: '#ic_add_24px',
+    ariaLabel: 'Lägg till lager',
+    title: 'Lägg till lager',
+    tabIndex: -1,
+    validStates: ['initial', 'hidden'],
+    state: 'hidden'
   });
 
   const layerSearchInput = Input({
@@ -472,18 +547,22 @@ const Legend = function Legend(options = {}) {
     getuseGroupIndication() { return useGroupIndication; },
     getOverlaysCollapse() { return overlaysCmp.overlaysCollapse; },
     setVisibleLayersViewActive,
-    addButtonToTools(button) {
-      const toolsEl = document.getElementById(toolsCmp.getId());
-      toolsEl.classList.remove('hidden');
-      if (toolsCmp.getComponents().length > 0) {
-        toolsEl.style.justifyContent = 'space-between';
-        toolsEl.insertBefore(dom.html(divider.render()), toolsEl.firstChild);
-        toolsEl.insertBefore(dom.html(button.render()), toolsEl.firstChild);
+    addButtonToTools(button, buttonGroup) {
+      if (buttonGroup === 'addLayerButton') {
+        addPopupMenuItems(button, this);
       } else {
-        toolsEl.appendChild(dom.html(button.render()));
+        const toolsEl = document.getElementById(toolsCmp.getId());
+        toolsEl.classList.remove('hidden');
+        if (toolsCmp.getComponents().length > 0) {
+          toolsEl.style.justifyContent = 'space-between';
+          toolsEl.insertBefore(dom.html(divider.render()), toolsEl.firstChild);
+          toolsEl.insertBefore(dom.html(button.render()), toolsEl.firstChild);
+        } else {
+          toolsEl.appendChild(dom.html(button.render()));
+        }
+        toolsCmp.addComponent(button);
+        button.onRender();
       }
-      toolsCmp.addComponent(button);
-      button.onRender();
     },
     onInit() {
       this.on('render', this.onRender);
@@ -504,7 +583,6 @@ const Legend = function Legend(options = {}) {
         components: backgroundLayerButtons,
         cls: 'spacing-horizontal-small'
       });
-
       this.render();
       this.dispatch('render');
       viewer.getMap().on('click', onMapClick);
@@ -602,7 +680,8 @@ const Legend = function Legend(options = {}) {
         style: {
           'background-color': '#fff',
           height: '50px',
-          'border-top': '1px solid #dbdbdb'
+          'border-top': '1px solid #dbdbdb',
+          'border-radius': '0.5rem'
         },
         components: baselayerCmps
       });
@@ -610,7 +689,7 @@ const Legend = function Legend(options = {}) {
       const mainContainerComponents = [overlaysCmp, visibleOverlaysCmp, toolsCmp, baselayersCmp];
 
       mainContainerCmp = El({
-        cls: 'flex column overflow-hidden relative',
+        cls: 'flex column relative',
         components: mainContainerComponents,
         style: {
           'max-height': `${maxHeight}px`
