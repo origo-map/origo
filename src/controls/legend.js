@@ -551,14 +551,24 @@ const Legend = function Legend(options = {}) {
       if (buttonGroup === 'addLayerButton') {
         addPopupMenuItems(button, this);
       } else {
-        const node = document.createElement('div');
-        if (typeof button.getValue === 'function') {
-          node.classList.add('grow');
-          toolsEl.appendChild(node);
-          node.appendChild(dom.html(button.render()));
+        const toolsEl = document.getElementById(toolsCmp.getId());
+        toolsEl.classList.remove('hidden');
+        if (toolsCmp.getComponents().length > 0) {
+          toolsEl.style.justifyContent = 'space-between';
+          toolsEl.insertBefore(dom.html(divider.render()), toolsEl.firstChild);
+          toolsEl.insertBefore(dom.html(button.render()), toolsEl.firstChild);
         } else {
-          toolsEl.appendChild(dom.html(button.render()));
+          const node = document.createElement('div');
+          if (typeof button.getValue === 'function') {
+            node.classList.add('grow');
+            toolsEl.appendChild(node);
+            node.appendChild(dom.html(button.render()));
+          } else {
+            toolsEl.appendChild(dom.html(button.render()));
+          }
         }
+        toolsCmp.addComponent(button);
+        button.onRender();
       }
     },
     onInit() {
