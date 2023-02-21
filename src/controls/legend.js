@@ -332,7 +332,7 @@ const Legend = function Legend(options = {}) {
 
   const layerSearchInput = Input({
     cls: 'o-search-layer-field placeholder-text-smaller smaller',
-    style: { height: '1.5rem', margin: 0, width: '180px' },
+    style: { height: '1.5rem', margin: 0, width: '100%' },
     placeholderText: searchLayersPlaceholderText,
     value: ''
   });
@@ -504,6 +504,7 @@ const Legend = function Legend(options = {}) {
       });
 
       input.parentNode.classList.add('black');
+      input.parentNode.classList.add('grow');
       input.addEventListener('keyup', (e) => {
         const keyCode = e.keyCode;
         if (input.value.length >= searchLayersMinLength) {
@@ -605,7 +606,7 @@ const Legend = function Legend(options = {}) {
       if (turnOnLayersControl) layerControlCmps.push(turnOnLayersButton);
       if (turnOffLayersControl) layerControlCmps.push(turnOffLayersButton);
       const layerControl = El({
-        cls: 'grow flex justify-end align-center no-shrink',
+        cls: 'flex justify-end align-center no-shrink',
         components: layerControlCmps
       });
       mainContainerEl = document.getElementById(mainContainerCmp.getId());
@@ -696,7 +697,7 @@ const Legend = function Legend(options = {}) {
       const mainContainerComponents = [overlaysCmp, visibleOverlaysCmp, toolsCmp, baselayersCmp];
 
       mainContainerCmp = El({
-        cls: 'flex column relative',
+        cls: 'flex column relative width-100',
         components: mainContainerComponents,
         style: {
           'max-height': `${maxHeight}px`
