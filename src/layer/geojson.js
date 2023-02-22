@@ -2,6 +2,7 @@ import VectorSource from 'ol/source/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
 import vector from './vector';
 import isurl from '../utils/isurl';
+import { getStylewindowStyle } from '../controls/editor/stylewindow';
 
 function createSource(options) {
   const vectorSource = new VectorSource({
@@ -22,6 +23,10 @@ function createSource(options) {
                 feature.setId(1000000 + i);
               }
             }
+            if (feature.get('style') && options.styleByAttribute) {
+              const featureStyle = getStylewindowStyle(feature, feature.get('style'));
+              feature.setStyle(featureStyle);
+            }
             i += 1;
           });
         }
@@ -37,7 +42,8 @@ function createSource(options) {
 
 const geojson = function geojson(layerOptions, viewer) {
   const geojsonDefault = {
-    layerType: 'vector'
+    layerType: 'vector',
+    styleByAttribute: false
   };
   const geojsonOptions = Object.assign(geojsonDefault, layerOptions);
   const sourceOptions = {};
@@ -46,6 +52,7 @@ const geojson = function geojson(layerOptions, viewer) {
   geojsonOptions.extent = undefined;
   sourceOptions.projectionCode = viewer.getProjectionCode();
   sourceOptions.idField = layerOptions.idField || 'id';
+  sourceOptions.styleByAttribute = geojsonOptions.styleByAttribute;
   if (geojsonOptions.projection) {
     sourceOptions.dataProjection = geojsonOptions.projection;
   } else if (sourceOptions.projection) {
