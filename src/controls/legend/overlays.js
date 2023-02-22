@@ -206,7 +206,7 @@ const Overlays = function Overlays(options) {
     const layer = evt.element;
     const layerName = layer.get('name');
     const groupName = layer.get('group');
-    if (groupName) {
+    if (groupName && groupName !== 'root') {
       const groupCmp = groupCmps.find((cmp) => cmp.name === groupName);
       if (groupCmp) {
         groupCmp.removeOverlay(layerName);
@@ -214,7 +214,7 @@ const Overlays = function Overlays(options) {
           document.getElementById(groupCmp.getId()).classList.add('hidden');
         }
       }
-    } else {
+    } else if (groupName === 'root') {
       rootGroup.removeOverlay(layerName);
     }
   };
