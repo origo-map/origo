@@ -273,7 +273,7 @@ const Legend = function Legend(options = {}) {
       this.addComponents(popupMenuItems);
       let html = `<ul id="${this.getId()}">`;
       popupMenuItems.forEach((item) => {
-        html += `${item.render()}`;
+        html += `<li class="padding-x-small">${item.render()}</li>`;
       });
       html += '</ul>';
       return html;
@@ -281,8 +281,11 @@ const Legend = function Legend(options = {}) {
   });
 
   const createPopupMenu = function createPopupMenu() {
-    const newDiv = document.createElement('div');
-    newDiv.classList.add('relative');
+    const relDiv = document.createElement('div');
+    const absDiv = document.createElement('div');
+    relDiv.classList.add('relative');
+    relDiv.style.display = 'contents';
+    absDiv.classList.add('absolute');
     const addLayerButtonEl = document.getElementById(addLayerButton.getId());
     const onUnfocus = (e) => {
       if (!addLayerButtonEl.contains(e.target)) {
@@ -290,9 +293,10 @@ const Legend = function Legend(options = {}) {
       }
     };
     popupMenu = PopupMenu({ onUnfocus, cls: 'button-popup' });
-    addLayerButtonEl.insertAdjacentElement('afterend', newDiv);
-    newDiv.appendChild(dom.html(popupMenu.render()));
-    newDiv.addEventListener('click', () => { popupMenu.setVisibility(false); });
+    addLayerButtonEl.insertAdjacentElement('beforebegin', relDiv);
+    relDiv.appendChild(absDiv);
+    absDiv.appendChild(dom.html(popupMenu.render()));
+    relDiv.addEventListener('click', () => { popupMenu.setVisibility(false); });
     popupMenu.setContent(popupMenuList.render());
     popupMenuList.dispatch('render');
     if (popupMenuItems.length > 1) {
@@ -315,14 +319,14 @@ const Legend = function Legend(options = {}) {
   };
 
   addLayerButton = Button({
-    cls: 'round compact boxshadow-subtle icon-small primary',
+    cls: 'round compact primary icon-small margin-x-smaller o-tooltip',
     click() {
       togglePopupMenu();
     },
     style: {
       'align-self': 'center'
     },
-    icon: '#ic_add_24px',
+    icon: '#o_add_24px',
     ariaLabel: 'Lägg till lager',
     title: 'Lägg till lager',
     tabIndex: -1,

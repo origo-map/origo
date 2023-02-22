@@ -42,7 +42,7 @@ const DragAndDrop = function DragAndDrop(options = {}) {
     });
 
     const openBtn = Button({
-      cls: 'text-medium',
+      cls: 'text-medium padding-0',
       click() {
         const inputEl = document.getElementById(fileInput.getId());
         inputEl.value = null;
@@ -53,7 +53,6 @@ const DragAndDrop = function DragAndDrop(options = {}) {
     });
 
     legendButton = El({
-      cls: 'padding-small',
       components: [fileInput, openBtn]
     });
 
