@@ -43,6 +43,12 @@ Your pull request should:
 
  * Be able to merge without conflicts.
 
+ * The subject of the PR has to start with one of these prefix:
+   * dep: updated dependencies
+   * docs: editing .md-files in this repo
+   * feature: for new features
+   * fix: bugfix or rewritten code that doesn't add new functionality
+
 ### Commit messages guidelines
 
 We are using the same guidelines for commit messages as the [OpenLayers project](https://github.com/openlayers/openlayers).
