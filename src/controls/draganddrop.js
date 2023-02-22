@@ -66,8 +66,10 @@ const DragAndDrop = function DragAndDrop(options = {}) {
     onAdd(evt) {
       viewer = evt.target;
       map = viewer.getMap();
-      const legend = viewer.getControlByName('legend');
-      if (options.showLegendButton) { legend.addButtonToTools(legendButton, 'addLayerButton'); }
+      if (options.showLegendButton) {
+        const legend = viewer.getControlByName('legend');
+        legend.addButtonToTools(legendButton, 'addLayerButton'); 
+      }
       const groupName = options.groupName || 'egna-lager';
       const groupTitle = options.groupTitle || 'Egna lager';
       const featureStyles = options.featureStyles || {
