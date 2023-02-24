@@ -20,7 +20,9 @@ const Group = function Group(viewer, options = {}) {
     type = 'group',
     autoExpand = true,
     exclusive = false,
-    toggleAll = true
+    toggleAll = true,
+    draggable = false,
+    zIndexStart = 0.1
   } = options;
 
   const stateCls = {
@@ -144,7 +146,7 @@ const Group = function Group(viewer, options = {}) {
 
   const addOverlay = function addOverlay(overlay) {
     groupList.addOverlay(overlay);
-    this.dispatch('add:overlay');
+    this.dispatch('add:overlay', overlay);
   };
 
   const removeOverlay = function removeOverlay(layerName) {
@@ -165,6 +167,51 @@ const Group = function Group(viewer, options = {}) {
     }
   };
 
+  function orderZIndex(list, groupCmp) {
+    const elementIds = [...list.children].map(x => x.id);
+    const overlayArray = groupCmp.getOverlayList().getOverlays();
+    overlayArray.forEach(element => {
+      const layerIndex = 1 + elementIds.reverse().indexOf(element.getId());
+      element.getLayer().setZIndex(zIndexStart + (layerIndex / 100));
+    });
+  }
+
+  function dragover(evt) {
+    const event = evt;
+    event.dataTransfer.dropEffect = 'move';
+    event.preventDefault();
+  }
+
+  function handleDrag(evt) {
+    const selectedItem = evt.target;
+    const list = selectedItem.parentNode;
+    const x = evt.clientX;
+    const y = evt.clientY;
+
+    selectedItem.classList.add('move-item');
+    let swapItem = document.elementFromPoint(x, y) === null ? selectedItem : document.elementFromPoint(x, y);
+
+    if (list === swapItem.parentNode) {
+      swapItem = swapItem !== selectedItem.nextSibling ? swapItem : swapItem.nextSibling;
+      list.insertBefore(selectedItem, swapItem);
+    }
+  }
+
+  function handleDrop(evt, groupCmp) {
+    const selectedItem = evt.target;
+    selectedItem.classList.remove('move-item');
+    orderZIndex(selectedItem.parentElement, groupCmp);
+  }
+
+  function enableDragItem(el, groupCmp) {
+    const item = el;
+    item.setAttribute('draggable', true);
+    item.ondrag = handleDrag;
+    item.ondragend = (evt) => { handleDrop(evt, groupCmp); };
+    item.ondragenter = dragover;
+    item.ondragover = dragover;
+  }
+
   return Component({
     addOverlay,
     getEl,
@@ -175,6 +222,7 @@ const Group = function Group(viewer, options = {}) {
     parent,
     title,
     type,
+    draggable,
     addGroup,
     appendGroup,
     removeGroup,
@@ -191,11 +239,15 @@ const Group = function Group(viewer, options = {}) {
     },
     onInit() {
       this.addComponent(collapse);
-      this.on('add:overlay', () => {
+      this.on('add:overlay', (overlay) => {
         visibleState = groupList.getVisible();
         if (tickButton) {
           tickButton.setState(stateCls[visibleState]);
           tickButton.setIcon(getCheckIcon(visibleState));
+        }
+        if (draggable) {
+          const el = document.getElementById(overlay.getId());
+          enableDragItem(el, this);
         }
       });
       this.on('add:group', () => {
