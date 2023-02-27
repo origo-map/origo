@@ -34,6 +34,7 @@ const Group = function Group(viewer, options = {}) {
   const uncheckIcon = '#ic_radio_button_unchecked_24px';
   let visibleState = 'all';
   let groupEl;
+  let selectedItem;
 
   const listCls = type === 'grouplayer' ? 'divider-start padding-left padding-top-small' : '';
   const groupList = GroupList({ viewer, cls: listCls, abstract });
@@ -168,48 +169,52 @@ const Group = function Group(viewer, options = {}) {
   };
 
   function orderZIndex(list, groupCmp) {
-    const elementIds = [...list.children].map(x => x.id);
+    const elementIds = [...list.children].map(x => x.id).reverse();
     const overlayArray = groupCmp.getOverlayList().getOverlays();
     overlayArray.forEach(element => {
-      const layerIndex = 1 + elementIds.reverse().indexOf(element.getId());
+      const layerIndex = 1 + elementIds.indexOf(element.getId());
       element.getLayer().setZIndex(zIndexStart + (layerIndex / 100));
     });
   }
 
-  function dragover(evt) {
-    const event = evt;
-    event.dataTransfer.dropEffect = 'move';
-    event.preventDefault();
+  function handleDragStart(evt) {
+    selectedItem = evt.target;
+    selectedItem.classList.add('move-item');
   }
 
-  function handleDrag(evt) {
-    const selectedItem = evt.target;
+  function handleDragOver(evt) {
+    const event = evt;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+  }
+
+  function handleDragEnd(evt, groupCmp) {
+    selectedItem.classList.remove('move-item');
+    orderZIndex(selectedItem.parentElement, groupCmp);
+    selectedItem = null;
+  }
+
+  function handleDragEnter(evt) {
+    const event = evt;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
     const list = selectedItem.parentNode;
     const x = evt.clientX;
     const y = evt.clientY;
-
-    selectedItem.classList.add('move-item');
     let swapItem = document.elementFromPoint(x, y) === null ? selectedItem : document.elementFromPoint(x, y);
-
     if (list === swapItem.parentNode) {
       swapItem = swapItem !== selectedItem.nextSibling ? swapItem : swapItem.nextSibling;
       list.insertBefore(selectedItem, swapItem);
     }
   }
 
-  function handleDrop(evt, groupCmp) {
-    const selectedItem = evt.target;
-    selectedItem.classList.remove('move-item');
-    orderZIndex(selectedItem.parentElement, groupCmp);
-  }
-
   function enableDragItem(el, groupCmp) {
     const item = el;
     item.setAttribute('draggable', true);
-    item.ondrag = handleDrag;
-    item.ondragend = (evt) => { handleDrop(evt, groupCmp); };
-    item.ondragenter = dragover;
-    item.ondragover = dragover;
+    item.ondragstart = handleDragStart;
+    item.ondragenter = handleDragEnter;
+    item.ondragover = handleDragOver;
+    item.ondragend = (evt) => { handleDragEnd(evt, groupCmp); };
   }
 
   return Component({
