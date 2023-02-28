@@ -189,22 +189,26 @@ const Group = function Group(viewer, options = {}) {
   }
 
   function handleDragEnd(evt, groupCmp) {
-    selectedItem.classList.remove('move-item');
-    orderZIndex(selectedItem.parentElement, groupCmp);
-    selectedItem = null;
+    if (selectedItem) {
+      selectedItem.classList.remove('move-item');
+      orderZIndex(selectedItem.parentElement, groupCmp);
+      selectedItem = null;
+    }
   }
 
   function handleDragEnter(evt) {
-    const event = evt;
-    event.preventDefault();
-    event.dataTransfer.dropEffect = 'move';
-    const list = selectedItem.parentNode;
-    const x = evt.clientX;
-    const y = evt.clientY;
-    let swapItem = document.elementFromPoint(x, y) === null ? selectedItem : document.elementFromPoint(x, y);
-    if (list === swapItem.parentNode) {
-      swapItem = swapItem !== selectedItem.nextSibling ? swapItem : swapItem.nextSibling;
-      list.insertBefore(selectedItem, swapItem);
+    if (selectedItem) {
+      const event = evt;
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+      const list = selectedItem.parentNode;
+      const x = evt.clientX;
+      const y = evt.clientY;
+      let swapItem = document.elementFromPoint(x, y) === null ? selectedItem : document.elementFromPoint(x, y);
+      if (list === swapItem.parentNode) {
+        swapItem = swapItem !== selectedItem.nextSibling ? swapItem : swapItem.nextSibling;
+        list.insertBefore(selectedItem, swapItem);
+      }
     }
   }
 
@@ -250,7 +254,7 @@ const Group = function Group(viewer, options = {}) {
           tickButton.setState(stateCls[visibleState]);
           tickButton.setIcon(getCheckIcon(visibleState));
         }
-        if (draggable) {
+        if (draggable && typeof overlay.getId === 'function') {
           const el = document.getElementById(overlay.getId());
           enableDragItem(el, this);
         }
