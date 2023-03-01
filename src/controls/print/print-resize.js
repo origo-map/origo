@@ -558,7 +558,9 @@ export default function PrintResize(options = {}) {
 
     const newSource = new ImageWMS(({
       url: `${source.getUrl()}/export?`,
-      crossOrigin: 'anonymous',
+      // No other way to access source/layer crossOrigin parameter
+      // eslint-disable-next-line no-underscore-dangle
+      crossOrigin: source.crossOrigin_ || 'anonymous',
       projection,
       ratio: 1,
       params: {
