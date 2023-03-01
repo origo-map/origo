@@ -11,11 +11,15 @@ const xyz = function xyz(layerOptions, viewer) {
     layerType: 'tile',
     featureinfoLayer: undefined
   };
-  const sourceDefault = { url: '' };
+  const sourceDefault = {
+    crossOrigin: 'anonymous',
+    url: ''
+  };
   const xyzOptions = Object.assign(xyzDefault, layerOptions);
   xyzOptions.sourceName = xyzOptions.id;
   const sourceOptions = Object.assign(sourceDefault, viewer.getMapSource()[layerOptions.source]);
   sourceOptions.attributions = xyzOptions.attribution;
+  sourceOptions.crossOrigin = xyzOptions.crossOrigin ? xyzOptions.crossOrigin : sourceOptions.crossOrigin;
   sourceOptions.projection = viewer.getProjectionCode() || 'EPSG:3857';
 
   if (xyzOptions.tileGrid) {
@@ -33,7 +37,7 @@ const xyz = function xyz(layerOptions, viewer) {
   if (xyzOptions.layerURL) {
     sourceOptions.url += xyzOptions.layerURL;
   }
-  sourceOptions.crossOrigin = 'anonymous';
+
   const xyzSource = createSource(sourceOptions);
   return tile(xyzOptions, xyzSource, viewer);
 };
