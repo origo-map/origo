@@ -9,7 +9,7 @@ function createTileSource(options) {
     attributions: options.attribution,
     url: options.url,
     gutter: options.gutter,
-    crossOrigin: 'anonymous',
+    crossOrigin: options.crossOrigin,
     projection: options.projection,
     tileGrid: options.tileGrid,
     params: {
@@ -90,6 +90,7 @@ const wms = function wms(layerOptions, viewer) {
     featureinfoLayer: null
   };
   const sourceDefault = {
+    crossOrigin: 'anonymous',
     version: '1.1.1',
     gutter: 0,
     format: 'image/png'
@@ -99,6 +100,7 @@ const wms = function wms(layerOptions, viewer) {
   wmsOptions.name.split(':').pop();
   const sourceOptions = Object.assign(sourceDefault, viewer.getMapSource()[layerOptions.source]);
   sourceOptions.attribution = wmsOptions.attribution;
+  sourceOptions.crossOrigin = wmsOptions.crossOrigin ? wmsOptions.crossOrigin : sourceOptions.crossOrigin;
   sourceOptions.projection = viewer.getProjection();
   sourceOptions.id = wmsOptions.id;
   sourceOptions.format = wmsOptions.format ? wmsOptions.format : sourceOptions.format;

@@ -19,6 +19,7 @@ const agsMap = function agsMap(layerOptions, viewer) {
   };
   const layerSettings = { ...layerDefault, ...layerOptions };
   const sourceSettings = { ...sourceDefault, ...viewer.getSource(layerOptions.source) };
+  sourceSettings.crossOrigin = layerSettings.crossOrigin ? layerSettings.crossOrigin : sourceSettings.crossOrigin;
   sourceSettings.params = layerSettings.params || {};
   sourceSettings.params.layers = `show:${layerSettings.id}`;
 
