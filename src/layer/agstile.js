@@ -6,7 +6,7 @@ function createSource(options) {
   return new TileArcGISRest({
     attributions: options.attribution,
     projection: options.projection,
-    crossOrigin: 'anonymous',
+    crossOrigin: options.crossOrigin,
     params: options.params,
     url: options.url,
     tileGrid: options.tileGrid
@@ -18,10 +18,13 @@ const agsTile = function agsTile(layerOptions, viewer) {
     layerType: 'tile',
     featureinfoLayer: undefined
   };
-  const sourceDefault = {};
+  const sourceDefault = {
+    crossOrigin: 'anonymous'
+  };
   const agsOptions = Object.assign(agsDefault, layerOptions);
   const sourceOptions = Object.assign(sourceDefault, viewer.getMapSource()[layerOptions.source]);
   sourceOptions.attribution = agsOptions.attribution;
+  sourceOptions.crossOrigin = agsOptions.crossOrigin ? agsOptions.crossOrigin : sourceOptions.crossOrigin;
   sourceOptions.projection = viewer.getProjection();
   sourceOptions.params = agsOptions.params || {};
   sourceOptions.params.layers = `show:${agsOptions.id}`;

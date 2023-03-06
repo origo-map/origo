@@ -73,6 +73,7 @@ const DragAndDrop = function DragAndDrop(options = {}) {
       }
       const groupName = options.groupName || 'egna-lager';
       const groupTitle = options.groupTitle || 'Egna lager';
+      const draggable = options.draggable || true;
       const styleByAttribute = options.styleByAttribute || false;
       const featureStyles = options.featureStyles || {
         Point: [{
@@ -156,7 +157,7 @@ const DragAndDrop = function DragAndDrop(options = {}) {
           }
         });
         if (!viewer.getGroup(groupName)) {
-          viewer.addGroup({ title: groupTitle, name: groupName, expanded: true });
+          viewer.addGroup({ title: groupTitle, name: groupName, expanded: true, draggable });
         }
         vectorLayer = new VectorLayer({
           source: vectorSource,
