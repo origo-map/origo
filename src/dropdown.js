@@ -37,7 +37,9 @@ export default function dropDown(target, items, options) {
   }
 
   function toggleActive(activeEl) {
-    targetEl.querySelector(`li.${activeCls}`).classList.remove(activeCls);
+    if (targetEl.querySelector(`li.${activeCls}`)) {
+      targetEl.querySelector(`li.${activeCls}`).classList.remove(activeCls);
+    }
     activeEl.classList.add(activeCls);
   }
 

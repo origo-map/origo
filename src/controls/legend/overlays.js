@@ -238,10 +238,15 @@ const Overlays = function Overlays(options) {
     }
   };
 
+  const getGroups = function getGroups() {
+    return groupCmps;
+  };
+
   return Component({
     onAddGroup,
     onChangeLayer,
     slidenav,
+    getGroups,
     overlaysCollapse,
     onInit() {
       this.addComponent(overlaysCollapse);

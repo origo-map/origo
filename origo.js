@@ -96,6 +96,9 @@ const Origo = function Origo(configPath, options = {}) {
   const api = () => viewer;
   const getConfig = () => origoConfig;
 
+  api.controls = () => origoControls;
+  api.extensions = () => origoExtensions;
+
   /** Helper that initialises a new viewer  */
   const initViewer = () => {
     const defaultConfig = Object.assign({}, origoConfig, options);

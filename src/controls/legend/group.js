@@ -226,6 +226,7 @@ const Group = function Group(viewer, options = {}) {
     getEl,
     getOverlayList,
     getVisible,
+    getHeaderCmp() { return headerComponent; },
     name,
     exclusive,
     parent,
