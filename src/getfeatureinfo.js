@@ -69,9 +69,20 @@ function getFeatureInfoUrl({
         if (res.error) {
           return [];
         }
-        return res.json();
+        return res.text();
       })
-      .then(json => {
+      .then(text => {
+        let json = {};
+        try {
+          json = JSON.parse(text);
+        } catch (error) {
+          if (error instanceof SyntaxError) {
+            // Maybe bad escaped character, retry with escaping backslash
+            json = JSON.parse(text.replaceAll('\\', '\\\\'));
+          } else {
+            console.error(error);
+          }
+        }
         if (json.features.length > 0) {
           const copyJson = json;
           copyJson.features.forEach((item, i) => {
