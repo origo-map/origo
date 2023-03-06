@@ -84,10 +84,12 @@ const getContent = {
         suffix = attribute.suffix;
       }
       if (attribute.formatDatetime) {
+        const locale = 'locale' in attribute.formatDatetime ? attribute.formatDatetime.locale : 'default';
+        const options = 'options' in attribute.formatDatetime ? attribute.formatDatetime.options : { dateStyle: 'full', timeStyle: 'long' };
         if (!Number.isNaN(Date.parse(featureValue))) {
-          const locale = 'locale' in attribute.formatDatetime ? attribute.formatDatetime.locale : 'default';
-          const options = 'options' in attribute.formatDatetime ? attribute.formatDatetime.options : { dateStyle: 'full', timeStyle: 'long' };
           val = new Intl.DateTimeFormat(locale, options).format(Date.parse(featureValue));
+        } else if (!Number.isNaN(new Date(featureValue).getTime())) {
+          val = new Intl.DateTimeFormat(locale, options).format(new Date(featureValue));
         }
       }
       if (attribute.url) {
