@@ -39,9 +39,9 @@
     "downloadjs": "^1.4.7",
     "elm-pep": "^1.0.6",
     "html2canvas": "^1.4.1",
-    "ol-mapbox-style": "9.4.0",
+    "ol-mapbox-style": "10.1.0",
     "jspdf": "^2.5.0",
-    "ol": "^7.2.2",
+    "ol": "^7.3.0",
     "pepjs": "^0.5.3",
     "proj4": "^2.7.5"
   },
