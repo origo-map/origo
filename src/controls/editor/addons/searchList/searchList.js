@@ -10,6 +10,8 @@ import spinner from '../../../../utils/spinner';
 const hintTypeMore = 'Skriv fler tecken';
 /** Default user message. Can be overriden by config. */
 const hintNoHits = 'Inga träffar';
+/** Attribute name in DOM for backing data */
+const databackingValue = 'data-backing-value';
 
 /**
  * Helper to escape strings for regex
@@ -67,15 +69,18 @@ function searchList(input, conf) {
   /** The list of items set to awesome */
   let olist = conf.list || [];
   const searchListConfig = conf.config;
+  // useBackingValue implies allowOnlyFromList, otherwise it would be rather silly.
+  const allowOnlyFromList = searchListConfig.allowOnlyFromList || searchListConfig.useBackingValue;
   // Set up default config for awesome
+  searchListConfig.minChars = searchListConfig.minChars === undefined ? 2 : searchListConfig.minChars;
   const awesomeConfig = {
     minChars: searchListConfig.minChars,
-    maxItems: searchListConfig.maxItems,
+    maxItems: searchListConfig.maxItems || 10,
     filter,
     item: imageItemFormatter
   };
 
-  if (searchListConfig.allowOnlyFromList) {
+  if (allowOnlyFromList) {
     awesomeConfig.autoFirst = true;
   }
 
@@ -113,6 +118,20 @@ function searchList(input, conf) {
   }
   /** Keep track of ongoing requests */
   let abortControllers = [];
+
+  /**
+   * Looks up the label for inputs current backingValue.
+   * @returns {string} The label or empty string is not found
+   * */
+  function getLabelForBackingValue() {
+    let label = '';
+    // input.value is always string as it is roundtripped in DOM using default toString.
+    const listitem = olist.find(item => item.backingValue.toString() === input.value);
+    if (listitem) {
+      label = listitem.value;
+    }
+    return label;
+  }
   /**
    * Calls the remote server
    * @param {any} url Url to call.
@@ -164,7 +183,7 @@ function searchList(input, conf) {
     if (e.relatedTarget === btn && awe.opened) {
       supressOpen = true;
     }
-    if (e.relatedTarget !== btn && searchListConfig.allowOnlyFromList) {
+    if (e.relatedTarget !== btn && allowOnlyFromList) {
       // eslint-disable-next-line no-param-reassign
       input.value = lastValidinput;
     }
@@ -235,7 +254,8 @@ function searchList(input, conf) {
       // If list is null, request was aborted beacuse another request was sent before this was finished.
       // Only need to update if request actually returns something
       if (list) {
-        awesome.list = awesomeParser(list);
+        olist = awesomeParser(list);
+        awesome.list = olist;
         awesome.evaluate();
         evaluateEmptyList();
       }
@@ -266,14 +286,25 @@ function searchList(input, conf) {
     supressOpen = false;
   }
 
+  function updateAfterReverseLookup(label) {
+    // eslint-disable-next-line no-param-reassign
+    input.value = label;
+    lastValidinput = label;
+  }
+
   // Load the remote list into awesome if configured to do so
   if (searchListConfig.url && !searchListConfig.dynamic) {
     const url = searchListConfig.url;
     setMessage(spinner().outerHTML);
     awesome.list = [];
     getSuggestionsFromRemote(url).then(list => {
-      awesome.list = awesomeParser(list);
+      olist = awesomeParser(list);
+      awesome.list = olist;
       hideMessage();
+      if (searchListConfig.useBackingValue) {
+        const label = getLabelForBackingValue();
+        updateAfterReverseLookup(label);
+      }
     })
       .catch(e => {
         console.error(e);
@@ -307,7 +338,7 @@ function searchList(input, conf) {
 
   // Event handler for when awesome closes.
   awesome.input.addEventListener('awesomplete-close', (e) => {
-    if (searchListConfig.allowOnlyFromList && e.reason !== 'select' && e.reason !== 'nomatches') {
+    if (allowOnlyFromList && e.reason !== 'select' && e.reason !== 'nomatches') {
       // eslint-disable-next-line no-param-reassign
       input.value = lastValidinput;
       hideMessage();
@@ -323,7 +354,7 @@ function searchList(input, conf) {
   input.addEventListener('keyup', (e) => {
     if (e.key === 'Escape') {
       awesome.close();
-      if (searchListConfig.allowOnlyFromList) {
+      if (allowOnlyFromList) {
         // Reset input
         // eslint-disable-next-line no-param-reassign
         input.value = lastValidinput;
@@ -335,6 +366,50 @@ function searchList(input, conf) {
   awesome.input.addEventListener('awesomplete-open', () => {
     hideMessage();
   });
+
+  if (searchListConfig.useBackingValue) {
+    awesome.input.addEventListener('awesomplete-selectcomplete', (e) => {
+      // Save the selected backing value when a selection is made
+      // Setting it to the last valid input is done in the usual "close"-handler
+      const backingValue = olist.find(it => it.value === e.text.value).backingValue;
+      input.setAttribute(databackingValue, backingValue);
+    });
+
+    // The input element can not handle both value and label as select can. Store the value in a data-attrib and retreive it later.
+    // When the awesome is created the input contains the backingvalue, as that is stored in database.
+    input.setAttribute(databackingValue, input.value);
+
+    // Look up label for current backing value when displaying the form
+    // If no label is found, the input is set blank, but the backing value remains. In this way save will fail if
+    // input has the required attribute, which forces the user to select a new value. If it is not required, the old value is kept without
+    // being able to display its value. If the value reappears in the list, its value will be shown next time.
+    if (searchListConfig.dynamic) {
+      let url = searchListConfig.url;
+      url += url.includes('?') ? '&' : '?';
+      url += `${(searchListConfig.valueQueryParameter || 'value')}=${encodeURIComponent(input.value)}`;
+      // eslint-disable-next-line no-param-reassign
+      input.value = '';
+      setMessage(spinner().outerHTML);
+      getSuggestionsFromRemote(url).then(list => {
+        // Hide spinner and set data
+        hideMessage();
+        let label = '';
+        if (list instanceof Array && list.length === 1) {
+          label = list[0].label;
+        }
+        updateAfterReverseLookup(label);
+      });
+    } else if (!searchListConfig.url) {
+      // If there is an Url, but not dynamic, the list is fetched once earlier, and the reverse look up is already performed in that fetch.
+      const label = getLabelForBackingValue();
+      updateAfterReverseLookup(label);
+    }
+  }
+
+  return {
+    // Almost a component ...
+    getValue: () => (searchListConfig.useBackingValue ? input.getAttribute(databackingValue) : input.value)
+  };
 }
 
 export default searchList;

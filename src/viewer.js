@@ -13,6 +13,7 @@ import utils from './utils';
 import Layer from './layer';
 import Main from './components/main';
 import Footer from './components/footer';
+import CenterMarker from './components/centermarker';
 import flattenGroups from './utils/flattengroups';
 import getcenter from './geometry/getcenter';
 import isEmbedded from './utils/isembedded';
@@ -24,8 +25,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
   let featureinfo;
   let selectionmanager;
 
-  let {
-    projection,
+  const {
     breakPoints,
     breakPointsPrefix,
     clsOptions = '',
@@ -51,6 +51,10 @@ const Viewer = function Viewer(targetOption, options = {}) {
     clusterOptions = {},
     tileGridOptions = {},
     url
+  } = options;
+
+  let {
+    projection
   } = options;
 
   const viewerOptions = Object.assign({}, options);
@@ -96,11 +100,20 @@ const Viewer = function Viewer(targetOption, options = {}) {
   const footer = Footer({
     data: footerData
   });
+  const centerMarker = CenterMarker();
   let mapSize;
 
   const addControl = function addControl(control) {
     if (control.onAdd && control.dispatch) {
-      if (!control.options.hideWhenEmbedded || !isEmbedded(this.getTarget())) {
+      if (control.options.hideWhenEmbedded && isEmbedded(this.getTarget())) {
+        if (typeof control.hide === 'function') {
+          // Exclude these controls in the array since they can't be hidden and the solution is to not add them. If the control hasn't a hide method don't add the control.
+          if (!['sharemap', 'link', 'about', 'print', 'draganddrop'].includes(control.name)) {
+            this.addComponent(control);
+          }
+          control.hide();
+        }
+      } else {
         this.addComponent(control);
       }
     } else {
@@ -378,7 +391,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
   };
 
   const getLayerStylePicker = function getLayerStylePicker(layer) {
-    return layerStylePicker[layer.get('name')] || [];
+    return layerStylePicker[layer.get('id')] || [];
   };
 
   const addLayerStylePicker = function addLayerStylePicker(layerProps) {
@@ -387,13 +400,23 @@ const Viewer = function Viewer(targetOption, options = {}) {
     }
   };
 
-  const addLayer = function addLayer(layerProps) {
+  const addLayer = function addLayer(layerProps, insertBefore) {
     const layer = Layer(layerProps, this);
     addLayerStylePicker(layerProps);
-    map.addLayer(layer);
+    if (insertBefore) {
+      map.getLayers().insertAt(map.getLayers().getArray().indexOf(insertBefore), layer);
+    } else {
+      map.addLayer(layer);
+    }
     this.dispatch('addlayer', {
       layerName: layerProps.name
     });
+    return layer;
+  };
+
+  const removeLayer = function removeLayer(layer) {
+    this.dispatch('removelayer', { layerName: layer.get('name') });
+    map.removeLayer(layer);
   };
 
   const addLayers = function addLayers(layersProps) {
@@ -567,6 +590,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
           featureinfo = Featureinfo(featureinfoOptions);
           this.addComponent(selectionmanager);
           this.addComponent(featureinfo);
+          this.addComponent(centerMarker);
 
           this.addControls();
           this.dispatch('loaded');
@@ -579,7 +603,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
                               ${footer.render()}
                             </div>
                           </div>
-                              
+
                           <div id="loading" class="hide">
                             <div class="loading-spinner"></div>
                           </div>`;
@@ -636,12 +660,14 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getUrlParams,
     getViewerOptions,
     removeGroup,
+    removeLayer,
     removeOverlays,
     setStyle,
     zoomToExtent,
     getSelectionManager,
     getEmbedded,
-    permalink
+    permalink,
+    centerMarker
   });
 };
 

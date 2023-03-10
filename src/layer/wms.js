@@ -9,7 +9,7 @@ function createTileSource(options) {
     attributions: options.attribution,
     url: options.url,
     gutter: options.gutter,
-    crossOrigin: 'anonymous',
+    crossOrigin: options.crossOrigin,
     projection: options.projection,
     tileGrid: options.tileGrid,
     params: {
@@ -37,18 +37,52 @@ function createImageSource(options) {
   }));
 }
 
-function createDefaultStyle(wmsOptions, source, viewer) {
-  const maxResolution = viewer.getResolutions()[viewer.getResolutions().length - 1];
-  const styleName = `${wmsOptions.name}_WMSDefault`;
-  const getLegendString = source.getLegendUrl(maxResolution, wmsOptions.legendParams);
+function createWmsStyle(wmsOptions, source, viewer, defaultStyle = true) {
+  let altStyleLegendParams;
+  let maxResolution = viewer.getResolutions()[viewer.getResolutions().length - 1];
+
+  if (!(defaultStyle) && (wmsOptions.stylePicker)) {
+    const altStyle = wmsOptions.stylePicker.find(style => style.style === wmsOptions.styleName);
+    if (altStyle.legendParams) {
+      altStyleLegendParams = altStyle.legendParams;
+      if (Object.keys(altStyle.legendParams).find(key => key.toUpperCase() === 'SCALE')) {
+        maxResolution = null;
+      }
+    }
+  }
+
+  const styleName = defaultStyle ? `${wmsOptions.name}_WMSDefault` : wmsOptions.styleName;
+  const getLegendString = defaultStyle ? source.getLegendUrl(maxResolution, wmsOptions.legendParams) : source.getLegendUrl(maxResolution, {
+    STYLE: styleName,
+    ...altStyleLegendParams
+  });
+  let hasThemeLegend = wmsOptions.hasThemeLegend || false;
+  if (!defaultStyle) {
+    hasThemeLegend = wmsOptions.stylePicker[wmsOptions.altStyleIndex].hasThemeLegend || false;
+  }
+
   const style = [[{
     icon: {
       src: `${getLegendString}`
     },
-    extendedLegend: wmsOptions.hasThemeLegend || false
+    extendedLegend: hasThemeLegend
   }]];
   viewer.addStyle(styleName, style);
   return styleName;
+}
+
+function createWmsLayer(wmsOptions, source, viewer) {
+  const wmsOpts = wmsOptions;
+  const wmsSource = source;
+  if (wmsOpts.styleName === 'default') {
+    wmsOpts.styleName = createWmsStyle(wmsOptions, source, viewer);
+    wmsOpts.style = wmsOptions.styleName;
+  } else if (wmsOptions.altStyleIndex > -1) {
+    wmsOpts.defaultStyle = createWmsStyle(wmsOptions, source, viewer);
+    wmsOpts.styleName = createWmsStyle(wmsOptions, source, viewer, false);
+    wmsOpts.style = wmsOptions.styleName;
+    wmsSource.getParams().STYLES = wmsOptions.styleName;
+  }
 }
 
 const wms = function wms(layerOptions, viewer) {
@@ -56,6 +90,7 @@ const wms = function wms(layerOptions, viewer) {
     featureinfoLayer: null
   };
   const sourceDefault = {
+    crossOrigin: 'anonymous',
     version: '1.1.1',
     gutter: 0,
     format: 'image/png'
@@ -65,6 +100,7 @@ const wms = function wms(layerOptions, viewer) {
   wmsOptions.name.split(':').pop();
   const sourceOptions = Object.assign(sourceDefault, viewer.getMapSource()[layerOptions.source]);
   sourceOptions.attribution = wmsOptions.attribution;
+  sourceOptions.crossOrigin = wmsOptions.crossOrigin ? wmsOptions.crossOrigin : sourceOptions.crossOrigin;
   sourceOptions.projection = viewer.getProjection();
   sourceOptions.id = wmsOptions.id;
   sourceOptions.format = wmsOptions.format ? wmsOptions.format : sourceOptions.format;
@@ -87,19 +123,12 @@ const wms = function wms(layerOptions, viewer) {
 
   if (renderMode === 'image') {
     const source = createImageSource(sourceOptions);
-    if (wmsOptions.styleName === 'default') {
-      wmsOptions.styleName = createDefaultStyle(wmsOptions, source, viewer);
-      wmsOptions.style = wmsOptions.styleName;
-    }
+    createWmsLayer(wmsOptions, source, viewer);
     return image(wmsOptions, source);
   }
 
   const source = createTileSource(sourceOptions);
-
-  if (wmsOptions.styleName === 'default') {
-    wmsOptions.styleName = createDefaultStyle(wmsOptions, source, viewer);
-    wmsOptions.style = wmsOptions.styleName;
-  }
+  createWmsLayer(wmsOptions, source, viewer);
   return tile(wmsOptions, source);
 };
 

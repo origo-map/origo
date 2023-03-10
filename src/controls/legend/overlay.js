@@ -19,7 +19,6 @@ const OverlayLayer = function OverlayLayer(options) {
   let headerIconClass = headerIconCls;
 
   const popupMenuItems = [];
-  let layerList;
 
   const hasStylePicker = viewer.getLayerStylePicker(layer).length > 0;
   const layerIconCls = `round compact icon-small relative no-shrink light ${hasStylePicker ? 'style-picker' : ''}`;
@@ -138,7 +137,7 @@ const OverlayLayer = function OverlayLayer(options) {
       });
     },
     render() {
-      const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden basis-50';
+      const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden basis-50 break-word';
       return `<div id="${this.getId()}" class="${labelCls}">${title}</div>`;
     }
   });
@@ -223,8 +222,9 @@ const OverlayLayer = function OverlayLayer(options) {
       onRender() {
         const labelEl = document.getElementById(this.getId());
         labelEl.addEventListener('click', (e) => {
-          layerList.removeOverlay(layer.get('name'));
-          viewer.getMap().removeLayer(layer);
+          if (window.confirm('Vill du radera lagret?')) {
+            viewer.getMap().removeLayer(layer);
+          }
           e.preventDefault();
         });
       },
@@ -330,7 +330,6 @@ const OverlayLayer = function OverlayLayer(options) {
       this.on('clear', onRemove.bind(this));
     },
     onAdd(evt) {
-      layerList = evt.target;
       const parentEl = document.getElementById(evt.target.getId());
       const htmlString = this.render();
       const el = dom.html(htmlString);

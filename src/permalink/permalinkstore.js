@@ -4,7 +4,7 @@ let getPin;
 const permalinkStore = {};
 const additionalMapStateParams = {};
 
-function getSaveLayers(layers) {
+permalinkStore.getSaveLayers = function getSaveLayers(layers) {
   const saveLayers = [];
   layers.forEach((layer) => {
     const saveLayer = {};
@@ -23,7 +23,7 @@ function getSaveLayers(layers) {
     }
   });
   return saveLayers;
-}
+};
 
 permalinkStore.getState = function getState(viewer, isExtended) {
   const state = {};
@@ -32,7 +32,7 @@ permalinkStore.getState = function getState(viewer, isExtended) {
   const featureinfo = viewer.getFeatureinfo();
   const type = featureinfo.getSelection().type;
   getPin = featureinfo.getPin;
-  state.layers = getSaveLayers(layers);
+  state.layers = permalinkStore.getSaveLayers(layers);
   state.center = view.getCenter().map(coord => Math.round(coord)).join();
   state.zoom = view.getZoom().toString();
 

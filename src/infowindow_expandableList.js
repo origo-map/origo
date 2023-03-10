@@ -515,7 +515,7 @@ function expandListElement(featureId) {
   */
 }
 
-function scrollListElementToView(featureId) {
+function scrollListElementToView() {
   // Do nothing
 }
 

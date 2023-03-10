@@ -1,6 +1,6 @@
 import { ImageArcGISRest, ImageWMS } from 'ol/source';
 import { Component } from '../../ui';
-import { renderSvgIcon } from '../../utils/legendmaker';
+import { isHidden, renderSvgIcon } from '../../utils/legendmaker';
 
 /**
  * More information: https://developers.arcgis.com/rest/services-reference/enterprise/legend-map-service-.htm
@@ -59,6 +59,10 @@ const LayerRow = function LayerRow(options) {
   const getWMSLegendUrl = (aLayer, format) => {
     const url = getOneUrl(aLayer);
     const layerName = aLayer.get('name');
+    const style = viewer.getStyle(aLayer.get('styleName'));
+    if (style && style[0] && style[0][0] && style[0][0].icon) {
+      return `${style[0][0].icon.src}&format=${format}`;
+    }
     return `${url}?SERVICE=WMS&layer=${layerName}&format=${format}&version=1.1.1&request=getLegendGraphic&scale=401&legend_options=dpi:300`;
   };
 
@@ -164,9 +168,12 @@ const LayerRow = function LayerRow(options) {
     }
 
     const children = style.map((thisStyle, index) => {
-      const styleIcon = getStyleIcon(thisStyle);
-      const rowTitle = thisStyle[0].label ? thisStyle[0].label : index + 1;
-      return getListItem(rowTitle, styleIcon);
+      if (!isHidden(thisStyle)) {
+        const styleIcon = getStyleIcon(thisStyle);
+        const rowTitle = thisStyle[0].label ? thisStyle[0].label : index + 1;
+        return getListItem(rowTitle, styleIcon);
+      }
+      return '';
     });
     return getTitleWithChildren(title, children);
   };
@@ -297,7 +304,7 @@ export default function PrintLegend(options = {}) {
 
       return `
         <div id="legendContainer">
-          <div class="control overflow-hidden flex row o-legend">
+          <div class="control overflow-hidden flex row o-legend o-no-boxshadow">
             <div class="flex column overflow-hidden relative">
               ${await overlaysCmp.render()}
             </div>

@@ -155,6 +155,22 @@ const drawToolsSelector = function drawToolsSelector(tools, defaultLayer, v) {
   }
 
   init();
+
+  return {
+    /**
+     * Call this to update available tools when layer has changed. No need to call if layer changed using GUI, as that is done by an event.
+     * @param {any} layerName
+     */
+    updateTools: (layerName) => {
+      currentLayer = layerName;
+      // If not visible we don't actually have to change the tools now
+      if (active) {
+        setActive(false);
+        setDrawTools(currentLayer);
+        setActive(true);
+      }
+    }
+  };
 };
 
 export default drawToolsSelector;

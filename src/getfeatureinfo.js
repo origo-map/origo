@@ -1,7 +1,6 @@
 import EsriJSON from 'ol/format/EsriJSON';
 import BaseTileLayer from 'ol/layer/BaseTile';
 import ImageLayer from 'ol/layer/Image';
-import LayerGroup from 'ol/layer/Group';
 import maputils from './maputils';
 import SelectedItem from './models/SelectedItem';
 
@@ -70,9 +69,20 @@ function getFeatureInfoUrl({
         if (res.error) {
           return [];
         }
-        return res.json();
+        return res.text();
       })
-      .then(json => {
+      .then(text => {
+        let json = {};
+        try {
+          json = JSON.parse(text);
+        } catch (error) {
+          if (error instanceof SyntaxError) {
+            // Maybe bad escaped character, retry with escaping backslash
+            json = JSON.parse(text.replaceAll('\\', '\\\\'));
+          } else {
+            console.error(error);
+          }
+        }
         if (json.features.length > 0) {
           const copyJson = json;
           copyJson.features.forEach((item, i) => {
@@ -181,19 +191,47 @@ function getFeatureInfoRequests({
   coordinate,
   pixel
 }, viewer) {
+  const imageFeatureInfoMode = viewer.getViewerOptions().featureinfoOptions.imageFeatureInfoMode || 'pixel';
   const requests = [];
-  const layerArray = [];
-  const layerGroups = viewer.getQueryableLayers().filter(layer => layer instanceof LayerGroup);
-  if (layerGroups) { layerGroups.forEach(item => item.getLayersArray().forEach(element => layerArray.push(element))); }
-  const layers = viewer.getQueryableLayers().filter(layer => layer instanceof BaseTileLayer || layer instanceof ImageLayer);
-  if (layers) { layers.forEach(element => layerArray.push(element)); }
-  layerArray.forEach(layer => {
-    const pixelVal = layer.getData(pixel);
-    if (pixelVal instanceof Uint8ClampedArray && pixelVal[3] > 0) {
-      const item = getGetFeatureInfoRequest({ layer, coordinate }, viewer);
-      if (item) {
-        requests.push(item);
+  const queryableLayers = viewer.getLayersByProperty('queryable', true);
+  const layerGroups = viewer.getGroupLayers();
+  layerGroups.forEach(layerGroup => {
+    if (layerGroup.get('visible')) {
+      layerGroup.getLayersArray().forEach(layer => {
+        if ((layer.get('queryable'))) {
+          queryableLayers.push(layer);
+        }
+      });
+    } else {
+      layerGroup.getLayersArray().forEach(layer => {
+        if (layer.get('queryable') && ((layer.get('imageFeatureInfoMode') && layer.get('imageFeatureInfoMode') === 'always') || (!layer.get('imageFeatureInfoMode') && imageFeatureInfoMode === 'always'))) {
+          queryableLayers.push(layer);
+        }
+      });
+    }
+  });
+
+  const imageLayers = queryableLayers.filter(layer => layer instanceof BaseTileLayer || layer instanceof ImageLayer);
+  imageLayers.forEach(layer => {
+    let item;
+    let imageInfoMode;
+
+    if (layer.get('imageFeatureInfoMode')) {
+      imageInfoMode = layer.get('imageFeatureInfoMode');
+    } else imageInfoMode = imageFeatureInfoMode;
+
+    if (imageInfoMode === 'pixel') {
+      const pixelVal = layer.getData(pixel);
+      if (pixelVal instanceof Uint8ClampedArray && pixelVal[3] > 0) {
+        item = getGetFeatureInfoRequest({ layer, coordinate }, viewer);
       }
+    } else if ((imageInfoMode === 'visible') && (layer.get('visible') === true)) {
+      item = getGetFeatureInfoRequest({ layer, coordinate }, viewer);
+    } else if (imageInfoMode === 'always') {
+      item = getGetFeatureInfoRequest({ layer, coordinate }, viewer);
+    }
+    if (item) {
+      requests.push(item);
     }
   });
   return requests;
