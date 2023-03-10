@@ -499,7 +499,7 @@ function setInteractions(drawType) {
   select = new Select({
     layers: [editLayer]
   });
-  let alreadySelectedFeatureFromFeatureInfo = featureInfo.getLastSelectedItem();
+  const alreadySelectedFeatureFromFeatureInfo = featureInfo.getLastSelectedItem();
   if (alreadySelectedFeatureFromFeatureInfo instanceof SelectedItem
     && alreadySelectedFeatureFromFeatureInfo.getLayer().get('name') == currentLayer) {
     select.getFeatures().push(alreadySelectedFeatureFromFeatureInfo.getFeature());

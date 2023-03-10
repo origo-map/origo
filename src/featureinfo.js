@@ -23,7 +23,6 @@ const styleTypes = StyleTypes();
 let selectionLayer;
 let lastSelectedItem;
 
-
 const Featureinfo = function Featureinfo(options = {}) {
   const {
     clickEvent = 'click',
@@ -138,7 +137,7 @@ const Featureinfo = function Featureinfo(options = {}) {
   // TODO: rename and wrap original function
   const dispatchToggleFeatureEvent = function dispatchToggleFeatureEvent(currentItem) {
     lastSelectedItem = currentItem;
-    console.log("Seeting");
+    console.log('Seeting');
     const toggleFeatureinfo = new CustomEvent('toggleFeatureinfo', {
       detail: {
         type: 'toggleFeatureinfo',
@@ -719,8 +718,8 @@ const Featureinfo = function Featureinfo(options = {}) {
     showInfo,
     showFeatureInfo,
     getLastSelectedItem,
-    /** Clears the lastSelectedItem so getLastSelectedItem returns null*/
-    clearLastSelectedItem: ()=> lastSelectedItem = null
+    /** Clears the lastSelectedItem so getLastSelectedItem returns null */
+    clearLastSelectedItem: () => lastSelectedItem = null
   });
 };
 
