@@ -13,6 +13,9 @@ const Editor = function Editor(options = {}) {
   let viewer;
   let isVisible = isActive;
   let toolbarVisible = false;
+  /** Keeps track of the last selected item in featureinfo. We need to use our own variable for this
+   * in order to determine if editor got activated directly from featureinfo or some other tool has been active between. */
+  let lastSelectedItem;
 
   /** The handler were all state is kept */
   let editHandler;
@@ -25,6 +28,15 @@ const Editor = function Editor(options = {}) {
     // There are some serious event dependencies between viewer, editor, edithandler, editortoolbar, editorlayers, dropdown and editorbutton,
     // which makes it almost impossible to do things in correct order.
     isVisible = detail.active;
+    // Actually, if we're going visible
+    if (isVisible) {
+      if (lastSelectedItem && lastSelectedItem.getLayer().get('editable') && !lastSelectedItem.getLayer().get('isTable')) {
+        // Set a preselected feature. No use to set layer in handler as toolbar keeps state that will override a set of layer in handler anyway.
+        editHandler.preselectFeature(lastSelectedItem.getFeature());
+        // Have to set layer in toolbar instead of handler.
+        editorToolbar.changeActiveLayer(lastSelectedItem.getLayer().get('name'));
+      }
+    }
     viewer.dispatch('toggleClickInteraction', detail);
   };
 
@@ -72,11 +84,22 @@ const Editor = function Editor(options = {}) {
         isActive
       });
       editHandler = EditHandler(handlerOptions, viewer);
+      const featureInfo = viewer.getFeatureinfo();
+      featureInfo.on('changeselection', detail => {
+        lastSelectedItem = detail;
+      });
+
+      // Event is sent from featureinfo when popup etc is closed or cleared, but not when tool changes
+      featureInfo.on('clearselection', () => {
+        lastSelectedItem = null;
+      });
 
       viewer.on('toggleClickInteraction', (detail) => {
         if (detail.name === 'editor' && detail.active) {
           editorButton.dispatch('change', { state: 'active' });
         } else {
+          // Someone else got active. Ditch the last selected item as we don't go directly from featureinfo to edit
+          lastSelectedItem = null;
           editorButton.dispatch('change', { state: 'initial' });
         }
       });

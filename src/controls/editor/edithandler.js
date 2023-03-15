@@ -22,7 +22,6 @@ import topology from '../../utils/topology';
 import attachmentsform from './attachmentsform';
 import relatedTablesForm from './relatedtablesform';
 import relatedtables from '../../utils/relatedtables';
-import SelectedItem from '../../models/SelectedItem';
 
 const editsStore = store();
 let editLayers = {};
@@ -55,6 +54,7 @@ let allowEditGeometry;
 /** List that tracks the state when editing related tables */
 let breadcrumbs = [];
 let autoCreatedFeature = false;
+let preselectedFeature;
 
 function isActive() {
   // FIXME: this only happens at startup as they are set to null on closing. If checking for null/falsley/not truely it could work as isVisible with
@@ -502,12 +502,11 @@ function setInteractions(drawType) {
   select = new Select({
     layers: [editLayer]
   });
-  const alreadySelectedFeatureFromFeatureInfo = featureInfo.getLastSelectedItem();
-  if (alreadySelectedFeatureFromFeatureInfo instanceof SelectedItem
-    && alreadySelectedFeatureFromFeatureInfo.getLayer().get('name') == currentLayer) {
-    select.getFeatures().push(alreadySelectedFeatureFromFeatureInfo.getFeature());
+  if (preselectedFeature) {
+    select.getFeatures().push(preselectedFeature);
   }
-  featureInfo.clearLastSelectedItem();
+  // Clear it so we won't get stuck on this feature. This makes it unnecessary to clear it anywhere else.
+  preselectedFeature = null;
   if (allowEditGeometry) {
     modify = new Modify({
       features: select.getFeatures()
@@ -1412,6 +1411,15 @@ function onDeleteChild(e) {
 }
 
 /**
+ * Sets a feature that will be active for editing when editor is activated. When the edit session starts, the feature's layer must
+ * be active and that state is kept in the editor toolbar and sent through an event, so you better update toolbar as well.
+ * @param {any} feature
+ */
+function preselectFeature(feature) {
+  preselectedFeature = feature;
+}
+
+/**
  * Creates the handler. It is used as sort of a singelton, but in theory there could be many handlers.
  * It communicates with the editor toolbar and forms using DOM events, which makes it messy to have more than one instance as they would use the same events.
  * @param {any} options
@@ -1452,6 +1460,7 @@ export default function editHandler(options, v) {
     createFeature: createFeatureApi,
     editAttributesDialog: editAttributesDialogApi,
     deleteFeature: deleteFeatureApi,
-    setActiveLayer: setActiveLayerApi
+    setActiveLayer: setActiveLayerApi,
+    preselectFeature
   };
 }
