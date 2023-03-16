@@ -374,7 +374,7 @@ function addLayer(layerParams = {}) {
     newLayer = layer;
     map.addLayer(newLayer);
   } else {
-    if (!viewer.getGroup(groupName)) {
+    if (!viewer.getGroup(groupName) && groupName !== 'none') {
       viewer.addGroup({ title: groupTitle, name: groupName, expanded: true });
     }
     const newLayerOptions = {
