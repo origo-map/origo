@@ -516,8 +516,6 @@ const init = function init(optOptions) {
     const addedLayer = await this.drawHandler.addLayer();
     setActiveLayer(addedLayer);
   });
-  drawCmp.on('changeFeature', (params) => {
-  });
 };
 
 export default {
