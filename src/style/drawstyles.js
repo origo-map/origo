@@ -7,7 +7,7 @@ import {
   Text
 } from 'ol/style';
 import { getArea, getLength } from 'ol/sphere';
-import { LineString, Point } from 'ol/geom';
+import { LineString, MultiPoint, Point } from 'ol/geom';
 
 function createRegularShape(type, size, fill, stroke) {
   let style;
@@ -135,6 +135,34 @@ function formatRadius(feat) {
   return output;
 }
 
+const selectionStyle = new Style({
+  image: new CircleStyle({
+    radius: 5,
+    stroke: new Stroke({
+      color: 'rgba(0, 0, 0, 0.7)'
+    }),
+    fill: new Fill({
+      color: 'rgba(0, 153, 255, 0.8)'
+    })
+  }),
+  geometry(feature) {
+    let coords;
+    let pointGeometry;
+    const type = feature.getGeometry().getType();
+    if (type === 'Polygon') {
+      coords = feature.getGeometry().getCoordinates()[0];
+      pointGeometry = new MultiPoint(coords);
+    } else if (type === 'LineString') {
+      coords = feature.getGeometry().getCoordinates();
+      pointGeometry = new MultiPoint(coords);
+    } else if (type === 'Point') {
+      coords = feature.getGeometry().getCoordinates();
+      pointGeometry = new Point(coords);
+    }
+    return pointGeometry;
+  }
+});
+
 const measureStyle = new Style({
   fill: new Fill({
     color: 'rgba(255, 255, 255, 0.4)'
@@ -205,7 +233,7 @@ const modifyStyle = new Style({
       color: 'rgba(0, 0, 0, 0.7)'
     }),
     fill: new Fill({
-      color: 'rgba(255, 0, 0, 0.4)'
+      color: 'rgba(0, 153, 255, 0.8)'
     })
   }),
   text: new Text({
@@ -433,5 +461,6 @@ export {
   measureStyle,
   modifyStyle,
   segmentStyle,
+  selectionStyle,
   tipStyle
 };

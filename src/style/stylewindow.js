@@ -1,6 +1,5 @@
-import { LineString, MultiPoint, Point } from 'ol/geom';
+import { LineString, Point } from 'ol/geom';
 import Select from 'ol/interaction/Select';
-import Circle from 'ol/style/Circle';
 import Fill from 'ol/style/Fill';
 import Stroke from 'ol/style/Stroke';
 import Style from 'ol/style/Style';
@@ -39,31 +38,6 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     showMeasure: false,
     selected: false
   };
-
-  const selectionStyle = new Style({
-    image: new Circle({
-      radius: 6,
-      fill: new Fill({
-        color: [0, 200, 200, 0.8]
-      })
-    }),
-    geometry(feature) {
-      let coords;
-      let pointGeometry;
-      const type = feature.getGeometry().getType();
-      if (type === 'Polygon') {
-        coords = feature.getGeometry().getCoordinates()[0];
-        pointGeometry = new MultiPoint(coords);
-      } else if (type === 'LineString') {
-        coords = feature.getGeometry().getCoordinates();
-        pointGeometry = new MultiPoint(coords);
-      } else if (type === 'Point') {
-        coords = feature.getGeometry().getCoordinates();
-        pointGeometry = new Point(coords);
-      }
-      return pointGeometry;
-    }
-  });
 
   function escapeQuotes(s) {
     return s.replace(/'/g, "''");
@@ -319,7 +293,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
         break;
     }
     if (styleObj.selected) {
-      style.push(selectionStyle);
+      style.push(drawStyles.selectionStyle);
     }
     return style;
   }
