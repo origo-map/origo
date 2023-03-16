@@ -16,16 +16,18 @@ import Footer from './components/footer';
 import flattenGroups from './utils/flattengroups';
 import getcenter from './geometry/getcenter';
 import isEmbedded from './utils/isembedded';
+import generateUUID from './utils/generateuuid';
 import permalink from './permalink/permalink';
+import Stylewindow from './style/stylewindow';
 
 const Viewer = function Viewer(targetOption, options = {}) {
   let map;
   let tileGrid;
   let featureinfo;
   let selectionmanager;
+  let stylewindow;
 
-  let {
-    projection,
+  const {
     breakPoints,
     breakPointsPrefix,
     clsOptions = '',
@@ -50,7 +52,12 @@ const Viewer = function Viewer(targetOption, options = {}) {
     source = {},
     clusterOptions = {},
     tileGridOptions = {},
-    url
+    url,
+    palette = ['rgb(166,206,227)', 'rgb(31,120,180)', 'rgb(178,223,138)', 'rgb(51,160,44)', 'rgb(251,154,153)', 'rgb(227,26,28)', 'rgb(253,191,111)']
+  } = options;
+
+  let {
+    projection
   } = options;
 
   const viewerOptions = Object.assign({}, options);
@@ -123,6 +130,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
   const getFeatureinfo = () => featureinfo;
 
   const getSelectionManager = () => selectionmanager;
+
+  const getStylewindow = () => stylewindow;
 
   const getCenter = () => getcenter;
 
@@ -394,6 +403,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     this.dispatch('addlayer', {
       layerName: layerProps.name
     });
+    return layer;
   };
 
   const addLayers = function addLayers(layersProps) {
@@ -564,6 +574,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
           featureinfoOptions.viewer = this;
 
           selectionmanager = Selectionmanager(featureinfoOptions);
+          stylewindow = Stylewindow({ target: this.getId(), palette, viewer: this });
           featureinfo = Featureinfo(featureinfoOptions);
           this.addComponent(selectionmanager);
           this.addComponent(featureinfo);
@@ -579,7 +590,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
                               ${footer.render()}
                             </div>
                           </div>
-                              
+
                           <div id="loading" class="hide">
                             <div class="loading-spinner"></div>
                           </div>`;
@@ -640,8 +651,10 @@ const Viewer = function Viewer(targetOption, options = {}) {
     setStyle,
     zoomToExtent,
     getSelectionManager,
+    getStylewindow,
     getEmbedded,
-    permalink
+    permalink,
+    generateUUID
   });
 };
 

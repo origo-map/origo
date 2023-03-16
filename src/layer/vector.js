@@ -14,11 +14,16 @@ export default function vector(opt, src, viewer) {
   switch (options.layerType) {
     case 'vector':
     {
+      if (typeof opt.style === 'function') {
+        options.style = opt.style;
+      } else {
+        options.style = Style.createStyle({
+          style: options.style,
+          viewer
+        });
+      }
+
       options.source = source;
-      options.style = Style.createStyle({
-        style: options.style,
-        viewer
-      });
       vectorLayer = new VectorLayer(options);
       break;
     }

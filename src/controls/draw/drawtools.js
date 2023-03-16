@@ -1,12 +1,11 @@
 import dropDown from '../../dropdown';
-import dispatcher from './drawdispatcher';
 import utils from '../../utils';
 
 const createElement = utils.createElement;
 
 let viewer;
 
-const drawToolsSelector = function drawToolsSelector(tools, v) {
+const drawToolsSelector = function drawToolsSelector(extraTools, v, toolCmps) {
   const toolNames = {
     Polygon: 'Polygon',
     Point: 'Punkt',
@@ -15,11 +14,13 @@ const drawToolsSelector = function drawToolsSelector(tools, v) {
     freehand: 'Frihandsläge'
   };
   viewer = v;
+  const drawCmp = viewer.getControlByName('draw');
   let drawTools;
   const map = viewer.getMap();
   let active = false;
   const activeCls = 'o-active';
   const target = 'draw-toolbar-dropdown';
+  let activeTool;
 
   function selectionModel() {
     const selectOptions = drawTools.map((drawTool) => {
@@ -46,16 +47,18 @@ const drawToolsSelector = function drawToolsSelector(tools, v) {
     }
   }
 
+  function changeDrawType(e) {
+    drawCmp.dispatch('toggleDraw', { tool: activeTool, drawType: e.detail.dataAttribute, clearTool: true });
+    close();
+  }
+
   function addDropDown(options) {
     dropDown(options.target, options.selectOptions, {
       dataAttribute: 'shape',
       active: options.activeTool
     });
-    document.getElementById(options.target).addEventListener('changeDropdown', (e) => {
-      e.stopImmediatePropagation(e);
-      dispatcher.emitChangeEditorDrawType(options.activeTool, e.detail.dataAttribute);
-      close();
-    });
+    activeTool = options.activeTool;
+    document.getElementById(options.target).addEventListener('changeDropdown', changeDrawType);
   }
 
   function setActive(tool, state) {
@@ -81,22 +84,22 @@ const drawToolsSelector = function drawToolsSelector(tools, v) {
 
   function render() {
     // eslint-disable-next-line no-restricted-syntax
-    for (const tool in tools) {
-      if (Object.prototype.hasOwnProperty.call(tools, tool)) {
+    for (const tool in extraTools) {
+      if (Object.prototype.hasOwnProperty.call(extraTools, tool)) {
         const popover = createElement('div', '', {
           id: `${target}-${tool}`,
           cls: 'o-popover'
         });
         const { body: popoverHTML } = new DOMParser().parseFromString(popover, 'text/html');
-        document.querySelector(`button[title=${toolNames[tool]}]`).insertAdjacentElement('afterend', popoverHTML.firstElementChild);
+        document.getElementById(toolCmps[tool].getId()).appendChild(popoverHTML.firstElementChild);
         setActive(tool, false);
       }
     }
   }
 
   function setDrawTools(tool) {
-    if (tools[tool]) {
-      drawTools = tools[tool] ? tools[tool].slice(0) : [];
+    if (extraTools[tool]) {
+      drawTools = extraTools[tool] ? extraTools[tool].slice(0) : [];
       drawTools.unshift(tool);
     } else {
       drawTools = [tool];
@@ -104,18 +107,17 @@ const drawToolsSelector = function drawToolsSelector(tools, v) {
   }
 
   function onChangeEdit(e) {
-    const { detail: { tool, active: state } } = e;
+    const { tool, active: state } = e;
     if (state === true) {
       setDrawTools(tool);
       setActive(tool, true);
     } else if (state === false) {
       setActive(tool, false);
     }
-    e.stopPropagation();
   }
 
   function addListener() {
-    document.addEventListener('changeDraw', onChangeEdit);
+    drawCmp.on('changeDraw', onChangeEdit);
   }
 
   function init() {

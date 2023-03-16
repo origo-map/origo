@@ -10,7 +10,7 @@
   z-index: 10;
 }
 
-#o-draw-stylewindow {
+.o-draw-stylewindow {
   font-family: Arial,sans-serif;
   width: 250px;
   position:absolute;
@@ -22,11 +22,11 @@
   height: calc(100% - 9rem);
 }
 
-#o-draw-stylewindow input[type="radio"] {
+.o-draw-stylewindow input[type="radio"] {
   display:none;
 }
 
-#o-draw-stylewindow input[type="radio"] + label span {
+.o-draw-stylewindow input[type="radio"] + label span {
   display:inline-block;
   width:24px;
   height:24px;
@@ -37,20 +37,20 @@
   box-shadow: 0 0 0 2px white, 0 0 0 4px white;
 }
 
-#o-draw-stylewindow input[type="radio"]:checked + label span{
+.o-draw-stylewindow input[type="radio"]:checked + label span{
   box-shadow: 0 0 0 2px white, 0 0 0 4px #ababab;
 }
 
-#o-draw-stylewindow input[type="radio"] ~ label span:hover {
+.o-draw-stylewindow input[type="radio"] ~ label span:hover {
   box-shadow: 0 0 0 2px white, 0 0 0 4px #cdcdcd;
 }
 
-#o-draw-stylewindow input[type="radio"] ~ label {
+.o-draw-stylewindow input[type="radio"] ~ label {
   display:inline-block;
   vertical-align:middle;
   padding:5px;
 }
 
-#o-draw-stylewindow ul li {
+.o-draw-stylewindow ul li {
   float:left;
 }

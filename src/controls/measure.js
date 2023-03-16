@@ -8,7 +8,7 @@ import { Collection } from 'ol';
 import LayerGroup from 'ol/layer/Group';
 import { unByKey } from 'ol/Observable';
 import { Component, Icon, Element as El, Button, dom, Modal } from '../ui';
-import * as drawStyles from '../style/draw';
+import * as drawStyles from '../style/drawstyles';
 import replacer from '../utils/replacer';
 
 const Measure = function Measure({
@@ -109,7 +109,11 @@ const Measure = function Measure({
   }
 
   const vector = new VectorLayer({
+    group: 'none',
+    name: 'measure',
+    title: 'Measure',
     source,
+    zIndex: 8,
     style(feature) {
       return styleFunction(feature, showSegmentLabels);
     }

@@ -46,6 +46,11 @@ const Layer = function Layer(optOptions, viewer) {
   layerOptions.extent = layerOptions.extent || viewer.getExtent();
   layerOptions.sourceName = layerOptions.source;
   layerOptions.styleName = layerOptions.style;
+  if (typeof layerOptions.style === 'function') {
+    layerOptions.styleName = 'stylefunction';
+  } else {
+    layerOptions.styleName = layerOptions.style;
+  }
   if (layerOptions.id === undefined) {
     layerOptions.id = name.split('__').shift();
   }

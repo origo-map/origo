@@ -4,7 +4,7 @@ const templateHelpers = {
     const props = Object.keys(obj);
     const propsIncluded = [];
     props.forEach(element => {
-      if (typeof obj[element] !== 'undefined' && obj[element] !== null && obj[element] !== '') {
+      if (typeof obj[element] !== 'undefined' && obj[element] !== null && obj[element] !== '' && element !== 'style') {
         propsIncluded.push(element);
       }
     });

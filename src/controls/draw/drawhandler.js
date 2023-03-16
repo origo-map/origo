@@ -3,17 +3,9 @@ import Select from 'ol/interaction/Select';
 import Modify from 'ol/interaction/Modify';
 import DoubleClickZoom from 'ol/interaction/DoubleClickZoom';
 import GeoJSONFormat from 'ol/format/GeoJSON';
-import Circle from 'ol/style/Circle';
-import Fill from 'ol/style/Fill';
-import Style from 'ol/style/Style';
-import { MultiPoint, Point } from 'ol/geom';
-import VectorLayer from 'ol/layer/Vector';
-import VectorSource from 'ol/source/Vector';
-import dispatcher from './drawdispatcher';
-import defaultDrawStyle from './drawstyle';
-import shapes from '../editor/shapes';
-import { restoreStylewindow, updateStylewindow, getStylewindowStyle } from './stylewindow';
-import origoStyle from '../../style';
+import Feature from 'ol/Feature';
+import shapes from './shapes';
+import generateUUID from '../../utils/generateuuid';
 
 let map;
 let drawSource;
@@ -23,31 +15,10 @@ let activeTool;
 let select;
 let modify;
 let annotationField;
-
-const selectionStyle = new Style({
-  image: new Circle({
-    radius: 6,
-    fill: new Fill({
-      color: [200, 100, 100, 0.8]
-    })
-  }),
-  geometry(feature) {
-    let coords;
-    let pointGeometry;
-    const type = feature.getGeometry().getType();
-    if (type === 'Polygon') {
-      coords = feature.getGeometry().getCoordinates()[0];
-      pointGeometry = new MultiPoint(coords);
-    } else if (type === 'LineString') {
-      coords = feature.getGeometry().getCoordinates();
-      pointGeometry = new MultiPoint(coords);
-    } else if (type === 'Point') {
-      coords = feature.getGeometry().getCoordinates();
-      pointGeometry = new Point(coords);
-    }
-    return pointGeometry;
-  }
-});
+let stylewindow;
+let viewer;
+let drawCmp;
+let drawOptions;
 
 function disableDoubleClickZoom(evt) {
   const featureType = evt.feature.getGeometry().getType();
@@ -76,15 +47,20 @@ function onDrawStart(evt) {
 function setActive(drawType) {
   switch (drawType) {
     case 'draw':
-      select.getFeatures().clear();
       modify.setActive(true);
-      select.setActive(false);
+      if (select) {
+        select.getFeatures().clear();
+        select.setActive(false);
+      }
       break;
     default:
       activeTool = undefined;
       map.removeInteraction(draw);
       modify.setActive(true);
-      select.setActive(true);
+      if (select) {
+        select.getFeatures().clear();
+        select.setActive(true);
+      }
       break;
   }
 }
@@ -98,7 +74,14 @@ function onTextEnd(feature, textVal) {
   }
   setActive();
   activeTool = undefined;
-  dispatcher.emitChangeDraw('Text', false);
+  const details = {
+    feature,
+    layerName: drawLayer.get('name'),
+    action: 'insert',
+    tool: 'Text',
+    active: false
+  };
+  drawCmp.dispatch('changeDraw', details);
 }
 
 function addDoubleClickZoomInteraction() {
@@ -120,18 +103,32 @@ function enableDoubleClickZoom() {
 }
 
 function onDrawEnd(evt) {
+  const feature = evt.feature;
   if (activeTool === 'Text') {
-    onTextEnd(evt.feature, 'Text');
-    document.getElementById('o-draw-stylewindow').classList.remove('hidden');
+    onTextEnd(feature, 'Text');
+    stylewindow.dispatch('showStylewindow', true);
   } else {
     setActive();
     activeTool = undefined;
-    dispatcher.emitChangeDraw(evt.feature.getGeometry().getType(), false);
   }
   enableDoubleClickZoom(evt);
   if (drawLayer) {
-    const featureStyle = getStylewindowStyle(evt.feature);
-    evt.feature.setStyle(featureStyle);
+    feature.setId(generateUUID());
+    const styleObject = stylewindow.getStyleObject(feature);
+    feature.set('style', styleObject);
+  }
+  const details = {
+    feature,
+    layerName: drawLayer.get('name'),
+    action: 'insert',
+    status: 'pending',
+    tool: feature.getGeometry().getType(),
+    active: false
+  };
+  drawCmp.dispatch('changeDraw', details);
+  if (select) {
+    select.getFeatures().clear();
+    select.getFeatures().push(feature);
   }
 }
 
@@ -144,19 +141,24 @@ function setDraw(tool, drawType) {
     geometryType = 'Point';
   }
 
-  const drawOptions = {
+  const opt = {
     source: drawSource,
     type: geometryType
   };
 
   if (drawType) {
-    Object.assign(drawOptions, shapes(drawType));
+    Object.assign(opt, shapes(drawType));
   }
 
   map.removeInteraction(draw);
-  draw = new Draw(drawOptions);
+  draw = new Draw(opt);
   map.addInteraction(draw);
-  dispatcher.emitChangeDraw(tool, true);
+  const details = {
+    tool,
+    active: true
+  };
+  drawCmp.dispatch('changeDraw', details);
+
   draw.on('drawend', onDrawEnd, this);
   draw.on('drawstart', onDrawStart, this);
 }
@@ -167,6 +169,13 @@ function onDeleteSelected() {
   if (features.getLength()) {
     source = drawLayer.getSource();
     features.forEach((feature) => {
+      const details = {
+        feature,
+        layerName: drawLayer.get('name'),
+        action: 'delete',
+        status: 'pending'
+      };
+      drawCmp.dispatch('changeDraw', details);
       source.removeFeature(feature);
     });
     select.getFeatures().clear();
@@ -176,31 +185,42 @@ function onDeleteSelected() {
 function onSelectAdd(e) {
   if (e.target) {
     const feature = e.target.item(0);
-    const featureStyle = feature.getStyle() || origoStyle.createStyleRule(defaultDrawStyle.draw[1]);
-    featureStyle.push(selectionStyle);
-    feature.setStyle(featureStyle);
-    updateStylewindow(feature);
+    const s = feature.get('style') || {};
+    s.selected = true;
+    feature.set('style', s);
+    stylewindow.updateStylewindow(feature);
   }
 }
 
 function onSelectRemove(e) {
-  restoreStylewindow();
-  const style = e.element.getStyle();
-  if (style[style.length - 1] === selectionStyle) {
-    style.pop();
-    e.element.setStyle(style);
-  }
+  const feature = e.element;
+  const s = feature.get('style') || {};
+
+  s.selected = false;
+  feature.set('style', s);
+
+  stylewindow.restoreStylewindow();
+}
+
+function onModifyEnd(evt) {
+  const feature = evt.features.item(0);
+  const details = {
+    feature,
+    layerName: drawLayer.get('name'),
+    action: 'update',
+    status: 'pending'
+  };
+  drawCmp.dispatch('changeDraw', details);
 }
 
 function cancelDraw(tool) {
   setActive();
   activeTool = undefined;
-  dispatcher.emitChangeDraw(tool, false);
-}
-
-function onChangeDrawType(e) {
-  activeTool = undefined;
-  dispatcher.emitToggleDraw(e.detail.tool, { drawType: e.detail.drawType });
+  const details = {
+    tool,
+    active: false
+  };
+  drawCmp.dispatch('changeDraw', details);
 }
 
 function isActive() {
@@ -221,116 +241,296 @@ function removeInteractions() {
   }
 }
 
-function getState() {
-  if (drawLayer) {
-    const source = drawLayer.getSource();
-    const geojson = new GeoJSONFormat();
-    const features = source.getFeatures();
-    const json = geojson.writeFeatures(features);
-    return {
-      features: json
-    };
+function toggleDraw(detail) {
+  if (detail.clearTool) {
+    activeTool = undefined;
   }
-
-  return undefined;
-}
-
-function restoreState(state) {
-  // TODO: Sanity/data check
-  if (state.features && state.features.length > 0) {
-    if (drawLayer === undefined) {
-      drawLayer = new VectorLayer({
-        group: 'none',
-        name: 'drawplugin',
-        visible: true,
-        zIndex: 7,
-        source: new VectorSource()
-      });
-      map.addLayer(drawLayer);
-    }
-    const source = drawLayer.getSource();
-    source.addFeatures(state.features);
-    source.getFeatures().forEach((feature) => {
-      if (feature.get(annotationField)) {
-        feature.set(annotationField, feature.get(annotationField));
-      }
-      if (feature.get('style')) {
-        const featureStyle = getStylewindowStyle(feature, feature.get('style'));
-        feature.setStyle(featureStyle);
-      } else {
-        const featureStyle = getStylewindowStyle(feature);
-        feature.setStyle(featureStyle);
-      }
-    });
-  }
-}
-
-function toggleDraw(e) {
-  e.stopPropagation();
-  if (e.detail.tool === 'delete') {
+  if (detail.tool === 'delete') {
     onDeleteSelected();
-  } else if (e.detail.tool === 'cancel') {
-    cancelDraw(e.detail.tool);
+  } else if (detail.tool === 'cancel' && isActive()) {
+    cancelDraw(detail.tool);
     removeInteractions();
-  } else if (e.detail.tool === activeTool) {
-    cancelDraw(e.detail.tool);
-  } else if (e.detail.tool === 'Polygon' || e.detail.tool === 'LineString' || e.detail.tool === 'Point' || e.detail.tool === 'Text') {
+  } else if (detail.tool === activeTool) {
+    cancelDraw(detail.tool);
+  } else if (detail.tool === 'Polygon' || detail.tool === 'LineString' || detail.tool === 'Point' || detail.tool === 'Text') {
     if (activeTool) {
       cancelDraw(activeTool);
     }
     setActive('draw');
-    setDraw(e.detail.tool, e.detail.drawType);
+    setDraw(detail.tool, detail.drawType);
   }
 }
 
-function onEnableInteraction(e) {
-  if (e.detail.interaction === 'draw' && !isActive()) {
-    if (drawLayer === undefined) {
-      drawLayer = new VectorLayer({
-        group: 'none',
-        name: 'drawplugin',
-        visible: true,
-        zIndex: 7,
-        source: new VectorSource()
-      });
-      map.addLayer(drawLayer);
-    }
-    select = new Select({
-      layers: [drawLayer],
-      style: null,
-      hitTolerance: 5
-    });
-    modify = new Modify({
-      features: select.getFeatures(),
-      style: null
-    });
-    map.addInteraction(select);
-    map.addInteraction(modify);
-    select.getFeatures().on('add', onSelectAdd, this);
-    select.getFeatures().on('remove', onSelectRemove, this);
-    setActive();
+function addDrawInteractions() {
+  select = new Select({
+    layers: [drawLayer],
+    style(feature) {
+      const style = stylewindow.getStyleFunction(feature);
+      return style;
+    },
+    hitTolerance: 5
+  });
+  modify = new Modify({
+    features: select.getFeatures()
+  });
+  map.addInteraction(select);
+  map.addInteraction(modify);
+  select.getFeatures().on('add', onSelectAdd, this);
+  select.getFeatures().on('remove', onSelectRemove, this);
+  modify.on('modifyend', onModifyEnd, this);
+  setActive();
+}
+
+function removeDrawInteractions() {
+  if (select) {
+    select.getFeatures().clear();
+    map.removeInteraction(select);
   }
+  if (modify) {
+    map.removeInteraction(modify);
+  }
+}
+
+async function onEnableInteraction(e) {
+  if (e.detail.name === 'draw' && e.detail.active) {
+    if (drawLayer === undefined) {
+      drawCmp.dispatch('addDrawLayer');
+    } else {
+      addDrawInteractions();
+    }
+  }
+}
+
+function getFeaturesByIds(type, layer, ids) {
+  const source = layer.getSource();
+  const features = [];
+  if (type === 'delete') {
+    ids.forEach((id) => {
+      const dummy = new Feature();
+      dummy.setId(id);
+      features.push(dummy);
+    });
+  } else {
+    ids.forEach((id) => {
+      let feature;
+      if (source.getFeatureById(id)) {
+        feature = source.getFeatureById(id);
+        feature.unset('bbox');
+        features.push(feature);
+      }
+    });
+  }
+
+  return features;
 }
 
 const getSelection = () => select.getFeatures();
 
+const getActiveLayer = () => drawLayer;
+
+function getDrawLayers() {
+  const drawLayersArray = viewer.getLayersByProperty('drawlayer', true);
+  return drawLayersArray;
+}
+
+function setActiveLayer(layer) {
+  if (layer) {
+    drawLayer = layer;
+  }
+  removeDrawInteractions();
+  addDrawInteractions();
+}
+
+function onUpdate(feature, layerName) {
+  const details = {
+    feature,
+    layerName,
+    action: 'update',
+    status: 'pending'
+  };
+  drawCmp.dispatch('changeDraw', details);
+}
+
+function addLayer(layerParams = {}) {
+  const layerOptions = Object.assign(drawOptions, layerParams);
+  const {
+    layerTitle = 'Ritlager',
+    groupName = 'none',
+    groupTitle = 'Ritlager',
+    layerId = generateUUID(),
+    layer,
+    features,
+    source,
+    visible = true,
+    styleByAttribute = false,
+    queryable = false,
+    removable = true,
+    exportable = true,
+    drawlayer = true
+  } = layerOptions;
+  let newLayer;
+
+  if (layer) { // Should maybe be handled differently, where does the layer come from?
+    newLayer = layer;
+    map.addLayer(newLayer);
+  } else {
+    if (!viewer.getGroup(groupName)) {
+      viewer.addGroup({ title: groupTitle, name: groupName, expanded: true });
+    }
+    const newLayerOptions = {
+      group: groupName,
+      id: layerId,
+      name: layerId,
+      title: layerTitle,
+      zIndex: 7,
+      styleByAttribute,
+      visible,
+      queryable,
+      removable,
+      exportable,
+      drawlayer,
+      type: 'GEOJSON',
+      attributes: [
+        {
+          title: '',
+          name: 'popuptext',
+          type: 'text'
+        }
+      ],
+      style(feature) {
+        return stylewindow.getStyleFunction(feature);
+      }
+    };
+    if (source) {
+      newLayerOptions.source = source;
+    }
+    if (features) {
+      newLayerOptions.features = features;
+    }
+    drawCmp.dispatch('addLayer', true);
+    newLayer = viewer.addLayer(newLayerOptions);
+  }
+  drawLayer = newLayer;
+  if (isActive()) {
+    setActiveLayer(newLayer);
+  }
+
+  newLayer.getSource().forEachFeature((e) => {
+    e.on('change:style', () => {
+      onUpdate(e, newLayer.get('name'));
+    });
+    e.on('change:popuptext', () => {
+      onUpdate(e, newLayer.get('name'));
+    });
+  });
+  newLayer.getSource().on('addfeature', (e) => {
+    e.feature.on('change:style', () => {
+      onUpdate(e.feature, newLayer.get('name'));
+    });
+    e.feature.on('change:popuptext', () => {
+      onUpdate(e, newLayer.get('name'));
+    });
+  });
+  return newLayer;
+}
+
 const getActiveTool = () => activeTool;
+
+function getState() {
+  if (select) {
+    select.getFeatures().clear();
+  }
+  const drawLayers = getDrawLayers();
+  const layerArr = [];
+  drawLayers.forEach(layer => {
+    const source = layer.getSource();
+    const layerId = layer.get('name') || layer.get('id') || generateUUID();
+    const layerTitle = layer.get('title') || drawOptions.layerTitle || 'Ritlager';
+    const visible = layer.get('visible') || layer.getVisible();
+    const features = source.getFeatures();
+    const geojson = new GeoJSONFormat();
+    layerArr.push({ id: layerId, title: layerTitle, visible, features: geojson.writeFeatures(features) });
+  });
+  if (layerArr.length > 0) {
+    return {
+      layers: layerArr
+    };
+  }
+  return undefined;
+}
+
+function restoreState(urlParams) {
+  if (urlParams && urlParams.controls && urlParams.controls.draw) {
+    const state = urlParams.controls.draw;
+    // TODO: Sanity/data check
+    if (state.layers && state.layers.length > 0) {
+      state.layers.forEach(layer => {
+        const layerId = layer.id || generateUUID();
+        const layerTitle = layer.title || 'Ritlager';
+        const visible = layer.visible;
+        const features = layer.features;
+        const newLayer = addLayer({ layerId, layerTitle, visible });
+        const source = newLayer.getSource();
+        source.addFeatures(features);
+      });
+    } else if (state.features && state.features.length > 0) {
+      const features = state.features;
+      features.forEach(feature => {
+        const layerId = feature.get('layer');
+        if (layerId) {
+          const layer = viewer.getLayer(layerId);
+          if (layer) {
+            const source = layer.getSource();
+            source.addFeature(feature);
+          } else {
+            let layerTitle;
+            const newLayer = addLayer({ layerId, layerTitle });
+            const source = newLayer.getSource();
+            source.addFeature(feature);
+          }
+        } else {
+          if (drawLayer === undefined) {
+            addLayer();
+          }
+          const source = drawLayer.getSource();
+          source.addFeature(feature);
+        }
+      });
+    }
+  }
+}
 
 const init = function init(optOptions) {
   const options = optOptions || {};
-  map = options.viewer.getMap();
-  annotationField = options.annotation || 'annonation';
+  viewer = options.viewer;
+  map = viewer.getMap();
+  stylewindow = options.stylewindow;
+  annotationField = options.annotation || 'annonation'; // Old typo we will have to live with
+  drawCmp = options.drawCmp;
+  drawOptions = drawCmp.options;
   activeTool = undefined;
-  document.addEventListener('toggleDraw', toggleDraw);
-  document.addEventListener('editorDrawTypes', onChangeDrawType);
-  document.addEventListener('enableInteraction', onEnableInteraction);
+  viewer.on('toggleClickInteraction', (detail) => {
+    onEnableInteraction({ detail });
+  });
+  drawCmp.on('addDrawLayer', async function addDrawLayer() {
+    const addedLayer = await this.drawHandler.addLayer();
+    setActiveLayer(addedLayer);
+  });
+  drawCmp.on('changeFeature', (params) => {
+  });
 };
 
 export default {
   init,
+  getDrawLayers,
+  getActiveLayer,
+  setActiveLayer,
+  addLayer,
   getSelection,
+  getFeaturesByIds,
   getState,
   restoreState,
   getActiveTool,
-  isActive
+  isActive,
+  toggleDraw
 };

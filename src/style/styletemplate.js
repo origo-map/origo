@@ -89,5 +89,16 @@ export default function styleTemplate(palette, swStyle) {
     <input id="o-draw-style-textString" class="small no-margin width-full" type="text" value="${swStyle.textString}">
   </div></div>`;
 
-  return textHtml + pointHtml + fillHtml + strokeHtml;
+  const measureHtml = `<div id="o-draw-style-measure" class="padding border-bottom"><div class="text-large text-align-center">Mått</div><div class="padding-smaller o-tooltip active">
+  <div>
+    <input type="checkbox" id="o-draw-style-showMeasure" name="showMeasure"${swStyle.showMeasure ? ' checked' : ''} />
+    <label for="coding">Visa längd/area</label>
+  </div>
+  <div>
+    <input type="checkbox" id="o-draw-style-showMeasureSegments" name="showMeasureSegments"${swStyle.showMeasureSegments ? ' checked' : ''} />
+    <label for="music">Visa delsträckor</label>
+  </div>
+</div></div>`;
+
+  return textHtml + pointHtml + fillHtml + strokeHtml + measureHtml;
 }

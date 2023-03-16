@@ -323,6 +323,11 @@ const OverlayLayer = function OverlayLayer(options) {
     layerIcon.dispatch('change', { icon: newIcon });
   };
 
+  const onLayerTitleChange = function onLayerTitleChange(newTitle) {
+    const labelEl = document.getElementById(label.getId());
+    labelEl.innerHTML = newTitle;
+  };
+
   return Component({
     name,
     getLayer,
@@ -364,6 +369,9 @@ const OverlayLayer = function OverlayLayer(options) {
       });
       layer.on('change:style', () => {
         onLayerStyleChange();
+      });
+      layer.on('change:title', (e) => {
+        onLayerTitleChange(e.target.get('title'));
       });
     },
     render() {

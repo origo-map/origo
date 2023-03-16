@@ -9,6 +9,95 @@ import {
 import { getArea, getLength } from 'ol/sphere';
 import { LineString, Point } from 'ol/geom';
 
+function createRegularShape(type, size, fill, stroke) {
+  let style;
+  switch (type) {
+    case 'square':
+      style = new Style({
+        image: new RegularShape({
+          fill,
+          stroke,
+          points: 4,
+          radius: size,
+          angle: Math.PI / 4
+        })
+      });
+      break;
+
+    case 'triangle':
+      style = new Style({
+        image: new RegularShape({
+          fill,
+          stroke,
+          points: 3,
+          radius: size,
+          rotation: 0,
+          angle: 0
+        })
+      });
+      break;
+
+    case 'star':
+      style = new Style({
+        image: new RegularShape({
+          fill,
+          stroke,
+          points: 5,
+          radius: size,
+          radius2: size / 2.5,
+          angle: 0
+        })
+      });
+      break;
+
+    case 'cross':
+      style = new Style({
+        image: new RegularShape({
+          fill,
+          stroke,
+          points: 4,
+          radius: size,
+          radius2: 0,
+          angle: 0
+        })
+      });
+      break;
+
+    case 'x':
+      style = new Style({
+        image: new RegularShape({
+          fill,
+          stroke,
+          points: 4,
+          radius: size,
+          radius2: 0,
+          angle: Math.PI / 4
+        })
+      });
+      break;
+
+    case 'circle':
+      style = new Style({
+        image: new CircleStyle({
+          fill,
+          stroke,
+          radius: size
+        })
+      });
+      break;
+
+    default:
+      style = new Style({
+        image: new CircleStyle({
+          fill,
+          stroke,
+          radius: size
+        })
+      });
+  }
+  return style;
+}
+
 function formatLength(line) {
   const length = getLength(line);
   let output;
@@ -331,17 +420,18 @@ const measure = {
 
 export {
   bufferStyleFunction,
+  createRegularShape,
+  formatLength,
+  formatArea,
+  formatRadius,
   getBufferLabelStyle,
   getBufferPointStyle,
   getLabelStyle,
   getSegmentLabelStyle,
   labelStyle,
+  measure,
   measureStyle,
   modifyStyle,
   segmentStyle,
-  tipStyle,
-  formatLength,
-  formatArea,
-  formatRadius,
-  measure
+  tipStyle
 };
