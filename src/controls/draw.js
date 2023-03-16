@@ -29,6 +29,7 @@ const Draw = function Draw(options = {}) {
     } else {
       document.getElementById(thisComponent.getId()).classList.add('o-hidden');
       thisComponent.dispatch('toggleDraw', { tool: 'cancel' });
+      stylewindow.dispatch('showStylewindow', false);
     }
   }
 

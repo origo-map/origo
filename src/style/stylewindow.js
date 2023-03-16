@@ -411,7 +411,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
   });
 
   const closeWindow = function closeWindow() {
-    stylewindowEl.classList.toggle('hidden');
+    stylewindowEl.classList.add('hidden');
   };
 
   return Component({
