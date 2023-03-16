@@ -61,10 +61,6 @@ const Viewer = function Viewer(targetOption, options = {}) {
     projection
   } = options;
 
-  let {
-    projection
-  } = options;
-
   const viewerOptions = Object.assign({}, options);
   const target = targetOption;
   const center = urlParams.center || centerOption;
