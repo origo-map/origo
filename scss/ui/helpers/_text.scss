@@ -202,3 +202,7 @@ $text-fade-background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(25
     height: $text-height-smallest;
   }
 }
+
+.break-word {
+  word-wrap: break-word;
+}

@@ -51,7 +51,6 @@ export default function popup(options = {}) {
         const popupMenuEl = document.getElementById(id);
         if (popupMenuEl && !popupMenuEl.contains(e.target)) {
           onUnfocus(e);
-          e.preventDefault();
         }
       });
     },

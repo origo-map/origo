@@ -2,6 +2,7 @@ import VectorSource from 'ol/source/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
 import vector from './vector';
 import isurl from '../utils/isurl';
+import { getStylewindowStyle } from '../controls/editor/stylewindow';
 
 function createSource(options, stylewindow) {
   if (options.url) {

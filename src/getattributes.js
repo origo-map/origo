@@ -84,10 +84,12 @@ const getContent = {
         suffix = attribute.suffix;
       }
       if (attribute.formatDatetime) {
+        const locale = 'locale' in attribute.formatDatetime ? attribute.formatDatetime.locale : 'default';
+        const options = 'options' in attribute.formatDatetime ? attribute.formatDatetime.options : { dateStyle: 'full', timeStyle: 'long' };
         if (!Number.isNaN(Date.parse(featureValue))) {
-          const locale = 'locale' in attribute.formatDatetime ? attribute.formatDatetime.locale : 'default';
-          const options = 'options' in attribute.formatDatetime ? attribute.formatDatetime.options : { dateStyle: 'full', timeStyle: 'long' };
           val = new Intl.DateTimeFormat(locale, options).format(Date.parse(featureValue));
+        } else if (!Number.isNaN(new Date(featureValue).getTime())) {
+          val = new Intl.DateTimeFormat(locale, options).format(new Date(featureValue));
         }
       }
       if (attribute.url) {
@@ -195,6 +197,7 @@ function getAttributes(feature, layer, map) {
   featureinfoElement.appendChild(ulList);
   const attributes = feature.getProperties();
   const geometryName = feature.getGeometryName();
+  const attributeAlias = map.get('mapConfig').attributeAlias || [];
   delete attributes[geometryName];
   let content;
   let attribute;
@@ -205,7 +208,7 @@ function getAttributes(feature, layer, map) {
     // If attributes is string then use template named with the string
     if (typeof layerAttributes === 'string') {
       // Use attributes with the template
-      const li = featureinfotemplates(layerAttributes, attributes);
+      const li = featureinfotemplates.getFromTemplate(layerAttributes, attributes, attributeAlias);
       const templateList = document.createElement('ul');
       featureinfoElement.appendChild(templateList);
       templateList.innerHTML = li;
@@ -214,7 +217,7 @@ function getAttributes(feature, layer, map) {
         attribute = layer.get('attributes')[i];
         val = '';
         if (attribute.template) {
-          const li = featureinfotemplates(attribute.template, attributes);
+          const li = featureinfotemplates.getFromTemplate(attribute.template, attributes, attributeAlias);
           const templateList = document.createElement('ul');
           featureinfoElement.appendChild(templateList);
           templateList.innerHTML = li;
@@ -242,7 +245,7 @@ function getAttributes(feature, layer, map) {
     }
   } else {
     // Use attributes with the template
-    const li = featureinfotemplates('default', attributes);
+    const li = featureinfotemplates.getFromTemplate('default', attributes, attributeAlias);
     const templateList = document.createElement('ul');
     featureinfoElement.appendChild(templateList);
     templateList.innerHTML = li;
@@ -251,7 +254,5 @@ function getAttributes(feature, layer, map) {
   return content;
 }
 
-// export { getAttributes as default, getContent };
-
 export default getAttributes;
-export { getContent };
+export { getContent, featureinfotemplates };

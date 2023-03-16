@@ -161,10 +161,10 @@ const PrintSettings = function PrintSettings(options = {}) {
       });
       const marginControl = MarginControl({ checked: showMargins });
       const createdControl = CreatedControl({ checked: showCreated });
-      const resolutionControl = ResolutionControl({
+      const resolutionControl = resolutions.length > 1 ? ResolutionControl({
         initialResolution: resolution,
         resolutions
-      });
+      }) : undefined;
       const showScaleControl = ShowScaleControl({ checked: showScale });
       northArrowControl = NorthArrowControl({ showNorthArrow });
       printLegendControl = PrintLegendControl({ showPrintLegend });
@@ -204,8 +204,9 @@ const PrintSettings = function PrintSettings(options = {}) {
           });
         }
       });
-      const components = [customSizeControl, marginControl, orientationControl, sizeControl, titleControl, descriptionControl, createdControl, northArrowControl, printLegendControl, setScaleControl, resolutionControl, showScaleControl];
+      const components = [customSizeControl, marginControl, orientationControl, sizeControl, titleControl, descriptionControl, createdControl, northArrowControl, printLegendControl, setScaleControl, showScaleControl];
       if (rotationControl) { components.push(rotationControl); }
+      if (resolutions.length > 1) { components.push(resolutionControl); }
       contentComponent.addComponents(components);
       printSettingsContainer = Collapse({
         cls: 'flex column',
@@ -232,7 +233,9 @@ const PrintSettings = function PrintSettings(options = {}) {
       createdControl.on('change:check', (evt) => this.dispatch('change:created', evt));
       northArrowControl.on('change:check', (evt) => this.dispatch('change:northarrow', evt));
       printLegendControl.on('change:check', (evt) => this.dispatch('change:printlegend', evt));
-      resolutionControl.on('change:resolution', (evt) => this.dispatch('change:resolution', evt));
+      if (resolutionControl) {
+        resolutionControl.on('change:resolution', (evt) => this.dispatch('change:resolution', evt));
+      }
       setScaleControl.on('change:scale', (evt) => this.dispatch('change:scale', evt));
       showScaleControl.on('change:check', (evt) => this.dispatch('change:showscale', evt));
     },
