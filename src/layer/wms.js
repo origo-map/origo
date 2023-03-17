@@ -37,30 +37,45 @@ function createImageSource(options) {
   }));
 }
 
-function createWmsStyle(wmsOptions, source, viewer, defaultStyle = true) {
-  let altStyleLegendParams;
+function createWmsStyle({ wmsOptions, source, viewer, initialStyle = false }) {
   let maxResolution = viewer.getResolutions()[viewer.getResolutions().length - 1];
+  let newStyle;
 
-  if (!(defaultStyle) && (wmsOptions.stylePicker)) {
-    const altStyle = wmsOptions.stylePicker.find(style => style.style === wmsOptions.styleName);
-    if (altStyle.legendParams) {
-      altStyleLegendParams = altStyle.legendParams;
-      if (Object.keys(altStyle.legendParams).find(key => key.toUpperCase() === 'SCALE')) {
-        maxResolution = null;
-      }
+  if (initialStyle) {
+    if (wmsOptions.stylePicker) {
+      newStyle = wmsOptions.stylePicker.find(style => style.initialStyle);
+    } else {
+      newStyle = {
+        defaultWMSServerStyle: true,
+        hasThemeLegend: wmsOptions.hasThemeLegend || false,
+        legendParams: wmsOptions.legendParams || false
+      };
     }
+  } else {
+    newStyle = wmsOptions.stylePicker[wmsOptions.altStyleIndex];
   }
 
-  const styleName = defaultStyle ? `${wmsOptions.name}_WMSDefault` : wmsOptions.styleName;
-  const getLegendString = defaultStyle ? source.getLegendUrl(maxResolution, wmsOptions.legendParams) : source.getLegendUrl(maxResolution, {
-    STYLE: styleName,
-    ...altStyleLegendParams
-  });
-  let hasThemeLegend = wmsOptions.hasThemeLegend || false;
-  if (!defaultStyle) {
-    hasThemeLegend = wmsOptions.stylePicker[wmsOptions.altStyleIndex].hasThemeLegend || false;
+  const legendParams = wmsOptions.stylePicker ? newStyle.legendParams : wmsOptions.legendParams;
+
+  if ((legendParams) && (Object.keys(legendParams).find(key => key.toUpperCase() === 'SCALE'))) {
+    maxResolution = null;
   }
 
+  let getLegendString;
+  let styleName;
+
+  if (newStyle.defaultWMSServerStyle) {
+    getLegendString = source.getLegendUrl(maxResolution, legendParams);
+    styleName = `${wmsOptions.name}_WMSServerDefault`;
+  } else {
+    getLegendString = source.getLegendUrl(maxResolution, {
+      STYLE: newStyle.style,
+      ...legendParams
+    });
+    styleName = newStyle.style;
+  }
+
+  const hasThemeLegend = newStyle.hasThemeLegend || false;
   const style = [[{
     icon: {
       src: `${getLegendString}`
@@ -74,14 +89,26 @@ function createWmsStyle(wmsOptions, source, viewer, defaultStyle = true) {
 function createWmsLayer(wmsOptions, source, viewer) {
   const wmsOpts = wmsOptions;
   const wmsSource = source;
-  if (wmsOpts.styleName === 'default') {
-    wmsOpts.styleName = createWmsStyle(wmsOptions, source, viewer);
+
+  if (wmsOptions.stylePicker) {
+    let pickedStyle;
+    if (wmsOptions.altStyleIndex > -1) {
+      wmsOpts.defaultStyle = createWmsStyle({ wmsOptions, source, viewer, initialStyle: true });
+      wmsOpts.styleName = createWmsStyle({ wmsOptions, source, viewer });
+      wmsOpts.style = wmsOptions.styleName;
+      pickedStyle = wmsOptions.stylePicker[wmsOptions.altStyleIndex];
+    } else {
+      wmsOpts.styleName = createWmsStyle({ wmsOptions, source, viewer, initialStyle: true });
+      wmsOpts.defaultStyle = wmsOpts.styleName;
+      wmsOpts.style = wmsOptions.styleName;
+      pickedStyle = wmsOpts.stylePicker.find(style => style.initialStyle === true);
+    }
+    if (!(pickedStyle.defaultWMSServerStyle)) {
+      wmsSource.getParams().STYLES = wmsOptions.styleName;
+    }
+  } else if (wmsOpts.styleName === 'default') {
+    wmsOpts.styleName = createWmsStyle({ wmsOptions, source, viewer, initialStyle: true });
     wmsOpts.style = wmsOptions.styleName;
-  } else if (wmsOptions.altStyleIndex > -1) {
-    wmsOpts.defaultStyle = createWmsStyle(wmsOptions, source, viewer);
-    wmsOpts.styleName = createWmsStyle(wmsOptions, source, viewer, false);
-    wmsOpts.style = wmsOptions.styleName;
-    wmsSource.getParams().STYLES = wmsOptions.styleName;
   }
 }
 
@@ -104,9 +131,11 @@ const wms = function wms(layerOptions, viewer) {
   sourceOptions.projection = viewer.getProjection();
   sourceOptions.id = wmsOptions.id;
   sourceOptions.format = wmsOptions.format ? wmsOptions.format : sourceOptions.format;
-  const styleSettings = viewer.getStyle(wmsOptions.styleName);
-  const wmsStyleObject = styleSettings ? styleSettings[0].find(s => s.wmsStyle) : undefined;
-  sourceOptions.style = wmsStyleObject ? wmsStyleObject.wmsStyle : '';
+  if (!wmsOptions.stylePicker) {
+    const styleSettings = viewer.getStyle(wmsOptions.styleName);
+    const wmsStyleObject = styleSettings ? styleSettings[0].find(s => s.wmsStyle) : undefined;
+    sourceOptions.style = wmsStyleObject ? wmsStyleObject.wmsStyle : '';
+  }
 
   if (wmsOptions.tileGrid) {
     sourceOptions.tileGrid = maputils.tileGrid(wmsOptions.tileGrid);

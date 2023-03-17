@@ -343,7 +343,9 @@ const Viewer = function Viewer(targetOption, options = {}) {
             const altStyle = initialProps.stylePicker[savedLayerProps[layerName].altStyleIndex];
             savedProps.clusterStyle = altStyle.clusterStyle;
             savedProps.style = altStyle.style;
-            savedProps.defaultStyle = initialProps.style;
+            if (initialProps.type === 'WMS') {
+              savedProps.defaultStyle = initialProps.stylePicker.find(style => style.initialStyle);
+            } else savedProps.defaultStyle = initialProps.style;
           }
           savedProps.name = initialProps.name;
           const mergedProps = Object.assign({}, initialProps, savedProps);

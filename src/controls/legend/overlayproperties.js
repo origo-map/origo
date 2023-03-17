@@ -65,7 +65,7 @@ const OverlayProperties = function OverlayProperties(options = {}) {
   function getStyleDisplayName(styleName) {
     let altStyle = stylePicker.find(s => s.style === styleName);
     if (!altStyle) {
-      altStyle = stylePicker.find(s => s.default);
+      altStyle = stylePicker.find(s => s.defaultWMSServerStyle);
     }
     return (altStyle && altStyle.title) || styleName;
   }
@@ -75,27 +75,33 @@ const OverlayProperties = function OverlayProperties(options = {}) {
     const altStyle = stylePicker[altStyleIndex];
     styleSelection.setButtonText(styleTitle);
     const legendCmp = document.getElementById(legendComponent.getId());
-    if (!layer.get('defaultStyle')) layer.setProperties({ defaultStyle: layer.get('styleName') });
+    if (!layer.get('defaultStyle')) {
+      layer.setProperties({ defaultStyle: layer.get('styleName') });
+    }
     layer.setProperties({ altStyleIndex });
+
     if (layer.get('type') === 'WMS') {
       const layerSource = layer.get('source');
       const sourceParams = layerSource.getParams();
       let styleToSet = altStyle.style;
-      if (altStyle.default) {
-        sourceParams.STYLES = altStyle.style;
+
+      if (altStyle.initialStyle) {
         styleToSet = layer.get('defaultStyle');
-      } else {
-        sourceParams.STYLES = styleToSet;
+      } else if (altStyle.defaultWMSServerStyle) {
+        styleToSet = `${layer.get('name')}_WMSServerDefault`;
       }
+
+      sourceParams.STYLES = altStyle.defaultWMSServerStyle ? '' : styleToSet;
       layerSource.refresh();
       layer.set('styleName', styleToSet);
       let maxResolution;
       if (!(altStyle.legendParams) || !(Object.keys(altStyle.legendParams).find(key => key.toUpperCase() === 'SCALE'))) {
         maxResolution = viewer.getResolutions()[viewer.getResolutions().length - 1];
       }
-
+      let styleNameParam = styleToSet;
+      if (altStyle.defaultWMSServerStyle) styleNameParam = '';
       const getLegendString = layerSource.getLegendUrl(maxResolution, {
-        STYLE: styleToSet,
+        STYLE: styleNameParam,
         ...altStyle.legendParams
       });
       const newWmsStyle = [[{
@@ -110,6 +116,7 @@ const OverlayProperties = function OverlayProperties(options = {}) {
       layer.dispatchEvent('change:style');
       return;
     }
+
     layer.set('styleName', altStyle.style);
     legendCmp.innerHTML = Legend(viewer.getStyle(altStyle.style), opacity);
     const newStyle = Style.createStyle({ style: altStyle.style, clusterStyleName: altStyle.clusterStyle, viewer });
