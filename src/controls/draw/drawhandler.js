@@ -188,6 +188,7 @@ function onSelectAdd(e) {
     const s = feature.get('style') || {};
     s.selected = true;
     feature.set('style', s);
+    feature.changed();
     stylewindow.updateStylewindow(feature);
   }
 }
@@ -195,10 +196,9 @@ function onSelectAdd(e) {
 function onSelectRemove(e) {
   const feature = e.element;
   const s = feature.get('style') || {};
-
   s.selected = false;
   feature.set('style', s);
-
+  feature.changed();
   stylewindow.restoreStylewindow();
 }
 
@@ -264,10 +264,7 @@ function toggleDraw(detail) {
 function addDrawInteractions() {
   select = new Select({
     layers: [drawLayer],
-    style(feature) {
-      const style = stylewindow.getStyleFunction(feature);
-      return style;
-    },
+    style: null,
     hitTolerance: 5
   });
   modify = new Modify({
@@ -505,7 +502,7 @@ const init = function init(optOptions) {
   viewer = options.viewer;
   map = viewer.getMap();
   stylewindow = options.stylewindow;
-  annotationField = options.annotation || 'annonation'; // Old typo we will have to live with
+  annotationField = 'annotation';
   drawCmp = options.drawCmp;
   drawOptions = drawCmp.options;
   activeTool = undefined;

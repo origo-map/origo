@@ -54,7 +54,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     clusterOptions = {},
     tileGridOptions = {},
     url,
-    palette = ['rgb(166,206,227)', 'rgb(31,120,180)', 'rgb(178,223,138)', 'rgb(51,160,44)', 'rgb(251,154,153)', 'rgb(227,26,28)', 'rgb(253,191,111)']
+    palette
   } = options;
 
   let {
@@ -593,7 +593,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
           featureinfoOptions.viewer = this;
 
           selectionmanager = Selectionmanager(featureinfoOptions);
-          stylewindow = Stylewindow({ target: this.getId(), palette, viewer: this });
+          stylewindow = Stylewindow({ palette, viewer: this });
           featureinfo = Featureinfo(featureinfoOptions);
           this.addComponent(selectionmanager);
           this.addComponent(featureinfo);

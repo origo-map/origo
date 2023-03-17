@@ -3,6 +3,15 @@ import GeoJSON from 'ol/format/GeoJSON';
 import vector from './vector';
 import isurl from '../utils/isurl';
 
+function addStyle(feature, stylewindow) {
+  if (feature.style && feature.style !== 'undefined' && JSON.parse(feature.style)) {
+    const style = JSON.parse(feature.style);
+    feature.set('style', style);
+  }
+  const featureStyle = stylewindow.getStyleFunction;
+  feature.setStyle(featureStyle);
+}
+
 function createSource(options, stylewindow) {
   if (options.url) {
     const vectorSource = new VectorSource({
@@ -24,9 +33,8 @@ function createSource(options, stylewindow) {
                     feature.setId(1000000 + i);
                   }
                 }
-                if (feature.get('style') && options.styleByAttribute) {
-                  const featureStyle = stylewindow.getStyleFunction(feature, feature.get('style'));
-                  feature.setStyle(featureStyle);
+                if (options.styleByAttribute) {
+                  addStyle(feature, stylewindow);
                 }
                 i += 1;
               });
@@ -50,15 +58,9 @@ function createSource(options, stylewindow) {
       } else if (!feature.getId()) {
         feature.setId(1000000 + j);
       }
-      feature.style = featureProp.style;
-      if (feature.get('style') && options.styleByAttribute) {
-        const style = feature.get('style');
-        const featureStyle = stylewindow.getStyleFunction(feature, style);
-        feature.setStyle(featureStyle);
-      } else if (feature.style && options.styleByAttribute && feature.style !== 'undefined' && JSON.parse(feature.style)) {
-        const style = JSON.parse(feature.style);
-        const featureStyle = stylewindow.getStyleFunction(feature, style);
-        feature.setStyle(featureStyle);
+      if (options.styleByAttribute) {
+        feature.style = featureProp.style;
+        addStyle(feature, stylewindow);
       }
       features.push(feature);
     }

@@ -7,6 +7,7 @@ import Text from 'ol/style/Text';
 
 import * as drawStyles from './drawstyles';
 import styleTemplate from './styletemplate';
+import hexToRgba from './hextorgba';
 import { Component, Button, Element, dom } from '../ui';
 
 const Stylewindow = function Stylewindow(optOptions = {}) {
@@ -14,7 +15,6 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     title = 'Anpassa stil',
     cls = 'control overflow-hidden hidden',
     css = '',
-    target,
     viewer,
     closeIcon = '#ic_close_24px',
     palette = ['rgb(166,206,227)', 'rgb(31,120,180)', 'rgb(178,223,138)', 'rgb(51,160,44)', 'rgb(251,154,153)', 'rgb(227,26,28)', 'rgb(253,191,111)']
@@ -49,17 +49,37 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     return colorArray;
   }
 
-  swDefaults.fillColorArr = rgbToArray(swDefaults.fillColor, swDefaults.fillOpacity);
-  swDefaults.strokeColorArr = rgbToArray(swDefaults.strokeColor, swDefaults.strokeOpacity);
+  function rgbToRgba(colorString, opacity = 1) {
+    const colorArray = colorString.replace(/[^\d,.]/g, '').split(',');
+    return `rgba(${colorArray[0]},${colorArray[1]},${colorArray[2]},${opacity})`;
+  }
+
+  function rgbaToRgb(colorString) {
+    const colorArray = colorString.replace(/[^\d,.]/g, '').split(',');
+    return `rgb(${colorArray[0]},${colorArray[1]},${colorArray[2]})`;
+  }
+
+  function rgbaToOpacity(colorString) {
+    const colorArray = colorString.replace(/[^\d,.]/g, '').split(',');
+    return colorArray[3];
+  }
+
+  function stringToRgba(colorString, opacity) {
+    if (colorString.toLowerCase().startsWith('rgba(')) { return colorString; }
+    if (colorString.startsWith('#')) {
+      return hexToRgba(colorString, opacity || 1);
+    } else if (colorString.toLowerCase().startsWith('rgb(')) {
+      return rgbToRgba(colorString, opacity || 1);
+    }
+    return rgbToRgba(swDefaults.fillColor, swDefaults.fillOpacity);
+  }
 
   function setFillColor(color) {
-    swStyle.fillColor = color;
-    swStyle.fillColorArr = rgbToArray(swStyle.fillColor, swStyle.fillOpacity);
+    swStyle.fillColor = rgbToRgba(color, swStyle.fillOpacity);
   }
 
   function setStrokeColor(color) {
-    swStyle.strokeColor = color;
-    swStyle.strokeColorArr = rgbToArray(swStyle.strokeColor, swStyle.strokeOpacity);
+    swStyle.strokeColor = rgbToRgba(color, swStyle.strokeOpacity);
   }
 
   function getStyleObject(feature, selected = false) {
@@ -72,9 +92,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
       case 'LineString':
       case 'MultiLineString':
         styleObject = {
-          strokeColor: swStyle.strokeColor,
-          strokeColorArr: swStyle.strokeColorArr,
-          strokeOpacity: swStyle.strokeOpacity,
+          strokeColor: rgbToRgba(swStyle.strokeColor, swStyle.strokeOpacity),
           strokeWidth: swStyle.strokeWidth,
           strokeType: swStyle.strokeType,
           showMeasureSegments: swStyle.showMeasureSegments,
@@ -85,12 +103,8 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
       case 'Polygon':
       case 'MultiPolygon':
         styleObject = {
-          fillColor: swStyle.fillColor,
-          fillColorArr: swStyle.fillColorArr,
-          fillOpacity: swStyle.fillOpacity,
-          strokeColor: swStyle.strokeColor,
-          strokeColorArr: swStyle.strokeColorArr,
-          strokeOpacity: swStyle.strokeOpacity,
+          fillColor: rgbToRgba(swStyle.fillColor, swStyle.fillOpacity),
+          strokeColor: rgbToRgba(swStyle.strokeColor, swStyle.strokeOpacity),
           strokeWidth: swStyle.strokeWidth,
           strokeType: swStyle.strokeType,
           showMeasureSegments: swStyle.showMeasureSegments,
@@ -101,12 +115,8 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
       case 'Point':
       case 'MultiPoint':
         styleObject = {
-          fillColor: swStyle.fillColor,
-          fillColorArr: swStyle.fillColorArr,
-          fillOpacity: swStyle.fillOpacity,
-          strokeColor: swStyle.strokeColor,
-          strokeColorArr: swStyle.strokeColorArr,
-          strokeOpacity: swStyle.strokeOpacity,
+          fillColor: rgbToRgba(swStyle.fillColor, swStyle.fillOpacity),
+          strokeColor: rgbToRgba(swStyle.strokeColor, swStyle.strokeOpacity),
           strokeWidth: swStyle.strokeWidth,
           strokeType: swStyle.strokeType,
           pointSize: swStyle.pointSize,
@@ -116,9 +126,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
         break;
       case 'TextPoint':
         styleObject = {
-          fillColor: swStyle.fillColor,
-          fillColorArr: swStyle.fillColorArr,
-          fillOpacity: swStyle.fillOpacity,
+          fillColor: rgbToRgba(swStyle.fillColor, swStyle.fillOpacity),
           textSize: swStyle.textSize,
           textString: swStyle.textString,
           textFont: swStyle.textFont,
@@ -127,6 +135,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
         break;
       default:
         styleObject = swStyle;
+        styleObject.fillColor = rgbToRgba(swStyle.fillColor, swStyle.fillOpacity);
         break;
     }
     return Object.assign({}, styleObject);
@@ -141,8 +150,11 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
   }
 
   function updateStylewindow(feature) {
+    const featureStyle = feature.get('style') || {};
+    featureStyle.fillColor = stringToRgba(featureStyle.fillColor, featureStyle.fillOpacity);
+    featureStyle.strokeColor = stringToRgba(featureStyle.strokeColor, featureStyle.strokeOpacity);
     let geometryType = feature.getGeometry().getType();
-    swStyle = Object.assign(swStyle, feature.get('style'));
+    swStyle = Object.assign({}, swStyle, featureStyle);
     if (feature.get(annotationField)) {
       geometryType = 'TextPoint';
     }
@@ -175,7 +187,8 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     document.getElementById('o-draw-style-pointType').value = swStyle.pointType;
     document.getElementById('o-draw-style-textSizeSlider').value = swStyle.textSize;
     document.getElementById('o-draw-style-textString').value = swStyle.textString;
-    swStyle.strokeColor = swStyle.strokeColor.replace(/ /g, '');
+    swStyle.strokeOpacity = rgbaToOpacity(swStyle.strokeColor);
+    swStyle.strokeColor = rgbaToRgb(swStyle.strokeColor);
     const strokeEl = document.getElementById('o-draw-style-strokeColor');
     const strokeInputEl = strokeEl.querySelector(`input[value = "${swStyle.strokeColor}"]`);
     if (strokeInputEl) {
@@ -191,7 +204,8 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     document.getElementById('o-draw-style-strokeType').value = swStyle.strokeType;
 
     const fillEl = document.getElementById('o-draw-style-fillColor');
-    swStyle.fillColor = swStyle.fillColor.replace(/ /g, '');
+    swStyle.fillOpacity = rgbaToOpacity(swStyle.fillColor);
+    swStyle.fillColor = rgbaToRgb(swStyle.fillColor);
     const fillInputEl = fillEl.querySelector(`input[value = "${swStyle.fillColor}"]`);
     if (fillInputEl) {
       fillInputEl.checked = true;
@@ -206,48 +220,50 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     document.getElementById('o-draw-style-showMeasureSegments').checked = swStyle.showMeasureSegments;
   }
 
-  function getStyleFunction(feature, featureStyle) {
+  function getStyleFunction(feature, inputStyle = {}) {
+    const featureStyle = feature.get('style') || {};
+    const newStyleObj = Object.assign({}, swDefaults, featureStyle, inputStyle);
+    newStyleObj.fillColor = stringToRgba(newStyleObj.fillColor, newStyleObj.fillOpacity);
+    newStyleObj.strokeColor = stringToRgba(newStyleObj.strokeColor, newStyleObj.strokeOpacity);
     const geom = feature.getGeometry();
-    const styleObj = feature.get('style') || Object.assign(swStyle, featureStyle);
     let geometryType = feature.getGeometry().getType();
     if (feature.get(annotationField)) {
       geometryType = 'TextPoint';
     }
     let style = [];
     let lineDash;
-    if (styleObj.strokeType === 'dash') {
-      lineDash = [3 * styleObj.strokeWidth, 3 * styleObj.strokeWidth];
-    } else if (styleObj.strokeType === 'dash-point') {
-      lineDash = [3 * styleObj.strokeWidth, 3 * styleObj.strokeWidth, 0.1, 3 * styleObj.strokeWidth];
-    } else if (styleObj.strokeType === 'point') {
-      lineDash = [0.1, 3 * styleObj.strokeWidth];
+    if (newStyleObj.strokeType === 'dash') {
+      lineDash = [3 * newStyleObj.strokeWidth, 3 * newStyleObj.strokeWidth];
+    } else if (newStyleObj.strokeType === 'dash-point') {
+      lineDash = [3 * newStyleObj.strokeWidth, 3 * newStyleObj.strokeWidth, 0.1, 3 * newStyleObj.strokeWidth];
+    } else if (newStyleObj.strokeType === 'point') {
+      lineDash = [0.1, 3 * newStyleObj.strokeWidth];
     } else {
       lineDash = false;
     }
 
     const stroke = new Stroke({
-      color: styleObj.strokeColorArr,
-      width: styleObj.strokeWidth,
+      color: newStyleObj.strokeColor,
+      width: newStyleObj.strokeWidth,
       lineDash
     });
     const fill = new Fill({
-      color: styleObj.fillColorArr
+      color: newStyleObj.fillColor
     });
-    const font = `${styleObj.textSize}px ${styleObj.textFont}`;
+    const font = `${newStyleObj.textSize}px ${newStyleObj.textFont}`;
     switch (geometryType) {
       case 'LineString':
       case 'MultiLineString':
         style[0] = new Style({
           stroke
         });
-        if (styleObj.showMeasureSegments) {
+        if (newStyleObj.showMeasureSegments) {
           const segmentLabelStyle = drawStyles.getSegmentLabelStyle(geom);
           style = style.concat(segmentLabelStyle);
         }
-        if (styleObj.showMeasure) {
+        if (newStyleObj.showMeasure) {
           const label = drawStyles.formatLength(geom, true);
           const point = new Point(geom.getLastCoordinate());
-
           const labelStyle = drawStyles.getLabelStyle();
           labelStyle.setGeometry(point);
           labelStyle.getText().setText(label);
@@ -260,12 +276,12 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
           fill,
           stroke
         });
-        if (styleObj.showMeasureSegments) {
+        if (newStyleObj.showMeasureSegments) {
           const line = new LineString(geom.getCoordinates()[0]);
           const segmentLabelStyle = drawStyles.getSegmentLabelStyle(line);
           style = style.concat(segmentLabelStyle);
         }
-        if (styleObj.showMeasure) {
+        if (newStyleObj.showMeasure) {
           const label = drawStyles.formatArea(geom, true);
           const point = geom.getInteriorPoint();
           const labelStyle = drawStyles.getLabelStyle();
@@ -276,23 +292,23 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
         break;
       case 'Point':
       case 'MultiPoint':
-        style[0] = drawStyles.createRegularShape(styleObj.pointType, styleObj.pointSize, fill, stroke);
+        style[0] = drawStyles.createRegularShape(newStyleObj.pointType, newStyleObj.pointSize, fill, stroke);
         break;
       case 'TextPoint':
         style[0] = new Style({
           text: new Text({
-            text: styleObj.textString || 'Text',
+            text: newStyleObj.textString || 'Text',
             font,
             fill
           })
         });
-        feature.set(annotationField, styleObj.textString || 'Text');
+        feature.set(annotationField, newStyleObj.textString || 'Text');
         break;
       default:
-        style[0] = drawStyles.createRegularShape(styleObj.pointType, styleObj.pointSize, fill, stroke);
+        style[0] = drawStyles.createRegularShape(newStyleObj.pointType, newStyleObj.pointSize, fill, stroke);
         break;
     }
-    if (styleObj.selected) {
+    if (newStyleObj.selected) {
       style.push(drawStyles.selectionStyle);
     }
     return style;
@@ -313,7 +329,6 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
   function styleFeature(feature, selected = false) {
     const styleObject = getStyleObject(feature, selected);
     feature.set('style', styleObject);
-    feature.setStyle(getStyleFunction);
   }
 
   function styleSelectedFeatures() {
@@ -396,7 +411,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     });
   }
 
-  annotationField = optOptions.annotation || 'annonation';
+  annotationField = optOptions.annotation || 'annotation';
   swStyle = Object.assign(swDefaults, optOptions.swDefaults);
 
   let stylewindowEl;
@@ -455,6 +470,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
       this.addComponent(contentEl);
 
       this.on('render', this.onRender);
+      const target = optOptions.target || viewer.getId();
       document.getElementById(target).appendChild(dom.html(this.render()));
       this.dispatch('render');
       bindUIActions();
