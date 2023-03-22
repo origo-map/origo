@@ -65,11 +65,13 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
   }
 
   function stringToRgba(colorString, opacity) {
-    if (colorString.toLowerCase().startsWith('rgba(')) { return colorString; }
-    if (colorString.startsWith('#')) {
-      return hexToRgba(colorString, opacity || 1);
-    } else if (colorString.toLowerCase().startsWith('rgb(')) {
-      return rgbToRgba(colorString, opacity || 1);
+    if (typeof colorString === 'string') {
+      if (colorString.toLowerCase().startsWith('rgba(')) { return colorString; }
+      if (colorString.startsWith('#')) {
+        return hexToRgba(colorString, opacity || 1);
+      } else if (colorString.toLowerCase().startsWith('rgb(')) {
+        return rgbToRgba(colorString, opacity || 1);
+      }
     }
     return rgbToRgba(swDefaults.fillColor, swDefaults.fillOpacity);
   }
@@ -222,9 +224,12 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
 
   function getStyleFunction(feature, inputStyle = {}) {
     const featureStyle = feature.get('style') || {};
+    const styleScale = feature.get('styleScale') || 1;
     const newStyleObj = Object.assign({}, swDefaults, featureStyle, inputStyle);
     newStyleObj.fillColor = stringToRgba(newStyleObj.fillColor, newStyleObj.fillOpacity);
     newStyleObj.strokeColor = stringToRgba(newStyleObj.strokeColor, newStyleObj.strokeOpacity);
+    newStyleObj.strokeWidth *= styleScale;
+    newStyleObj.textSize *= styleScale;
     const geom = feature.getGeometry();
     let geometryType = feature.getGeometry().getType();
     if (feature.get(annotationField)) {

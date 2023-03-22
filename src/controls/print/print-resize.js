@@ -404,8 +404,10 @@ export default function PrintResize(options = {}) {
       } else if (features) {
         features.forEach(feature => {
           const featureStyle = feature.getStyle();
-          if (featureStyle) {
-            const styleScale = multiplyByFactor(1.5);
+          const styleScale = multiplyByFactor(1.5);
+          if (styleName === 'stylefunction') {
+            feature.set('styleScale', styleScale);
+          } else if (featureStyle) {
             if (Array.from(featureStyle).length === 0) {
               resizeFeature(featureStyle, feature, styleScale);
             } else {
@@ -439,11 +441,11 @@ export default function PrintResize(options = {}) {
     const source = layer.getSource();
     if (isVector(layer)) {
       const features = source.getFeatures();
-
-      let style = viewer.getStyle(layer.get('styleName'));
+      const styleName = layer.get('styleName');
+      let style = viewer.getStyle();
 
       const clusterStyleName = layer.get('clusterStyle') ? layer.get('clusterStyle') : undefined;
-      if (typeof layer.get('styleName') !== 'undefined') {
+      if (typeof layer.get('styleName') !== 'undefined' && layer.get('styleName') !== 'stylefunction') {
         style = Style.createStyle({ style: layer.get('styleName'), viewer, clusterStyleName });
       }
       if (style) {
@@ -451,7 +453,9 @@ export default function PrintResize(options = {}) {
       } else if (features) {
         features.forEach(feature => {
           const featureStyle = feature.getStyle();
-          if (featureStyle) {
+          if (styleName === 'stylefunction') {
+            feature.set('styleScale', 1);
+          } else if (featureStyle) {
             if (Array.from(featureStyle).length === 0) {
               resetFeature(featureStyle, layer, feature);
             } else {

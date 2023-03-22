@@ -92,11 +92,11 @@ export default function styleTemplate(palette, swStyle) {
   const measureHtml = `<div id="o-draw-style-measure" class="padding border-bottom"><div class="text-large text-align-center">Mått</div><div class="padding-smaller o-tooltip active">
   <div>
     <input type="checkbox" id="o-draw-style-showMeasure" name="showMeasure"${swStyle.showMeasure ? ' checked' : ''} />
-    <label for="coding">Visa längd/area</label>
+    <label for="o-draw-style-showMeasure" class="text-weight-normal">Visa längd/area</label>
   </div>
   <div>
     <input type="checkbox" id="o-draw-style-showMeasureSegments" name="showMeasureSegments"${swStyle.showMeasureSegments ? ' checked' : ''} />
-    <label for="music">Visa delsträckor</label>
+    <label for="o-draw-style-showMeasureSegments" class="text-weight-normal">Visa delsträckor</label>
   </div>
 </div></div>`;
 
