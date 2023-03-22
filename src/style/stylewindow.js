@@ -230,6 +230,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     newStyleObj.strokeColor = stringToRgba(newStyleObj.strokeColor, newStyleObj.strokeOpacity);
     newStyleObj.strokeWidth *= styleScale;
     newStyleObj.textSize *= styleScale;
+    newStyleObj.pointSize *= styleScale;
     const geom = feature.getGeometry();
     let geometryType = feature.getGeometry().getType();
     if (feature.get(annotationField)) {
