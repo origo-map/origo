@@ -1,4 +1,5 @@
 import Collection from 'ol/Collection';
+import { getArea, getLength } from 'ol/sphere';
 import { Component } from './ui';
 import featurelayer from './featurelayer';
 import infowindowManagerV1 from './infowindow';
@@ -180,14 +181,16 @@ const Selectionmanager = function Selectionmanager(options = {}) {
           if (currAggregation.attribute.startsWith('@')) {
             const helperName = currAggregation.attribute.substring(1);
             const geometry = currFeature.getGeometry();
+            const geomType = geometry.getType();
+            const proj = viewer.getProjection();
             if (helperName === 'area') {
-              if (geometry.getArea) {
-                val = geometry.getArea();
+              if (geomType === 'Polygon' || geomType === 'MultiPolygon') {
+                val = getArea(geometry, { projection: proj });
                 valFound = true;
               }
             } else if (helperName === 'length') {
-              if (geometry.getLength) {
-                val = geometry.getLength();
+              if (geomType === 'LineString' || geomType === 'LinearRing' || geomType === 'MultiLineString') {
+                val = getLength(geometry, { projection: proj });
                 valFound = true;
               }
             } else {
