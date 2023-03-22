@@ -64,7 +64,6 @@ const Measure = function Measure({
   let snapActive = snapIsActive;
   let tipPoint;
 
-  const labelStyle = drawStyles.getLabelStyle();
   const tipStyle = drawStyles.tipStyle;
   const modifyStyle = drawStyles.modifyStyle;
   const measureStyle = drawStyles.measureStyle;
@@ -72,7 +71,9 @@ const Measure = function Measure({
   const modify = new Modify({ source, style: modifyStyle });
 
   function styleFunction(feature, segments, drawType, tip) {
-    let styles = [measureStyle];
+    const styleScale = feature.get('styleScale') || 1;
+    const labelStyle = drawStyles.getLabelStyle(styleScale);
+    let styles = [measureStyle(styleScale)];
     const geometry = feature.getGeometry();
     const geomType = geometry.getType();
     let point; let line; let label;
@@ -114,6 +115,7 @@ const Measure = function Measure({
     title: 'Measure',
     source,
     zIndex: 8,
+    styleName: 'stylefunction',
     style(feature) {
       return styleFunction(feature, showSegmentLabels);
     }
@@ -183,8 +185,8 @@ const Measure = function Measure({
       easting,
       northing
     }, options);
-
-    const featureStyle = drawStyles.getLabelStyle();
+    const styleScale = feature.get('styleScale') || 1;
+    const featureStyle = drawStyles.getLabelStyle(styleScale);
     feature.setStyle(featureStyle);
     feature.getStyle().getText().setText('Hämtar höjd...');
 

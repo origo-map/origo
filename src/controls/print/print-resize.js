@@ -46,7 +46,7 @@ export default function PrintResize(options = {}) {
 
   // Resize features when DPI changes
   const resizeFeature = function resizeFeature(style, feature, styleScale) {
-    if (!Array.isArray(style)) {
+    if (style && !Array.isArray(style)) {
       const image = style.getImage();
       if (image) {
         if (!(feature.ol_uid in imageSavedScale)) {
@@ -76,7 +76,7 @@ export default function PrintResize(options = {}) {
 
   // Reset features that was resized in DPI changes
   const resetFeature = function resetFeature(style, layer, feature) {
-    if (!Array.isArray(style)) {
+    if (style && !Array.isArray(style)) {
       const image = style.getImage();
       if (image) {
         if (typeof layersSaveStyle[layer.get('name')].imageScale[feature.ol_uid].scale !== 'undefined') {

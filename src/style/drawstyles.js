@@ -163,52 +163,56 @@ const selectionStyle = new Style({
   }
 });
 
-const measureStyle = new Style({
-  fill: new Fill({
-    color: 'rgba(255, 255, 255, 0.4)'
-  }),
-  stroke: new Stroke({
-    color: 'rgba(0, 0, 0, 0.8)',
-    lineDash: [10, 10],
-    width: 2
-  }),
-  image: new CircleStyle({
-    radius: 5,
+const measureStyle = function measureStyle(scale = 1) {
+  return new Style({
+    fill: new Fill({
+      color: 'rgba(255, 255, 255, 0.4)'
+    }),
     stroke: new Stroke({
-      color: 'rgba(0, 0, 0, 0.7)'
+      color: 'rgba(0, 0, 0, 0.8)',
+      lineDash: [10 * scale, 10 * scale],
+      width: 2 * scale
     }),
-    fill: new Fill({
-      color: 'rgba(255, 255, 255, 0.2)'
+    image: new CircleStyle({
+      radius: 5 * scale,
+      stroke: new Stroke({
+        color: 'rgba(0, 0, 0, 0.7)'
+      }),
+      fill: new Fill({
+        color: 'rgba(255, 255, 255, 0.2)'
+      })
     })
-  })
-});
+  });
+};
 
-const labelStyle = new Style({
-  text: new Text({
-    font: '14px Calibri,sans-serif',
-    fill: new Fill({
-      color: 'rgba(255, 255, 255, 1)'
+const labelStyle = function labelStyle(scale = 1) {
+  return new Style({
+    text: new Text({
+      font: `${14 * scale}px Calibri,sans-serif`,
+      fill: new Fill({
+        color: 'rgba(255, 255, 255, 1)'
+      }),
+      backgroundFill: new Fill({
+        color: 'rgba(0, 0, 0, 0.7)'
+      }),
+      padding: [3 * scale, 3 * scale, 3 * scale, 3 * scale],
+      textBaseline: 'bottom',
+      offsetY: -15 * scale
     }),
-    backgroundFill: new Fill({
-      color: 'rgba(0, 0, 0, 0.7)'
-    }),
-    padding: [3, 3, 3, 3],
-    textBaseline: 'bottom',
-    offsetY: -15
-  }),
-  image: new RegularShape({
-    radius: 8,
-    points: 3,
-    angle: Math.PI,
-    displacement: [0, 10],
-    fill: new Fill({
-      color: 'rgba(0, 0, 0, 0.7)'
+    image: new RegularShape({
+      radius: 8 * scale,
+      points: 3,
+      angle: Math.PI,
+      displacement: [0, 10 * scale],
+      fill: new Fill({
+        color: 'rgba(0, 0, 0, 0.7)'
+      })
     })
-  })
-});
+  });
+};
 
-function getLabelStyle() {
-  return labelStyle.clone();
+function getLabelStyle(scale = 1) {
+  return labelStyle(scale).clone();
 }
 
 const tipStyle = new Style({
@@ -251,50 +255,52 @@ const modifyStyle = new Style({
   })
 });
 
-const segmentStyle = new Style({
-  text: new Text({
-    font: '12px Calibri,sans-serif',
-    fill: new Fill({
-      color: 'rgba(255, 255, 255, 1)'
-    }),
-    backgroundFill: new Fill({
-      color: 'rgba(0, 0, 0, 0.4)'
-    }),
-    padding: [2, 2, 2, 2],
-    textBaseline: 'bottom',
-    offsetY: -12
-  }),
-  image: new RegularShape({
-    radius: 6,
-    points: 3,
-    angle: Math.PI,
-    displacement: [0, 8],
-    fill: new Fill({
-      color: 'rgba(0, 0, 0, 0.4)'
-    })
-  })
-});
-
-function getBufferLabelStyle(label = '') {
+const segmentStyle = function segmentStyle(scale = 1) {
   return new Style({
     text: new Text({
-      font: '14px Calibri,sans-serif',
+      font: `${12 * scale}px Calibri,sans-serif`,
+      fill: new Fill({
+        color: 'rgba(255, 255, 255, 1)'
+      }),
+      backgroundFill: new Fill({
+        color: 'rgba(0, 0, 0, 0.4)'
+      }),
+      padding: [2 * scale, 2 * scale, 2 * scale, 2 * scale],
+      textBaseline: 'bottom',
+      offsetY: -12 * scale
+    }),
+    image: new RegularShape({
+      radius: 6 * scale,
+      points: 3,
+      angle: Math.PI,
+      displacement: [0, 8 * scale],
+      fill: new Fill({
+        color: 'rgba(0, 0, 0, 0.4)'
+      })
+    })
+  });
+};
+
+function getBufferLabelStyle(label = '', scale = 1) {
+  return new Style({
+    text: new Text({
+      font: `${14 * scale}px Calibri,sans-serif`,
       fill: new Fill({
         color: 'rgba(255, 255, 255, 1)'
       }),
       backgroundFill: new Fill({
         color: 'rgba(0, 0, 0, 0.7)'
       }),
-      padding: [3, 3, 3, 3],
+      padding: [3 * scale, 3 * scale, 3 * scale, 3 * scale],
       textBaseline: 'bottom',
-      offsetY: -15,
+      offsetY: -15 * scale,
       text: label
     }),
     image: new RegularShape({
-      radius: 8,
+      radius: 8 * scale,
       points: 3,
       angle: Math.PI,
-      displacement: [0, 10],
+      displacement: [0, 10 * scale],
       fill: new Fill({
         color: 'rgba(0, 0, 0, 0.7)'
       })
@@ -306,14 +312,14 @@ function getBufferLabelStyle(label = '') {
   });
 }
 
-function getSegmentLabelStyle(line, segmentStyles = []) {
+function getSegmentLabelStyle(line, segmentStyles = [], scale = 1) {
   let count = 0;
   const style = [];
   line.forEachSegment((a, b) => {
     const segment = new LineString([a, b]);
     const segmentLabel = formatLength(segment);
     if (segmentStyles.length - 1 < count) {
-      segmentStyles.push(segmentStyle.clone());
+      segmentStyles.push(segmentStyle(scale).clone());
     }
     const segmentPoint = new Point(segment.getCoordinateAt(0.5));
     segmentStyles[count].setGeometry(segmentPoint);
@@ -324,18 +330,18 @@ function getSegmentLabelStyle(line, segmentStyles = []) {
   return style;
 }
 
-function getBufferPointStyle() {
+function getBufferPointStyle(scale = 1) {
   return new Style({
     fill: new Fill({
       color: 'rgba(255, 255, 255, 0.2)'
     }),
     stroke: new Stroke({
       color: 'rgba(0, 0, 0, 0.5)',
-      lineDash: [10, 10],
-      width: 2
+      lineDash: [10 * scale, 10 * scale],
+      width: 2 * scale
     }),
     image: new CircleStyle({
-      radius: 5,
+      radius: 5 * scale,
       stroke: new Stroke({
         color: 'rgba(0, 0, 0, 0.7)'
       }),
@@ -351,9 +357,10 @@ function getBufferPointStyle() {
 }
 
 function bufferStyleFunction(feature) {
-  const bufferLabelStyle = getBufferLabelStyle(`${formatRadius(feature)}`);
-  const pointStyle = getBufferPointStyle();
-  return [measureStyle, bufferLabelStyle, pointStyle];
+  const styleScale = feature.get('styleScale') || 1;
+  const bufferLabelStyle = getBufferLabelStyle(`${formatRadius(feature)}`, styleScale);
+  const pointStyle = getBufferPointStyle(styleScale);
+  return [measureStyle(styleScale), bufferLabelStyle, pointStyle];
 }
 
 const measure = {

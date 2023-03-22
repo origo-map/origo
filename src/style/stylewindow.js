@@ -264,13 +264,13 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
           stroke
         });
         if (newStyleObj.showMeasureSegments) {
-          const segmentLabelStyle = drawStyles.getSegmentLabelStyle(geom);
+          const segmentLabelStyle = drawStyles.getSegmentLabelStyle(geom, [], styleScale);
           style = style.concat(segmentLabelStyle);
         }
         if (newStyleObj.showMeasure) {
           const label = drawStyles.formatLength(geom, true);
           const point = new Point(geom.getLastCoordinate());
-          const labelStyle = drawStyles.getLabelStyle();
+          const labelStyle = drawStyles.getLabelStyle(styleScale);
           labelStyle.setGeometry(point);
           labelStyle.getText().setText(label);
           style = style.concat(labelStyle);
@@ -284,13 +284,13 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
         });
         if (newStyleObj.showMeasureSegments) {
           const line = new LineString(geom.getCoordinates()[0]);
-          const segmentLabelStyle = drawStyles.getSegmentLabelStyle(line);
+          const segmentLabelStyle = drawStyles.getSegmentLabelStyle(line, [], styleScale);
           style = style.concat(segmentLabelStyle);
         }
         if (newStyleObj.showMeasure) {
           const label = drawStyles.formatArea(geom, true);
           const point = geom.getInteriorPoint();
-          const labelStyle = drawStyles.getLabelStyle();
+          const labelStyle = drawStyles.getLabelStyle(styleScale);
           labelStyle.setGeometry(point);
           labelStyle.getText().setText(label);
           style = style.concat(labelStyle);
