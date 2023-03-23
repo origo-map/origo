@@ -559,11 +559,13 @@ const Measure = function Measure({
             area.push(feature.getGeometry().getCoordinates());
             break;
           case 'Point':
-            if (feature.getStyle()[0].getText().getText() === 'o') {
-              buffer.push(feature.getGeometry().getCoordinates());
-            } else if (feature.getStyle()[0].getText().getPlacement() === 'line') {
-              bufferRadius.push(feature.getStyle()[0].getText().getText());
-            } else {
+          case 'Circle':
+            if (feature.get('tool') === 'buffer') {
+              const radius = feature.getGeometry().getRadius();
+              const center = feature.getGeometry().getCenter();
+              bufferRadius.push(radius);
+              buffer.push(center);
+            } else if (feature.get('tool') === 'elevation') {
               elevation.push(feature.getGeometry().getCoordinates());
             }
             break;
@@ -600,13 +602,16 @@ const Measure = function Measure({
   function restoreState(params) {
     if (params && params.controls && params.controls.measure) {
       if (params.controls.measure.measureState.isActive) {
-        enableInteraction();
+        isActive = false;
+        toggleMeasure();
       }
       // Restore areas
       if (params.controls.measure.measureState && params.controls.measure.measureState.area && params.controls.measure.measureState.area.length > 0) {
         if (Array.isArray(params.controls.measure.measureState.area)) {
           params.controls.measure.measureState.area.forEach((item) => {
-            source.addFeature(new Feature(item));
+            source.addFeature(new Feature({
+              geometry: new Polygon(item)
+            }));
           });
         }
       }
@@ -614,7 +619,9 @@ const Measure = function Measure({
       if (params.controls.measure.measureState && params.controls.measure.measureState.length && params.controls.measure.measureState.length.length > 0) {
         if (Array.isArray(params.controls.measure.measureState.length)) {
           params.controls.measure.measureState.length.forEach((item) => {
-            source.addFeature(new Feature(item));
+            source.addFeature(new Feature({
+              geometry: new LineString(item)
+            }));
           });
         }
       }
@@ -622,9 +629,12 @@ const Measure = function Measure({
       if (params.controls.measure.measureState && params.controls.measure.measureState.buffer && params.controls.measure.measureState.buffer.length > 0) {
         if (Array.isArray(params.controls.measure.measureState.buffer)) {
           for (let i = 0; i < params.controls.measure.measureState.buffer.length; i += 1) {
-            let radius = params.controls.measure.measureState.bufferRadius[i];
-            radius = radius.replace(' m', '');
-            addBuffer(new Feature(new Point(params.controls.measure.measureState.buffer[i]), Number(radius)), Number(radius));
+            const radius = params.controls.measure.measureState.bufferRadius[i];
+            const point = params.controls.measure.measureState.buffer[i];
+            const feature = new Feature(new Point(point));
+            feature.set('tool', 'buffer');
+            source.addFeature(feature);
+            addBuffer(feature, radius);
           }
         }
       }
@@ -632,7 +642,10 @@ const Measure = function Measure({
       if (params.controls.measure.measureState && params.controls.measure.measureState.elevation && params.controls.measure.measureState.elevation.length > 0) {
         if (Array.isArray(params.controls.measure.measureState.elevation)) {
           for (let i = 0; i < params.controls.measure.measureState.elevation.length; i += 1) {
-            getElevation(new Feature(new Point(params.controls.measure.measureState.elevation[i])));
+            const feature = new Feature(new Point(params.controls.measure.measureState.elevation[i]));
+            feature.set('tool', 'elevation');
+            source.addFeature(feature);
+            getElevation(feature);
           }
         }
       }
@@ -698,7 +711,6 @@ const Measure = function Measure({
       map.addLayer(vector);
       this.addComponents(buttons);
       this.render();
-      restoreState(viewer.getUrlParams());
       viewer.on('toggleClickInteraction', (detail) => {
         if (detail.name === 'measure' && detail.active) {
           enableInteraction();
@@ -706,6 +718,7 @@ const Measure = function Measure({
           disableInteraction();
         }
       });
+      restoreState(viewer.getUrlParams());
     },
     onInit() {
       lengthTool = measureTools.indexOf('length') >= 0;
