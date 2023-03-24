@@ -17,7 +17,8 @@ function createTileSource(options) {
       TILED: true,
       VERSION: options.version,
       FORMAT: options.format,
-      STYLES: options.style
+      STYLES: options.style,
+      CQL_FILTER: options.filter
     }
   }));
 }
@@ -32,7 +33,8 @@ function createImageSource(options) {
       LAYERS: options.id,
       VERSION: options.version,
       FORMAT: options.format,
-      STYLES: options.style
+      STYLES: options.style,
+      CQL_FILTER: options.filter
     }
   }));
 }
@@ -103,6 +105,7 @@ const wms = function wms(layerOptions, viewer) {
   sourceOptions.crossOrigin = wmsOptions.crossOrigin ? wmsOptions.crossOrigin : sourceOptions.crossOrigin;
   sourceOptions.projection = viewer.getProjection();
   sourceOptions.id = wmsOptions.id;
+  sourceOptions.filter = wmsOptions.filter;
   sourceOptions.format = wmsOptions.format ? wmsOptions.format : sourceOptions.format;
   const styleSettings = viewer.getStyle(wmsOptions.styleName);
   const wmsStyleObject = styleSettings ? styleSettings[0].find(s => s.wmsStyle) : undefined;
