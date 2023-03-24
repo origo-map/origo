@@ -197,7 +197,10 @@ function getAttributes(feature, layer, map) {
   featureinfoElement.appendChild(ulList);
   const attributes = feature.getProperties();
   const geometryName = feature.getGeometryName();
-  const attributeAlias = map.get('mapConfig').attributeAlias || [];
+  let attributeAlias = [];
+  if (map) {
+    attributeAlias = map.get('mapConfig').attributeAlias || [];
+  }
   delete attributes[geometryName];
   let content;
   let attribute;
