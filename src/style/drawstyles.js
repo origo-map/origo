@@ -98,8 +98,8 @@ function createRegularShape(type, size, fill, stroke) {
   return style;
 }
 
-function formatLength(line) {
-  const length = getLength(line);
+function formatLength(line, projection) {
+  const length = getLength(line, { projection });
   let output;
   if (length > 1000) {
     output = `${Math.round((length / 1000) * 100) / 100} km`;
@@ -109,8 +109,8 @@ function formatLength(line) {
   return output;
 }
 
-function formatArea(polygon, useHectare) {
-  const area = getArea(polygon);
+function formatArea(polygon, useHectare, projection) {
+  const area = getArea(polygon, { projection });
   let output;
   if (area > 10000000) {
     output = `${Math.round((area / 1000000) * 100) / 100} km\xB2`;
@@ -312,12 +312,12 @@ function getBufferLabelStyle(label = '', scale = 1) {
   });
 }
 
-function getSegmentLabelStyle(line, segmentStyles = [], scale = 1) {
+function getSegmentLabelStyle(line, projection, scale = 1, segmentStyles = []) {
   let count = 0;
   const style = [];
   line.forEachSegment((a, b) => {
     const segment = new LineString([a, b]);
-    const segmentLabel = formatLength(segment);
+    const segmentLabel = formatLength(segment, projection);
     if (segmentStyles.length - 1 < count) {
       segmentStyles.push(segmentStyle(scale).clone());
     }

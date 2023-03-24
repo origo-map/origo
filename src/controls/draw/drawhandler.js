@@ -17,6 +17,7 @@ let modify;
 let annotationField;
 let stylewindow;
 let viewer;
+let projection;
 let drawCmp;
 let drawOptions;
 
@@ -395,7 +396,7 @@ function addLayer(layerParams = {}) {
         }
       ],
       style(feature) {
-        return stylewindow.getStyleFunction(feature);
+        return stylewindow.getStyleFunction(feature, {}, projection);
       }
     };
     if (source) {
@@ -500,6 +501,7 @@ function restoreState(urlParams) {
 const init = function init(optOptions) {
   const options = optOptions || {};
   viewer = options.viewer;
+  projection = viewer.getProjection().getCode();
   map = viewer.getMap();
   stylewindow = options.stylewindow;
   annotationField = 'annotation';

@@ -22,6 +22,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
 
   let annotationField;
   let swStyle = {};
+  let mapProjection;
   const swDefaults = {
     fillColor: 'rgb(0,153,255)',
     fillOpacity: 0.75,
@@ -222,7 +223,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     document.getElementById('o-draw-style-showMeasureSegments').checked = swStyle.showMeasureSegments;
   }
 
-  function getStyleFunction(feature, inputStyle = {}) {
+  function getStyleFunction(feature, inputStyle = {}, projection = mapProjection) {
     const featureStyle = feature.get('style') || {};
     const styleScale = feature.get('styleScale') || 1;
     const newStyleObj = Object.assign({}, swDefaults, featureStyle, inputStyle);
@@ -264,11 +265,11 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
           stroke
         });
         if (newStyleObj.showMeasureSegments) {
-          const segmentLabelStyle = drawStyles.getSegmentLabelStyle(geom, [], styleScale);
+          const segmentLabelStyle = drawStyles.getSegmentLabelStyle(geom, projection, styleScale);
           style = style.concat(segmentLabelStyle);
         }
         if (newStyleObj.showMeasure) {
-          const label = drawStyles.formatLength(geom, true);
+          const label = drawStyles.formatLength(geom, projection);
           const point = new Point(geom.getLastCoordinate());
           const labelStyle = drawStyles.getLabelStyle(styleScale);
           labelStyle.setGeometry(point);
@@ -284,11 +285,11 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
         });
         if (newStyleObj.showMeasureSegments) {
           const line = new LineString(geom.getCoordinates()[0]);
-          const segmentLabelStyle = drawStyles.getSegmentLabelStyle(line, [], styleScale);
+          const segmentLabelStyle = drawStyles.getSegmentLabelStyle(line, projection, styleScale);
           style = style.concat(segmentLabelStyle);
         }
         if (newStyleObj.showMeasure) {
-          const label = drawStyles.formatArea(geom, true);
+          const label = drawStyles.formatArea(geom, true, projection);
           const point = geom.getInteriorPoint();
           const labelStyle = drawStyles.getLabelStyle(styleScale);
           labelStyle.setGeometry(point);
@@ -442,6 +443,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     restoreStylewindow,
     updateStylewindow,
     onInit() {
+      mapProjection = viewer.getProjection().getCode();
       const headerCmps = [];
       const thisComponent = this;
       titleEl = Element({

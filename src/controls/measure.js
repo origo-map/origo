@@ -63,6 +63,7 @@ const Measure = function Measure({
   let snapEventListenerKeys;
   let snapActive = snapIsActive;
   let tipPoint;
+  let projection;
 
   const tipStyle = drawStyles.tipStyle;
   const modifyStyle = drawStyles.modifyStyle;
@@ -80,16 +81,16 @@ const Measure = function Measure({
     if (!drawType || drawType === geomType) {
       if (geomType === 'Polygon') {
         point = geometry.getInteriorPoint();
-        label = drawStyles.formatArea(geometry, useHectare);
+        label = drawStyles.formatArea(geometry, useHectare, projection);
         line = new LineString(geometry.getCoordinates()[0]);
       } else if (geomType === 'LineString') {
         point = new Point(geometry.getLastCoordinate());
-        label = drawStyles.formatLength(geometry);
+        label = drawStyles.formatLength(geometry, projection);
         line = geometry;
       }
     }
     if (segments && line) {
-      const segmentLabelStyle = drawStyles.getSegmentLabelStyle(line);
+      const segmentLabelStyle = drawStyles.getSegmentLabelStyle(line, projection);
       styles = styles.concat(segmentLabelStyle);
     }
     if (label) {
@@ -674,6 +675,7 @@ const Measure = function Measure({
     },
     onAdd(evt) {
       viewer = evt.target;
+      projection = viewer.getProjection().getCode();
       touchMode = 'ontouchstart' in document.documentElement;
       if (touchMode) {
         addNodeButton = Button({

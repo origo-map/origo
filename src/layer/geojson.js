@@ -3,13 +3,13 @@ import GeoJSON from 'ol/format/GeoJSON';
 import vector from './vector';
 import isurl from '../utils/isurl';
 
-function addStyle(feature, stylewindow) {
+function addStyle(feature, stylewindow, projection) {
   if (feature.style && feature.style !== 'undefined' && JSON.parse(feature.style)) {
     const style = JSON.parse(feature.style);
     feature.set('style', style);
   }
   const featureStyle = stylewindow.getStyleFunction;
-  feature.setStyle(featureStyle);
+  feature.setStyle((feat) => featureStyle(feat, {}, projection));
 }
 
 function createSource(options, stylewindow) {
@@ -34,7 +34,7 @@ function createSource(options, stylewindow) {
                   }
                 }
                 if (options.styleByAttribute) {
-                  addStyle(feature, stylewindow);
+                  addStyle(feature, stylewindow, options.projectionCode);
                 }
                 i += 1;
               });
@@ -60,7 +60,7 @@ function createSource(options, stylewindow) {
       }
       if (options.styleByAttribute) {
         feature.style = featureProp.style;
-        addStyle(feature, stylewindow);
+        addStyle(feature, stylewindow, options.projectionCode);
       }
       features.push(feature);
     }
