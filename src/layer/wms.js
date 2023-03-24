@@ -90,7 +90,14 @@ function createWmsLayer(wmsOptions, source, viewer) {
   const wmsOpts = wmsOptions;
   const wmsSource = source;
 
+  function setInitialStyle() {
+    if (!(wmsOpts.stylePicker.some(style => style.initialStyle === true))) {
+      wmsOpts.stylePicker[0].initialStyle = true;
+    }
+  }
+
   if (wmsOptions.stylePicker) {
+    setInitialStyle();
     let pickedStyle;
     if (wmsOptions.altStyleIndex > -1) {
       wmsOpts.defaultStyle = createWmsStyle({ wmsOptions, source, viewer, initialStyle: true });

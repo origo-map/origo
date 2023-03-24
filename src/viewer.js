@@ -344,7 +344,12 @@ const Viewer = function Viewer(targetOption, options = {}) {
             savedProps.clusterStyle = altStyle.clusterStyle;
             savedProps.style = altStyle.style;
             if (initialProps.type === 'WMS') {
-              savedProps.defaultStyle = initialProps.stylePicker.find(style => style.initialStyle);
+              let WMSStylePickerInitialStyle = initialProps.stylePicker.find(style => style.initialStyle);
+              if (WMSStylePickerInitialStyle === undefined) {
+                WMSStylePickerInitialStyle = initialProps.stylePicker[0];
+                WMSStylePickerInitialStyle.initialStyle = true;
+              }
+              savedProps.defaultStyle = WMSStylePickerInitialStyle;
             } else savedProps.defaultStyle = initialProps.style;
           }
           savedProps.name = initialProps.name;
