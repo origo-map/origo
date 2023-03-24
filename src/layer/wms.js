@@ -58,7 +58,7 @@ function createWmsStyle({ wmsOptions, source, viewer, initialStyle = false }) {
   const legendParams = wmsOptions.stylePicker ? newStyle.legendParams : wmsOptions.legendParams;
 
   if ((legendParams) && (Object.keys(legendParams).find(key => key.toUpperCase() === 'SCALE'))) {
-    maxResolution = null;
+    maxResolution = undefined;
   }
 
   let getLegendString;
