@@ -95,7 +95,7 @@ const geojson = function geojson(layerOptions, viewer) {
   } else if (geojsonOptions.source && viewer.getMapSource()[geojsonOptions.source]) {
     geojsonOptions.sourceName = geojsonOptions.source;
     sourceOptions.url = viewer.getMapSource()[geojsonOptions.source].url;
-  } else if (geojsonOptions.source) {
+  } else if (geojsonOptions.source && geojsonOptions.source !== 'none') {
     geojsonOptions.sourceName = geojsonOptions.source;
     sourceOptions.url = geojsonOptions.source;
   } else if (geojsonOptions.features) {

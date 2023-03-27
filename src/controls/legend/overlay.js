@@ -199,7 +199,7 @@ const OverlayLayer = function OverlayLayer(options) {
             const features = layer.getSource().getFeatures();
             exportToFile(features, format, {
               featureProjection: viewer.getProjection().getCode(),
-              filename: title || 'export'
+              filename: layer.get('title') || 'export'
             });
             e.preventDefault();
           });

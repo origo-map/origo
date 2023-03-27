@@ -1,5 +1,5 @@
 import { Button, dom, Component, Element as El, Input, Modal } from '../ui';
-import drawHandler from './draw/drawhandler';
+import DrawHandler from './draw/drawhandler';
 import drawExtraTools from './draw/drawtools';
 import exportToFile from '../utils/exporttofile';
 
@@ -22,6 +22,7 @@ const Draw = function Draw(options = {}) {
   let stylewindow;
   let saveButton;
   let thisComponent;
+  let drawHandler;
 
   function setActive(state) {
     if (state === true) {
@@ -113,6 +114,19 @@ const Draw = function Draw(options = {}) {
     }
   });
 
+  const onLayerDelete = function onLayerDelete(evt) {
+    const activeLayer = drawHandler.getActiveLayer();
+    const removedLayer = evt.element;
+    if (activeLayer === removedLayer) {
+      const drawLayers = drawHandler.getDrawLayers();
+      if (drawLayers.length > 0) {
+        drawHandler.setActiveLayer(drawLayers[drawLayers.length - 1]);
+      } else {
+        drawHandler.setActiveLayer(null);
+      }
+    }
+  };
+
   const layerForm = Component({ // Handle draw layers
     name: 'layerForm',
     show() {
@@ -173,7 +187,7 @@ const Draw = function Draw(options = {}) {
             const features = drawLayer.getSource().getFeatures();
             exportToFile(features, 'geojson', {
               featureProjection: viewer.getProjection().getCode(),
-              filename: 'export'
+              filename: drawLayer.get('title') || 'export'
             });
           },
           tooltipText: 'Ladda ner ritlager',
@@ -289,9 +303,9 @@ const Draw = function Draw(options = {}) {
   });
 
   toolbarButtons.push(textButton);
-
+  let layerAttributeButton;
   if (showAttributeButton) {
-    const layerAttributeButton = Button({
+    layerAttributeButton = Button({
       cls: 'padding-small icon-smaller round light box-shadow relative',
       click() {
         attributeForm.show();
@@ -360,7 +374,7 @@ const Draw = function Draw(options = {}) {
         const features = drawLayer.getSource().getFeatures();
         exportToFile(features, 'geojson', {
           featureProjection: viewer.getProjection().getCode(),
-          filename: 'export'
+          filename: drawLayer.get('title') || 'export'
         });
       },
       icon: '#ic_download_24px',
@@ -381,7 +395,8 @@ const Draw = function Draw(options = {}) {
     icon: '#ic_delete_24px',
     tooltipText: 'Ta bort',
     tooltipPlacement: 'south',
-    tooltipStyle: 'bottom:-5px;'
+    tooltipStyle: 'bottom:-5px;',
+    state: 'disabled'
   });
 
   toolbarButtons.push(deleteFeatureButton);
@@ -419,18 +434,9 @@ const Draw = function Draw(options = {}) {
     getState() {
       return drawHandler.getState();
     },
-    toggleDraw(e) {
-      drawHandler.toggleDraw(e);
-    },
-    cancelDraw() {
-      drawHandler.cancelDraw();
-    },
     onInit() {
       thisComponent = this;
       this.on('render', this.onRender);
-      this.on('cancelDraw', this.cancelDraw);
-      this.on('toggleDraw', this.toggleDraw);
-      this.on('changeDraw', changeDrawState);
     },
     onRender() {
       drawTools = {
@@ -474,7 +480,7 @@ const Draw = function Draw(options = {}) {
       this.addComponent(drawToolbarElement);
       if (showAttributeButton) { this.addComponent(attributeForm); }
       if (multipleLayers) { this.addComponent(layerForm); }
-      drawHandler.init({
+      drawHandler = DrawHandler({
         viewer,
         annotation,
         drawCmp: this,
@@ -485,6 +491,19 @@ const Draw = function Draw(options = {}) {
       viewer.on('toggleClickInteraction', (detail) => {
         onEnableInteraction({ detail });
       });
+      map.getLayers().on('remove', onLayerDelete.bind(this));
+      drawHandler.on('changeDraw', changeDrawState);
+      drawHandler.on('selectionChange', (detail) => {
+        if (deleteFeatureButton) {
+          const state = detail.features.getLength() > 0 ? 'inital' : 'disabled';
+          deleteFeatureButton.setState(state);
+        }
+        if (showAttributeButton) {
+          const state = detail.features.getLength() > 0 ? 'inital' : 'disabled';
+          layerAttributeButton.setState(state);
+        }
+      });
+      this.on('toggleDraw', drawHandler.toggleDraw);
     },
     render() {
       mapMenu.appendMenuItem(menuItem);
