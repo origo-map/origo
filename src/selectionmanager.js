@@ -6,6 +6,8 @@ import infowindowManagerV1 from './infowindow';
 import infowindowManagerV2 from './infowindow_expandableList';
 import Style from './style';
 import StyleTypes from './style/styletypes';
+import { formatAreaString } from './utils/formatareastring';
+import { formatLengthString } from './utils/formatlengthstring';
 
 const styleTypes = StyleTypes();
 
@@ -173,13 +175,17 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     let aggregationFn;
 
     aggregations.forEach(currAggregation => {
+      const {
+        useHectare = true
+      } = currAggregation;
+      let helperName;
       if (!currAggregation.layer || currAggregation.layer === selectionGroup) {
         let valFound = false;
         // Suck out the attribute to aggregate.
         const values = urval.get(selectionGroup).getFeatures().map(currFeature => {
           let val = 0;
           if (currAggregation.attribute.startsWith('@')) {
-            const helperName = currAggregation.attribute.substring(1);
+            helperName = currAggregation.attribute.substring(1);
             const geometry = currFeature.getGeometry();
             const geomType = geometry.getType();
             const proj = viewer.getProjection();
@@ -221,14 +227,26 @@ const Selectionmanager = function Selectionmanager(options = {}) {
           }
 
           let result = aggregationFn(values);
-          if (currAggregation.scalefactor) {
-            result *= currAggregation.scalefactor;
-          }
           const decimals = currAggregation.decimals !== undefined ? currAggregation.decimals : 2;
-          const resultstring = result.toFixed(decimals);
-          const prefix = currAggregation.label || `${currAggregation.function}(${currAggregation.attribute}): `;
-          const suffix = currAggregation.suffix || '';
-          const line = `${prefix}${resultstring}${suffix}`;
+
+          // Correct result depending on type
+          let resultstring;
+          if (helperName === 'area' && !currAggregation.unit) {
+            resultstring = formatAreaString(result, { useHectare, decimals })
+          } else if (helperName === 'length' && !currAggregation.unit) {
+            resultstring = formatLengthString(result, { decimals });
+          } else {
+            if (currAggregation.scalefactor) {
+              result *= currAggregation.scalefactor;
+            }
+            resultstring = result.toFixed(decimals);
+            if (currAggregation.unit) {
+              resultstring = `${resultstring} ${currAggregation.unit}`;
+            }
+          }
+          
+          const prefix = currAggregation.label || `${currAggregation.function}(${currAggregation.attribute}):`;
+          const line = `${prefix} ${resultstring}`;
           retval.push(line);
         }
       }
