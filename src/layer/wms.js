@@ -5,7 +5,7 @@ import maputils from '../maputils';
 import image from './image';
 
 function createTileSource(options) {
-  return new TileWMSSource(({
+  const sourceOptions = {
     attributions: options.attribution,
     url: options.url,
     gutter: options.gutter,
@@ -17,14 +17,21 @@ function createTileSource(options) {
       TILED: true,
       VERSION: options.version,
       FORMAT: options.format,
-      STYLES: options.style,
-      CQL_FILTER: options.filter
+      STYLES: options.style
     }
-  }));
+  };
+  if (options.filter) {
+    if (options.filterType === 'qgis') {
+      sourceOptions.params.EXP_FILTER = options.filter;
+    } else {
+      sourceOptions.params.CQL_FILTER = options.filter;
+    }
+  }
+  return new TileWMSSource((sourceOptions));
 }
 
 function createImageSource(options) {
-  return new ImageWMSSource(({
+  const sourceOptions = {
     attributions: options.attribution,
     url: options.url,
     crossOrigin: 'anonymous',
@@ -33,10 +40,17 @@ function createImageSource(options) {
       LAYERS: options.id,
       VERSION: options.version,
       FORMAT: options.format,
-      STYLES: options.style,
-      CQL_FILTER: options.filter
+      STYLES: options.style
     }
-  }));
+  };
+  if (options.filter) {
+    if (options.filterType === 'qgis') {
+      sourceOptions.params.EXP_FILTER = options.filter;
+    } else {
+      sourceOptions.params.CQL_FILTER = options.filter;
+    }
+  }
+  return new ImageWMSSource((sourceOptions));
 }
 
 function createWmsStyle(wmsOptions, source, viewer, defaultStyle = true) {
@@ -106,6 +120,7 @@ const wms = function wms(layerOptions, viewer) {
   sourceOptions.projection = viewer.getProjection();
   sourceOptions.id = wmsOptions.id;
   sourceOptions.filter = wmsOptions.filter;
+  sourceOptions.filterType = wmsOptions.filterType;
   sourceOptions.format = wmsOptions.format ? wmsOptions.format : sourceOptions.format;
   const styleSettings = viewer.getStyle(wmsOptions.styleName);
   const wmsStyleObject = styleSettings ? styleSettings[0].find(s => s.wmsStyle) : undefined;
