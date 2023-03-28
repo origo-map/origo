@@ -6,6 +6,8 @@ import exportToFile from '../utils/exporttofile';
 const Draw = function Draw(options = {}) {
   const {
     buttonText = 'Rita',
+    placement = ['menu'],
+    icon = '#fa-pencil',
     annotation,
     showAttributeButton = false,
     showDownloadButton = false,
@@ -13,10 +15,12 @@ const Draw = function Draw(options = {}) {
     multipleLayers = false
   } = options;
 
-  const icon = '#fa-pencil';
   let map;
   let viewer;
   let drawTools;
+  let mapTools;
+  let screenButtonContainer;
+  let screenButton;
   let mapMenu;
   let menuItem;
   let stylewindow;
@@ -28,10 +32,16 @@ const Draw = function Draw(options = {}) {
   function setActive(state) {
     if (state === true) {
       document.getElementById(thisComponent.getId()).classList.remove('o-hidden');
+      if (screenButton) {
+        screenButton.setState('active');
+      }
     } else {
       document.getElementById(thisComponent.getId()).classList.add('o-hidden');
       thisComponent.dispatch('toggleDraw', { tool: 'cancel' });
       stylewindow.dispatch('showStylewindow', false);
+      if (screenButton) {
+        screenButton.setState('initial');
+      }
     }
   }
 
@@ -455,7 +465,7 @@ const Draw = function Draw(options = {}) {
     onAdd(evt) {
       viewer = evt.target;
       map = viewer.getMap();
-      mapMenu = viewer.getControlByName('mapmenu');
+      // mapMenu = viewer.getControlByName('mapmenu');
       stylewindow = viewer.getStylewindow();
       stylewindow.on('showStylewindow', function showStylewindow(e) {
         if (e) {
@@ -469,18 +479,38 @@ const Draw = function Draw(options = {}) {
         }
       });
 
-      menuItem = mapMenu.MenuItem({
-        click() {
-          if (!drawHandler.isActive()) {
+      if (placement.indexOf('screen') > -1) {
+        mapTools = `${viewer.getMain().getMapTools().getId()}`;
+        screenButtonContainer = El({
+          tagName: 'div',
+          cls: 'flex column'
+        });
+        screenButton = Button({
+          cls: 'o-print padding-small margin-bottom-smaller icon-smaller round light box-shadow',
+          click() {
             viewer.dispatch('toggleClickInteraction', { name: 'draw', active: true });
-          }
-          mapMenu.close();
-        },
-        icon,
-        title: buttonText
-      });
+          },
+          icon,
+          tooltipText: buttonText,
+          tooltipPlacement: 'east'
+        });
+        this.addComponent(screenButton);
+      }
+      if (placement.indexOf('menu') > -1) {
+        mapMenu = viewer.getControlByName('mapmenu');
+        menuItem = mapMenu.MenuItem({
+          click() {
+            if (!drawHandler.isActive()) {
+              viewer.dispatch('toggleClickInteraction', { name: 'draw', active: true });
+            }
+            mapMenu.close();
+          },
+          icon,
+          title: buttonText
+        });
+        this.addComponent(menuItem);
+      }
 
-      this.addComponent(menuItem);
       this.addComponent(drawToolbarElement);
       if (showAttributeButton) { this.addComponent(attributeForm); }
       if (multipleLayers) { this.addComponent(layerForm); }
@@ -510,7 +540,17 @@ const Draw = function Draw(options = {}) {
       this.on('toggleDraw', drawHandler.toggleDraw);
     },
     render() {
-      mapMenu.appendMenuItem(menuItem);
+      if (placement.indexOf('screen') > -1) {
+        let htmlString = `${screenButtonContainer.render()}`;
+        let el = dom.html(htmlString);
+        document.getElementById(mapTools).appendChild(el);
+        htmlString = screenButton.render();
+        el = dom.html(htmlString);
+        document.getElementById(screenButtonContainer.getId()).appendChild(el);
+      }
+      if (placement.indexOf('menu') > -1) {
+        mapMenu.appendMenuItem(menuItem);
+      }
       const targetElement = document.getElementById(viewer.getMain().getId());
       const htmlString = `
       <div id="${this.getId()}" class="flex no-wrap fade-in no-margin bg-grey-lightest overflow-auto o-hidden">
