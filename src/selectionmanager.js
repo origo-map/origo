@@ -6,8 +6,8 @@ import infowindowManagerV1 from './infowindow';
 import infowindowManagerV2 from './infowindow_expandableList';
 import Style from './style';
 import StyleTypes from './style/styletypes';
-import { formatAreaString } from './utils/formatareastring';
-import { formatLengthString } from './utils/formatlengthstring';
+import formatAreaString from './utils/formatareastring';
+import formatLengthString from './utils/formatlengthstring';
 
 const styleTypes = StyleTypes();
 
@@ -232,7 +232,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
           // Correct result depending on type
           let resultstring;
           if (helperName === 'area' && !currAggregation.unit) {
-            resultstring = formatAreaString(result, { useHectare, decimals })
+            resultstring = formatAreaString(result, { useHectare, decimals });
           } else if (helperName === 'length' && !currAggregation.unit) {
             resultstring = formatLengthString(result, { decimals });
           } else {
@@ -244,7 +244,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
               resultstring = `${resultstring} ${currAggregation.unit}`;
             }
           }
-          
+
           const prefix = currAggregation.label || `${currAggregation.function}(${currAggregation.attribute}):`;
           const line = `${prefix} ${resultstring}`;
           retval.push(line);

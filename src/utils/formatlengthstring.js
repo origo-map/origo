@@ -4,22 +4,21 @@
  * @param {any} opts
  */
 function formatLengthString(length, opts = {}) {
-	const {
-		decimals
-	} = opts;
-	let result = length;
-	let unit = 'm';
-	if (result > 1000) {
-		result = result / 1000;
-		unit = 'km';
-	}
+  const {
+    decimals
+  } = opts;
+  let result = length;
+  let unit = 'm';
+  if (result > 1000) {
+    result /= 1000;
+    unit = 'km';
+  }
 
-	if (decimals !== undefined) {
-		result = result.toFixed(decimals);
-	}
-	const retstr = `${result} ${unit}`;
-	return retstr;
+  if (decimals !== undefined) {
+    result = result.toFixed(decimals);
+  }
+  const retstr = `${result} ${unit}`;
+  return retstr;
 }
 
-
-export { formatLengthString }
+export default formatLengthString;
