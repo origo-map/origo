@@ -372,7 +372,8 @@ const Draw = function Draw(options = {}) {
       icon: '#ic_save_24px',
       tooltipText: 'Spara',
       tooltipPlacement: 'south',
-      tooltipStyle: 'bottom:-5px;'
+      tooltipStyle: 'bottom:-5px;',
+      state: 'disabled'
     });
 
     toolbarButtons.push(saveButton);
