@@ -21,6 +21,7 @@ const Draw = function Draw(options = {}) {
   let menuItem;
   let stylewindow;
   let saveButton;
+  let layerAttributeButton;
   let thisComponent;
   let drawHandler;
 
@@ -303,7 +304,7 @@ const Draw = function Draw(options = {}) {
   });
 
   toolbarButtons.push(textButton);
-  let layerAttributeButton;
+
   if (showAttributeButton) {
     layerAttributeButton = Button({
       cls: 'padding-small icon-smaller round light box-shadow relative',
@@ -313,7 +314,8 @@ const Draw = function Draw(options = {}) {
       icon: '#ic_menu_24px',
       tooltipText: 'Attribut',
       tooltipPlacement: 'south',
-      tooltipStyle: 'bottom:-5px;'
+      tooltipStyle: 'bottom:-5px;',
+      state: 'disabled'
     });
 
     toolbarButtons.push(layerAttributeButton);
@@ -426,7 +428,9 @@ const Draw = function Draw(options = {}) {
   return Component({
     name: 'draw',
     attributeForm,
-    drawHandler,
+    getDrawHandler() {
+      return drawHandler;
+    },
     saveButton,
     getSelection() {
       return drawHandler.getSelection();
@@ -495,11 +499,11 @@ const Draw = function Draw(options = {}) {
       drawHandler.on('changeDraw', changeDrawState);
       drawHandler.on('selectionChange', (detail) => {
         if (deleteFeatureButton) {
-          const state = detail.features.getLength() > 0 ? 'inital' : 'disabled';
+          const state = detail.features.getLength() > 0 ? 'initial' : 'disabled';
           deleteFeatureButton.setState(state);
         }
         if (showAttributeButton) {
-          const state = detail.features.getLength() > 0 ? 'inital' : 'disabled';
+          const state = detail.features.getLength() > 0 ? 'initial' : 'disabled';
           layerAttributeButton.setState(state);
         }
       });

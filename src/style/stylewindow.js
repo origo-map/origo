@@ -153,7 +153,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
   }
 
   function updateStylewindow(feature) {
-    const featureStyle = feature.get('style') || {};
+    const featureStyle = feature.get('origostyle') || {};
     featureStyle.fillColor = stringToRgba(featureStyle.fillColor, featureStyle.fillOpacity);
     featureStyle.strokeColor = stringToRgba(featureStyle.strokeColor, featureStyle.strokeOpacity);
     let geometryType = feature.getGeometry().getType();
@@ -224,7 +224,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
   }
 
   function getStyleFunction(feature, inputStyle = {}, projection = mapProjection) {
-    const featureStyle = feature.get('style') || {};
+    const featureStyle = feature.get('origostyle') || {};
     const styleScale = feature.get('styleScale') || 1;
     const newStyleObj = Object.assign({}, swDefaults, featureStyle, inputStyle);
     newStyleObj.fillColor = stringToRgba(newStyleObj.fillColor, newStyleObj.fillOpacity);
@@ -335,7 +335,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
 
   function styleFeature(feature, selected = false) {
     const styleObject = getStyleObject(feature, selected);
-    feature.set('style', styleObject);
+    feature.set('origostyle', styleObject);
   }
 
   function styleSelectedFeatures() {

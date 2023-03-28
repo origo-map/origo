@@ -1,18 +1,11 @@
 import VectorSource from 'ol/source/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
+import Feature from 'ol/Feature';
 import vector from './vector';
 import isurl from '../utils/isurl';
 
-function addStyle(feature, stylewindow, projection) {
-  if (feature.style && feature.style !== 'undefined' && JSON.parse(feature.style)) {
-    const style = JSON.parse(feature.style);
-    feature.set('style', style);
-  }
-  const featureStyle = stylewindow.getStyleFunction;
-  feature.setStyle((feat) => featureStyle(feat, {}, projection));
-}
-
-function createSource(options, stylewindow) {
+function createSource(options) {
+  console.log(options);
   if (options.url) {
     const vectorSource = new VectorSource({
       attributions: options.attribution,
@@ -33,9 +26,6 @@ function createSource(options, stylewindow) {
                     feature.setId(1000000 + i);
                   }
                 }
-                if (options.styleByAttribute) {
-                  addStyle(feature, stylewindow, options.projectionCode);
-                }
                 i += 1;
               });
             }
@@ -52,17 +42,27 @@ function createSource(options, stylewindow) {
     const features = [];
     for (let j = options.features.length - 1; j >= 0; j -= 1) {
       const featureProp = options.features[j];
-      const feature = new GeoJSON().readFeature(featureProp.data);
-      if (featureProp.name) {
-        feature.setId(featureProp.name);
-      } else if (!feature.getId()) {
-        feature.setId(1000000 + j);
+      if (featureProp instanceof Feature) { // Real OpenLayers feature
+        const feature = featureProp;
+        if (!feature.getId()) {
+          feature.setId(1000000 + j);
+        }
+        features.push(feature);
+      } else if (typeof featureProp === 'object') {
+        let feature;
+        if (Object.prototype.hasOwnProperty.call(featureProp, 'geometry')) { // Probably true GeoJSON-object
+          feature = new GeoJSON().readFeature(featureProp);
+        } else if (Object.prototype.hasOwnProperty.call(featureProp, 'data')) { // Custom GeoJSON-object
+          feature = new GeoJSON().readFeature(featureProp.data);
+          if (!feature.getId() && featureProp.name) {
+            feature.setId(featureProp.name);
+          }
+        } else break;
+        if (!feature.getId()) {
+          feature.setId(1000000 + j);
+        }
+        features.push(feature);
       }
-      if (options.styleByAttribute) {
-        feature.style = featureProp.style;
-        addStyle(feature, stylewindow, options.projectionCode);
-      }
-      features.push(feature);
     }
     return new VectorSource({ features });
   }
@@ -103,8 +103,7 @@ const geojson = function geojson(layerOptions, viewer) {
   }
 
   sourceOptions.headers = layerOptions.headers;
-  const stylewindow = viewer.getStylewindow();
-  const geojsonSource = createSource(sourceOptions, stylewindow);
+  const geojsonSource = createSource(sourceOptions);
   return vector(geojsonOptions, geojsonSource, viewer);
 };
 

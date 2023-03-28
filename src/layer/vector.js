@@ -5,6 +5,8 @@ import ClusterSource from 'ol/source/Cluster';
 import Style from '../style';
 
 export default function vector(opt, src, viewer) {
+  const stylewindow = viewer.getStylewindow();
+  const stylefunction = stylewindow.getStyleFunction;
   const options = opt;
   const source = src;
   const distance = 60;
@@ -14,7 +16,10 @@ export default function vector(opt, src, viewer) {
   switch (options.layerType) {
     case 'vector':
     {
-      if (typeof opt.style === 'function') {
+      if (opt.styleByAttribute) {
+        const projection = source.projection || viewer.getProjectionCode();
+        options.style = (feat) => stylefunction(feat, {}, projection);
+      } else if (typeof opt.style === 'function') {
         options.style = opt.style;
       } else {
         options.style = Style.createStyle({

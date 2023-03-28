@@ -22,7 +22,6 @@ const DrawHandler = function DrawHandler(options = {}) {
   let select;
   let modify;
   let annotationField;
-  let projection;
   let drawOptions;
   let thisComponent;
 
@@ -121,7 +120,7 @@ const DrawHandler = function DrawHandler(options = {}) {
     if (drawLayer) {
       feature.setId(generateUUID());
       const styleObject = stylewindow.getStyleObject(feature);
-      feature.set('style', styleObject);
+      feature.set('origostyle', styleObject);
     }
     const details = {
       feature,
@@ -287,9 +286,9 @@ const DrawHandler = function DrawHandler(options = {}) {
     onSelectChange(e);
     if (e.target) {
       const feature = e.target.item(0);
-      const s = feature.get('style') || {};
+      const s = feature.get('origostyle') || {};
       s.selected = true;
-      feature.set('style', s);
+      feature.set('origostyle', s);
       feature.changed();
       stylewindow.updateStylewindow(feature);
     }
@@ -298,9 +297,9 @@ const DrawHandler = function DrawHandler(options = {}) {
   function onSelectRemove(e) {
     onSelectChange(e);
     const feature = e.element;
-    const s = feature.get('style') || {};
+    const s = feature.get('origostyle') || {};
     s.selected = false;
-    feature.set('style', s);
+    feature.set('origostyle', s);
     feature.changed();
     stylewindow.restoreStylewindow();
   }
@@ -362,7 +361,7 @@ const DrawHandler = function DrawHandler(options = {}) {
       features,
       source,
       visible = true,
-      styleByAttribute = false,
+      styleByAttribute = true,
       queryable = false,
       removable = true,
       exportable = true,
@@ -396,10 +395,7 @@ const DrawHandler = function DrawHandler(options = {}) {
             name: 'popuptext',
             type: 'text'
           }
-        ],
-        style(feature) {
-          return stylewindow.getStyleFunction(feature, {}, projection);
-        }
+        ]
       };
       if (source) {
         newLayerOptions.source = source;
@@ -524,7 +520,6 @@ const DrawHandler = function DrawHandler(options = {}) {
     toggleDraw,
     onInit() {
       thisComponent = this;
-      projection = viewer.getProjection().getCode();
       map = viewer.getMap();
       annotationField = 'annotation';
       drawOptions = drawCmp.options;
