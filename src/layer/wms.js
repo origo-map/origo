@@ -20,12 +20,10 @@ function createTileSource(options) {
       STYLES: options.style
     }
   };
-  if (options.filter) {
-    if (options.filterType === 'qgis') {
-      sourceOptions.params.EXP_FILTER = options.filter;
-    } else {
-      sourceOptions.params.CQL_FILTER = options.filter;
-    }
+  if (options.params) {
+    Object.keys(options.params).forEach((element) => {
+      sourceOptions.params[element] = options.params[element];
+    });
   }
   return new TileWMSSource((sourceOptions));
 }
@@ -43,12 +41,10 @@ function createImageSource(options) {
       STYLES: options.style
     }
   };
-  if (options.filter) {
-    if (options.filterType === 'qgis') {
-      sourceOptions.params.EXP_FILTER = options.filter;
-    } else {
-      sourceOptions.params.CQL_FILTER = options.filter;
-    }
+  if (options.params) {
+    Object.keys(options.params).forEach((element) => {
+      sourceOptions.params[element] = options.params[element];
+    });
   }
   return new ImageWMSSource((sourceOptions));
 }
@@ -121,6 +117,7 @@ const wms = function wms(layerOptions, viewer) {
   sourceOptions.id = wmsOptions.id;
   sourceOptions.filter = wmsOptions.filter;
   sourceOptions.filterType = wmsOptions.filterType;
+  sourceOptions.params = wmsOptions.sourceParams;
   sourceOptions.format = wmsOptions.format ? wmsOptions.format : sourceOptions.format;
   const styleSettings = viewer.getStyle(wmsOptions.styleName);
   const wmsStyleObject = styleSettings ? styleSettings[0].find(s => s.wmsStyle) : undefined;
