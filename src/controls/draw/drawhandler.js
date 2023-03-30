@@ -351,7 +351,7 @@ const DrawHandler = function DrawHandler(options = {}) {
   }
 
   function addLayer(layerParams = {}) {
-    const layerOptions = Object.assign(drawOptions, layerParams);
+    const layerOptions = Object.assign({}, drawOptions, layerParams);
     const {
       layerTitle = 'Ritlager',
       groupName = 'none',
@@ -368,7 +368,6 @@ const DrawHandler = function DrawHandler(options = {}) {
       drawlayer = true
     } = layerOptions;
     let newLayer;
-
     if (layer) { // Should maybe be handled differently, where does the layer come from?
       newLayer = layer;
       map.addLayer(newLayer);
@@ -432,7 +431,7 @@ const DrawHandler = function DrawHandler(options = {}) {
   async function onEnableInteraction(e) {
     if (e.detail.name === 'draw' && e.detail.active) {
       if (drawLayer === undefined) {
-        const addedLayer = await addLayer();
+        const addedLayer = await thisComponent.addLayer();
         setActiveLayer(addedLayer);
       } else {
         addDrawInteractions();
@@ -475,7 +474,7 @@ const DrawHandler = function DrawHandler(options = {}) {
           const layerTitle = layer.title || 'Ritlager';
           const visible = layer.visible;
           const features = layer.features;
-          const newLayer = addLayer({ layerId, layerTitle, visible });
+          const newLayer = thisComponent.addLayer({ layerId, layerTitle, visible });
           const source = newLayer.getSource();
           source.addFeatures(features);
         });
@@ -490,13 +489,13 @@ const DrawHandler = function DrawHandler(options = {}) {
               source.addFeature(feature);
             } else {
               let layerTitle;
-              const newLayer = addLayer({ layerId, layerTitle });
+              const newLayer = thisComponent.addLayer({ layerId, layerTitle });
               const source = newLayer.getSource();
               source.addFeature(feature);
             }
           } else {
             if (drawLayer === undefined) {
-              addLayer();
+              thisComponent.addLayer();
             }
             const source = drawLayer.getSource();
             source.addFeature(feature);
@@ -528,7 +527,7 @@ const DrawHandler = function DrawHandler(options = {}) {
         onEnableInteraction({ detail });
       });
       drawCmp.on('addDrawLayer', async () => {
-        const addedLayer = await addLayer();
+        const addedLayer = await this.addLayer();
         setActiveLayer(addedLayer);
       });
     }

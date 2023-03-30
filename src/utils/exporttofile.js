@@ -42,6 +42,15 @@ const exportToFile = function exportToFile(features, format, opts = {}) {
     featureProjection
   };
 
+  // Set selected attribute if origostyle is present
+  features.forEach((feature) => {
+    if (feature.get('origostyle')) {
+      const style = feature.get('origostyle');
+      style.selected = false;
+      feature.set('origostyle', style);
+    }
+  });
+
   // Convert features to the specified format using the provided parameters
   const bytes = formatter.writeFeatures(features, formatterOptions);
 

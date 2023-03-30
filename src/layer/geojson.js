@@ -3,16 +3,20 @@ import GeoJSON from 'ol/format/GeoJSON';
 import Feature from 'ol/Feature';
 import vector from './vector';
 import isurl from '../utils/isurl';
+import validate from '../utils/validate';
 
 function createSource(options) {
-  console.log(options);
+  const formatOptions = {
+    featureProjection: options.projectionCode,
+    dataProjection: options.dataProjection
+  };
   if (options.url) {
     const vectorSource = new VectorSource({
       attributions: options.attribution,
       loader() {
         fetch(options.url, { headers: options.headers }).then(response => response.json()).then((data) => {
           if (data.features) {
-            vectorSource.addFeatures(vectorSource.getFormat().readFeatures(data));
+            vectorSource.addFeatures(vectorSource.getFormat().readFeatures(data, formatOptions));
             const numFeatures = vectorSource.getFeatures().length;
             for (let i = 0; i < numFeatures; i += 1) {
               vectorSource.forEachFeature((feature) => {
@@ -32,39 +36,47 @@ function createSource(options) {
           }
         }).catch(error => console.warn(error));
       },
-      format: new GeoJSON({
-        dataProjection: options.dataProjection,
-        featureProjection: options.projectionCode
-      })
+      format: new GeoJSON()
     });
     return vectorSource;
   } else if (options.features) {
-    const features = [];
-    for (let j = options.features.length - 1; j >= 0; j -= 1) {
-      const featureProp = options.features[j];
-      if (featureProp instanceof Feature) { // Real OpenLayers feature
-        const feature = featureProp;
-        if (!feature.getId()) {
-          feature.setId(1000000 + j);
+    let features = options.features;
+    let featureArray = [];
+
+    if (typeof features === 'string' && validate.json(features)) { // JSON-string
+      features = JSON.parse(features);
+    }
+
+    if (typeof features === 'object' && (features.type === 'FeatureCollection' || features.type === 'Feature')) { // GeoJSON-object
+      featureArray = new GeoJSON().readFeatures(features, formatOptions);
+    } else if (Array.isArray(features)) {
+      for (let j = features.length - 1; j >= 0; j -= 1) {
+        let item = features[j];
+        if (typeof item === 'string' && validate.json(item)) { // JSON-string
+          item = JSON.parse(item);
         }
-        features.push(feature);
-      } else if (typeof featureProp === 'object') {
-        let feature;
-        if (Object.prototype.hasOwnProperty.call(featureProp, 'geometry')) { // Probably true GeoJSON-object
-          feature = new GeoJSON().readFeature(featureProp);
-        } else if (Object.prototype.hasOwnProperty.call(featureProp, 'data')) { // Custom GeoJSON-object
-          feature = new GeoJSON().readFeature(featureProp.data);
-          if (!feature.getId() && featureProp.name) {
-            feature.setId(featureProp.name);
-          }
-        } else break;
-        if (!feature.getId()) {
-          feature.setId(1000000 + j);
+        if (typeof item === 'object' && (item.type === 'FeatureCollection' || item.type === 'Feature')) { // GeoJSON-object
+          const readFeatures = new GeoJSON().readFeatures(item, formatOptions);
+          featureArray.push(...readFeatures);
+        } else if (item instanceof Feature) { // Real OpenLayers feature
+          featureArray.push(item);
         }
-        features.push(feature);
       }
     }
-    return new VectorSource({ features });
+
+    featureArray.forEach((element, index) => {
+      if (!element.getId()) {
+        if (element.get(options.idField)) {
+          element.setId(element.get(options.idField));
+        } else if (element.get('id')) {
+          element.setId(element.get('id'));
+        } else {
+          element.setId(1000000 + index);
+        }
+      }
+    });
+
+    return new VectorSource({ features: featureArray });
   }
   return new VectorSource({});
 }
@@ -84,10 +96,6 @@ const geojson = function geojson(layerOptions, viewer) {
   sourceOptions.styleByAttribute = geojsonOptions.styleByAttribute;
   if (geojsonOptions.projection) {
     sourceOptions.dataProjection = geojsonOptions.projection;
-  } else if (sourceOptions.projection) {
-    sourceOptions.dataProjection = sourceOptions.projection;
-  } else {
-    sourceOptions.dataProjection = viewer.getProjectionCode();
   }
   sourceOptions.sourceName = layerOptions.source;
   if (isurl(geojsonOptions.source)) {

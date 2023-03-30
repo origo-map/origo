@@ -1,7 +1,8 @@
-import { Button, dom, Component, Element as El, Input, Modal } from '../ui';
+import { Button, dom, Component, Element as El, Input, InputFile, Modal } from '../ui';
 import DrawHandler from './draw/drawhandler';
 import drawExtraTools from './draw/drawtools';
 import exportToFile from '../utils/exporttofile';
+import validate from '../utils/validate';
 
 const Draw = function Draw(options = {}) {
   const {
@@ -12,7 +13,8 @@ const Draw = function Draw(options = {}) {
     showAttributeButton = false,
     showDownloadButton = false,
     showSaveButton = false,
-    multipleLayers = false
+    multipleLayers = false,
+    isActive = false
   } = options;
 
   let map;
@@ -145,9 +147,9 @@ const Draw = function Draw(options = {}) {
       const activeLayer = drawHandler.getActiveLayer();
       const components = [];
       let modal;
+      const thisForm = this;
 
       drawLayers.reverse().forEach(drawLayer => {
-        const thisForm = this;
         const layerTitle = drawLayer.get('title');
         const layerName = drawLayer.get('name');
 
@@ -226,6 +228,44 @@ const Draw = function Draw(options = {}) {
         }
       });
 
+      const fileInput = InputFile({
+        labelCls: 'hidden',
+        inputCls: 'hidden',
+        change(e) {
+          const file = e.target.files[0];
+          const fileName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+          const reader = new FileReader();
+          reader.addEventListener(
+            'loadend',
+            async () => {
+              if (validate.json(reader.result)) {
+                const features = reader.result;
+                await drawHandler.addLayer({ features, layerTitle: fileName });
+                modal.closeModal();
+                thisForm.show();
+              }
+            },
+            false
+          );
+          if (file) {
+            reader.readAsText(file);
+          }
+        }
+      });
+
+      const openBtn = Button({
+        cls: 'icon-smaller light box-shadow',
+        style: 'border-radius: 3px',
+        icon: '#ic_add_24px',
+        click() {
+          const inputEl = document.getElementById(fileInput.getId());
+          inputEl.value = null;
+          inputEl.click();
+        },
+        text: 'Importera ritlager',
+        ariaLabel: 'Importera ritlager'
+      });
+
       const okButton = Button({
         cls: 'icon-smaller light box-shadow',
         style: 'border-radius: 3px',
@@ -238,7 +278,7 @@ const Draw = function Draw(options = {}) {
 
       const buttonRow = El({
         cls: 'flex row align-start justify-space-evenly margin-top-large',
-        components: [okButton, addLayerButton],
+        components: [okButton, addLayerButton, fileInput, openBtn],
         tagName: 'div'
       });
 
@@ -489,7 +529,11 @@ const Draw = function Draw(options = {}) {
         screenButton = Button({
           cls: 'o-print padding-small margin-bottom-smaller icon-smaller round light box-shadow',
           click() {
-            viewer.dispatch('toggleClickInteraction', { name: 'draw', active: true });
+            if (!drawHandler.isActive()) {
+              viewer.dispatch('toggleClickInteraction', { name: 'draw', active: true });
+            } else {
+              viewer.dispatch('toggleClickInteraction', { name: 'draw', active: false });
+            }
           },
           icon,
           tooltipText: buttonText,
@@ -503,6 +547,8 @@ const Draw = function Draw(options = {}) {
           click() {
             if (!drawHandler.isActive()) {
               viewer.dispatch('toggleClickInteraction', { name: 'draw', active: true });
+            } else {
+              viewer.dispatch('toggleClickInteraction', { name: 'draw', active: false });
             }
             mapMenu.close();
           },
@@ -539,6 +585,9 @@ const Draw = function Draw(options = {}) {
         }
       });
       this.on('toggleDraw', drawHandler.toggleDraw);
+      if (isActive) {
+        viewer.dispatch('toggleClickInteraction', { name: 'draw', active: true });
+      }
     },
     render() {
       if (placement.indexOf('screen') > -1) {
