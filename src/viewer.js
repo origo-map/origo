@@ -46,7 +46,6 @@ const Viewer = function Viewer(targetOption, options = {}) {
     zoom: zoomOption = 0,
     resolutions = null,
     layers: layerOptions = [],
-    defaultLayerParams = {},
     map: mapName,
     params: urlParams = {},
     proj4Defs,
@@ -407,8 +406,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     }
   };
 
-  const addLayer = function addLayer(thisProps, insertBefore) {
-    const layerProps = Object.assign({}, defaultLayerParams, thisProps);
+  const addLayer = function addLayer(layerProps, insertBefore) {
     const layer = Layer(layerProps, this);
     addLayerStylePicker(layerProps);
     if (insertBefore) {
