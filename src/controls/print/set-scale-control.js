@@ -57,6 +57,9 @@ export default function SetScaleControl(map, options = {}) {
       <div class="padding-smaller o-tooltip active">
         ${selectScale.render()}
       </div>`;
+    },
+    setButtonText(buttonText) {
+      selectScale.setButtonText(buttonText);
     }
   });
 }
