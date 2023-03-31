@@ -117,7 +117,7 @@ const drawToolsSelector = function drawToolsSelector(extraTools, v, toolCmps) {
   }
 
   function addListener() {
-    drawCmp.on('changeDraw', onChangeEdit);
+    drawCmp.getDrawHandler().on('changeDraw', onChangeEdit);
   }
 
   function init() {
