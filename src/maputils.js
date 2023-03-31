@@ -129,7 +129,7 @@ const maputils = {
     return resolution;
   },
   formatScale: function formatScale(scale) {
-    const roundedScale = this.roundScale(scale);
+    const roundedScale = Math.round(scale / 10) * 10;
     return `1:${numberFormatter(roundedScale)}`;
   },
   roundScale: function roundScale(scale) {
