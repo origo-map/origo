@@ -79,12 +79,14 @@ const PrintComponent = function PrintComponent(options = {}) {
   let descriptionAlign = `text-align-${descriptionAlignment}`;
   let viewerMapTarget;
   let today = new Date(Date.now());
+  let initZoom;
   let printScale = 0;
   let widthImage = 0;
   let heightImage = 0;
   const originalResolutions = viewer.getResolutions().map(item => item);
   const originalGrids = new Map();
   const deviceOnIos = isOnIos();
+  const view = map.getView();
 
   // eslint-disable-next-line no-underscore-dangle
   const olPixelRatio = map.pixelRatio_;
@@ -341,8 +343,28 @@ const PrintComponent = function PrintComponent(options = {}) {
     printToolbar.setDisabled(false);
   }
 
+  function updateScaleOnMove() {
+    if (initZoom !== view.getZoom()) {
+      initZoom = view.getZoom();
+      const res = view.getResolution();
+      const projection = view.getProjection();
+      const scale = res * getPointResolution(
+        projection,
+        resolution / 25.4,
+        view.getCenter()
+      );
+      let textContent = scale;
+      textContent = maputils.formatScale(scale * 1000);
+      printSettings.getScaleControl().setButtonText(textContent);
+      setScale(scale);
+    }
+  }
+
   return Component({
     name: 'printComponent',
+    getResolution() {
+      return resolution;
+    },
     onInit() {
       this.on('render', this.onRender);
       this.addComponent(printSettings);
@@ -469,6 +491,7 @@ const PrintComponent = function PrintComponent(options = {}) {
       }
       unByKey(mapLoadListenRefs[0]);
       unByKey(mapLoadListenRefs[1]);
+      unByKey(mapLoadListenRefs[2]);
       // GH-1537: remove layers temporarily added for print and unhide layers hidden for print
       viewer.getLayersByProperty('added-for-print', true).forEach((l) => viewer.removeLayer(l));
       viewer.getLayersByProperty('hidden-for-print', true).forEach((l) => {
@@ -571,7 +594,8 @@ const PrintComponent = function PrintComponent(options = {}) {
       function addMapLoadListeners() {
         const startEvRef = map.on('loadstart', disablePrintToolbar);
         const endEvRef = map.on('loadend', enablePrintToolbar);
-        return [startEvRef, endEvRef];
+        const endMoveRef = map.on('moveend', updateScaleOnMove);
+        return [startEvRef, endEvRef, endMoveRef];
       }
       mapLoadListenRefs = addMapLoadListeners();
       printScale = 0;
