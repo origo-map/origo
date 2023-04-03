@@ -488,6 +488,10 @@ function createListElement(item) {
   const urvalContent = urvalElementContents.get(item.getSelectionGroup());
   urvalContent.replaceChildren(sublist);
 
+  const groupFooterEl = document.createElement('div');
+  groupFooterEl.classList.add('groupfootercontainer');
+  urvalContent.appendChild(groupFooterEl);
+
   const subexportToAppend = subexports.get(item.getSelectionGroup());
   urvalContent.appendChild(subexportToAppend);
 }
@@ -538,17 +542,34 @@ function removeListElement(item) {
   }
 }
 
-function hideUrvalElement(selectionGroup) {
+/**
+ * Helper to get the DOM element for a selection group's urval
+ * @param {any} selectionGroup
+ */
+function getUrvalElement(selectionGroup) {
   const urvalCmp = urvalElements.get(selectionGroup);
-  const urvalElement = document.getElementById(urvalCmp.getId());
+  return document.getElementById(urvalCmp.getId());
+}
+
+function hideUrvalElement(selectionGroup) {
+  const urvalElement = getUrvalElement(selectionGroup);
   urvalElement.classList.add('hidden');
 }
 
 function updateUrvalElementText(selectionGroup, selectionGroupTitle, sum) {
-  const urvalCmp = urvalElements.get(selectionGroup);
-  const urvalElement = document.getElementById(urvalCmp.getId());
+  const urvalElement = getUrvalElement(selectionGroup);
   const newNodeValue = `${selectionGroupTitle} (${sum})`;
   urvalElement.getElementsByTagName('span')[0].innerText = newNodeValue;
+}
+
+/**
+ * Updates the footer text for the given selectionGroup.
+ * @param {any} selectionGroup
+ * @param {any} text Some html to display in the footer
+ */
+function updateSelectionGroupFooter(selectionGroup, text) {
+  const urvalElement = getUrvalElement(selectionGroup);
+  urvalElement.getElementsByClassName('groupfootercontainer')[0].innerHTML = text;
 }
 
 function init(options) {
@@ -577,7 +598,8 @@ function init(options) {
     showSelectedList,
     scrollListElementToView,
     hide: hideInfowindow,
-    show: showInfowindow
+    show: showInfowindow,
+    updateSelectionGroupFooter
   };
 }
 

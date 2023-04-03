@@ -9,9 +9,11 @@ let mainContainer;
 let urvalContainer;
 let listContainer;
 let exportContainer;
+let groupFooterContainer;
 let sublists;
 let subexports;
 let urvalElements;
+let footerContainers;
 let expandableContents;
 let exportOptions;
 let activeSelectionGroup;
@@ -127,8 +129,15 @@ function render(viewerId) {
   exportContainer = document.createElement('div');
   exportContainer.classList.add('exportcontainer');
 
+  groupFooterContainer = document.createElement('div');
+  groupFooterContainer.classList.add('groupfootercontainer');
+
+  // Add some divs to populate later. It works by replacing the contents of these containers with the
+  // information for the selected selectionGroup. Each selectionGroup is rendered in memory only
+  // and is put into DOM when it should be visible
   mainContainer.appendChild(urvalContainer);
   mainContainer.appendChild(listContainer);
+  mainContainer.appendChild(groupFooterContainer);
   mainContainer.appendChild(exportContainer);
 
   parentElement = document.getElementById(viewerId);
@@ -160,6 +169,13 @@ function showSelectedList(selectionGroup) {
   }
   const sublistToAppend = sublists.get(selectionGroup);
   listContainer.appendChild(sublistToAppend);
+
+  // Replace the container with this group's content
+  while (groupFooterContainer.firstChild) {
+    groupFooterContainer.removeChild(groupFooterContainer.firstChild);
+  }
+  const footerToAppend = footerContainers.get(selectionGroup);
+  groupFooterContainer.appendChild(footerToAppend);
 
   while (exportContainer.firstChild) {
     exportContainer.removeChild(exportContainer.firstChild);
@@ -442,6 +458,12 @@ function createSubexportComponent(selectionGroup) {
   return subexportContainer;
 }
 
+/**
+ * Creates everything that is needed internally before adding items to a selectionGroup.
+ * Creates some elements, but does not add them to the DOM. That is done when a selectiongroup is displayed.
+ * @param {any} selectionGroup
+ * @param {any} selectionGroupTitle
+ */
 function createUrvalElement(selectionGroup, selectionGroupTitle) {
   const urvalElement = document.createElement('div');
   urvalElement.classList.add('urvalelement');
@@ -455,6 +477,9 @@ function createUrvalElement(selectionGroup, selectionGroupTitle) {
 
   const sublistContainter = document.createElement('div');
   sublists.set(selectionGroup, sublistContainter);
+
+  const footerContainer = document.createElement('div');
+  footerContainers.set(selectionGroup, footerContainer);
 
   const subexportComponent = createSubexportComponent(selectionGroup);
   subexports.set(selectionGroup, subexportComponent);
@@ -643,6 +668,16 @@ function updateUrvalElementText(selectionGroup, selectionGroupTitle, sum) {
   urvalElement.childNodes[0].nodeValue = newNodeValue;
 }
 
+/**
+ * Updates the footer text for the given selectionGroup.
+ * @param {any} selectionGroup
+ * @param {any} text Some html to display in the footer
+ */
+function updateSelectionGroupFooter(selectionGroup, text) {
+  const footerContainer = footerContainers.get(selectionGroup);
+  footerContainer.innerHTML = text;
+}
+
 function init(options) {
   viewer = options.viewer;
   selectionManager = options.viewer.getSelectionManager();
@@ -653,6 +688,7 @@ function init(options) {
   subexports = new Map();
   urvalElements = new Map();
   expandableContents = new Map();
+  footerContainers = new Map();
 
   render(options.viewer.getId());
 
@@ -667,7 +703,8 @@ function init(options) {
     showSelectedList,
     scrollListElementToView,
     hide: hideInfowindow,
-    show: showInfowindow
+    show: showInfowindow,
+    updateSelectionGroupFooter
   };
 }
 
