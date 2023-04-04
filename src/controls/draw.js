@@ -17,6 +17,18 @@ const Draw = function Draw(options = {}) {
     isActive = false
   } = options;
 
+  const drawDefaults = {
+    layerTitle: 'Ritlager',
+    groupName: 'none',
+    groupTitle: 'Ritlager',
+    visible: true,
+    styleByAttribute: true,
+    queryable: false,
+    removable: true,
+    exportable: true,
+    drawlayer: true
+  };
+
   let map;
   let viewer;
   let drawTools;
@@ -30,6 +42,8 @@ const Draw = function Draw(options = {}) {
   let layerAttributeButton;
   let thisComponent;
   let drawHandler;
+
+  const drawOptions = Object.assign({}, drawDefaults, options);
 
   function setActive(state) {
     if (state === true) {
@@ -222,7 +236,18 @@ const Draw = function Draw(options = {}) {
         icon: '#ic_add_24px',
         text: 'Nytt ritlager',
         async click() {
-          await drawHandler.addLayer();
+          let title = drawOptions.layerTitle;
+          if (viewer.getLayersByProperty('title', title)) {
+            let i = 1;
+            while (i <= drawLayers.length) {
+              if (viewer.getLayersByProperty('title', `${title} ${i}`).length === 0) {
+                title = `${title} ${i}`;
+                break;
+              }
+              i += 1;
+            }
+          }
+          await drawHandler.addLayer({ layerTitle: title });
           modal.closeModal();
           layerForm.show();
         }
@@ -361,7 +386,7 @@ const Draw = function Draw(options = {}) {
       click() {
         attributeForm.show();
       },
-      icon: '#ic_menu_24px',
+      icon: '#ic_textsms_24px',
       tooltipText: 'Attribut',
       tooltipPlacement: 'south',
       tooltipStyle: 'bottom:-5px;',
@@ -486,6 +511,9 @@ const Draw = function Draw(options = {}) {
     getSelection() {
       return drawHandler.getSelection();
     },
+    getDrawOptions() {
+      return drawOptions;
+    },
     getState() {
       return drawHandler.getState();
     },
@@ -500,7 +528,7 @@ const Draw = function Draw(options = {}) {
         Polygon: polygonButton,
         Text: textButton
       };
-      const extraTools = options.drawTools || [];
+      const extraTools = drawOptions.drawTools || [];
       drawExtraTools(extraTools, viewer, drawTools);
     },
     onAdd(evt) {

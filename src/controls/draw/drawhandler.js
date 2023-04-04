@@ -353,26 +353,26 @@ const DrawHandler = function DrawHandler(options = {}) {
   function addLayer(layerParams = {}) {
     const layerOptions = Object.assign({}, drawOptions, layerParams);
     const {
-      layerTitle = 'Ritlager',
-      groupName = 'none',
-      groupTitle = 'Ritlager',
+      layerTitle,
+      groupName,
+      groupTitle,
       layerId = generateUUID(),
       layer,
       features,
       source,
-      visible = true,
-      styleByAttribute = true,
-      queryable = false,
-      removable = true,
-      exportable = true,
-      drawlayer = true
+      visible,
+      styleByAttribute,
+      queryable,
+      removable,
+      exportable,
+      drawlayer
     } = layerOptions;
     let newLayer;
     if (layer) { // Should maybe be handled differently, where does the layer come from?
       newLayer = layer;
       map.addLayer(newLayer);
     } else {
-      if (!viewer.getGroup(groupName) && groupName !== 'none') {
+      if (!viewer.getGroup(groupName) && groupName !== 'none' && groupName !== 'root') {
         viewer.addGroup({ title: groupTitle, name: groupName, expanded: true });
       }
       const newLayerOptions = {
@@ -521,7 +521,7 @@ const DrawHandler = function DrawHandler(options = {}) {
       thisComponent = this;
       map = viewer.getMap();
       annotationField = 'annotation';
-      drawOptions = drawCmp.options;
+      drawOptions = drawCmp.getDrawOptions();
       activeTool = undefined;
       viewer.on('toggleClickInteraction', (detail) => {
         onEnableInteraction({ detail });
