@@ -237,7 +237,7 @@ const Draw = function Draw(options = {}) {
         text: 'Nytt ritlager',
         async click() {
           let title = drawOptions.layerTitle;
-          if (viewer.getLayersByProperty('title', title)) {
+          if (viewer.getLayersByProperty('title', title).length > 0) {
             let i = 1;
             while (i <= drawLayers.length) {
               if (viewer.getLayersByProperty('title', `${title} ${i}`).length === 0) {
