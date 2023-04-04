@@ -5,7 +5,7 @@ import maputils from '../maputils';
 import image from './image';
 
 function createTileSource(options) {
-  return new TileWMSSource(({
+  const sourceOptions = {
     attributions: options.attribution,
     url: options.url,
     gutter: options.gutter,
@@ -19,11 +19,17 @@ function createTileSource(options) {
       FORMAT: options.format,
       STYLES: options.style
     }
-  }));
+  };
+  if (options.params) {
+    Object.keys(options.params).forEach((element) => {
+      sourceOptions.params[element] = options.params[element];
+    });
+  }
+  return new TileWMSSource((sourceOptions));
 }
 
 function createImageSource(options) {
-  return new ImageWMSSource(({
+  const sourceOptions = {
     attributions: options.attribution,
     url: options.url,
     crossOrigin: 'anonymous',
@@ -34,7 +40,13 @@ function createImageSource(options) {
       FORMAT: options.format,
       STYLES: options.style
     }
-  }));
+  };
+  if (options.params) {
+    Object.keys(options.params).forEach((element) => {
+      sourceOptions.params[element] = options.params[element];
+    });
+  }
+  return new ImageWMSSource((sourceOptions));
 }
 
 function createWmsStyle({ wmsOptions, source, viewer, initialStyle = false }) {
@@ -137,6 +149,9 @@ const wms = function wms(layerOptions, viewer) {
   sourceOptions.crossOrigin = wmsOptions.crossOrigin ? wmsOptions.crossOrigin : sourceOptions.crossOrigin;
   sourceOptions.projection = viewer.getProjection();
   sourceOptions.id = wmsOptions.id;
+  sourceOptions.filter = wmsOptions.filter;
+  sourceOptions.filterType = wmsOptions.filterType;
+  sourceOptions.params = wmsOptions.sourceParams;
   sourceOptions.format = wmsOptions.format ? wmsOptions.format : sourceOptions.format;
   if (!wmsOptions.stylePicker) {
     const styleSettings = viewer.getStyle(wmsOptions.styleName);
