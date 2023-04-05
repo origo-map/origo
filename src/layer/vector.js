@@ -19,6 +19,7 @@ export default function vector(opt, src, viewer) {
       if (opt.styleByAttribute) {
         const projection = source.projection || viewer.getProjectionCode();
         options.style = (feat) => stylefunction(feat, {}, projection);
+        options.styleName = 'origoStylefunction';
       } else if (typeof opt.style === 'function') {
         options.style = opt.style;
       } else {

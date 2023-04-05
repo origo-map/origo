@@ -47,7 +47,7 @@ const Layer = function Layer(optOptions, viewer) {
   layerOptions.sourceName = layerOptions.source;
   layerOptions.styleName = layerOptions.style;
   if (typeof layerOptions.style === 'function') {
-    layerOptions.styleName = 'stylefunction';
+    layerOptions.styleName = 'origoStylefunction';
   } else {
     layerOptions.styleName = layerOptions.style;
   }

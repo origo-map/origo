@@ -405,7 +405,7 @@ export default function PrintResize(options = {}) {
         features.forEach(feature => {
           const featureStyle = feature.getStyle();
           const styleScale = multiplyByFactor(1.5);
-          if (styleName === 'stylefunction') {
+          if (styleName === 'origoStylefunction') {
             feature.set('styleScale', styleScale);
           } else if (featureStyle) {
             if (Array.from(featureStyle).length === 0) {
@@ -445,7 +445,7 @@ export default function PrintResize(options = {}) {
       let style = viewer.getStyle();
 
       const clusterStyleName = layer.get('clusterStyle') ? layer.get('clusterStyle') : undefined;
-      if (typeof layer.get('styleName') !== 'undefined' && layer.get('styleName') !== 'stylefunction') {
+      if (typeof layer.get('styleName') !== 'undefined' && layer.get('styleName') !== 'origoStylefunction') {
         style = Style.createStyle({ style: layer.get('styleName'), viewer, clusterStyleName });
       }
       if (style) {
@@ -453,7 +453,7 @@ export default function PrintResize(options = {}) {
       } else if (features) {
         features.forEach(feature => {
           const featureStyle = feature.getStyle();
-          if (styleName === 'stylefunction') {
+          if (styleName === 'origoStylefunction') {
             feature.set('styleScale', 1);
           } else if (featureStyle) {
             if (Array.from(featureStyle).length === 0) {
