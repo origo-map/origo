@@ -116,7 +116,7 @@ const Measure = function Measure({
     title: 'Measure',
     source,
     zIndex: 8,
-    styleName: 'stylefunction',
+    styleName: 'origoStylefunction',
     style(feature) {
       return styleFunction(feature, showSegmentLabels);
     }
