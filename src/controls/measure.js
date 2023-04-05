@@ -14,6 +14,9 @@ import { Snap } from 'ol/interaction';
 import { Collection } from 'ol';
 import LayerGroup from 'ol/layer/Group';
 import { unByKey } from 'ol/Observable';
+import GeoJSON from 'ol/format/GeoJSON';
+import Fill from 'ol/style/Fill';
+import Stroke from 'ol/style/Stroke';
 import { Component, Icon, Element as El, Button, dom, Modal } from '../ui';
 import Style from '../style';
 import StyleTypes from '../style/styletypes';
@@ -25,6 +28,7 @@ const Measure = function Measure({
   elevationServiceURL,
   elevationTargetProjection,
   elevationAttribute,
+  elevationProfileURL,
   showSegmentLengths = false,
   showSegmentLabelButtonActive = true,
   useHectare = true,
@@ -83,6 +87,11 @@ const Measure = function Measure({
   let snapCollection;
   let snapEventListenerKeys;
   let snapActive = snapIsActive;
+  let profilePt;
+  let profileSource;
+  let profileLayer;
+  let profileStyle;
+  let elevationProfile;
 
   function createStyle(feature) {
     const featureType = feature.getGeometry().getType();
@@ -327,8 +336,35 @@ const Measure = function Measure({
     }
   }
 
+  // Takes coordinates and feature id and places a icon feature on the map which can be clicked to show elevation profile for the referenced feature
+  function placeProfileIcon(coords, featureId, showProfiles = false) {
+    elevationProfile = viewer.getControlByName('elevationProfile');
+
+    if (typeof elevationProfileURL !== 'undefined' && (elevationProfile !== null || showProfiles)) {
+      const profileIconSize = [25, 25];
+      const profileIconText =  '<text x="5" y="40" font-size="45" font-family="Arial" fill="black">Profil</text>';
+      const svgFI = `<svg width="${profileIconSize[0]}" height="${profileIconSize[1]}" version="1.1" xmlns="http://www.w3.org/2000/svg"><rect width="${profileIconSize[0]}" height="${profileIconSize[1]}" style="fill:rgba(255,255,255,0.5);stroke-width:5;stroke:rgb(0,0,0)" /><path d="M14 6l-3.75 5 2.85 3.8-1.6 1.2C9.81 13.75 7 10 7 10l-6 8h22L14 6z"/></svg>`;
+      const iconStyle = new Origo.ol.style.Style({
+        image: new Origo.ol.style.Icon({
+          src: `data:image/svg+xml;utf8,${svgFI}`,
+          anchor: [0.5, -20],
+          anchorXUnits: 'fraction',
+          anchorYUnits: 'pixels',
+          scale: 1
+        })
+      });
+      const iconFeature = new Feature({
+        geometry: new Point(coords[coords.length - 1]),
+        name: 'Markhöjd profil',
+        featureId
+      });
+      iconFeature.setStyle(iconStyle);
+      source.addFeature(iconFeature);
+    }
+  }
+
   // Takes a Polygon as input and adds area measurements on it
-  function addArea(area) {
+  function addArea(area, showProfiles) {
     const tempFeature = new Feature(area);
     const areaLabel = formatArea(area);
     tempFeature.setStyle(style.createStyleRule(measureStyleOptions.polygon));
@@ -342,10 +378,12 @@ const Measure = function Measure({
     }
     const totalLength = formatLength(new LineString(flatCoords[0]));
     tempFeature.getStyle()[0].getText().setText(`${areaLabel}\n${totalLength}`);
+    const featureId = tempFeature.getId() != null ? tempFeature.getId() : tempFeature.ol_uid;
+    placeProfileIcon([flatCoords[0][flatCoords[0].length-1]], featureId, showProfiles);
   }
 
   // Takes a LineString as input and adds length measurements on it
-  function addLength(line) {
+  function addLength(line, showProfiles) {
     const tempFeature = new Feature(line);
     const totalLength = formatLength(line);
     tempFeature.setStyle(style.createStyleRule(measureStyleOptions.linestring));
@@ -358,6 +396,8 @@ const Measure = function Measure({
       }
     }
     tempFeature.getStyle()[0].getText().setText(totalLength);
+    const featureId = tempFeature.getId() != null ? tempFeature.getId() : tempFeature.ol_uid;
+    placeProfileIcon([flatCoords[flatCoords.length-1]], featureId, showProfiles);
   }
 
   function centerSketch() {
@@ -373,6 +413,88 @@ const Measure = function Measure({
         sketch.getGeometry().setCoordinates(sketchCoord);
       }
     }
+  }
+
+  // Check if the click in map is on a icon for profile and if so show the elevation profile for the linked feature.
+  function showProfile(clickGeom) {
+    let clickedOnProfile = false;
+    let pixel;
+    let coords;
+
+    function drawPoint(e) {
+      if (!profilePt) return;
+      if (e.type === 'over') {
+        profilePt.setGeometry(new Point(e.coord));
+        profilePt.setStyle(null);
+      } else {
+        profilePt.setStyle([]);
+      }
+    }
+    function roundOfHeight(geojson, decimals) {
+      let rounded = geojson;
+      if (rounded.geometry.type === 'LineString') {
+        rounded.geometry.coordinates.forEach((coord, i) => {
+          rounded.geometry.coordinates[i][2] = Math.round(coord[2] * 10) / 10;
+        });
+      } else {
+        rounded.geometry.coordinates[0].forEach((coord, i) => {
+          rounded.geometry.coordinates[0][i][2] = Math.round(coord[2] * 10) / 10;
+        });
+      }
+      return rounded;
+    }
+    if (clickGeom.getType() === 'Point') {
+      return false;
+    } else if (clickGeom.getType() === 'LineString') {
+      pixel = map.getPixelFromCoordinate(clickGeom.getCoordinates()[0]);
+      coords = clickGeom.getCoordinates()[0];
+    } else {
+      pixel = map.getPixelFromCoordinate(clickGeom.getCoordinates()[0][0]);
+      coords = clickGeom.getCoordinates()[0][0];
+    }
+    elevationProfile = viewer.getControlByName('elevationProfile');
+    map.forEachFeatureAtPixel(pixel,
+      (feature) => {
+        if (feature.getProperties().name === 'Markhöjd profil' && elevationProfile !== null) {
+          const featureId = feature.get('featureId');
+          const features = source.getFeatures()
+          features.forEach(feature => {
+            const fid = feature.getId() != null ? feature.getId() : feature.ol_uid;
+            if (fid === featureId) {
+              clickedOnProfile = true;
+              const featureGeom = feature.getGeometry();
+              let geometry = {};
+              if (featureGeom.getType() === 'Polygon') {
+                geometry = { type: 'LineString', coordinates: featureGeom.getCoordinates()[0] };
+              } else if (featureGeom.getType() === 'LineString') {
+                geometry = { type: 'LineString', coordinates: featureGeom.getCoordinates() };
+              }
+              const projCode = viewer.getProjectionCode();
+              const projCodeArr = projCode.split(':');
+              (async () => {
+                const rawResponse = await fetch(`${elevationProfileURL}/${projCodeArr[1]}`, {
+                  method: 'POST',
+                  headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(geometry)
+                });
+                const content = await rawResponse.json();
+                if (typeof content.error !== 'undefined') {
+                  alert(content.error.errors);
+                } else {
+                  const contentRounded = roundOfHeight(content, 1);
+                  var newGeom = new LineString(contentRounded.geometry.coordinates);
+                  feature.setGeometry(newGeom);
+                  elevationProfile.onShowElevationProfile(feature);
+                }
+              })();
+            }
+          });
+        }
+      });
+      return clickedOnProfile;
   }
 
   // Display and move tooltips with pointer
@@ -450,6 +572,9 @@ const Measure = function Measure({
       } else {
         output = totalLength;
         label += totalLength;
+      }
+      if (evt.type === 'drawend' && !(geom instanceof Point)) {
+        placeProfileIcon(coords, sketch.ol_uid);
       }
 
       measureTooltipElement.innerHTML = output;
@@ -692,18 +817,22 @@ const Measure = function Measure({
     }
 
     measure.on('drawstart', (evt) => {
-      measure.getOverlay().getSource().getFeatures()[1].setStyle([]);
-      sketch = evt.feature;
-      sketch.on('change', pointerMoveHandler);
-      if (touchMode) {
-        map.getView().on('change:center', centerSketch);
+      if (showProfile(evt.feature.getGeometry())) {
+        abort();
       } else {
-        pointerMoveHandler(evt);
-      }
-      document.getElementsByClassName('o-tooltip-measure')[1].remove();
+        measure.getOverlay().getSource().getFeatures()[1].setStyle([]);
+        sketch = evt.feature;
+        sketch.on('change', pointerMoveHandler);
+        if (touchMode) {
+          map.getView().on('change:center', centerSketch);
+        } else {
+          pointerMoveHandler(evt);
+        }
+        document.getElementsByClassName('o-tooltip-measure')[1].remove();
 
-      if (type === 'LineString' || type === 'Polygon') {
-        document.getElementById(undoButton.getId()).classList.remove('hidden');
+        if (type === 'LineString' || type === 'Polygon') {
+          document.getElementById(undoButton.getId()).classList.remove('hidden');
+        }
       }
     }, this);
 
@@ -836,6 +965,8 @@ const Measure = function Measure({
       const elevation = [];
       const buffer = [];
       const bufferRadius = [];
+      const profile = [];
+      let showProfiles = false;
       features.forEach((feature) => {
         switch (feature.getGeometry().getType()) {
           case 'LineString':
@@ -845,10 +976,13 @@ const Measure = function Measure({
             area.push(feature.getGeometry().getCoordinates());
             break;
           case 'Point':
-            if (feature.getStyle()[0].getText().getText() === 'o') {
+            const featStyle = feature.getStyle()[0] ? feature.getStyle()[0] : undefined;
+            if (typeof featStyle === 'undefined') {
+              showProfiles = true;
+            } else if (featStyle.getText().getText() === 'o') {
               buffer.push(feature.getGeometry().getCoordinates());
-            } else if (feature.getStyle()[0].getText().getPlacement() === 'line') {
-              bufferRadius.push(feature.getStyle()[0].getText().getText());
+            } else if (featStyle.getText().getPlacement() === 'line') {
+              bufferRadius.push(featStyle.getText().getText());
             } else {
               elevation.push(feature.getGeometry().getCoordinates());
             }
@@ -873,6 +1007,7 @@ const Measure = function Measure({
       if (bufferRadius.length > 0) {
         returnValue.bufferRadius = bufferRadius;
       }
+      returnValue.showProfiles = showProfiles;
       returnValue.showSegmentLabels = showSegmentLabels;
       returnValue.isActive = isActive;
       if (Object.keys(returnValue).length !== 0) {
@@ -884,15 +1019,22 @@ const Measure = function Measure({
   }
 
   function restoreState(params) {
+    let showProfiles = false;
     if (params && params.controls && params.controls.measure) {
       if (params.controls.measure.measureState.isActive) {
         enableInteraction();
+      }
+      // Restore showSegmentLabels state
+      if (params.controls.measure.measureState) {
+        if (params.controls.measure.measureState.showProfiles === true) {
+          showProfiles = true;
+        }
       }
       // Restore areas
       if (params.controls.measure.measureState && params.controls.measure.measureState.area && params.controls.measure.measureState.area.length > 0) {
         if (Array.isArray(params.controls.measure.measureState.area)) {
           params.controls.measure.measureState.area.forEach((item) => {
-            addArea(new Polygon(item));
+            addArea(new Polygon(item), showProfiles);
           });
         }
       }
@@ -900,7 +1042,7 @@ const Measure = function Measure({
       if (params.controls.measure.measureState && params.controls.measure.measureState.length && params.controls.measure.measureState.length.length > 0) {
         if (Array.isArray(params.controls.measure.measureState.length)) {
           params.controls.measure.measureState.length.forEach((item) => {
-            addLength(new LineString(item));
+            addLength(new LineString(item), showProfiles);
           });
         }
       }
