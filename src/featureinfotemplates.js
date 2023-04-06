@@ -17,13 +17,13 @@ function renameKeys(obj, newKeys) {
   return Object.assign({}, ...keyValues);
 }
 
-function getFromTemplate(template, featureAttributes, attributeAlias) {
+function getFromTemplate(template, featureAttributes, attributeAlias, layer) {
   const attributes = featureAttributes;
   if (attributes.url) {
     attributes.url = `<a href="${attributes.url}" target="_blank">${attributes.url}</a>`;
   }
   const renamedObj = renameKeys(attributes, attributeAlias);
-  return templates[template](renamedObj);
+  return templates[template](renamedObj, layer);
 }
 
 export default { getFromTemplate, addFeatureinfotemplate, templateHelpers };
