@@ -26,7 +26,8 @@ const Draw = function Draw(options = {}) {
     queryable: false,
     removable: true,
     exportable: true,
-    drawlayer: true
+    drawlayer: true,
+    draggable: true
   };
 
   let map;

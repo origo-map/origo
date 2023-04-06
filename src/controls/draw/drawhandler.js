@@ -356,6 +356,7 @@ const DrawHandler = function DrawHandler(options = {}) {
       layerTitle,
       groupName,
       groupTitle,
+      draggable,
       layerId = generateUUID(),
       layer,
       features,
@@ -373,7 +374,7 @@ const DrawHandler = function DrawHandler(options = {}) {
       map.addLayer(newLayer);
     } else {
       if (!viewer.getGroup(groupName) && groupName !== 'none' && groupName !== 'root') {
-        viewer.addGroup({ title: groupTitle, name: groupName, expanded: true });
+        viewer.addGroup({ title: groupTitle, name: groupName, expanded: true, draggable });
       }
       const newLayerOptions = {
         group: groupName,
