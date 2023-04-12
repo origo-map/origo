@@ -224,6 +224,9 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
   }
 
   function getStyleFunction(feature, inputStyle = {}, projection = mapProjection) {
+    if (!feature.get('origostyle') && feature.get('style') && typeof feature.get('style') === 'object') {
+      feature.set('origostyle', feature.get('style'));
+    }
     const featureStyle = feature.get('origostyle') || {};
     const styleScale = feature.get('styleScale') || 1;
     const newStyleObj = Object.assign({}, swDefaults, featureStyle, inputStyle);

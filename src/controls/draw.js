@@ -13,7 +13,10 @@ const Draw = function Draw(options = {}) {
     showAttributeButton = false,
     showDownloadButton = false,
     showSaveButton = false,
-    multipleLayers = false,
+    multipleLayers = false
+  } = options;
+
+  let {
     isActive = false
   } = options;
 
@@ -52,6 +55,7 @@ const Draw = function Draw(options = {}) {
       if (screenButton) {
         screenButton.setState('active');
       }
+      isActive = true;
     } else {
       document.getElementById(thisComponent.getId()).classList.add('o-hidden');
       thisComponent.dispatch('toggleDraw', { tool: 'cancel' });
@@ -59,6 +63,7 @@ const Draw = function Draw(options = {}) {
       if (screenButton) {
         screenButton.setState('initial');
       }
+      isActive = false;
     }
   }
 
@@ -248,7 +253,8 @@ const Draw = function Draw(options = {}) {
               i += 1;
             }
           }
-          await drawHandler.addLayer({ layerTitle: title });
+          const addedLayer = await drawHandler.addLayer({ layerTitle: title });
+          drawHandler.setActiveLayer(addedLayer);
           modal.closeModal();
           layerForm.show();
         }
@@ -266,7 +272,8 @@ const Draw = function Draw(options = {}) {
             async () => {
               if (validate.json(reader.result)) {
                 const features = reader.result;
-                await drawHandler.addLayer({ features, layerTitle: fileName });
+                const addedLayer = await drawHandler.addLayer({ features, layerTitle: fileName });
+                drawHandler.setActiveLayer(addedLayer);
                 modal.closeModal();
                 thisForm.show();
               }
@@ -332,12 +339,15 @@ const Draw = function Draw(options = {}) {
   const pointButton = Button({
     cls: 'padding-small icon-smaller round light box-shadow relative',
     click() {
-      thisComponent.dispatch('toggleDraw', { tool: 'Point' });
+      if (this.getState() !== 'disabled') {
+        thisComponent.dispatch('toggleDraw', { tool: 'Point' });
+      }
     },
     icon: '#ic_place_24px',
     tooltipText: 'Punkt',
     tooltipPlacement: 'south',
-    tooltipStyle: 'bottom:-5px;'
+    tooltipStyle: 'bottom:-5px;',
+    state: 'inactive'
   });
 
   toolbarButtons.push(pointButton);
@@ -345,7 +355,9 @@ const Draw = function Draw(options = {}) {
   const lineButton = Button({
     cls: 'padding-small icon-smaller round light box-shadow relative',
     click() {
-      thisComponent.dispatch('toggleDraw', { tool: 'LineString' });
+      if (this.getState() !== 'disabled') {
+        thisComponent.dispatch('toggleDraw', { tool: 'LineString' });
+      }
     },
     icon: '#ic_timeline_24px',
     tooltipText: 'Linje',
@@ -358,7 +370,9 @@ const Draw = function Draw(options = {}) {
   const polygonButton = Button({
     cls: 'padding-small icon-smaller round light box-shadow relative',
     click() {
-      thisComponent.dispatch('toggleDraw', { tool: 'Polygon' });
+      if (this.getState() !== 'disabled') {
+        thisComponent.dispatch('toggleDraw', { tool: 'Polygon' });
+      }
     },
     icon: '#o_polygon_24px',
     tooltipText: 'Polygon',
@@ -371,7 +385,9 @@ const Draw = function Draw(options = {}) {
   const textButton = Button({
     cls: 'padding-small icon-smaller round light box-shadow relative',
     click() {
-      thisComponent.dispatch('toggleDraw', { tool: 'Text' });
+      if (this.getState() !== 'disabled') {
+        thisComponent.dispatch('toggleDraw', { tool: 'Text' });
+      }
     },
     icon: '#ic_title_24px',
     tooltipText: 'Text',
@@ -518,6 +534,9 @@ const Draw = function Draw(options = {}) {
     getState() {
       return drawHandler.getState();
     },
+    isActive() {
+      return isActive;
+    },
     onInit() {
       thisComponent = this;
       this.on('render', this.onRender);
@@ -535,7 +554,6 @@ const Draw = function Draw(options = {}) {
     onAdd(evt) {
       viewer = evt.target;
       map = viewer.getMap();
-      // mapMenu = viewer.getControlByName('mapmenu');
       stylewindow = viewer.getStylewindow();
       stylewindow.on('showStylewindow', function showStylewindow(e) {
         if (e) {
@@ -558,7 +576,7 @@ const Draw = function Draw(options = {}) {
         screenButton = Button({
           cls: 'o-print padding-small margin-bottom-smaller icon-smaller round light box-shadow',
           click() {
-            if (!drawHandler.isActive()) {
+            if (!isActive) {
               viewer.dispatch('toggleClickInteraction', { name: 'draw', active: true });
             } else {
               viewer.dispatch('toggleClickInteraction', { name: 'draw', active: false });
@@ -574,7 +592,7 @@ const Draw = function Draw(options = {}) {
         mapMenu = viewer.getControlByName('mapmenu');
         menuItem = mapMenu.MenuItem({
           click() {
-            if (!drawHandler.isActive()) {
+            if (!isActive) {
               viewer.dispatch('toggleClickInteraction', { name: 'draw', active: true });
             } else {
               viewer.dispatch('toggleClickInteraction', { name: 'draw', active: false });
@@ -612,6 +630,13 @@ const Draw = function Draw(options = {}) {
           const state = detail.features.getLength() > 0 ? 'initial' : 'disabled';
           layerAttributeButton.setState(state);
         }
+      });
+      drawHandler.on('changeButtonState', (detail) => {
+        const state = detail.state;
+        textButton.setState(state);
+        polygonButton.setState(state);
+        pointButton.setState(state);
+        lineButton.setState(state);
       });
       this.on('toggleDraw', drawHandler.toggleDraw);
       if (isActive) {

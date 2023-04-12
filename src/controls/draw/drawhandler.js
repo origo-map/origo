@@ -304,7 +304,19 @@ const DrawHandler = function DrawHandler(options = {}) {
     stylewindow.restoreStylewindow();
   }
 
+  function removeDrawInteractions() {
+    if (select) {
+      select.getFeatures().clear();
+      map.removeInteraction(select);
+    }
+    if (modify) {
+      map.removeInteraction(modify);
+    }
+    thisComponent.dispatch('changeButtonState', { state: 'disabled' });
+  }
+
   function addDrawInteractions() {
+    removeDrawInteractions();
     select = new Select({
       layers: [drawLayer],
       style: null,
@@ -320,24 +332,33 @@ const DrawHandler = function DrawHandler(options = {}) {
     select.getFeatures().on('change', onSelectChange, this);
     modify.on('modifyend', onModifyEnd, this);
     setActive();
+    if (drawLayer.getVisible()) {
+      thisComponent.dispatch('changeButtonState', { state: 'initial' });
+    }
   }
 
-  function removeDrawInteractions() {
-    if (select) {
-      select.getFeatures().clear();
-      map.removeInteraction(select);
-    }
-    if (modify) {
-      map.removeInteraction(modify);
+  function onChangeVisible() {
+    if (drawCmp.isActive()) {
+      if (drawLayer.getVisible()) {
+        addDrawInteractions();
+      } else {
+        removeDrawInteractions();
+      }
     }
   }
 
   function setActiveLayer(layer) {
     if (layer) {
+      if (drawLayer) {
+        drawLayer.un('change:visible', onChangeVisible);
+      }
       drawLayer = layer;
+      drawLayer.on('change:visible', onChangeVisible);
+      onChangeVisible();
+    } else {
+      drawLayer = null;
+      removeDrawInteractions();
     }
-    removeDrawInteractions();
-    addDrawInteractions();
   }
 
   function onUpdate(feature, layerName) {
@@ -405,13 +426,8 @@ const DrawHandler = function DrawHandler(options = {}) {
       }
       newLayer = viewer.addLayer(newLayerOptions);
     }
-    drawLayer = newLayer;
-    if (isActive()) {
-      setActiveLayer(newLayer);
-    }
-
     newLayer.getSource().forEachFeature((e) => {
-      e.on('change:style', () => {
+      e.on('change:origostyle', () => {
         onUpdate(e, newLayer.get('name'));
       });
       e.on('change:popuptext', () => {
@@ -419,8 +435,8 @@ const DrawHandler = function DrawHandler(options = {}) {
       });
     });
     newLayer.getSource().on('addfeature', (e) => {
-      e.feature.on('change:style', () => {
-        onUpdate(e.feature, newLayer.get('name'));
+      e.feature.on('change:origostyle', () => {
+        onUpdate(e, newLayer.get('name'));
       });
       e.feature.on('change:popuptext', () => {
         onUpdate(e, newLayer.get('name'));
@@ -434,9 +450,8 @@ const DrawHandler = function DrawHandler(options = {}) {
       if (drawLayer === undefined) {
         const addedLayer = await thisComponent.addLayer();
         setActiveLayer(addedLayer);
-      } else {
-        addDrawInteractions();
       }
+      addDrawInteractions();
     }
   }
 
@@ -469,6 +484,7 @@ const DrawHandler = function DrawHandler(options = {}) {
     if (urlParams && urlParams.controls && urlParams.controls.draw) {
       const state = urlParams.controls.draw;
       // TODO: Sanity/data check
+      let activeLayer;
       if (state.layers && state.layers.length > 0) {
         state.layers.forEach(layer => {
           const layerId = layer.id || generateUUID();
@@ -478,6 +494,7 @@ const DrawHandler = function DrawHandler(options = {}) {
           const newLayer = thisComponent.addLayer({ layerId, layerTitle, visible });
           const source = newLayer.getSource();
           source.addFeatures(features);
+          activeLayer = newLayer;
         });
       } else if (state.features && state.features.length > 0) {
         const features = state.features;
@@ -493,15 +510,20 @@ const DrawHandler = function DrawHandler(options = {}) {
               const newLayer = thisComponent.addLayer({ layerId, layerTitle });
               const source = newLayer.getSource();
               source.addFeature(feature);
+              activeLayer = newLayer;
             }
           } else {
             if (drawLayer === undefined) {
-              thisComponent.addLayer();
+              drawLayer = thisComponent.addLayer();
             }
             const source = drawLayer.getSource();
             source.addFeature(feature);
+            activeLayer = drawLayer;
           }
         });
+      }
+      if (activeLayer) {
+        setActiveLayer(activeLayer);
       }
     }
   }
@@ -526,10 +548,6 @@ const DrawHandler = function DrawHandler(options = {}) {
       activeTool = undefined;
       viewer.on('toggleClickInteraction', (detail) => {
         onEnableInteraction({ detail });
-      });
-      drawCmp.on('addDrawLayer', async () => {
-        const addedLayer = await this.addLayer();
-        setActiveLayer(addedLayer);
       });
     }
   });
