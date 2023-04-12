@@ -55,6 +55,7 @@ export default function dropDown(target, items, options) {
       targetEl.dispatchEvent(dropdownEvent);
 
       toggleActive(activeEl);
+      e.stopPropagation(e);
     });
   }
 

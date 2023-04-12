@@ -1,0 +1,56 @@
+.o-draw-toolbar {
+  bottom: 0;
+  left: 50%;
+  margin-bottom: .5rem !important;
+  max-width: 80%;
+  position: relative;
+  -ms-transform: translate(-50%, 0);
+  -webkit-transform: translate(-50%, 0);
+  transform: translate(-50%, 0);
+  z-index: 10;
+}
+
+.o-draw-stylewindow {
+  font-family: Arial,sans-serif;
+  width: 250px;
+  position:absolute;
+  right: 1rem;
+  -ms-transform: translate(0, -50%);
+  -webkit-transform: translate(0, -50%);
+  transform: translate(0, -50%);
+  top:50%;
+  height: calc(100% - 9rem);
+}
+
+.o-draw-stylewindow input[type="radio"] {
+  display:none;
+}
+
+.o-draw-stylewindow input[type="radio"] + label span {
+  display:inline-block;
+  width:24px;
+  height:24px;
+  vertical-align:middle;
+  cursor:pointer;
+  -moz-border-radius:  50%;
+  border-radius:  50%;
+  box-shadow: 0 0 0 2px white, 0 0 0 4px white;
+}
+
+.o-draw-stylewindow input[type="radio"]:checked + label span{
+  box-shadow: 0 0 0 2px white, 0 0 0 4px #ababab;
+}
+
+.o-draw-stylewindow input[type="radio"] ~ label span:hover {
+  box-shadow: 0 0 0 2px white, 0 0 0 4px #cdcdcd;
+}
+
+.o-draw-stylewindow input[type="radio"] ~ label {
+  display:inline-block;
+  vertical-align:middle;
+  padding:5px;
+}
+
+.o-draw-stylewindow ul li {
+  float:left;
+}

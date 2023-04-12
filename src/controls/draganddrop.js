@@ -4,11 +4,8 @@ import GeoJSONFormat from 'ol/format/GeoJSON';
 import IGCFormat from 'ol/format/IGC';
 import KMLFormat from 'ol/format/KML';
 import TopoJSONFormat from 'ol/format/TopoJSON';
-import VectorSource from 'ol/source/Vector';
-import VectorLayer from 'ol/layer/Vector';
 import Style from '../style';
 import { Component, InputFile, Button, Element as El } from '../ui';
-import { getStylewindowStyle } from './editor/stylewindow';
 
 const DragAndDrop = function DragAndDrop(options = {}) {
   let dragAndDrop;
@@ -118,8 +115,6 @@ const DragAndDrop = function DragAndDrop(options = {}) {
           }
         }]
       };
-      let vectorSource;
-      let vectorLayer;
       const vectorStyles = Style.createGeometryStyle(featureStyles);
       dragAndDrop = new olDragAndDrop({
         formatConstructors: [
@@ -147,30 +142,26 @@ const DragAndDrop = function DragAndDrop(options = {}) {
             i += 1;
           }
         }
-        vectorSource = new VectorSource({
-          features: event.features
-        });
-        vectorSource.forEachFeature((feature) => {
-          if (feature.get('style') && styleByAttribute) {
-            const featureStyle = getStylewindowStyle(feature, feature.get('style'));
-            feature.setStyle(featureStyle);
-          }
-        });
         if (!viewer.getGroup(groupName)) {
           viewer.addGroup({ title: groupTitle, name: groupName, expanded: true, draggable });
         }
-        vectorLayer = new VectorLayer({
-          source: vectorSource,
-          name: layerName,
+        const layerOptions = {
           group: groupName,
+          name: layerName,
           title: layerTitle,
+          zIndex: 6,
+          styleByAttribute,
           queryable: true,
           removable: true,
-          style: vectorStyles[event.features[0].getGeometry().getType()]
-        });
-
-        map.addLayer(vectorLayer);
-        map.getView().fit(vectorSource.getExtent());
+          visible: true,
+          source: 'none',
+          type: 'GEOJSON',
+          features: event.features
+        };
+        if (!styleByAttribute) {
+          layerOptions.style = vectorStyles[event.features[0].getGeometry().getType()];
+        }
+        viewer.addLayer(layerOptions);
       });
       this.render();
     },
