@@ -17,13 +17,16 @@ import CenterMarker from './components/centermarker';
 import flattenGroups from './utils/flattengroups';
 import getcenter from './geometry/getcenter';
 import isEmbedded from './utils/isembedded';
+import generateUUID from './utils/generateuuid';
 import permalink from './permalink/permalink';
+import Stylewindow from './style/stylewindow';
 
 const Viewer = function Viewer(targetOption, options = {}) {
   let map;
   let tileGrid;
   let featureinfo;
   let selectionmanager;
+  let stylewindow;
 
   const {
     breakPoints,
@@ -51,7 +54,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
     source = {},
     clusterOptions = {},
     tileGridOptions = {},
-    url
+    url,
+    palette
   } = options;
 
   let {
@@ -137,6 +141,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
   const getFeatureinfo = () => featureinfo;
 
   const getSelectionManager = () => selectionmanager;
+
+  const getStylewindow = () => stylewindow;
 
   const getCenter = () => getcenter;
 
@@ -517,6 +523,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
       }));
 
       tileGrid = maputils.tileGrid(tileGridSettings);
+      stylewindow = Stylewindow({ palette, viewer: this });
 
       setMap(Map(Object.assign(options, { projection, center, zoom, target: this.getId() })));
 
@@ -677,8 +684,10 @@ const Viewer = function Viewer(targetOption, options = {}) {
     setStyle,
     zoomToExtent,
     getSelectionManager,
+    getStylewindow,
     getEmbedded,
     permalink,
+    generateUUID,
     centerMarker
   });
 };

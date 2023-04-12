@@ -90,8 +90,18 @@ const controls = function controls(controlsStr) {
 };
 
 const controlDraw = function controlDraw(drawState) {
-  const features = new GeoJSON().readFeatures(drawState.features);
-  return { features };
+  const drawLayers = drawState.layers || [];
+  const layerArr = [];
+  let features = [];
+  drawLayers.forEach((element) => {
+    const layer = element;
+    layer.features = new GeoJSON().readFeatures(element.features);
+    layerArr.push(layer);
+  });
+  if (drawState.features) {
+    features = new GeoJSON().readFeatures(drawState.features);
+  }
+  return { features, layers: layerArr };
 };
 
 const legend = function legend(stateStr) {

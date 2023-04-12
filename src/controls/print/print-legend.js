@@ -266,7 +266,9 @@ const LayerRows = function LayerRows(options) {
       const overlayEls = [];
 
       overlays.forEach((layer) => {
-        overlayEls.push(LayerRow({ layer, viewer }));
+        if (!layer.get('drawlayer')) {
+          overlayEls.push(LayerRow({ layer, viewer }));
+        }
       });
       const layerListCmp = Component({
         async render() {

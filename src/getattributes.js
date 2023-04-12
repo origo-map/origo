@@ -211,7 +211,7 @@ function getAttributes(feature, layer, map) {
     // If attributes is string then use template named with the string
     if (typeof layerAttributes === 'string') {
       // Use attributes with the template
-      const li = featureinfotemplates.getFromTemplate(layerAttributes, attributes, attributeAlias);
+      const li = featureinfotemplates.getFromTemplate(layerAttributes, attributes, attributeAlias, layer);
       const templateList = document.createElement('ul');
       featureinfoElement.appendChild(templateList);
       templateList.innerHTML = li;
@@ -220,7 +220,7 @@ function getAttributes(feature, layer, map) {
         attribute = layer.get('attributes')[i];
         val = '';
         if (attribute.template) {
-          const li = featureinfotemplates.getFromTemplate(attribute.template, attributes, attributeAlias);
+          const li = featureinfotemplates.getFromTemplate(attribute.template, attributes, attributeAlias, layer);
           const templateList = document.createElement('ul');
           featureinfoElement.appendChild(templateList);
           templateList.innerHTML = li;
@@ -248,7 +248,7 @@ function getAttributes(feature, layer, map) {
     }
   } else {
     // Use attributes with the template
-    const li = featureinfotemplates.getFromTemplate('default', attributes, attributeAlias);
+    const li = featureinfotemplates.getFromTemplate('default', attributes, attributeAlias, layer);
     const templateList = document.createElement('ul');
     featureinfoElement.appendChild(templateList);
     templateList.innerHTML = li;

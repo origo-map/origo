@@ -15,7 +15,7 @@ permalinkStore.getSaveLayers = function getSaveLayers(layers) {
     if (layer.get('defaultStyle') && layer.get('defaultStyle') !== layer.get('styleName')) saveLayer.sn = layer.get('altStyleIndex');
     if (saveLayer.s || saveLayer.v) {
       saveLayer.name = layer.get('name');
-      if (saveLayer.name !== 'measure') {
+      if (saveLayer.name !== 'measure' && !layer.get('drawlayer')) {
         saveLayers.push(urlparser.stringify(saveLayer, {
           topmost: 'name'
         }));
