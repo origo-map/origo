@@ -224,7 +224,7 @@ function getAttributes(feature, layer, map) {
           const templateList = document.createElement('ul');
           featureinfoElement.appendChild(templateList);
           templateList.innerHTML = li;
-        } else if (attribute.type !== 'hidden') {
+        } else {
           if (attribute.name) {
             val = getContent.name(feature, attribute, attributes, map);
           } else if (attribute.url) {
