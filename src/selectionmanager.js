@@ -1,10 +1,13 @@
 import Collection from 'ol/Collection';
+import { getArea, getLength } from 'ol/sphere';
 import { Component } from './ui';
 import featurelayer from './featurelayer';
 import infowindowManagerV1 from './infowindow';
 import infowindowManagerV2 from './infowindow_expandableList';
 import Style from './style';
 import StyleTypes from './style/styletypes';
+import formatAreaString from './utils/formatareastring';
+import formatLengthString from './utils/formatlengthstring';
 
 const styleTypes = StyleTypes();
 
@@ -12,6 +15,11 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   const {
     toggleSelectOnClick = false
   } = options;
+
+  let aggregations = [];
+  if (options.infowindowOptions && options.infowindowOptions.groupAggregations) {
+    aggregations = options.infowindowOptions.groupAggregations;
+  }
   let viewer;
   let selectedItems;
   let urval;
@@ -157,6 +165,97 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     infowindow.createUrvalElement(selectionGroup, selectionGroupTitle);
   }
 
+  /**
+   * Calculates all configured aggregations for one selectionGroup
+   * @param {any} selectionGroup
+   */
+  function calculateGroupAggregations(selectionGroup) {
+    const retval = [];
+    // function pointer to a function that takes an array as argumnet
+    let aggregationFn;
+
+    aggregations.forEach(currAggregation => {
+      const {
+        useHectare = true
+      } = currAggregation;
+      let helperName;
+      if (!currAggregation.layer || currAggregation.layer === selectionGroup) {
+        let valFound = false;
+        // Suck out the attribute to aggregate.
+        const values = urval.get(selectionGroup).getFeatures().map(currFeature => {
+          let val = 0;
+          if (currAggregation.attribute.startsWith('@')) {
+            helperName = currAggregation.attribute.substring(1);
+            const geometry = currFeature.getGeometry();
+            const geomType = geometry.getType();
+            const proj = viewer.getProjection();
+            if (helperName === 'area') {
+              if (geomType === 'Polygon' || geomType === 'MultiPolygon') {
+                val = getArea(geometry, { projection: proj });
+                valFound = true;
+              }
+            } else if (helperName === 'length') {
+              if (geomType === 'LineString' || geomType === 'LinearRing' || geomType === 'MultiLineString') {
+                val = getLength(geometry, { projection: proj });
+                valFound = true;
+              }
+            } else {
+              console.error(`Unsupported geometry operation: ${helperName}`);
+            }
+          } else {
+            val = currFeature.get(currAggregation.attribute);
+            if (val !== undefined) {
+              valFound = true;
+            }
+          }
+          return val;
+        });
+
+        // Only add the aggregation if this layer has the attribute (or function)
+        if (valFound) {
+          switch (currAggregation.function) {
+            case 'sum':
+              // Define the "sum" aggregation.
+              // To be honest, we could have just performed the aggregation here
+              // but it is cool to use function pointers.
+              // javascript does not provide a sum function. Define our own.
+              aggregationFn = (arr) => arr.reduce((a, b) => (Number(a) || 0) + (Number(b) || 0), 0);
+              break;
+            default:
+              console.error(`Unsupported aggregation function: ${currAggregation.function}`);
+              return; // Return from labmda. Skips this aggregation
+          }
+
+          let result = aggregationFn(values);
+          const decimals = currAggregation.decimals !== undefined ? currAggregation.decimals : 2;
+
+          // Correct result depending on type
+          let resultstring;
+          if (helperName === 'area' && !currAggregation.unit) {
+            resultstring = formatAreaString(result, { useHectare, decimals });
+          } else if (helperName === 'length' && !currAggregation.unit) {
+            resultstring = formatLengthString(result, { decimals });
+          } else {
+            if (currAggregation.scalefactor) {
+              result *= currAggregation.scalefactor;
+            }
+            resultstring = result.toFixed(decimals);
+            if (currAggregation.unit) {
+              resultstring = `${resultstring} ${currAggregation.unit}`;
+            }
+          }
+
+          const prefix = currAggregation.label || `${currAggregation.function}(${currAggregation.attribute}):`;
+          const line = `${prefix} ${resultstring}`;
+          retval.push(line);
+        }
+      }
+    });
+
+    // Return all aggregations in one multiline string
+    return retval.join('<br>');
+  }
+
   function onItemAdded(event) {
     const item = event.element;
 
@@ -176,6 +275,8 @@ const Selectionmanager = function Selectionmanager(options = {}) {
 
     const sum = urval.get(selectionGroup).getFeatures().length;
     infowindow.updateUrvalElementText(selectionGroup, selectionGroupTitle, sum);
+    const aggregationstring = calculateGroupAggregations(selectionGroup);
+    infowindow.updateSelectionGroupFooter(selectionGroup, aggregationstring);
   }
 
   function onItemRemoved(event) {
@@ -193,6 +294,8 @@ const Selectionmanager = function Selectionmanager(options = {}) {
 
     const sum = urval.get(selectionGroup).getFeatures().length;
     infowindow.updateUrvalElementText(selectionGroup, selectionGroupTitle, sum);
+    const aggregationstring = calculateGroupAggregations(selectionGroup);
+    infowindow.updateSelectionGroupFooter(selectionGroup, aggregationstring);
 
     if (urval.get(selectionGroup).getFeatures().length < 1) {
       infowindow.hideUrvalElement(selectionGroup);

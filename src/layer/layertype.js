@@ -13,21 +13,21 @@ import osm from './osm';
 import vectortile from './vectortile';
 import feature from './featurelayer';
 
-const type = {};
+const layerType = {};
 
-type.WFS = wfs;
-type.AGS_FEATURE = agsFeature;
-type.AGS_MAP = agsMap;
-type.TOPOJSON = topojson;
-type.GEOJSON = geojson;
-type.GPX = gpx;
-type.KML = kml;
-type.WMS = wms;
-type.WMTS = wmts;
-type.AGS_TILE = agsTile;
-type.XYZ = xyz;
-type.OSM = osm;
-type.VECTORTILE = vectortile;
-type.FEATURE = feature;
+layerType.WFS = wfs;
+layerType.AGS_FEATURE = agsFeature;
+layerType.AGS_MAP = agsMap;
+layerType.TOPOJSON = topojson;
+layerType.GEOJSON = geojson;
+layerType.GPX = gpx;
+layerType.KML = kml;
+layerType.WMS = wms;
+layerType.WMTS = wmts;
+layerType.AGS_TILE = agsTile;
+layerType.XYZ = xyz;
+layerType.OSM = osm;
+layerType.VECTORTILE = vectortile;
+layerType.FEATURE = feature;
 
-export default type;
+export default layerType;

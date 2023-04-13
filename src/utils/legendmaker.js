@@ -2,7 +2,7 @@ import { renderIcon, renderSvg } from './legendrender';
 
 const size = 24;
 
-const isHidden = function isHidden(arr) {
+export const isHidden = function isHidden(arr) {
   const hiddenItem = arr.find(item => item.hidden);
   if (hiddenItem) {
     if (hiddenItem.hidden === true) {

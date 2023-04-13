@@ -5,7 +5,7 @@ import tile from './tile';
 
 function createSource(options) {
   return new WMTSSource({
-    crossOrigin: 'anonymous',
+    crossOrigin: options.crossOrigin,
     attributions: options.attribution,
     url: options.url,
     projection: options.projectionCode,
@@ -28,8 +28,9 @@ const wmts = function wmts(layerOptions, viewer) {
     featureinfoLayer: undefined
   };
   const sourceDefault = {
-    matrixSet: viewer.getProjectionCode(),
-    matrixIdsPrefix: `${viewer.getProjectionCode()}:`,
+    crossOrigin: 'anonymous',
+    matrixSet: layerOptions.matrixSet || viewer.getProjectionCode(),
+    matrixIdsPrefix: layerOptions.matrixIdsPrefix === false ? '' : `${viewer.getProjectionCode()}:`,
     format: 'image/png',
     resolutions: JSON.parse(JSON.stringify(viewer.getResolutions())),
     tileSize: [256, 256]
@@ -42,6 +43,7 @@ const wmts = function wmts(layerOptions, viewer) {
     sourceOptions.format = wmtsOptions.format;
   }
   sourceOptions.attribution = wmtsOptions.attribution;
+  sourceOptions.crossOrigin = wmtsOptions.crossOrigin ? wmtsOptions.crossOrigin : sourceOptions.crossOrigin;
   sourceOptions.projectionCode = viewer.getProjectionCode();
   sourceOptions.matrixIds = [];
   sourceOptions.resolutions.forEach((resolution, i) => {

@@ -128,7 +128,7 @@ const Search = function Search(options = {}) {
           let featureWkt;
           let coordWkt;
           if (res.length > 0) {
-            showFeatureInfo(res, layer.get('title'), getAttributes(res[0], layer));
+            showFeatureInfo(res, layer.get('title'), getAttributes(res[0], layer, map));
           } else if (geometryAttribute) {
             // Fallback if no geometry in response
             featureWkt = mapUtils.wktToFeature(data[geometryAttribute], projectionCode);
@@ -139,7 +139,7 @@ const Search = function Search(options = {}) {
     } else if (geometryAttribute && layerName) {
       feature = mapUtils.wktToFeature(data[geometryAttribute], projectionCode);
       layer = viewer.getLayer(data[layerName]);
-      showFeatureInfo([feature], layer.get('title'), getAttributes(feature, layer));
+      showFeatureInfo([feature], layer.get('title'), getAttributes(feature, layer, map));
     } else if (titleAttribute && contentAttribute && geometryAttribute) {
       feature = mapUtils.wktToFeature(data[geometryAttribute], projectionCode);
 

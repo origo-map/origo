@@ -32,44 +32,47 @@ export default function defaultStyle() {
   const styles = [];
 
   return function style(feature) {
+    const styleScale = feature.get('styleScale') || 1;
     polygon.setZIndex(1);
     line.setZIndex(10);
     let length = 0;
+    const width = 1 * styleScale;
+    const radius = 5 * styleScale;
     const geom = feature.getGeometry().getType();
     switch (geom) {
       case 'Polygon':
         stroke.setColor(getColor('blue'));
-        stroke.setWidth(1);
+        stroke.setWidth(width);
         fill.setColor(getColor('blue', 0.8));
         styles[length] = strokedPolygon;
         length += 1;
         break;
       case 'MultiPolygon':
         stroke.setColor(getColor('blue'));
-        stroke.setWidth(1);
+        stroke.setWidth(width);
         fill.setColor(getColor('blue', 0.8));
         styles[length] = strokedPolygon;
         length += 1;
         break;
       case 'LineString':
         stroke.setColor(getColor('red'));
-        stroke.setWidth(1);
+        stroke.setWidth(width);
         styles[length] = line;
         length += 1;
         break;
       case 'MultiLineString':
         stroke.setColor(getColor('red'));
-        stroke.setWidth(1);
+        stroke.setWidth(width);
         styles[length] = line;
         length += 1;
         break;
       case 'Point':
         stroke.setColor(getColor('blue'));
-        stroke.setWidth(1);
+        stroke.setWidth(width);
         fill.setColor(getColor('blue', 0.8));
         point = new Style({
           image: new Circle({
-            radius: 5,
+            radius,
             fill,
             stroke
           }),
@@ -80,11 +83,11 @@ export default function defaultStyle() {
         break;
       case 'MultiPoint':
         stroke.setColor(getColor('blue'));
-        stroke.setWidth(1);
+        stroke.setWidth(width);
         fill.setColor(getColor('blue', 0.8));
         point = new Style({
           image: new Circle({
-            radius: 5,
+            radius,
             fill,
             stroke
           }),
@@ -95,7 +98,7 @@ export default function defaultStyle() {
         break;
       default:
         stroke.setColor(getColor('blue'));
-        stroke.setWidth(1);
+        stroke.setWidth(width);
         fill.setColor(getColor('blue', 0.8));
         styles[length] = strokedPolygon;
         length += 1;

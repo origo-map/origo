@@ -22,6 +22,7 @@ export default function Modal(options = {}) {
     title = '',
     content = '',
     contentElement,
+    contentCmp,
     cls = '',
     isStatic = options.static,
     target,
@@ -95,11 +96,13 @@ export default function Modal(options = {}) {
         cls: 'flex row justify-end grey-lightest',
         components: headerCmps
       });
-
-      contentEl = Element({
-        cls: 'o-modal-content',
-        innerHTML: `${content}`
-      });
+      const elOptions = { cls: 'o-modal-content' };
+      if (contentCmp) {
+        elOptions.components = [contentCmp];
+      } else if (content) {
+        elOptions.innerHTML = `${content}`;
+      }
+      contentEl = Element(elOptions);
 
       this.addComponent(screenEl);
       this.addComponent(headerEl);

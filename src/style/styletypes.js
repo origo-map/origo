@@ -1,5 +1,5 @@
 import pin from './pin';
-import measure from './measure';
+import { measure } from './drawstyles';
 import multiselection from './multiselection';
 
 export default function styletypes() {
