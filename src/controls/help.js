@@ -68,6 +68,10 @@ const Help = function Help(options = {}) {
       text: 'Dela din karta med en kompis!',
       icon: '#ic_screen_share_outline_24px'
     },
+    Draw: {
+      text: 'Rita och skriv på kartan i egna lager. Det går även att importera och/eller exportera ritade lager i formatet GeoJSON.',
+      icon: '#fa-pencil'
+    },
     Print: {
       text: 'Skriv ut kartan till en pdf',
       icon: '#ic_print_24px'
