@@ -5,7 +5,6 @@
 "features": [
 { "type": "Feature", "properties": { "id": 1, "name": "Karlstad" }, "geometry": { "type": "Point", "coordinates": [ 1503136, 8262205 ] } },
 { "type": "Feature", "properties": { "id": 2, "name": "Hallstahammar" }, "geometry": { "type": "Point", "coordinates": [ 1807133, 8313751 ] } },
-{ "type": "Feature", "properties": { "id": 3, "name": "Västerås" }, "geometry": { "type": "Point", "coordinates": [ 1841462, 8314392 ] } },
 { "type": "Feature", "properties": { "id": 4, "name": "Eskilstuna" }, "geometry": { "type": "Point", "coordinates": [ 1836807, 8260572 ] } },
 { "type": "Feature", "properties": { "id": 5, "name": "Strängnäs" }, "geometry": { "type": "Point", "coordinates": [ 1894581, 8261118 ] } },
 { "type": "Feature", "properties": { "id": 6, "name": "Enköping" }, "geometry": { "type": "Point", "coordinates": [ 1901643, 8320134 ] } },
@@ -22,6 +21,8 @@
 { "type": "Feature", "properties": { "id": 17, "name": "Norberg" }, "geometry": { "type": "Point", "coordinates": [ 1773055, 8414134 ] } },
 { "type": "Feature", "properties": { "id": 18, "name": "Avesta" }, "geometry": { "type": "Point", "coordinates": [ 1801204, 8431717 ] } },
 { "type": "Feature", "properties": { "id": 19, "name": "Fagersta" }, "geometry": { "type": "Point", "coordinates": [ 1758647, 8400343 ] } },
-{ "type": "Feature", "properties": { "id": 20, "name": "Kristianstad" }, "geometry": { "type": "Point", "coordinates": [ 1575633, 7565358 ] } }
+{ "type": "Feature", "properties": { "id": 20, "name": "Kristianstad" }, "geometry": { "type": "Point", "coordinates": [ 1575633, 7565358 ] } },
+{ "type": "Feature", "properties": { "id": 21, "name": "Mora" }, "geometry": { "type": "Point", "coordinates": [ 1618908, 8627715 ] } },
+{ "type": "Feature", "properties": { "id": 22, "name": "Orsa" }, "geometry": { "type": "Point", "coordinates": [ 1627705, 8653421 ] } }
 ]
 }

@@ -128,6 +128,10 @@ const maputils = {
     const resolution = scale / (mpu * 39.37 * dpi);
     return resolution;
   },
+  formatScale: function formatScale(scale) {
+    const roundedScale = Math.round(scale / 10) * 10;
+    return `1:${numberFormatter(roundedScale)}`;
+  },
   roundScale: function roundScale(scale) {
     let scaleValue = scale;
     const differens = scaleValue % 10;

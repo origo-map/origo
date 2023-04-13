@@ -239,6 +239,8 @@
       flex-basis: 75%; }
     .o-ui .flex .basis-100 {
       flex-basis: 100%; }
+    .o-ui .flex .small-gap {
+      gap: 0.2rem; }
   .o-ui .grid {
     display: flex;
     flex-wrap: wrap;
@@ -629,6 +631,9 @@
       transform: rotate(180deg); }
   .o-ui .collapse-scroll.expanded {
     height: calc(100% - 2rem); }
+  .o-ui .move-item {
+    background-color: #008ff5;
+    opacity: 0.2; }
   .o-ui .icon-smallest:not(.button):not(button) {
     height: 0.75rem;
     width: 0.75rem; }
@@ -1290,6 +1295,8 @@
     line-height: 1rem; }
     .o-ui .text-height-smallest.text-fade::after {
       height: 1rem; }
+  .o-ui .break-word {
+    word-wrap: break-word; }
   .o-ui .z-index-bottom {
     z-index: 0; }
   .o-ui .z-index-low {
@@ -1451,6 +1458,12 @@
     right: 30px;
     margin-top: -30px;
     width: max-content; }
+  .o-ui .popup-menu.button-popup {
+    position: absolute;
+    text-align: left;
+    width: max-content;
+    bottom: 5px;
+    left: 0; }
 
 .app {
   background-color: rgba(0, 0, 0, 0.1);
@@ -1618,6 +1631,12 @@ body {
     margin: 1px;
     padding: 0 2px;
     text-align: center; }
+  .o-map .ol-scale-bar-inner {
+    display: flex; }
+  .o-map .ol-scale-singlebar-even {
+    background-color: #000000; }
+  .o-map .ol-scale-singlebar-odd {
+    background-color: #FFFFFF; }
   .o-map .ol-has-tooltip [role=tooltip] {
     border: 0;
     clip: rect(1px 1px 1px 1px);
@@ -2515,6 +2534,47 @@ body {
     width: 100%; }
   .o-map[class*=o-media-l-m-s-xs] #o-sidebar {
     display: none; }
+  .o-map .o-draw-toolbar {
+    bottom: 0;
+    left: 50%;
+    margin-bottom: .5rem !important;
+    max-width: 80%;
+    position: relative;
+    -ms-transform: translate(-50%, 0);
+    -webkit-transform: translate(-50%, 0);
+    transform: translate(-50%, 0);
+    z-index: 10; }
+  .o-map .o-draw-stylewindow {
+    font-family: Arial,sans-serif;
+    width: 250px;
+    position: absolute;
+    right: 1rem;
+    -ms-transform: translate(0, -50%);
+    -webkit-transform: translate(0, -50%);
+    transform: translate(0, -50%);
+    top: 50%;
+    height: calc(100% - 9rem); }
+  .o-map .o-draw-stylewindow input[type="radio"] {
+    display: none; }
+  .o-map .o-draw-stylewindow input[type="radio"] + label span {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+    cursor: pointer;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px white, 0 0 0 4px white; }
+  .o-map .o-draw-stylewindow input[type="radio"]:checked + label span {
+    box-shadow: 0 0 0 2px white, 0 0 0 4px #ababab; }
+  .o-map .o-draw-stylewindow input[type="radio"] ~ label span:hover {
+    box-shadow: 0 0 0 2px white, 0 0 0 4px #cdcdcd; }
+  .o-map .o-draw-stylewindow input[type="radio"] ~ label {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 5px; }
+  .o-map .o-draw-stylewindow ul li {
+    float: left; }
   .o-map #o-editor-button .o-icon-fa-pencil {
     height: 1em;
     padding: 0.25em;
@@ -2617,7 +2677,7 @@ body {
     margin: 0; }
   .o-map input.o-position-find {
     padding: 0;
-    width: 95px; }
+    width: auto; }
   .o-map .o-progress {
     background: #008ff5;
     bottom: 0;
@@ -2758,7 +2818,9 @@ body {
     left: 0px;
     list-style: none;
     margin: 0;
-    min-width: 100%;
+    min-width: 180px;
+    max-width: 100%;
+    overflow-wrap: break-word;
     padding: 0;
     position: absolute;
     top: auto;
@@ -2825,8 +2887,7 @@ body {
     background-color: #eeeeee; }
   .o-map[class*=o-media-l-m] .awesomplete > ul {
     max-width: calc(100% + 2rem);
-    min-width: calc(100% + 2rem);
-    top: 2.25rem; }
+    min-width: calc(100% + 2rem); }
   .o-map .o-search-wrapper {
     max-width: calc(100% - 8rem);
     width: 310px; }
@@ -3145,19 +3206,21 @@ body {
   .o-map[class*=o-media-l-m-s] .sidebarcontainer {
     left: 5em;
     transform: none; }
-  .o-map .validate > .errorMsg {
+  .o-map .groupfootercontainer {
+    margin-left: 36px; }
+  .o-map .validate .errorMsg {
     color: #ff9500; }
-  .o-map .validate > input:optional {
+  .o-map .validate input:optional {
     border-color: #ebebeb; }
-  .o-map .validate > input:required:invalid {
+  .o-map .validate input:required:invalid {
     border-color: #ff9500; }
-  .o-map .validate > input:invalid {
+  .o-map .validate input:invalid {
     border-color: #ff9500; }
-  .o-map .validate > textarea:required:invalid {
+  .o-map .validate textarea:required:invalid {
     border-color: #ff9500; }
-  .o-map .validate > select:required:invalid {
+  .o-map .validate select:required:invalid {
     border-color: #ff9500; }
-  .o-map .validate > select:required:invalid {
+  .o-map .validate select:required:invalid {
     border-color: #ff9500; }
   .o-map input.awesome:required:invalid {
     border-color: #ff9500; }

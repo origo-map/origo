@@ -62,7 +62,8 @@ const Editor = function Editor(options = {}) {
       const toolbarOptions = Object.assign({}, options, {
         autoSave,
         currentLayer,
-        editableLayers: editableFeatureLayers
+        editableLayers: editableFeatureLayers,
+        isActive
       });
       const handlerOptions = Object.assign({}, options, {
         autoForm,
