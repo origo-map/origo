@@ -429,6 +429,7 @@ const Search = function Search(options = {}) {
       });
       infowindow.changeContent(listcomponent, `Sökresultat för "${searchVal}"`);
     };
+
     function makeRequest(reqHandler, obj, opt) {
       const searchVal = obj.value;
       let queryUrl = `${url}${url.indexOf('?') !== -1 ? '&' : '?'}${queryParameterName}=${encodeURI(obj.value)}`;
