@@ -99,10 +99,10 @@ function createRegularShape(type, pointSize, pointFill, pointStroke) {
       let strokeColor = 'black';
       let strokeWidth = 10;
       if (fill && fill.getColor) {
-        fillColor = fill.getColor().replace('#', '%23');
+        fillColor = encodeURIComponent(fill.getColor());
       }
       if (stroke && stroke.getColor) {
-        strokeColor = stroke.getColor().replace('#', '%23');
+        strokeColor = encodeURIComponent(stroke.getColor());
       }
       if (stroke && stroke.getWidth) {
         strokeWidth = 5 * stroke.getWidth();
