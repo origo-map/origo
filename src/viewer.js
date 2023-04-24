@@ -555,7 +555,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
           this.addComponent(centerMarker);
 
           this.addControls();
-          
+
           if (urlParams.feature) {
             const featureId = urlParams.feature;
             const layerName = featureId.split('.')[0];
