@@ -537,12 +537,31 @@ const Viewer = function Viewer(targetOption, options = {}) {
             mapId: this.getId()
           });
 
+          if (urlParams.pin) {
+            featureinfoOptions.savedPin = urlParams.pin;
+          } else if (urlParams.selection) {
+            // This needs further development for proper handling in permalink
+            featureinfoOptions.savedSelection = new Feature({
+              geometry: new geom[urlParams.selection.geometryType](urlParams.selection.coordinates)
+            });
+          }
+
+          featureinfoOptions.viewer = this;
+
+          selectionmanager = Selectionmanager(featureinfoOptions);
+          featureinfo = Featureinfo(featureinfoOptions);
+          this.addComponent(selectionmanager);
+          this.addComponent(featureinfo);
+          this.addComponent(centerMarker);
+
+          this.addControls();
+
           if (urlParams.feature) {
             const featureId = urlParams.feature;
             const layerName = featureId.split('.')[0];
             const layer = getLayer(layerName);
-            const layerType = layer.get('type');
-            if (layer && layerType !== 'GROUP') {
+            if (layer && layer.get('type') !== 'GROUP') {
+              const layerType = layer.get('type');
               // FIXME: postrender event is only emitted if any features from a layer is actually drawn, which means there is no feature in the default extent,
               // it will not be triggered until map is panned or zoomed where a feature exists.
               layer.once('postrender', () => {
@@ -590,28 +609,10 @@ const Viewer = function Viewer(targetOption, options = {}) {
             }
           }
 
-          if (urlParams.pin) {
-            featureinfoOptions.savedPin = urlParams.pin;
-          } else if (urlParams.selection) {
-            // This needs further development for proper handling in permalink
-            featureinfoOptions.savedSelection = new Feature({
-              geometry: new geom[urlParams.selection.geometryType](urlParams.selection.coordinates)
-            });
-          }
-
           if (!urlParams.zoom && !urlParams.mapStateId && startExtent) {
             map.getView().fit(startExtent, { size: map.getSize() });
           }
 
-          featureinfoOptions.viewer = this;
-
-          selectionmanager = Selectionmanager(featureinfoOptions);
-          featureinfo = Featureinfo(featureinfoOptions);
-          this.addComponent(selectionmanager);
-          this.addComponent(featureinfo);
-          this.addComponent(centerMarker);
-
-          this.addControls();
           this.dispatch('loaded');
         });
     },
