@@ -334,84 +334,86 @@ const Search = function Search(options = {}) {
     const infowindowHandler = function func(list, searchVal) {
       const result = list.reduce((r, a) => {
         /* eslint-disable-next-line no-param-reassign */
-        r[a.layer] = r[a.layer] || [];
-        r[a.layer].push(a);
+        r[a[layerNameAttribute]] = r[a[layerNameAttribute]] || [];
+        r[a[layerNameAttribute]].push(a);
         return r;
       }, Object.create(null));
 
       const groups = [];
       Object.keys(result).forEach((layername) => {
         const resultArray = result[layername];
-        const layertitle = `${viewer.getLayer(layername).get('title')} (${resultArray.length})`;
-        const rows = [];
-        resultArray.forEach((element) => {
-          const row = Component({
-            addClick() {
-              document.getElementById(this.getId()).addEventListener('click', () => {
-                const source = viewer.getMapSource();
-                const projCode = viewer.getProjectionCode();
-                const proj = viewer.getProjection();
-                const layer = viewer.getLayer(layername);
-                const id = element.idfield;
-                getFeature(id, layer, source, projCode, proj)
-                  .then((res) => {
-                    if (res.length > 0) {
-                      const featureLayerName = layer.get('name');
-                      const feature = res[0];
-                      featureInfo.showFeatureInfo({ feature, layerName: featureLayerName });
-                    }
-                  });
-              });
-            },
+        if (viewer.getLayer(layername)) {
+          const layertitle = `${viewer.getLayer(layername).get('title')} (${resultArray.length})`;
+          const rows = [];
+          resultArray.forEach((element) => {
+            const row = Component({
+              addClick() {
+                document.getElementById(this.getId()).addEventListener('click', () => {
+                  const source = viewer.getMapSource();
+                  const projCode = viewer.getProjectionCode();
+                  const proj = viewer.getProjection();
+                  const layer = viewer.getLayer(layername);
+                  const id = element[idAttribute];
+                  getFeature(id, layer, source, projCode, proj)
+                    .then((res) => {
+                      if (res.length > 0) {
+                        const featureLayerName = layer.get('name');
+                        const feature = res[0];
+                        featureInfo.showFeatureInfo({ feature, layerName: featureLayerName });
+                      }
+                    });
+                });
+              },
+              onInit() {
+                this.addComponent(El({
+                  cls: 'flex row align-center padding-left padding-right item',
+                  tagName: 'div',
+                  innerHTML: `${element[name]}`
+                }));
+              },
+              render() {
+                const content = this.getComponents().reduce((acc, item) => {
+                  const rendered = item.render();
+                  return acc + rendered;
+                }, '');
+                return `<li class="flex row text-smaller align-center padding-x padding-y-smaller hover pointer" id="${this.getId()}">${content}</li>`;
+              }
+            });
+            rows.push(row);
+          });
+
+          const contentComponent = Component({
             onInit() {
-              this.addComponent(El({
-                cls: 'flex row align-center padding-left padding-right item',
-                tagName: 'div',
-                innerHTML: `${element.searchfield}`
-              }));
+              this.addComponents(rows);
+            },
+            onRender() {
+              this.getComponents().forEach((comp) => {
+                comp.addClick();
+              });
             },
             render() {
               const content = this.getComponents().reduce((acc, item) => {
                 const rendered = item.render();
                 return acc + rendered;
               }, '');
-              return `<li class="flex row text-smaller align-center padding-x padding-y-smaller hover pointer" id="${this.getId()}">${content}</li>`;
+              this.dispatch('render');
+              return `<ul id="${this.getId()}">${content}</ul>`;
             }
           });
-          rows.push(row);
-        });
 
-        const contentComponent = Component({
-          onInit() {
-            this.addComponents(rows);
-          },
-          onRender() {
-            this.getComponents().forEach((comp) => {
-              comp.addClick();
-            });
-          },
-          render() {
-            const content = this.getComponents().reduce((acc, item) => {
-              const rendered = item.render();
-              return acc + rendered;
-            }, '');
-            this.dispatch('render');
-            return `<ul id="${this.getId()}">${content}</ul>`;
-          }
-        });
-
-        const groupCmp = Collapse({
-          cls: '',
-          expanded: false,
-          headerComponent: CollapseHeader({
-            cls: 'hover padding-x padding-y-small grey-lightest border-bottom text-small',
-            icon: '#ic_chevron_right_24px',
-            title: layertitle
-          }),
-          contentComponent,
-          collapseX: false
-        });
-        groups.push(groupCmp);
+          const groupCmp = Collapse({
+            cls: '',
+            expanded: false,
+            headerComponent: CollapseHeader({
+              cls: 'hover padding-x padding-y-small grey-lightest border-bottom text-small',
+              icon: '#ic_chevron_right_24px',
+              title: layertitle
+            }),
+            contentComponent,
+            collapseX: false
+          });
+          groups.push(groupCmp);
+        }
       });
 
       const listcomponent = Component({
