@@ -74,6 +74,7 @@ export default function styleTemplate(palette, swStyle) {
       <option value="star"${swStyle.pointType === 'star' ? ' selected' : ''}>Stjärna</option>
       <option value="triangle"${swStyle.pointType === 'triangle' ? ' selected' : ''}>Triangel</option>
       <option value="square"${swStyle.pointType === 'square' ? ' selected' : ''}>Kvadrat</option>
+      <option value="marker"${swStyle.pointType === 'marker' ? ' selected' : ''}>Markör</option>
     </select>
   </div></div>`;
 
