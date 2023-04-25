@@ -483,9 +483,12 @@ const Viewer = function Viewer(targetOption, options = {}) {
     }
   };
 
-  const addMarker = function addMarker(coordinates, title, content) {
-    const layer = maputils.createMarker(coordinates, title, content, this);
-    map.addLayer(layer);
+  const addMarker = function addMarker(coordinates, title, content, layerProps, showPopup) {
+    maputils.createMarker(coordinates, title, content, this, layerProps, showPopup);
+  };
+
+  const removeMarkers = function removeMarkers(layerName) {
+    maputils.removeMarkers(this, layerName);
   };
 
   const getUrlParams = function getUrlParams() {
@@ -659,6 +662,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     removeGroup,
     removeLayer,
     removeOverlays,
+    removeMarkers,
     setStyle,
     zoomToExtent,
     getSelectionManager,
