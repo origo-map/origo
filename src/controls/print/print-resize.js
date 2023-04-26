@@ -453,8 +453,6 @@ export default function PrintResize(options = {}) {
       } else if (features) {
         features.forEach(feature => {
           const featureStyle = feature.getStyle();
-          console.log(featureStyle);
-          console.log(styleName);
           if (styleName === 'origoStylefunction' || styleName === 'default') {
             feature.set('styleScale', 1);
           } else if (featureStyle) {
