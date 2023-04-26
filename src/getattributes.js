@@ -27,12 +27,8 @@ function parseUrl(urlattr, feature, attribute, attributes, map, linktext) {
   } else if (attribute.target === 'modal-full') {
     aTarget = 'modal-full';
     aCls = 'o-identify-link-modal';
-  } else if (attribute.target === '_self') {
-    aTarget = '_self';
-  } else if (attribute.target === '_top') {
-    aTarget = '_top';
-  } else if (attribute.target === '_parent') {
-    aTarget = '_parent';
+  } else {
+    aTarget = attribute.target ? attribute.target : '_blank';
   }
   val = `<a class="${aCls}" target="${aTarget}" href="${url}" title="${aTargetTitle}">${text}</a>`;
   return val;
