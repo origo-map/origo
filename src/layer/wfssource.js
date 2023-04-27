@@ -150,11 +150,7 @@ class WfsSource extends VectorSource {
 
     // Actually fetch some features
     let JsonFeatures;
-    if (this._options.requestMethod && this._options.requestMethod.toLowerCase() !== 'post') { // GET request
-      JsonFeatures = await fetch(url).then(response => response.json({
-        cache: false
-      }));
-    } else { // POST request
+    if (this._options.requestMethod && this._options.requestMethod.toLowerCase() === 'post') { // POST request
       let formBody = [];
       Object.keys(postData).forEach(key => {
         const encodedKey = encodeURIComponent(key);
@@ -169,6 +165,10 @@ class WfsSource extends VectorSource {
         },
         body: formBody
       }).then(response => response.json({
+        cache: false
+      }));
+    } else { // GET request
+      JsonFeatures = await fetch(url).then(response => response.json({
         cache: false
       }));
     }
