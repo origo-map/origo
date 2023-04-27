@@ -105,36 +105,26 @@ function createWmsStyle({ wmsOptions, source, viewer, initialStyle = false }) {
 }
 
 function imageLoadFunction(loadedImage, src) {
-  const img = loadedImage.getImage();
-  if (typeof window.btoa === 'function') {
-    const urlArray = src.split('?');
-    const url = urlArray[0];
-    const params = urlArray[1];
-
-    const xhr = new XMLHttpRequest();
-    xhr.onload = function loaded() {
-      if (this.status === 200) {
-        const uInt8Array = new Uint8Array(this.response);
-        let i = uInt8Array.length;
-        const binaryString = new Array(i);
-        while (i > 0) {
-          binaryString[i] = String.fromCharCode(uInt8Array[i]);
-          i -= 1;
-        }
-        const data = binaryString.join('');
-        const type = xhr.getResponseHeader('content-type');
-        if (type.indexOf('image') === 0) {
-          img.src = `data:${type};base64,${window.btoa(data)}`;
-        }
-      }
-    };
-    xhr.open('POST', url, true);
-    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    xhr.responseType = 'arraybuffer';
-    xhr.send(params);
-  } else {
-    img.src = src;
-  }
+  const xhr = new XMLHttpRequest();
+  xhr.responseType = 'blob';
+  xhr.addEventListener('loadend', function loaded() {
+    const data = this.response;
+    if (data) {
+      const img = loadedImage.getImage();
+      const url = URL.createObjectURL(data);
+      img.addEventListener('loadend', () => {
+        URL.revokeObjectURL(url);
+      });
+      img.src = url;
+    }
+  });
+  const split = src.split('?');
+  xhr.open('POST', split[0]);
+  xhr.setRequestHeader(
+    'Content-type',
+    'application/x-www-form-urlencoded'
+  );
+  xhr.send(split[1]);
 }
 
 function createWmsLayer(wmsOptions, source, viewer) {

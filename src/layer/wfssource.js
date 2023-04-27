@@ -107,22 +107,11 @@ class WfsSource extends VectorSource {
     if (cql) {
       cqlfilter += `${replacer.replace(cql, window)}`;
     }
-    const postData = {
-      service: 'WFS',
-      version: '1.1.0',
-      request: 'GetFeature',
-      typeName: `${this._options.featureType}`,
-      outputFormat: 'application/json',
-      srsname: `${this._options.dataProjection}`
-    };
 
     // Create the complete CQL query string
     let queryFilter = '';
     if (this._options.strategy === 'all' || cql || this._options.isTable) {
       queryFilter = cqlfilter ? `&CQL_FILTER=${cqlfilter}` : '';
-      if (cqlfilter) {
-        postData.CQL_FILTER = cqlfilter;
-      }
     } else {
       // Extent should be used. Depending if there also is a filter, the queryfilter looks different
       const ext = getIntersection(this._options.customExtent, extent) || extent;
@@ -134,10 +123,8 @@ class WfsSource extends VectorSource {
       }
       if (cqlfilter) {
         queryFilter = `&CQL_FILTER=${cqlfilter} AND BBOX(${this._options.geometryName},${requestExtent.join(',')},'${this._options.dataProjection}')`;
-        postData.CQL_FILTER = `${cqlfilter} AND BBOX(${this._options.geometryName},${requestExtent.join(',')},'${this._options.dataProjection}')`;
       } else {
         queryFilter = `&BBOX=${requestExtent.join(',')},${this._options.dataProjection}`;
-        postData.BBOX = `${requestExtent.join(',')},${this._options.dataProjection}`;
       }
     }
 
@@ -151,19 +138,13 @@ class WfsSource extends VectorSource {
     // Actually fetch some features
     let JsonFeatures;
     if (this._options.requestMethod && this._options.requestMethod.toLowerCase() === 'post') { // POST request
-      let formBody = [];
-      Object.keys(postData).forEach(key => {
-        const encodedKey = encodeURIComponent(key);
-        const encodedValue = encodeURIComponent(postData[key]);
-        formBody.push(`${encodedKey}=${encodedValue}`);
-      });
-      formBody = formBody.join('&');
-      JsonFeatures = await fetch(serverUrl, {
+      const split = url.split('?');
+      JsonFeatures = await fetch(split[0], {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
         },
-        body: formBody
+        body: split[1]
       }).then(response => response.json({
         cache: false
       }));
