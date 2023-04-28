@@ -340,7 +340,6 @@ const Search = function Search(options = {}) {
         r[a[layerNameAttribute]].push(a);
         return r;
       }, Object.create(null));
-      console.log(result);
       const groups = [];
       Object.keys(result).forEach((layername) => {
         const resultArray = result[layername];
