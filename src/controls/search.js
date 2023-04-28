@@ -10,6 +10,7 @@ import mapUtils from '../maputils';
 import popup from '../popup';
 import utils from '../utils';
 import Infowindow from '../components/infowindow';
+import { listExportHandler } from '../infowindow_exporthandler';
 
 const Search = function Search(options = {}) {
   const keyCodes = {
@@ -46,9 +47,10 @@ const Search = function Search(options = {}) {
     url,
     queryParameterName = 'q',
     autocompletePlacement,
-    searchlistPlacement
+    searchlistOptions = {}
   } = options;
 
+  const searchlistPlacement = searchlistOptions.placement;
   let searchDb = {};
   let map;
   let projectionCode;
@@ -338,7 +340,7 @@ const Search = function Search(options = {}) {
         r[a[layerNameAttribute]].push(a);
         return r;
       }, Object.create(null));
-
+      console.log(result);
       const groups = [];
       Object.keys(result).forEach((layername) => {
         const resultArray = result[layername];
@@ -416,10 +418,34 @@ const Search = function Search(options = {}) {
         }
       });
 
+      let exportButton;
+      if (Object.keys(result).length > 0 && searchlistOptions.export && searchlistOptions.exportUrl) {
+        const buttonText = searchlistOptions.exportButtontext || 'Export';
+        const exportFileName = searchlistOptions.exportFilename || 'export.xlsx';
+
+        exportButton = Button({
+          cls: 'padding-medium margin-small no-shrink no-grow compact icon-small',
+          text: buttonText,
+          click() {
+            listExportHandler(
+              searchlistOptions.exportUrl,
+              result,
+              exportFileName
+            )
+              .catch((err) => {
+                console.error(err);
+              });
+          }
+        });
+      }
+
       const listcomponent = Component({
         name: 'searchlist',
         onInit() {
           this.addComponents(groups);
+          if (exportButton) {
+            this.addComponent(exportButton);
+          }
         },
         onAdd() {
           this.render();
@@ -432,7 +458,7 @@ const Search = function Search(options = {}) {
       infowindow.changeContent(listcomponent, `Sökresultat för "${searchVal}"`);
     };
 
-    function makeRequest(reqHandler, obj, opt) {
+    function makeRequest(reqHandler, obj, opt, ignoreGroup = false) {
       const searchVal = obj.value;
       let queryUrl = `${url}${url.indexOf('?') !== -1 ? '&' : '?'}${queryParameterName}=${encodeURI(obj.value)}`;
       if (includeSearchableLayers) {
@@ -445,7 +471,7 @@ const Search = function Search(options = {}) {
           searchDb = {};
           if (data.length) {
             setSearchDb(data);
-            if (name && groupSuggestions) {
+            if (name && groupSuggestions && !ignoreGroup) {
               list = groupToList(groupDb(searchDb));
             } else {
               list = dbToList(data);
@@ -462,7 +488,7 @@ const Search = function Search(options = {}) {
           switch (searchlistPlacement) {
             case 'floating':
             case 'left':
-              makeRequest(infowindowHandler, input);
+              makeRequest(infowindowHandler, input, {}, true);
               clearAll();
               break;
             default:
