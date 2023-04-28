@@ -71,6 +71,7 @@ const DragAndDrop = function DragAndDrop(options = {}) {
       const groupName = options.groupName || 'egna-lager';
       const groupTitle = options.groupTitle || 'Egna lager';
       const draggable = options.draggable || true;
+      const promptlessRemoval = options.promptlessRemoval !== false;
       const styleByAttribute = options.styleByAttribute || false;
       const featureStyles = options.featureStyles || {
         Point: [{
@@ -153,6 +154,7 @@ const DragAndDrop = function DragAndDrop(options = {}) {
           styleByAttribute,
           queryable: true,
           removable: true,
+          promptlessRemoval,
           visible: true,
           source: 'none',
           type: 'GEOJSON',

@@ -222,10 +222,11 @@ const OverlayLayer = function OverlayLayer(options) {
       onRender() {
         const labelEl = document.getElementById(this.getId());
         labelEl.addEventListener('click', (e) => {
-          if (window.confirm('Vill du radera lagret?')) {
+          const doRemove = (layer.get('promptlessRemoval') === true) || window.confirm('Vill du radera lagret?');
+          if (doRemove) {
             viewer.getMap().removeLayer(layer);
+            e.preventDefault();
           }
-          e.preventDefault();
         });
       },
       render() {
