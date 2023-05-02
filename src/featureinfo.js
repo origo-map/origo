@@ -405,6 +405,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         initCarousel('#o-identify-carousel');
         const firstFeature = items[0].feature;
         const geometry = firstFeature.getGeometry();
+        const origostyle = firstFeature.get('origostyle');
         const clone = firstFeature.clone();
         clone.setId(firstFeature.getId());
         // FIXME: should be layer name, not feature name
@@ -432,6 +433,9 @@ const Featureinfo = function Featureinfo(options = {}) {
         const popupHeight = document.querySelector('.o-popup').offsetHeight + 10;
         popupEl.style.height = `${popupHeight}px`;
         const overlayOptions = { element: popupEl, positioning: 'bottom-center' };
+        if (origostyle && origostyle.overlayOptions) {
+          Object.assign(overlayOptions, origostyle.overlayOptions);
+        }
         if (!ignorePan) {
           overlayOptions.autoPan = {
             margin: 55,
