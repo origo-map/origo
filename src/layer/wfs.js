@@ -33,6 +33,7 @@ export default function wfs(layerOptions, viewer) {
     wfsOptions.visible = true;
   }
   sourceOptions.strategy = layerOptions.strategy ? layerOptions.strategy : sourceOptions.strategy;
+  sourceOptions.requestMethod = layerOptions.requestMethod ? layerOptions.requestMethod : sourceOptions.requestMethod;
   switch (sourceOptions.strategy) {
     case 'all':
       sourceOptions.loadingstrategy = LoadingStrategy.all;

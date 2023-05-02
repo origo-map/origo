@@ -20,6 +20,9 @@ function createTileSource(options) {
       STYLES: options.style
     }
   };
+  if (options.imageLoadFunction) {
+    sourceOptions.tileLoadFunction = options.imageLoadFunction;
+  }
   if (options.params) {
     Object.keys(options.params).forEach((element) => {
       sourceOptions.params[element] = options.params[element];
@@ -41,6 +44,9 @@ function createImageSource(options) {
       STYLES: options.style
     }
   };
+  if (options.imageLoadFunction) {
+    sourceOptions.imageLoadFunction = options.imageLoadFunction;
+  }
   if (options.params) {
     Object.keys(options.params).forEach((element) => {
       sourceOptions.params[element] = options.params[element];
@@ -98,6 +104,29 @@ function createWmsStyle({ wmsOptions, source, viewer, initialStyle = false }) {
   return styleName;
 }
 
+function imageLoadFunction(loadedImage, src) {
+  const xhr = new XMLHttpRequest();
+  xhr.responseType = 'blob';
+  xhr.addEventListener('loadend', function loaded() {
+    const data = this.response;
+    if (data) {
+      const img = loadedImage.getImage();
+      const url = URL.createObjectURL(data);
+      img.addEventListener('loadend', () => {
+        URL.revokeObjectURL(url);
+      });
+      img.src = url;
+    }
+  });
+  const split = src.split('?');
+  xhr.open('POST', split[0]);
+  xhr.setRequestHeader(
+    'Content-type',
+    'application/x-www-form-urlencoded'
+  );
+  xhr.send(split[1]);
+}
+
 function createWmsLayer(wmsOptions, source, viewer) {
   const wmsOpts = wmsOptions;
   const wmsSource = source;
@@ -153,6 +182,7 @@ const wms = function wms(layerOptions, viewer) {
   sourceOptions.filterType = wmsOptions.filterType;
   sourceOptions.params = wmsOptions.sourceParams;
   sourceOptions.format = wmsOptions.format ? wmsOptions.format : sourceOptions.format;
+  sourceOptions.requestMethod = wmsOptions.requestMethod ? wmsOptions.requestMethod : sourceOptions.requestMethod;
   if (!wmsOptions.stylePicker) {
     const styleSettings = viewer.getStyle(wmsOptions.styleName);
     const wmsStyleObject = styleSettings ? styleSettings[0].find(s => s.wmsStyle) : undefined;
@@ -170,6 +200,10 @@ const wms = function wms(layerOptions, viewer) {
       // FIXME: there is no "extent" property to set. Code has no effect. Probably must create a new grid from viewer.getTileGridSettings .
       sourceOptions.tileGrid.extent = wmsOptions.extent;
     }
+  }
+
+  if (sourceOptions.requestMethod && sourceOptions.requestMethod === 'post') {
+    sourceOptions.imageLoadFunction = imageLoadFunction;
   }
 
   if (renderMode === 'image') {
