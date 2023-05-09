@@ -424,6 +424,11 @@ const Viewer = function Viewer(targetOption, options = {}) {
     if (insertBefore) {
       map.getLayers().insertAt(map.getLayers().getArray().indexOf(insertBefore), layer);
     } else {
+      if (layerProps.isDragDroppedLayer === true) {
+        if (layerProps.styleByAttribute === false) {
+          layer.setStyle(thisProps.style);
+        }
+      }
       map.addLayer(layer);
     }
     this.dispatch('addlayer', {

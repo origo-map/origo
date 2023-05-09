@@ -155,6 +155,7 @@ const DragAndDrop = function DragAndDrop(options = {}) {
           queryable: true,
           removable: true,
           promptlessRemoval,
+          isDragDroppedLayer: true,
           visible: true,
           source: 'none',
           type: 'GEOJSON',
