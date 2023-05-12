@@ -770,7 +770,6 @@ function onAttributesSave(features, attrs) {
   document.getElementById(`o-save-button-${currentLayer}`).addEventListener('click', (e) => {
     const editEl = {};
     const valid = {};
-    const fileReaders = [];
     attrs.forEach((attribute) => {
       // Get the input container class
       const containerClass = `.${attribute.elId}`;
@@ -798,31 +797,11 @@ function onAttributesSave(features, attrs) {
           // No other validation is performed on searchList as the only thing that can be checked now is that value is in list
           // and that is handled inside the searchList itself.
           editEl[attribute.name] = attribute.searchList.getValue();
+        } else if (attribute.type === 'image') {
+          // File input's value is the filename, but the image itself is stored in the model
+          editEl[attribute.name] = attribute.val;
         } else { // Read value from input text, textarea or select
           editEl[attribute.name] = inputValue;
-        }
-      }
-      // Check if file. If file, read and trigger resize
-      if (inputType === 'file') {
-        const input = document.getElementById(attribute.elId);
-        const file = input.files[0];
-
-        if (file) {
-          const fileReader = new FileReader();
-          fileReader.onload = () => {
-            getImageOrientation(file, (orientation) => {
-              imageresizer(fileReader.result, attribute, orientation, (resized) => {
-                editEl[attribute.name] = resized;
-                const imageresized = new CustomEvent('imageresized');
-                document.dispatchEvent(imageresized);
-              });
-            });
-          };
-
-          fileReader.readAsDataURL(file);
-          fileReaders.push(fileReader);
-        } else {
-          editEl[attribute.name] = document.getElementById(attribute.elId).getAttribute('value');
         }
       }
 
@@ -967,13 +946,7 @@ function onAttributesSave(features, attrs) {
 
     // If valid, continue
     if (valid.validates) {
-      if (fileReaders.length > 0 && fileReaders.every(reader => reader.readyState === 1)) {
-        document.addEventListener('imageresized', () => {
-          attributesSaveHandler(features, editEl);
-        });
-      } else {
-        attributesSaveHandler(features, editEl);
-      }
+      attributesSaveHandler(features, editEl);
 
       document.getElementById(`o-save-button-${currentLayer}`).blur();
       modal.closeModal();
@@ -1006,6 +979,9 @@ function addListener() {
   return fn;
 }
 
+/**
+ * Returns a function that adds an event handler to read an image file when user selects a file.
+ * */
 function addImageListener() {
   const fn = (obj) => {
     const fileReader = new FileReader();
@@ -1014,16 +990,31 @@ function addImageListener() {
       if (ev.target.files && ev.target.files[0]) {
         document.querySelector(`${containerClass} img`).classList.remove('o-hidden');
         document.querySelector(`${containerClass} input[type=button]`).classList.remove('o-hidden');
-        fileReader.onload = (e) => {
-          document.querySelector(`${containerClass} img`).setAttribute('src', e.target.result);
+        fileReader.onload = () => {
+          // When the file has been read, rotate it and resize to configured max size or default max
+          // Don't know why it's rotated. Probably something to do with iphones that store images upside down.
+          getImageOrientation(ev.target.files[0], (orientation) => {
+            imageresizer(fileReader.result, obj, orientation, (resized) => {
+              // Display the image in the form
+              document.querySelector(`${containerClass} img`).setAttribute('src', resized);
+              // Store the image data in the model so it can be retreived when saving without having to read the file again
+              // or pick it up from the img tag
+              // eslint-disable-next-line no-param-reassign
+              obj.val = resized;
+            });
+          });
         };
         fileReader.readAsDataURL(ev.target.files[0]);
       }
     });
-
+    // Find the remove button and attach event handler.
     document.querySelector(`${containerClass} input[type=button]`).addEventListener('click', (e) => {
+      // Clear the filename
       document.getElementById(obj.elId).setAttribute('value', '');
       document.getElementById(obj.elId).value = '';
+      // Also clear the model value
+      // eslint-disable-next-line no-param-reassign
+      obj.val = '';
       document.querySelector(`${containerClass} img`).classList.add('o-hidden');
       e.target.classList.add('o-hidden');
     });
