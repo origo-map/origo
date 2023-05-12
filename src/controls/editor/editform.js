@@ -78,7 +78,7 @@ const createForm = function createForm(obj) {
       const imageClass = val ? '' : 'o-hidden';
       el = `<div class="validate ${cls}"><label>${label}<br>`;
       el += `<img src="${val}" id="image-upload" class="${imageClass}"/>`;
-      el += `<input type="file" name="bildfil" id="${id}" value="${val}" accept="image/*"${disabled}></label>`;
+      el += `<input type="file" name="bildfil" id="${id}" accept="image/*"${disabled}></label>`;
       el += `<input id="o-delete-image-button" class="${imageClass}" type="button" aria-label="Ta bort bild" value="Ta bort bild"${disabled}>`;
       el += '</div>';
       break;

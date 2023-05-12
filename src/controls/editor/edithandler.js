@@ -1010,7 +1010,6 @@ function addImageListener() {
     // Find the remove button and attach event handler.
     document.querySelector(`${containerClass} input[type=button]`).addEventListener('click', (e) => {
       // Clear the filename
-      document.getElementById(obj.elId).setAttribute('value', '');
       document.getElementById(obj.elId).value = '';
       // Also clear the model value
       // eslint-disable-next-line no-param-reassign
