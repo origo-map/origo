@@ -55,7 +55,7 @@ let allowEditGeometry;
 /** List that tracks the state when editing related tables */
 let breadcrumbs = [];
 let autoCreatedFeature = false;
-let infowindowCmp;
+let infowindowCmp = false;
 
 function isActive() {
   // FIXME: this only happens at startup as they are set to null on closing. If checking for null/falsley/not truely it could work as isVisible with
@@ -498,40 +498,56 @@ function setInteractions(drawType) {
     drawOptions.finishCondition = finishConditionCallback;
   }
   removeInteractions();
-  infowindowCmp.close();
   draw = new Draw(drawOptions);
   hasDraw = false;
   select = new Select({
     layers: [editLayer],
-    multi: true
+    multi: !!infowindowCmp
   });
-  select.on('select', () => {
-    if (select.getFeatures().getLength() > 1) {
-      const listCmp = [];
-      const featureArray = select.getFeatures().getArray();
-      featureArray.forEach(feature => {
-        const featureButton = Button({
-          text: `ID: ${feature.getId()}`,
-          click() {
-            select.getFeatures().clear();
-            select.getFeatures().push(feature);
+  if (infowindowCmp) {
+    infowindowCmp.close();
+    select.on('select', () => {
+      if (select.getFeatures().getLength() > 1) {
+        const featureListAttributes = editLayer.get('featureListAttributes');
+        const listCmp = [];
+        const featureArray = select.getFeatures().getArray();
+        featureArray.forEach(feature => {
+          let buttonText = '';
+          if (featureListAttributes && featureListAttributes.length > 0) {
+            featureListAttributes.forEach(attribute => {
+              if (attribute.toLowerCase() === 'id') {
+                buttonText += `id: ${feature.getId()}<br />`;
+              } else {
+                buttonText += feature.get(attribute) ? `${attribute}: ${feature.get(attribute)}<br />` : '';
+              }
+            });
+          } else {
+            buttonText += `ID: ${feature.getId()}`;
           }
+          const featureButton = Button({
+            text: buttonText,
+            cls: 'text-align-left',
+            click() {
+              select.getFeatures().clear();
+              select.getFeatures().push(feature);
+            }
+          });
+          const listItem = El({
+            tagName: 'li',
+            components: [featureButton]
+          });
+          listCmp.push(listItem);
         });
-        const listItem = El({
-          tagName: 'li',
-          components: [featureButton]
+        const content = El({
+          tagName: 'ul',
+          components: listCmp
         });
-        listCmp.push(listItem);
-      });
-      const content = El({
-        tagName: 'ul',
-        components: listCmp
-      });
-      infowindowCmp.changeContent(content);
-    } else {
-      infowindowCmp.close();
-    }
-  });
+        infowindowCmp.changeContent(content);
+      } else {
+        infowindowCmp.close();
+      }
+    });
+  }
   if (allowEditGeometry) {
     modify = new Modify({
       features: select.getFeatures()
@@ -1443,8 +1459,10 @@ function onDeleteChild(e) {
 export default function editHandler(options, v) {
   viewer = v;
   featureInfo = viewer.getControlByName('featureInfo');
-  infowindowCmp = Infowindow({ viewer, type: 'floating', title: 'Välj objekt' });
-  infowindowCmp.render();
+  if (options.featureList) {
+    infowindowCmp = Infowindow({ viewer, type: 'floating', title: 'Välj objekt' });
+    infowindowCmp.render();
+  }
   map = viewer.getMap();
   currentLayer = options.currentLayer;
   editableLayers = options.editableLayers;
