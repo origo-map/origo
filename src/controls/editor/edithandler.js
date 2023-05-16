@@ -512,6 +512,10 @@ function setInteractions(drawType) {
         const listCmp = [];
         const featureArray = select.getFeatures().getArray();
         featureArray.forEach(feature => {
+          if (typeof feature.getStyle() === 'function') {
+            const styleArr = feature.getStyle()(feature);
+            styleArr.forEach(style => style.setZIndex(10));
+          }
           let buttonText = '';
           if (featureListAttributes && featureListAttributes.length > 0) {
             featureListAttributes.forEach(attribute => {
