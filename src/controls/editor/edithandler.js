@@ -498,6 +498,7 @@ function setInteractions(drawType) {
     drawOptions.finishCondition = finishConditionCallback;
   }
   removeInteractions();
+  infowindowCmp.close();
   draw = new Draw(drawOptions);
   hasDraw = false;
   select = new Select({
