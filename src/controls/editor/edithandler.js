@@ -6,7 +6,8 @@ import Collection from 'ol/Collection';
 import Feature from 'ol/Feature';
 import { LineString } from 'ol/geom';
 import { noModifierKeys } from 'ol/events/condition';
-import { Modal } from '../../ui';
+import { Button, Element as El, Modal } from '../../ui';
+import Infowindow from '../../components/infowindow';
 import store from './editsstore';
 import generateUUID from '../../utils/generateuuid';
 import transactionHandler from './transactionhandler';
@@ -54,6 +55,7 @@ let allowEditGeometry;
 /** List that tracks the state when editing related tables */
 let breadcrumbs = [];
 let autoCreatedFeature = false;
+let infowindowCmp;
 
 function isActive() {
   // FIXME: this only happens at startup as they are set to null on closing. If checking for null/falsley/not truely it could work as isVisible with
@@ -499,7 +501,35 @@ function setInteractions(drawType) {
   draw = new Draw(drawOptions);
   hasDraw = false;
   select = new Select({
-    layers: [editLayer]
+    layers: [editLayer],
+    multi: true
+  });
+  select.on('select', () => {
+    if (select.getFeatures().getLength() > 1) {
+      const listCmp = [];
+      const featureArray = select.getFeatures().getArray();
+      featureArray.forEach(feature => {
+        const featureButton = Button({
+          text: `ID: ${feature.getId()}`,
+          click() {
+            select.getFeatures().clear();
+            select.getFeatures().push(feature);
+          }
+        });
+        const listItem = El({
+          tagName: 'li',
+          components: [featureButton]
+        });
+        listCmp.push(listItem);
+      });
+      const content = El({
+        tagName: 'ul',
+        components: listCmp
+      });
+      infowindowCmp.changeContent(content);
+    } else {
+      infowindowCmp.close();
+    }
   });
   if (allowEditGeometry) {
     modify = new Modify({
@@ -1412,6 +1442,8 @@ function onDeleteChild(e) {
 export default function editHandler(options, v) {
   viewer = v;
   featureInfo = viewer.getControlByName('featureInfo');
+  infowindowCmp = Infowindow({ viewer, type: 'floating', title: 'Välj objekt' });
+  infowindowCmp.render();
   map = viewer.getMap();
   currentLayer = options.currentLayer;
   editableLayers = options.editableLayers;
