@@ -27,12 +27,8 @@ function parseUrl(urlattr, feature, attribute, attributes, map, linktext) {
   } else if (attribute.target === 'modal-full') {
     aTarget = 'modal-full';
     aCls = 'o-identify-link-modal';
-  } else if (attribute.target === '_self') {
-    aTarget = '_self';
-  } else if (attribute.target === '_top') {
-    aTarget = '_top';
-  } else if (attribute.target === '_parent') {
-    aTarget = '_parent';
+  } else {
+    aTarget = attribute.target ? attribute.target : '_blank';
   }
   val = `<a class="${aCls}" target="${aTarget}" href="${url}" title="${aTargetTitle}">${text}</a>`;
   return val;
@@ -197,7 +193,10 @@ function getAttributes(feature, layer, map) {
   featureinfoElement.appendChild(ulList);
   const attributes = feature.getProperties();
   const geometryName = feature.getGeometryName();
-  const attributeAlias = map.get('mapConfig').attributeAlias || [];
+  let attributeAlias = [];
+  if (map) {
+    attributeAlias = map.get('mapConfig').attributeAlias || [];
+  }
   delete attributes[geometryName];
   let content;
   let attribute;
@@ -208,7 +207,7 @@ function getAttributes(feature, layer, map) {
     // If attributes is string then use template named with the string
     if (typeof layerAttributes === 'string') {
       // Use attributes with the template
-      const li = featureinfotemplates.getFromTemplate(layerAttributes, attributes, attributeAlias);
+      const li = featureinfotemplates.getFromTemplate(layerAttributes, attributes, attributeAlias, layer);
       const templateList = document.createElement('ul');
       featureinfoElement.appendChild(templateList);
       templateList.innerHTML = li;
@@ -217,11 +216,11 @@ function getAttributes(feature, layer, map) {
         attribute = layer.get('attributes')[i];
         val = '';
         if (attribute.template) {
-          const li = featureinfotemplates.getFromTemplate(attribute.template, attributes, attributeAlias);
+          const li = featureinfotemplates.getFromTemplate(attribute.template, attributes, attributeAlias, layer);
           const templateList = document.createElement('ul');
           featureinfoElement.appendChild(templateList);
           templateList.innerHTML = li;
-        } else if (attribute.type !== 'hidden') {
+        } else {
           if (attribute.name) {
             val = getContent.name(feature, attribute, attributes, map);
           } else if (attribute.url) {
@@ -245,7 +244,7 @@ function getAttributes(feature, layer, map) {
     }
   } else {
     // Use attributes with the template
-    const li = featureinfotemplates.getFromTemplate('default', attributes, attributeAlias);
+    const li = featureinfotemplates.getFromTemplate('default', attributes, attributeAlias, layer);
     const templateList = document.createElement('ul');
     featureinfoElement.appendChild(templateList);
     templateList.innerHTML = li;

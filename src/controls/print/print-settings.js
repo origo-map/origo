@@ -110,6 +110,7 @@ const PrintSettings = function PrintSettings(options = {}) {
 
   return Component({
     close,
+    getScaleControl() { return setScaleControl; },
     onInit() {
       openButton = Button({
         cls: 'padding-small icon-smaller round light box-shadow',

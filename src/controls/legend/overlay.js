@@ -199,7 +199,7 @@ const OverlayLayer = function OverlayLayer(options) {
             const features = layer.getSource().getFeatures();
             exportToFile(features, format, {
               featureProjection: viewer.getProjection().getCode(),
-              filename: title || 'export'
+              filename: layer.get('title') || 'export'
             });
             e.preventDefault();
           });
@@ -222,10 +222,11 @@ const OverlayLayer = function OverlayLayer(options) {
       onRender() {
         const labelEl = document.getElementById(this.getId());
         labelEl.addEventListener('click', (e) => {
-          if (window.confirm('Vill du radera lagret?')) {
+          const doRemove = (layer.get('promptlessRemoval') === true) || window.confirm('Vill du radera lagret?');
+          if (doRemove) {
             viewer.getMap().removeLayer(layer);
+            e.preventDefault();
           }
-          e.preventDefault();
         });
       },
       render() {
@@ -323,6 +324,11 @@ const OverlayLayer = function OverlayLayer(options) {
     layerIcon.dispatch('change', { icon: newIcon });
   };
 
+  const onLayerTitleChange = function onLayerTitleChange(newTitle) {
+    const labelEl = document.getElementById(label.getId());
+    labelEl.innerHTML = newTitle;
+  };
+
   return Component({
     name,
     getLayer,
@@ -363,6 +369,9 @@ const OverlayLayer = function OverlayLayer(options) {
       });
       layer.on('change:style', () => {
         onLayerStyleChange();
+      });
+      layer.on('change:title', (e) => {
+        onLayerTitleChange(e.target.get('title'));
       });
     },
     render() {
