@@ -15,6 +15,7 @@ export default function Button(options = {}) {
     iconCls = '',
     iconStyle = {},
     click,
+    mouseenter,
     style: styleSettings,
     textCls = '',
     tooltipText,
@@ -108,11 +109,21 @@ export default function Button(options = {}) {
           this.un('click', click.bind(this));
         });
       }
+      if (mouseenter) {
+        this.on('mouseenter', mouseenter.bind(this));
+        this.on('clear', () => {
+          this.un('mouseenter', mouseenter.bind(this));
+        });
+      }
     },
     onRender() {
       buttonEl = document.getElementById(this.getId());
       buttonEl.addEventListener('click', (e) => {
         this.dispatch('click');
+        e.preventDefault();
+      });
+      buttonEl.addEventListener('mouseenter', (e) => {
+        this.dispatch('mouseenter');
         e.preventDefault();
       });
       if (validStates.indexOf(state) > 0) {

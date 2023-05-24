@@ -530,10 +530,19 @@ function setInteractions(drawType) {
           }
           const featureButton = Button({
             text: buttonText,
-            cls: 'text-align-left',
+            state: 'initial',
+            cls: 'text-align-left hover light',
             click() {
               select.getFeatures().clear();
               select.getFeatures().push(feature);
+              infowindowCmp.dispatch('resetButtonStates');
+              this.setState('active');
+            },
+            mouseenter() {
+              select.getFeatures().clear();
+              select.getFeatures().push(feature);
+              infowindowCmp.dispatch('resetButtonStates');
+              this.setState('active');
             }
           });
           const listItem = El({
@@ -541,6 +550,10 @@ function setInteractions(drawType) {
             components: [featureButton]
           });
           listCmp.push(listItem);
+          infowindowCmp.on('resetButtonStates', () => {
+            featureButton.setState('initial');
+            document.getElementById(featureButton.getId()).blur();
+          });
         });
         const content = El({
           tagName: 'ul',
