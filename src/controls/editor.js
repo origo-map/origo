@@ -94,7 +94,7 @@ const Editor = function Editor(options = {}) {
           // This can only happen if featureInfo.ShowFeatureInfo, featureInfo.showInfow or featureInfo.render is called
           // from api, as featureInfo component can not be active when editor is so the user can not click in the map to select anything.
           if (detail && detail.getLayer().get('editable') && !detail.getLayer().get('isTable')) {
-            // Set a preselected feature. 
+            // Set a preselected feature.
             editHandler.preselectFeature(detail.getFeature());
             // Actually change active layer.
             editHandler.setActiveLayer(detail.getLayer().get('name'));

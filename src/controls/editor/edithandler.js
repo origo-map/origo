@@ -1340,7 +1340,7 @@ function editAttributesDialogApi(featureId, layerName = null) {
   const layer = viewer.getLayer(layerName);
   const feature = layer.getSource().getFeatureById(featureId);
   // Hijack the current layer for a while. If there's a modal visible it is closed (without saving) as editAttributes can not handle
-  // multiple dialogs for the same layer so to be safe we always close. 
+  // multiple dialogs for the same layer so to be safe we always close.
   // Restoring currentLayer is performed in onModalClosed(), as we can't await the modal.
   closeAllModals();
   // If editing in another layer, add a breadcrumb to restore layer when modal is closed.
