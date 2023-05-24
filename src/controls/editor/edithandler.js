@@ -536,20 +536,25 @@ function setInteractions(drawType) {
   }
 }
 
+/** Closes all modals and resets breadcrumbs */
 function closeAllModals() {
-  // Close all modals first to get rid of tags in DOM
+  // Close all modals before resetting breadcrumbs to get rid of tags in DOM
   if (modal) modal.closeModal();
   modal = null;
   breadcrumbs.forEach(br => {
     if (br.modal) br.modal.closeModal();
   });
+  if (breadcrumbs.length > 0) {
+    currentLayer = breadcrumbs[0].layerName;
+    title = breadcrumbs[0].title;
+    attributes = breadcrumbs[0].attributes;
+  }
   breadcrumbs = [];
 }
 
 function setEditLayer(layerName) {
-  // It is not possible to actually change layer while having breadcrubs as all modals must be closed, which will
-  // pop off all breadcrumbs.
-  // But just in case something changes, reset the breadcrumbs when a new layer is edited.
+  // Close all modals first and restore state. This can only happen if calling using api, as
+  // the modal prevents user from clicking in the map conrol
   closeAllModals();
   currentLayer = layerName;
   setAllowedOperations();
@@ -1335,10 +1340,8 @@ function editAttributesDialogApi(featureId, layerName = null) {
   const layer = viewer.getLayer(layerName);
   const feature = layer.getSource().getFeatureById(featureId);
   // Hijack the current layer for a while. If there's a modal visible it is closed (without saving) as editAttributes can not handle
-  // multiple dialogs for the same layer so to be safe we always close. Technically the user can not
-  // call this function when a modal is visible, as they can't click anywhere.
+  // multiple dialogs for the same layer so to be safe we always close. 
   // Restoring currentLayer is performed in onModalClosed(), as we can't await the modal.
-  // Close all modals and eat all breadcrumbs
   closeAllModals();
   // If editing in another layer, add a breadcrumb to restore layer when modal is closed.
   if (layerName && layerName !== currentLayer) {
