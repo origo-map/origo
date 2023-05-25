@@ -4,7 +4,6 @@ import GeoJSONFormat from 'ol/format/GeoJSON';
 import IGCFormat from 'ol/format/IGC';
 import KMLFormat from 'ol/format/KML';
 import TopoJSONFormat from 'ol/format/TopoJSON';
-import Style from '../style';
 import { Component, InputFile, Button, Element as El } from '../ui';
 
 const DragAndDrop = function DragAndDrop(options = {}) {
@@ -116,7 +115,6 @@ const DragAndDrop = function DragAndDrop(options = {}) {
           }
         }]
       };
-      const vectorStyles = Style.createGeometryStyle(featureStyles);
       dragAndDrop = new olDragAndDrop({
         formatConstructors: [
           GPXFormat,
@@ -161,7 +159,7 @@ const DragAndDrop = function DragAndDrop(options = {}) {
           features: event.features
         };
         if (!styleByAttribute) {
-          layerOptions.style = vectorStyles[event.features[0].getGeometry().getType()];
+          layerOptions.styleDef = featureStyles[event.features[0].getGeometry().getType()];
         }
         viewer.addLayer(layerOptions);
       });
