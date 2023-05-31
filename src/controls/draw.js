@@ -643,6 +643,12 @@ const Draw = function Draw(options = {}) {
         viewer.dispatch('toggleClickInteraction', { name: 'draw', active: true });
       }
     },
+    hide() {
+      document.getElementById(screenButtonContainer.getId()).classList.add('hidden');
+    },
+    unhide() {
+      document.getElementById(screenButtonContainer.getId()).classList.remove('hidden');
+    },
     render() {
       if (placement.indexOf('screen') > -1) {
         let htmlString = `${screenButtonContainer.render()}`;
