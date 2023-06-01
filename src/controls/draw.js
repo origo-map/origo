@@ -644,10 +644,14 @@ const Draw = function Draw(options = {}) {
       }
     },
     hide() {
-      document.getElementById(screenButtonContainer.getId()).classList.add('hidden');
+      if (placement.some(place => place === 'screen')) {
+        document.getElementById(screenButtonContainer.getId()).classList.add('hidden');
+      }
     },
     unhide() {
-      document.getElementById(screenButtonContainer.getId()).classList.remove('hidden');
+      if (placement.some(place => place === 'screen')) {
+        document.getElementById(screenButtonContainer.getId()).classList.remove('hidden');
+      }
     },
     render() {
       if (placement.indexOf('screen') > -1) {
