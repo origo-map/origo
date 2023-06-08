@@ -318,7 +318,7 @@ const OverlayLayer = function OverlayLayer(options) {
     let newIcon = HeaderIcon(newStyle, opacity);
     if (!newIcon) {
       hasExtendedLegend = true;
-      extendedLegendContent.setContent(Legend(newStyle));
+      extendedLegendContent.setContent(Legend({ styleRules: newStyle, layer, viewer }).render());
     } else {
       hasExtendedLegend = false;
       extendedLegendContent.setContent('');

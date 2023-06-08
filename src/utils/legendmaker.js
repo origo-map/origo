@@ -147,7 +147,7 @@ function updateLayer(layer, viewer) {
   }
 }
 
-async function setIcon(src, cmp, styleRules, layer, viewer) {
+async function setIcon(src, cmp, styleRules, layer, viewer, clickable) {
   const styleName = layer.get('styleName');
   const style = viewer.getStyle(styleName);
   if (!style[0].thematic) {
@@ -178,13 +178,15 @@ async function setIcon(src, cmp, styleRules, layer, viewer) {
     const elCmps = [];
     if (layer) {
       const toggleButton = Button({
-        cls: 'round small icon-smaller no-shrink',
+        cls: `round small icon-smaller no-shrink${clickable ? '' : ' cursor-default'}`,
         click() {
-          const visible = viewer.getStyles()[styleName][0].thematic[index].visible !== false;
-          this.setIcon(!visible ? checkIcon : uncheckIcon);
-          const thisStyle = viewer.getStyles()[styleName];
-          thisStyle[0].thematic[index].visible = !visible;
-          updateLayer(layer, viewer);
+          if (clickable) {
+            const visible = viewer.getStyles()[styleName][0].thematic[index].visible !== false;
+            this.setIcon(!visible ? checkIcon : uncheckIcon);
+            const thisStyle = viewer.getStyles()[styleName];
+            thisStyle[0].thematic[index].visible = !visible;
+            updateLayer(layer, viewer);
+          }
         },
         style: {
           'align-self': 'center',
@@ -211,11 +213,11 @@ export const renderExtendedLegendItem = function renderExtendedLegendItem(extend
   return El({ innerHTML: `<img class="extendedlegend pointer" src=${extendedLegendItem.icon.src} />` });
 };
 
-export const renderExtendedLegendItemNew = function renderExtendedLegendItemNew(extendedLegendItem, styleRules, layer, viewer) {
+export const renderExtendedThematicLegendItem = function renderExtendedThematicLegendItem(extendedLegendItem, styleRules, layer, viewer, clickable) {
   const returnCmp = El({
     tagName: 'ul'
   });
-  returnCmp.on('render', () => { setIcon(extendedLegendItem, returnCmp, styleRules, layer, viewer); });
+  returnCmp.on('render', () => { setIcon(extendedLegendItem, returnCmp, styleRules, layer, viewer, clickable); });
 
   return returnCmp;
 };
@@ -240,7 +242,7 @@ export const Legend = function Legend({
           const label = labelItem.label || '';
           const elCmps = [];
           if (extendedLegendItem && thematicStyling) {
-            elCmps.push(renderExtendedLegendItemNew(extendedLegendItem, styleRules, layer, viewer));
+            elCmps.push(renderExtendedThematicLegendItem(extendedLegendItem, styleRules, layer, viewer, clickable));
             cmps = elCmps;
           } else if (extendedLegendItem && extendedLegendItem.icon) {
             elCmps.push(renderExtendedLegendItem(extendedLegendItem));
