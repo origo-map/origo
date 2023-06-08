@@ -1,6 +1,9 @@
 import { renderIcon, renderSvg } from './legendrender';
+import { Button, Element as El } from '../ui';
 
 const size = 24;
+const checkIcon = '#ic_check_circle_24px';
+const uncheckIcon = '#ic_radio_button_unchecked_24px';
 
 export const isHidden = function isHidden(arr) {
   const hiddenItem = arr.find(item => item.hidden);
@@ -118,40 +121,163 @@ export const renderSvgIcon = function renderSvgIcon(styleRule, {
 
 export const renderLegendItem = function renderLegendItem(svgIcon, label = '') {
   const style = `style="width: ${size}px; height: ${size}px;"`;
-  return `<li class="flex row align-center padding-y-smallest">
-            <div ${style} class="icon-small round">${svgIcon}</div>
-            <div class="text-smaller padding-left-small">${label}</div>
-          </li>`;
+  const legendCmp = El({ cls: 'flex row align-center padding-y-smallest',
+    innerHTML: `<div ${style} class="icon-small round">${svgIcon}</div><div class="text-smaller padding-left-small">${label}</div>` });
+  return legendCmp;
 };
+function updateLayer(layer, viewer) {
+  const styleName = layer.get('styleName');
+  const style = viewer.getStyle(styleName);
+  if (style[0] && style[0].thematic) {
+    const thematicArr = style[0].thematic;
+    // Check if any theme is not visible, otherwise remove filter
+    const checkArr = obj => obj.visible === false;
+    if (thematicArr.some(checkArr)) {
+      let filterStr = '';
+      thematicArr.forEach(theme => {
+        if (theme.visible) {
+          filterStr += filterStr === '' ? '' : ' OR ';
+          filterStr += theme.filter;
+        }
+      });
+      layer.getSource().updateParams({ CQL_FILTER: filterStr });
+    } else {
+      layer.getSource().updateParams({ CQL_FILTER: null });
+    }
+  }
+}
+
+async function setIcon(src, cmp, styleRules, layer, viewer) {
+  const styleName = layer.get('styleName');
+  const style = viewer.getStyle(styleName);
+  if (!style[0].thematic) {
+    style[0].thematic = [];
+    const paramsString = src.icon.json;
+    const searchParams = new URLSearchParams(paramsString);
+    const response = await fetch(src.icon.json);
+    const jsonData = await response.json();
+    jsonData.Legend[0].rules.forEach(row => {
+      searchParams.set('FORMAT', 'image/png');
+      searchParams.set('RULE', row.name);
+      const imgUrl = decodeURIComponent(searchParams.toString());
+      style[0].thematic.push({
+        image: { src: imgUrl },
+        filter: row.filter,
+        name: row.name,
+        label: row.title,
+        visible: row.visible !== false
+      });
+    });
+    viewer.setStyle(styleName, style);
+  }
+  const cmps = [];
+  for (let index = 0; index < style[0].thematic.length; index += 1) {
+    const rule = style[0].thematic[index];
+    let label = rule.label || '';
+    const svgIcon = renderSvgIcon([rule], { opacity: 1 });
+    const elCmps = [];
+    if (layer) {
+      const toggleButton = Button({
+        cls: 'round small icon-smaller no-shrink',
+        click() {
+          const visible = viewer.getStyles()[styleName][0].thematic[index].visible !== false;
+          this.setIcon(!visible ? checkIcon : uncheckIcon);
+          const thisStyle = viewer.getStyles()[styleName];
+          thisStyle[0].thematic[index].visible = !visible;
+          updateLayer(layer, viewer);
+        },
+        style: {
+          'align-self': 'center',
+          'padding-left': '0rem'
+        },
+        icon: viewer.getStyles()[styleName][0].thematic[index].visible === false ? uncheckIcon : checkIcon,
+        ariaLabel: 'Växla synlighet',
+        tabIndex: -1
+      });
+      elCmps.push(toggleButton);
+      label = `${label}`;
+      elCmps.push(renderLegendItem(svgIcon, label, { styleName, index }));
+      cmps.push(El({ components: elCmps, tagName: 'li', cls: 'flex row align-center padding-y-smallest' }));
+    }
+  }
+  const newEl = El({ components: cmps, tagName: 'ul' });
+
+  const contentEl = document.getElementById(cmp.getId());
+  contentEl.innerHTML = newEl.render();
+  newEl.onRender();
+}
 
 export const renderExtendedLegendItem = function renderExtendedLegendItem(extendedLegendItem) {
-  return `<li class="flex row align-center padding-y-smallest">
-            <img class="extendedlegend pointer" src=${extendedLegendItem.icon.src} />
-          </li>`;
+  return El({ innerHTML: `<img class="extendedlegend pointer" src=${extendedLegendItem.icon.src} />` });
 };
 
-export const Legend = function Legend(styleRules, opacity = 1) {
+export const renderExtendedLegendItemNew = function renderExtendedLegendItemNew(extendedLegendItem, styleRules, layer, viewer) {
+  const returnCmp = El({
+    tagName: 'ul'
+  });
+  returnCmp.on('render', () => { setIcon(extendedLegendItem, returnCmp, styleRules, layer, viewer); });
+
+  return returnCmp;
+};
+
+export const Legend = function Legend({
+  styleRules, layer, viewer, clickable = true
+} = {}) {
   const noLegend = 'Legend saknas';
   if (Array.isArray(styleRules)) {
-    const legend = styleRules.reduce((prevRule, styleRule) => {
-      if (Array.isArray(styleRule)) {
-        if (!isHidden(styleRule)) {
-          const labelItem = styleRule.find(style => style.label) || {};
-          const extendedLegendItem = styleRule.find(style => style.extendedLegend);
+    let styleName;
+    const layerType = layer.get('type');
+    if (layer) {
+      styleName = layer.get('styleName');
+    }
+    const thematicStyling = layer.get('thematicStyling');
+    let cmps = [];
+    styleRules.forEach((rule, index) => {
+      if (Array.isArray(rule)) {
+        if (!isHidden(rule)) {
+          const labelItem = rule.find(style => style.label) || {};
+          const extendedLegendItem = rule.find(style => style.extendedLegend);
           const label = labelItem.label || '';
-          if (extendedLegendItem && extendedLegendItem.icon) {
-            return prevRule + renderExtendedLegendItem(extendedLegendItem);
+          const elCmps = [];
+          if (extendedLegendItem && thematicStyling) {
+            elCmps.push(renderExtendedLegendItemNew(extendedLegendItem, styleRules, layer, viewer));
+            cmps = elCmps;
+          } else if (extendedLegendItem && extendedLegendItem.icon) {
+            elCmps.push(renderExtendedLegendItem(extendedLegendItem));
+            cmps = elCmps;
+          } else {
+            if (thematicStyling && layerType !== 'WMS') {
+              const toggleButton = Button({
+                cls: `round small icon-smaller no-shrink${clickable ? '' : ' cursor-default'}`,
+                click() {
+                  if (clickable) {
+                    const thisStyle = viewer.getStyles()[styleName];
+                    const visible = thisStyle[index][0].visible !== false;
+                    this.setIcon(!visible ? checkIcon : uncheckIcon);
+                    thisStyle[index][0].visible = !visible;
+                    layer.changed();
+                  }
+                },
+                style: {
+                  'align-self': 'center',
+                  'padding-left': '0rem'
+                },
+                icon: viewer.getStyles()[styleName][index][0].visible === false ? uncheckIcon : checkIcon,
+                ariaLabel: 'Växla synlighet',
+                tabIndex: -1
+              });
+              elCmps.push(toggleButton);
+            }
+            const svgIcon = renderSvgIcon(rule, { opacity: 1 });
+            elCmps.push(renderLegendItem(svgIcon, label, { styleName, index }));
+            cmps.push(El({ components: elCmps, tagName: 'li', cls: 'flex row align-center padding-y-smallest' }));
           }
-
-          const svgIcon = renderSvgIcon(styleRule, { opacity });
-          return prevRule + renderLegendItem(svgIcon, label);
         }
       }
-      return prevRule;
-    }, '');
-    return `<ul>${legend}</ul>`;
+    });
+    return El({ components: cmps, tagName: 'ul' });
   }
-  return `<ul><li class="padding-small">${noLegend}</li></ul>`;
+  return El({ innerHTML: noLegend });
 };
 
 export const HeaderIcon = function HeaderIcon(styleRules, opacity = 1) {
