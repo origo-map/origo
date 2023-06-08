@@ -110,9 +110,9 @@ export default function Button(options = {}) {
         });
       }
       if (mouseenter) {
-        this.on('mouseenter', mouseenter.bind(this));
-        this.on('clear', () => {
-          this.un('mouseenter', mouseenter.bind(this));
+        this.on('mouseenter', mouseenter);
+        this.on('removeMouseenter', () => {
+          this.un('mouseenter', mouseenter);
         });
       }
     },

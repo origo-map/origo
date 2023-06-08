@@ -536,6 +536,7 @@ function setInteractions(drawType) {
               select.getFeatures().clear();
               select.getFeatures().push(feature);
               infowindowCmp.dispatch('resetButtonStates');
+              infowindowCmp.dispatch('removeMouseenter');
               this.setState('active');
             },
             mouseenter() {
@@ -552,7 +553,12 @@ function setInteractions(drawType) {
           listCmp.push(listItem);
           infowindowCmp.on('resetButtonStates', () => {
             featureButton.setState('initial');
-            document.getElementById(featureButton.getId()).blur();
+            if (document.getElementById(featureButton.getId())) {
+              document.getElementById(featureButton.getId()).blur();
+            }
+          });
+          infowindowCmp.on('removeMouseenter', () => {
+            featureButton.dispatch('removeMouseenter');
           });
         });
         const content = El({
