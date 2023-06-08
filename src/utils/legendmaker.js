@@ -140,6 +140,9 @@ function updateLayer(layer, viewer) {
           filterStr += theme.filter;
         }
       });
+      if (filterStr === '') {
+        filterStr = "IN ('')";
+      }
       layer.getSource().updateParams({ CQL_FILTER: filterStr });
     } else {
       layer.getSource().updateParams({ CQL_FILTER: null });
