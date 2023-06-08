@@ -223,7 +223,7 @@ export const renderExtendedThematicLegendItem = function renderExtendedThematicL
 };
 
 export const Legend = function Legend({
-  styleRules, layer, viewer, clickable = true
+  styleRules, layer, viewer, clickable = true, opacity = 1
 } = {}) {
   const noLegend = 'Legend saknas';
   if (Array.isArray(styleRules)) {
@@ -270,7 +270,7 @@ export const Legend = function Legend({
               });
               elCmps.push(toggleButton);
             }
-            const svgIcon = renderSvgIcon(rule, { opacity: 1 });
+            const svgIcon = renderSvgIcon(rule, { opacity });
             elCmps.push(renderLegendItem(svgIcon, label, { styleName, index }));
             cmps.push(El({ components: elCmps, tagName: 'li', cls: 'flex row align-center padding-y-smallest' }));
           }
