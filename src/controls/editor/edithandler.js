@@ -6,7 +6,8 @@ import Collection from 'ol/Collection';
 import Feature from 'ol/Feature';
 import { LineString } from 'ol/geom';
 import { noModifierKeys } from 'ol/events/condition';
-import { Modal } from '../../ui';
+import { Button, Element as El, Modal } from '../../ui';
+import Infowindow from '../../components/infowindow';
 import store from './editsstore';
 import generateUUID from '../../utils/generateuuid';
 import transactionHandler from './transactionhandler';
@@ -54,6 +55,7 @@ let allowEditGeometry;
 /** List that tracks the state when editing related tables */
 let breadcrumbs = [];
 let autoCreatedFeature = false;
+let infowindowCmp = false;
 
 function isActive() {
   // FIXME: this only happens at startup as they are set to null on closing. If checking for null/falsley/not truely it could work as isVisible with
@@ -499,8 +501,76 @@ function setInteractions(drawType) {
   draw = new Draw(drawOptions);
   hasDraw = false;
   select = new Select({
-    layers: [editLayer]
+    layers: [editLayer],
+    multi: !!infowindowCmp
   });
+  if (infowindowCmp) {
+    infowindowCmp.close();
+    select.on('select', () => {
+      if (select.getFeatures().getLength() > 1) {
+        const featureListAttributes = editLayer.get('featureListAttributes');
+        const listCmp = [];
+        const featureArray = select.getFeatures().getArray();
+        featureArray.forEach(feature => {
+          if (typeof feature.getStyle() === 'function') {
+            const styleArr = feature.getStyle()(feature);
+            styleArr.forEach(style => style.setZIndex(10));
+          }
+          let buttonText = '';
+          if (featureListAttributes && featureListAttributes.length > 0) {
+            featureListAttributes.forEach(attribute => {
+              if (attribute.toLowerCase() === 'id') {
+                buttonText += `id: ${feature.getId()}<br />`;
+              } else {
+                buttonText += feature.get(attribute) ? `${attribute}: ${feature.get(attribute)}<br />` : '';
+              }
+            });
+          } else {
+            buttonText += `ID: ${feature.getId()}`;
+          }
+          const featureButton = Button({
+            text: buttonText,
+            state: 'initial',
+            cls: 'text-align-left hover light',
+            click() {
+              select.getFeatures().clear();
+              select.getFeatures().push(feature);
+              infowindowCmp.dispatch('resetButtonStates');
+              infowindowCmp.dispatch('removeMouseenter');
+              this.setState('active');
+            },
+            mouseenter() {
+              select.getFeatures().clear();
+              select.getFeatures().push(feature);
+              infowindowCmp.dispatch('resetButtonStates');
+              this.setState('active');
+            }
+          });
+          const listItem = El({
+            tagName: 'li',
+            components: [featureButton]
+          });
+          listCmp.push(listItem);
+          infowindowCmp.on('resetButtonStates', () => {
+            featureButton.setState('initial');
+            if (document.getElementById(featureButton.getId())) {
+              document.getElementById(featureButton.getId()).blur();
+            }
+          });
+          infowindowCmp.on('removeMouseenter', () => {
+            featureButton.dispatch('removeMouseenter');
+          });
+        });
+        const content = El({
+          tagName: 'ul',
+          components: listCmp
+        });
+        infowindowCmp.changeContent(content);
+      } else {
+        infowindowCmp.close();
+      }
+    });
+  }
   if (allowEditGeometry) {
     modify = new Modify({
       features: select.getFeatures()
@@ -1412,6 +1482,10 @@ function onDeleteChild(e) {
 export default function editHandler(options, v) {
   viewer = v;
   featureInfo = viewer.getControlByName('featureInfo');
+  if (options.featureList) {
+    infowindowCmp = Infowindow({ viewer, type: 'floating', title: 'Välj objekt' });
+    infowindowCmp.render();
+  }
   map = viewer.getMap();
   currentLayer = options.currentLayer;
   editableLayers = options.editableLayers;
