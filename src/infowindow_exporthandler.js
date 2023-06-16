@@ -3,6 +3,8 @@ import getSpinner from './utils/spinner';
 import exportToFile from './utils/exporttofile';
 import Icon from './ui/icon';
 
+const defaultIcon = '#fa-download';
+const defaultText = 'Ladda ner';
 let viewerId;
 
 export function simpleExportHandler(simpleExportUrl, activeLayer, selectedItems, exportedFileName) {
@@ -157,7 +159,7 @@ function createCustomExportButton(roundButtonIcon, roundButtonTooltipText) {
   );
   button.style = 'position: relative';
 
-  button.innerHTML = `<span class="icon" style="z-index: 10000">${iconComponent.render()}</span><span data-tooltip="${roundButtonTooltipText}" data-placement="north"></span>`;
+  button.innerHTML = `<span class="icon" style="z-index: 10000">${iconComponent.render()}</span><span data-tooltip="${roundButtonTooltipText}" data-placement="east" style="transition:unset"></span>`;
 
   container.appendChild(button);
   const spinner = getSpinner();
@@ -215,7 +217,7 @@ function createExportButtons(
   exportOptions
 ) {
   const roundButton = obj.button.roundButton || false;
-  const buttonText = obj.button.buttonText || 'Export';
+  const buttonText = obj.button.buttonText || defaultText;
   const url = obj.url;
   const layerSpecificExportedFileName = obj.exportedFileName;
   const attributesToSendToExport = obj.attributesToSendToExport
@@ -223,8 +225,8 @@ function createExportButtons(
     : attributesToSendToExportPerLayer;
   const exportBtn = roundButton
     ? createCustomExportButton(
-      obj.button.roundButtonIcon || '#fa-download',
-      obj.button.roundButtonTooltipText || 'Ladda ner'
+      obj.button.roundButtonIcon || defaultIcon,
+      obj.button.roundButtonTooltipText || defaultText
     )
     : createExportButton(buttonText);
   const btn = exportBtn.querySelector('button');
@@ -314,26 +316,23 @@ export function createSubexportComponent({ selectionGroup, viewer, exportOptions
       subexportContainer.appendChild(button);
     });
   }
-  if (exportOptions.simpleExport) {
-    const simpleExportLayers = exportOptions.simpleExport.layers ? exportOptions.simpleExport.layers : [];
-    const simpleExportUrl = exportOptions.simpleExport.url || false;
-    const simpleExportButtonText = exportOptions.simpleExport.button.buttonText || 'Export';
+  if (exportOptions.simpleExport && exportOptions.simpleExport.url) {
+    const simpleExport = exportOptions.simpleExport;
+    const simpleExportLayers = Array.isArray(simpleExport.layers) ? simpleExport.layers : [];
     const exportAllowed = simpleExportLayers.length === 0 || simpleExportLayers.find((l) => l === selectionGroup);
     if (exportAllowed) {
+      const simpleExportUrl = simpleExport.url || false;
+      const buttonText = simpleExport.button.buttonText || defaultText;
       const exportedFileName = `${selectionGroup}.xlsx`;
-      const roundButton = exportOptions.simpleExport.button.roundButton || false;
+      const roundButton = simpleExport.button.roundButton || false;
       const exportBtn = roundButton
         ? createCustomExportButton(
-          exportOptions.simpleExport.roundButtonIcon || '#fa-download',
-          exportOptions.simpleExport.roundButtonTooltipText || 'Ladda ner'
+          simpleExport.button.roundButtonIcon || defaultIcon,
+          simpleExport.button.roundButtonTooltipText || defaultText
         )
-        : createExportButton(simpleExportButtonText);
+        : createExportButton(buttonText);
       const btn = exportBtn.querySelector('button');
       btn.addEventListener('click', () => {
-        if (!simpleExportUrl) {
-          createToaster('fail', exportOptions);
-          return;
-        }
         btn.loadStart();
         const selectedItems = selectionManager.getSelectedItemsForASelectionGroup(selectionGroup);
         simpleExportHandler(
@@ -355,15 +354,16 @@ export function createSubexportComponent({ selectionGroup, viewer, exportOptions
     }
   }
   if (exportOptions.clientExport) {
-    const conf = exportOptions.clientExport;
-    const exportAllowed = !conf.layers || conf.layers.find((l) => l === selectionGroup);
+    const clientExport = exportOptions.clientExport;
+    const clientExportLayers = Array.isArray(clientExport.layers) ? clientExport.layers : [];
+    const exportAllowed = clientExportLayers.length === 0 || clientExportLayers.find((l) => l === selectionGroup);
     if (exportAllowed) {
-      const roundButton = conf.button.roundButton || false;
-      const buttonText = conf.button.buttonText || 'Exportera';
+      const roundButton = clientExport.button.roundButton || false;
+      const buttonText = clientExport.button.buttonText || defaultText;
       const exportBtn = roundButton
         ? createCustomExportButton(
-          conf.button.roundButtonIcon || '#fa-download',
-          conf.button.roundButtonTooltipText || 'Ladda ner'
+          clientExport.button.roundButtonIcon || defaultIcon,
+          clientExport.button.roundButtonTooltipText || defaultText
         )
         : createExportButton(buttonText);
 
@@ -372,7 +372,7 @@ export function createSubexportComponent({ selectionGroup, viewer, exportOptions
         btn.loadStart();
         const selectedItems = selectionManager.getSelectedItemsForASelectionGroup(selectionGroup);
         const features = selectedItems.map(i => i.getFeature());
-        exportToFile(features, conf.format, {
+        exportToFile(features, clientExport.format, {
           featureProjection: viewer.getProjection().getCode(),
           filename: selectionGroup
         });
