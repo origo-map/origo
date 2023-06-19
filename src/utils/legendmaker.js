@@ -47,6 +47,7 @@ export const findStyleType = function findStyleType(styles) {
 };
 
 // If there is only one styleRule that will be used as header icon, but not if that is extendedLegend. In latter case null is returned  meaning that list_icon will be set as header icon.
+// If there is only one styleRule, but that consist of a compounded style it's checked to see if any of the compounded style has header=true then this is used otherwise default order is applied.
 // If there are more than one styleRule the last styleRule flagged as header will be returned. In other words, if there are for example 3 styleRules
 // an all of them have header=true, then the last one will be returned and set on the icon legend.
 // If there are more than one styleRule but none of them has header flag, then null is returned meaning that list_icon will be set as header icon.
@@ -55,6 +56,14 @@ export const findHeaderStyle = function findHeaderStyle(styleRules) {
     const icons = styleRules[0].filter(sr => sr.icon);
     if (icons && icons.length && icons[0].extendedLegend) {
       return null;
+    }
+    if (styleRules[0].length > 1) {
+      for (let index = 0; index < styleRules[0].length; index += 1) {
+        const styleRule = styleRules[0][index];
+        if (styleRule.header === true) {
+          return [styleRule];
+        }
+      }
     }
     return styleRules[0];
   }
