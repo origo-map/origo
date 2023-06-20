@@ -433,17 +433,17 @@ const Featureinfo = function Featureinfo(options = {}) {
         const popupHeight = document.querySelector('.o-popup').offsetHeight + 10;
         popupEl.style.height = `${popupHeight}px`;
         const overlayOptions = { element: popupEl, positioning: 'bottom-center' };
+        if (!ignorePan) {
+          overlayOptions.autoPan = {
+            margin: 55,
+            animation: {
+              duration: 500
+            }
+          };
+        }
         if (items[0].layer && items[0].layer.get('styleName')) {
           const styleName = items[0].layer.get('styleName');
           const itemStyle = viewer.getStyle(styleName);
-          if (!ignorePan) {
-            overlayOptions.autoPan = {
-              margin: 55,
-              animation: {
-                duration: 500
-              }
-            };
-          }
           if (itemStyle && itemStyle[0] && itemStyle[0][0] && itemStyle[0][0].overlayOptions) {
             Object.assign(overlayOptions, itemStyle[0][0].overlayOptions);
           }
