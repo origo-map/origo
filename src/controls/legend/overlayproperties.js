@@ -146,6 +146,7 @@ const OverlayProperties = function OverlayProperties(options = {}) {
       });
     },
     onRender() {
+      viewer.getControlByName('legend').dispatch('renderOverlayProperties', { cmp: this, layer });
       this.dispatch('render');
       sliderEl = document.getElementById(transparencySlider.getId());
       overlayEl = document.getElementById(this.getId());
