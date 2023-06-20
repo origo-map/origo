@@ -66,7 +66,8 @@ function createWmsStyle({ wmsOptions, source, viewer, initialStyle = false }) {
       newStyle = {
         defaultWMSServerStyle: true,
         hasThemeLegend: wmsOptions.hasThemeLegend || false,
-        legendParams: wmsOptions.legendParams || false
+        legendParams: wmsOptions.legendParams || false,
+        thematicStyling: wmsOptions.thematicStyling || false
       };
     }
   } else {
@@ -80,25 +81,31 @@ function createWmsStyle({ wmsOptions, source, viewer, initialStyle = false }) {
   }
 
   let getLegendString;
+  let getLegendJson;
   let styleName;
 
   if (newStyle.defaultWMSServerStyle) {
     getLegendString = source.getLegendUrl(maxResolution, legendParams);
+    getLegendJson = source.getLegendUrl(maxResolution, Object.assign({}, legendParams, { FORMAT: 'application/json' }));
     styleName = `${wmsOptions.name}_WMSServerDefault`;
   } else {
     getLegendString = source.getLegendUrl(maxResolution, {
       STYLE: newStyle.style,
       ...legendParams
     });
+    getLegendJson = source.getLegendUrl(maxResolution, Object.assign({}, legendParams, { FORMAT: 'application/json' }));
     styleName = newStyle.style;
   }
 
   const hasThemeLegend = newStyle.hasThemeLegend || false;
+  const thematicStyling = newStyle.thematicStyling || false;
   const style = [[{
     icon: {
-      src: `${getLegendString}`
+      src: `${getLegendString}`,
+      json: `${getLegendJson}`
     },
-    extendedLegend: hasThemeLegend
+    extendedLegend: hasThemeLegend,
+    thematicStyling
   }]];
   viewer.addStyle(styleName, style);
   return styleName;
