@@ -278,10 +278,13 @@ function checkOptions(options = {}) {
           }
         });
         if (filterMatch) {
-          styleL = styleList[j];
-          return styleL;
+          if (s[j][0].visible !== false) {
+            styleL = styleList[j];
+            return styleL;
+          }
+          return null;
         }
-      } else {
+      } else if (s[j][0].visible !== false) {
         styleL = styleList[j];
         return styleL;
       }

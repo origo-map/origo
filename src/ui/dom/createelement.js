@@ -23,6 +23,8 @@ const createElement = function createElement(type, content, options) {
   });
   if (typeof content === 'string') {
     el.innerHTML = content;
+  } else if (typeof content === 'object' && Object.prototype.hasOwnProperty.call(content, 'render')) {
+    el.innerHTML = content.render();
   } else {
     el.appendChild(content);
   }

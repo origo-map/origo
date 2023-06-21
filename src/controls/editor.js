@@ -6,7 +6,8 @@ const Editor = function Editor(options = {}) {
   const {
     autoForm = false,
     autoSave = true,
-    isActive = true
+    isActive = true,
+    featureList = true
   } = options;
   let editorButton;
   let target;
@@ -70,7 +71,8 @@ const Editor = function Editor(options = {}) {
         autoSave,
         currentLayer,
         editableLayers,
-        isActive
+        isActive,
+        featureList
       });
       editHandler = EditHandler(handlerOptions, viewer);
 

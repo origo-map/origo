@@ -1,6 +1,7 @@
 import {
   Circle as CircleStyle,
   Fill,
+  Icon,
   RegularShape,
   Stroke,
   Style,
@@ -9,8 +10,15 @@ import {
 import { getArea, getLength } from 'ol/sphere';
 import { LineString, MultiPoint, Point } from 'ol/geom';
 
-function createRegularShape(type, size, fill, stroke) {
+function createRegularShape(type, pointSize, pointFill, pointStroke) {
   let style;
+  const size = pointSize || 10;
+  const stroke = pointStroke || new Stroke({
+    color: 'rgba(0, 0, 0, 0.7)'
+  });
+  const fill = pointFill || new Fill({
+    color: 'rgba(0, 153, 255, 0.8)'
+  });
   switch (type) {
     case 'square':
       style = new Style({
@@ -86,6 +94,29 @@ function createRegularShape(type, size, fill, stroke) {
       });
       break;
 
+    case 'marker': {
+      let fillColor = 'blue';
+      let strokeColor = 'black';
+      let strokeWidth = 10;
+      if (fill && fill.getColor) {
+        fillColor = encodeURIComponent(fill.getColor());
+      }
+      if (stroke && stroke.getColor) {
+        strokeColor = encodeURIComponent(stroke.getColor());
+      }
+      if (stroke && stroke.getWidth) {
+        strokeWidth = 5 * stroke.getWidth();
+      }
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 96 960 960" width="48"><path stroke="${strokeColor}" stroke-width="${strokeWidth}" fill="${fillColor}" d="M480 897q133-121 196.5-219.5T740 504q0-117.79-75.292-192.895Q589.417 236 480 236t-184.708 75.105Q220 386.21 220 504q0 75 65 173.5T480 897Zm0 79"/></svg>`;
+      style = new Style({
+        image: new Icon({
+          src: `data:image/svg+xml;utf8,${svg}`,
+          scale: size / 10 || 1,
+          anchor: [0.5, 0.85]
+        })
+      });
+      break;
+    }
     default:
       style = new Style({
         image: new CircleStyle({

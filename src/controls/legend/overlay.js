@@ -29,6 +29,7 @@ const OverlayLayer = function OverlayLayer(options) {
   let moreInfoButton;
   let popupMenu;
   let hasExtendedLegend = false;
+  let thisComponent;
 
   const checkIcon = '#ic_check_circle_24px';
   let uncheckIcon = '#ic_radio_button_unchecked_24px';
@@ -75,8 +76,12 @@ const OverlayLayer = function OverlayLayer(options) {
   // Always do this even if there is no extended legend, as user may change symbol later and then its nice to have a placeholder.
   const extendedLegendContent = Component({
     render() {
-      // Need to wrap legend as Collapse requires an id on the content
-      return `<div id="${this.getId()}" class="padding-left">${hasExtendedLegend ? Legend(style) : ''}</div>`;
+      const legendContent = Legend({ styleRules: style, layer, viewer });
+      if (typeof (legendContent) === 'string') {
+        return `<div id="${this.getId()}" class="padding-left">${hasExtendedLegend ? legendContent : ''}</div>`;
+      }
+      thisComponent.addComponents([legendContent]);
+      return `<div id="${this.getId()}" class="padding-left">${hasExtendedLegend ? legendContent.render() : ''}</div>`;
     },
     setContent(content) {
       const contentEl = document.getElementById(this.getId());
@@ -222,10 +227,11 @@ const OverlayLayer = function OverlayLayer(options) {
       onRender() {
         const labelEl = document.getElementById(this.getId());
         labelEl.addEventListener('click', (e) => {
-          if (window.confirm('Vill du radera lagret?')) {
+          const doRemove = (layer.get('promptlessRemoval') === true) || window.confirm('Vill du radera lagret?');
+          if (doRemove) {
             viewer.getMap().removeLayer(layer);
+            e.preventDefault();
           }
-          e.preventDefault();
         });
       },
       render() {
@@ -312,7 +318,7 @@ const OverlayLayer = function OverlayLayer(options) {
     let newIcon = HeaderIcon(newStyle, opacity);
     if (!newIcon) {
       hasExtendedLegend = true;
-      extendedLegendContent.setContent(Legend(newStyle));
+      extendedLegendContent.setContent(Legend({ styleRules: newStyle, layer, viewer }).render());
     } else {
       hasExtendedLegend = false;
       extendedLegendContent.setContent('');
@@ -332,6 +338,7 @@ const OverlayLayer = function OverlayLayer(options) {
     name,
     getLayer,
     onInit() {
+      thisComponent = this;
       this.on('clear', onRemove.bind(this));
     },
     onAdd(evt) {

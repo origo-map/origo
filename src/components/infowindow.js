@@ -54,7 +54,6 @@ const Infowindow = function Infowindow(options = {}) {
     changeContent,
     onAdd() {
       this.on('render', this.onRender);
-      this.addComponent(infowindow);
       this.render();
     },
     onInit() {
@@ -102,6 +101,7 @@ const Infowindow = function Infowindow(options = {}) {
         collapseX: true,
         components: [headerComponent, contentComponent]
       });
+      this.addComponent(infowindow);
     },
     render() {
       const newEl = dom.html(infowindow.render());

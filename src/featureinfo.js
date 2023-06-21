@@ -405,6 +405,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         initCarousel('#o-identify-carousel');
         const firstFeature = items[0].feature;
         const geometry = firstFeature.getGeometry();
+        const origostyle = firstFeature.get('origostyle');
         const clone = firstFeature.clone();
         clone.setId(firstFeature.getId());
         // FIXME: should be layer name, not feature name
@@ -439,6 +440,19 @@ const Featureinfo = function Featureinfo(options = {}) {
               duration: 500
             }
           };
+        }
+        if (items[0].layer && items[0].layer.get('styleName')) {
+          const styleName = items[0].layer.get('styleName');
+          const itemStyle = viewer.getStyle(styleName);
+          if (itemStyle && itemStyle[0] && itemStyle[0][0] && itemStyle[0][0].overlayOptions) {
+            Object.assign(overlayOptions, itemStyle[0][0].overlayOptions);
+          }
+        }
+        if (origostyle && origostyle.overlayOptions) {
+          Object.assign(overlayOptions, origostyle.overlayOptions);
+        }
+        if (overlayOptions.positioning) {
+          popupEl.classList.add(`popup-${overlayOptions.positioning}`);
         }
         overlay = new Overlay(overlayOptions);
         map.addOverlay(overlay);
