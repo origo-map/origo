@@ -419,12 +419,17 @@ const Search = function Search(options = {}) {
 
       let exportButton;
       if (Object.keys(result).length > 0 && searchlistOptions.export && searchlistOptions.exportUrl) {
-        const buttonText = searchlistOptions.exportButtontext || 'Export';
+        const roundButton = searchlistOptions.roundButton;
+        const buttonIcon = searchlistOptions.roundButtonIcon || '#fa-download';
+        const buttonText = searchlistOptions.exportButtonText || 'Export';
         const exportFileName = searchlistOptions.exportFilename || 'export.xlsx';
 
         exportButton = Button({
-          cls: 'padding-medium margin-small no-shrink no-grow compact icon-small',
-          text: buttonText,
+          cls: roundButton ? 'padding-small margin-bottom-smaller icon-smaller round light box-shadow o-tooltip margin-right-small' : 'export-button',
+          style: roundButton ? 'position:absolute; bottom:0.2rem; left:0.75rem' : 'position:absolute; bottom:0.75rem; left:0.75rem',
+          text: roundButton ? '' : buttonText,
+          tooltipText: roundButton ? buttonText : '',
+          icon: roundButton ? buttonIcon : '',
           click() {
             listExportHandler(
               searchlistOptions.exportUrl,
@@ -596,10 +601,24 @@ const Search = function Search(options = {}) {
       bindUIActions();
 
       if (autocompletePlacement === 'floating' || searchlistPlacement === 'floating') {
-        infowindow = Infowindow({ viewer, type: 'floating' });
+        infowindow = Infowindow({ viewer,
+          type: 'floating',
+          contentComponent: El({
+            tagName: 'div',
+            cls: 'padding-y-small overflow-auto text-small',
+            style: (searchlistOptions.export && searchlistOptions.exportUrl) ? 'margin-bottom:2.7rem' : ''
+          })
+        });
         this.addComponent(infowindow);
       } else if (autocompletePlacement === 'left' || searchlistPlacement === 'left') {
-        infowindow = Infowindow({ viewer, type: 'left' });
+        infowindow = Infowindow({ viewer,
+          type: 'left',
+          contentComponent: El({
+            tagName: 'div',
+            cls: 'padding-y-small overflow-auto text-small',
+            style: (searchlistOptions.export && searchlistOptions.exportUrl) ? 'margin-bottom:2.7rem' : ''
+          })
+        });
         this.addComponent(infowindow);
       }
 
