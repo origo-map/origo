@@ -138,6 +138,7 @@ export function listExportHandler(exportUrl, exportObject, exportedFileName) {
       // Throwing here cause the whole fetch function be rejected, the same effect as returning Promise.reject();
       throw err;
     });
+}
 
 function createExportButton(buttonText) {
   const container = document.createElement('div');
