@@ -101,6 +101,7 @@ const Infowindow = function Infowindow(options = {}) {
         collapseX: true,
         components: [headerComponent, contentComponent]
       });
+
       this.addComponent(infowindow);
     },
     render() {
