@@ -459,7 +459,8 @@ const Search = function Search(options = {}) {
           return `${content}`;
         }
       });
-      infowindow.changeContent(listcomponent, `Sökresultat för "${searchVal}"`);
+      const searchlistTitle = searchlistOptions.title || 'Sökresultat för "{{value}}"';
+      infowindow.changeContent(listcomponent, `${searchlistTitle.replace('{{value}}', searchVal)}`);
     };
 
     function makeRequest(reqHandler, obj, opt, ignoreGroup = false) {
