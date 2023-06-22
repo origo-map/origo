@@ -346,6 +346,39 @@ const Search = function Search(options = {}) {
         if (viewer.getLayer(layername)) {
           const layertitle = `${viewer.getLayer(layername).get('title')} (${resultArray.length})`;
           const rows = [];
+          if (searchlistOptions.makeSelectionButton) {
+            const ids = resultArray.map(item => item[idAttribute]);
+            const buttonText = searchlistOptions.makeSelectionButtonText || 'Gör urval i kartan';
+            const makeSelectionButton = Button({
+              cls: 'export-button',
+              text: buttonText
+            });
+            const makeSelection = Component({
+              addClick() {
+                document.getElementById(makeSelectionButton.getId()).addEventListener('click', () => {
+                  const source = viewer.getMapSource();
+                  const projCode = viewer.getProjectionCode();
+                  const proj = viewer.getProjection();
+                  const layer = viewer.getLayer(layername);
+                  getFeature(ids.join(), layer, source, projCode, proj)
+                    .then((res) => {
+                      if (res.length > 0) {
+                        const featLayerName = layer.get('name');
+                        featureInfo.showFeatureInfo({ feature: res, layerName: featLayerName });
+                      }
+                    });
+                });
+              },
+              onInit() {
+                this.addComponent(makeSelectionButton);
+              },
+              render() {
+                return `<li class="flex row text-smaller align-center padding-x padding-y-smaller hover pointer" id="${this.getId()}">${makeSelectionButton.render()}</li>`;
+              }
+            });
+            rows.push(makeSelection);
+          }
+
           resultArray.forEach((element) => {
             const row = Component({
               addClick() {
@@ -359,8 +392,7 @@ const Search = function Search(options = {}) {
                     .then((res) => {
                       if (res.length > 0) {
                         const featureLayerName = layer.get('name');
-                        const feature = res[0];
-                        featureInfo.showFeatureInfo({ feature, layerName: featureLayerName });
+                        featureInfo.showFeatureInfo({ feature: res, layerName: featureLayerName });
                       }
                     });
                 });
@@ -423,6 +455,19 @@ const Search = function Search(options = {}) {
         const buttonIcon = searchlistOptions.roundButtonIcon || '#fa-download';
         const buttonText = searchlistOptions.exportButtonText || 'Export';
         const exportFileName = searchlistOptions.exportFilename || 'export.xlsx';
+        const exportExcludedFields = searchlistOptions.exportExcludedFields || [];
+        if (exportExcludedFields.length > 0) {
+          Object.keys(result).forEach(thisName => {
+            result[thisName].forEach(res => {
+              const row = res;
+              exportExcludedFields.forEach(field => {
+                if (row[field]) {
+                  delete row[field];
+                }
+              });
+            });
+          });
+        }
 
         exportButton = Button({
           cls: roundButton ? 'padding-small margin-bottom-smaller icon-smaller round light box-shadow o-tooltip margin-right-small' : 'export-button',
