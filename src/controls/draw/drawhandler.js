@@ -436,10 +436,10 @@ const DrawHandler = function DrawHandler(options = {}) {
     });
     newLayer.getSource().on('addfeature', (e) => {
       e.feature.on('change:origostyle', () => {
-        onUpdate(e, newLayer.get('name'));
+        onUpdate(e.feature, newLayer.get('name'));
       });
       e.feature.on('change:popuptext', () => {
-        onUpdate(e, newLayer.get('name'));
+        onUpdate(e.feature, newLayer.get('name'));
       });
     });
     return newLayer;
