@@ -72,6 +72,8 @@ const DragAndDrop = function DragAndDrop(options = {}) {
       const draggable = options.draggable || true;
       const promptlessRemoval = options.promptlessRemoval !== false;
       const styleByAttribute = options.styleByAttribute || false;
+      const zoomToExtent = options.zoomToExtent || true;
+      const zoomToExtentOnLoad = options.zoomToExtentOnLoad || true;
       const featureStyles = options.featureStyles || {
         Point: [{
           circle: {
@@ -153,6 +155,7 @@ const DragAndDrop = function DragAndDrop(options = {}) {
           queryable: true,
           removable: true,
           promptlessRemoval,
+          zoomToExtent,
           visible: true,
           source: 'none',
           type: 'GEOJSON',
@@ -161,7 +164,16 @@ const DragAndDrop = function DragAndDrop(options = {}) {
         if (!styleByAttribute) {
           layerOptions.styleDef = featureStyles[event.features[0].getGeometry().getType()];
         }
-        viewer.addLayer(layerOptions);
+        const layer = viewer.addLayer(layerOptions);
+        if (zoomToExtentOnLoad) {
+          const extent = typeof layer.getSource !== 'undefined' && typeof layer.getSource().getExtent !== 'undefined' ? layer.getSource().getExtent() : layer.getExtent();
+          if (layer.getVisible()) {
+            viewer.getMap().getView().fit(extent, {
+              padding: [50, 50, 50, 50],
+              duration: 1000
+            });
+          }
+        }
       });
       this.render();
     },
