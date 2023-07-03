@@ -72,8 +72,8 @@ const DragAndDrop = function DragAndDrop(options = {}) {
       const draggable = options.draggable || true;
       const promptlessRemoval = options.promptlessRemoval !== false;
       const styleByAttribute = options.styleByAttribute || false;
-      const zoomToExtent = options.zoomToExtent || true;
-      const zoomToExtentOnLoad = options.zoomToExtentOnLoad || true;
+      const zoomToExtent = options.zoomToExtent !== false;
+      const zoomToExtentOnLoad = options.zoomToExtentOnLoad !== false;
       const featureStyles = options.featureStyles || {
         Point: [{
           circle: {
