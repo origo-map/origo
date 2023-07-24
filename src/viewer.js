@@ -13,19 +13,22 @@ import utils from './utils';
 import Layer from './layer';
 import Main from './components/main';
 import Footer from './components/footer';
+import CenterMarker from './components/centermarker';
 import flattenGroups from './utils/flattengroups';
 import getcenter from './geometry/getcenter';
 import isEmbedded from './utils/isembedded';
+import generateUUID from './utils/generateuuid';
 import permalink from './permalink/permalink';
+import Stylewindow from './style/stylewindow';
 
 const Viewer = function Viewer(targetOption, options = {}) {
   let map;
   let tileGrid;
   let featureinfo;
   let selectionmanager;
+  let stylewindow;
 
-  let {
-    projection,
+  const {
     breakPoints,
     breakPointsPrefix,
     clsOptions = '',
@@ -43,6 +46,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     zoom: zoomOption = 0,
     resolutions = null,
     layers: layerOptions = [],
+    layerParams = {},
     map: mapName,
     params: urlParams = {},
     proj4Defs,
@@ -50,7 +54,12 @@ const Viewer = function Viewer(targetOption, options = {}) {
     source = {},
     clusterOptions = {},
     tileGridOptions = {},
-    url
+    url,
+    palette
+  } = options;
+
+  let {
+    projection
   } = options;
 
   const viewerOptions = Object.assign({}, options);
@@ -96,11 +105,20 @@ const Viewer = function Viewer(targetOption, options = {}) {
   const footer = Footer({
     data: footerData
   });
+  const centerMarker = CenterMarker();
   let mapSize;
 
   const addControl = function addControl(control) {
     if (control.onAdd && control.dispatch) {
-      if (!control.options.hideWhenEmbedded || !isEmbedded(this.getTarget())) {
+      if (control.options.hideWhenEmbedded && isEmbedded(this.getTarget())) {
+        if (typeof control.hide === 'function') {
+          // Exclude these controls in the array since they can't be hidden and the solution is to not add them. If the control hasn't a hide method don't add the control.
+          if (!['sharemap', 'link', 'about', 'print', 'draganddrop'].includes(control.name)) {
+            this.addComponent(control);
+          }
+          control.hide();
+        }
+      } else {
         this.addComponent(control);
       }
     } else {
@@ -123,6 +141,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
   const getFeatureinfo = () => featureinfo;
 
   const getSelectionManager = () => selectionmanager;
+
+  const getStylewindow = () => stylewindow;
 
   const getCenter = () => getcenter;
 
@@ -156,6 +176,12 @@ const Viewer = function Viewer(targetOption, options = {}) {
   };
 
   const getStyles = () => styles;
+
+  const addStyle = function addStyle(styleName, styleProps) {
+    if (!(styleName in styles)) {
+      styles[styleName] = styleProps;
+    }
+  };
 
   const getResolutions = () => resolutions;
 
@@ -330,7 +356,14 @@ const Viewer = function Viewer(targetOption, options = {}) {
             const altStyle = initialProps.stylePicker[savedLayerProps[layerName].altStyleIndex];
             savedProps.clusterStyle = altStyle.clusterStyle;
             savedProps.style = altStyle.style;
-            savedProps.defaultStyle = initialProps.style;
+            if (initialProps.type === 'WMS') {
+              let WMSStylePickerInitialStyle = initialProps.stylePicker.find(style => style.initialStyle);
+              if (WMSStylePickerInitialStyle === undefined) {
+                WMSStylePickerInitialStyle = initialProps.stylePicker[0];
+                WMSStylePickerInitialStyle.initialStyle = true;
+              }
+              savedProps.defaultStyle = WMSStylePickerInitialStyle;
+            } else savedProps.defaultStyle = initialProps.style;
           }
           savedProps.name = initialProps.name;
           const mergedProps = Object.assign({}, initialProps, savedProps);
@@ -378,7 +411,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
   };
 
   const getLayerStylePicker = function getLayerStylePicker(layer) {
-    return layerStylePicker[layer.get('name')] || [];
+    return layerStylePicker[layer.get('id')] || [];
   };
 
   const addLayerStylePicker = function addLayerStylePicker(layerProps) {
@@ -387,13 +420,32 @@ const Viewer = function Viewer(targetOption, options = {}) {
     }
   };
 
-  const addLayer = function addLayer(layerProps) {
+  const addLayer = function addLayer(thisProps, insertBefore) {
+    let layerProps = thisProps;
+    if (thisProps.layerParam && layerParams[thisProps.layerParam]) {
+      layerProps = Object.assign({}, layerParams[thisProps.layerParam], thisProps);
+    }
+    if (thisProps.styleDef && !thisProps.style) {
+      const styleId = generateUUID();
+      addStyle(styleId, [thisProps.styleDef]);
+      layerProps.style = styleId;
+    }
     const layer = Layer(layerProps, this);
     addLayerStylePicker(layerProps);
-    map.addLayer(layer);
+    if (insertBefore) {
+      map.getLayers().insertAt(map.getLayers().getArray().indexOf(insertBefore), layer);
+    } else {
+      map.addLayer(layer);
+    }
     this.dispatch('addlayer', {
       layerName: layerProps.name
     });
+    return layer;
+  };
+
+  const removeLayer = function removeLayer(layer) {
+    this.dispatch('removelayer', { layerName: layer.get('name') });
+    map.removeLayer(layer);
   };
 
   const addLayers = function addLayers(layersProps) {
@@ -456,15 +508,12 @@ const Viewer = function Viewer(targetOption, options = {}) {
     }
   };
 
-  const addStyle = function addStyle(styleName, styleProps) {
-    if (!(styleName in styles)) {
-      styles[styleName] = styleProps;
-    }
+  const addMarker = function addMarker(coordinates, title, content, layerProps, showPopup) {
+    maputils.createMarker(coordinates, title, content, this, layerProps, showPopup);
   };
 
-  const addMarker = function addMarker(coordinates, title, content) {
-    const layer = maputils.createMarker(coordinates, title, content, this);
-    map.addLayer(layer);
+  const removeMarkers = function removeMarkers(layerName) {
+    maputils.removeMarkers(this, layerName);
   };
 
   const getUrlParams = function getUrlParams() {
@@ -482,6 +531,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
       }));
 
       tileGrid = maputils.tileGrid(tileGridSettings);
+      stylewindow = Stylewindow({ palette, viewer: this });
 
       setMap(Map(Object.assign(options, { projection, center, zoom, target: this.getId() })));
 
@@ -495,12 +545,31 @@ const Viewer = function Viewer(targetOption, options = {}) {
             mapId: this.getId()
           });
 
+          if (urlParams.pin) {
+            featureinfoOptions.savedPin = urlParams.pin;
+          } else if (urlParams.selection) {
+            // This needs further development for proper handling in permalink
+            featureinfoOptions.savedSelection = new Feature({
+              geometry: new geom[urlParams.selection.geometryType](urlParams.selection.coordinates)
+            });
+          }
+
+          featureinfoOptions.viewer = this;
+
+          selectionmanager = Selectionmanager(featureinfoOptions);
+          featureinfo = Featureinfo(featureinfoOptions);
+          this.addComponent(selectionmanager);
+          this.addComponent(featureinfo);
+          this.addComponent(centerMarker);
+
+          this.addControls();
+
           if (urlParams.feature) {
             const featureId = urlParams.feature;
             const layerName = featureId.split('.')[0];
             const layer = getLayer(layerName);
-            const layerType = layer.get('type');
-            if (layer && layerType !== 'GROUP') {
+            if (layer && layer.get('type') !== 'GROUP') {
+              const layerType = layer.get('type');
               // FIXME: postrender event is only emitted if any features from a layer is actually drawn, which means there is no feature in the default extent,
               // it will not be triggered until map is panned or zoomed where a feature exists.
               layer.once('postrender', () => {
@@ -548,27 +617,10 @@ const Viewer = function Viewer(targetOption, options = {}) {
             }
           }
 
-          if (urlParams.pin) {
-            featureinfoOptions.savedPin = urlParams.pin;
-          } else if (urlParams.selection) {
-            // This needs further development for proper handling in permalink
-            featureinfoOptions.savedSelection = new Feature({
-              geometry: new geom[urlParams.selection.geometryType](urlParams.selection.coordinates)
-            });
-          }
-
           if (!urlParams.zoom && !urlParams.mapStateId && startExtent) {
             map.getView().fit(startExtent, { size: map.getSize() });
           }
 
-          featureinfoOptions.viewer = this;
-
-          selectionmanager = Selectionmanager(featureinfoOptions);
-          featureinfo = Featureinfo(featureinfoOptions);
-          this.addComponent(selectionmanager);
-          this.addComponent(featureinfo);
-
-          this.addControls();
           this.dispatch('loaded');
         });
     },
@@ -579,7 +631,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
                               ${footer.render()}
                             </div>
                           </div>
-                              
+
                           <div id="loading" class="hide">
                             <div class="loading-spinner"></div>
                           </div>`;
@@ -636,12 +688,17 @@ const Viewer = function Viewer(targetOption, options = {}) {
     getUrlParams,
     getViewerOptions,
     removeGroup,
+    removeLayer,
     removeOverlays,
+    removeMarkers,
     setStyle,
     zoomToExtent,
     getSelectionManager,
+    getStylewindow,
     getEmbedded,
-    permalink
+    permalink,
+    generateUUID,
+    centerMarker
   });
 };
 

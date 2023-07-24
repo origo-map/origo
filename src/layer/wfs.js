@@ -15,6 +15,8 @@ export default function wfs(layerOptions, viewer) {
   sourceOptions.geometryName = wfsOptions.geometryName;
   sourceOptions.filter = wfsOptions.filter;
   sourceOptions.attribution = wfsOptions.attribution;
+  sourceOptions.customExtent = wfsOptions.extent;
+  wfsOptions.extent = undefined;
   sourceOptions.resolutions = viewer.getResolutions();
   sourceOptions.projectionCode = viewer.getProjectionCode();
   if (wfsOptions.projection) {
@@ -31,6 +33,7 @@ export default function wfs(layerOptions, viewer) {
     wfsOptions.visible = true;
   }
   sourceOptions.strategy = layerOptions.strategy ? layerOptions.strategy : sourceOptions.strategy;
+  sourceOptions.requestMethod = layerOptions.requestMethod ? layerOptions.requestMethod : sourceOptions.requestMethod;
   switch (sourceOptions.strategy) {
     case 'all':
       sourceOptions.loadingstrategy = LoadingStrategy.all;

@@ -1,4 +1,5 @@
 import permalink from './permalink/permalink';
+import permalinkParser from './permalink/permalinkparser';
 import getUrl from './utils/geturl';
 import isUrl from './utils/isurl';
 import trimUrl from './utils/trimurl';
@@ -141,6 +142,16 @@ const loadResources = async function loadResources(mapOptions, config) {
             map.options.url = mapUrl;
             map.options.map = json;
             map.options.params = urlParams;
+
+            if (config.mapState) {
+              const mapObj = {};
+              const state = config.mapState;
+              Object.keys(state).forEach(key => {
+                if (permalinkParser[key]) mapObj[key] = permalinkParser[key](state[key]);
+                else mapObj[key] = state[key];
+              });
+              map.options.params = mapObj;
+            }
 
             for (let i = 0; i < map.options.controls.length; i += 1) {
               if (map.options.controls[i].name === 'sharemap') {

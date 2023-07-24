@@ -1,7 +1,6 @@
 import Overlay from 'ol/Overlay';
 import BaseTileLayer from 'ol/layer/BaseTile';
 import ImageLayer from 'ol/layer/Image';
-import LayerGroup from 'ol/layer/Group';
 import OGlide from './oglide';
 import { Component, Modal } from './ui';
 import Popup from './popup';
@@ -14,7 +13,7 @@ import getFeatureInfo from './getfeatureinfo';
 import replacer from './utils/replacer';
 import SelectedItem from './models/SelectedItem';
 import attachmentclient from './utils/attachmentclient';
-import getAttributes, { getContent } from './getattributes';
+import getAttributes, { getContent, featureinfotemplates } from './getattributes';
 import relatedtables from './utils/relatedtables';
 
 const styleTypes = StyleTypes();
@@ -406,6 +405,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         initCarousel('#o-identify-carousel');
         const firstFeature = items[0].feature;
         const geometry = firstFeature.getGeometry();
+        const origostyle = firstFeature.get('origostyle');
         const clone = firstFeature.clone();
         clone.setId(firstFeature.getId());
         // FIXME: should be layer name, not feature name
@@ -440,6 +440,19 @@ const Featureinfo = function Featureinfo(options = {}) {
               duration: 500
             }
           };
+        }
+        if (items[0].layer && items[0].layer.get('styleName')) {
+          const styleName = items[0].layer.get('styleName');
+          const itemStyle = viewer.getStyle(styleName);
+          if (itemStyle && itemStyle[0] && itemStyle[0][0] && itemStyle[0][0].overlayOptions) {
+            Object.assign(overlayOptions, itemStyle[0][0].overlayOptions);
+          }
+        }
+        if (origostyle && origostyle.overlayOptions) {
+          Object.assign(overlayOptions, origostyle.overlayOptions);
+        }
+        if (overlayOptions.positioning) {
+          popupEl.classList.add(`popup-${overlayOptions.positioning}`);
         }
         overlay = new Overlay(overlayOptions);
         map.addOverlay(overlay);
@@ -674,8 +687,10 @@ const Featureinfo = function Featureinfo(options = {}) {
             cursor = 'pointer';
           } else {
             const layerArray = [];
-            const layerGroups = viewer.getQueryableLayers().filter(layer => layer instanceof LayerGroup);
-            if (layerGroups) { layerGroups.forEach(item => item.getLayersArray().forEach(element => layerArray.push(element))); }
+            const layerGroups = viewer.getGroupLayers();
+            layerGroups.forEach(item => item.getLayersArray().forEach(element => {
+              if (element.get('queryable') && element.get('visible')) { layerArray.push(element); }
+            }));
             const layers = viewer.getQueryableLayers().filter(layer => layer instanceof BaseTileLayer || layer instanceof ImageLayer);
             if (layers) { layers.forEach(element => layerArray.push(element)); }
             for (let i = 0; i < layerArray.length; i += 1) {
@@ -693,7 +708,8 @@ const Featureinfo = function Featureinfo(options = {}) {
     },
     render,
     showInfo,
-    showFeatureInfo
+    showFeatureInfo,
+    featureinfotemplates
   });
 };
 

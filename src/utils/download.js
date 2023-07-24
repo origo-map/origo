@@ -1,6 +1,5 @@
 import convertHtml2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
-import domtoimage from 'dom-to-image-more';
 
 let url;
 
@@ -54,24 +53,26 @@ export const html2canvas = function html2canvas(el) {
   return convertHtml2canvas(el, {
     useCORS: true,
     allowTaint: true,
-    backgroundColor: null,
+    backgroundColor: '#FFFFFF',
     logging: false,
     height: el.offsetHeight,
     width: el.offsetWidth
   });
 };
 
-export const dom2image = function dom2image(el, exportOptions) {
-  return domtoimage.toJpeg(el, exportOptions);
-};
-
 export const getImageBlob = async function getImageBlob(el) {
   if (el) {
-    const transformScale = el.style.transform;
-    const printEl = el;
-    printEl.style.transform = 'scale(1)';
-    const canvas = await html2canvas(printEl);
-    printEl.style.transform = transformScale;
+    const mapEl = el;
+    const parentEl = mapEl.parentElement;
+    const styleAttributes = mapEl.getAttribute('style');
+    const parentStyleAttributes = parentEl.getAttribute('style');
+    mapEl.style.transform = 'unset';
+    mapEl.style.transformOrigin = 'unset';
+    parentEl.style.transform = 'unset';
+    parentEl.style.transformOrigin = 'unset';
+    const canvas = await html2canvas(mapEl);
+    mapEl.setAttribute('style', styleAttributes); // Restore scaling
+    parentEl.setAttribute('style', parentStyleAttributes); // Restore scaling
     const blob = await canvasToBlob(canvas);
     return blob;
   }
@@ -121,46 +122,39 @@ export const printToScalePDF = async function printToScalePDF({
   orientation,
   size,
   width,
-  printScale,
   widthImage,
   heightImage
 }) {
-  // export options for html-to-image.
-  // See: https://github.com/bubkoo/html-to-image#options
-  const exportOptions = {
-    filter(element) {
-      let className = element.className || '';
-      if (typeof className === 'object' && element.classList) {
-        className = `${element.classList}`;
-      }
-      return (
-        className.indexOf('o-print') === -1
-        || className.indexOf('o-print-header') > -1
-        || className.indexOf('print-scale-line') > -1
-        || className.indexOf('padding-right-small') > -1
-        || className.indexOf('padding-bottom-small') > -1
-        || className.indexOf('o-print-description') > -1
-        || className.indexOf('o-print-footer') > -1
-        || className.indexOf('o-print-footer-left') > -1
-        || className.indexOf('o-print-created') > -1
-        || (className.indexOf('print-attribution') > -1
-          && className.indexOf('ol-uncollapsible'))
-      );
+  const mapEl = el;
+  let orient = orientation;
+  if (size === 'custom') {
+    if (width > height) {
+      orient = widthImage < heightImage ? 'portrait' : 'landscape';
     }
-  };
-
-  const format = size === 'custom' ? [mm2Pt(width), mm2Pt(height)] : size;
-  if (printScale !== 0) {
-    exportOptions.width = widthImage;
-    exportOptions.height = heightImage;
   }
-
-  const pdf = new jsPDF({ orientation, format, unit: 'mm', compress: true });
-  const styleAttributes = el.getAttribute('style');
-  el.setAttribute('style', styleAttributes.split('transform: scale')[0]); // Remove scaling to get correct print size of image
-  let image = await dom2image(el, exportOptions);
-  image = await dom2image(el, exportOptions); // Fix for iPhone
-  pdf.addImage(image, 'JPEG', 0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
-  el.setAttribute('style', styleAttributes); // Restore scaling
-  pdf.save(`${filename}.pdf`);
+  const format = size === 'custom' ? [mm2Pt(height), mm2Pt(width)] : size;
+  const pdf = new jsPDF({ orientation: orient, format, unit: 'mm', compress: true });
+  const parentEl = mapEl.parentElement;
+  const styleAttributes = mapEl.getAttribute('style');
+  const parentStyleAttributes = parentEl.getAttribute('style');
+  mapEl.style.transform = 'unset';
+  mapEl.style.transformOrigin = 'unset';
+  parentEl.style.transform = 'unset';
+  parentEl.style.transformOrigin = 'unset';
+  convertHtml2canvas(mapEl, {
+    useCORS: true,
+    allowTaint: true,
+    backgroundColor: '#FFFFFF',
+    logging: false,
+    height: heightImage,
+    width: widthImage
+  })
+    .then((dataUrl) => {
+      pdf.addImage(dataUrl, 'JPEG', 0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
+    })
+    .then(() => {
+      pdf.save(`${filename}.pdf`);
+      mapEl.setAttribute('style', styleAttributes); // Restore scaling
+      parentEl.setAttribute('style', parentStyleAttributes); // Restore scaling
+    });
 };

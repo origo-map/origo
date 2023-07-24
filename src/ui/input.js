@@ -17,10 +17,15 @@ export default function Input(options = {}) {
     onRender() {
       const el = document.getElementById(this.getId());
       el.addEventListener('keyup', this.onChange.bind(this));
+      el.addEventListener('focusout', this.onFocusOut.bind(this));
     },
     onChange(evt) {
       value = evt.target.value;
       this.dispatch('change', { value });
+    },
+    onFocusOut(evt) {
+      value = evt.target.value;
+      this.dispatch('focusout', { value });
     },
     render() {
       return `

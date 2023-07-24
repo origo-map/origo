@@ -25,6 +25,7 @@ import { renderSvgIcon } from './src/utils/legendmaker';
 import SelectedItem from './src/models/SelectedItem';
 import 'elm-pep';
 import 'pepjs';
+import 'drag-drop-touch';
 import permalink from './src/permalink/permalink';
 
 const Origo = function Origo(configPath, options = {}) {
@@ -94,6 +95,9 @@ const Origo = function Origo(configPath, options = {}) {
 
   const api = () => viewer;
   const getConfig = () => origoConfig;
+
+  api.controls = () => origoControls;
+  api.extensions = () => origoExtensions;
 
   /** Helper that initialises a new viewer  */
   const initViewer = () => {

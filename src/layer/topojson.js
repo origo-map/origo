@@ -21,6 +21,8 @@ const topojson = function topojson(layerOptions, viewer) {
   const sourceOptions = {};
 
   sourceOptions.attribution = topojsonOptions.attribution;
+  sourceOptions.customExtent = topojsonOptions.extent;
+  topojsonOptions.extent = undefined;
   sourceOptions.projectionCode = viewer.getProjectionCode();
   sourceOptions.sourceName = layerOptions.source;
   if (isUrl(topojsonOptions.source)) {

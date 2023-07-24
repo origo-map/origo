@@ -63,9 +63,13 @@ const Print = function Print(options = {}) {
   let screenButton;
   let mapMenu;
   let menuItem;
+  let printComponent;
+
+  const getPrintComponent = () => printComponent;
 
   return Component({
     name: 'print',
+    getPrintComponent,
     onInit() {
       if ('visible' in northArrow) {
         showNorthArrow = northArrow.visible;
@@ -76,7 +80,7 @@ const Print = function Print(options = {}) {
     },
     onAdd(evt) {
       viewer = evt.target;
-      const printComponent = PrintComponent({
+      printComponent = PrintComponent({
         logo,
         northArrow,
         printLegend,

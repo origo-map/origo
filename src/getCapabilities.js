@@ -27,6 +27,7 @@ const getCapabilities = function getCapabilities(name, getCapabilitiesURL) {
     };
     xmlHttp.onerror = reject;
     xmlHttp.open('GET', getCapabilitiesURL);
+    xmlHttp.setRequestHeader('Content-type', 'application/xml; charset=UTF-8');
     xmlHttp.send(null);
   });
 };

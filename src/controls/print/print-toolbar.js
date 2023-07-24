@@ -13,28 +13,34 @@ const PrintToolbar = function PrintToolbar() {
 
   return Component({
     onInit() {
+      this.addComponents([pngButton, pdfButton]);
       pngButton.on('click', this.dispatchExport.bind(this));
       pdfButton.on('click', this.dispatchPrint.bind(this));
     },
     dispatchExport() {
-      this.dispatch('PNG');
+      if (pngButton.getState() !== 'disabled') this.dispatch('PNG');
     },
     dispatchPrint() {
-      this.dispatch('PDF');
+      if (pdfButton.getState() !== 'disabled') this.dispatch('PDF');
     },
     render() {
-      return this.html`
+      return `
       <div
         class="flex box fixed bottom-center button-group divider-horizontal box-shadow rounded-large bg-inverted z-index-ontop-high no-print"
         style="height: 2rem;"
       >
-        ${pngButton}
-        ${pdfButton}
+        ${pngButton.render()}
+        ${pdfButton.render()}
       </div>`;
     },
     setDisabled(disabled) {
-      pngButton.setState(disabled ? 'disabled' : 'initial');
-      pdfButton.setState(disabled ? 'disabled' : 'initial');
+      if (disabled) {
+        pngButton.setState('disabled');
+        pdfButton.setState('disabled');
+      } else {
+        pngButton.setState('initial');
+        pdfButton.setState('initial');
+      }
     }
   });
 };

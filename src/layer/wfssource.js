@@ -3,6 +3,7 @@
 import VectorSource from 'ol/source/Vector';
 import GeoJSONFormat from 'ol/format/GeoJSON';
 import * as LoadingStrategy from 'ol/loadingstrategy';
+import { getIntersection } from 'ol/extent';
 import { transformExtent } from 'ol/proj';
 import replacer from '../utils/replacer';
 
@@ -63,6 +64,31 @@ class WfsSource extends VectorSource {
   }
 
   /**
+   * Set request method for layer
+   * @param {any} method
+   */
+  setMethod(method) {
+    this._options.requestMethod = method;
+  }
+
+  /**
+   * Set filter on layer
+   * @param {any} cql
+   */
+  setFilter(cql) {
+    this._options.filter = cql;
+    this.refresh();
+  }
+
+  /**
+   * Clear filter on layer
+   */
+  clearFilter() {
+    this._options.filter = '';
+    this.refresh();
+  }
+
+  /**
    * Helper to reuse code. Consider it to be private to this class
    * @param {any} extent
    * @param {any} cql if provided, extent is ignored
@@ -88,11 +114,12 @@ class WfsSource extends VectorSource {
       queryFilter = cqlfilter ? `&CQL_FILTER=${cqlfilter}` : '';
     } else {
       // Extent should be used. Depending if there also is a filter, the queryfilter looks different
+      const ext = getIntersection(this._options.customExtent, extent) || extent;
       let requestExtent;
       if (this._options.dataProjection !== this._options.projectionCode) {
-        requestExtent = transformExtent(extent, this._options.projectionCode, this._options.dataProjection);
+        requestExtent = transformExtent(ext, this._options.projectionCode, this._options.dataProjection);
       } else {
-        requestExtent = extent;
+        requestExtent = ext;
       }
       if (cqlfilter) {
         queryFilter = `&CQL_FILTER=${cqlfilter} AND BBOX(${this._options.geometryName},${requestExtent.join(',')},'${this._options.dataProjection}')`;
@@ -109,9 +136,24 @@ class WfsSource extends VectorSource {
     url = encodeURI(url);
 
     // Actually fetch some features
-    const JsonFeatures = await fetch(url).then(response => response.json({
-      cache: false
-    }));
+    let JsonFeatures;
+    if (this._options.requestMethod && this._options.requestMethod.toLowerCase() === 'post') { // POST request
+      const split = url.split('?');
+      JsonFeatures = await fetch(split[0], {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+        },
+        body: split[1]
+      }).then(response => response.json({
+        cache: false
+      }));
+    } else { // GET request
+      JsonFeatures = await fetch(url).then(response => response.json({
+        cache: false
+      }));
+    }
+
     const features = super.getFormat().readFeatures(JsonFeatures);
     // Delete the geometry if it is a table (ignoring geometry) as the GeoJSON loader creates an empty geometry and that will
     // mess up saving the feature
