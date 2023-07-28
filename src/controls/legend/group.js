@@ -1,4 +1,4 @@
-import {Button, Collapse, CollapseHeader, Component, dom} from '../../ui';
+import { Button, Collapse, CollapseHeader, Component, dom } from '../../ui';
 import GroupList from './grouplist';
 
 /**

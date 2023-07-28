@@ -1,6 +1,7 @@
+/* eslint-disable no-underscore-dangle */
 import Cuid from 'cuid';
 import isComponent from './utils/iscomponent';
-import Eventer from "./utils/eventer";
+import Eventer from './utils/eventer';
 
 /**
  * @typedef {Object.<string, *>} ComponentOptions
@@ -40,15 +41,16 @@ class Base {
     this._wasOnRenderCalled = false;
     this._onRender = undefined;
 
-    for (const [k, v] of Object.entries(options)) {
-      // the onRender event is a special case; it will be run upon the `render` event from the parent component, see below
-      if (k === 'onRender') {
-        this._onRender = v;
-      } else if (k.length >= 5 && k.startsWith('on') && k[2].toUpperCase() === k[2]) {
-        const type = k.slice(2).toLowerCase();
-        this.on(type, v);
+    const optionsArray = Object.entries(options);
+    optionsArray.forEach(option => {
+      const [key, value] = option;
+      if (key === 'onRender') {
+        this._onRender = value;
+      } else if (key.length >= 5 && key.startsWith('on') && key[2].toUpperCase() === key[2]) {
+        const type = key.slice(2).toLowerCase();
+        this.on(type, value);
       }
-    }
+    });
 
     const opts = { ...options };
     delete opts.onRender;
@@ -80,9 +82,7 @@ class Base {
       this._onRender();
     }
 
-    for (const child of this.components) {
-      child.onRender();
-    }
+    this.components.forEach(component => component.onRender());
   }
 
   addComponent(child) {
