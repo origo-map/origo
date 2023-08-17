@@ -119,7 +119,7 @@ function imageLoadFunction(loadedImage, src) {
     if (data) {
       const img = loadedImage.getImage();
       const url = URL.createObjectURL(data);
-      img.addEventListener('loadend', () => {
+      img.addEventListener('load', () => {
         URL.revokeObjectURL(url);
       });
       img.src = url;
