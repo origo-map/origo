@@ -572,7 +572,7 @@ function setInteractions(drawType) {
       }
     });
   }
-    
+
   if (preselectedFeature) {
     select.getFeatures().push(preselectedFeature);
   }
