@@ -28,6 +28,9 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   /** The selectionmanager component itself */
   let component;
 
+  // TODO: Maybe use items instead to avoid comparing featureId directly or a property on SelectedItem?
+  let highlightedFeatures = [];
+
   const multiselectStyleOptions = options.multiSelectionStyles || styleTypes.getStyle('multiselection');
   const isInfowindow = options.infowindow === 'infowindow' || false;
   const infowindowManager = options.infowindowOptions && options.infowindowOptions.listLayout ? infowindowManagerV2 : infowindowManagerV1;
@@ -94,15 +97,19 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     selectedItems.forEach((item) => {
       const feature = item.getFeature();
       if (item.getId() === id) {
-        feature.set('state', 'selected');
+        highlightedFeatures = [feature];
         component.dispatch('highlight', item);
-      } else {
-        // FIXME: Second argument should be a bool. Change to true to intentionally supress event, or remove second arg to emit the event. May affect the all other layers refresh below
-        feature.unset('state', 'selected');
       }
+      //  feature.set('state', 'selected');
+      //  component.dispatch('highlight', item);
+      // } else {
+      //  // FIXME: Second argument should be a bool. Change to true to intentionally supress event, or remove second arg to emit the event. May affect the all other layers refresh below
+      //  feature.unset('state', 'selected');
+      // }
     });
 
     // we need to manually refresh other layers, otherwise unselecting does not take effect until the next layer refresh.
+    // TODO: break out to a refresh all internal, or just refresh the newly highlighted and all unhighlighted layers
     urval.forEach((value) => {
       value.getFeatureStore().changed();
     });
@@ -148,11 +155,13 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   }
 
   function clearSelection() {
+    highlightedFeatures = [];
     selectedItems.clear();
   }
 
   function featureStyler(feature) {
-    if (feature.get('state') === 'selected') {
+    if (highlightedFeatures.includes(feature)) {
+      // if (feature.get('state') === 'selected') {
       return Style.createStyleRule(multiselectStyleOptions.highlighted);
     }
     return Style.createStyleRule(multiselectStyleOptions.selected);
@@ -287,7 +296,8 @@ const Selectionmanager = function Selectionmanager(options = {}) {
 
     const feature = item.getFeature();
     // FIXME: second argument should be a bool. True supresses event. 'selected' will be treated as true. Maybe correct, but not obvious.
-    feature.unset('state', 'selected');
+    // feature.unset('state', 'selected');
+    highlightedFeatures = highlightedFeatures.filter(f => f !== feature);
 
     urval.get(selectionGroup).removeFeature(feature);
     infowindow.removeListElement(item);
@@ -311,7 +321,12 @@ const Selectionmanager = function Selectionmanager(options = {}) {
    * @param {any} feature The feature to highlight
    */
   function highlightFeature(feature) {
-    feature.set('state', 'selected');
+    // feature.set('state', 'selected');
+    // TODO: break out to a refresh all internal, or just refresh this layer. We only affected one layer.
+    highlightedFeatures.push(feature);
+    urval.forEach((value) => {
+      value.getFeatureStore().changed();
+    });
   }
 
   function getNumberOfSelectedItems() {
