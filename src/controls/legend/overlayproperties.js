@@ -15,14 +15,8 @@ const OverlayProperties = function OverlayProperties(options = {}) {
   const opacity = layer.getOpacity();
   const opacityControl = layer.get('opacityControl') !== false;
   const style = viewer.getStyle(layer.get('styleName'));
-  const legend = Legend(style, opacity);
+  const legendComponent = Legend({ styleRules: style, opacity, layer, viewer, clickable: false });
   const stylePicker = viewer.getLayerStylePicker(layer);
-
-  const legendComponent = Component({
-    render() {
-      return `<div id=${this.getId()}>${legend}</div>`;
-    }
-  });
 
   let styleSelection;
   let overlayEl;
@@ -111,14 +105,13 @@ const OverlayProperties = function OverlayProperties(options = {}) {
         extendedLegend: altStyle.hasThemeLegend || false
       }]];
       viewer.addStyle(styleToSet, newWmsStyle);
-
-      legendCmp.innerHTML = Legend(viewer.getStyle(styleToSet), opacity);
+      legendCmp.innerHTML = Legend({ styleRules: viewer.getStyle(styleToSet), opacity, layer, viewer, clickable: false }).render();
       layer.dispatchEvent('change:style');
       return;
     }
 
     layer.set('styleName', altStyle.style);
-    legendCmp.innerHTML = Legend(viewer.getStyle(altStyle.style), opacity);
+    legendCmp.innerHTML = Legend({ styleRules: viewer.getStyle(altStyle.style), opacity, layer, viewer, clickable: false }).render();
     const newStyle = Style.createStyle({ style: altStyle.style, clusterStyleName: altStyle.clusterStyle, viewer });
     layer.setStyle(newStyle);
     layer.dispatchEvent('change:style');
@@ -136,7 +129,7 @@ const OverlayProperties = function OverlayProperties(options = {}) {
         buttonIconCls: 'black',
         ariaLabel: 'Välj stil'
       });
-      const components = [transparencySlider];
+      const components = [transparencySlider, legendComponent];
       if (hasStylePicker()) {
         components.push(styleSelection);
       }
@@ -146,6 +139,7 @@ const OverlayProperties = function OverlayProperties(options = {}) {
       });
     },
     onRender() {
+      viewer.getControlByName('legend').dispatch('renderOverlayProperties', { cmp: this, layer });
       this.dispatch('render');
       sliderEl = document.getElementById(transparencySlider.getId());
       overlayEl = document.getElementById(this.getId());
