@@ -172,13 +172,15 @@ async function setIcon(src, cmp, styleRules, layer, viewer, clickable) {
       searchParams.set('FORMAT', 'image/png');
       searchParams.set('RULE', row.name);
       const imgUrl = decodeURIComponent(searchParams.toString());
-      style[0].thematic.push({
-        image: { src: imgUrl },
-        filter: row.filter,
-        name: row.name,
-        label: row.title,
-        visible: row.visible !== false
-      });
+      if (typeof row.filter !== 'undefined') {
+        style[0].thematic.push({
+          image: { src: imgUrl },
+          filter: row.filter,
+          name: row.name,
+          label: row.title,
+          visible: row.visible !== false
+        });
+      }
     });
     viewer.setStyle(styleName, style);
   }
