@@ -17,7 +17,6 @@ import getAttributes, { getContent, featureinfotemplates } from './getattributes
 import relatedtables from './utils/relatedtables';
 
 const styleTypes = StyleTypes();
-let selectionLayer;
 
 const Featureinfo = function Featureinfo(options = {}) {
   const {
@@ -32,6 +31,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     autoplay = false
   } = options;
 
+  let selectionLayer;
   let identifyTarget;
   let overlay;
   let items;
@@ -47,6 +47,47 @@ const Featureinfo = function Featureinfo(options = {}) {
   const savedFeature = savedPin || savedSelection || undefined;
   const uiOutput = 'infowindow' in options ? options.infowindow : 'overlay';
 
+  /** Dispatches a clearselectionevent. Should be emitted when window is closed or cleared but not when featureinfo is closed as a result of tool change. */
+  const dispatchClearSelection = function dispatchClearSelection() {
+    component.dispatch('clearselection', null);
+  };
+
+  /** Eventhandler for Selectionmanager's clear event.  */
+  function onSelectionManagerClear() {
+    // Not much do to, just dispatch event as our own.
+    dispatchClearSelection();
+  }
+
+  /**
+    * Clears selection in all possible infowindows (overlay, sidebar and infoWindow) and closes the windows
+    * @param {any} supressEvent Set to true when closing as a result of tool change to supress sending clearselection event
+    */
+  const clear = function clear(supressEvent) {
+    selectionLayer.clear();
+    // Sidebar is static and always present.
+    sidebar.setVisibility(false);
+    // check needed for when sidebar or overlay are selected.
+    if (overlay) {
+      viewer.removeOverlays(overlay);
+    }
+    if (selectionManager) {
+      // clearSelection will fire an cleared event, but we don't want our handler to emit a clear event as we are the one closing,
+      // so we stop listening for a while.
+      selectionManager.un('cleared', onSelectionManagerClear);
+      // This actually closes infowindow as infowindow closes automatically when selection is empty.
+      selectionManager.clearSelection();
+      selectionManager.on('cleared', onSelectionManagerClear);
+    }
+    if (!supressEvent) {
+      dispatchClearSelection();
+    }
+  };
+
+  /** Callback called from overlay and sidebar when they are closed by their close buttons */
+  function onInfoClosed() {
+    clear(false);
+  }
+
   function setUIoutput(v) {
     switch (uiOutput) {
       case 'infowindow':
@@ -54,7 +95,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         break;
 
       case 'sidebar':
-        sidebar.init(v);
+        sidebar.init(v, { closeCb: onInfoClosed });
         identifyTarget = 'sidebar';
         break;
 
@@ -63,16 +104,6 @@ const Featureinfo = function Featureinfo(options = {}) {
         break;
     }
   }
-
-  const clear = function clear() {
-    selectionLayer.clear();
-    // check needed for when sidebar or overlay are selected.
-    if (selectionManager) selectionManager.clearSelection();
-    sidebar.setVisibility(false);
-    if (overlay) {
-      viewer.removeOverlays(overlay);
-    }
-  };
 
   // FIXME: overly complex. Don't think layer can be a string anymore
   const getTitle = function getTitle(item) {
@@ -379,14 +410,14 @@ const Featureinfo = function Featureinfo(options = {}) {
     const map = viewer.getMap();
 
     items = identifyItems;
-    clear();
+    clear(false);
     // FIXME: variable is overwritten in next row
     let content = items.map((i) => i.content).join('');
     content = '<div id="o-identify"><div id="o-identify-carousel" class="flex"></div></div>';
     switch (target) {
       case 'overlay':
       {
-        popup = Popup(`#${viewer.getId()}`);
+        popup = Popup(`#${viewer.getId()}`, { closeCb: onInfoClosed });
         popup.setContent({
           content,
           title: getTitle(items[0])
@@ -607,10 +638,10 @@ const Featureinfo = function Featureinfo(options = {}) {
           const serverResult = data || [];
           const result = serverResult.concat(clientResult);
           if (result.length > 0) {
-            selectionLayer.clear();
+            selectionLayer.clear(false);
             render(result, identifyTarget, evt.coordinate);
           } else if (selectionLayer.getFeatures().length > 0 || (identifyTarget === 'infowindow' && selectionManager.getNumberOfSelectedItems() > 0)) {
-            clear();
+            clear(false);
           } else if (pinning) {
             const resolution = map.getView().getResolution();
             sidebar.setVisibility(false);
@@ -631,7 +662,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     if (state) {
       map.on(clickEvent, onClick);
     } else {
-      clear();
+      clear(true);
       map.un(clickEvent, onClick);
     }
   };
@@ -655,9 +686,12 @@ const Featureinfo = function Featureinfo(options = {}) {
       // Re dispatch selectionmanager's event as our own
       if (selectionManager) {
         selectionManager.on('highlight', evt => dispatchToggleFeatureEvent(evt));
+        selectionManager.on('cleared', onSelectionManagerClear);
       }
       map.on(clickEvent, onClick);
       viewer.on('toggleClickInteraction', (detail) => {
+        // This line of beauty makes feature info active if explicitly set active of another control yields active state.
+        // which effectively makes this the default tool.
         if ((detail.name === 'featureinfo' && detail.active) || (detail.name !== 'featureinfo' && !detail.active)) {
           setActive(true);
         } else {
