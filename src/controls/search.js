@@ -169,7 +169,7 @@ const Search = function Search(options = {}) {
   }
 
   function clearSearchResults() {
-    awesomplete.list = [];
+    awesomplete.suggestions = [];
     setSearchDb([]);
   }
 
