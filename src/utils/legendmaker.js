@@ -177,7 +177,7 @@ async function setIcon(src, cmp, styleRules, layer, viewer, clickable) {
           image: { src: imgUrl },
           filter: row.filter,
           name: row.name,
-          label: row.title,
+          label: row.title || row.name,
           visible: row.visible !== false
         });
       }
