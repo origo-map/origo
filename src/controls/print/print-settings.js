@@ -44,6 +44,7 @@ const PrintSettings = function PrintSettings(options = {}) {
     resolution,
     scales,
     scaleInitial,
+    settingsExpanded,
     showMargins,
     showCreated,
     showScale,
@@ -117,7 +118,7 @@ const PrintSettings = function PrintSettings(options = {}) {
         icon: openIcon,
         tooltipText: 'Visa inställningar',
         tooltipPlacement: 'east',
-        state: 'initial',
+        state: settingsExpanded === true ? 'hidden' : 'initial',
         validStates: ['initial', 'hidden'],
         click() {
           toggle();
@@ -126,7 +127,7 @@ const PrintSettings = function PrintSettings(options = {}) {
       closeButton = Button({
         cls: 'small round margin-top-small margin-right small icon-smaller grey-lightest',
         icon: closeIcon,
-        state: 'hidden',
+        state: settingsExpanded === true ? 'initial' : 'hidden',
         validStates: ['initial', 'hidden'],
         ariaLabel: 'Stäng',
         click() {
@@ -216,7 +217,8 @@ const PrintSettings = function PrintSettings(options = {}) {
         collapseY: true,
         headerComponent,
         contentComponent,
-        mainCls: 'collapse-scroll'
+        mainCls: 'collapse-scroll',
+        expanded: settingsExpanded === true
       });
       this.addComponent(printSettingsContainer);
 

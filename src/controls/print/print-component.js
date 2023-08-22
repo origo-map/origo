@@ -50,7 +50,8 @@ const PrintComponent = function PrintComponent(options = {}) {
     leftFooterText,
     mapInteractionsActive,
     supressResolutionsRecalculation,
-    suppressNewDPIMethod
+    suppressNewDPIMethod,
+    settingsExpanded
   } = options;
 
   let {
@@ -320,6 +321,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     resolution,
     scales,
     scaleInitial,
+    settingsExpanded,
     showMargins,
     showCreated,
     showScale,
