@@ -567,7 +567,9 @@ const Featureinfo = function Featureinfo(options = {}) {
 
   /**
   * Shows the featureinfo popup/sidebar/infowindow for the provided feature and fit the view to it.
-  * @param {any} feature An object containing layerName and feature
+  * @param {any} featureObj An object containing layerName and feature
+  * @param {any} opts An object containing options. Supported options are : coordinate, the coordinate where popup will be shown. If omitted first feature is used.
+  *                                                                         ignorePan, do not autopan if type is overlay. Pan should be supressed if view is changed manually to avoid contradicting animations.
   * @returns nothing
   */
   const showFeatureInfo = function showFeatureInfo(featureObj, opts = { ignorePan: true }) {

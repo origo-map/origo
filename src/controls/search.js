@@ -556,6 +556,16 @@ const Search = function Search(options = {}) {
               makeRequest(handler, input);
           }
         }
+      } else {
+        switch (searchlistPlacement) {
+          case 'floating':
+          case 'left':
+            infowindowHandler([], '');
+            infowindow.close();
+            break;
+          default:
+            break;
+        }
       }
     });
   }

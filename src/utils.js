@@ -62,10 +62,7 @@ export default {
     const touchMode = 'ontouchstart' in document.documentElement;
     const elmnt = el;
     let draggableEl;
-    if (document.getElementById(`${elmnt.id}-draggable`)) {
-      /* if present, the header is where you move the DIV from: */
-      draggableEl = document.getElementById(`${elmnt}-draggable`);
-    } else if (elmnt.getElementsByClassName('draggable')[0]) {
+    if (elmnt.getElementsByClassName('draggable')[0]) {
       /* if present, move the DIV from a child element with draggable class: */
       draggableEl = elmnt.getElementsByClassName('draggable')[0];
     } else {
