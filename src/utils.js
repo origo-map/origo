@@ -61,6 +61,15 @@ export default {
   makeElementDraggable(el) {
     const touchMode = 'ontouchstart' in document.documentElement;
     const elmnt = el;
+    let draggableEl;
+    if (elmnt.getElementsByClassName('draggable')[0]) {
+      /* if present, move the DIV from a child element with draggable class: */
+      draggableEl = elmnt.getElementsByClassName('draggable')[0];
+    } else {
+      /* otherwise, move the DIV from anywhere inside the DIV: */
+      draggableEl = elmnt;
+    }
+
     let pos1 = 0;
     let pos2 = 0;
     let pos3 = 0;
@@ -77,16 +86,16 @@ export default {
       pos3 = clientX;
       pos4 = clientY;
 
-      elmnt.style.top = `${elmnt.offsetTop - pos2}px`;
-      elmnt.style.left = `${elmnt.offsetLeft - pos1}px`;
+      elmnt.style.top = `${el.offsetTop - pos2}px`;
+      elmnt.style.left = `${el.offsetLeft - pos1}px`;
     }
 
     function closeDragElement() {
-      elmnt.classList.toggle('grabbing');
+      draggableEl.classList.toggle('grabbing');
 
       if (touchMode) {
-        elmnt.ontouchend = null;
-        elmnt.ontouchmove = null;
+        draggableEl.ontouchend = null;
+        draggableEl.ontouchmove = null;
       } else {
         document.onmouseup = null;
         document.onmousemove = null;
@@ -95,13 +104,13 @@ export default {
 
     function dragMouseDown(evt) {
       const e = evt || window.event;
-      elmnt.classList.toggle('grabbing');
+      draggableEl.classList.toggle('grabbing');
       pos3 = e.clientX;
       pos4 = e.clientY;
 
       if (touchMode) {
-        elmnt.ontouchend = closeDragElement;
-        elmnt.ontouchmove = elementDrag;
+        draggableEl.ontouchend = closeDragElement;
+        draggableEl.ontouchmove = elementDrag;
       } else {
         document.onmouseup = closeDragElement;
         document.onmousemove = elementDrag;
@@ -109,9 +118,9 @@ export default {
     }
 
     if (touchMode) {
-      elmnt.ontouchstart = dragMouseDown;
+      draggableEl.ontouchstart = dragMouseDown;
     } else {
-      elmnt.onmousedown = dragMouseDown;
+      draggableEl.onmousedown = dragMouseDown;
     }
   }
 };
