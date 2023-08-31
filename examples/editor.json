@@ -114,7 +114,6 @@
       "style": "polygon-blue",
       "type": "WFS",
       "visible": true,
-      "offline": true,
       "attributes": [
           {
             "name": "name",
