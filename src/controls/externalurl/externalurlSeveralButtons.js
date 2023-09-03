@@ -43,7 +43,7 @@ const externalurlSeveralButtons = function externalurlSeveralButtons(options = {
       });
 
       externalUrlMainButton = Button({
-        cls: 'o-measure padding-small margin-bottom-smaller icon-smaller round light box-shadow',
+        cls: 'o-external-url padding-small margin-bottom-smaller icon-smaller round light box-shadow',
         icon: '#ic_baseline_link_24px',
         tooltipText: mainbuttonTooltipText,
         tooltipPlacement: 'east',

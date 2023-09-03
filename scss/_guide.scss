@@ -1,0 +1,22 @@
+.o-guide {
+    align-items: center;
+}
+
+.o-guide span {
+    max-width: 30px;
+    min-width:60px;
+}
+
+.o-guide-target {
+    animation: target-animate 1s ease infinite alternate;
+}
+
+@keyframes target-animate {
+    0% {
+        transform: scale(1);
+    }
+
+    100% {
+        transform: scale(1.1);
+    }
+}
