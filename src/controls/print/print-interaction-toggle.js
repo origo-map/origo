@@ -47,7 +47,7 @@ export default function PrintInteractionToggle(options = {}) {
         icon: toggleIcon,
         tooltipText: 'Ändra kartans läge',
         tooltipPlacement: 'east',
-        state: 'initial',
+        state: 'active',
         validStates: ['initial', 'active'],
         style: 'width: fit-content;',
         click() {
@@ -64,7 +64,7 @@ export default function PrintInteractionToggle(options = {}) {
       this.dispatch('render');
     },
     render() {
-      if (!mapInteractionsActive) {
+      if (mapInteractionsActive !== true) {
         onInitial();
         mapInteractionToggleButton.setState('initial');
       }
