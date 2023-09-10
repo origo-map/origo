@@ -1,12 +1,14 @@
 import { Component, Modal, Button, Icon } from '../ui';
 import stripJSONComments from '../utils/stripjsoncomments';
+import isEmbedded from '../utils/isembedded';
 
 const Guide = function Guide(options = {}) {
   const contentItems = [];
   const {
     title = 'Guide',
     cls,
-    style
+    style,
+    url
   } = options;
 
   let viewer;
@@ -29,12 +31,13 @@ const Guide = function Guide(options = {}) {
     confirmText
   } = options;
 
+  // Fetches the controls defined in json configuration and origos default controls
   const getActiveControls = async () => {
     const configUrl = `${window.location.href}${viewer.getMapName()}`;
     try {
       const response = await fetch(configUrl);
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status}\nCould not GET origo configuration`);
       }
       const strippedOfComments = stripJSONComments(await response.text());
       const data = JSON.parse(strippedOfComments);
@@ -49,12 +52,13 @@ const Guide = function Guide(options = {}) {
     }
   };
 
+  // Fetches the configuration json for guide
   const getGuideConfig = async () => {
-    const configUrl = `${window.location.href}guide.json`;
+    const configUrl = url || `${window.location.href}guide.json`;
     try {
       const response = await fetch(configUrl);
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error(`HTTP error! status: ${response.status}\nPlease configure url to guide.json or place it in application root`);
       }
       const data = await response.json();
       return data;
@@ -65,20 +69,35 @@ const Guide = function Guide(options = {}) {
   };
 
   const createContent = async () => {
+    let targetValue;
     let groupItems = [];
-    const userDefinedControl = { name: 'new control' };
     const controlsToRender = [];
     const activeControls = await getActiveControls();
-    activeControls.push(userDefinedControl);
     const guideConfigControls = await getGuideConfig();
+    // Finds active control by name
+    const findControl = (name) => {
+      const foundControl = activeControls.find((activeControl) => activeControl.name === name);
+      return foundControl;
+    };
+    // Creates a dummy to use for undefined controls
+    const userDefinedControl = { name: 'new' };
+    activeControls.push(userDefinedControl);
     // Make sure only active controls render in guide
     activeControls.forEach(activeControl => {
-      const filterGuideConfigControls = guideConfigControls.filter((el) => el.name === activeControl.name || el.name === '');
+      let activeC = activeControl;
+      const ifOptions = activeC.options;
+      // If map is embedded and controls hideWhenEmbedded is true they are exclude from guide
+      if (ifOptions && ifOptions.hideWhenEmbedded && isEmbedded(viewer.getTarget())) {
+        activeC = {};
+      }
+      const filterGuideConfigControls = guideConfigControls.filter((el) => el.name === activeC.name || el.name === '');
       controlsToRender.push(...filterGuideConfigControls);
     });
     // Sort controls by guide config order
     controlsToRender.sort((a, b) => guideConfigControls.indexOf(a) - guideConfigControls.indexOf(b));
+    // Creates nested group if configured
     controlsToRender.forEach(controlToRender => {
+      groupItems = [];
       if ('group' in controlToRender) {
         controlToRender.group.forEach(groupItem => {
           const groupItemIcon = Icon({
@@ -90,7 +109,22 @@ const Guide = function Guide(options = {}) {
       } else if (!('group' in controlToRender)) {
         groupItems = [];
       }
-      const targetValue = controlToRender.target;
+      // Sets the guides target control
+      targetValue = controlToRender.target;
+
+      // Specials, targets for different controls dynamic states
+      if (controlToRender.name === 'legend' && 'expanded' in findControl('legend').options && !findControl('legend').options.expanded) {
+        targetValue = 'o-legend-btn';
+      }
+      if (controlToRender.name === 'bookmarks' && !findControl('bookmarks').options.isActive) {
+        targetValue = 'o-bookmarks-btn';
+      }
+      if (!isEmbedded(viewer.getTarget())) {
+        const indx = controlsToRender.findIndex(v => v.name === 'fullscreen');
+        controlsToRender.splice(indx, indx >= 0 ? 1 : 0);
+      }
+
+      // Creates the content of slides for modal
       const descriptionValue = controlToRender.description;
       const iconValue = controlToRender.icon;
       const controlIcons = Icon({
@@ -101,6 +135,7 @@ const Guide = function Guide(options = {}) {
     });
   };
 
+  // Adds previous and next buttons
   const moveButtons = () => {
     const nextButtonHtml = nextButton.render();
     const prevButtonHtml = prevButton.render();
@@ -108,18 +143,16 @@ const Guide = function Guide(options = {}) {
     content += prevButtonHtml;
     return content;
   };
-
+  // Adds the hide button
   const addHideButton = () => {
     const hideButtonHtml = hideButton.render();
     content += hideButtonHtml;
     return content;
   };
-
   const clearLocalStorage = () => {
     localStorage.removeItem(visibilityKey);
     localStorage.removeItem(contentKey);
   };
-
   const setLocalStorage = () => {
     const newContent = localStorage.getItem(contentKey) !== content;
     if (localStorage.getItem(visibilityKey) !== 'false' || content) {
@@ -130,10 +163,12 @@ const Guide = function Guide(options = {}) {
     }
   };
 
+  // Uppdates the sliders item to show and toggles the animation for target control
   const updateDisplayedItem = (prevElSelector) => {
     const currentElClass = items.at(currentIndex).id ? `.${items.at(currentIndex).id}` : false;
     const currentEl = document.querySelectorAll(currentElClass)[0];
     const prevEl = document.querySelectorAll(prevElSelector)[0];
+
     items.forEach((item, index) => {
       const itm = item;
       if (index === currentIndex) {
@@ -149,7 +184,7 @@ const Guide = function Guide(options = {}) {
       currentEl.classList.add('o-guide-target');
     }
   };
-
+  // Creates the guide modal with its buttons and content
   const createModal = async (modalContent) => {
     content = modalContent;
     await createContent();
@@ -183,9 +218,6 @@ const Guide = function Guide(options = {}) {
     list = document.getElementById('o-guide-slides-container');
     items = Array.from(list.children);
     updateDisplayedItem();
-    const currentIndexElId = items[0].id;
-    const currentEl = document.querySelectorAll(`.${currentIndexElId}`)[0];
-    currentEl.classList.add('o-guide-target');
   };
 
   return Component({
@@ -244,7 +276,7 @@ const Guide = function Guide(options = {}) {
     onAdd(evt) {
       component = this;
       viewer = evt.target;
-      target = viewer.getId();
+      target = document.querySelectorAll('.o-main')[0].id;
       contentKey = `guideContent;${window.location.pathname};${viewer.getMapName().split('.')[0]}`;
       visibilityKey = `guideVisibility;${window.location.pathname};${viewer.getMapName().split('.')[0]}`;
       createModal(content);

@@ -12,6 +12,12 @@
     "icon": "#ic_remove_24px"
   },
   {
+    "target": "o-fullscreen",
+    "name": "fullscreen",
+    "description": "Öppnar kartan i helskärmsläge",
+    "icon": "#ic_fullscreen_24px"
+  },
+  {
     "target": "o-home-in",
     "name": "home",
     "description": "Tar kartan till startposition",
@@ -24,16 +30,16 @@
     "icon": "#ic_near_me_24px"
   },
   {
+    "target": "o-bookmarks",
+    "name": "bookmarks",
+    "description": "Här finns direktlänkar till specifika platser i kartan",
+    "icon": "#ic_bookmark_24px"
+  },
+  {
     "target": "o-measure",
     "name": "measure",
     "description": "Mät avtånd och ytor",
     "icon": "#ic_straighten_24px"
-  },
-  {
-    "target": "o-bookmark-button",
-    "name": "bookmarks",
-    "description": "Här finns direktlänkar till specifika platser i kartan",
-    "icon": ""
   },
   {
     "target": "o-external-url",
@@ -42,16 +48,22 @@
     "icon": "#ic_baseline_link_24px"
   },
   {
-    "target": "swiper-tool-button",
-    "name": "new control",
-    "description": "Jämför kartlager med svepare eller titthål",
-    "icon": "#mui-compare"
-  },
-  {
     "target": "o-menu-button",
     "name": "editor",
     "description": "Växlar redigeringsläge",
     "icon": "#ic_edit_24px"
+  },
+  {
+    "target": "ol-rotate",
+    "name": "rotate",
+    "description": "Rotera kartan med två fingrar på pekskärm, håll ned Shift+Alt på PC. Klicka på symbolen för att återgå. Syns endast vid roterat läge.",
+    "icon": "#origo-compass"
+  },
+  {
+    "target": "o-search-wrapper",
+    "name": "search",
+    "description": "Sök i kartan",
+    "icon": "#ic_search_24px"
   },
   {
     "target": "o-mapmenu",
@@ -92,16 +104,30 @@
     ]
   },
   {
-    "target": "ol-attribution",
-    "name": "attribution",
-    "description": "Tillskrivningar för aktiva kartlager",
-    "icon": "#fa-copyright"
-  },
-  {
-    "target": "o-fullscreen",
-    "name": "fullscreen",
-    "description": "Öppnar kartan i helskärmsläge",
-    "icon": "#ic_fullscreen_24px"
+    "target": "bg-inverted",
+    "name": "draw",
+    "description": "",
+    "icon": "#fa-pencil",
+    "group": [
+      {
+        "target": "undefined",
+        "name": "new",
+        "description": "Rita en punkt",
+        "icon": "#ic_place_24px"
+      },
+      {
+        "target": "undefined",
+        "name": "new",
+        "description": "Rita en linje",
+        "icon": "#ic_timeline_24px"
+      },
+      {
+        "target": "undefined",
+        "name": "new",
+        "description": "Rita ett område",
+        "icon": "#o_polygon_24px"
+      }
+    ]
   },
   {
     "target": "o-legend",
@@ -116,39 +142,27 @@
     "icon": "#ic_gps_not_fixed_24px"
   },
   {
-    "target": "ol-rotate",
-    "name": "rotate",
-    "description": "Rotera kartan med två fingrar på pekskärm, håll ned Shift+Alt på PC. Klicka på symbolen för att återgå",
-    "icon": "#origo-compass"
-  },
-  {
-    "target": "o-search",
-    "name": "search",
-    "description": "Sök i kartan",
-    "icon": "#ic_search_24px"
-  },
-  {
     "target": "o-scale",
     "name": "scale",
     "description": "Visar kartans nuvarande skala",
     "icon": ""
   },
   {
-    "target": "ol-scale-line",
-    "name": "scaleline",
-    "description": "Visar en skalstock som förmedlar ett ungefärligt världsligt avstånd i kartan",
-    "icon": "img/png/origo_skalstock.JPG"
+    "target": "o-scalepicker",
+    "name": "scalepicker",
+    "description": "Visar kartans nuvarande skala. Klicka för att välja skala manuellt",
+    "icon": ""
+  },
+  {
+    "target": "ol-attribution",
+    "name": "attribution",
+    "description": "Tillskrivningar för aktiva kartlager",
+    "icon": "#fa-copyright"
   },
   {
     "target": "undefined",
     "name": "draganddrop",
     "description": "Du har möjlighet att dra in kartlager från din dator till kartan. Möjliga format är: GPX, GeoJSON, IGC, KML och TopoJSON",
     "icon": "#drag-and-drop"
-  },
-  {
-    "target": "o-scalepicker",
-    "name": "scalepicker",
-    "description": "Visar kartans nuvarande skala. Klicka för att välja skala manuellt",
-    "icon": ""
   }
 ]

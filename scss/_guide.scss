@@ -4,19 +4,37 @@
 
 .o-guide span {
     max-width: 30px;
-    min-width:60px;
+    min-width: 60px;
 }
 
 .o-guide-target {
-    animation: target-animate 1s ease infinite alternate;
+    animation: o-guide-target-animate 1s ease infinite alternate;
+    z-index: 1201;
 }
 
-@keyframes target-animate {
+.o-guide-target.ol-rotate {
+    animation: o-guide-target-ol-rotate-animate 1s ease infinite alternate;
+    z-index: 1201;
+}
+
+@keyframes o-guide-target-animate {
     0% {
-        transform: scale(1);
+        scale: 1;
     }
 
     100% {
-        transform: scale(1.1);
+        scale: 1.15;
+    }
+}
+
+@keyframes o-guide-target-ol-rotate-animate {
+    0% {
+        opacity: 0;
+        visibility: visible;
+    }
+
+    100% {
+        opacity: 1;
+        visibility: visible;
     }
 }
