@@ -60,7 +60,8 @@ const Guide = function Guide(options = {}) {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}\nPlease configure url to guide.json or place it in application root`);
       }
-      const data = await response.json();
+      const strippedOfComments = stripJSONComments(await response.text());
+      const data = JSON.parse(strippedOfComments);
       return data;
     } catch (error) {
       console.error(`Error: ${error}`);
