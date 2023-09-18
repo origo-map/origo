@@ -169,7 +169,6 @@ const Search = function Search(options = {}) {
   }
 
   function clearSearchResults() {
-    awesomplete.suggestions = [];
     setSearchDb([]);
   }
 
@@ -204,9 +203,7 @@ const Search = function Search(options = {}) {
     });
     document.getElementsByClassName('o-search-field')[0].addEventListener('focus', () => {
       document.getElementById(`${wrapperElement.getId()}`).classList.add('active');
-      if (awesomplete.suggestions && awesomplete.suggestions.length > 0) {
-        awesomplete.open();
-      }
+      awesomplete.evaluate();
       window.dispatchEvent(new CustomEvent('resize'));
     });
   }
