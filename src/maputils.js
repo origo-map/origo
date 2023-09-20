@@ -45,7 +45,9 @@ const maputils = {
   tileGrid: function tileGrid(settings, defaultSettings = {}) {
     const tileGridSettings = Object.assign({}, defaultSettings, settings);
     const extent = tileGridSettings.extent;
-    tileGridSettings.origin = tileGridSettings.alignBottomLeft === false ? getTopLeft(extent) : getBottomLeft(extent);
+    if (!tileGridSettings.origin) {
+      tileGridSettings.origin = tileGridSettings.alignBottomLeft === false ? getTopLeft(extent) : getBottomLeft(extent);
+    }
     return new TileGrid(tileGridSettings);
   },
   checkZoomChange: function checkZoomChange(resolution, currentResolution) {
