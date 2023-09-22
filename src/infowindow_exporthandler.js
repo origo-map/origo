@@ -111,6 +111,35 @@ export function layerSpecificExportHandler(url, activeLayer, selectedItems, attr
     });
 }
 
+export function listExportHandler(exportUrl, exportObject, exportedFileName) {
+  if (!exportUrl) {
+    // Here we cannot simply throw, because it won't be catched. We need to rejecet it as the calling function expects a promise.
+    return Promise.reject(new Error('Export URL is not specified.'));
+  }
+  // eslint-disable-next-line consistent-return
+  return fetch(exportUrl, {
+    method: 'POST', // or 'PUT'
+    body: JSON.stringify(exportObject), // data can be `string` or {object}!
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+    .then((response) => {
+      if (response.status !== 200) {
+        // Note: Throwing here has practically the same effect as returning a Promise.reject() and both will be catched down here in the catch function;
+        throw response.statusText;
+      }
+      return response.blob();
+    })
+    .then((blob) => {
+      download(blob, exportedFileName);
+    })
+    .catch((err) => {
+      // Throwing here cause the whole fetch function be rejected, the same effect as returning Promise.reject();
+      throw err;
+    });
+}
+
 function createExportButton(buttonText) {
   const container = document.createElement('div');
 

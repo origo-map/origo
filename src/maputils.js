@@ -6,7 +6,7 @@ import Point from 'ol/geom/Point';
 import Vector from 'ol/source/Vector';
 import Overlay from 'ol/Overlay';
 import GeoJSON from 'ol/format/GeoJSON';
-import { getTopLeft, getBottomLeft } from 'ol/extent';
+import { extend, getTopLeft, getBottomLeft } from 'ol/extent';
 import WKT from 'ol/format/WKT';
 import numberFormatter from './utils/numberformatter';
 import Popup from './popup';
@@ -108,6 +108,14 @@ const maputils = {
         break;
     }
     return center;
+  },
+  getExtent: function getCenter(featureArray) {
+    const featureExtent = featureArray[0].getGeometry().getExtent();
+    let i;
+    for (i = 0; i < featureArray.length; i += 1) {
+      extend(featureExtent, featureArray[i].getGeometry().getExtent());
+    }
+    return featureExtent;
   },
   resolutionToScale: function resolutionToScale(resolution, projection) {
     const dpi = 25.4 / 0.28;

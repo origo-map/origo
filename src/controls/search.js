@@ -1,7 +1,7 @@
 import Overlay from 'ol/Overlay';
 import Point from 'ol/geom/Point';
 import Awesomplete from 'awesomplete';
-import { Component, Element as El, Button, dom } from '../ui';
+import { Component, Element as El, Button, Collapse, CollapseHeader, dom } from '../ui';
 import generateUUID from '../utils/generateuuid';
 import getAttributes from '../getattributes';
 import getCenter from '../geometry/getcenter';
@@ -9,6 +9,8 @@ import getFeature from '../getfeature';
 import mapUtils from '../maputils';
 import popup from '../popup';
 import utils from '../utils';
+import Infowindow from '../components/infowindow';
+import { listExportHandler } from '../infowindow_exporthandler';
 
 const Search = function Search(options = {}) {
   const keyCodes = {
@@ -43,9 +45,12 @@ const Search = function Search(options = {}) {
   const {
     geometryAttribute,
     url,
-    queryParameterName = 'q'
+    queryParameterName = 'q',
+    autocompletePlacement,
+    searchlistOptions = {}
   } = options;
 
+  const searchlistPlacement = searchlistOptions.placement;
   let searchDb = {};
   let map;
   let projectionCode;
@@ -57,6 +62,7 @@ const Search = function Search(options = {}) {
   let closeButton;
   let containerElement;
   let wrapperElement;
+  let infowindow;
 
   function clear() {
     featureInfo.clear();
@@ -173,14 +179,19 @@ const Search = function Search(options = {}) {
     setSearchDb([]);
   }
 
+  function clearAll() {
+    clearSearchResults();
+    clear();
+    document.getElementById(`${containerElement.getId()}`).classList.remove('o-search-true');
+    document.getElementById(`${containerElement.getId()}`).classList.add('o-search-false');
+    document.getElementsByClassName('o-search-field')[0].value = '';
+    document.getElementById(`${searchButton.getId()}`).blur();
+    document.getElementsByClassName('o-search-field')[0].blur();
+  }
+
   function onClearSearch() {
     document.getElementById(`${closeButton.getId()}`).addEventListener('click', () => {
-      clearSearchResults();
-      clear();
-      document.getElementById(`${containerElement.getId()}`).classList.remove('o-search-true');
-      document.getElementById(`${containerElement.getId()}`).classList.add('o-search-false');
-      document.getElementsByClassName('o-search-field')[0].value = '';
-      document.getElementById(`${searchButton.getId()}`).blur();
+      clearAll();
     });
   }
 
@@ -303,7 +314,6 @@ const Search = function Search(options = {}) {
   */
 
   function initAutocomplete() {
-    let list;
     const input = document.getElementsByClassName('o-search-field')[0];
 
     awesomplete = new Awesomplete('.o-search-field', {
@@ -318,22 +328,188 @@ const Search = function Search(options = {}) {
       }
     });
 
-    const handler = function func(data) {
-      list = [];
-      searchDb = {};
-      if (data.length) {
-        setSearchDb(data);
-        if (name && groupSuggestions) {
-          list = groupToList(groupDb(searchDb));
-        } else {
-          list = dbToList(data);
-        }
-        awesomplete.list = list;
-        awesomplete.evaluate();
-      }
+    const handler = function func(list) {
+      awesomplete.list = list;
+      awesomplete.evaluate();
     };
 
-    function makeRequest(reqHandler, obj) {
+    const infowindowHandler = function func(list, searchVal) {
+      const result = list.reduce((r, a) => {
+        /* eslint-disable-next-line no-param-reassign */
+        r[a[layerNameAttribute]] = r[a[layerNameAttribute]] || [];
+        r[a[layerNameAttribute]].push(a);
+        return r;
+      }, Object.create(null));
+      const groups = [];
+      Object.keys(result).forEach((layername) => {
+        const resultArray = result[layername];
+        if (viewer.getLayer(layername)) {
+          const layertitle = `${viewer.getLayer(layername).get('title')} (${resultArray.length})`;
+          const rows = [];
+          if (searchlistOptions.makeSelectionButton) {
+            const ids = resultArray.map(item => item[idAttribute]);
+            const buttonText = searchlistOptions.makeSelectionButtonText || 'Gör urval i kartan';
+            const makeSelectionButton = Button({
+              cls: 'export-button',
+              text: buttonText
+            });
+            const makeSelection = Component({
+              addClick() {
+                document.getElementById(makeSelectionButton.getId()).addEventListener('click', () => {
+                  const source = viewer.getMapSource();
+                  const projCode = viewer.getProjectionCode();
+                  const proj = viewer.getProjection();
+                  const layer = viewer.getLayer(layername);
+                  getFeature(ids.join(), layer, source, projCode, proj)
+                    .then((res) => {
+                      if (res.length > 0) {
+                        const featLayerName = layer.get('name');
+                        featureInfo.showFeatureInfo({ feature: res, layerName: featLayerName });
+                      }
+                    });
+                });
+              },
+              onInit() {
+                this.addComponent(makeSelectionButton);
+              },
+              render() {
+                return `<li class="flex row text-smaller align-center padding-x padding-y-smaller hover pointer" id="${this.getId()}">${makeSelectionButton.render()}</li>`;
+              }
+            });
+            rows.push(makeSelection);
+          }
+
+          resultArray.forEach((element) => {
+            const row = Component({
+              addClick() {
+                document.getElementById(this.getId()).addEventListener('click', () => {
+                  const source = viewer.getMapSource();
+                  const projCode = viewer.getProjectionCode();
+                  const proj = viewer.getProjection();
+                  const layer = viewer.getLayer(layername);
+                  const id = element[idAttribute];
+                  getFeature(id, layer, source, projCode, proj)
+                    .then((res) => {
+                      if (res.length > 0) {
+                        const featureLayerName = layer.get('name');
+                        featureInfo.showFeatureInfo({ feature: res, layerName: featureLayerName });
+                      }
+                    });
+                });
+              },
+              onInit() {
+                this.addComponent(El({
+                  cls: 'flex row align-center padding-left padding-right item',
+                  tagName: 'div',
+                  innerHTML: `${element[name]}`
+                }));
+              },
+              render() {
+                const content = this.getComponents().reduce((acc, item) => {
+                  const rendered = item.render();
+                  return acc + rendered;
+                }, '');
+                return `<li class="flex row text-smaller align-center padding-x padding-y-smaller hover pointer" id="${this.getId()}">${content}</li>`;
+              }
+            });
+            rows.push(row);
+          });
+
+          const contentComponent = Component({
+            onInit() {
+              this.addComponents(rows);
+            },
+            onRender() {
+              this.getComponents().forEach((comp) => {
+                comp.addClick();
+              });
+            },
+            render() {
+              const content = this.getComponents().reduce((acc, item) => {
+                const rendered = item.render();
+                return acc + rendered;
+              }, '');
+              this.dispatch('render');
+              return `<ul id="${this.getId()}">${content}</ul>`;
+            }
+          });
+
+          const groupCmp = Collapse({
+            cls: '',
+            expanded: false,
+            headerComponent: CollapseHeader({
+              cls: 'hover padding-x padding-y-small grey-lightest border-bottom text-small',
+              icon: '#ic_chevron_right_24px',
+              title: layertitle
+            }),
+            contentComponent,
+            collapseX: false
+          });
+          groups.push(groupCmp);
+        }
+      });
+
+      let exportButton;
+      if (Object.keys(result).length > 0 && searchlistOptions.export && searchlistOptions.exportUrl) {
+        const roundButton = searchlistOptions.roundButton;
+        const buttonIcon = searchlistOptions.roundButtonIcon || '#fa-download';
+        const buttonText = searchlistOptions.exportButtonText || 'Export';
+        const exportFileName = searchlistOptions.exportFilename || 'export.xlsx';
+        const exportExcludedFields = searchlistOptions.exportExcludedFields || [];
+        if (exportExcludedFields.length > 0) {
+          Object.keys(result).forEach(thisName => {
+            result[thisName].forEach(res => {
+              const row = res;
+              exportExcludedFields.forEach(field => {
+                if (row[field]) {
+                  delete row[field];
+                }
+              });
+            });
+          });
+        }
+
+        exportButton = Button({
+          cls: roundButton ? 'padding-small margin-bottom-smaller icon-smaller round light box-shadow o-tooltip margin-right-small' : 'export-button',
+          style: roundButton ? 'position:absolute; bottom:0.2rem; left:0.75rem' : 'position:absolute; bottom:0.75rem; left:0.75rem',
+          text: roundButton ? '' : buttonText,
+          tooltipText: roundButton ? buttonText : '',
+          icon: roundButton ? buttonIcon : '',
+          click() {
+            listExportHandler(
+              searchlistOptions.exportUrl,
+              result,
+              exportFileName
+            )
+              .catch((err) => {
+                console.error(err);
+              });
+          }
+        });
+      }
+
+      const listcomponent = Component({
+        name: 'searchlist',
+        onInit() {
+          this.addComponents(groups);
+          if (exportButton) {
+            this.addComponent(exportButton);
+          }
+        },
+        onAdd() {
+          this.render();
+        },
+        render() {
+          const content = this.getComponents().reduce((acc, item) => acc + item.render(), '');
+          return `${content}`;
+        }
+      });
+      const searchlistTitle = searchlistOptions.title || 'Sökresultat för "{{value}}"';
+      infowindow.changeContent(listcomponent, `${searchlistTitle.replace('{{value}}', searchVal)}`);
+    };
+
+    function makeRequest(reqHandler, obj, opt, ignoreGroup = false) {
+      const searchVal = obj.value;
       let queryUrl = `${url}${url.indexOf('?') !== -1 ? '&' : '?'}${queryParameterName}=${encodeURI(obj.value)}`;
       if (includeSearchableLayers) {
         queryUrl += `&l=${viewer.getSearchableLayers(searchableDefault)}`;
@@ -341,17 +517,54 @@ const Search = function Search(options = {}) {
       fetch(queryUrl)
         .then(response => response.json())
         .then((data) => {
-          reqHandler(data);
+          let list = [];
+          searchDb = {};
+          if (data.length) {
+            setSearchDb(data);
+            if (name && groupSuggestions && !ignoreGroup) {
+              list = groupToList(groupDb(searchDb));
+            } else {
+              list = dbToList(data);
+            }
+          }
+          reqHandler(list, searchVal, opt);
         });
     }
 
     input.addEventListener('keyup', (e) => {
-      const keyCode = e.keyCode;
       if (input.value.length >= minLength) {
-        if (keyCode in keyCodes) {
+        const keyCode = e.keyCode;
+        if (keyCode === 13) {
+          switch (searchlistPlacement) {
+            case 'floating':
+            case 'left':
+              makeRequest(infowindowHandler, input, {}, true);
+              clearAll();
+              break;
+            default:
+              makeRequest(handler, input);
+          }
+        } else if (keyCode in keyCodes) {
           // empty
         } else {
-          makeRequest(handler, input);
+          switch (autocompletePlacement) {
+            case 'floating':
+            case 'left':
+              makeRequest(infowindowHandler, input);
+              break;
+            default:
+              makeRequest(handler, input);
+          }
+        }
+      } else {
+        switch (searchlistPlacement) {
+          case 'floating':
+          case 'left':
+            infowindowHandler([], '');
+            infowindow.close();
+            break;
+          default:
+            break;
         }
       }
     });
@@ -442,6 +655,28 @@ const Search = function Search(options = {}) {
 
       initAutocomplete();
       bindUIActions();
+
+      if (autocompletePlacement === 'floating' || searchlistPlacement === 'floating') {
+        infowindow = Infowindow({ viewer,
+          type: 'floating',
+          contentComponent: El({
+            tagName: 'div',
+            cls: 'padding-y-small overflow-auto text-small',
+            style: (searchlistOptions.export && searchlistOptions.exportUrl) ? 'margin-bottom:2.7rem' : ''
+          })
+        });
+        this.addComponent(infowindow);
+      } else if (autocompletePlacement === 'left' || searchlistPlacement === 'left') {
+        infowindow = Infowindow({ viewer,
+          type: 'left',
+          contentComponent: El({
+            tagName: 'div',
+            cls: 'padding-y-small overflow-auto text-small',
+            style: (searchlistOptions.export && searchlistOptions.exportUrl) ? 'margin-bottom:2.7rem' : ''
+          })
+        });
+        this.addComponent(infowindow);
+      }
 
       this.dispatch('render');
     }

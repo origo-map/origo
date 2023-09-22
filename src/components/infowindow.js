@@ -75,7 +75,7 @@ const Infowindow = function Infowindow(options = {}) {
       }
 
       closeButton = Button({
-        cls: 'small round margin-top-smaller margin-bottom-auto margin-right icon-smaller grey-lightest no-shrink o-tooltip',
+        cls: 'small round margin-top-small margin-right-small icon-smaller grey-lightest o-tooltip',
         ariaLabel: 'Stäng',
         icon: closeIcon,
         click() {
@@ -84,7 +84,7 @@ const Infowindow = function Infowindow(options = {}) {
       });
 
       titleComponent = El({
-        cls: 'flex row justify-start margin-y-smaller margin-left text-weight-bold',
+        cls: 'flex row justify-start margin-top-small margin-left text-weight-bold padding-right',
         style: { width: '100%' },
         innerHTML: title
       });

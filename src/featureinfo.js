@@ -598,18 +598,30 @@ const Featureinfo = function Featureinfo(options = {}) {
 
   /**
   * Shows the featureinfo popup/sidebar/infowindow for the provided feature and fit the view to it.
-  * @param {any} feature An object containing layerName and feature
+  * @param {any} featureObj An object containing layerName and feature
+  * @param {any} opts An object containing options. Supported options are : coordinate, the coordinate where popup will be shown. If omitted first feature is used.
+  *                                                                         ignorePan, do not autopan if type is overlay. Pan should be supressed if view is changed manually to avoid contradicting animations.
   * @returns nothing
   */
-  const showFeatureInfo = function showFeatureInfo(featureObj) {
-    const feature = featureObj.feature;
+  const showFeatureInfo = function showFeatureInfo(featureObj, opts = { ignorePan: true }) {
+    const newItems = [];
     const layerName = featureObj.layerName;
     const layer = viewer.getLayer(layerName);
     const map = viewer.getMap();
     const grouplayers = viewer.getGroupLayers();
-    const newItem = getFeatureInfo.createSelectedItem(feature, layer, map, grouplayers);
-    render([newItem], identifyTarget, maputils.getCenter(feature.getGeometry()), { ignorePan: true });
-    viewer.zoomToExtent(feature.getGeometry());
+    if (Array.isArray(featureObj.feature)) {
+      featureObj.feature.forEach(feature => {
+        const newItem = getFeatureInfo.createSelectedItem(feature, layer, map, grouplayers);
+        newItems.push(newItem);
+      });
+    } else {
+      const newItem = getFeatureInfo.createSelectedItem(featureObj.feature, layer, map, grouplayers);
+      newItems.push(newItem);
+    }
+    if (newItems.length > 0) {
+      render(newItems, identifyTarget, opts.coordinate || maputils.getCenter(newItems[0].getFeature().getGeometry()), opts);
+      viewer.getMap().getView().fit(maputils.getExtent(featureObj.feature));
+    }
   };
 
   const onClick = function onClick(evt) {
