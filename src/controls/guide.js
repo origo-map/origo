@@ -69,6 +69,7 @@ const Guide = function Guide(options = {}) {
     }
   };
 
+  // Filters and creates the content of the guide modal
   const createContent = async () => {
     let targetValue;
     let groupItems = [];
@@ -80,49 +81,62 @@ const Guide = function Guide(options = {}) {
       const foundControl = activeControls.find((activeControl) => activeControl.name === name);
       return foundControl;
     };
-    // Creates a dummy to use for undefined controls
-    const userDefinedControl = { name: 'new' };
-    activeControls.push(userDefinedControl);
-    // Make sure only active controls render in guide
-    activeControls.forEach(activeControl => {
-      let activeC = activeControl;
-      const ifOptions = activeC.options;
-      // If map is embedded and controls hideWhenEmbedded is true they are exclude from guide
+
+    // If map is embedded and controls hideWhenEmbedded is true, they are excluded from the guide
+    const filterEmbedded = activeControls.map(activeControl => {
+      const ifOptions = activeControl.options;
       if (ifOptions && ifOptions.hideWhenEmbedded && isEmbedded(viewer.getTarget())) {
-        activeC = {};
+        return {};
       }
-      const filterGuideConfigControls = guideConfigControls.filter((el) => el.name === activeC.name || el.name === '');
-      controlsToRender.push(...filterGuideConfigControls);
+      return activeControl;
     });
+
+    const getActiveControlNames = filterEmbedded.map(obj => obj.name);
+    function filterControlsByName(dataArray, namesToFilter) {
+      const filtredControls = dataArray.filter(item => {
+        if (namesToFilter.includes(item.name)) {
+          return true;
+        } else if (item.group) {
+          // eslint-disable-next-line no-param-reassign
+          item.group = filterControlsByName(item.group, namesToFilter);
+          return true;
+        }
+        return false;
+      });
+      return filtredControls;
+    }
+
+    const filtredControls = filterControlsByName(guideConfigControls, getActiveControlNames);
+    controlsToRender.push(...filtredControls);
     // Sort controls by guide config order
     controlsToRender.sort((a, b) => guideConfigControls.indexOf(a) - guideConfigControls.indexOf(b));
     // Creates nested group if configured
     controlsToRender.forEach(controlToRender => {
-      groupItems = [];
-      if ('group' in controlToRender) {
-        controlToRender.group.forEach(groupItem => {
-          const groupItemIcon = Icon({
-            icon: groupItem.icon
-          });
-          const groupEl = `<li class="flex o-guide text-align-left"><span class="flex icon icon-small">${groupItemIcon.render()}</span>${groupItem.description}</li>`;
-          groupItems.push(groupEl);
-        });
-      } else if (!('group' in controlToRender)) {
-        groupItems = [];
-      }
       // Sets the guides target control
       targetValue = controlToRender.target;
 
-      // Specials, targets for different controls dynamic states
+      // Specials, targets for different controls configured initial state
       if (controlToRender.name === 'legend' && 'expanded' in findControl('legend').options && !findControl('legend').options.expanded) {
         targetValue = 'o-legend-btn';
       }
       if (controlToRender.name === 'bookmarks' && !findControl('bookmarks').options.isActive) {
         targetValue = 'o-bookmarks-btn';
       }
-      if (!isEmbedded(viewer.getTarget())) {
-        const indx = controlsToRender.findIndex(v => v.name === 'fullscreen');
-        controlsToRender.splice(indx, indx >= 0 ? 1 : 0);
+      if (!isEmbedded(viewer.getTarget()) && 'group' in controlToRender) {
+        const indx = controlToRender.group.findIndex(v => v.name === 'fullscreen');
+        controlToRender.group.splice(indx, indx >= 0 ? 1 : 0);
+      }
+      // Creates the nested groups
+      if ('group' in controlToRender) {
+        controlToRender.group.forEach(groupItem => {
+          const groupItemIcon = Icon({
+            icon: groupItem.icon
+          });
+          const groupEl = `<li class="flex o-guide text-align-left margin-bottom-small"><span class="flex icon icon-small">${groupItemIcon.render()}</span>${groupItem.description}</li>`;
+          groupItems.push(groupEl);
+        });
+      } else if (!('group' in controlToRender)) {
+        groupItems = [];
       }
 
       // Creates the content of slides for modal
@@ -166,10 +180,9 @@ const Guide = function Guide(options = {}) {
 
   // Uppdates the sliders item to show and toggles the animation for target control
   const updateDisplayedItem = (prevElSelector) => {
-    const currentElClass = items.at(currentIndex).id ? `.${items.at(currentIndex).id}` : false;
-    const currentEl = document.querySelectorAll(currentElClass)[0];
-    const prevEl = document.querySelectorAll(prevElSelector)[0];
-
+    const currentElClass = items.at(currentIndex).id ? `${items.at(currentIndex).id}` : false;
+    const currentEl = document.querySelectorAll(`.${currentElClass}`)[0] || document.querySelector(`#${currentElClass}`);
+    const prevEl = document.querySelectorAll(`.${prevElSelector}`)[0] || document.querySelector(`#${prevElSelector}`);
     items.forEach((item, index) => {
       const itm = item;
       if (index === currentIndex) {
@@ -178,13 +191,10 @@ const Guide = function Guide(options = {}) {
         itm.style.display = 'none';
       }
     });
-    if (prevEl && prevEl !== undefined) {
-      prevEl.classList.remove('o-guide-target');
-    }
-    if (currentEl && currentEl !== undefined) {
-      currentEl.classList.add('o-guide-target');
-    }
+    prevEl.classList.remove('o-guide-target');
+    currentEl.classList.add('o-guide-target');
   };
+
   // Creates the guide modal with its buttons and content
   const createModal = async (modalContent) => {
     content = modalContent;
@@ -254,7 +264,7 @@ const Guide = function Guide(options = {}) {
           items = Array.from(list.children);
           if (currentIndex < items.length - 1) {
             currentIndex += 1;
-            prevElClass = items.at(currentIndex - 1).id ? `.${items.at(currentIndex - 1).id}` : false;
+            prevElClass = items.at(currentIndex - 1).id ? `${items.at(currentIndex - 1).id}` : false;
             updateDisplayedItem(prevElClass);
           }
         }
@@ -268,7 +278,7 @@ const Guide = function Guide(options = {}) {
           items = Array.from(list.children);
           if (currentIndex > 0) {
             currentIndex -= 1;
-            prevElClass = items.at(currentIndex - 1).id ? `.${items.at(currentIndex + 1).id}` : false;
+            prevElClass = items.at(currentIndex - 1).id ? `${items.at(currentIndex + 1).id}` : false;
             updateDisplayedItem(prevElClass);
           }
         }

@@ -1,57 +1,65 @@
 [
   {
-    "target": "o-zoom-in",
-    "name": "zoom",
-    "description": "Zooma in i kartan",
-    "icon": "#ic_add_24px"
-  },
-  {
-    "target": "o-zoom-out",
-    "name": "zoom",
-    "description": "Zooma ut i kartan",
-    "icon": "#ic_remove_24px"
-  },
-  {
-    "target": "o-fullscreen",
-    "name": "fullscreen",
-    "description": "Öppnar kartan i helskärmsläge",
-    "icon": "#ic_fullscreen_24px"
-  },
-  {
-    "target": "o-home-in",
-    "name": "home",
-    "description": "Tar kartan till startposition",
-    "icon": "#ic_home_24px"
-  },
-  {
-    "target": "o-geoposition",
-    "name": "geoposition",
-    "description": "Tar kartan till din position",
-    "icon": "#ic_near_me_24px"
-  },
-  {
-    "target": "o-bookmarks",
-    "name": "bookmarks",
-    "description": "Här finns direktlänkar till specifika platser i kartan",
-    "icon": "#ic_bookmark_24px"
-  },
-  {
-    "target": "o-measure",
-    "name": "measure",
-    "description": "Mät avtånd och ytor",
-    "icon": "#ic_straighten_24px"
-  },
-  {
-    "target": "o-external-url",
-    "name": "externalurl",
-    "description": "Öppnar fler knappar där du kan välja att öppna din kartposition i annan applikation",
-    "icon": "#ic_baseline_link_24px"
-  },
-  {
-    "target": "o-menu-button",
-    "name": "editor",
-    "description": "Växlar redigeringsläge",
-    "icon": "#ic_edit_24px"
+    "target": "o-tools-left",
+    "name": "new",
+    "description": "Verktyg",
+    "icon": "#ic_tools_24px",
+    "group": [
+      {
+        "target": "o-zoom-in",
+        "name": "zoom",
+        "description": "Zooma in i kartan",
+        "icon": "#ic_add_24px"
+      },
+      {
+        "target": "o-zoom-out",
+        "name": "zoom",
+        "description": "Zooma ut i kartan",
+        "icon": "#ic_remove_24px"
+      },
+      {
+        "target": "o-fullscreen",
+        "name": "fullscreen",
+        "description": "Öppnar kartan i helskärmsläge",
+        "icon": "#ic_fullscreen_24px"
+      },
+      {
+        "target": "o-home-in",
+        "name": "home",
+        "description": "Tar kartan till startposition",
+        "icon": "#ic_home_24px"
+      },
+      {
+        "target": "o-geoposition",
+        "name": "geoposition",
+        "description": "Tar kartan till din position",
+        "icon": "#ic_near_me_24px"
+      },
+      {
+        "target": "o-bookmarks",
+        "name": "bookmarks",
+        "description": "Här finns direktlänkar till specifika platser i kartan",
+        "icon": "#ic_bookmark_24px"
+      },
+      {
+        "target": "o-measure",
+        "name": "measure",
+        "description": "Mät avtånd och ytor",
+        "icon": "#ic_straighten_24px"
+      },
+      {
+        "target": "o-external-url",
+        "name": "externalurl",
+        "description": "Öppnar fler knappar där du kan välja att öppna din kartposition i annan applikation",
+        "icon": "#ic_baseline_link_24px"
+      },
+      {
+        "target": "o-menu-button",
+        "name": "editor",
+        "description": "Växlar redigeringsläge",
+        "icon": "#ic_edit_24px"
+      }
+    ]
   },
   {
     "target": "ol-rotate",
@@ -67,65 +75,39 @@
   },
   {
     "target": "o-mapmenu",
-    "name": "mapmenu",
+    "name": "new",
     "description": "",
     "icon": "#ic_menu_24px",
     "group": [
       {
-        "target": "o-mapmenu",
+        "target": "",
         "name": "about",
-        "description": "Här finner du mer information",
+        "description": "Här finner du mer information om kartan",
         "icon": "#ic_help_outline_24px"
       },
       {
-        "target": "o-mapmenu",
+        "target": "",
         "name": "link",
         "description": "Tar dig någon annanstans...",
         "icon": "#ic_launch_24px"
       },
       {
-        "target": "o-mapmenu",
+        "target": "",
         "name": "print",
-        "description": "Skriv ut kartan till en pdf",
+        "description": "Skriv ut kartan",
         "icon": "#ic_print_24px"
       },
       {
-        "target": "o-mapmenu",
+        "target": "",
         "name": "sharemap",
-        "description": "Dela din karta med en kompis!",
+        "description": "Dela en länk till din karta med en kompis!",
         "icon": "#ic_screen_share_outline_24px"
       },
       {
-        "target": "o-mapmenu",
+        "target": "",
         "name": "draw",
-        "description": "Rita och skriv på kartan i egna lager. Det går även att importera och/eller exportera ritade lager i formatet GeoJSON.",
+        "description": "Rita och skriv på kartan i eget kartlager. Det går även att importera och exportera ritade lager i formatet GeoJSON.",
         "icon": "#fa-pencil"
-      }
-    ]
-  },
-  {
-    "target": "bg-inverted",
-    "name": "draw",
-    "description": "",
-    "icon": "#fa-pencil",
-    "group": [
-      {
-        "target": "undefined",
-        "name": "new",
-        "description": "Rita en punkt",
-        "icon": "#ic_place_24px"
-      },
-      {
-        "target": "undefined",
-        "name": "new",
-        "description": "Rita en linje",
-        "icon": "#ic_timeline_24px"
-      },
-      {
-        "target": "undefined",
-        "name": "new",
-        "description": "Rita ett område",
-        "icon": "#o_polygon_24px"
       }
     ]
   },
@@ -138,7 +120,7 @@
   {
     "target": "o-position",
     "name": "position",
-    "description": "Klicka på denna om du vill ha positionen från kartans centrum och kan definiera egna koordinater direkt i koordinatdescriptionen. Byt system genom att klicka på koordinatsystemet",
+    "description": "Klicka på denna symbol om du vill ha positionen från kartans centrum låst och kan definiera egna koordinater vilket tar kartan dit. Byt koordinatsystemet genom att klicka på systemets namn",
     "icon": "#ic_gps_not_fixed_24px"
   },
   {
@@ -162,7 +144,7 @@
   {
     "target": "undefined",
     "name": "draganddrop",
-    "description": "Du har möjlighet att dra in kartlager från din dator till kartan. Möjliga format är: GPX, GeoJSON, IGC, KML och TopoJSON",
+    "description": "<p>Du har möjligheten att dra och släppa GeoJSON-, GPX-, IGC-, KML- och TopoJSON-filer till kartan. Observera att lagren endast är tillfälligt tillgängliga, när kartan är stängd är lagren förlorade. Det är möjligt att dra och släppa flera filer samtidigt.<br /><a href='https://origo-map.github.io/origo-documentation/latest/#drag-and-drop-control'>Mer info</a></p>",
     "icon": "#drag-and-drop"
   }
 ]
