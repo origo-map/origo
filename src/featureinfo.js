@@ -266,30 +266,34 @@ const Featureinfo = function Featureinfo(options = {}) {
   };
 
   const addLinkListener = function addLinkListener(el) {
-    el.addEventListener('click', (e) => {
-      e.preventDefault();
-      const targ = e.target;
-      let modalStyle = '';
-      switch (targ.target) {
-        case 'modal-full':
-        {
-          modalStyle = 'max-width:unset;width:98%;height:98%;resize:both;overflow:auto;display:flex;flex-flow:column;';
-          break;
+    // Check if element already has a listener
+    if (el && !el.hasAttribute('onClickModal')) {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targ = e.target;
+        let modalStyle = '';
+        switch (targ.target) {
+          case 'modal-full':
+          {
+            modalStyle = 'max-width:unset;width:98%;height:98%;resize:both;overflow:auto;display:flex;flex-flow:column;';
+            break;
+          }
+          default:
+          {
+            modalStyle = 'resize:both;overflow:auto;display:flex;flex-flow:column;';
+            break;
+          }
         }
-        default:
-        {
-          modalStyle = 'resize:both;overflow:auto;display:flex;flex-flow:column;';
-          break;
-        }
-      }
-      Modal({
-        title: targ.title,
-        content: `<iframe src="${targ.href}" class=""style="width:100%;height:99%"></iframe>`,
-        target: viewer.getId(),
-        style: modalStyle,
-        newTabUrl: targ.href
+        Modal({
+          title: targ.title,
+          content: `<iframe src="${targ.href}" class=""style="width:100%;height:99%"></iframe>`,
+          target: viewer.getId(),
+          style: modalStyle,
+          newTabUrl: targ.href
+        });
       });
-    });
+      el.setAttribute('onClickModal', 'true');
+    }
   };
 
   /**
@@ -682,6 +686,7 @@ const Featureinfo = function Featureinfo(options = {}) {
   return Component({
     name: 'featureInfo',
     clear,
+    addLinkListener,
     getHitTolerance,
     getPin,
     getSelectionLayer,

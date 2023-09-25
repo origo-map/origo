@@ -236,8 +236,15 @@ const Viewer = function Viewer(targetOption, options = {}) {
     return undefined;
   };
 
-  const getQueryableLayers = function getQueryableLayers() {
-    const queryableLayers = getLayers().filter(layer => layer.get('queryable') && layer.getVisible());
+  const getQueryableLayers = function getQueryableLayers(includeImageFeatureInfoMode = false) {
+    const queryableLayers = getLayers().filter(layer => {
+      if (layer.get('queryable') && layer.getVisible()) {
+        return true;
+      } else if (includeImageFeatureInfoMode && layer.get('queryable') && layer.get('imageFeatureInfoMode') === 'always') {
+        return true;
+      }
+      return false;
+    });
     return queryableLayers;
   };
 
