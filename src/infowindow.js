@@ -200,6 +200,7 @@ function showSelectedList(selectionGroup) {
       value.classList.remove('selectedurvalelement');
     }
   });
+  highlightListElement();
 }
 
 /**
