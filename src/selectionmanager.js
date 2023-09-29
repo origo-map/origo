@@ -155,6 +155,8 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   function featureStyler(feature) {
     if (feature.get('state') === 'selected') {
       return Style.createStyleRule(multiselectStyleOptions.highlighted);
+    } else if (feature.get('inActiveLayer') === true) {
+      return Style.createStyleRule(multiselectStyleOptions.inActiveLayer ? multiselectStyleOptions.inActiveLayer : multiselectStyleOptions.selected);
     }
     return Style.createStyleRule(multiselectStyleOptions.selected);
   }
@@ -261,6 +263,11 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     const item = event.element;
 
     const selectionGroup = event.element.getSelectionGroup();
+    if (selectionGroup === infowindow.getActiveSelectionGroup()) {
+      item.getFeature().set('inActiveLayer', true);
+    } else {
+      item.getFeature().set('inActiveLayer', false);
+    }
     const selectionGroupTitle = event.element.getSelectionGroupTitle();
 
     if (!urval.has(selectionGroup)) {

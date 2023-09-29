@@ -40,6 +40,10 @@ function showInfowindow() {
   mainContainer.classList.remove('hidden');
 }
 
+function getActiveSelectionGroup() {
+  return activeSelectionGroup;
+}
+
 function makeElementDraggable(elm) {
   const elmnt = elm;
   let pos1 = 0;
@@ -179,7 +183,16 @@ function showSelectedList(selectionGroup) {
   }
   const subexportToAppend = subexports.get(selectionGroup);
   exportContainer.appendChild(subexportToAppend);
-
+  const selectedItems = selectionManager.getSelectedItems().getArray();
+  selectedItems.forEach((item) => {
+    const feature = item.getFeature();
+    feature.unset('state', 'selected');
+    if (item.selectionGroup === selectionGroup) {
+      feature.set('inActiveLayer', true);
+    } else {
+      feature.set('inActiveLayer', false);
+    }
+  });
   urvalElements.forEach((value, key) => {
     if (key === selectionGroup) {
       value.classList.add('selectedurvalelement');
@@ -424,6 +437,7 @@ function init(options) {
   render(options.viewer.getId());
 
   return {
+    getActiveSelectionGroup,
     createListElement,
     removeListElement,
     expandListElement,
