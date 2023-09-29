@@ -159,6 +159,22 @@ function render(viewerId) {
   makeElementDraggable(mainContainer);
 }
 
+function highlightListElement(featureId) {
+  sublists.forEach((sublist) => {
+    const elements = sublist.getElementsByClassName('listelement');
+    for (let index = 0; index < elements.length; index += 1) {
+      const element = elements[index];
+      if (element.id === featureId) {
+        setTimeout(() => {
+          element.classList.add('highlighted');
+        }, 100);
+      } else {
+        element.classList.remove('highlighted');
+      }
+    }
+  });
+}
+
 function showSelectedList(selectionGroup) {
   if (activeSelectionGroup === selectionGroup) {
     return;
@@ -228,22 +244,6 @@ function createUrvalElement(selectionGroup, selectionGroupTitle) {
 
   const subexportComponent = createSubexportComponent({ selectionGroup, viewer, exportOptions });
   subexports.set(selectionGroup, subexportComponent);
-}
-
-function highlightListElement(featureId) {
-  sublists.forEach((sublist) => {
-    const elements = sublist.getElementsByClassName('listelement');
-    for (let index = 0; index < elements.length; index += 1) {
-      const element = elements[index];
-      if (element.id === featureId) {
-        setTimeout(() => {
-          element.classList.add('highlighted');
-        }, 100);
-      } else {
-        element.classList.remove('highlighted');
-      }
-    }
-  });
 }
 
 function createExpandableContent(listElementContentContainer, content, elementId) {
