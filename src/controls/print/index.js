@@ -50,7 +50,8 @@ const Print = function Print(options = {}) {
     filename,
     mapInteractionsActive = false,
     supressResolutionsRecalculation = false,
-    suppressNewDPIMethod = false
+    suppressNewDPIMethod = false,
+    settingsExpanded = false
   } = options;
   let {
     showNorthArrow = true,
@@ -114,6 +115,7 @@ const Print = function Print(options = {}) {
         showMargins,
         showCreated,
         createdPrefix,
+        settingsExpanded,
         showScale,
         showNorthArrow,
         showPrintLegend,

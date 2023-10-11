@@ -13,11 +13,9 @@
   border: 1px solid #ccc;
   border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 6px;
-  bottom: 12px;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   max-height: 70vh;
-  padding: 1px;
   position: absolute;
   text-align: left;
   white-space: normal;
@@ -36,11 +34,51 @@
   width: 0;
 }
 
-.o-popup::after {
+.popup-top-center .o-popup {
+  bottom: 0;
+}
+
+.popup-bottom-center .o-popup {
+  bottom: 12px;
+}
+
+.popup-center-left .o-popup {
+  left: 10px;
+}
+
+.popup-center-right .o-popup {
+  right: 10px;
+}
+
+.popup-top-center .o-popup::after {
+  border-bottom-color: $white;
+  border-width: 10px;
+  top: -20px;
+  left: 50%;
+  margin-left: -10px;
+}
+
+.popup-bottom-center .o-popup::after {
   border-top-color: $white;
   border-width: 10px;
   bottom: -20px;
   left: 50%;
+  margin-left: -10px;
+}
+
+.popup-center-left .o-popup::after {
+  border-right-color: $white;
+  border-width: 10px;
+  left: -10px;
+  top: calc(50% - 6px);
+  margin-left: -10px;
+}
+
+.popup-center-right .o-popup::after {
+  border-left-color: $white;
+  border-width: 10px;
+  right: -20px;
+  top: calc(50% - 6px);
   margin-left: -10px;
 }
 

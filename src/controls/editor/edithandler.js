@@ -6,7 +6,8 @@ import Collection from 'ol/Collection';
 import Feature from 'ol/Feature';
 import { LineString } from 'ol/geom';
 import { noModifierKeys } from 'ol/events/condition';
-import { Modal } from '../../ui';
+import { Button, Element as El, Modal } from '../../ui';
+import Infowindow from '../../components/infowindow';
 import store from './editsstore';
 import generateUUID from '../../utils/generateuuid';
 import transactionHandler from './transactionhandler';
@@ -54,6 +55,8 @@ let allowEditGeometry;
 /** List that tracks the state when editing related tables */
 let breadcrumbs = [];
 let autoCreatedFeature = false;
+let infowindowCmp = false;
+let preselectedFeature;
 
 function isActive() {
   // FIXME: this only happens at startup as they are set to null on closing. If checking for null/falsley/not truely it could work as isVisible with
@@ -499,8 +502,82 @@ function setInteractions(drawType) {
   draw = new Draw(drawOptions);
   hasDraw = false;
   select = new Select({
-    layers: [editLayer]
+    layers: [editLayer],
+    multi: !!infowindowCmp
   });
+  if (infowindowCmp) {
+    infowindowCmp.close();
+    select.on('select', () => {
+      if (select.getFeatures().getLength() > 1) {
+        const featureListAttributes = editLayer.get('featureListAttributes');
+        const listCmp = [];
+        const featureArray = select.getFeatures().getArray();
+        featureArray.forEach(feature => {
+          if (typeof feature.getStyle() === 'function') {
+            const styleArr = feature.getStyle()(feature);
+            styleArr.forEach(style => style.setZIndex(10));
+          }
+          let buttonText = '';
+          if (featureListAttributes && featureListAttributes.length > 0) {
+            featureListAttributes.forEach(attribute => {
+              if (attribute.toLowerCase() === 'id') {
+                buttonText += `id: ${feature.getId()}<br />`;
+              } else {
+                buttonText += feature.get(attribute) ? `${attribute}: ${feature.get(attribute)}<br />` : '';
+              }
+            });
+          } else {
+            buttonText += `ID: ${feature.getId()}`;
+          }
+          const featureButton = Button({
+            text: buttonText,
+            state: 'initial',
+            cls: 'text-align-left hover light',
+            click() {
+              select.getFeatures().clear();
+              select.getFeatures().push(feature);
+              infowindowCmp.dispatch('resetButtonStates');
+              infowindowCmp.dispatch('removeMouseenter');
+              this.setState('active');
+            },
+            mouseenter() {
+              select.getFeatures().clear();
+              select.getFeatures().push(feature);
+              infowindowCmp.dispatch('resetButtonStates');
+              this.setState('active');
+            }
+          });
+          const listItem = El({
+            tagName: 'li',
+            components: [featureButton]
+          });
+          listCmp.push(listItem);
+          infowindowCmp.on('resetButtonStates', () => {
+            featureButton.setState('initial');
+            if (document.getElementById(featureButton.getId())) {
+              document.getElementById(featureButton.getId()).blur();
+            }
+          });
+          infowindowCmp.on('removeMouseenter', () => {
+            featureButton.dispatch('removeMouseenter');
+          });
+        });
+        const content = El({
+          tagName: 'ul',
+          components: listCmp
+        });
+        infowindowCmp.changeContent(content);
+      } else {
+        infowindowCmp.close();
+      }
+    });
+  }
+
+  if (preselectedFeature) {
+    select.getFeatures().push(preselectedFeature);
+  }
+  // Clear it so we won't get stuck on this feature. This makes it unnecessary to clear it anywhere else.
+  preselectedFeature = null;
   if (allowEditGeometry) {
     modify = new Modify({
       features: select.getFeatures()
@@ -522,6 +599,7 @@ function setInteractions(drawType) {
   // If snap should be active then add snap internactions for all snap layers
   hasSnap = editLayer.get('snap');
   if (hasSnap) {
+    // FIXME: selection will almost certainly be empty as featureInfo is cleared
     const selectionSource = featureInfo.getSelectionLayer().getSource();
     const snapSources = editLayer.get('snapLayers') ? getSnapSources(editLayer.get('snapLayers')) : [editLayer.get('source')];
     snapSources.push(selectionSource);
@@ -529,20 +607,25 @@ function setInteractions(drawType) {
   }
 }
 
+/** Closes all modals and resets breadcrumbs */
 function closeAllModals() {
-  // Close all modals first to get rid of tags in DOM
+  // Close all modals before resetting breadcrumbs to get rid of tags in DOM
   if (modal) modal.closeModal();
   modal = null;
   breadcrumbs.forEach(br => {
     if (br.modal) br.modal.closeModal();
   });
+  if (breadcrumbs.length > 0) {
+    currentLayer = breadcrumbs[0].layerName;
+    title = breadcrumbs[0].title;
+    attributes = breadcrumbs[0].attributes;
+  }
   breadcrumbs = [];
 }
 
 function setEditLayer(layerName) {
-  // It is not possible to actually change layer while having breadcrubs as all modals must be closed, which will
-  // pop off all breadcrumbs.
-  // But just in case something changes, reset the breadcrumbs when a new layer is edited.
+  // Close all modals first and restore state. This can only happen if calling using api, as
+  // the modal prevents user from clicking in the map conrol
   closeAllModals();
   currentLayer = layerName;
   setAllowedOperations();
@@ -770,7 +853,6 @@ function onAttributesSave(features, attrs) {
   document.getElementById(`o-save-button-${currentLayer}`).addEventListener('click', (e) => {
     const editEl = {};
     const valid = {};
-    const fileReaders = [];
     attrs.forEach((attribute) => {
       // Get the input container class
       const containerClass = `.${attribute.elId}`;
@@ -798,31 +880,11 @@ function onAttributesSave(features, attrs) {
           // No other validation is performed on searchList as the only thing that can be checked now is that value is in list
           // and that is handled inside the searchList itself.
           editEl[attribute.name] = attribute.searchList.getValue();
+        } else if (attribute.type === 'image') {
+          // File input's value is the filename, but the image itself is stored in the model
+          editEl[attribute.name] = attribute.val;
         } else { // Read value from input text, textarea or select
           editEl[attribute.name] = inputValue;
-        }
-      }
-      // Check if file. If file, read and trigger resize
-      if (inputType === 'file') {
-        const input = document.getElementById(attribute.elId);
-        const file = input.files[0];
-
-        if (file) {
-          const fileReader = new FileReader();
-          fileReader.onload = () => {
-            getImageOrientation(file, (orientation) => {
-              imageresizer(fileReader.result, attribute, orientation, (resized) => {
-                editEl[attribute.name] = resized;
-                const imageresized = new CustomEvent('imageresized');
-                document.dispatchEvent(imageresized);
-              });
-            });
-          };
-
-          fileReader.readAsDataURL(file);
-          fileReaders.push(fileReader);
-        } else {
-          editEl[attribute.name] = document.getElementById(attribute.elId).getAttribute('value');
         }
       }
 
@@ -967,13 +1029,7 @@ function onAttributesSave(features, attrs) {
 
     // If valid, continue
     if (valid.validates) {
-      if (fileReaders.length > 0 && fileReaders.every(reader => reader.readyState === 1)) {
-        document.addEventListener('imageresized', () => {
-          attributesSaveHandler(features, editEl);
-        });
-      } else {
-        attributesSaveHandler(features, editEl);
-      }
+      attributesSaveHandler(features, editEl);
 
       document.getElementById(`o-save-button-${currentLayer}`).blur();
       modal.closeModal();
@@ -1006,6 +1062,9 @@ function addListener() {
   return fn;
 }
 
+/**
+ * Returns a function that adds an event handler to read an image file when user selects a file.
+ * */
 function addImageListener() {
   const fn = (obj) => {
     const fileReader = new FileReader();
@@ -1014,16 +1073,30 @@ function addImageListener() {
       if (ev.target.files && ev.target.files[0]) {
         document.querySelector(`${containerClass} img`).classList.remove('o-hidden');
         document.querySelector(`${containerClass} input[type=button]`).classList.remove('o-hidden');
-        fileReader.onload = (e) => {
-          document.querySelector(`${containerClass} img`).setAttribute('src', e.target.result);
+        fileReader.onload = () => {
+          // When the file has been read, rotate it and resize to configured max size or default max
+          // Don't know why it's rotated. Probably something to do with iphones that store images upside down.
+          getImageOrientation(ev.target.files[0], (orientation) => {
+            imageresizer(fileReader.result, obj, orientation, (resized) => {
+              // Display the image in the form
+              document.querySelector(`${containerClass} img`).setAttribute('src', resized);
+              // Store the image data in the model so it can be retreived when saving without having to read the file again
+              // or pick it up from the img tag
+              // eslint-disable-next-line no-param-reassign
+              obj.val = resized;
+            });
+          });
         };
         fileReader.readAsDataURL(ev.target.files[0]);
       }
     });
-
+    // Find the remove button and attach event handler.
     document.querySelector(`${containerClass} input[type=button]`).addEventListener('click', (e) => {
-      document.getElementById(obj.elId).setAttribute('value', '');
+      // Clear the filename
       document.getElementById(obj.elId).value = '';
+      // Also clear the model value
+      // eslint-disable-next-line no-param-reassign
+      obj.val = '';
       document.querySelector(`${containerClass} img`).classList.add('o-hidden');
       e.target.classList.add('o-hidden');
     });
@@ -1328,10 +1401,8 @@ function editAttributesDialogApi(featureId, layerName = null) {
   const layer = viewer.getLayer(layerName);
   const feature = layer.getSource().getFeatureById(featureId);
   // Hijack the current layer for a while. If there's a modal visible it is closed (without saving) as editAttributes can not handle
-  // multiple dialogs for the same layer so to be safe we always close. Technically the user can not
-  // call this function when a modal is visible, as they can't click anywhere.
+  // multiple dialogs for the same layer so to be safe we always close.
   // Restoring currentLayer is performed in onModalClosed(), as we can't await the modal.
-  // Close all modals and eat all breadcrumbs
   closeAllModals();
   // If editing in another layer, add a breadcrumb to restore layer when modal is closed.
   if (layerName && layerName !== currentLayer) {
@@ -1404,6 +1475,15 @@ function onDeleteChild(e) {
 }
 
 /**
+ * Sets a feature that will be active for editing when editor is activated. When the edit session starts, the feature's layer must
+ * be active and that state is kept in the editor toolbar and sent through an event, so you better update toolbar as well.
+ * @param {any} feature
+ */
+function preselectFeature(feature) {
+  preselectedFeature = feature;
+}
+
+/**
  * Creates the handler. It is used as sort of a singelton, but in theory there could be many handlers.
  * It communicates with the editor toolbar and forms using DOM events, which makes it messy to have more than one instance as they would use the same events.
  * @param {any} options
@@ -1412,6 +1492,10 @@ function onDeleteChild(e) {
 export default function editHandler(options, v) {
   viewer = v;
   featureInfo = viewer.getControlByName('featureInfo');
+  if (options.featureList) {
+    infowindowCmp = Infowindow({ viewer, type: 'floating', title: 'Välj objekt' });
+    infowindowCmp.render();
+  }
   map = viewer.getMap();
   currentLayer = options.currentLayer;
   editableLayers = options.editableLayers;
@@ -1444,6 +1528,7 @@ export default function editHandler(options, v) {
     createFeature: createFeatureApi,
     editAttributesDialog: editAttributesDialogApi,
     deleteFeature: deleteFeatureApi,
-    setActiveLayer: setActiveLayerApi
+    setActiveLayer: setActiveLayerApi,
+    preselectFeature
   };
 }

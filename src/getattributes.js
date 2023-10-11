@@ -221,17 +221,17 @@ function getAttributes(feature, layer, map) {
           featureinfoElement.appendChild(templateList);
           templateList.innerHTML = li;
         } else {
-          if (attribute.name) {
-            val = getContent.name(feature, attribute, attributes, map);
+          if (attribute.img || attribute.type === 'image') {
+            val = getContent.img(feature, attribute, attributes, map);
           } else if (attribute.url) {
             val = getContent.url(feature, attribute, attributes, map);
-          } else if (attribute.img || attribute.type === 'image') {
-            val = getContent.img(feature, attribute, attributes, map);
           } else if (attribute.html) {
             val = getContent.html(feature, attribute, attributes, map);
           } else if (attribute.carousel) {
             val = getContent.carousel(feature, attribute, attributes, map);
             ulList.classList.add('o-carousel-list');
+          } else if (attribute.name) {
+            val = getContent.name(feature, attribute, attributes, map);
           } else {
             val = customAttribute(feature, attribute, attributes, map);
           }

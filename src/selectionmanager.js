@@ -157,6 +157,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   function clearSelection() {
     highlightedFeatures = [];
     selectedItems.clear();
+    component.dispatch('cleared', null);
   }
 
   function featureStyler(feature) {

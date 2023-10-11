@@ -17,7 +17,6 @@ import getAttributes, { getContent, featureinfotemplates } from './getattributes
 import relatedtables from './utils/relatedtables';
 
 const styleTypes = StyleTypes();
-let selectionLayer;
 
 const Featureinfo = function Featureinfo(options = {}) {
   const {
@@ -32,6 +31,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     autoplay = false
   } = options;
 
+  let selectionLayer;
   let identifyTarget;
   let overlay;
   let items;
@@ -47,6 +47,47 @@ const Featureinfo = function Featureinfo(options = {}) {
   const savedFeature = savedPin || savedSelection || undefined;
   const uiOutput = 'infowindow' in options ? options.infowindow : 'overlay';
 
+  /** Dispatches a clearselectionevent. Should be emitted when window is closed or cleared but not when featureinfo is closed as a result of tool change. */
+  const dispatchClearSelection = function dispatchClearSelection() {
+    component.dispatch('clearselection', null);
+  };
+
+  /** Eventhandler for Selectionmanager's clear event.  */
+  function onSelectionManagerClear() {
+    // Not much do to, just dispatch event as our own.
+    dispatchClearSelection();
+  }
+
+  /**
+    * Clears selection in all possible infowindows (overlay, sidebar and infoWindow) and closes the windows
+    * @param {any} supressEvent Set to true when closing as a result of tool change to supress sending clearselection event
+    */
+  const clear = function clear(supressEvent) {
+    selectionLayer.clear();
+    // Sidebar is static and always present.
+    sidebar.setVisibility(false);
+    // check needed for when sidebar or overlay are selected.
+    if (overlay) {
+      viewer.removeOverlays(overlay);
+    }
+    if (selectionManager) {
+      // clearSelection will fire an cleared event, but we don't want our handler to emit a clear event as we are the one closing,
+      // so we stop listening for a while.
+      selectionManager.un('cleared', onSelectionManagerClear);
+      // This actually closes infowindow as infowindow closes automatically when selection is empty.
+      selectionManager.clearSelection();
+      selectionManager.on('cleared', onSelectionManagerClear);
+    }
+    if (!supressEvent) {
+      dispatchClearSelection();
+    }
+  };
+
+  /** Callback called from overlay and sidebar when they are closed by their close buttons */
+  function onInfoClosed() {
+    clear(false);
+  }
+
   function setUIoutput(v) {
     switch (uiOutput) {
       case 'infowindow':
@@ -54,7 +95,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         break;
 
       case 'sidebar':
-        sidebar.init(v);
+        sidebar.init(v, { closeCb: onInfoClosed });
         identifyTarget = 'sidebar';
         break;
 
@@ -63,16 +104,6 @@ const Featureinfo = function Featureinfo(options = {}) {
         break;
     }
   }
-
-  const clear = function clear() {
-    selectionLayer.clear();
-    // check needed for when sidebar or overlay are selected.
-    if (selectionManager) selectionManager.clearSelection();
-    sidebar.setVisibility(false);
-    if (overlay) {
-      viewer.removeOverlays(overlay);
-    }
-  };
 
   // FIXME: overly complex. Don't think layer can be a string anymore
   const getTitle = function getTitle(item) {
@@ -235,30 +266,34 @@ const Featureinfo = function Featureinfo(options = {}) {
   };
 
   const addLinkListener = function addLinkListener(el) {
-    el.addEventListener('click', (e) => {
-      e.preventDefault();
-      const targ = e.target;
-      let modalStyle = '';
-      switch (targ.target) {
-        case 'modal-full':
-        {
-          modalStyle = 'max-width:unset;width:98%;height:98%;resize:both;overflow:auto;display:flex;flex-flow:column;';
-          break;
+    // Check if element already has a listener
+    if (el && !el.hasAttribute('onClickModal')) {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targ = e.target;
+        let modalStyle = '';
+        switch (targ.target) {
+          case 'modal-full':
+          {
+            modalStyle = 'max-width:unset;width:98%;height:98%;resize:both;overflow:auto;display:flex;flex-flow:column;';
+            break;
+          }
+          default:
+          {
+            modalStyle = 'resize:both;overflow:auto;display:flex;flex-flow:column;';
+            break;
+          }
         }
-        default:
-        {
-          modalStyle = 'resize:both;overflow:auto;display:flex;flex-flow:column;';
-          break;
-        }
-      }
-      Modal({
-        title: targ.title,
-        content: `<iframe src="${targ.href}" class=""style="width:100%;height:99%"></iframe>`,
-        target: viewer.getId(),
-        style: modalStyle,
-        newTabUrl: targ.href
+        Modal({
+          title: targ.title,
+          content: `<iframe src="${targ.href}" class=""style="width:100%;height:99%"></iframe>`,
+          target: viewer.getId(),
+          style: modalStyle,
+          newTabUrl: targ.href
+        });
       });
-    });
+      el.setAttribute('onClickModal', 'true');
+    }
   };
 
   /**
@@ -379,14 +414,14 @@ const Featureinfo = function Featureinfo(options = {}) {
     const map = viewer.getMap();
 
     items = identifyItems;
-    clear();
+    clear(false);
     // FIXME: variable is overwritten in next row
     let content = items.map((i) => i.content).join('');
     content = '<div id="o-identify"><div id="o-identify-carousel" class="flex"></div></div>';
     switch (target) {
       case 'overlay':
       {
-        popup = Popup(`#${viewer.getId()}`);
+        popup = Popup(`#${viewer.getId()}`, { closeCb: onInfoClosed });
         popup.setContent({
           content,
           title: getTitle(items[0])
@@ -405,6 +440,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         initCarousel('#o-identify-carousel');
         const firstFeature = items[0].feature;
         const geometry = firstFeature.getGeometry();
+        const origostyle = firstFeature.get('origostyle');
         const clone = firstFeature.clone();
         clone.setId(firstFeature.getId());
         // FIXME: should be layer name, not feature name
@@ -439,6 +475,19 @@ const Featureinfo = function Featureinfo(options = {}) {
               duration: 500
             }
           };
+        }
+        if (items[0].layer && items[0].layer.get('styleName')) {
+          const styleName = items[0].layer.get('styleName');
+          const itemStyle = viewer.getStyle(styleName);
+          if (itemStyle && itemStyle[0] && itemStyle[0][0] && itemStyle[0][0].overlayOptions) {
+            Object.assign(overlayOptions, itemStyle[0][0].overlayOptions);
+          }
+        }
+        if (origostyle && origostyle.overlayOptions) {
+          Object.assign(overlayOptions, origostyle.overlayOptions);
+        }
+        if (overlayOptions.positioning) {
+          popupEl.classList.add(`popup-${overlayOptions.positioning}`);
         }
         overlay = new Overlay(overlayOptions);
         map.addOverlay(overlay);
@@ -553,18 +602,30 @@ const Featureinfo = function Featureinfo(options = {}) {
 
   /**
   * Shows the featureinfo popup/sidebar/infowindow for the provided feature and fit the view to it.
-  * @param {any} feature An object containing layerName and feature
+  * @param {any} featureObj An object containing layerName and feature
+  * @param {any} opts An object containing options. Supported options are : coordinate, the coordinate where popup will be shown. If omitted first feature is used.
+  *                                                                         ignorePan, do not autopan if type is overlay. Pan should be supressed if view is changed manually to avoid contradicting animations.
   * @returns nothing
   */
-  const showFeatureInfo = function showFeatureInfo(featureObj) {
-    const feature = featureObj.feature;
+  const showFeatureInfo = function showFeatureInfo(featureObj, opts = { ignorePan: true }) {
+    const newItems = [];
     const layerName = featureObj.layerName;
     const layer = viewer.getLayer(layerName);
     const map = viewer.getMap();
     const grouplayers = viewer.getGroupLayers();
-    const newItem = getFeatureInfo.createSelectedItem(feature, layer, map, grouplayers);
-    render([newItem], identifyTarget, maputils.getCenter(feature.getGeometry()), { ignorePan: true });
-    viewer.zoomToExtent(feature.getGeometry());
+    if (Array.isArray(featureObj.feature)) {
+      featureObj.feature.forEach(feature => {
+        const newItem = getFeatureInfo.createSelectedItem(feature, layer, map, grouplayers);
+        newItems.push(newItem);
+      });
+    } else {
+      const newItem = getFeatureInfo.createSelectedItem(featureObj.feature, layer, map, grouplayers);
+      newItems.push(newItem);
+    }
+    if (newItems.length > 0) {
+      render(newItems, identifyTarget, opts.coordinate || maputils.getCenter(newItems[0].getFeature().getGeometry()), opts);
+      viewer.getMap().getView().fit(maputils.getExtent(featureObj.feature));
+    }
   };
 
   const onClick = function onClick(evt) {
@@ -593,10 +654,10 @@ const Featureinfo = function Featureinfo(options = {}) {
           const serverResult = data || [];
           const result = serverResult.concat(clientResult);
           if (result.length > 0) {
-            selectionLayer.clear();
+            selectionLayer.clear(false);
             render(result, identifyTarget, evt.coordinate);
           } else if (selectionLayer.getFeatures().length > 0 || (identifyTarget === 'infowindow' && selectionManager.getNumberOfSelectedItems() > 0)) {
-            clear();
+            clear(false);
           } else if (pinning) {
             const resolution = map.getView().getResolution();
             sidebar.setVisibility(false);
@@ -617,7 +678,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     if (state) {
       map.on(clickEvent, onClick);
     } else {
-      clear();
+      clear(true);
       map.un(clickEvent, onClick);
     }
   };
@@ -625,6 +686,7 @@ const Featureinfo = function Featureinfo(options = {}) {
   return Component({
     name: 'featureInfo',
     clear,
+    addLinkListener,
     getHitTolerance,
     getPin,
     getSelectionLayer,
@@ -641,9 +703,12 @@ const Featureinfo = function Featureinfo(options = {}) {
       // Re dispatch selectionmanager's event as our own
       if (selectionManager) {
         selectionManager.on('highlight', evt => dispatchToggleFeatureEvent(evt));
+        selectionManager.on('cleared', onSelectionManagerClear);
       }
       map.on(clickEvent, onClick);
       viewer.on('toggleClickInteraction', (detail) => {
+        // This line of beauty makes feature info active if explicitly set active of another control yields active state.
+        // which effectively makes this the default tool.
         if ((detail.name === 'featureinfo' && detail.active) || (detail.name !== 'featureinfo' && !detail.active)) {
           setActive(true);
         } else {
