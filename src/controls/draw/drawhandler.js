@@ -388,6 +388,7 @@ const DrawHandler = function DrawHandler(options = {}) {
       queryable,
       removable,
       exportable,
+      zoomToExtent = true,
       drawlayer
     } = layerOptions;
     let newLayer;
@@ -409,6 +410,7 @@ const DrawHandler = function DrawHandler(options = {}) {
         queryable,
         removable,
         exportable,
+        zoomToExtent,
         drawlayer,
         type: 'GEOJSON',
         attributes: [
