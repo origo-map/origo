@@ -353,6 +353,7 @@ const DrawHandler = function DrawHandler(options = {}) {
         drawLayer.un('change:visible', onChangeVisible);
       }
       drawLayer = layer;
+      drawLayer.setVisible(true);
       drawLayer.on('change:visible', onChangeVisible);
       onChangeVisible();
     } else {
