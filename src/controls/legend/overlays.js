@@ -279,10 +279,14 @@ const Overlays = function Overlays(options) {
           const opacityInput = secondaryEl.getElementsByTagName('input')[0];
           backBtn.tabIndex = 0;
           backBtn.focus();
-          opacityInput.tabIndex = 0;
+          if (opacityInput) {
+            opacityInput.tabIndex = 0;
+          }
           backBtn.addEventListener('click', () => {
             backBtn.tabIndex = -99;
-            opacityInput.tabIndex = -99;
+            if (opacityInput) {
+              opacityInput.tabIndex = -99;
+            }
           }, false);
           slidenav.on('slide', () => {
             el.classList.remove('width-100');
