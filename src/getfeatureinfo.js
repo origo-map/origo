@@ -215,7 +215,8 @@ function getFeatureInfoRequests({
         });
       }
     });
-  };
+  }
+
   const imageLayers = queryableLayers.filter(layer => layer instanceof BaseTileLayer || layer instanceof ImageLayer);
   imageLayers.forEach(layer => {
     let item;
