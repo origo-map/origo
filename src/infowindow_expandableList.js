@@ -66,6 +66,10 @@ function showInfowindow() {
   mainContainer.classList.remove('hidden');
 }
 
+function getActiveSelectionGroup() {
+  return activeSelectionGroup;
+}
+
 function makeElementDraggable(elm) {
   const elmnt = elm;
   let pos1 = 0;
@@ -171,7 +175,7 @@ function showSelectedList(selectionGroup) {
     return;
   }
 
-  activeSelectionGroup = selectionGroup;
+  activeSelectionGroup = null;
 }
 
 function createUrvalElement(selectionGroup, selectionGroupTitle) {
@@ -426,6 +430,7 @@ function init(options) {
   render(options.viewer.getId());
 
   return {
+    getActiveSelectionGroup,
     createListElement,
     removeListElement,
     expandListElement,
