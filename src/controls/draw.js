@@ -185,7 +185,7 @@ const Draw = function Draw(options = {}) {
 
         const activeButton = Button({
           cls: 'margin-right-small padding-small icon-smaller round light box-shadow relative o-tooltip',
-          icon: '#ic_check_24px',
+          icon: '#ic_check_circle_24px',
           state: drawLayer === activeLayer ? 'active' : 'initial',
           click() {
             drawHandler.setActiveLayer(drawLayer);
