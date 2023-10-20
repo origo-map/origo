@@ -170,9 +170,10 @@ const Selectionmanager = function Selectionmanager(options = {}) {
    * @param {any} feature
    */
   function featureStyler(feature) {
+    console.log(feature);
     if (highlightedFeatures.includes(feature)) {
       return Style.createStyleRule(multiselectStyleOptions.highlighted);
-    } else if (feature.getId().split('.')[0] === infowindow.getActiveSelectionGroup()) {
+    } else if (feature.getId() && feature.getId().toString().split('.')[0] === infowindow.getActiveSelectionGroup()) {
       return Style.createStyleRule(multiselectStyleOptions.inActiveLayer ? multiselectStyleOptions.inActiveLayer : multiselectStyleOptions.selected);
     }
     return Style.createStyleRule(multiselectStyleOptions.selected);
