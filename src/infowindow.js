@@ -199,16 +199,8 @@ function showSelectedList(selectionGroup) {
   }
   const subexportToAppend = subexports.get(selectionGroup);
   exportContainer.appendChild(subexportToAppend);
-  const selectedItems = selectionManager.getSelectedItems().getArray();
-  selectedItems.forEach((item) => {
-    const feature = item.getFeature();
-    feature.unset('state', 'selected');
-    if (item.selectionGroup === selectionGroup) {
-      feature.set('inActiveLayer', true);
-    } else {
-      feature.set('inActiveLayer', false);
-    }
-  });
+  selectionManager.clearHighlightedFeatures();
+  selectionManager.refreshAllLayers();
   urvalElements.forEach((value, key) => {
     if (key === selectionGroup) {
       value.classList.add('selectedurvalelement');

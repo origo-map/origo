@@ -28,6 +28,9 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   /** The selectionmanager component itself */
   let component;
 
+  /** Keeps track of highlighted features. Stores pointers to the actual features. */
+  let highlightedFeatures = [];
+
   const multiselectStyleOptions = options.multiSelectionStyles || styleTypes.getStyle('multiselection');
   const isInfowindow = options.infowindow === 'infowindow' || false;
   const infowindowManager = options.infowindowOptions && options.infowindowOptions.listLayout ? infowindowManagerV2 : infowindowManagerV1;
@@ -84,6 +87,20 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     });
   }
 
+  /** Helper that refreshes all urvallayers. Typically called after highlightning or symbology has changed */
+  function refreshAllLayers() {
+    urval.forEach((value) => {
+      value.getFeatureStore().changed();
+    });
+  }
+
+  /**
+   * Clears highlighted features
+   */
+  function clearHighlightedFeatures() {
+    highlightedFeatures = [];
+  }
+
   /**
    * Highlights the feature with fid id.
    * All other items are un-highlighted
@@ -94,18 +111,13 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     selectedItems.forEach((item) => {
       const feature = item.getFeature();
       if (item.getId() === id) {
-        feature.set('state', 'selected');
+        highlightedFeatures = [feature];
         component.dispatch('highlight', item);
-      } else {
-        // FIXME: Second argument should be a bool. Change to true to intentionally supress event, or remove second arg to emit the event. May affect the all other layers refresh below
-        feature.unset('state', 'selected');
       }
     });
 
-    // we need to manually refresh other layers, otherwise unselecting does not take effect until the next layer refresh.
-    urval.forEach((value) => {
-      value.getFeatureStore().changed();
-    });
+    // We need to manually refresh all layers, otherwise selecting and unselecting does not take effect until the next layer refresh.
+    refreshAllLayers();
   }
 
   function highlightAndExpandItem(item) {
@@ -148,14 +160,19 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   }
 
   function clearSelection() {
+    // This will trigger onItemremove for each feature and refresh layers etc
     selectedItems.clear();
     component.dispatch('cleared', null);
   }
 
+  /**
+   * Callback function that styles a feature when it is drawn.
+   * @param {any} feature
+   */
   function featureStyler(feature) {
-    if (feature.get('state') === 'selected') {
+    if (highlightedFeatures.includes(feature)) {
       return Style.createStyleRule(multiselectStyleOptions.highlighted);
-    } else if (feature.get('inActiveLayer') === true) {
+    } else if (feature.getId().split('.')[0] === infowindow.getActiveSelectionGroup()) {
       return Style.createStyleRule(multiselectStyleOptions.inActiveLayer ? multiselectStyleOptions.inActiveLayer : multiselectStyleOptions.selected);
     }
     return Style.createStyleRule(multiselectStyleOptions.selected);
@@ -259,6 +276,10 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     return retval.join('<br>');
   }
 
+  /**
+   * Callback function called when a SelectedItem is added to selectedItems
+   * @param {any} event
+   */
   function onItemAdded(event) {
     const item = event.element;
 
@@ -287,6 +308,10 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     infowindow.updateSelectionGroupFooter(selectionGroup, aggregationstring);
   }
 
+  /**
+   * Callback function called when a SelectedItem is removed from selectedItems
+   * @param {any} event
+   */
   function onItemRemoved(event) {
     const item = event.element;
 
@@ -294,8 +319,8 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     const selectionGroupTitle = event.element.getSelectionGroupTitle();
 
     const feature = item.getFeature();
-    // FIXME: second argument should be a bool. True supresses event. 'selected' will be treated as true. Maybe correct, but not obvious.
-    feature.unset('state', 'selected');
+    // Remove from highlighted as feature does not exist in the layer anymore
+    highlightedFeatures = highlightedFeatures.filter(f => f !== feature);
 
     urval.get(selectionGroup).removeFeature(feature);
     infowindow.removeListElement(item);
@@ -319,7 +344,8 @@ const Selectionmanager = function Selectionmanager(options = {}) {
    * @param {any} feature The feature to highlight
    */
   function highlightFeature(feature) {
-    feature.set('state', 'selected');
+    highlightedFeatures.push(feature);
+    refreshAllLayers();
   }
 
   function getNumberOfSelectedItems() {
@@ -338,6 +364,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     addOrHighlightItem,
     removeItemById,
     clearSelection,
+    clearHighlightedFeatures,
     createSelectionGroup,
     highlightFeature,
     highlightFeatureById,
@@ -345,6 +372,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     getSelectedItems,
     getSelectedItemsForASelectionGroup,
     getUrval,
+    refreshAllLayers,
     onInit() {
       selectedItems = new Collection([], { unique: true });
       urval = new Map();
