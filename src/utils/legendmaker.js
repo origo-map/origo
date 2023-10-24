@@ -293,7 +293,9 @@ export const Legend = function Legend({
     });
     return El({ components: cmps, tagName: 'ul' });
   }
-  return El({ innerHTML: noLegend });
+  const noLegendInner = El({ innerHTML: noLegend, tagName: 'li', cls: 'padding-small' });
+  const noLegendOuter = El({ components: [noLegendInner], tagName: 'ul' });
+  return noLegendOuter;
 };
 
 export const HeaderIcon = function HeaderIcon(styleRules, opacity = 1) {
