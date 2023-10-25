@@ -71,7 +71,7 @@ sourceType.WFS = function wfsSourceType(id, layer, serverUrl, extent) {
   // Create a temporary WFS source if layer is WMS.
   // This is a special case for multiselect which utlizes the fact that Geoserver usually has an WFS endpoint
   // at the same place as an WMS endpoint
-  if (layerType === 'WMS') {
+  if (layerType !== 'WFS') {
     // Create the necessary configuration to create a request to WFS endpoint from a WMS layer
     const sourceOpts = {
       geometryName: layer.get('geometryName'),
