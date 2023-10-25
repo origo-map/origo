@@ -183,12 +183,31 @@ const selectionStyle = new Style({
     if (type === 'Polygon') {
       coords = feature.getGeometry().getCoordinates()[0];
       pointGeometry = new MultiPoint(coords);
+    } else if (type === 'MultiPolygon') {
+      coords = feature.getGeometry().getCoordinates();
+      const coordArr = [];
+      coords.forEach(parts => {
+        parts.forEach(part => {
+          coordArr.push(...part);
+        });
+      });
+      pointGeometry = new MultiPoint(coordArr);
     } else if (type === 'LineString') {
       coords = feature.getGeometry().getCoordinates();
       pointGeometry = new MultiPoint(coords);
+    } else if (type === 'MultiLineString') {
+      coords = feature.getGeometry().getCoordinates();
+      const coordArr = [];
+      coords.forEach(part => {
+        coordArr.push(...part);
+      });
+      pointGeometry = new MultiPoint(coordArr);
     } else if (type === 'Point') {
       coords = feature.getGeometry().getCoordinates();
       pointGeometry = new Point(coords);
+    } else if (type === 'MultiPoint') {
+      coords = feature.getGeometry().getCoordinates();
+      pointGeometry = new MultiPoint(coords);
     }
     return pointGeometry;
   }
