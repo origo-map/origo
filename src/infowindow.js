@@ -4,6 +4,7 @@ import { dom, Button } from './ui';
 let parentElement;
 let mainContainer;
 let urvalContainer;
+let urvalListContainer;
 let listContainer;
 let exportContainer;
 let groupFooterContainer;
@@ -111,6 +112,8 @@ function render(viewerId) {
   mainContainer.id = 'sidebarcontainer';
   urvalContainer = document.createElement('div');
   urvalContainer.classList.add('urvalcontainer');
+  urvalListContainer = document.createElement('div');
+  urvalListContainer.classList.add('urvalListContainer');
   // We add this so that urvalcontainer can become draggable
   urvalContainer.id = 'sidebarcontainer-draggable';
   const urvalTextNodeContainer = document.createElement('div');
@@ -120,6 +123,7 @@ function render(viewerId) {
   urvalContainer.appendChild(urvalTextNodeContainer);
   const closeButton = createCloseButton();
   urvalContainer.appendChild(dom.html(closeButton.render()));
+  urvalContainer.appendChild(urvalListContainer);
   listContainer = document.createElement('div');
   listContainer.classList.add('listcontainer');
 
@@ -200,7 +204,7 @@ function createUrvalElement(selectionGroup, selectionGroupTitle) {
   urvalElement.classList.add('urvalelement');
   const textNode = document.createTextNode(selectionGroupTitle);
   urvalElement.appendChild(textNode);
-  urvalContainer.appendChild(urvalElement);
+  urvalListContainer.appendChild(urvalElement);
   urvalElements.set(selectionGroup, urvalElement);
   urvalElement.addEventListener('click', () => {
     showSelectedList(selectionGroup);
