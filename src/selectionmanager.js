@@ -166,22 +166,24 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   }
 
   /**
-   * Callback function that styles a feature when it is drawn.
-   * @param {any} feature
+   * Returns a style function to be used when a feature is drawn.
+   * @param {any} selectionGroup
    */
-  function featureStyler(feature) {
-    console.log(feature);
-    if (highlightedFeatures.includes(feature)) {
-      return Style.createStyleRule(multiselectStyleOptions.highlighted);
-    } else if (feature.getId() && feature.getId().toString().split('.')[0] === infowindow.getActiveSelectionGroup()) {
-      return Style.createStyleRule(multiselectStyleOptions.inActiveLayer ? multiselectStyleOptions.inActiveLayer : multiselectStyleOptions.selected);
+  function getFeatureStyler(selectionGroup) {
+    function featureStyler(feature) {
+      if (highlightedFeatures.includes(feature)) {
+        return Style.createStyleRule(multiselectStyleOptions.highlighted);
+      } else if (selectionGroup === infowindow.getActiveSelectionGroup()) {
+        return Style.createStyleRule(multiselectStyleOptions.inActiveLayer ? multiselectStyleOptions.inActiveLayer : multiselectStyleOptions.selected);
+      }
+      return Style.createStyleRule(multiselectStyleOptions.selected);
     }
-    return Style.createStyleRule(multiselectStyleOptions.selected);
+    return featureStyler;
   }
 
   function createSelectionGroup(selectionGroup, selectionGroupTitle) {
     const urvalLayer = featurelayer(null, map);
-    urvalLayer.setStyle(featureStyler);
+    urvalLayer.setStyle(getFeatureStyler(selectionGroup));
     urval.set(selectionGroup, urvalLayer);
     infowindow.createUrvalElement(selectionGroup, selectionGroupTitle);
   }
@@ -285,11 +287,6 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     const item = event.element;
 
     const selectionGroup = event.element.getSelectionGroup();
-    if (selectionGroup === infowindow.getActiveSelectionGroup()) {
-      item.getFeature().set('inActiveLayer', true);
-    } else {
-      item.getFeature().set('inActiveLayer', false);
-    }
     const selectionGroupTitle = event.element.getSelectionGroupTitle();
 
     if (!urval.has(selectionGroup)) {
