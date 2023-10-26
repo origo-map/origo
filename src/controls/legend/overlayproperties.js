@@ -123,6 +123,7 @@ const OverlayProperties = function OverlayProperties(options = {}) {
         direction: 'up',
         cls: 'o-stylepicker text-black flex',
         contentCls: 'bg-grey-lighter text-smaller rounded',
+        contentStyle: 'max-height: 12em; overflow-y: scroll;',
         buttonCls: 'bg-white border text-black box-shadow',
         buttonTextCls: 'text-smaller',
         text: getStyleDisplayName(layer.get('styleName')),
