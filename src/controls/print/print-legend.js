@@ -241,7 +241,7 @@ const LayerRow = function LayerRow(options) {
       const style = viewer.getStyle(layer.get('styleName'));
       if (style && style[0] && (!style[0][0].extendedLegend)) {
         content = getStyleContent(title, style);
-      } else if (!layer.get('type')) {
+      } else if (!layer.get('type') || layer.get('styleName') === 'origoStylefunction') {
         content = getTitleWithIcon(title, '');
       } else if (layer.get('type').includes('AGS') || /\/arcgis\/services\/[^/]+\/[^/]+\/MapServer\/WMSServer/.test(getOneUrl(layer))) {
         content = await getAGSJSONContent(title, layer.get('id'));
