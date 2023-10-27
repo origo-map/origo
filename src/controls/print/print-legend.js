@@ -245,8 +245,11 @@ const LayerRow = function LayerRow(options) {
         content = getTitleWithIcon(title, '');
       } else if (layer.get('type').includes('AGS') || /\/arcgis\/services\/[^/]+\/[^/]+\/MapServer\/WMSServer/.test(getOneUrl(layer))) {
         content = await getAGSJSONContent(title, layer.get('id'));
-      } else {
+      } else if (layer.get('type').includes('WMS')) {
         content = await getWMSJSONContent(title);
+      }
+      if (content === '') {
+        content = getTitleWithIcon(title, '');
       }
       return `
           <li id="${this.getId()}" class="flex row align-center padding-left padding-right item legend-${layer.get('type')}">
