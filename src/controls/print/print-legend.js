@@ -237,19 +237,17 @@ const LayerRow = function LayerRow(options) {
     async render() {
       const title = layer.get('title') || 'Titel saknas';
       let content = '';
-
       const style = viewer.getStyle(layer.get('styleName'));
       if (style && style[0] && (!style[0][0].extendedLegend)) {
         content = getStyleContent(title, style);
-      } else if (!layer.get('type') || layer.get('styleName') === 'origoStylefunction') {
+      } else {
         content = getTitleWithIcon(title, '');
-      } else if (layer.get('type').includes('AGS') || /\/arcgis\/services\/[^/]+\/[^/]+\/MapServer\/WMSServer/.test(getOneUrl(layer))) {
-        content = await getAGSJSONContent(title, layer.get('id'));
-      } else if (layer.get('type').includes('WMS')) {
-        content = await getWMSJSONContent(title);
-      }
-      if (content === '') {
-        content = getTitleWithIcon(title, '');
+        const lType = layer.get('type');
+        if ((lType && lType.includes('AGS')) || /\/arcgis\/services\/[^/]+\/[^/]+\/MapServer\/WMSServer/.test(getOneUrl(layer))) {
+          content = await getAGSJSONContent(title, layer.get('id'));
+        } else if (lType && lType.includes('WMS')) {
+          content = await getWMSJSONContent(title);
+        }
       }
       return `
           <li id="${this.getId()}" class="flex row align-center padding-left padding-right item legend-${layer.get('type')}">
