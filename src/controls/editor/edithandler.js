@@ -4,7 +4,7 @@ import Modify from 'ol/interaction/Modify';
 import Snap from 'ol/interaction/Snap';
 import Collection from 'ol/Collection';
 import Feature from 'ol/Feature';
-import { LineString } from 'ol/geom';
+import { LineString, MultiPolygon, MultiLineString, MultiPoint } from 'ol/geom';
 import { noModifierKeys } from 'ol/events/condition';
 import { Button, Element as El, Modal } from '../../ui';
 import Infowindow from '../../components/infowindow';
@@ -280,6 +280,35 @@ async function addFeature(feature) {
     editAttributes(feature);
   }
 }
+/**
+ * Checks if a feature's geometry type is same as current edit layer's type. If it can be converted to
+ * correct type it will do that e.g. creating a multi variant of a single geometry.
+ * @param {any} f Feature to check
+ * @returns {boolean} True if feature matches layer
+ */
+function ensureCorrectGeometryType(f) {
+  //  Correct geometry type to conform to edit layer
+  const featureGeometryType = f.getGeometry().getType();
+  const layerGeometryType = editLayers[currentLayer].get('geometryType');
+  if (featureGeometryType !== layerGeometryType) {
+    if (featureGeometryType === 'Polygon' && layerGeometryType === 'MultiPolygon') {
+      const multiPoly = new MultiPolygon([f.getGeometry()]);
+      f.setGeometry(multiPoly);
+      return true;
+    }
+    if (featureGeometryType === 'LineString' && layerGeometryType === 'MultiLineString') {
+      const multiLine = new MultiLineString([f.getGeometry()]);
+      f.setGeometry(multiLine);
+      return true;
+    }
+    if (featureGeometryType === 'Point' && layerGeometryType === 'MultiPoint') {
+      const multiPoint = new MultiPoint([f.getGeometry()]);
+      f.setGeometry(multiPoint);
+      return true;
+    }
+  }
+  return featureGeometryType === layerGeometryType;
+}
 
 // Handler for OL Draw interaction
 function onDrawEnd(evt) {
@@ -294,6 +323,12 @@ function onDrawEnd(evt) {
   // Remove identical vertices by doing a simplify using a small tolerance. Not the most efficient, but it's only one row for me to write and
   // freehand produces so many vertices that a clean up is still a good idea.
   f.setGeometry(f.getGeometry().simplify(0.00001));
+
+  if (!ensureCorrectGeometryType(f)) {
+    // This is a configuration problem. You have added a tool that produces incorrect geometry type
+    console.error('Incorrect geometry type for layer');
+    return;
+  }
 
   // If live validation did its job, we should not have to validate here, but freehand bypasses all controls and we can't tell if freehand was used.
   if (validateOnDraw && !topology.isGeometryValid(f.getGeometry())) {
@@ -422,7 +457,7 @@ function onCustomDrawEnd(e) {
   // Check if a feature has been created, or tool canceled
   const feature = e.detail.feature;
   if (feature) {
-    if (feature.getGeometry().getType() !== editLayers[currentLayer].get('geometryType')) {
+    if (!ensureCorrectGeometryType(feature)) {
       alert('Kan inte lägga till en geometri av den typen i det lagret');
     } else {
       // Must move geometry to correct property. Setting geometryName is not enough.
