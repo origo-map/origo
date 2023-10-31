@@ -634,7 +634,6 @@ const Featureinfo = function Featureinfo(options = {}) {
     const pixel = evt.pixel;
     const map = viewer.getMap();
     const coordinate = evt.coordinate;
-    const layers = viewer.getQueryableLayers();
     const clientResult = getFeatureInfo.getFeaturesAtPixel({
       coordinate,
       clusterFeatureinfoLevel,
@@ -646,7 +645,6 @@ const Featureinfo = function Featureinfo(options = {}) {
     if (clientResult !== false) {
       getFeatureInfo.getFeaturesFromRemote({
         coordinate,
-        layers,
         map,
         pixel
       }, viewer)

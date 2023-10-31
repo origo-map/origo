@@ -189,27 +189,33 @@ function getGetFeatureInfoRequest({ layer, coordinate }, viewer) {
 
 function getFeatureInfoRequests({
   coordinate,
-  pixel
+  pixel,
+  layers
 }, viewer) {
   const imageFeatureInfoMode = viewer.getViewerOptions().featureinfoOptions.imageFeatureInfoMode || 'pixel';
   const requests = [];
-  const queryableLayers = viewer.getLayersByProperty('queryable', true);
-  const layerGroups = viewer.getGroupLayers();
-  layerGroups.forEach(layerGroup => {
-    if (layerGroup.get('visible')) {
-      layerGroup.getLayersArray().forEach(layer => {
-        if ((layer.get('queryable'))) {
-          queryableLayers.push(layer);
-        }
-      });
-    } else {
-      layerGroup.getLayersArray().forEach(layer => {
-        if (layer.get('queryable') && ((layer.get('imageFeatureInfoMode') && layer.get('imageFeatureInfoMode') === 'always') || (!layer.get('imageFeatureInfoMode') && imageFeatureInfoMode === 'always'))) {
-          queryableLayers.push(layer);
-        }
-      });
-    }
-  });
+  let queryableLayers;
+  if (layers) {
+    queryableLayers = layers;
+  } else {
+    queryableLayers = viewer.getLayersByProperty('queryable', true);
+    const layerGroups = viewer.getGroupLayers();
+    layerGroups.forEach(layerGroup => {
+      if (layerGroup.get('visible')) {
+        layerGroup.getLayersArray().forEach(layer => {
+          if ((layer.get('queryable'))) {
+            queryableLayers.push(layer);
+          }
+        });
+      } else {
+        layerGroup.getLayersArray().forEach(layer => {
+          if (layer.get('queryable') && ((layer.get('imageFeatureInfoMode') && layer.get('imageFeatureInfoMode') === 'always') || (!layer.get('imageFeatureInfoMode') && imageFeatureInfoMode === 'always'))) {
+            queryableLayers.push(layer);
+          }
+        });
+      }
+    });
+  }
 
   const imageLayers = queryableLayers.filter(layer => layer instanceof BaseTileLayer || layer instanceof ImageLayer);
   imageLayers.forEach(layer => {
