@@ -20,7 +20,7 @@ const Overlays = function Overlays(options) {
     labelOpacitySlider
   } = options;
 
-  const cls = `${clsSettings} o-layerswitcher-overlays flex row overflow-hidden`.trim();
+  const cls = `${clsSettings} o-layerswitcher-overlays flex row overflow-auto`.trim();
   const style = dom.createStyle({
     width: '220px', height: '100%', 'min-width': '220px', ...styleSettings
   });
