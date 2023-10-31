@@ -40,6 +40,10 @@ function showInfowindow() {
   mainContainer.classList.remove('hidden');
 }
 
+function getActiveSelectionGroup() {
+  return activeSelectionGroup;
+}
+
 function makeElementDraggable(elm) {
   const elmnt = elm;
   let pos1 = 0;
@@ -155,6 +159,22 @@ function render(viewerId) {
   makeElementDraggable(mainContainer);
 }
 
+function highlightListElement(featureId) {
+  sublists.forEach((sublist) => {
+    const elements = sublist.getElementsByClassName('listelement');
+    for (let index = 0; index < elements.length; index += 1) {
+      const element = elements[index];
+      if (element.id === featureId) {
+        setTimeout(() => {
+          element.classList.add('highlighted');
+        }, 100);
+      } else {
+        element.classList.remove('highlighted');
+      }
+    }
+  });
+}
+
 function showSelectedList(selectionGroup) {
   if (activeSelectionGroup === selectionGroup) {
     return;
@@ -179,7 +199,8 @@ function showSelectedList(selectionGroup) {
   }
   const subexportToAppend = subexports.get(selectionGroup);
   exportContainer.appendChild(subexportToAppend);
-
+  selectionManager.clearHighlightedFeatures();
+  selectionManager.refreshAllLayers();
   urvalElements.forEach((value, key) => {
     if (key === selectionGroup) {
       value.classList.add('selectedurvalelement');
@@ -187,6 +208,7 @@ function showSelectedList(selectionGroup) {
       value.classList.remove('selectedurvalelement');
     }
   });
+  highlightListElement();
 }
 
 /**
@@ -214,22 +236,6 @@ function createUrvalElement(selectionGroup, selectionGroupTitle) {
 
   const subexportComponent = createSubexportComponent({ selectionGroup, viewer, exportOptions });
   subexports.set(selectionGroup, subexportComponent);
-}
-
-function highlightListElement(featureId) {
-  sublists.forEach((sublist) => {
-    const elements = sublist.getElementsByClassName('listelement');
-    for (let index = 0; index < elements.length; index += 1) {
-      const element = elements[index];
-      if (element.id === featureId) {
-        setTimeout(() => {
-          element.classList.add('highlighted');
-        }, 100);
-      } else {
-        element.classList.remove('highlighted');
-      }
-    }
-  });
 }
 
 function createExpandableContent(listElementContentContainer, content, elementId) {
@@ -424,6 +430,7 @@ function init(options) {
   render(options.viewer.getId());
 
   return {
+    getActiveSelectionGroup,
     createListElement,
     removeListElement,
     expandListElement,

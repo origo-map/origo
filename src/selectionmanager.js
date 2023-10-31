@@ -95,6 +95,13 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   }
 
   /**
+   * Clears highlighted features
+   */
+  function clearHighlightedFeatures() {
+    highlightedFeatures = [];
+  }
+
+  /**
    * Highlights the feature with fid id.
    * All other items are un-highlighted
    * Emits event 'highlight' with highlighted SelectedItem
@@ -159,19 +166,24 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   }
 
   /**
-   * Callback function that styles a feature when it is drawn.
-   * @param {any} feature
+   * Returns a style function to be used when a feature is drawn.
+   * @param {any} selectionGroup
    */
-  function featureStyler(feature) {
-    if (highlightedFeatures.includes(feature)) {
-      return Style.createStyleRule(multiselectStyleOptions.highlighted);
+  function getFeatureStyler(selectionGroup) {
+    function featureStyler(feature) {
+      if (highlightedFeatures.includes(feature)) {
+        return Style.createStyleRule(multiselectStyleOptions.highlighted);
+      } else if (selectionGroup === infowindow.getActiveSelectionGroup()) {
+        return Style.createStyleRule(multiselectStyleOptions.inActiveLayer ? multiselectStyleOptions.inActiveLayer : multiselectStyleOptions.selected);
+      }
+      return Style.createStyleRule(multiselectStyleOptions.selected);
     }
-    return Style.createStyleRule(multiselectStyleOptions.selected);
+    return featureStyler;
   }
 
   function createSelectionGroup(selectionGroup, selectionGroupTitle) {
     const urvalLayer = featurelayer(null, map);
-    urvalLayer.setStyle(featureStyler);
+    urvalLayer.setStyle(getFeatureStyler(selectionGroup));
     urval.set(selectionGroup, urvalLayer);
     infowindow.createUrvalElement(selectionGroup, selectionGroupTitle);
   }
@@ -350,6 +362,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     addOrHighlightItem,
     removeItemById,
     clearSelection,
+    clearHighlightedFeatures,
     createSelectionGroup,
     highlightFeature,
     highlightFeatureById,
@@ -357,6 +370,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     getSelectedItems,
     getSelectedItemsForASelectionGroup,
     getUrval,
+    refreshAllLayers,
     onInit() {
       selectedItems = new Collection([], { unique: true });
       urval = new Map();
