@@ -13,6 +13,7 @@
   width: 320px;
   z-index: 1;
   overflow: visible;
+  max-height: 90%;
   &.expandable_list {
     cursor: move;
   }
@@ -40,9 +41,16 @@
   cursor: move;
   font-size: 12px;
   font-weight: bold;
-  padding: 1em 1em 1em 2em;
+  padding: 1em 0em 1em 2em;
   z-index: 10;
   border-radius: inherit;
+}
+
+.urvalListContainer {
+  margin-right: 0.5em;
+  max-height: 10em;
+  overflow-y: scroll;
+  scroll-behavior: smooth;
 }
 
 .expandable_list {
