@@ -54,17 +54,20 @@ class WfsSource extends VectorSource {
   }
 
   /**
-   * Called by VectorSource
+   * Called by VectorSource. VectorSource always calls with extent specified. If strategy = 'all' it is an infinite extent.
    * @param {any} extent
    */
   onLoad(extent, resolution, projection, success, failure) {
     this._loaderHelper(extent)
-      .then(f => success(f))
+      .then(f => {
+        super.addFeatures(f);
+        success(f);
+      })
       .catch(() => failure());
   }
 
   /**
-   * Set request method for layer
+   * Set request method for source
    * @param {any} method
    */
   setMethod(method) {
@@ -72,7 +75,7 @@ class WfsSource extends VectorSource {
   }
 
   /**
-   * Set filter on layer
+   * Set filter on source
    * @param {any} cql
    */
   setFilter(cql) {
@@ -81,7 +84,7 @@ class WfsSource extends VectorSource {
   }
 
   /**
-   * Clear filter on layer
+   * Clear filter on source
    */
   clearFilter() {
     this._options.filter = '';
@@ -89,16 +92,18 @@ class WfsSource extends VectorSource {
   }
 
   /**
-   * Helper to reuse code. Consider it to be private to this class
-   * @param {any} extent
-   * @param {any} cql if provided, extent is ignored
+   * Helper to reuse code. Consider it to be private to this class.
+   * @param {any} extent Extent to query. If specified the result is limited to the intersection of this parameter and layer's extent configuration.
+   * @param {any} cql Optional extra cql for this call.
+   * @param {any} ignoreOriginalFilter true if configured filter should be ignored for this call making parameter cql only filter (if specified)
+   * @param {any} ids Comma separated list of feature ids. If specified you probably want to call with extent and cql empty and ignoreOriginalFilter = true
    */
-  async _loaderHelper(extent, cql) {
+  async _loaderHelper(extent, cql, ignoreOriginalFilter, ids) {
     const serverUrl = this._options.url;
 
     // Set up the cql filter as a combination of the layer filter and the temporary cql parameter
     let cqlfilter = '';
-    if (this._options.filter) {
+    if (this._options.filter && !ignoreOriginalFilter) {
       cqlfilter = replacer.replace(this._options.filter, window);
       if (cql) {
         cqlfilter += ' AND ';
@@ -110,7 +115,7 @@ class WfsSource extends VectorSource {
 
     // Create the complete CQL query string
     let queryFilter = '';
-    if (this._options.strategy === 'all' || cql || this._options.isTable) {
+    if (!extent || this._options.isTable) {
       queryFilter = cqlfilter ? `&CQL_FILTER=${cqlfilter}` : '';
     } else {
       // Extent should be used. Depending if there also is a filter, the queryfilter looks different
@@ -129,10 +134,14 @@ class WfsSource extends VectorSource {
     }
 
     // Create the complete URL
+    // FIXME: rewrite using URL class
     let url = [`${serverUrl}${serverUrl.indexOf('?') < 0 ? '?' : '&'}service=WFS`,
       `&version=1.1.0&request=GetFeature&typeName=${this._options.featureType}&outputFormat=application/json`,
       `&srsname=${this._options.dataProjection}`].join('');
     url += queryFilter;
+    if (ids) {
+      url += `&FeatureId=${ids}`;
+    }
     url = encodeURI(url);
 
     // Actually fetch some features
@@ -162,7 +171,6 @@ class WfsSource extends VectorSource {
         f.unset(f.getGeometryName(), true);
       });
     }
-    super.addFeatures(features);
     return features;
   }
 
@@ -172,7 +180,26 @@ class WfsSource extends VectorSource {
    * @param {any} cql
    */
   async ensureLoaded(cql) {
-    await this._loaderHelper(null, cql);
+    const features = await this._loaderHelper(null, cql, false);
+    super.addFeatures(features);
+  }
+
+  /**
+   * Fetches features by id. Extent and filters are ignored. Does NOT add the feature to the layer
+   * @param {any} ids Comma separated list of ids
+   */
+  async getFeatureFromSourceByIds(ids) {
+    return this._loaderHelper(null, null, true, ids);
+  }
+
+  /**
+   * Fetches features from server without adding them to the source. Honors filter configuration unless ignoreOriginalFilter is specified.
+   * @param {any} extent Optional extent
+   * @param {any} cql Optional additional cql filter for this call
+   * @param {any} ignoreOriginalFilter true if configured cql filter should be ignored for this request
+   */
+  async getFeaturesFromSource(extent, cql, ignoreOriginalFilter) {
+    return this._loaderHelper(extent, cql, ignoreOriginalFilter);
   }
 }
 

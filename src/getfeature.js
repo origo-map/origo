@@ -1,11 +1,22 @@
 import EsriJSONFormat from 'ol/format/EsriJSON';
-import GeoJSONFormat from 'ol/format/GeoJSON';
-import replacer from './utils/replacer';
+import WfsSource from './layer/wfssource';
 
 let projectionCode;
 let projection;
 const sourceType = {};
 
+/**
+ * Fetches features from a layer's source but does not add them to the layer. Supports WFS and AGS_FEATURE altough functionality differs. Mainly used by search, but
+ * is also exposed as an api function that MultiSelect uses. As q quirky bonus it also support fetching features from WMS layers if there is a WFS service at the same endpoint.
+ *
+ * @param {any} id Comma separated list of ids. If specified layer's filter and parameter extent is ignored (even configured map and layer extent is ignored).
+ * @param {any} layer Layer instance to fetch from
+ * @param {any} source Array of know sources. Probably the configuration section source.
+ * @param {any} projCode Projection code for the returned features. Ignored by WFS as map projection is used
+ * @param {any} proj projection like object for the returned features. Ignored by WFS as map projection is used
+ * @param {any} extent Extent to fetch inside. Layer configuration extent is honored.
+ * @returns {Promise<any[]>}
+ */
 export default function getfeature(id, layer, source, projCode, proj, extent) {
   projectionCode = projCode;
   projection = proj;
@@ -15,6 +26,7 @@ export default function getfeature(id, layer, source, projCode, proj, extent) {
   if (type === 'AGS_FEATURE') {
     return sourceType.AGS_FEATURE(id, layer, serverUrl);
   }
+  // Note that this includes WMS which MultiSelect utilizes to make an WFS request to an unknown WFS layer assumed to reside on same place as WMS layer!
   return sourceType.WFS(id, layer, serverUrl, extent);
 }
 
@@ -54,47 +66,32 @@ sourceType.AGS_FEATURE = function agsFeature(id, layer, serverUrl) {
 };
 
 sourceType.WFS = function wfsSourceType(id, layer, serverUrl, extent) {
-  const geometryName = layer.get('geometryName');
-  const format = new GeoJSONFormat({
-    geometryName
-  });
-  let queryFilter = '';
-  if (!id) {
-    const filter = replacer.replace(layer.get('filter'), window);
-    const layerExtent = layer.get('extent');
-    let minExtent;
-    if (extent && layerExtent) {
-      minExtent = [Math.max(extent[0], layerExtent[0]),
-        Math.max(extent[1], layerExtent[1]),
-        Math.min(extent[2], layerExtent[2]),
-        Math.min(extent[3], layerExtent[3])];
-      if (!(minExtent[0] < minExtent[2] && minExtent[1] < minExtent[3])) {
-        return [];
-      }
-    } else if (extent) {
-      minExtent = extent;
-    } else if (layerExtent) {
-      minExtent = layerExtent;
-    }
-    if (filter) {
-      if (minExtent) {
-        queryFilter = layer.get('geometryName') ? `&CQL_FILTER=${filter} AND BBOX(${layer.get('geometryName')},${minExtent.toString()})` : `&CQL_FILTER=${filter}&BBOX=${minExtent.toString()}`;
-      } else {
-        queryFilter = `&CQL_FILTER=${filter}`;
-      }
-    } else if (minExtent) {
-      queryFilter = layer.get('geometryName') ? `&CQL_FILTER=BBOX(${layer.get('geometryName')},${minExtent.toString()})` : `&BBOX=${minExtent.toString()}`;
-    }
+  let wfsSource;
+  const layerType = layer.get('type');
+  // Create a temporary WFS source if layer is WMS.
+  // This is a special case for multiselect which utlizes the fact that Geoserver usually has an WFS endpoint
+  // at the same place as an WMS endpoint
+  if (layerType !== 'WFS') {
+    // Create the necessary configuration to create a request to WFS endpoint from a WMS layer
+    const sourceOpts = {
+      geometryName: layer.get('geometryName'),
+      dataProjection: projectionCode,
+      projectionCode,
+      loadingstrategy: 'all',
+      requestMethod: 'GET',
+      url: serverUrl,
+      customExtent: layer.get('extent'),
+      featureType: layer.get('id')
+    };
+    wfsSource = new WfsSource(sourceOpts);
   } else {
-    queryFilter = `&featureId=${id}`;
+    wfsSource = layer.getSource();
   }
-  const url = `${serverUrl}?`;
-  const data = ['service=WFS',
-    '&version=1.0.0',
-    `&request=GetFeature&typeName=${layer.get('name')}`,
-    '&outputFormat=json',
-    queryFilter
-  ].join('');
 
-  return fetch(url + data, { type: 'GET', dataType: 'json' }).then(res => res.json()).then(json => format.readFeatures(json)).catch(error => console.error(error));
+  if (id) {
+    return wfsSource.getFeatureFromSourceByIds(id);
+  }
+  // Have to pick up filter from layer as MultiSelect changes filter on layer instead of source
+  const filter = layer.get('filter');
+  return wfsSource.getFeaturesFromSource(extent, filter, true);
 };
