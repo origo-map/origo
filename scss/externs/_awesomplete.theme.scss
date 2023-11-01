@@ -88,6 +88,6 @@
 &[class*=#{$media-l-m}] {
   .awesomplete > ul {
     max-width: calc(100% + 2rem);
-    min-width: calc(100% + 2rem);
+    min-width: 100%;
   }
 }
