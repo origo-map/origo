@@ -510,6 +510,7 @@ const Legend = function Legend(options = {}) {
 
       input.parentNode.classList.add('black');
       input.parentNode.classList.add('grow');
+      input.parentNode.style.height = `${calcMaxHeight(getTargetHeight()) - 84}px`;
       input.addEventListener('keyup', (e) => {
         const keyCode = e.keyCode;
         if (input.value.length >= searchLayersMinLength) {
