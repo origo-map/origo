@@ -1,4 +1,4 @@
-import { LineString, Point } from 'ol/geom';
+import { LineString, Point, Polygon } from 'ol/geom';
 import Select from 'ol/interaction/Select';
 import Fill from 'ol/style/Fill';
 import Stroke from 'ol/style/Stroke';
@@ -263,7 +263,6 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     const font = `${newStyleObj.textSize}px ${newStyleObj.textFont}`;
     switch (geometryType) {
       case 'LineString':
-      case 'MultiLineString':
         style[0] = new Style({
           stroke
         });
@@ -280,8 +279,32 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
           style = style.concat(labelStyle);
         }
         break;
+      case 'MultiLineString':
+        style[0] = new Style({
+          stroke
+        });
+        if (newStyleObj.showMeasureSegments) {
+          const featureCoords = feature.getGeometry().getCoordinates();
+          featureCoords.forEach(part => {
+            const line = new LineString(part);
+            const segmentLabelStyle = drawStyles.getSegmentLabelStyle(line, projection, styleScale);
+            style = style.concat(segmentLabelStyle);
+          });
+        }
+        if (newStyleObj.showMeasure) {
+          const featureCoords = feature.getGeometry().getCoordinates();
+          featureCoords.forEach(part => {
+            const line = new LineString(part);
+            const label = drawStyles.formatLength(line, projection);
+            const point = new Point(line.getLastCoordinate());
+            const labelStyle = drawStyles.getLabelStyle(styleScale);
+            labelStyle.setGeometry(point);
+            labelStyle.getText().setText(label);
+            style = style.concat(labelStyle);
+          });
+        }
+        break;
       case 'Polygon':
-      case 'MultiPolygon':
         style[0] = new Style({
           fill,
           stroke
@@ -298,6 +321,34 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
           labelStyle.setGeometry(point);
           labelStyle.getText().setText(label);
           style = style.concat(labelStyle);
+        }
+        break;
+      case 'MultiPolygon':
+        style[0] = new Style({
+          fill,
+          stroke
+        });
+        if (newStyleObj.showMeasureSegments) {
+          const featureCoords = feature.getGeometry().getCoordinates();
+          featureCoords.forEach(parts => {
+            parts.forEach(part => {
+              const line = new LineString(part);
+              const segmentLabelStyle = drawStyles.getSegmentLabelStyle(line, projection, styleScale);
+              style = style.concat(segmentLabelStyle);
+            });
+          });
+        }
+        if (newStyleObj.showMeasure) {
+          const featureCoords = feature.getGeometry().getCoordinates();
+          featureCoords.forEach(parts => {
+            const polygon = new Polygon(parts);
+            const label = drawStyles.formatArea(polygon, true, projection);
+            const point = polygon.getInteriorPoint();
+            const labelStyle = drawStyles.getLabelStyle(styleScale);
+            labelStyle.setGeometry(point);
+            labelStyle.getText().setText(label);
+            style = style.concat(labelStyle);
+          });
         }
         break;
       case 'Point':
