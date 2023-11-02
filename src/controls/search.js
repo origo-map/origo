@@ -324,7 +324,7 @@ const Search = function Search(options = {}) {
         return suggestionValue.toLowerCase().includes(userInput.toLowerCase()) ? suggestionValue : false;
       }
     });
-    const mapEl = origo.api().getMap().getTargetElement();
+    const mapEl = viewer.getMap().getTargetElement();
     const listHeight = mapEl.offsetHeight / 2;
     awesomplete.ul.style.maxHeight = `${listHeight}px`;
     awesomplete.ul.style.overflowY = 'auto';
