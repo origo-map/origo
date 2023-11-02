@@ -508,7 +508,6 @@ const Legend = function Legend(options = {}) {
         }
       });
       awesomplete.ul.style.maxHeight = `${calcMaxHeight(getTargetHeight()) / 2}px`;
-      awesomplete.ul.style.overflowY = 'auto';
       input.parentNode.classList.add('black');
       input.parentNode.classList.add('grow');
       input.addEventListener('keyup', (e) => {

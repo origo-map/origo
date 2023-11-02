@@ -312,6 +312,8 @@ const Search = function Search(options = {}) {
 
   function initAutocomplete() {
     const input = document.getElementsByClassName('o-search-field')[0];
+    const mapEl = viewer.getMap().getTargetElement();
+    const listHeight = mapEl.offsetHeight / 2;
 
     awesomplete = new Awesomplete('.o-search-field', {
       minChars: minLength,
@@ -324,10 +326,8 @@ const Search = function Search(options = {}) {
         return suggestionValue.toLowerCase().includes(userInput.toLowerCase()) ? suggestionValue : false;
       }
     });
-    const mapEl = viewer.getMap().getTargetElement();
-    const listHeight = mapEl.offsetHeight / 2;
     awesomplete.ul.style.maxHeight = `${listHeight}px`;
-    awesomplete.ul.style.overflowY = 'auto';
+
     const handler = function func(list) {
       awesomplete.list = list;
       awesomplete.evaluate();
