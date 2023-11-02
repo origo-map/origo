@@ -49,7 +49,7 @@
 .urvalListContainer {
   margin-right: 0.5em;
   max-height: 10em;
-  overflow-y: scroll;
+  overflow-y: auto;
   scroll-behavior: smooth;
 }
 
@@ -114,7 +114,7 @@
   font-weight: normal;
   margin-right: 0.5em;
   max-height: 40em;
-  overflow-y: scroll;
+  overflow-y: auto;
   scroll-behavior: smooth;
 }
 
