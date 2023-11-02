@@ -507,10 +507,10 @@ const Legend = function Legend(options = {}) {
           return suggestionValue.toLowerCase().includes(userInput.toLowerCase()) ? suggestionValue : false;
         }
       });
-
+      awesomplete.ul.style.maxHeight = `${calcMaxHeight(getTargetHeight()) / 2}px`;
+      awesomplete.ul.style.overflowY = 'auto';
       input.parentNode.classList.add('black');
       input.parentNode.classList.add('grow');
-      input.parentNode.style.height = `${calcMaxHeight(getTargetHeight()) - 84}px`;
       input.addEventListener('keyup', (e) => {
         const keyCode = e.keyCode;
         if (input.value.length >= searchLayersMinLength) {
