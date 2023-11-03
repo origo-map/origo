@@ -2164,11 +2164,9 @@ body {
     border: 1px solid #ccc;
     border: 1px solid rgba(0, 0, 0, 0.2);
     border-radius: 6px;
-    bottom: 12px;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
     max-height: 70vh;
-    padding: 1px;
     position: absolute;
     text-align: left;
     white-space: normal;
@@ -2183,11 +2181,37 @@ body {
     pointer-events: none;
     position: absolute;
     width: 0; }
-  .o-map .o-popup::after {
+  .o-map .popup-top-center .o-popup {
+    bottom: 0; }
+  .o-map .popup-bottom-center .o-popup {
+    bottom: 12px; }
+  .o-map .popup-center-left .o-popup {
+    left: 10px; }
+  .o-map .popup-center-right .o-popup {
+    right: 10px; }
+  .o-map .popup-top-center .o-popup::after {
+    border-bottom-color: white;
+    border-width: 10px;
+    top: -20px;
+    left: 50%;
+    margin-left: -10px; }
+  .o-map .popup-bottom-center .o-popup::after {
     border-top-color: white;
     border-width: 10px;
     bottom: -20px;
     left: 50%;
+    margin-left: -10px; }
+  .o-map .popup-center-left .o-popup::after {
+    border-right-color: white;
+    border-width: 10px;
+    left: -10px;
+    top: calc(50% - 6px);
+    margin-left: -10px; }
+  .o-map .popup-center-right .o-popup::after {
+    border-left-color: white;
+    border-width: 10px;
+    right: -20px;
+    top: calc(50% - 6px);
     margin-left: -10px; }
   .o-map .o-popup::before {
     border-top-color: #999;
@@ -2810,7 +2834,8 @@ body {
     padding: 0;
     position: absolute;
     top: 40px;
-    z-index: 1; }
+    z-index: 1;
+    overflow-y: auto; }
   .o-map .awesomplete.black > ul {
     background: #000 !important;
     box-sizing: border-box;
@@ -2818,14 +2843,15 @@ body {
     left: 0px;
     list-style: none;
     margin: 0;
-    min-width: 180px;
-    max-width: 100%;
+    width: 100%;
+    min-width: unset;
     overflow-wrap: break-word;
     padding: 0;
     position: absolute;
     top: auto;
     bottom: 100%;
-    z-index: 9999999; }
+    z-index: 9999999;
+    overflow-y: auto; }
   .o-map .awesomplete > ul:empty {
     display: none; }
   .o-map .awesomplete > ul {
@@ -2885,9 +2911,6 @@ body {
     background-color: #fff; }
   .o-map .awesomplete li[aria-selected='true'] mark {
     background-color: #eeeeee; }
-  .o-map[class*=o-media-l-m] .awesomplete > ul {
-    max-width: calc(100% + 2rem);
-    min-width: calc(100% + 2rem); }
   .o-map .o-search-wrapper {
     max-width: calc(100% - 8rem);
     width: 310px; }
@@ -3018,7 +3041,8 @@ body {
     top: 6em;
     width: 320px;
     z-index: 1;
-    overflow-x: hidden; }
+    overflow: visible;
+    max-height: 90%; }
     .o-map .sidebarcontainer.expandable_list {
       cursor: move; }
   .o-map .expandable_list .urvalcontainer {
@@ -3035,8 +3059,14 @@ body {
     cursor: move;
     font-size: 12px;
     font-weight: bold;
-    padding: 1em 1em 1em 2em;
-    z-index: 10; }
+    padding: 1em 0em 1em 2em;
+    z-index: 10;
+    border-radius: inherit; }
+  .o-map .urvalListContainer {
+    margin-right: 0.5em;
+    max-height: 10em;
+    overflow-y: auto;
+    scroll-behavior: smooth; }
   .o-map .expandable_list .urval-textnode-container {
     font-weight: bold;
     margin: 1em; }
@@ -3073,7 +3103,7 @@ body {
     font-weight: normal;
     margin-right: 0.5em;
     max-height: 40em;
-    overflow-y: scroll;
+    overflow-y: auto;
     scroll-behavior: smooth; }
   .o-map .listelement {
     display: flex; }
@@ -3126,7 +3156,6 @@ body {
     transition: max-height .5s;
     transition: max-height .5s; }
   .o-map .unfolded {
-    max-height: 20em;
     overflow: hidden;
     transition: max-height 1s;
     transition: max-height 1s;
@@ -3145,13 +3174,11 @@ body {
     font-size: 12px;
     font-weight: normal; }
   .o-map .expandable_list .export-buttons-container {
-    padding: 0.5em 0;
-    margin: 0; }
+    padding: 0.5em 1.8em;
+    margin-left: 0; }
   .o-map .export-buttons-container {
     margin: 0.5em 0.2em;
     margin-left: 1.8em; }
-  .o-map .expandable_list .export-buttons-container {
-    padding: 0.5em 0; }
   .o-map .export-button {
     background-color: whitesmoke;
     border: 1px solid #ccc;
