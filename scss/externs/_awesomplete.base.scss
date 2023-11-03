@@ -30,6 +30,7 @@
   position: absolute;
   top: 40px;
   z-index: 1;
+  overflow-y: auto;
 }
 
 .awesomplete.black > ul {
@@ -39,14 +40,15 @@
   left: 0px;
   list-style: none;
   margin: 0;
-  min-width: 180px;
-  max-width: 100%;
+  width: 100%;
+  min-width: unset;
   overflow-wrap: break-word;
   padding: 0;
   position: absolute;
   top: auto;
   bottom: 100%;
   z-index: 9999999;
+  overflow-y: auto;
 }
 
 .awesomplete > ul:empty {

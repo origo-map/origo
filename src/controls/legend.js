@@ -507,7 +507,7 @@ const Legend = function Legend(options = {}) {
           return suggestionValue.toLowerCase().includes(userInput.toLowerCase()) ? suggestionValue : false;
         }
       });
-
+      awesomplete.ul.style.maxHeight = `${calcMaxHeight(getTargetHeight()) / 2}px`;
       input.parentNode.classList.add('black');
       input.parentNode.classList.add('grow');
       input.addEventListener('keyup', (e) => {

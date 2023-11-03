@@ -84,10 +84,3 @@
 .awesomplete li[aria-selected='true'] mark {
   background-color: $search-hover-backround;
 }
-
-&[class*=#{$media-l-m}] {
-  .awesomplete > ul {
-    max-width: calc(100% + 2rem);
-    min-width: calc(100% + 2rem);
-  }
-}
