@@ -116,6 +116,16 @@ $print-scale-line-font-size: $font-size-smallest;
   display: block;
 }
 
+.print-map-loading-spinner {
+  display: inline-block;
+  width: 35px;
+  height: 35px;
+  border: 2px solid rgba(255,255,255,.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+ }
+
 // media print settings
 @media print {
   .no-print {
