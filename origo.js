@@ -37,6 +37,7 @@ const Origo = function Origo(configPath, options = {}) {
     featureinfoOptions: {},
     crossDomain: true,
     target: '#app-wrapper',
+    keyboardEventTarget: document,
     svgSpritePath: 'css/svg/',
     svgSprites: ['fa-icons.svg', 'material-icons.svg', 'miscellaneous.svg', 'origo-icons.svg', 'custom.svg'],
     breakPoints: {
