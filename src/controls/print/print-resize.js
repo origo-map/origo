@@ -442,7 +442,7 @@ export default function PrintResize(options = {}) {
     if (isVector(layer)) {
       const features = source.getFeatures();
       const styleName = layer.get('styleName');
-      let style = viewer.getStyle();
+      let style = viewer.getStyle(styleName);
 
       const clusterStyleName = layer.get('clusterStyle') ? layer.get('clusterStyle') : undefined;
       if (typeof layer.get('styleName') !== 'undefined' && layer.get('styleName') !== 'origoStylefunction' && layer.get('styleName') !== 'default') {
