@@ -118,11 +118,11 @@ $print-scale-line-font-size: $font-size-smallest;
 
 .print-map-loading-spinner {
   display: inline-block;
-  width: 35px;
-  height: 35px;
-  border: 2px solid rgba(255,255,255,.3);
+  width: 45px;
+  height: 45px;
+  border: 16px solid rgba(255, 255, 255, 0.884);
   border-radius: 50%;
-  border-top-color: #fff;
+  border-top-color: #008ff5;
   animation: spin 1s ease-in-out infinite;
  }
 
