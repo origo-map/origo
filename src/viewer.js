@@ -577,9 +577,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
             const layer = getLayer(layerName);
             if (layer && layer.get('type') !== 'GROUP') {
               const layerType = layer.get('type');
-              // FIXME: postrender event is only emitted if any features from a layer is actually drawn, which means there is no feature in the default extent,
-              // it will not be triggered until map is panned or zoomed where a feature exists.
-              layer.once('postrender', () => {
+              layer.getSource().once('featuresloadend', () => {
                 const clusterSource = layer.getSource().source;
                 // Assume that id is just the second part of the argumment and adjust it for special cases later.
                 let id = featureId.split('.')[1];
@@ -610,15 +608,16 @@ const Viewer = function Viewer(targetOption, options = {}) {
                 }
 
                 if (feature) {
-                  const obj = {};
-                  obj.feature = feature;
-                  obj.layerName = layerName;
-                  featureinfo.showFeatureInfo(obj);
-                  map.getView().fit(feature.getGeometry(), {
-                    maxZoom: getResolutions().length - 2,
-                    padding: [15, 15, 40, 15],
-                    duration: 1000
-                  });
+                  const fidsbylayer = {};
+                  fidsbylayer[layerName] = [feature.getId()];
+                  featureinfo.showInfo(fidsbylayer, { ignorePan: true });
+                  if (!urlParams.zoom && !urlParams.center) {
+                    map.getView().fit(feature.getGeometry(), {
+                      maxZoom: getResolutions().length - 2,
+                      padding: [15, 15, 40, 15],
+                      duration: 1000
+                    });
+                  }
                 }
               });
             }

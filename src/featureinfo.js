@@ -601,8 +601,8 @@ const Featureinfo = function Featureinfo(options = {}) {
   };
 
   /**
-  * Shows the featureinfo popup/sidebar/infowindow for the provided feature and fit the view to it.
-  * @param {any} featureObj An object containing layerName and feature
+  * Shows the featureinfo popup/sidebar/infowindow for the provided features and fit the view to it.
+  * @param {any} featureObj An object containing layerName and feature. "feature" is either one Feature or an Array of Feature
   * @param {any} opts An object containing options. Supported options are : coordinate, the coordinate where popup will be shown. If omitted first feature is used.
   *                                                                         ignorePan, do not autopan if type is overlay. Pan should be supressed if view is changed manually to avoid contradicting animations.
   * @returns nothing
@@ -624,7 +624,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     }
     if (newItems.length > 0) {
       render(newItems, identifyTarget, opts.coordinate || maputils.getCenter(newItems[0].getFeature().getGeometry()), opts);
-      viewer.getMap().getView().fit(maputils.getExtent(featureObj.feature));
+      viewer.getMap().getView().fit(maputils.getExtent(newItems.map(i => i.getFeature())));
     }
   };
 
