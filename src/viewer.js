@@ -527,6 +527,26 @@ const Viewer = function Viewer(targetOption, options = {}) {
     return urlParams;
   };
 
+  /**
+   * Internal helper used when urlParams.feature is set and the popup should be displayed.
+   * @param {any} feature
+   * @param {any} layerName
+   */
+  const displayFeatureInfo = function displayFeatureInfo(feature, layerName) {
+    if (feature) {
+      const fidsbylayer = {};
+      fidsbylayer[layerName] = [feature.getId()];
+      featureinfo.showInfo(fidsbylayer, { ignorePan: true });
+      if (!urlParams.zoom && !urlParams.center) {
+        map.getView().fit(feature.getGeometry(), {
+          maxZoom: getResolutions().length - 2,
+          padding: [15, 15, 40, 15],
+          duration: 1000
+        });
+      }
+    }
+  };
+
   return Component({
     onInit() {
       this.render();
@@ -577,50 +597,43 @@ const Viewer = function Viewer(targetOption, options = {}) {
             const layer = getLayer(layerName);
             if (layer && layer.get('type') !== 'GROUP') {
               const layerType = layer.get('type');
-              // FIXME: postrender event is only emitted if any features from a layer is actually drawn, which means there is no feature in the default extent,
-              // it will not be triggered until map is panned or zoomed where a feature exists.
-              layer.once('postrender', () => {
-                const clusterSource = layer.getSource().source;
-                // Assume that id is just the second part of the argumment and adjust it for special cases later.
-                let id = featureId.split('.')[1];
-                let feature;
+              const layerSource = layer.getSource().source ? layer.getSource().source : layer.getSource();
+              // Assume that id is just the second part of the argumment and adjust it for special cases later.
+              let id = featureId.split('.')[1];
 
-                if (layerType === 'WFS') {
-                  // WFS uses the layername as a part of the featureId. Problem is that it what the server think is the name that matters.
-                  // First we assume that the layername is actually correct, then take the special cases
-                  let idLayerPart = layerName;
-                  const layerId = layer.get('id');
-                  if (layerId) {
-                    // if layer explicitly has set the id it takes precedense over name
-                    // layer name already have popped the namespace part, but id is untouched.
-                    idLayerPart = layerId.split(':').pop();
-                  } else if (layerName.includes('__')) {
-                    // If using the __-notation to use same layer several times, we must only use the actual layer name
-                    idLayerPart = layerName.split('__')[0];
-                  }
-                  // Build the correct WFS id
-                  id = `${idLayerPart}.${id}`;
+              if (layerType === 'WFS') {
+                // WFS uses the layername as a part of the featureId. Problem is that it what the server think is the name that matters.
+                // First we assume that the layername is actually correct, then take the special cases
+                let idLayerPart = layerName;
+                const layerId = layer.get('id');
+                if (layerId) {
+                  // if layer explicitly has set the id it takes precedense over name
+                  // layer name already have popped the namespace part, but id is untouched.
+                  idLayerPart = layerId.split(':').pop();
+                } else if (layerName.includes('__')) {
+                  // If using the __-notation to use same layer several times, we must only use the actual layer name
+                  idLayerPart = layerName.split('__')[0];
                 }
-                // FIXME: ensure that feature is loaded. If using bbox and feature is outside default extent it will not be found.
-                // Workaround is to have a default extent covering the entire map with the layer in visible range or use strategy all
-                if (clusterSource) {
-                  feature = clusterSource.getFeatureById(id);
-                } else {
-                  feature = layer.getSource().getFeatureById(id);
-                }
+                // Build the correct WFS id
+                id = `${idLayerPart}.${id}`;
+              }
 
-                if (feature) {
-                  const obj = {};
-                  obj.feature = feature;
-                  obj.layerName = layerName;
-                  featureinfo.showFeatureInfo(obj);
-                  map.getView().fit(feature.getGeometry(), {
-                    maxZoom: getResolutions().length - 2,
-                    padding: [15, 15, 40, 15],
-                    duration: 1000
-                  });
-                }
-              });
+              // Some layer types may already have been loaded, e.g. GeoJson with static configured features. As features are loaded
+              // on creation it is impossible to listen to the featuresloadend event, but on the other hand the features will be ready already
+              // when we get here. It is highly unlikely that a remote source is finished already, but that would work as well.
+              if (layerSource.getFeatures().length > 0) {
+                displayFeatureInfo(layerSource.getFeatureById(id), layerName);
+              } else {
+                // Set up an eventhandler and wait for the source to finsish loading if there are no features yet.
+                // Important that the source actually emits this event.
+                layerSource.once('featuresloadend', () => {
+                  // FIXME: ensure that feature is loaded. If using bbox and feature is outside default extent it will not be found.
+                  // Workaround is to have a default extent covering the entire map with the layer in visible range or use strategy all
+                  // Most likely it will work as sharemap links contains center and zoom so extent will be visible. Most sane people
+                  // will only share maps where the selected feature is in view
+                  displayFeatureInfo(layerSource.getFeatureById(id), layerName);
+                });
+              }
             }
           }
 

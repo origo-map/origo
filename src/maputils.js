@@ -111,6 +111,10 @@ const maputils = {
     }
     return center;
   },
+  /**
+   * Gets the union extent for an array of features
+   * @param {any} featureArray An array of features
+   */
   getExtent: function getCenter(featureArray) {
     const featureExtent = featureArray[0].getGeometry().getExtent();
     let i;

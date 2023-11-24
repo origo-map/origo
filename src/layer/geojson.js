@@ -13,7 +13,7 @@ function createSource(options) {
   if (options.url) {
     const vectorSource = new VectorSource({
       attributions: options.attribution,
-      loader() {
+      loader(extent, resolution, projection, success) {
         fetch(options.url, { headers: options.headers }).then(response => response.json()).then((data) => {
           if (data.features) {
             vectorSource.addFeatures(vectorSource.getFormat().readFeatures(data, formatOptions));
@@ -34,6 +34,7 @@ function createSource(options) {
               });
             }
           }
+          success(vectorSource.getFeatures());
         }).catch(error => console.warn(error));
       },
       format: new GeoJSON()
