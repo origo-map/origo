@@ -3,6 +3,7 @@ import ImageLayer from 'ol/layer/Image';
 import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
 import VectorImageLayer from 'ol/layer/VectorImage';
+import VectorTileLayer from 'ol/layer/VectorTile';
 import { OSM, WMTS, XYZ, ImageWMS, ImageArcGISRest, Cluster } from 'ol/source';
 import TileArcGISRest from 'ol/source/TileArcGISRest';
 import agsMap from '../../layer/agsmap';
@@ -104,6 +105,10 @@ export default function PrintResize(options = {}) {
 
   const isVector = function isVector(layer) {
     return layer instanceof VectorLayer || layer instanceof VectorImageLayer;
+  };
+
+  const isVectorTile = function isVectorTile(layer) {
+    return layer instanceof VectorTileLayer;
   };
 
   const isImage = function isImage(layer) {
@@ -422,6 +427,25 @@ export default function PrintResize(options = {}) {
       }
     }
 
+    if (isVectorTile(layer)) {
+      const styleName = layer.get('styleName');
+      const styles = viewer.getStyle(styleName);
+      if (styles) {
+        const newStyle = Style.createStyle({
+          style: styleName,
+          viewer,
+          scaleToDpi: resolution,
+          type: 'mapbox',
+          file: styles[0][0].custom.file,
+          layer,
+          source: styles[0][0].custom.source
+        });
+        if (newStyle) {
+          layer.setStyle(newStyle);
+        }
+      }
+    }
+
     if (isImage(layer) && isValidSource(source)) {
       const params = source.getParams();
       if (getSourceType(layer) === 'Geoserver') {
@@ -465,6 +489,24 @@ export default function PrintResize(options = {}) {
             }
           }
         });
+      }
+    }
+
+    if (isVectorTile(layer)) {
+      const styleName = layer.get('styleName');
+      const styles = viewer.getStyle(styleName);
+      if (styles) {
+        const newStyle = Style.createStyle({
+          style: styleName,
+          viewer,
+          type: 'mapbox',
+          file: styles[0][0].custom.file,
+          layer,
+          source: styles[0][0].custom.source
+        });
+        if (newStyle) {
+          layer.setStyle(newStyle);
+        }
       }
     }
 

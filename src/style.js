@@ -348,7 +348,7 @@ function createStyle({
       style = getCustomStyle('stylefunction', { name: styleSettings[0][0].custom, params: styleSettings[0][0].params });
     } else if (typeof styleSettings[0][0].custom === 'object') {
       style = getCustomStyle(type, {
-        layer, file, source, name
+        layer, file, source, name, scaleToDpi
       });
     }
     return style || stylefunctions('default');
@@ -434,5 +434,6 @@ export default {
   styleFunction,
   createEditStyle,
   createGeometryStyle,
-  addStyleType
+  addStyleType,
+  multiplyByFactor
 };
