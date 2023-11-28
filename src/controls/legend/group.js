@@ -1,5 +1,7 @@
 import { Component, Button, Collapse, CollapseHeader, dom } from '../../ui';
 import GroupList from './grouplist';
+import createMoreInfoButton from './moreinfobutton';
+import LayerProperties from './overlayproperties';
 
 /**
  * The Group component can be a group or a subgroup,
@@ -22,7 +24,10 @@ const Group = function Group(viewer, options = {}) {
     exclusive = false,
     toggleAll = true,
     draggable = false,
-    zIndexStart = 0.1
+    zIndexStart = 0.1,
+    opacityControl = false,
+    zoomToExtent = false,
+    description
   } = options;
 
   const stateCls = {
@@ -39,6 +44,8 @@ const Group = function Group(viewer, options = {}) {
   const listCls = type === 'grouplayer' ? 'divider-start padding-left padding-top-small' : '';
   const groupList = GroupList({ viewer, cls: listCls, abstract });
   visibleState = groupList.getVisible();
+
+  const thisGroup = viewer.getGroup(name);
 
   const getEl = () => groupEl;
 
@@ -70,6 +77,9 @@ const Group = function Group(viewer, options = {}) {
     }
   }) : false;
 
+  const moreInfoButton = (opacityControl || zoomToExtent || description) ? createMoreInfoButton({ viewer,
+    group: thisGroup }) : false;
+
   const SubGroupHeader = function SubGroupHeader() {
     const expandButton = Button({
       cls: 'icon-small compact round',
@@ -86,6 +96,9 @@ const Group = function Group(viewer, options = {}) {
         if (tickButton) {
           this.addComponent(tickButton);
         }
+        if (moreInfoButton) {
+          this.addComponent(moreInfoButton);
+        }
       },
       onRender() {
         this.dispatch('render');
@@ -99,12 +112,14 @@ const Group = function Group(viewer, options = {}) {
         });
       },
       render() {
-        return `<div class="flex row align-center padding-left text-smaller pointer collapse-header" style="width: 100%; padding-right: 1.875rem">
+        const padding = moreInfoButton ? '0.275rem' : '1.875rem';
+        return `<div class="flex row align-center padding-left text-smaller pointer collapse-header item wrap" style="width: 100%; padding-right: ${padding}">
                 <div id="${this.getId()}" class="flex row align-center grow">
                    ${expandButton.render()}
                     <span class="grow padding-x-small" style="word-break: break-all;">${title}</span>
                 </div>
                 ${tickButton ? tickButton.render() : ''}
+                ${moreInfoButton ? moreInfoButton.render() : ''}
               </div>`;
       }
     });
@@ -346,6 +361,38 @@ const Group = function Group(viewer, options = {}) {
             }
           } else {
             e.stopPropagation();
+          }
+        });
+        groupEl.addEventListener('overlayproperties', (evt) => {
+          const overlaysCmp = viewer.getControlByName('legend').getOverlays();
+          const slidenav = overlaysCmp.slidenav;
+          if (evt.detail.group) {
+            const group = evt.detail.group;
+            const thisParent = this;
+            const label = group.labelOpacitySlider ? group.labelOpacitySlider : '';
+            const layerProperties = LayerProperties({
+              group, viewer, thisParent, labelOpacitySlider: label
+            });
+            slidenav.setSecondary(layerProperties);
+            slidenav.slideToSecondary();
+            // Include back btn and opacity slider in tab order when opened and remove when closed
+            const secondaryEl = document.getElementById(slidenav.getId()).querySelector('.secondary');
+            const backBtn = secondaryEl.getElementsByTagName('button')[0];
+            const opacityInput = secondaryEl.getElementsByTagName('input')[0];
+            backBtn.tabIndex = 0;
+            backBtn.focus();
+            if (opacityInput) {
+              opacityInput.tabIndex = 0;
+            }
+            backBtn.addEventListener('click', () => {
+              backBtn.tabIndex = -99;
+              if (opacityInput) {
+                opacityInput.tabIndex = -99;
+              }
+            }, false);
+            slidenav.on('slide', () => {
+              groupEl.classList.remove('width-100');
+            });
           }
         });
       }

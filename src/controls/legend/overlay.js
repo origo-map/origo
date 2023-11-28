@@ -2,6 +2,7 @@ import { Component, Button, dom, Collapse } from '../../ui';
 import { HeaderIcon, Legend } from '../../utils/legendmaker';
 import PopupMenu from '../../ui/popupmenu';
 import exportToFile from '../../utils/exporttofile';
+import createMoreInfoButton from './moreinfobutton';
 
 const OverlayLayer = function OverlayLayer(options) {
   const {
@@ -18,16 +19,12 @@ const OverlayLayer = function OverlayLayer(options) {
   const buttons = [];
   let headerIconClass = headerIconCls;
 
-  const popupMenuItems = [];
-
   const hasStylePicker = viewer.getLayerStylePicker(layer).length > 0;
   const layerIconCls = `round compact icon-small relative no-shrink light ${hasStylePicker ? 'style-picker' : ''}`;
   const cls = `${clsSettings} flex row align-center padding-left padding-right-smaller item wrap`.trim();
   const title = layer.get('title') || 'Titel saknas';
   const name = layer.get('name');
   const secure = layer.get('secure');
-  let moreInfoButton;
-  let popupMenu;
   let hasExtendedLegend = false;
   let thisComponent;
 
@@ -46,13 +43,6 @@ const OverlayLayer = function OverlayLayer(options) {
     headerIconClass = iconCls;
     hasExtendedLegend = true;
   }
-
-  const eventOverlayProps = new CustomEvent('overlayproperties', {
-    bubbles: true,
-    detail: {
-      layer
-    }
-  });
 
   const getCheckIcon = (visible) => {
     const isVisible = visible ? checkIcon : uncheckIcon;
@@ -147,167 +137,11 @@ const OverlayLayer = function OverlayLayer(options) {
     }
   });
 
-  const layerInfoMenuItem = Component({
-    onRender() {
-      const labelEl = document.getElementById(this.getId());
-      labelEl.addEventListener('click', (e) => {
-        popupMenu.setVisibility(false);
-        document.getElementById(moreInfoButton.getId()).dispatchEvent(eventOverlayProps);
-        e.preventDefault();
-      });
-    },
-    render() {
-      const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
-      return `<li id="${this.getId()}" class="${labelCls}">Visa lagerinformation</li>`;
-    }
-  });
-  popupMenuItems.push(layerInfoMenuItem);
-
-  if (layer.get('zoomToExtent')) {
-    const zoomToExtentMenuItem = Component({
-      onRender() {
-        const labelEl = document.getElementById(this.getId());
-        labelEl.addEventListener('click', (e) => {
-          const extent = typeof layer.getSource !== 'undefined' && typeof layer.getSource().getExtent !== 'undefined' ? layer.getSource().getExtent() : layer.getExtent();
-          if (layer.getVisible()) {
-            viewer.getMap().getView().fit(extent, {
-              padding: [50, 50, 50, 50],
-              duration: 1000
-            });
-            e.preventDefault();
-          }
-        });
-      },
-      render() {
-        const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
-        return `<li id="${this.getId()}" class="${labelCls}">Zooma till</li>`;
-      }
-    });
-    popupMenuItems.push(zoomToExtentMenuItem);
-  }
-
-  if (layer.get('exportable')) {
-    const exportFormat = layer.get('exportFormat') || layer.get('exportformat');
-    let exportFormatArray = [];
-    if (exportFormat && typeof exportFormat === 'string') {
-      exportFormatArray.push(exportFormat);
-    } else if (exportFormat && Array.isArray(exportFormat)) {
-      exportFormatArray = exportFormat;
-    }
-    const formats = exportFormatArray.map(format => format.toLowerCase()).filter(format => format === 'geojson' || format === 'gpx' || format === 'kml');
-    if (formats.length === 0) { formats.push('geojson'); }
-    formats.forEach((format) => {
-      const exportLayerMenuItem = Component({
-        onRender() {
-          const labelEl = document.getElementById(this.getId());
-          labelEl.addEventListener('click', (e) => {
-            const features = layer.getSource().getFeatures();
-            exportToFile(features, format, {
-              featureProjection: viewer.getProjection().getCode(),
-              filename: layer.get('title') || 'export'
-            });
-            e.preventDefault();
-          });
-        },
-        render() {
-          let exportLabel;
-          if (exportFormatArray.length > 1) {
-            exportLabel = `Spara lager (.${format})`;
-          } else { exportLabel = 'Spara lager'; }
-          const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
-          return `<li id="${this.getId()}" class="${labelCls}">${exportLabel}</li>`;
-        }
-      });
-      popupMenuItems.push(exportLayerMenuItem);
-    });
-  }
-
-  if (layer.get('removable')) {
-    const removeLayerMenuItem = Component({
-      onRender() {
-        const labelEl = document.getElementById(this.getId());
-        labelEl.addEventListener('click', (e) => {
-          const doRemove = (layer.get('promptlessRemoval') === true) || window.confirm('Vill du radera lagret?');
-          if (doRemove) {
-            viewer.getMap().removeLayer(layer);
-            e.preventDefault();
-          }
-        });
-      },
-      render() {
-        const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
-        return `<li id="${this.getId()}" class="${labelCls}">Ta bort lager</li>`;
-      }
-    });
-    popupMenuItems.push(removeLayerMenuItem);
-  }
-
-  const popupMenuList = Component({
-    onInit() {
-      this.addComponents(popupMenuItems);
-    },
-    render() {
-      let html = `<ul id="${this.getId()}">`;
-      popupMenuItems.forEach((item) => {
-        html += `${item.render()}`;
-      });
-      html += '</ul>';
-      return html;
-    }
-  });
-
-  const createPopupMenu = function createPopupMenu() {
-    const moreInfoButtonEl = document.getElementById(moreInfoButton.getId());
-    const onUnfocus = (e) => {
-      if (!moreInfoButtonEl.contains(e.target)) {
-        popupMenu.setVisibility(false);
-      }
-    };
-    popupMenu = PopupMenu({ onUnfocus, cls: 'overlay-popup' });
-    const newDiv = document.createElement('div');
-    newDiv.classList.add('justify-end', 'flex', 'relative', 'basis-100');
-    moreInfoButtonEl.insertAdjacentElement('afterend', newDiv);
-    newDiv.appendChild(dom.html(popupMenu.render()));
-    popupMenu.setContent(popupMenuList.render());
-    popupMenuList.dispatch('render');
-    popupMenu.setVisibility(true);
-  };
-
-  const togglePopupMenu = function togglePopupMenu() {
-    if (!popupMenu) {
-      createPopupMenu();
-    } else {
-      popupMenu.toggleVisibility();
-    }
-  };
-
-  moreInfoButton = Button({
-    cls: 'round small icon-smaller no-shrink',
-    click() {
-      if (popupMenuItems.length > 1) {
-        togglePopupMenu();
-      } else {
-        document.getElementById(this.getId()).dispatchEvent(eventOverlayProps);
-      }
-    },
-    style: {
-      'align-self': 'center'
-    },
-    icon: '#ic_more_vert_24px',
-    ariaLabel: 'Visa lagerinfo',
-    tabIndex: -1
-  });
-
+  const moreInfoButton = createMoreInfoButton({ layer, viewer });
   buttons.push(moreInfoButton);
   const ButtonsHtml = `${layerIcon.render()}${label.render()}${toggleButton.render()}${moreInfoButton.render()}`;
 
-  const removeOverlayMenuItem = function removeListeners() {
-    const popupMenuListEl = document.getElementById(popupMenuList.getId());
-    if (popupMenuListEl) { popupMenuListEl.remove(); }
-  };
-
   const onRemove = function onRemove() {
-    removeOverlayMenuItem();
     const el = document.getElementById(this.getId());
     el.remove();
   };
