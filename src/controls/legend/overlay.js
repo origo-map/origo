@@ -1,7 +1,5 @@
 import { Component, Button, dom, Collapse } from '../../ui';
 import { HeaderIcon, Legend } from '../../utils/legendmaker';
-import PopupMenu from '../../ui/popupmenu';
-import exportToFile from '../../utils/exporttofile';
 import createMoreInfoButton from './moreinfobutton';
 
 const OverlayLayer = function OverlayLayer(options) {
