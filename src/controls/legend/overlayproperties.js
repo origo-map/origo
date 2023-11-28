@@ -81,6 +81,23 @@ const OverlayProperties = function OverlayProperties(options = {}) {
     return (altStyle && altStyle.title) || styleName;
   }
 
+  function getSubgroups(topGroup) {
+    const groups = viewer.getGroups();
+    const groupArr = [topGroup];
+    function loopGroups(checkGroup) {
+      if (groups) {
+        for (let i = 0; i < groups.length; i += 1) {
+          if (groups[i].parent === checkGroup.name) {
+            groupArr.push(groups[i]);
+            loopGroups(groups[i], groups);
+          }
+        }
+      }
+    }
+    loopGroups(topGroup, groups);
+    return groupArr;
+  }
+
   const onSelectStyle = (styleTitle) => {
     const altStyleIndex = stylePicker.findIndex(s => s.title === styleTitle);
     const altStyle = stylePicker[altStyleIndex];
@@ -178,8 +195,13 @@ const OverlayProperties = function OverlayProperties(options = {}) {
         sliderEl.nextElementSibling.value *= 100;
         sliderEl.addEventListener('input', () => {
           if (group) {
-            group.opacity = sliderEl.valueAsNumber;
-            viewer.getLayersByProperty('group', group.name).forEach(l => l.setOpacity(sliderEl.valueAsNumber));
+            const groups = viewer.getGroups();
+            const groupArr = getSubgroups(group, groups);
+            groupArr.forEach(grp => {
+              const activeGrp = grp;
+              viewer.getLayersByProperty('group', activeGrp.name).forEach(l => l.setOpacity(sliderEl.valueAsNumber));
+              activeGrp.opacity = sliderEl.valueAsNumber;
+            });
             viewer.getLayersByProperty('id', `grouplayer-${group.name}`).forEach(l => l.setOpacity(sliderEl.valueAsNumber));
           }
           if (layer) {
@@ -189,8 +211,12 @@ const OverlayProperties = function OverlayProperties(options = {}) {
         });
         sliderEl.addEventListener('change', () => {
           if (group) {
-            group.opacity = sliderEl.valueAsNumber;
-            viewer.getLayersByProperty('group', group.name).forEach(l => l.setOpacity(sliderEl.valueAsNumber));
+            const groupArr = getSubgroups(group);
+            groupArr.forEach(grp => {
+              const activeGrp = grp;
+              viewer.getLayersByProperty('group', activeGrp.name).forEach(l => l.setOpacity(sliderEl.valueAsNumber));
+              activeGrp.opacity = sliderEl.valueAsNumber;
+            });
             viewer.getLayersByProperty('id', `grouplayer-${group.name}`).forEach(l => l.setOpacity(sliderEl.valueAsNumber));
           }
           if (layer) {
