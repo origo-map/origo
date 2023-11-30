@@ -12,6 +12,7 @@ const OverlayProperties = function OverlayProperties(options = {}) {
   let cls = '';
   let title;
   let abstract;
+  let description;
   let opacity;
   let opacityControl;
   let style;
@@ -21,6 +22,7 @@ const OverlayProperties = function OverlayProperties(options = {}) {
     cls = `${clsOptions} item`.trim();
     title = layer.get('title') || '';
     abstract = layer.get('abstract') || '';
+    description = layer.get('description') || '';
     opacity = layer.getOpacity();
     opacityControl = layer.get('opacityControl') !== false;
     style = viewer.getStyle(layer.get('styleName'));
@@ -28,7 +30,8 @@ const OverlayProperties = function OverlayProperties(options = {}) {
     stylePicker = viewer.getLayerStylePicker(layer);
   } else if (group) {
     title = group.title;
-    abstract = group.description;
+    abstract = group.showAbstract ? group.abstract || '' : '';
+    description = group.description || '';
     opacity = group.opacity || 1;
     opacityControl = group.opacityControl === true;
   }
@@ -240,6 +243,7 @@ const OverlayProperties = function OverlayProperties(options = {}) {
                   ${opacityControl ? transparencySlider.render() : ''}
                 </div>
                 ${abstract ? `<div class="padding-small padding-x text-small">${abstract}</div>` : ''}
+                ${description ? `<div class="padding-small padding-x text-small">${description}</div>` : ''}
               </div>`;
     },
     labelCls: 'text-small text-semibold',
