@@ -127,10 +127,18 @@ const Group = function Group(viewer, options = {}) {
 
   const GroupHeader = function GroupHeader() {
     const headerComponent = CollapseHeader({
-      cls: 'hover padding-x padding-y-small grey-lightest border-bottom text-small',
+      cls: 'hover padding-x padding-y-small grey-lightest border-bottom text-small item wrap',
       icon,
-      title
+      title,
+      style: `${moreInfoButton ? 'padding-right: 0.275rem' : ''}`
     });
+    if (moreInfoButton) {
+      headerComponent.on('render', function hcRender() {
+        const el = document.getElementById(this.getId());
+        const html = moreInfoButton.render();
+        el.insertAdjacentHTML('beforeend', html);
+      });
+    }
     return headerComponent;
   };
 
@@ -143,6 +151,9 @@ const Group = function Group(viewer, options = {}) {
     contentComponent: groupList,
     collapseX: false
   });
+  if (moreInfoButton) {
+    collapse.addComponent(moreInfoButton);
+  }
 
   const addGroup = function addGroup(groupCmp) {
     groupList.addGroup(groupCmp);
@@ -338,31 +349,7 @@ const Group = function Group(viewer, options = {}) {
           updateGroupIndication();
         });
       }
-      // only listen to tick changes for subgroups
-      if (type === 'grouplayer') {
-        groupEl.addEventListener('tick:all', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          this.dispatch('tick:all');
-        });
-        groupEl.addEventListener('untick:all', (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          this.dispatch('untick:all');
-        });
-        groupEl.addEventListener('change:visible', (e) => {
-          e.preventDefault();
-          const newVisibleState = groupList.getVisible();
-          if (visibleState !== newVisibleState) {
-            visibleState = newVisibleState;
-            if (tickButton) {
-              tickButton.dispatch('change', { icon: getCheckIcon(visibleState) });
-              tickButton.setState(stateCls[visibleState]);
-            }
-          } else {
-            e.stopPropagation();
-          }
-        });
+      if (moreInfoButton) {
         groupEl.addEventListener('overlayproperties', (evt) => {
           const overlaysCmp = viewer.getControlByName('legend').getOverlays();
           const slidenav = overlaysCmp.slidenav;
@@ -393,6 +380,32 @@ const Group = function Group(viewer, options = {}) {
             slidenav.on('slide', () => {
               groupEl.classList.remove('width-100');
             });
+          }
+        });
+      }
+      // only listen to tick changes for subgroups
+      if (type === 'grouplayer') {
+        groupEl.addEventListener('tick:all', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          this.dispatch('tick:all');
+        });
+        groupEl.addEventListener('untick:all', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          this.dispatch('untick:all');
+        });
+        groupEl.addEventListener('change:visible', (e) => {
+          e.preventDefault();
+          const newVisibleState = groupList.getVisible();
+          if (visibleState !== newVisibleState) {
+            visibleState = newVisibleState;
+            if (tickButton) {
+              tickButton.dispatch('change', { icon: getCheckIcon(visibleState) });
+              tickButton.setState(stateCls[visibleState]);
+            }
+          } else {
+            e.stopPropagation();
           }
         });
       }

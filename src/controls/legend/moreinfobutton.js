@@ -29,6 +29,8 @@ export default function createMoreInfoButton(params) {
           popupMenu.setVisibility(false);
           document.getElementById(moreInfoButton.getId()).dispatchEvent(eventOverlayProps);
           e.preventDefault();
+          e.stopPropagation();
+          popupMenu.setVisibility(false);
         });
       },
       render() {
@@ -61,6 +63,8 @@ export default function createMoreInfoButton(params) {
             });
             e.preventDefault();
           }
+          e.stopPropagation();
+          popupMenu.setVisibility(false);
         });
       },
       render() {
@@ -92,6 +96,8 @@ export default function createMoreInfoButton(params) {
               filename: layer.get('title') || 'export'
             });
             e.preventDefault();
+            e.stopPropagation();
+            popupMenu.setVisibility(false);
           });
         },
         render() {
@@ -116,7 +122,9 @@ export default function createMoreInfoButton(params) {
           if (doRemove) {
             viewer.getMap().removeLayer(layer);
             e.preventDefault();
+            e.stopPropagation();
           }
+          popupMenu.setVisibility(false);
         });
       },
       render() {
@@ -182,6 +190,9 @@ export default function createMoreInfoButton(params) {
       icon: '#ic_more_vert_24px',
       ariaLabel: 'Visa lagerinfo',
       tabIndex: -1
+    });
+    moreInfoButton.on('render', function onRenderButton() {
+      document.getElementById(this.getId()).onclick = function handleEvent(e) { e.stopPropagation(); };
     });
     return moreInfoButton;
   }

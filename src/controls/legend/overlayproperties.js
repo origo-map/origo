@@ -30,7 +30,7 @@ const OverlayProperties = function OverlayProperties(options = {}) {
     title = group.title;
     abstract = group.description;
     opacity = group.opacity || 1;
-    opacityControl = group.opacityControl !== false;
+    opacityControl = group.opacityControl === true;
   }
   let styleSelection;
   let overlayEl;
