@@ -18,6 +18,7 @@ const Group = function Group(viewer, options = {}) {
     name,
     parent,
     abstract,
+    showAbstract,
     position = 'top',
     type = 'group',
     autoExpand = true,
@@ -77,7 +78,7 @@ const Group = function Group(viewer, options = {}) {
     }
   }) : false;
 
-  const moreInfoButton = (opacityControl || zoomToExtent || description) ? createMoreInfoButton({ viewer,
+  const moreInfoButton = (opacityControl || zoomToExtent || description || (abstract && showAbstract)) ? createMoreInfoButton({ viewer,
     group: thisGroup }) : false;
 
   const SubGroupHeader = function SubGroupHeader() {
