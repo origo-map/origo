@@ -30,7 +30,7 @@ const OverlayProperties = function OverlayProperties(options = {}) {
     stylePicker = viewer.getLayerStylePicker(layer);
   } else if (group) {
     title = group.title;
-    abstract = group.showAbstract ? group.abstract || '' : '';
+    abstract = !group.showAbstractInLegend ? group.abstract || '' : '';
     description = group.description || '';
     opacity = group.opacity || 1;
     opacityControl = group.opacityControl === true;

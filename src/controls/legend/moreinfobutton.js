@@ -21,7 +21,7 @@ export default function createMoreInfoButton(params) {
     }
   });
 
-  if (layer || group.opacityControl || group.description || (group.abstract && group.showAbstract)) {
+  if (layer || group.opacityControl || group.description || (group.abstract && !group.showAbstractInLegend)) {
     const layerInfoMenuItem = Component({
       onRender() {
         const labelEl = document.getElementById(this.getId());

@@ -18,7 +18,7 @@ const Group = function Group(viewer, options = {}) {
     name,
     parent,
     abstract,
-    showAbstract,
+    showAbstractInLegend = false,
     position = 'top',
     type = 'group',
     autoExpand = true,
@@ -43,7 +43,7 @@ const Group = function Group(viewer, options = {}) {
   let selectedItem;
 
   const listCls = type === 'grouplayer' ? 'divider-start padding-left padding-top-small' : '';
-  const groupList = GroupList({ viewer, cls: listCls, abstract });
+  const groupList = GroupList({ viewer, cls: listCls, abstract, showAbstractInLegend });
   visibleState = groupList.getVisible();
 
   const thisGroup = viewer.getGroup(name);
@@ -78,7 +78,7 @@ const Group = function Group(viewer, options = {}) {
     }
   }) : false;
 
-  const moreInfoButton = (opacityControl || zoomToExtent || description || (abstract && showAbstract)) ? createMoreInfoButton({ viewer,
+  const moreInfoButton = (opacityControl || zoomToExtent || description || (abstract && !showAbstractInLegend)) ? createMoreInfoButton({ viewer,
     group: thisGroup }) : false;
 
   const SubGroupHeader = function SubGroupHeader() {
@@ -152,7 +152,8 @@ const Group = function Group(viewer, options = {}) {
     contentComponent: groupList,
     collapseX: false
   });
-  if (moreInfoButton) {
+
+  if (moreInfoButton && type !== 'grouplayer') {
     collapse.addComponent(moreInfoButton);
   }
 
