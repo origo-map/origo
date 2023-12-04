@@ -131,7 +131,7 @@ const Group = function Group(viewer, options = {}) {
       cls: 'hover padding-x padding-y-small grey-lightest border-bottom text-small sticky bg-white z-index-low item wrap',
       style: `top: 0;${moreInfoButton ? 'padding-right: 0.275rem' : ''}`,
       icon,
-      title,
+      title
     });
     if (moreInfoButton) {
       headerComponent.on('render', function hcRender() {
