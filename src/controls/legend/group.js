@@ -129,10 +129,9 @@ const Group = function Group(viewer, options = {}) {
   const GroupHeader = function GroupHeader() {
     const headerComponent = CollapseHeader({
       cls: 'hover padding-x padding-y-small grey-lightest border-bottom text-small sticky bg-white z-index-low item wrap',
-      style: 'top: 0;',
+      style: `top: 0;${moreInfoButton ? 'padding-right: 0.275rem' : ''}`,
       icon,
       title,
-      style: `${moreInfoButton ? 'padding-right: 0.275rem' : ''}`
     });
     if (moreInfoButton) {
       headerComponent.on('render', function hcRender() {
