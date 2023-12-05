@@ -73,7 +73,7 @@ const Group = function Group(viewer, options = {}) {
     iconCls: '',
     state: visibleState,
     style: {
-      'align-self': 'flex-end',
+      'align-self': 'center',
       cursor: 'pointer'
     }
   }) : false;
@@ -114,7 +114,7 @@ const Group = function Group(viewer, options = {}) {
       },
       render() {
         const padding = moreInfoButton ? '0.275rem' : '1.875rem';
-        return `<div class="flex row align-center padding-left text-smaller pointer collapse-header item wrap" style="width: 100%; padding-right: ${padding}">
+        return `<div class="flex row align-center padding-left text-smaller pointer collapse-header" style="width: 100%; padding-right: ${padding}">
                 <div id="${this.getId()}" class="flex row align-center grow">
                    ${expandButton.render()}
                     <span class="grow padding-x-small" style="word-break: break-all;">${title}</span>
@@ -128,7 +128,7 @@ const Group = function Group(viewer, options = {}) {
 
   const GroupHeader = function GroupHeader() {
     const headerComponent = CollapseHeader({
-      cls: 'hover padding-x padding-y-small grey-lightest border-bottom text-small sticky bg-white z-index-low item wrap',
+      cls: 'hover padding-x padding-y-small grey-lightest border-bottom text-small sticky bg-white z-index-low',
       style: `top: 0;${moreInfoButton ? 'padding-right: 0.275rem' : ''}`,
       icon,
       title
