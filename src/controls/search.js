@@ -47,7 +47,8 @@ const Search = function Search(options = {}) {
     url,
     queryParameterName = 'q',
     autocompletePlacement,
-    searchlistOptions = {}
+    searchlistOptions = {},
+    queryType
   } = options;
 
   const searchlistPlacement = searchlistOptions.placement;
@@ -523,6 +524,9 @@ const Search = function Search(options = {}) {
       }
       if (complete) {
         queryUrl += '&c=true';
+      }
+      if (queryType) {
+        queryUrl += `&t=${queryType}`;
       }
       fetch(queryUrl)
         .then(response => response.json())
