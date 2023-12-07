@@ -66,7 +66,7 @@ const loadResources = async function loadResources(mapOptions, config) {
       if (mapOptions.controls) {
         mapOptions.controls.forEach((control) => {
           const matchingControlIndex = map.options.controls.findIndex(
-            (defaultControl) => (defaultControl.name === control.name)
+            () => (config.defaultControls.name === control.name)
           );
           if (matchingControlIndex !== -1) {
             Object.assign(map.options.controls[matchingControlIndex], control);
