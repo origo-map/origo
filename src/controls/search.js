@@ -364,7 +364,7 @@ const Search = function Search(options = {}) {
                     .then((res) => {
                       if (res.length > 0) {
                         const featLayerName = layer.get('name');
-                        featureInfo.showFeatureInfo({ feature: res, layerName: featLayerName });
+                        featureInfo.showFeatureInfo({ feature: res, layerName: featLayerName }, { maxZoomLevel });
                       }
                     });
                 });
@@ -392,7 +392,7 @@ const Search = function Search(options = {}) {
                     .then((res) => {
                       if (res.length > 0) {
                         const featureLayerName = layer.get('name');
-                        featureInfo.showFeatureInfo({ feature: res, layerName: featureLayerName });
+                        featureInfo.showFeatureInfo({ feature: res, layerName: featureLayerName }, { maxZoomLevel });
                       }
                     });
                 });

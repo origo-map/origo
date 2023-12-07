@@ -605,9 +605,15 @@ const Featureinfo = function Featureinfo(options = {}) {
   * @param {any} featureObj An object containing layerName and feature. "feature" is either one Feature or an Array of Feature
   * @param {any} opts An object containing options. Supported options are : coordinate, the coordinate where popup will be shown. If omitted first feature is used.
   *                                                                         ignorePan, do not autopan if type is overlay. Pan should be supressed if view is changed manually to avoid contradicting animations.
+  *                                                                         maxZoomLevel, max level for zooming on feature.
   * @returns nothing
   */
-  const showFeatureInfo = function showFeatureInfo(featureObj, opts = { ignorePan: true }) {
+  const showFeatureInfo = function showFeatureInfo(featureObj, opts) {
+    const thisOpts = { ...{
+      ignorePan: true
+    },
+    ...opts };
+
     const newItems = [];
     const layerName = featureObj.layerName;
     const layer = viewer.getLayer(layerName);
@@ -623,8 +629,8 @@ const Featureinfo = function Featureinfo(options = {}) {
       newItems.push(newItem);
     }
     if (newItems.length > 0) {
-      render(newItems, identifyTarget, opts.coordinate || maputils.getCenter(newItems[0].getFeature().getGeometry()), opts);
-      viewer.getMap().getView().fit(maputils.getExtent(newItems.map(i => i.getFeature())));
+      render(newItems, identifyTarget, thisOpts.coordinate || maputils.getCenter(newItems[0].getFeature().getGeometry()), thisOpts);
+      viewer.getMap().getView().fit(maputils.getExtent(newItems.map(i => i.getFeature())), { maxZoom: thisOpts.maxZoomLevel });
     }
   };
 
