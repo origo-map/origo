@@ -139,7 +139,7 @@ class WfsSource extends VectorSource {
       `&version=1.1.0&request=GetFeature&typeName=${this._options.featureType}&outputFormat=application/json`,
       `&srsname=${this._options.dataProjection}`].join('');
     url += queryFilter;
-    if (ids) {
+    if (ids || ids === 0) {
       url += `&FeatureId=${ids}`;
     }
     url = encodeURI(url);
