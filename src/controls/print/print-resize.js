@@ -386,22 +386,18 @@ export default function PrintResize(options = {}) {
     }
   };
 
-  const scaleMapboxLayer = function scaleMapboxLayer(layer, scaleToDpi) {
-    const styleName = layer.get('styleName');
-    const styles = viewer.getStyle(styleName);
-    if (styles) {
-      const newStyle = Style.createStyle({
-        style: styleName,
-        viewer,
-        type: 'mapbox',
-        scaleToDpi,
-        file: styles[0][0].custom.file,
-        layer,
-        source: styles[0][0].custom.source
-      });
-      if (newStyle) {
-        layer.setStyle(newStyle);
-      }
+  const scaleMapboxLayer = function scaleMapboxLayer(layer, styleName, styles, scaleToDpi) {
+    const newStyle = Style.createStyle({
+      style: styleName,
+      viewer,
+      type: 'mapbox',
+      scaleToDpi,
+      file: styles[0][0].custom.file,
+      layer,
+      source: styles[0][0].custom.source
+    });
+    if (newStyle) {
+      layer.setStyle(newStyle);
     }
   };
 
@@ -447,9 +443,10 @@ export default function PrintResize(options = {}) {
     }
 
     if (isVectorTile(layer)) {
-      const format = layer.get('format');
-      if (format === 'mvt') {
-        scaleMapboxLayer(layer, resolution);
+      const styleName = layer.get('styleName');
+      const styles = viewer.getStyle(styleName);
+      if (styles && styles[0][0].custom.type === 'mapbox') {
+        scaleMapboxLayer(layer, styleName, styles, resolution);
       }
     }
 
@@ -500,9 +497,10 @@ export default function PrintResize(options = {}) {
     }
 
     if (isVectorTile(layer)) {
-      const format = layer.get('format');
-      if (format === 'mvt') {
-        scaleMapboxLayer(layer, null);
+      const styleName = layer.get('styleName');
+      const styles = viewer.getStyle(styleName);
+      if (styles && styles[0][0].custom.type === 'mapbox') {
+        scaleMapboxLayer(layer, styleName, styles, null);
       }
     }
 
