@@ -117,7 +117,7 @@ const Group = function Group(viewer, options = {}) {
         return `<div class="flex row align-center padding-left text-smaller pointer collapse-header" style="width: 100%; padding-right: ${padding}">
                 <div id="${this.getId()}" class="flex row align-center grow">
                    ${expandButton.render()}
-                    <span class="grow padding-x-small" style="word-break: break-all;">${title}</span>
+                    <span class="grow padding-x-small" style="overflow-wrap: anywhere;">${title}</span>
                 </div>
                 ${tickButton ? tickButton.render() : ''}
                 ${moreInfoButton ? moreInfoButton.render() : ''}
