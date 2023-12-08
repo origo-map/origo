@@ -386,6 +386,25 @@ export default function PrintResize(options = {}) {
     }
   };
 
+  const scaleMapboxLayer = function scaleMapboxLayer(layer, scaleToDpi) {
+    const styleName = layer.get('styleName');
+    const styles = viewer.getStyle(styleName);
+    if (styles) {
+      const newStyle = Style.createStyle({
+        style: styleName,
+        viewer,
+        type: 'mapbox',
+        scaleToDpi,
+        file: styles[0][0].custom.file,
+        layer,
+        source: styles[0][0].custom.source
+      });
+      if (newStyle) {
+        layer.setStyle(newStyle);
+      }
+    }
+  };
+
   // Alters layer in map, if vector then set scale for feature, if image set DPI parameter for source
   const setLayerScale = function setLayerScale(layer) {
     const source = layer.getSource();
@@ -428,21 +447,9 @@ export default function PrintResize(options = {}) {
     }
 
     if (isVectorTile(layer)) {
-      const styleName = layer.get('styleName');
-      const styles = viewer.getStyle(styleName);
-      if (styles) {
-        const newStyle = Style.createStyle({
-          style: styleName,
-          viewer,
-          scaleToDpi: resolution,
-          type: 'mapbox',
-          file: styles[0][0].custom.file,
-          layer,
-          source: styles[0][0].custom.source
-        });
-        if (newStyle) {
-          layer.setStyle(newStyle);
-        }
+      const format = layer.get('format');
+      if (format === 'mvt') {
+        scaleMapboxLayer(layer, resolution);
       }
     }
 
@@ -493,20 +500,9 @@ export default function PrintResize(options = {}) {
     }
 
     if (isVectorTile(layer)) {
-      const styleName = layer.get('styleName');
-      const styles = viewer.getStyle(styleName);
-      if (styles) {
-        const newStyle = Style.createStyle({
-          style: styleName,
-          viewer,
-          type: 'mapbox',
-          file: styles[0][0].custom.file,
-          layer,
-          source: styles[0][0].custom.source
-        });
-        if (newStyle) {
-          layer.setStyle(newStyle);
-        }
+      const format = layer.get('format');
+      if (format === 'mvt') {
+        scaleMapboxLayer(layer, null);
       }
     }
 
