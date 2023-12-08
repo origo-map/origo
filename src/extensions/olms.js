@@ -23,6 +23,14 @@ const Olms = function Olms(options = {}) {
         if (lineWidth) {
           paint['line-width'] = Style.multiplyByFactor(lineWidth, dpi);
         }
+        const circleRadius = paint['circle-radius'];
+        if (circleRadius) {
+          paint['circle-radius'] = Style.multiplyByFactor(circleRadius, dpi);
+        }
+        const circleStrokeWidth = paint['circle-stroke-width'];
+        if (circleStrokeWidth) {
+          paint['circle-stroke-width'] = Style.multiplyByFactor(circleStrokeWidth, dpi);
+        }
       }
       if (layout) {
         const textSize = layout['text-size'];
