@@ -23,13 +23,13 @@ export default function CollapseHeader(options = {}) {
     icon,
     iconCls: 'rotate grey',
     style: {
-      'align-self': 'flex-end'
+      'align-self': 'center'
     }
   });
 
   const titleCmp = Component({
     render() {
-      return `<span id="${this.getId()}" class="grow">${title}</span>`;
+      return `<span id="${this.getId()}" class="grow  basis-0">${title}</span>`;
     }
   });
 
