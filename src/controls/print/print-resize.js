@@ -500,7 +500,7 @@ export default function PrintResize(options = {}) {
       const styleName = layer.get('styleName');
       const styles = viewer.getStyle(styleName);
       if (styles && styles[0][0].custom.type === 'mapbox') {
-        scaleMapboxLayer(layer, styleName, styles, null);
+        scaleMapboxLayer(layer, styleName, styles);
       }
     }
 
