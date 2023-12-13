@@ -1,13 +1,13 @@
-import { Component, Button, dom, Element } from '../ui';
 import { Draw } from 'ol/interaction';
 import { Vector as VectorLayer } from 'ol/layer';
 import { Vector as VectorSource } from 'ol/source';
+import { Component, Button, dom, Element } from '../ui';
 import shapes from './offline-new/shapes';
 import offlineToolbar from './offline-new/offline-toolbar'
-import offlineConfirmationModal from './offline-new/offline-confirmation-modal'
+import offlineConfirmationModal from './offline-new/offline-confirmation-modal';
 import * as drawStyles from '../style/drawstyles';
 
-const offline = function() {
+const offline = function offline() {
   let offlineButtonTarget;
   let toolbarTarget;
   let viewer;

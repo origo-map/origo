@@ -2,7 +2,7 @@ import { Component, Button, dom, Element } from '../../ui';
 import { html } from '../../ui/dom/dom';
 import utils from '../../utils';
 
-const offlineConfirmationModal = function(options ={}) {
+const offlineConfirmationModal = function offlineConfirmationModal(options = {}) {
   const {
     title,
     content,
