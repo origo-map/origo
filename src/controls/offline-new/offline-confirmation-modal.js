@@ -71,7 +71,7 @@ const offlineConfirmationModal = function offlineConfirmationModal(options = {})
       this.addComponent(contentElement);
 
       this.on('render', this.onRender);
-      
+
       document.getElementById(target).appendChild(html(this.render()));
 
       const contentDomElement = document.getElementById(contentElement.getId());
@@ -90,6 +90,6 @@ const offlineConfirmationModal = function offlineConfirmationModal(options = {})
       return wrapperElement.render();
     }
   });
-}
+};
 
 export default offlineConfirmationModal;
