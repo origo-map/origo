@@ -1,0 +1,14 @@
+.o-offline-confirmation-modal {
+    background-color: $white;
+    border-radius: 6px;
+    bottom: auto;
+    box-shadow: 0 2px 8px 1px rgba(0, 0, 0, 0.45);
+    font-family: Arial,sans-serif;
+    left: 50%;
+    position: absolute;
+    right: auto;
+    top: 15%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    z-index: 1100;
+}

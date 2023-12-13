@@ -55,6 +55,9 @@
     },
     {
       "name": "measure"
+    },
+    {
+      "name": "offline"
     }
   ],
   "pageSettings": {
