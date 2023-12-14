@@ -1,4 +1,5 @@
-import { Component, Modal, Button, Icon } from '../ui';
+import { Component, Modal, Button, Icon, dom } from '../ui';
+import utils from '../utils';
 import stripJSONComments from '../utils/stripjsoncomments';
 import isEmbedded from '../utils/isembedded';
 
@@ -8,10 +9,12 @@ const Guide = function Guide(options = {}) {
     title = 'Guide',
     cls,
     style,
+    activeOnstart = false,
     url
   } = options;
-
   let viewer;
+  let guideButton;
+  let guideButtonEl;
   let hideButton;
   let nextButton;
   let prevButton;
@@ -76,12 +79,6 @@ const Guide = function Guide(options = {}) {
     const controlsToRender = [];
     const activeControls = await getActiveControls();
     const guideConfigControls = await getGuideConfig();
-    // Finds active control by name
-    const findControl = (name) => {
-      const foundControl = activeControls.find((activeControl) => activeControl.name === name);
-      return foundControl;
-    };
-
     // If map is embedded and controls hideWhenEmbedded is true, they are excluded from the guide
     const filterEmbedded = activeControls.map(activeControl => {
       const ifOptions = activeControl.options;
@@ -115,17 +112,19 @@ const Guide = function Guide(options = {}) {
       // Sets the guides target control
       targetValue = controlToRender.target;
 
-      // Specials, targets for different controls configured initial state
-      if (controlToRender.name === 'legend' && 'expanded' in findControl('legend').options && !findControl('legend').options.expanded) {
+      // Specials, targets for different controls configured initial state.
+      // Could this be configured with method in guide.json instead or both?
+      if (controlToRender.name === 'legend' && 'expanded' in viewer.getControlByName('legend').options && !viewer.getControlByName('legend').options.expanded) {
         targetValue = 'o-legend-btn';
       }
-      if (controlToRender.name === 'bookmarks' && !findControl('bookmarks').options.isActive) {
+      if (controlToRender.name === 'bookmarks' && !viewer.getControlByName('bookmarks').options.isActive) {
         targetValue = 'o-bookmarks-btn';
       }
       if (!isEmbedded(viewer.getTarget()) && 'group' in controlToRender) {
         const indx = controlToRender.group.findIndex(v => v.name === 'fullscreen');
         controlToRender.group.splice(indx, indx >= 0 ? 1 : 0);
       }
+
       // Creates the nested groups
       if ('group' in controlToRender) {
         controlToRender.group.forEach(groupItem => {
@@ -196,22 +195,14 @@ const Guide = function Guide(options = {}) {
   };
 
   // Creates the guide modal with its buttons and content
-  const createModal = async (modalContent) => {
-    content = modalContent;
+  const createModal = async () => {
     await createContent();
-    if (!hideButton) {
-      component.addComponent(nextButton);
-      component.addComponent(prevButton);
-      content = `<ul id="o-guide-slides-container">${contentItems.join(' ')}</ul>`;
-      content = moveButtons();
-    }
+    component.addComponents([nextButton, prevButton]);
+    content = `<ul id="o-guide-slides-container">${contentItems.join(' ')}</ul>`;
+    content = moveButtons();
     if (hideButton) {
       setLocalStorage();
-      component.addComponent(nextButton);
-      component.addComponent(prevButton);
-      component.addComponent(hideButton);
-      content = `<ul id="o-guide-slides-container">${contentItems.join(' ')}</ul>`;
-      content = moveButtons();
+      component.addComponents([hideButton]);
       content = addHideButton();
     } else {
       clearLocalStorage();
@@ -224,7 +215,9 @@ const Guide = function Guide(options = {}) {
         target,
         style: `text-align: center;${style}`
       });
-      component.dispatch('render');
+      if (!modal) {
+        component.dispatch('render');
+      }
     }
     list = document.getElementById('o-guide-slides-container');
     items = Array.from(list.children);
@@ -234,6 +227,15 @@ const Guide = function Guide(options = {}) {
   return Component({
     name: 'guide',
     onInit() {
+      guideButton = Button({
+        icon: '#fa-signs-post',
+        cls: 'o-guide-btn control icon-smaller medium round light',
+        tooltipText: title,
+        tooltipPlacement: 'east',
+        click() {
+          createModal();
+        }
+      });
       if (options.hideButton) {
         hideButtonVisible = Object.prototype.hasOwnProperty.call(options.hideButton, 'visible') ? options.hideButton.visible : false;
         hideText = Object.prototype.hasOwnProperty.call(options.hideButton, 'hideText') ? options.hideButton.hideText : 'Visa inte igen';
@@ -290,7 +292,16 @@ const Guide = function Guide(options = {}) {
       target = document.querySelectorAll('.o-main')[0].id;
       contentKey = `guideContent;${window.location.pathname};${viewer.getMapName().split('.')[0]}`;
       visibilityKey = `guideVisibility;${window.location.pathname};${viewer.getMapName().split('.')[0]}`;
-      createModal(content);
+      if (activeOnstart) {
+        createModal();
+      }
+      this.addComponents([guideButton]);
+      this.render();
+    },
+    render() {
+      guideButtonEl = dom.html(guideButton.render());
+      document.getElementById(`${viewer.getMain().getMapTools().getId()}`).appendChild(guideButtonEl);
+      this.dispatch('render');
     }
   });
 };
