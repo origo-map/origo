@@ -156,7 +156,9 @@ const offline = function offline() {
          */
         confirmationContent = `<p>Envelope: ${evt.feature.getGeometry().getCoordinates()}</p>`;
         const layers = viewer.getLayers();
-        confirmationContent = `${confirmationContent}<p>LayerNames: ${layers.map(layer => `${layer.values_.name}`)}</p>`;
+        /* eslint no-underscore-dangle: [1, { "allow": ["values_"] }] */
+        const layerNames = layers.map(layer => `${layer.values_.name}`);
+        confirmationContent = `${confirmationContent}<p>LayerNames: ${layerNames}</p>`;
         const confirmationContentElement = Element({
           cls: 'content',
           innerHTML: confirmationContent
