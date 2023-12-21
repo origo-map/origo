@@ -1,12 +1,17 @@
 import { Draw } from 'ol/interaction';
 import { Vector as VectorLayer } from 'ol/layer';
 import { Vector as VectorSource } from 'ol/source';
+import offlineToolbar from 'offline-new/offline-toolbar';
 import { Component, Button, dom, Element } from '../ui';
 import shapes from './offline-new/shapes';
-import offlineToolbar from './offline-new/offline-toolbar';
 import offlineConfirmationModal from './offline-new/offline-confirmation-modal';
 import * as drawStyles from '../style/drawstyles';
 
+/**
+ * Creates component for drawing an envelope which extent
+ * will be used to cache tiles for offline use.
+ * @returns Component
+ */
 const offline = function offline() {
   let offlineButtonTarget;
   let toolbarTarget;
@@ -20,6 +25,9 @@ const offline = function offline() {
 
   const measureStyle = drawStyles.measureStyle;
 
+  /**
+   * Button to activate toolbar.
+   */
   const offlineButton = Button({
     cls: 'o-offline-in padding-small icon-smaller round light box-shadow',
     click() {
@@ -30,6 +38,9 @@ const offline = function offline() {
     tooltipPlacement: 'east'
   });
 
+  /**
+   * Create buttons for toolbar.
+   */
   const toolbarButtons = [];
 
   const envelopeButton = Button({
@@ -62,12 +73,41 @@ const offline = function offline() {
 
   const toolbarOptions = {
     buttons: toolbarButtons
-  }
+  };
 
+  /**
+   * Create toolbar.
+   */
   const toolbar = offlineToolbar(toolbarOptions);
 
+  /**
+   * Define style for envelope drawing.
+   * @param {*} feature
+   * @returns
+   */
+  function styleFunction(feature) {
+    const styleScale = feature.get('styleScale') || 1;
+    const labelStyle = drawStyles.getLabelStyle(styleScale);
+    const styles = [measureStyle(styleScale)];
+    const geometry = feature.getGeometry();
+    const geomType = geometry.getType();
+    if (geomType === 'Polygon') {
+      const point = geometry.getInteriorPoint();
+      const useHectare = true;
+      const label = drawStyles.formatArea(geometry, useHectare, projection);
+      labelStyle.setGeometry(point);
+      labelStyle.getText().setText(label);
+      styles.push(labelStyle);
+    }
+    return styles;
+  }
+
+  /**
+   * Create vector source and vector layer
+   * to be able to draw envelope.
+   */
   const source = new VectorSource();
-  
+
   const vector = new VectorLayer({
     group: 'none',
     name: 'offline',
@@ -80,46 +120,43 @@ const offline = function offline() {
     }
   });
 
-  function styleFunction(feature) {
-    const styleScale = feature.get('styleScale') || 1;
-    const labelStyle = drawStyles.getLabelStyle(styleScale);
-    const styles = [measureStyle(styleScale)];
-    const geometry = feature.getGeometry();
-    const geomType = geometry.getType();
-    if (geomType === 'Polygon'){
-      const point = geometry.getInteriorPoint();
-      const useHectare = true;
-      const label = drawStyles.formatArea(geometry, useHectare, projection);
-      labelStyle.setGeometry(point);
-      labelStyle.getText().setText(label);
-      styles.push(labelStyle);
-    }
-    return styles;
-  }
-
   function setActive(state) {
     isActive = state;
   }
 
+  /**
+   * Add map interaction for drawing.
+   */
   function addInteraction() {
     const drawType = 'box';
     const drawOptions = {
-      source: source,
+      source,
       style(feature) {
         return styleFunction(feature);
       }
-    }
+    };
     Object.assign(drawOptions, shapes(drawType));
 
+    /**
+     * Add draw functionality for envelope.
+     */
     envelope = new Draw(drawOptions);
-    envelope.on('drawend',
+
+    /**
+     * Add eventhandler to fire on drawend.
+     */
+    envelope.on(
+      'drawend',
       (evt) => {
         map.removeInteraction(envelope);
         envelopeButton.setState('initial');
-        
-        confirmationContent = '<p>Envelope: ' + evt.feature.getGeometry().getCoordinates() + '</p>';
+
+        /**
+         * Create content for confirmation modal.
+         */
+        confirmationContent = `<p>Envelope: ${evt.feature.getGeometry().getCoordinates()}</p>`;
         const layers = viewer.getLayers();
-        confirmationContent = confirmationContent + '<p>LayerNames: ' + layers.map(layer => ' ' + layer.values_.name) + '</p>';
+        confirmationContent = `${confirmationContent}<p>LayerNames: ${layers.map(layer => `${layer.values_.name}`)}</p>`;
         const confirmationContentElement = Element({
           cls: 'content',
           innerHTML: confirmationContent
@@ -131,12 +168,30 @@ const offline = function offline() {
           target: viewer.getId()
         };
 
+        /**
+         * Create confirmation modal.
+         */
         modal = offlineConfirmationModal(modalOptions);
-      });
+      }
+    );
 
+    /**
+     * Add the map interaction.
+     */
     map.addInteraction(envelope);
   }
 
+  /**
+   * Clears drawing.
+   */
+  function clearDrawings() {
+    if (envelope) envelope.abortDrawing();
+    vector.getSource().clear();
+  }
+
+  /**
+   * Hide toolbar, clear drawing and inactivate offline mode.
+   */
   function disableInteraction() {
     document.getElementById(envelopeButton.getId()).classList.remove('active');
     document.getElementById(toolbar.getId()).classList.add('o-hidden');
@@ -144,27 +199,36 @@ const offline = function offline() {
     clearDrawings();
   }
 
+  /**
+   * Enable interaction.
+   */
   function enableInteraction() {
     setActive(true);
     document.getElementById(toolbar.getId()).classList.remove('o-hidden');
   }
 
-  function clearAndRestartInteraction() {
-    clearAndRemoveInteraction();
-    addInteraction();
-  }
-
+  /**
+   * Clear drawings, remove interaction and
+   * close confirmation modal if present.
+   */
   function clearAndRemoveInteraction() {
     clearDrawings();
     map.removeInteraction(envelope);
     if (modal) modal.closeModal();
   }
 
-  function clearDrawings() {
-    if (envelope) envelope.abortDrawing();
-    vector.getSource().clear();
+  /**
+   * Restart interaction.
+   */
+  function clearAndRestartInteraction() {
+    clearAndRemoveInteraction();
+    addInteraction();
   }
 
+  /**
+   * Dispatch toggleClickInteraction for
+   * offline component.
+   */
   function toggleOffline() {
     const detail = {
       name: 'offline',
@@ -174,6 +238,10 @@ const offline = function offline() {
     viewer.dispatch('toggleClickInteraction', detail);
   }
 
+  /**
+   * Return offline component
+   * with toolbar and buttons.
+   */
   return Component({
     name: 'offline',
     onAdd(evt) {

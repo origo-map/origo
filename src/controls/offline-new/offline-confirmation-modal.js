@@ -2,6 +2,11 @@ import { Component, Button, dom, Element } from '../../ui';
 import { html } from '../../ui/dom/dom';
 import utils from '../../utils';
 
+/**
+ *
+ * @param {*} options
+ * @returns Component
+ */
 const offlineConfirmationModal = function offlineConfirmationModal(options = {}) {
   const {
     title,
@@ -12,10 +17,16 @@ const offlineConfirmationModal = function offlineConfirmationModal(options = {})
   let modal;
   let component;
 
+  /**
+   * Remove modal.
+   */
   const closeModal = function closeModal() {
     if (modal.parentNode) modal.parentNode.removeChild(modal);
   };
 
+  /**
+   * Add components for the modal header.
+   */
   const headerComponents = [];
 
   const titleElement = Element({
@@ -30,7 +41,7 @@ const offlineConfirmationModal = function offlineConfirmationModal(options = {})
     cls: 'small round margin-top-smaller margin-bottom-auto margin-right icon-smaller grey-lightest no-shrink',
     icon: '#ic_close_24px',
     validStates: ['initial', 'hidden'],
-    ariaLabel: 'Stäng',
+    ariaLabel: 'Stï¿½ng',
     click() {
       closeModal();
       component.dispatch('closed');
@@ -39,25 +50,41 @@ const offlineConfirmationModal = function offlineConfirmationModal(options = {})
 
   headerComponents.push(closeButton);
 
+  /**
+   * Header element with components.
+   */
   const headerElement = Element({
     cls: 'flex row justify-end grey-lightest draggable',
     components: headerComponents
   });
 
+  /**
+   * Create content element where
+   * content can be injected.
+   */
   const contentElement = Element({
     cls: 'o-modal-content'
   });
 
+  /**
+   * Create the modal element.
+   */
   const modalElement = Element({
     cls: 'o-offline-confirmation-modal',
     components: [headerElement, contentElement]
   });
 
+  /**
+   * Wrap the modal into a wrapper element.
+   */
   const wrapperElement = Element({
     cls: 'flex',
     components: [modalElement]
   });
 
+  /**
+   * Return modal component.
+   */
   return Component({
     closeModal,
     hide() {
@@ -72,8 +99,14 @@ const offlineConfirmationModal = function offlineConfirmationModal(options = {})
 
       this.on('render', this.onRender);
 
+      /**
+       * Insert modal to the dom.
+       */
       document.getElementById(target).appendChild(html(this.render()));
 
+      /**
+       * Append content to the content element.
+       */
       const contentDomElement = document.getElementById(contentElement.getId());
       contentDomElement.innerHTML = '';
       contentDomElement.appendChild(dom.html(content.render()));
