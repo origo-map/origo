@@ -37,7 +37,8 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     textFont: '"Helvetica Neue", Helvetica, Arial, sans-serif',
     showMeasureSegments: false,
     showMeasure: false,
-    selected: false
+    selected: false,
+    objRotation: 0
   };
 
   function escapeQuotes(s) {
@@ -124,6 +125,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
           strokeType: swStyle.strokeType,
           pointSize: swStyle.pointSize,
           pointType: swStyle.pointType,
+          objRotation: swStyle.objRotation,
           selected
         };
         break;
@@ -133,6 +135,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
           textSize: swStyle.textSize,
           textString: swStyle.textString,
           textFont: swStyle.textFont,
+          objRotation: swStyle.objRotation,
           selected
         };
         break;
@@ -150,6 +153,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     document.getElementById('o-draw-style-point').classList.remove('hidden');
     document.getElementById('o-draw-style-text').classList.remove('hidden');
     document.getElementById('o-draw-style-measure').classList.remove('hidden');
+    document.getElementById('o-draw-style-rotation').classList.remove('hidden');
   }
 
   function updateStylewindow(feature) {
@@ -167,11 +171,13 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
         document.getElementById('o-draw-style-fill').classList.add('hidden');
         document.getElementById('o-draw-style-point').classList.add('hidden');
         document.getElementById('o-draw-style-text').classList.add('hidden');
+        document.getElementById('o-draw-style-rotation').classList.add('hidden');
         break;
       case 'Polygon':
       case 'MultiPolygon':
         document.getElementById('o-draw-style-point').classList.add('hidden');
         document.getElementById('o-draw-style-text').classList.add('hidden');
+        document.getElementById('o-draw-style-rotation').classList.add('hidden');
         break;
       case 'Point':
       case 'MultiPoint':
@@ -190,6 +196,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     document.getElementById('o-draw-style-pointType').value = swStyle.pointType;
     document.getElementById('o-draw-style-textSizeSlider').value = swStyle.textSize;
     document.getElementById('o-draw-style-textString').value = swStyle.textString;
+    document.getElementById('o-draw-style-rotationSlider').value = swStyle.objRotation;
     swStyle.strokeOpacity = rgbaToOpacity(swStyle.strokeColor);
     swStyle.strokeColor = rgbaToRgb(swStyle.strokeColor);
     const strokeEl = document.getElementById('o-draw-style-strokeColor');
@@ -353,14 +360,15 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
         break;
       case 'Point':
       case 'MultiPoint':
-        style[0] = drawStyles.createRegularShape(newStyleObj.pointType, newStyleObj.pointSize, fill, stroke);
+        style[0] = drawStyles.createRegularShape(newStyleObj.pointType, newStyleObj.pointSize, fill, stroke, newStyleObj.objRotation);
         break;
       case 'TextPoint':
         style[0] = new Style({
           text: new Text({
             text: newStyleObj.textString || 'Text',
             font,
-            fill
+            fill,
+            rotation: (newStyleObj.objRotation / 360) * Math.PI || 0
           })
         });
         feature.set(annotationField, newStyleObj.textString || 'Text');
@@ -468,6 +476,11 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
 
     document.getElementById('o-draw-style-textSizeSlider').addEventListener('input', function e() {
       swStyle.textSize = escapeQuotes(this.value);
+      styleSelectedFeatures();
+    });
+
+    document.getElementById('o-draw-style-rotationSlider').addEventListener('input', function e() {
+      swStyle.objRotation = escapeQuotes(this.value);
       styleSelectedFeatures();
     });
   }

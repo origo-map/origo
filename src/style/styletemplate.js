@@ -101,5 +101,14 @@ export default function styleTemplate(palette, swStyle) {
   </div>
 </div></div>`;
 
-  return textHtml + pointHtml + fillHtml + strokeHtml + measureHtml;
+  const rotateHtml = `<div id="o-draw-style-rotation" class="padding border-bottom"><div class="text-large text-align-center">Rotation</div><div class="padding-smaller o-tooltip active">
+<input id="o-draw-style-rotationSlider" type="range" min="-360" max="360" value="${swStyle.objRotation}" step="1">
+<div class="text-align-center">
+  <span class="text-smaller float-left">-360&deg;</span>
+  <span class="text-smaller">Graders rotation</span>
+  <span class="text-smaller float-right">360&deg;</span>
+</div>
+</div>`;
+
+  return textHtml + pointHtml + fillHtml + strokeHtml + measureHtml + rotateHtml;
 }
