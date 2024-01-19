@@ -379,6 +379,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     }
     if (newStyleObj.selected) {
       style.push(drawStyles.selectionStyle);
+      swStyle.objRotation = 0;
     }
     return style;
   }
