@@ -1,6 +1,7 @@
 import EsriJSON from 'ol/format/EsriJSON';
 import BaseTileLayer from 'ol/layer/BaseTile';
 import ImageLayer from 'ol/layer/Image';
+import infoTemplates from './featureinfotemplates';
 import maputils from './maputils';
 import SelectedItem from './models/SelectedItem';
 
@@ -53,60 +54,105 @@ function createSelectedItem(feature, layer, map, groupLayers) {
   return new SelectedItem(feature, layer, map, selectionGroup, selectionGroupTitle);
 }
 
-function getFeatureInfoUrl({
+async function getFeatureInfoUrl({
   coordinate,
   resolution,
   projection
-}, layer) {
+}, layer, viewer) {
+  if (layer.get('infoFormat') === 'text/html') {
+    infoTemplates.addFeatureinfotemplate('textHtml', attributes => attributes.textHtml);
+
+    const mapSource = viewer.getMapSource();
+    const sourceName = layer.get('sourceName');
+    const WMSServerType = mapSource[sourceName].type;
+
+    if ((!WMSServerType) || (!['geoserver', 'qgis'].includes(WMSServerType.toLowerCase()))) {
+      return [];
+    }
+
+    const jsonRequestParamObj = {
+      INFO_FORMAT: 'application/json',
+      FEATURE_COUNT: '20',
+      ...(WMSServerType.toLowerCase() === 'qgis' && { WITH_GEOMETRY: true })
+    };
+
+    const jsonUrlString = layer.getSource().getFeatureInfoUrl(coordinate, resolution, projection, jsonRequestParamObj);
+    const jsonResponse = await fetch(jsonUrlString, { method: 'GET' });
+    const json = await jsonResponse.json();
+    const featureCollection = maputils.geojsonToFeature(json);
+
+    const textFeatureInfoUrlString = layer.getSource().getFeatureInfoUrl(coordinate, resolution, projection, {
+      INFO_FORMAT: 'text/html',
+      FEATURE_COUNT: '20'
+    });
+
+    const htmlResponse = await fetch(textFeatureInfoUrlString, { method: 'GET' });
+    const html = await htmlResponse.text();
+    const htmlDOM = new DOMParser().parseFromString(html, 'text/html');
+    let handleTag;
+    let elementArray = [];
+    if (layer.get('htmlseparator')) {
+      handleTag = layer.get('htmlseparator').toUpperCase();
+      elementArray = Array.from(htmlDOM.body.children).filter(child => child.tagName === handleTag);
+    } else if (WMSServerType.toLowerCase() === 'qgis') {
+      const tables = Array.from(htmlDOM.querySelectorAll('table'));
+      tables.shift();
+      tables.forEach(table => {
+        const featureTable = table;
+        featureTable.style.width = '99%';
+      });
+      elementArray = tables;
+    } else if (WMSServerType.toLowerCase() === 'geoserver') {
+      elementArray = Array.from(htmlDOM.body.children).filter(child => child.tagName === 'UL');
+    }
+
+    const features = elementArray.map((element, index) => {
+      const feature = featureCollection[index];
+      const htmlfeat = `<html> ${htmlDOM.head.outerHTML} <body> ${element.outerHTML} </body> </html>`;
+      feature.set('textHtml', htmlfeat);
+      return feature;
+    });
+    layer.set('attributes', 'textHtml');
+    return features;
+  }
+
   if (layer.get('infoFormat') === 'application/geo+json' || layer.get('infoFormat') === 'application/geojson') {
     const url = layer.getSource().getFeatureInfoUrl(coordinate, resolution, projection, {
       INFO_FORMAT: layer.get('infoFormat'),
       FEATURE_COUNT: '20'
     });
-
-    return fetch(url, { type: 'GET' })
-      .then((res) => {
-        if (res.error) {
-          return [];
+    const res = await fetch(url, { method: 'GET' });
+    const text = await res.text();
+    let json = {};
+    try {
+      json = JSON.parse(text);
+    } catch (error) {
+      if (error instanceof SyntaxError) {
+        json = JSON.parse(text.replaceAll('\\', '\\\\'));
+      } else {
+        console.error(error);
+      }
+    }
+    if (json.features.length > 0) {
+      const copyJson = json;
+      copyJson.features.forEach((item, i) => {
+        if (!item.geometry) {
+          copyJson.features[i].geometry = { type: 'Point', coordinates: coordinate };
         }
-        return res.text();
-      })
-      .then(text => {
-        let json = {};
-        try {
-          json = JSON.parse(text);
-        } catch (error) {
-          if (error instanceof SyntaxError) {
-            // Maybe bad escaped character, retry with escaping backslash
-            json = JSON.parse(text.replaceAll('\\', '\\\\'));
-          } else {
-            console.error(error);
-          }
-        }
-        if (json.features.length > 0) {
-          const copyJson = json;
-          copyJson.features.forEach((item, i) => {
-            if (!item.geometry) {
-              copyJson.features[i].geometry = { type: 'Point', coordinates: coordinate };
-            }
-          });
-          const feature = maputils.geojsonToFeature(copyJson);
-          return feature;
-        }
-        return [];
-      })
-      .catch(error => console.error(error));
+      });
+      const feature = maputils.geojsonToFeature(copyJson);
+      return feature;
+    }
+    return [];
   }
+
   const url = layer.getSource().getFeatureInfoUrl(coordinate, resolution, projection, {
     INFO_FORMAT: 'application/json',
     FEATURE_COUNT: '20'
   });
-  return fetch(url, { type: 'GET' }).then((res) => {
-    if (res.error) {
-      return [];
-    }
-    return res.json();
-  }).then(json => maputils.geojsonToFeature(json)).catch(error => console.error(error));
+  const res = await fetch(url, { method: 'GET' });
+  const json = await res.json();
+  return maputils.geojsonToFeature(json);
 }
 
 function getAGSIdentifyUrl({ layer, coordinate }, viewer) {
@@ -170,7 +216,7 @@ function getGetFeatureInfoRequest({ layer, coordinate }, viewer) {
         return getGetFeatureInfoRequest({ layer: featureinfoLayer, coordinate }, viewer);
       }
       obj.cb = 'GEOJSON';
-      obj.fn = getFeatureInfoUrl({ coordinate, resolution, projection }, layer);
+      obj.fn = getFeatureInfoUrl({ coordinate, resolution, projection }, layer, viewer);
       return obj;
     case 'AGS_TILE':
       if (layer.get('featureinfoLayer')) {
