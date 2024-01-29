@@ -132,7 +132,7 @@ export default function Slidenav(options = {}) {
     getState,
     onInit() {
       mainContainer = Element({
-        cls: 'main'
+        cls: 'main overflow-unset'
       });
       backButton = Button({
         cls: 'icon-small padding-small',

@@ -2808,6 +2808,14 @@ body {
     display: none; }
   .o-map .printmap-north-arrow {
     display: block; }
+  .o-map .print-map-loading-spinner {
+    display: inline-block;
+    width: 45px;
+    height: 45px;
+    border: 16px solid rgba(255, 255, 255, 0.884);
+    border-radius: 50%;
+    border-top-color: #008ff5;
+    animation: spin 1s ease-in-out infinite; }
   @media print {
     .o-map .no-print {
       display: none; } }

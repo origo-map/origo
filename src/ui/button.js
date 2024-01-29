@@ -129,6 +129,7 @@ export default function Button(options = {}) {
       if (validStates.indexOf(state) > 0) {
         buttonEl.classList.add(state);
       }
+      this.dispatch('render');
     },
     render: function render() {
       return `<button id="${this.getId()}" class="${cls} o-tooltip" style="${style}" aria-label="${ariaLabel}" tabindex="${tabIndex}">

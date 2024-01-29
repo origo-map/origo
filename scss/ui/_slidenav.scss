@@ -2,7 +2,6 @@
   box-sizing: border-box;
   display: inline-block;
   line-height: 0;
-  overflow: hidden;
   position: relative;
   transition: height 0.3s;
 
@@ -10,7 +9,6 @@
     box-sizing: border-box;
     display: inline-block;
     left: 0;
-    overflow: hidden;
     position: relative;
     top: 0;
     transition: all 0.3s;
@@ -35,9 +33,11 @@
     width: 100%;
     will-change: transform;
     z-index: 1000;
+    height: unset;
 
     &.absolute {
       position: absolute;
+      height: 0;
     }
   }
 
@@ -70,5 +70,7 @@
       opacity: 1;
       transform: none;
     }
+    
+    overflow: hidden
   }  
 }
