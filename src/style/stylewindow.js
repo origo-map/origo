@@ -38,7 +38,14 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     showMeasureSegments: false,
     showMeasure: false,
     selected: false,
-    objRotation: 0
+    objRotation: 0,
+    backgroundFillColor: 'rgb(255,255,255)',
+    backgroundFillOpacity: 0,
+    backgroundStrokeColor: 'rgb(0,0,0)',
+    backgroundStrokeOpacity: 0,
+    backgroundStrokeWidth: 2,
+    backgroundStrokeType: 'line',
+    paddingText: 3
   };
 
   function escapeQuotes(s) {
@@ -78,12 +85,40 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     return rgbToRgba(swDefaults.fillColor, swDefaults.fillOpacity);
   }
 
+  function paddingToArray(padding) {
+    return [padding, padding, padding, padding];
+  }
+
   function setFillColor(color) {
     swStyle.fillColor = rgbToRgba(color, swStyle.fillOpacity);
   }
 
   function setStrokeColor(color) {
     swStyle.strokeColor = rgbToRgba(color, swStyle.strokeOpacity);
+  }
+
+  function setBackgroundFillColor(color, opacity) {
+    if (typeof opacity === 'undefined') {
+      if (swStyle.backgroundFillOpacity === '0') {
+        swStyle.backgroundFillColor = rgbToRgba(color, 0.7);
+        swStyle.backgroundFillOpacity = 0.7;
+        document.getElementById('o-draw-style-backgroundFillOpacitySlider').value = 0.7;
+      } else {
+        swStyle.backgroundFillColor = rgbToRgba(color, swStyle.backgroundFillOpacity);
+      }
+    } else {
+      swStyle.backgroundFillColor = rgbToRgba(color, opacity);
+    }
+  }
+
+  function setBackgroundStrokeColor(color) {
+    if (swStyle.backgroundStrokeOpacity === 0) {
+      swStyle.backgroundStrokeColor = rgbToRgba(color, 0.7);
+      swStyle.backgroundStrokeOpacity = 0.7;
+      document.getElementById('o-draw-style-backgroundStrokeOpacitySlider').value = 0.7;
+    } else {
+      swStyle.backgroundStrokeColor = rgbToRgba(color, swStyle.backgroundStrokeOpacity);
+    }
   }
 
   function getStyleObject(feature, selected = false) {
@@ -136,6 +171,12 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
           textString: swStyle.textString,
           textFont: swStyle.textFont,
           objRotation: swStyle.objRotation,
+          backgroundFill: rgbToRgba(swStyle.backgroundFillColor, swStyle.backgroundFillOpacity),
+          backgroundStrokeColor: swStyle.backgroundStrokeColor,
+          backgroundStrokeOpacity: swStyle.backgroundStrokeOpacity,
+          backgroundStrokeWidth: swStyle.backgroundStrokeWidth,
+          backgroundStrokeType: swStyle.backgroundStrokeType,
+          paddingText: swStyle.paddingText,
           selected
         };
         break;
@@ -154,6 +195,9 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     document.getElementById('o-draw-style-text').classList.remove('hidden');
     document.getElementById('o-draw-style-measure').classList.remove('hidden');
     document.getElementById('o-draw-style-rotation').classList.remove('hidden');
+    document.getElementById('o-draw-style-backgroundFill').classList.remove('hidden');
+    document.getElementById('o-draw-style-backgroundStroke').classList.remove('hidden');
+    document.getElementById('o-draw-style-padding').classList.remove('hidden');
   }
 
   function updateStylewindow(feature) {
@@ -172,17 +216,26 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
         document.getElementById('o-draw-style-point').classList.add('hidden');
         document.getElementById('o-draw-style-text').classList.add('hidden');
         document.getElementById('o-draw-style-rotation').classList.add('hidden');
+        document.getElementById('o-draw-style-backgroundFill').classList.add('hidden');
+        document.getElementById('o-draw-style-backgroundStroke').classList.add('hidden');
+        document.getElementById('o-draw-style-padding').classList.add('hidden');
         break;
       case 'Polygon':
       case 'MultiPolygon':
         document.getElementById('o-draw-style-point').classList.add('hidden');
         document.getElementById('o-draw-style-text').classList.add('hidden');
         document.getElementById('o-draw-style-rotation').classList.add('hidden');
+        document.getElementById('o-draw-style-backgroundFill').classList.add('hidden');
+        document.getElementById('o-draw-style-backgroundStroke').classList.add('hidden');
+        document.getElementById('o-draw-style-padding').classList.add('hidden');
         break;
       case 'Point':
       case 'MultiPoint':
         document.getElementById('o-draw-style-text').classList.add('hidden');
         document.getElementById('o-draw-style-measure').classList.add('hidden');
+        document.getElementById('o-draw-style-backgroundFill').classList.add('hidden');
+        document.getElementById('o-draw-style-backgroundStroke').classList.add('hidden');
+        document.getElementById('o-draw-style-padding').classList.add('hidden');
         break;
       case 'TextPoint':
         document.getElementById('o-draw-style-stroke').classList.add('hidden');
@@ -197,6 +250,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     document.getElementById('o-draw-style-textSizeSlider').value = swStyle.textSize;
     document.getElementById('o-draw-style-textString').value = swStyle.textString;
     document.getElementById('o-draw-style-rotationSlider').value = swStyle.objRotation;
+    document.getElementById('o-draw-style-padding').value = swStyle.paddingText;
     swStyle.strokeOpacity = rgbaToOpacity(swStyle.strokeColor);
     swStyle.strokeColor = rgbaToRgb(swStyle.strokeColor);
     const strokeEl = document.getElementById('o-draw-style-strokeColor');
@@ -213,6 +267,21 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     document.getElementById('o-draw-style-strokeOpacitySlider').value = swStyle.strokeOpacity;
     document.getElementById('o-draw-style-strokeType').value = swStyle.strokeType;
 
+    swStyle.backgroundStrokeColor = rgbaToRgb(swStyle.backgroundStrokeColor);
+    const bgStrokeEl = document.getElementById('o-draw-style-strokeColor');
+    const bgStrokeInputEl = bgStrokeEl.querySelector(`input[value = "${swStyle.backgroundStrokeColor}"]`);
+    if (bgStrokeInputEl) {
+      bgStrokeInputEl.checked = true;
+    } else {
+      const checkedEl = document.querySelector('input[name = "backgroundStrokeColorRadio"]:checked');
+      if (checkedEl) {
+        checkedEl.checked = false;
+      }
+    }
+    document.getElementById('o-draw-style-backgroundStrokeWidthSlider').value = swStyle.backgroundStrokeWidth;
+    document.getElementById('o-draw-style-backgroundStrokeOpacitySlider').value = swStyle.backgroundStrokeOpacity;
+    document.getElementById('o-draw-style-backgroundStrokeType').value = swStyle.backgroundStrokeType;
+
     const fillEl = document.getElementById('o-draw-style-fillColor');
     swStyle.fillOpacity = rgbaToOpacity(swStyle.fillColor);
     swStyle.fillColor = rgbaToRgb(swStyle.fillColor);
@@ -228,6 +297,20 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     document.getElementById('o-draw-style-fillOpacitySlider').value = swStyle.fillOpacity;
     document.getElementById('o-draw-style-showMeasure').checked = swStyle.showMeasure;
     document.getElementById('o-draw-style-showMeasureSegments').checked = swStyle.showMeasureSegments;
+
+    const bgFillEl = document.getElementById('o-draw-style-backgroundFillColor');
+    swStyle.backgroundFillOpacity = rgbaToOpacity(swStyle.backgroundFill);
+    swStyle.backgroundFillColor = rgbaToRgb(swStyle.backgroundFill);
+    const bgFillInputEl = bgFillEl.querySelector(`input[value = "${swStyle.backgroundFillColor}"]`);
+    if (bgFillInputEl) {
+      bgFillInputEl.checked = true;
+    } else {
+      const checkedEl = document.querySelector('input[name = "backgroundFillColorRadio"]:checked');
+      if (checkedEl) {
+        checkedEl.checked = false;
+      }
+    }
+    document.getElementById('o-draw-style-backgroundFillOpacitySlider').value = swStyle.backgroundFillOpacity;
   }
 
   function getStyleFunction(feature, inputStyle = {}, projection = mapProjection) {
@@ -242,6 +325,10 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     newStyleObj.strokeWidth *= styleScale;
     newStyleObj.textSize *= styleScale;
     newStyleObj.pointSize *= styleScale;
+    newStyleObj.backgroundStrokeOpacity = featureStyle.backgroundStrokeOpacity;
+    newStyleObj.backgroundStrokeColor = stringToRgba(newStyleObj.backgroundStrokeColor, newStyleObj.backgroundStrokeOpacity);
+    newStyleObj.backgroundStrokeWidth *= styleScale;
+    newStyleObj.paddingText = paddingToArray(featureStyle.paddingText);
     const geom = feature.getGeometry();
     let geometryType = feature.getGeometry().getType();
     if (feature.get(annotationField)) {
@@ -258,6 +345,16 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     } else {
       lineDash = false;
     }
+    let bgLineDash;
+    if (newStyleObj.backgroundStrokeType === 'dash') {
+      bgLineDash = [3 * newStyleObj.backgroundStrokeWidth, 3 * newStyleObj.backgroundStrokeWidth];
+    } else if (newStyleObj.backgroundStrokeType === 'dash-point') {
+      bgLineDash = [3 * newStyleObj.backgroundStrokeWidth, 3 * newStyleObj.backgroundStrokeWidth, 0.1, 3 * newStyleObj.backgroundStrokeWidth];
+    } else if (newStyleObj.backgroundStrokeType === 'point') {
+      bgLineDash = [0.1, 3 * newStyleObj.backgroundStrokeWidth];
+    } else {
+      bgLineDash = false;
+    }
 
     const stroke = new Stroke({
       color: newStyleObj.strokeColor,
@@ -266,6 +363,14 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     });
     const fill = new Fill({
       color: newStyleObj.fillColor
+    });
+    const bgStroke = new Stroke({
+      color: rgbToArray(newStyleObj.backgroundStrokeColor, newStyleObj.backgroundStrokeOpacity),
+      width: newStyleObj.backgroundStrokeWidth,
+      lineDash: bgLineDash
+    });
+    const bgFill = new Fill({
+      color: newStyleObj.backgroundFill
     });
     const font = `${newStyleObj.textSize}px ${newStyleObj.textFont}`;
     switch (geometryType) {
@@ -368,7 +473,10 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
             text: newStyleObj.textString || 'Text',
             font,
             fill,
-            rotation: (newStyleObj.objRotation / 360) * Math.PI || 0
+            rotation: (newStyleObj.objRotation / 360) * Math.PI || 0,
+            backgroundFill: bgFill,
+            backgroundStroke: bgStroke,
+            padding: newStyleObj.paddingText
           })
         });
         feature.set(annotationField, newStyleObj.textString || 'Text');
@@ -411,6 +519,8 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     let matches;
     const fillColorEl = document.getElementById('o-draw-style-fillColor');
     const strokeColorEl = document.getElementById('o-draw-style-strokeColor');
+    const bgFillColorEl = document.getElementById('o-draw-style-backgroundFillColor');
+    const bgStrokeColorEl = document.getElementById('o-draw-style-backgroundStrokeColor');
 
     matches = fillColorEl.querySelectorAll('span');
     for (let i = 0; i < matches.length; i += 1) {
@@ -428,6 +538,22 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
       });
     }
 
+    matches = bgFillColorEl.querySelectorAll('span');
+    for (let i = 0; i < matches.length; i += 1) {
+      matches[i].addEventListener('click', function e() {
+        setBackgroundFillColor(this.style.backgroundColor);
+        styleSelectedFeatures();
+      });
+    }
+
+    matches = bgStrokeColorEl.querySelectorAll('span');
+    for (let i = 0; i < matches.length; i += 1) {
+      matches[i].addEventListener('click', function e() {
+        setBackgroundStrokeColor(this.style.backgroundColor);
+        styleSelectedFeatures();
+      });
+    }
+
     document.getElementById('o-draw-style-fillOpacitySlider').addEventListener('input', function e() {
       swStyle.fillOpacity = escapeQuotes(this.value);
       setFillColor(swStyle.fillColor);
@@ -440,6 +566,12 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
       styleSelectedFeatures();
     });
 
+    document.getElementById('o-draw-style-backgroundFillOpacitySlider').addEventListener('input', function e() {
+      swStyle.backgroundFillOpacity = escapeQuotes(this.value);
+      setBackgroundFillColor(swStyle.backgroundFillColor, escapeQuotes(this.value));
+      styleSelectedFeatures();
+    });
+
     document.getElementById('o-draw-style-strokeWidthSlider').addEventListener('input', function e() {
       swStyle.strokeWidth = escapeQuotes(this.value);
       styleSelectedFeatures();
@@ -447,6 +579,22 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
 
     document.getElementById('o-draw-style-strokeType').addEventListener('change', function e() {
       swStyle.strokeType = escapeQuotes(this.value);
+      styleSelectedFeatures();
+    });
+
+    document.getElementById('o-draw-style-backgroundStrokeWidthSlider').addEventListener('input', function e() {
+      swStyle.backgroundStrokeWidth = escapeQuotes(this.value);
+      styleSelectedFeatures();
+    });
+
+    document.getElementById('o-draw-style-backgroundStrokeType').addEventListener('change', function e() {
+      swStyle.backgroundStrokeType = escapeQuotes(this.value);
+      styleSelectedFeatures();
+    });
+
+    document.getElementById('o-draw-style-backgroundStrokeOpacitySlider').addEventListener('input', function e() {
+      swStyle.backgroundStrokeOpacity = escapeQuotes(this.value);
+      setBackgroundStrokeColor(swStyle.backgroundStrokeColor);
       styleSelectedFeatures();
     });
 
@@ -482,6 +630,11 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
 
     document.getElementById('o-draw-style-rotationSlider').addEventListener('input', function e() {
       swStyle.objRotation = escapeQuotes(this.value);
+      styleSelectedFeatures();
+    });
+
+    document.getElementById('o-draw-style-paddingSlider').addEventListener('input', function e() {
+      swStyle.paddingText = escapeQuotes(this.value);
       styleSelectedFeatures();
     });
   }
