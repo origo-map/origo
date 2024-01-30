@@ -271,7 +271,8 @@ const PrintComponent = function PrintComponent(options = {}) {
     titleComponent,
     descriptionComponent,
     createdComponent,
-    closeButton
+    closeButton,
+    constrainResolution: view.getConstrainResolution()
   });
 
   const setScale = function setScale(scale) {
