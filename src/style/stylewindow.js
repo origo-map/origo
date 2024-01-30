@@ -299,8 +299,10 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     document.getElementById('o-draw-style-showMeasureSegments').checked = swStyle.showMeasureSegments;
 
     const bgFillEl = document.getElementById('o-draw-style-backgroundFillColor');
-    swStyle.backgroundFillOpacity = rgbaToOpacity(swStyle.backgroundFill);
-    swStyle.backgroundFillColor = rgbaToRgb(swStyle.backgroundFill);
+    if (typeof swStyle.backgroundFill !== 'undefined') {
+      swStyle.backgroundFillOpacity = rgbaToOpacity(swStyle.backgroundFill);
+      swStyle.backgroundFillColor = rgbaToRgb(swStyle.backgroundFill);
+    }
     const bgFillInputEl = bgFillEl.querySelector(`input[value = "${swStyle.backgroundFillColor}"]`);
     if (bgFillInputEl) {
       bgFillInputEl.checked = true;
@@ -487,7 +489,6 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     }
     if (newStyleObj.selected) {
       style.push(drawStyles.selectionStyle);
-      swStyle.objRotation = 0;
     }
     return style;
   }
