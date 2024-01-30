@@ -60,20 +60,27 @@ async function getFeatureInfoUrl({
   projection
 }, layer, viewer) {
   if (layer.get('infoFormat') === 'text/html') {
-    infoTemplates.addFeatureinfotemplate('textHtml', attributes => attributes.textHtml);
-
     const mapSource = viewer.getMapSource();
     const sourceName = layer.get('sourceName');
-    const WMSServerType = mapSource[sourceName].type;
+    const WMSServerType = mapSource[sourceName].type.toLowerCase();
 
-    if ((!WMSServerType) || (!['geoserver', 'qgis'].includes(WMSServerType.toLowerCase()))) {
+    const supportedWMSServerTypes = ['geoserver'];
+
+    if ((!WMSServerType) || (!supportedWMSServerTypes.includes(WMSServerType))) {
       return [];
     }
+    const htmlHandler = function htmlHandler({ vendor, lyr, htmlDOM }) {
+      if (vendor === 'geoserver') {
+        const handleTag = lyr.get('htmlSeparator')?.toUpperCase() || 'UL';
+        return Array.from(htmlDOM.body.children).filter(child => child.tagName === handleTag);
+      } return [];
+    };
+
+    infoTemplates.addFeatureinfotemplate('textHtml', attributes => attributes.textHtml);
 
     const jsonRequestParamObj = {
       INFO_FORMAT: 'application/json',
-      FEATURE_COUNT: '20',
-      ...(WMSServerType.toLowerCase() === 'qgis' && { WITH_GEOMETRY: true })
+      FEATURE_COUNT: '20'
     };
 
     const jsonUrlString = layer.getSource().getFeatureInfoUrl(coordinate, resolution, projection, jsonRequestParamObj);
@@ -89,22 +96,12 @@ async function getFeatureInfoUrl({
     const htmlResponse = await fetch(textFeatureInfoUrlString, { method: 'GET' });
     const html = await htmlResponse.text();
     const htmlDOM = new DOMParser().parseFromString(html, 'text/html');
-    let handleTag;
-    let elementArray = [];
-    if (layer.get('htmlseparator')) {
-      handleTag = layer.get('htmlseparator').toUpperCase();
-      elementArray = Array.from(htmlDOM.body.children).filter(child => child.tagName === handleTag);
-    } else if (WMSServerType.toLowerCase() === 'qgis') {
-      const tables = Array.from(htmlDOM.querySelectorAll('table'));
-      tables.shift();
-      tables.forEach(table => {
-        const featureTable = table;
-        featureTable.style.width = '99%';
-      });
-      elementArray = tables;
-    } else if (WMSServerType.toLowerCase() === 'geoserver') {
-      elementArray = Array.from(htmlDOM.body.children).filter(child => child.tagName === 'UL');
-    }
+
+    const elementArray = htmlHandler({
+      vendor: WMSServerType.toLowerCase(),
+      lyr: layer,
+      htmlDOM
+    });
 
     const features = elementArray.map((element, index) => {
       const feature = featureCollection[index];
