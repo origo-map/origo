@@ -6,6 +6,7 @@
   "parserOptions": {
     "ecmaVersion": "latest"
 },
+
   "rules": {
     "comma-dangle": [
       "error",

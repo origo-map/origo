@@ -10,7 +10,7 @@ import {
 import { getArea, getLength } from 'ol/sphere';
 import { LineString, MultiPoint, Point } from 'ol/geom';
 
-function createRegularShape(type, pointSize, pointFill, pointStroke) {
+function createRegularShape(type, pointSize, pointFill, pointStroke, pointRotation) {
   let style;
   const size = pointSize || 10;
   const stroke = pointStroke || new Stroke({
@@ -19,6 +19,7 @@ function createRegularShape(type, pointSize, pointFill, pointStroke) {
   const fill = pointFill || new Fill({
     color: 'rgba(0, 153, 255, 0.8)'
   });
+  const rotation = pointRotation || 0;
   switch (type) {
     case 'square':
       style = new Style({
@@ -27,6 +28,7 @@ function createRegularShape(type, pointSize, pointFill, pointStroke) {
           stroke,
           points: 4,
           radius: size,
+          rotation: (rotation / 360) * Math.PI,
           angle: Math.PI / 4
         })
       });
@@ -39,7 +41,7 @@ function createRegularShape(type, pointSize, pointFill, pointStroke) {
           stroke,
           points: 3,
           radius: size,
-          rotation: 0,
+          rotation: (rotation / 360) * Math.PI,
           angle: 0
         })
       });
@@ -53,6 +55,7 @@ function createRegularShape(type, pointSize, pointFill, pointStroke) {
           points: 5,
           radius: size,
           radius2: size / 2.5,
+          rotation: (rotation / 360) * Math.PI,
           angle: 0
         })
       });
@@ -66,6 +69,7 @@ function createRegularShape(type, pointSize, pointFill, pointStroke) {
           points: 4,
           radius: size,
           radius2: 0,
+          rotation: (rotation / 360) * Math.PI,
           angle: 0
         })
       });
@@ -79,6 +83,7 @@ function createRegularShape(type, pointSize, pointFill, pointStroke) {
           points: 4,
           radius: size,
           radius2: 0,
+          rotation: (rotation / 360) * Math.PI,
           angle: Math.PI / 4
         })
       });
@@ -112,6 +117,7 @@ function createRegularShape(type, pointSize, pointFill, pointStroke) {
         image: new Icon({
           src: `data:image/svg+xml;utf8,${svg}`,
           scale: size / 10 || 1,
+          rotation: (rotation / 360) * Math.PI,
           anchor: [0.5, 0.85]
         })
       });
