@@ -247,6 +247,15 @@ export const Legend = function Legend({
       styleName = layer.get('styleName');
     }
     const thematicStyling = layer.get('thematicStyling');
+    const activeThemes = layer.get('activeThemes');
+    if (activeThemes && activeThemes.length === styleRules.length) {
+      activeThemes.forEach((theme, index) => {
+        if (theme === 0) {
+          const style = viewer.getStyles()[styleName];
+          style[index][0].visible = false;
+        }
+      });
+    }
     let cmps = [];
     styleRules.forEach((rule, index) => {
       if (Array.isArray(rule)) {

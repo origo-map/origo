@@ -4,13 +4,28 @@ let getPin;
 const permalinkStore = {};
 const additionalMapStateParams = {};
 
-permalinkStore.getSaveLayers = function getSaveLayers(layers) {
+permalinkStore.getSaveLayers = function getSaveLayers(layers, viewer) {
   const saveLayers = [];
   layers.forEach((layer) => {
     const saveLayer = {};
+    // activeThemes is an Array with 2 possible values to choose from: 1, 0
+    // It refers to the visibility of thematicStyling's themes; 1 = visible and 0 = invisible.
+    const activeThemes = [];
     saveLayer.v = layer.getVisible() === true ? 1 : 0;
     saveLayer.s = layer.get('legend') === true ? 1 : 0;
     saveLayer.o = Number(layer.get('opacity')) * 100;
+    if (layer.get('thematicStyling')) {
+      const styleName = layer.get('styleName');
+      const style = viewer.getStyles()[styleName];
+      for (let i = 0; i < style.length; i += 1) {
+        if (style[i][0].visible === false) {
+          activeThemes.push(0);
+        } else {
+          activeThemes.push(1);
+        }
+      }
+      saveLayer.th = activeThemes.join('');
+    }
     // Only get style for layer styles that have changed
     if (layer.get('defaultStyle') && layer.get('defaultStyle') !== layer.get('styleName')) saveLayer.sn = layer.get('altStyleIndex');
     if (saveLayer.s || saveLayer.v) {
@@ -32,7 +47,7 @@ permalinkStore.getState = function getState(viewer, isExtended) {
   const featureinfo = viewer.getFeatureinfo();
   const type = featureinfo.getSelection().type;
   getPin = featureinfo.getPin;
-  state.layers = permalinkStore.getSaveLayers(layers);
+  state.layers = permalinkStore.getSaveLayers(layers, viewer);
   state.center = view.getCenter().map(coord => Math.round(coord)).join();
   state.zoom = view.getZoom().toString();
 
