@@ -16,7 +16,10 @@ permalinkStore.getSaveLayers = function getSaveLayers(layers, viewer) {
     saveLayer.o = Number(layer.get('opacity')) * 100;
     if (layer.get('thematicStyling')) {
       const styleName = layer.get('styleName');
-      const style = viewer.getStyles()[styleName];
+      let style = viewer.getStyles()[styleName];
+      if (layer.get('type') === 'WMS') {
+        style = viewer.getStyles()[styleName][0].thematic.map(obj => [obj]);
+      }
       for (let i = 0; i < style.length; i += 1) {
         if (style[i][0].visible === false) {
           activeThemes.push(0);

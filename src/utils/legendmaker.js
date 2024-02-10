@@ -248,11 +248,15 @@ export const Legend = function Legend({
     }
     const thematicStyling = layer.get('thematicStyling');
     const activeThemes = layer.get('activeThemes');
-    if (activeThemes && activeThemes.length === styleRules.length) {
+    if (activeThemes) {
+      const style = viewer.getStyles()[styleName];
       activeThemes.forEach((theme, index) => {
-        if (theme === 0) {
-          const style = viewer.getStyles()[styleName];
+        if (theme === 0 && layerType !== 'WMS') {
           style[index][0].visible = false;
+        }
+        if (theme === 0 && layerType === 'WMS') {
+          // style[0].thematic[index].visible = false;
+          // It's not working; any suggestions?
         }
       });
     }
