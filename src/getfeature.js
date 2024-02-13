@@ -88,7 +88,7 @@ sourceType.WFS = function wfsSourceType(id, layer, serverUrl, extent) {
     wfsSource = layer.getSource();
   }
 
-  if (id) {
+  if (id || id === 0) {
     return wfsSource.getFeatureFromSourceByIds(id);
   }
   // Have to pick up filter from layer as MultiSelect changes filter on layer instead of source
