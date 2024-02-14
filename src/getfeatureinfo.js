@@ -58,7 +58,7 @@ async function getFeatureInfoUrl({
   coordinate,
   resolution,
   projection
-}, layer, viewer) {
+}, layer, viewer, textHtmlHandler) {
   if (layer.get('infoFormat') === 'text/html') {
     const mapSource = viewer.getMapSource();
     const sourceName = layer.get('sourceName');
@@ -69,23 +69,45 @@ async function getFeatureInfoUrl({
     if ((!WMSServerType) || (!supportedWMSServerTypes.includes(WMSServerType))) {
       return [];
     }
-    const htmlHandler = function htmlHandler({ vendor, lyr, htmlDOM }) {
+    // may be provided via featureinfo.js: addTextHtmlHandler(function) via viewer/api: getFeatureinfo()
+    const htmlHandler = textHtmlHandler || function htmlHandler({ vendor, lyr, htmlDOM }) {
       if (vendor === 'geoserver') {
-        const handleTag = lyr.get('htmlSeparator')?.toUpperCase() || 'UL';
-        return Array.from(htmlDOM.body.children).filter(child => child.tagName === handleTag);
+        const handleTag = lyr.get('htmlSeparator')?.toUpperCase() || null;
+        if (handleTag) {
+          return Array.from(htmlDOM.body.children).filter(child => child.tagName === handleTag);
+        }
+        return [htmlDOM];
       } return [];
     };
 
     infoTemplates.addFeatureinfotemplate('textHtml', attributes => attributes.textHtml);
 
-    const jsonRequestParamObj = {
-      INFO_FORMAT: 'application/json',
-      FEATURE_COUNT: '20'
-    };
+    let json;
+    if (!layer.get('htmlSeparator')) {
+      json = {
+        type: 'FeatureCollection',
+        features: [
+          {
+            type: 'Feature',
+            geometry: {
+              type: 'Point',
+              coordinates: coordinate
+            },
+            layerName: layer.get('name')
+          }
+        ]
+      };
+    } else {
+      const jsonRequestParamObj = {
+        INFO_FORMAT: 'application/json',
+        FEATURE_COUNT: '20'
+      };
 
-    const jsonUrlString = layer.getSource().getFeatureInfoUrl(coordinate, resolution, projection, jsonRequestParamObj);
-    const jsonResponse = await fetch(jsonUrlString, { method: 'GET' });
-    const json = await jsonResponse.json();
+      const jsonUrlString = layer.getSource().getFeatureInfoUrl(coordinate, resolution, projection, jsonRequestParamObj);
+      const jsonResponse = await fetch(jsonUrlString, { method: 'GET' });
+      json = await jsonResponse.json();
+    }
+
     const featureCollection = maputils.geojsonToFeature(json);
 
     const textFeatureInfoUrlString = layer.getSource().getFeatureInfoUrl(coordinate, resolution, projection, {
@@ -103,9 +125,20 @@ async function getFeatureInfoUrl({
       htmlDOM
     });
 
+    if (elementArray[0]?.body?.children?.length === 0) return [];
+
     const features = elementArray.map((element, index) => {
-      const feature = featureCollection[index];
-      const htmlfeat = `<html> ${htmlDOM.head.outerHTML} <body> ${element.outerHTML} </body> </html>`;
+      let feature;
+      let htmlfeat;
+      // case no htmlSeparator prop: show same dot geometry for all hits
+      // and put the documentElement of the response within <html>
+      if (!layer.get('htmlSeparator')) {
+        feature = featureCollection[0];
+        htmlfeat = `<html> ${element.documentElement.outerHTML} </html>`;
+      } else {
+        feature = featureCollection[index];
+        htmlfeat = `<html> ${htmlDOM.head.outerHTML} <body> ${element.outerHTML} </body> </html>`;
+      }
       feature.set('textHtml', htmlfeat);
       return feature;
     });
@@ -191,7 +224,7 @@ function getAGSIdentifyUrl({ layer, coordinate }, viewer) {
   }).catch(error => console.error(error));
 }
 
-function getGetFeatureInfoRequest({ layer, coordinate }, viewer) {
+function getGetFeatureInfoRequest({ layer, coordinate }, viewer, textHtmlHandler) {
   const layerType = layer.get('type');
   const obj = {};
   const projection = viewer.getProjection();
@@ -213,7 +246,7 @@ function getGetFeatureInfoRequest({ layer, coordinate }, viewer) {
         return getGetFeatureInfoRequest({ layer: featureinfoLayer, coordinate }, viewer);
       }
       obj.cb = 'GEOJSON';
-      obj.fn = getFeatureInfoUrl({ coordinate, resolution, projection }, layer, viewer);
+      obj.fn = getFeatureInfoUrl({ coordinate, resolution, projection }, layer, viewer, textHtmlHandler);
       return obj;
     case 'AGS_TILE':
       if (layer.get('featureinfoLayer')) {
@@ -234,7 +267,7 @@ function getFeatureInfoRequests({
   coordinate,
   pixel,
   layers
-}, viewer) {
+}, viewer, textHtmlHandler) {
   const imageFeatureInfoMode = viewer.getViewerOptions().featureinfoOptions.imageFeatureInfoMode || 'pixel';
   const requests = [];
   let queryableLayers;
@@ -272,12 +305,12 @@ function getFeatureInfoRequests({
     if (imageInfoMode === 'pixel') {
       const pixelVal = layer.getData(pixel);
       if (pixelVal instanceof Uint8ClampedArray && pixelVal[3] > 0) {
-        item = getGetFeatureInfoRequest({ layer, coordinate }, viewer);
+        item = getGetFeatureInfoRequest({ layer, coordinate }, viewer, textHtmlHandler);
       }
     } else if ((imageInfoMode === 'visible') && (layer.get('visible') === true)) {
-      item = getGetFeatureInfoRequest({ layer, coordinate }, viewer);
+      item = getGetFeatureInfoRequest({ layer, coordinate }, viewer, textHtmlHandler);
     } else if (imageInfoMode === 'always') {
-      item = getGetFeatureInfoRequest({ layer, coordinate }, viewer);
+      item = getGetFeatureInfoRequest({ layer, coordinate }, viewer, textHtmlHandler);
     }
     if (item) {
       requests.push(item);
@@ -286,10 +319,9 @@ function getFeatureInfoRequests({
   return requests;
 }
 
-function getFeaturesFromRemote(requestOptions, viewer) {
+function getFeaturesFromRemote(requestOptions, viewer, textHtmlHandler) {
   const requestResult = [];
-
-  const requestPromises = getFeatureInfoRequests(requestOptions, viewer).map((request) => request.fn.then((features) => {
+  const requestPromises = getFeatureInfoRequests(requestOptions, viewer, textHtmlHandler).map((request) => request.fn.then((features) => {
     const layer = viewer.getLayer(request.layer);
     const groupLayers = viewer.getGroupLayers();
     const map = viewer.getMap();
