@@ -38,6 +38,7 @@ const Featureinfo = function Featureinfo(options = {}) {
   let popup;
   let viewer;
   let selectionManager;
+  let textHtmlHandler;
   /** The featureinfo component itself */
   let component;
 
@@ -294,6 +295,10 @@ const Featureinfo = function Featureinfo(options = {}) {
       });
       el.setAttribute('onClickModal', 'true');
     }
+  };
+
+  const addTextHtmlHandler = function addTextHtmlHandler(func) {
+    textHtmlHandler = func;
   };
 
   /**
@@ -653,7 +658,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         coordinate,
         map,
         pixel
-      }, viewer)
+      }, viewer, textHtmlHandler)
         .then((data) => {
           const serverResult = data || [];
           const result = serverResult.concat(clientResult);
@@ -696,6 +701,7 @@ const Featureinfo = function Featureinfo(options = {}) {
     getSelectionLayer,
     getSelection,
     addAttributeType,
+    addTextHtmlHandler,
     onAdd(e) {
       // Keep a reference to "ourselves"
       component = this;
