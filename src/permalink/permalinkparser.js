@@ -50,7 +50,7 @@ const layers = function layers(layersStr) {
         obj[attribute.name] = Number(val);
       } else if (prop === 'th') {
         const attribute = layerModel[prop];
-        obj[attribute.name] = val.split('').map(Number);
+        obj[attribute.name] = val.split('~').map(theme => decodeURIComponent(theme));
       } else {
         obj[prop] = val;
       }

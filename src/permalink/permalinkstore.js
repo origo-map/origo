@@ -8,26 +8,28 @@ permalinkStore.getSaveLayers = function getSaveLayers(layers, viewer) {
   const saveLayers = [];
   layers.forEach((layer) => {
     const saveLayer = {};
-    // activeThemes is an Array with 2 possible values to choose from: 1, 0
-    // It refers to the visibility of thematicStyling's themes; 1 = visible and 0 = invisible.
     const activeThemes = [];
+    function getActiveThemes(style) {
+      for (let i = 0; i < style.length; i += 1) {
+        if (style[i][0].visible !== false) {
+          activeThemes.push(style[i][0].label);
+        }
+      }
+    }
     saveLayer.v = layer.getVisible() === true ? 1 : 0;
     saveLayer.s = layer.get('legend') === true ? 1 : 0;
     saveLayer.o = Number(layer.get('opacity')) * 100;
+    // only get active themes when thematicStyling is true
     if (layer.get('thematicStyling')) {
       const styleName = layer.get('styleName');
       let style = viewer.getStyles()[styleName];
-      if (layer.get('type') === 'WMS') {
+      if (layer.get('type') !== 'WMS') {
+        getActiveThemes(style);
+      } else if (layer.get('type') === 'WMS' && layer.get('hasThemeLegend')) {
         style = viewer.getStyles()[styleName][0].thematic.map(obj => [obj]);
+        getActiveThemes(style);
       }
-      for (let i = 0; i < style.length; i += 1) {
-        if (style[i][0].visible === false) {
-          activeThemes.push(0);
-        } else {
-          activeThemes.push(1);
-        }
-      }
-      saveLayer.th = activeThemes.join('');
+      saveLayer.th = activeThemes.join('~');
     }
     // Only get style for layer styles that have changed
     if (layer.get('defaultStyle') && layer.get('defaultStyle') !== layer.get('styleName')) saveLayer.sn = layer.get('altStyleIndex');
