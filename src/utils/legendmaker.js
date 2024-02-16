@@ -259,7 +259,11 @@ export const Legend = function Legend({
       const style = viewer.getStyles()[styleName];
       if (layer.get('type') !== 'WMS') {
         for (let i = 0; i < style.length; i += 1) {
-          style[i][0].visible = activeThemes.includes(style[i][0].id || style[i][0].label);
+          let themeStr;
+          if (style[i][0].id) {
+            themeStr = style[i][0].id.toString();
+          }
+          style[i][0].visible = activeThemes.includes(themeStr || style[i][0].label);
         }
       }
     }
