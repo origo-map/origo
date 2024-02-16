@@ -12,7 +12,7 @@ permalinkStore.getSaveLayers = function getSaveLayers(layers, viewer) {
     function getActiveThemes(style) {
       for (let i = 0; i < style.length; i += 1) {
         if (style[i][0].visible !== false) {
-          activeThemes.push(style[i][0].label);
+          activeThemes.push(style[i][0].id || style[i][0].name || style[i][0].label);
         }
       }
     }

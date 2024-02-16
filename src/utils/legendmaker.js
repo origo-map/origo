@@ -184,7 +184,7 @@ async function setIcon(src, cmp, styleRules, layer, viewer, clickable) {
         });
         if (activeThemes && hasThemeLegend) {
           const lastItem = style[0].thematic[style[0].thematic.length - 1];
-          lastItem.visible = activeThemes.includes(lastItem.label);
+          lastItem.visible = activeThemes.includes(row.name || row.title);
         }
       }
     });
@@ -259,7 +259,7 @@ export const Legend = function Legend({
       const style = viewer.getStyles()[styleName];
       if (layer.get('type') !== 'WMS') {
         for (let i = 0; i < style.length; i += 1) {
-          style[i][0].visible = activeThemes.includes(style[i][0].label);
+          style[i][0].visible = activeThemes.includes(style[i][0].id || style[i][0].label);
         }
       }
     }
