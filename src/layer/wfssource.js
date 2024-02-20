@@ -99,17 +99,17 @@ class WfsSource extends VectorSource {
    * @param {any} extraFilter Optional extra filter for this call with syntax matching the source's `filterType` (`cql`|`qgis`). Will be combined with any configured layer filter unless ignoreOriginalFilter is true
    * @param {any} ignoreOriginalFilter true if configured layer filter should be ignored for this call, making parameter extraFilter the only filter (if specified)
    */
-  createQueryFilter(extent, extraFilter, ignoreOriginalFilter, ids) {
+  createQueryFilter(extent, extraFilter, ignoreOriginalFilter) {
     let layerFilter = '';
     let queryFilter = '';
     // Add layer filter unless `ignoreOriginalFilter` is set
-    if (this._options.filter  && !ignoreOriginalFilter) {
+    if (this._options.filter && !ignoreOriginalFilter) {
       layerFilter = replacer.replace(this._options.filter, window);
     }
 
     // Prepare extent if used
     let requestExtent;
-    if(extent && !this._options.isTable) {
+    if (extent && !this._options.isTable) {
       // Combine the layer's extent with the extent used for this function call
       const ext = getIntersection(this._options.customExtent, extent) || extent;
       // Reproject it if the layer's data projection differs from that of the map

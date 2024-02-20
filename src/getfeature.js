@@ -80,7 +80,7 @@ sourceType.WFS = function wfsSourceType(id, layer, serverUrl, filterType, extent
       dataProjection: projectionCode,
       projectionCode,
       loadingstrategy: 'all',
-      filterType: filterType,
+      filterType,
       requestMethod: 'GET',
       url: serverUrl,
       customExtent: layer.get('extent'),
