@@ -4,16 +4,18 @@ let getPin;
 const permalinkStore = {};
 const additionalMapStateParams = {};
 
-function getSaveLayers(layers) {
+permalinkStore.getSaveLayers = function getSaveLayers(layers) {
   const saveLayers = [];
   layers.forEach((layer) => {
     const saveLayer = {};
     saveLayer.v = layer.getVisible() === true ? 1 : 0;
     saveLayer.s = layer.get('legend') === true ? 1 : 0;
     saveLayer.o = Number(layer.get('opacity')) * 100;
+    // Only get style for layer styles that have changed
+    if (layer.get('defaultStyle') && layer.get('defaultStyle') !== layer.get('styleName')) saveLayer.sn = layer.get('altStyleIndex');
     if (saveLayer.s || saveLayer.v) {
       saveLayer.name = layer.get('name');
-      if (saveLayer.name !== 'measure') {
+      if (saveLayer.name !== 'measure' && !layer.get('drawlayer')) {
         saveLayers.push(urlparser.stringify(saveLayer, {
           topmost: 'name'
         }));
@@ -21,7 +23,7 @@ function getSaveLayers(layers) {
     }
   });
   return saveLayers;
-}
+};
 
 permalinkStore.getState = function getState(viewer, isExtended) {
   const state = {};
@@ -30,7 +32,7 @@ permalinkStore.getState = function getState(viewer, isExtended) {
   const featureinfo = viewer.getFeatureinfo();
   const type = featureinfo.getSelection().type;
   getPin = featureinfo.getPin;
-  state.layers = getSaveLayers(layers);
+  state.layers = permalinkStore.getSaveLayers(layers);
   state.center = view.getCenter().map(coord => Math.round(coord)).join();
   state.zoom = view.getZoom().toString();
 

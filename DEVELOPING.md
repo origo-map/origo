@@ -1,14 +1,18 @@
 # Developing with Origo
 
 ## Language
-Origo uses JavaScript ECMAScript 6, HTML5 and CSS3. Dependencies to other frameworks shall be avoided. Utilizing other libraries and components are however allowed. The ambition is to use smaller libraries as building blocks rather than building Origo into a big and complex framework such as ExtJS or AngularJS. When using third party libraries or components it is important to ensure that the license is compatible with the license for Origo, see the [license file](LICENSE.txt). 
+Origo uses JavaScript ECMAScript 6, HTML5 and CSS3. Dependencies to other frameworks shall be avoided. Utilizing other libraries and components are however allowed. The ambition is to use smaller libraries as building blocks rather than building Origo into a big and complex framework such as ExtJS or AngularJS. When using third party libraries or components it is important to ensure that the license is compatible with the license for Origo, see the [license file](LICENSE.txt).
 
-Origo uses OpenLayers as the map component. Development in Origo shall support versions according to package.json at GitHub. Origo shall support the most commonly used web browsers such as Internet Explorer 11, Edge, FireFox, Chrome and Safari. 
+Origo uses OpenLayers as the map component. Development in Origo shall support versions according to package.json at GitHub. Origo shall support the most commonly used web browsers such as Edge, FireFox, Chrome and Safari. 
 
 When developing, progressive enhancement is an encouraged strategy. That means that it is allowed to adopt new technology that may not be widely supported today but enhances the user experience in modern web browsers under the condition that the functionality is not critical.
 
 ## JavaScript
-Origo follows the [Airbnb's JavaScript Style Guide](https://github.com/airbnb/javascript) for EcmaScript 6.
+Origo follows the [Airbnb's JavaScript Style Guide](https://github.com/airbnb/javascript) for EcmaScript 6. There are npm scripts that can be used
+to verify that the code complies with the rules: `npm run lint`to check the code, `npm run lint-run` to run the _webpack dev server_ with lint enabled and
+`npm run lint-build` to lint and build. As the lint rules are also enforced when creating a pull request, there must be no errors in the code. If an error can not be avoided
+it must be ignored by adding a _eslint_ ignore comment: `// eslint-disable-next-line <name-of-error>`. There should also be a comment that
+clearly states why it is ignored instead of fixed.
 
 We wish to promote modular development, and in order to do this we have chosen [webpack](https://github.com/webpack/webpack) as the bundler.
 
@@ -20,7 +24,7 @@ Origo uses [Handlebars.js](http://handlebarsjs.com/) as templating system to bui
 ## CSS
 The [CSS/SASS guidelines from Airbnb](https://github.com/airbnb/css) shall be followed.
 
-Origo uses SASS to enable modular development of CSS. That means changes and additions to CSS are made in .scss files only. When changes are made it must be verified they are not in conflict with existing css. 
+Origo uses SASS to enable modular development of CSS. That means changes and additions to CSS are made in .scss files only. When changes are made it must be verified they are not in conflict with existing css.
 
 The classes and IDs of CSS selectors shall have the prefix 'o-'.
 

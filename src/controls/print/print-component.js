@@ -1,13 +1,13 @@
 import olAttribution from 'ol/control/Attribution';
 import olScaleLine from 'ol/control/ScaleLine';
+import { unByKey } from 'ol/Observable';
 import { getPointResolution } from 'ol/proj';
 import TileImage from 'ol/source/TileImage';
 import TileWMSSource from 'ol/source/TileWMS';
 import TileGrid from 'ol/tilegrid/TileGrid';
 import { Group } from 'ol/layer';
-import PluggableMap from 'ol/PluggableMap';
 import {
-  Button, Component, cuid, dom
+  Button, Component, cuid, dom, Element as El
 } from '../../ui';
 import pageTemplate from './page.template';
 import PrintMap from './print-map';
@@ -18,34 +18,8 @@ import { downloadPNG, downloadPDF, printToScalePDF } from '../../utils/download'
 import { afterRender, beforeRender } from './download-callback';
 import maputils from '../../maputils';
 import PrintResize from './print-resize';
-/** Backup of original OL function */
-const original = PluggableMap.prototype.getEventPixel;
-
-/**
- * Recalculates the event position to account for transform: scale in the container as OL does not do that.
- * Used to monkey patch OL.
- * @param {any} event
- */
-const getEventPixelScale = function monkeyPatch(event) {
-  // This is internal in OL, nust allow
-  // eslint-disable-next-line no-underscore-dangle
-  const viewportPosition = this.viewport_.getBoundingClientRect();
-  let size = [viewportPosition.width, viewportPosition.height];
-  const view = this.getView();
-  if (view) {
-    // This is internal in OL, nust allow
-    // eslint-disable-next-line no-underscore-dangle
-    size = view.getViewportSize_();
-  }
-  const eventPosition = 'changedTouches' in event ? event.changedTouches[0] : event;
-
-  return [
-    ((eventPosition.clientX - viewportPosition.left) * size[0])
-    / viewportPosition.width,
-    ((eventPosition.clientY - viewportPosition.top) * size[1])
-    / viewportPosition.height
-  ];
-};
+import { withLoading } from '../../loading';
+import isOnIos from '../../utils/browser';
 
 const PrintComponent = function PrintComponent(options = {}) {
   const {
@@ -69,7 +43,6 @@ const PrintComponent = function PrintComponent(options = {}) {
     sizeCustomMaxHeight,
     sizeCustomMinWidth,
     sizeCustomMaxWidth,
-    resolutions,
     scaleInitial,
     createdPrefix,
     rotation,
@@ -77,7 +50,8 @@ const PrintComponent = function PrintComponent(options = {}) {
     leftFooterText,
     mapInteractionsActive,
     supressResolutionsRecalculation,
-    suppressNewDPIMethod
+    suppressNewDPIMethod,
+    settingsExpanded
   } = options;
 
   let {
@@ -88,6 +62,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     size,
     orientation,
     resolution,
+    resolutions,
     scales,
     showMargins,
     showCreated,
@@ -104,16 +79,38 @@ const PrintComponent = function PrintComponent(options = {}) {
   let titleAlign = `text-align-${titleAlignment}`;
   let descriptionAlign = `text-align-${descriptionAlignment}`;
   let viewerMapTarget;
-  const printMarginClass = 'print-margin';
   let today = new Date(Date.now());
+  let initZoom;
   let printScale = 0;
   let widthImage = 0;
   let heightImage = 0;
   const originalResolutions = viewer.getResolutions().map(item => item);
   const originalGrids = new Map();
+  const deviceOnIos = isOnIos();
+  const view = map.getView();
+
+  // eslint-disable-next-line no-underscore-dangle
+  const olPixelRatio = map.pixelRatio_;
 
   if (!Array.isArray(scales) || scales.length === 0) {
     scales = originalResolutions.map(currRes => maputils.resolutionToFormattedScale(currRes, viewer.getProjection()));
+  }
+
+  const calcMaxRes = function calcMaxRes() {
+    const devicePixelRatio = window.devicePixelRatio;
+    const maxSize = 16777216;
+    const maxRes = Math.floor((Math.sqrt(maxSize / (sizes[size][1] * sizes[size][0])) * 25.4) / devicePixelRatio);
+    return maxRes;
+  };
+
+  const setMaxRes = function setMaxRes() {
+    const res = calcMaxRes();
+    resolutions = [{ label: 'Hög', value: res }];
+    resolution = res;
+  };
+
+  if (deviceOnIos) {
+    setMaxRes();
   }
 
   /**
@@ -224,6 +221,10 @@ const PrintComponent = function PrintComponent(options = {}) {
     }
   };
 
+  const getPrintPadding = function getPrintPadding() {
+    return showMargins ? `${(10 * resolution) / 150}mm ${(10 * resolution) / 150}mm` : '';
+  };
+
   const created = function created() {
     return showCreated ? `${createdPrefix}${today.toLocaleDateString()} ${today.toLocaleTimeString()}` : '';
   };
@@ -252,6 +253,10 @@ const PrintComponent = function PrintComponent(options = {}) {
 
   const printMapComponent = PrintMap({ logo, northArrow, map, viewer, showNorthArrow, printLegend, showPrintLegend });
 
+  const centerComponent = El({ cls: 'flex column align-start absolute center-center transparent z-index-ontop-middle' });
+  const printMapSpinner = El({ cls: 'print-map-loading-spinner' });
+  centerComponent.addComponent(printMapSpinner);
+
   const closeButton = Button({
     cls: 'fixed top-right medium round icon-smaller light box-shadow z-index-ontop-high',
     icon: '#ic_close_24px',
@@ -266,7 +271,8 @@ const PrintComponent = function PrintComponent(options = {}) {
     titleComponent,
     descriptionComponent,
     createdComponent,
-    closeButton
+    closeButton,
+    constrainResolution: view.getConstrainResolution()
   });
 
   const setScale = function setScale(scale) {
@@ -287,9 +293,10 @@ const PrintComponent = function PrintComponent(options = {}) {
     pageElement.style.width = `${widthImage}px`;
     pageElement.style.height = `${heightImage}px`;
     // Scale the printed map to make it fit in the preview
-    const scaleWidth = orientation === 'portrait' ? widthImage : heightImage;
-    const scaleFactor = `;transform: scale(${((widthInMm * 3.779527559055) / scaleWidth)});transform-origin: top left;`;
-    pageElement.setAttribute('style', pageElement.getAttribute('style') + scaleFactor);
+    const scaleWidth = widthImage;
+    pageElement.style.transform = `scale(${((widthInMm * 3.779527559055) / scaleWidth)})`;
+    pageElement.style.transformOrigin = 'top left';
+    pageElement.style.padding = getPrintPadding();
     map.updateSize();
     map.getView().setResolution(scaleResolution);
   };
@@ -319,6 +326,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     resolution,
     scales,
     scaleInitial,
+    settingsExpanded,
     showMargins,
     showCreated,
     showScale,
@@ -329,12 +337,45 @@ const PrintComponent = function PrintComponent(options = {}) {
     viewerResolutions: originalResolutions
   });
   const printInteractionToggle = PrintInteractionToggle({ map, target, mapInteractionsActive, pageSettings: viewer.getViewerOptions().pageSettings });
+
   const printToolbar = PrintToolbar();
+
+  let mapLoadListenRefs;
+
+  function disablePrintToolbar() {
+    printToolbar.setDisabled(true);
+    document.querySelector(`#${printMapSpinner.getId()}`).style.display = '';
+  }
+
+  function enablePrintToolbar() {
+    printToolbar.setDisabled(false);
+    document.querySelector(`#${printMapSpinner.getId()}`).style.display = 'none';
+  }
+
+  function updateScaleOnMove() {
+    if (initZoom !== view.getZoom()) {
+      initZoom = view.getZoom();
+      const res = view.getResolution();
+      const projection = view.getProjection();
+      const scale = res * getPointResolution(
+        projection,
+        resolution / 25.4,
+        view.getCenter()
+      );
+      let textContent = scale;
+      textContent = maputils.formatScale(scale * 1000);
+      printSettings.getScaleControl().setButtonText(textContent);
+      setScale(scale);
+    }
+  }
+
   return Component({
     name: 'printComponent',
+    getResolution() {
+      return resolution;
+    },
     onInit() {
       this.on('render', this.onRender);
-
       this.addComponent(printSettings);
       this.addComponent(printInteractionToggle);
       this.addComponent(printToolbar);
@@ -382,10 +423,16 @@ const PrintComponent = function PrintComponent(options = {}) {
     },
     changeSize(evt) {
       size = evt.size;
+      if (deviceOnIos) {
+        setMaxRes();
+      }
       this.updatePageSize();
     },
     changeCustomSize(evt) {
       setCustomSize(evt);
+      if (deviceOnIos) {
+        setMaxRes();
+      }
       this.updatePageSize();
     },
     changeOrientation(evt) {
@@ -424,11 +471,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     changeScale(evt) {
       setScale(evt.scale);
     },
-    printMargin() {
-      return showMargins ? 'print-margin' : '';
-    },
     toggleMargin() {
-      pageElement.classList.toggle(printMarginClass);
       showMargins = !showMargins;
       this.updatePageSize();
     },
@@ -450,14 +493,26 @@ const PrintComponent = function PrintComponent(options = {}) {
       printMapComponent.dispatch('change:togglePrintLegend', { showPrintLegend });
     },
     close() {
+      if (deviceOnIos) {
+        // Reset pixelRatio
+        // eslint-disable-next-line no-underscore-dangle
+        map.pixelRatio_ = olPixelRatio;
+      }
+      unByKey(mapLoadListenRefs[0]);
+      unByKey(mapLoadListenRefs[1]);
+      unByKey(mapLoadListenRefs[2]);
+      // GH-1537: remove layers temporarily added for print and unhide layers hidden for print
+      viewer.getLayersByProperty('added-for-print', true).forEach((l) => viewer.removeLayer(l));
+      viewer.getLayersByProperty('hidden-for-print', true).forEach((l) => {
+        l.setVisible(true);
+        l.unset('hidden-for-print');
+      });
+
       if (suppressNewDPIMethod === false) {
         printResize.resetLayers();
         printResize.setResolution(150);
       }
-      // Restore monkey patch
-      // WORKAROUND: Remove when OL supports transform: scale
-      // See https://github.com/openlayers/openlayers/issues/13283
-      PluggableMap.prototype.getEventPixel = original;
+
       // Restore scales
       if (!supressResolutionsRecalculation) {
         const viewerResolutions = viewer.getResolutions();
@@ -487,12 +542,12 @@ const PrintComponent = function PrintComponent(options = {}) {
       printElement.remove();
     },
     async downloadPNG() {
-      await downloadPNG({
+      await withLoading(() => downloadPNG({
         afterRender: afterRender(map),
         beforeRender: beforeRender(map),
         filename: `${filename}.png`,
         el: pageElement
-      });
+      }));
     },
     async downloadPDF() {
       let height;
@@ -507,7 +562,7 @@ const PrintComponent = function PrintComponent(options = {}) {
         width = sizes[size][0];
         pdfOrientation = orientation;
       }
-      await downloadPDF({
+      await withLoading(() => downloadPDF({
         afterRender: afterRender(map),
         beforeRender: beforeRender(map),
         el: pageElement,
@@ -516,7 +571,7 @@ const PrintComponent = function PrintComponent(options = {}) {
         orientation: pdfOrientation,
         size,
         width
-      });
+      }));
     },
     async printToScalePDF() {
       let height;
@@ -531,7 +586,8 @@ const PrintComponent = function PrintComponent(options = {}) {
       }
       widthImage = orientation === 'portrait' ? Math.round((sizes[size][1] * resolution) / 25.4) : Math.round((sizes[size][0] * resolution) / 25.4);
       heightImage = orientation === 'portrait' ? Math.round((sizes[size][0] * resolution) / 25.4) : Math.round((sizes[size][1] * resolution) / 25.4);
-      await printToScalePDF({
+
+      await withLoading(() => printToScalePDF({
         el: pageElement,
         filename,
         height,
@@ -541,13 +597,16 @@ const PrintComponent = function PrintComponent(options = {}) {
         printScale,
         widthImage,
         heightImage
-      });
+      }));
     },
     async onRender() {
-      // Monkey patch OL
-      // WORKAROUND: Remove when OL supports transform: scale
-      // See https://github.com/openlayers/openlayers/issues/13283
-      PluggableMap.prototype.getEventPixel = getEventPixelScale;
+      function addMapLoadListeners() {
+        const startEvRef = map.on('loadstart', disablePrintToolbar);
+        const endEvRef = map.on('loadend', enablePrintToolbar);
+        const endMoveRef = map.on('moveend', updateScaleOnMove);
+        return [startEvRef, endEvRef, endMoveRef];
+      }
+      mapLoadListenRefs = addMapLoadListeners();
       printScale = 0;
       today = new Date(Date.now());
       viewerMapTarget = map.getTarget();
@@ -556,6 +615,28 @@ const PrintComponent = function PrintComponent(options = {}) {
       map.setTarget(printMapComponent.getId());
       this.removeViewerControls();
       await printMapComponent.addPrintControls();
+
+      // GH-1537: temporarily add layers for print and hide their original versions
+      viewer.getLayersByProperty('printRenderMode', 'image').forEach((layer) => {
+        if (layer.getVisible() && !layer.get('added-for-print') && !layer.get('hidden-for-print')) {
+          // hide the original, tiled, layer
+          layer.setVisible(false);
+          layer.set('hidden-for-print', true);
+
+          // create a duplicate of the layer with a different renderMode
+          const { map: _, type, name, sourceName, ...properties } = layer.getProperties();
+          const newLayer = viewer.addLayer({
+            ...properties,
+            source: sourceName,
+            renderMode: 'image',
+            type: type === 'AGS_TILE' ? 'AGS_MAP' : type,
+            name: `${name}-forPrint`,
+            visible: true
+          }, layer);
+          newLayer.set('added-for-print', true);
+        }
+      });
+
       if (!supressResolutionsRecalculation) {
         updateResolutions();
       }
@@ -568,6 +649,16 @@ const PrintComponent = function PrintComponent(options = {}) {
     updatePageSize() {
       pageContainerElement.style.height = orientation === 'portrait' ? `${sizes[size][0]}mm` : `${sizes[size][1]}mm`;
       pageContainerElement.style.width = orientation === 'portrait' ? `${sizes[size][1]}mm` : `${sizes[size][0]}mm`;
+      const qH = (window.innerHeight - 78) / pageContainerElement.clientHeight;
+      const qW = (window.innerWidth - 32) / pageContainerElement.clientWidth;
+      pageContainerElement.style.transform = `scale(${qH > qW ? qW : qH})`;
+      if (window.innerWidth <= 1000) {
+        pageContainerElement.style.transformOrigin = 'top left';
+        pageContainerElement.style.marginLeft = '16px';
+        pageContainerElement.style.marginRight = '16px';
+      } else {
+        pageContainerElement.style.transformOrigin = 'top center';
+      }
       this.updateMapSize();
       if (printScale > 0) {
         this.changeScale({ scale: printScale });
@@ -587,17 +678,26 @@ const PrintComponent = function PrintComponent(options = {}) {
       if (draganddropControl) draganddropControl.addInteraction();
     },
     render() {
+      viewer.dispatch('toggleClickInteraction', {
+        name: 'featureinfo',
+        active: true
+      });
+      if (deviceOnIos) {
+        // If user is on iOS we have to make sure the canvas ain't too heavy and make the browser crash
+        // eslint-disable-next-line no-underscore-dangle
+        map.pixelRatio_ = 1;
+      }
       targetElement = document.getElementById(target);
       const htmlString = `
-      <div id="${this.getId()}" class="absolute flex no-wrap fade-in no-margin width-full height-full z-index-ontop-low bg-grey-lightest overflow-auto">
+      <div id="${this.getId()}" class="absolute flex no-wrap fade-in no-margin width-full height-full z-index-ontop-low bg-grey-lightest overflow-auto" style="touch-action:none">
         <div
           id="${pageContainerId}"
           class="flex column no-shrink margin-top-large margin-x-auto box-shadow bg-white border-box"
           style="margin-bottom: 4rem;">
           <div
             id="${pageId}"
-            class="o-print-page flex column no-shrink no-margin width-full height-full bg-white ${this.printMargin()}"
-            style="margin-bottom: 4rem;">
+            class="o-print-page flex column no-shrink no-margin width-full height-full bg-white}"
+            style="margin-bottom: 4rem; ${showMargins ? `padding: ${getPrintPadding()}` : ''}">
             <div class="flex column no-margin width-full height-full overflow-hidden">
   ${pageTemplate({
     descriptionComponent, printMapComponent, titleComponent, footerComponent
@@ -605,6 +705,7 @@ const PrintComponent = function PrintComponent(options = {}) {
             </div>
           </div>
         </div>
+        ${centerComponent.render()}
         <div id="o-print-tools-left" class="top-left fixed no-print flex column spacing-vertical-small z-index-ontop-top height-full">
           ${printSettings.render()}
           ${printInteractionToggle.render()}

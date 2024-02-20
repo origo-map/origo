@@ -1,19 +1,23 @@
-import { simpleExportHandler, layerSpecificExportHandler } from './infowindow_exporthandler';
-import exportToFile from './utils/exporttofile';
+import { createSubexportComponent } from './infowindow_exporthandler';
+import { dom, Button } from './ui';
 
 let parentElement;
 let mainContainer;
 let urvalContainer;
+let urvalListContainer;
 let listContainer;
 let exportContainer;
+let groupFooterContainer;
 let sublists;
 let subexports;
 let urvalElements;
+let footerContainers;
 let expandableContents;
 let exportOptions;
 let activeSelectionGroup;
 let selectionManager;
 let viewer;
+let infowindowOptions;
 
 function createSvgElement(id, className) {
   const svgContainer = document.createElement('div');
@@ -35,6 +39,10 @@ function hideInfowindow() {
 
 function showInfowindow() {
   mainContainer.classList.remove('hidden');
+}
+
+function getActiveSelectionGroup() {
+  return activeSelectionGroup;
 }
 
 function makeElementDraggable(elm) {
@@ -83,21 +91,65 @@ function makeElementDraggable(elm) {
   }
 }
 
-function render(viewerId, title) {
+function setInfowindowStyle() {
+  // Only change style for standard screen size (desktop).
+  const shouldSetWidth = document.querySelectorAll('div[class*="o-media-l"]').length === 0;
+  if (infowindowOptions.contentStyle && shouldSetWidth) {
+    mainContainer.style = dom.createStyle(infowindowOptions.contentStyle);
+  }
+}
+
+function createCloseButton() {
+  return Button({
+    cls: 'closebutton-svg-container small round small icon-smaller grey-lightest margin-top-small margin-right-small z-index-ontop-low ',
+    icon: '#ic_close_24px',
+    state: 'initial',
+    validStates: ['initial', 'hidden'],
+    ariaLabel: 'Stäng'
+  });
+}
+
+function render(viewerId) {
   mainContainer = document.createElement('div');
+  setInfowindowStyle();
   mainContainer.classList.add('sidebarcontainer');
   mainContainer.id = 'sidebarcontainer';
   urvalContainer = document.createElement('div');
   urvalContainer.classList.add('urvalcontainer');
+  urvalListContainer = document.createElement('div');
+  urvalListContainer.classList.add('urvalListContainer');
   // We add this so that urvalcontainer can become draggable
   urvalContainer.id = 'sidebarcontainer-draggable';
   const urvalTextNodeContainer = document.createElement('div');
   urvalTextNodeContainer.classList.add('urval-textnode-container');
-  const urvalTextNode = document.createTextNode(title || 'Träffar');
+  const urvalTextNode = document.createTextNode(infowindowOptions.title || 'Träffar');
   urvalTextNodeContainer.appendChild(urvalTextNode);
   urvalContainer.appendChild(urvalTextNodeContainer);
-  const closeButtonSvg = createSvgElement('ic_close_24px', 'closebutton-svg');
-  closeButtonSvg.addEventListener('click', () => {
+  const closeButton = createCloseButton();
+  urvalContainer.appendChild(dom.html(closeButton.render()));
+  urvalContainer.appendChild(urvalListContainer);
+  listContainer = document.createElement('div');
+  listContainer.classList.add('listcontainer');
+
+  exportContainer = document.createElement('div');
+  exportContainer.classList.add('exportcontainer');
+
+  groupFooterContainer = document.createElement('div');
+  groupFooterContainer.classList.add('groupfootercontainer');
+
+  // Add some divs to populate later. It works by replacing the contents of these containers with the
+  // information for the selected selectionGroup. Each selectionGroup is rendered in memory only
+  // and is put into DOM when it should be visible
+  mainContainer.appendChild(urvalContainer);
+  mainContainer.appendChild(listContainer);
+  mainContainer.appendChild(groupFooterContainer);
+  mainContainer.appendChild(exportContainer);
+
+  parentElement = document.getElementById(viewerId);
+  parentElement.appendChild(mainContainer);
+  mainContainer.classList.add('hidden');
+
+  document.getElementById(closeButton.getId()).addEventListener('click', () => {
     const detail = {
       name: 'multiselection',
       active: false
@@ -106,229 +158,9 @@ function render(viewerId, title) {
     selectionManager.clearSelection();
     hideInfowindow();
   });
-  urvalContainer.appendChild(closeButtonSvg);
-  listContainer = document.createElement('div');
-  listContainer.classList.add('listcontainer');
-
-  exportContainer = document.createElement('div');
-  exportContainer.classList.add('exportcontainer');
-
-  mainContainer.appendChild(urvalContainer);
-  mainContainer.appendChild(listContainer);
-  mainContainer.appendChild(exportContainer);
-
-  parentElement = document.getElementById(viewerId);
-  parentElement.appendChild(mainContainer);
-  mainContainer.classList.add('hidden');
 
   // Make the DIV element draggagle:
   makeElementDraggable(mainContainer);
-}
-
-function showSelectedList(selectionGroup) {
-  if (activeSelectionGroup === selectionGroup) {
-    return;
-  }
-
-  activeSelectionGroup = selectionGroup;
-  while (listContainer.firstChild) {
-    listContainer.removeChild(listContainer.firstChild);
-  }
-  const sublistToAppend = sublists.get(selectionGroup);
-  listContainer.appendChild(sublistToAppend);
-
-  while (exportContainer.firstChild) {
-    exportContainer.removeChild(exportContainer.firstChild);
-  }
-  const subexportToAppend = subexports.get(selectionGroup);
-  exportContainer.appendChild(subexportToAppend);
-
-  urvalElements.forEach((value, key) => {
-    if (key === selectionGroup) {
-      value.classList.add('selectedurvalelement');
-    } else {
-      value.classList.remove('selectedurvalelement');
-    }
-  });
-}
-
-function createExportButton(buttonText) {
-  const container = document.createElement('div');
-
-  const spinner = document.createElement('img');
-  spinner.src = 'img/loading.gif';
-  spinner.classList.add('spinner');
-  spinner.style.visibility = 'hidden';
-
-  const button = document.createElement('button');
-  button.classList.add('export-button');
-  button.textContent = buttonText;
-
-  container.appendChild(spinner);
-  container.appendChild(button);
-
-  container.loadStart = () => {
-    button.disabled = true;
-    button.classList.add('disabled');
-    spinner.style.visibility = 'visible';
-  };
-
-  container.loadStop = () => {
-    button.disabled = false;
-    button.classList.remove('disabled');
-    spinner.style.visibility = 'hidden';
-  };
-
-  return container;
-}
-
-function createToaster(status, message) {
-  let msg = message;
-  const toaster = document.createElement('div');
-  toaster.style.fontSize = '12px';
-  if (!message) {
-    const successMsg = exportOptions.toasterMessages && exportOptions.toasterMessages.success ? exportOptions.toasterMessages.success : 'Success!';
-    const failMsg = exportOptions.toasterMessages && exportOptions.toasterMessages.fail ? exportOptions.toasterMessages.fail : 'Sorry, something went wrong. Please contact your administrator';
-    msg = status === 'ok' ? successMsg : failMsg;
-  }
-  // It cannot be appended to infowindow bcuz in mobile tranform:translate is used css, and it causes that position: fixed loses its effect.
-  parentElement.appendChild(toaster);
-  setTimeout(() => {
-    // message must be added here inside timeout otherwise it will be shown 50 ms before it take the effect of the css
-    toaster.textContent = msg;
-    toaster.classList.add('toaster');
-    if (status === 'ok') {
-      toaster.classList.add('toaster-successful');
-    } else {
-      toaster.classList.add('toaster-unsuccessful');
-    }
-  }, 50);
-
-  setTimeout(() => {
-    toaster.parentNode.removeChild(toaster);
-  }, 5000);
-}
-
-function createSubexportComponent(selectionGroup) {
-  // OBS! selectionGroup corresponds to a layer with the same name in most cases, but in case of a group layer it can contain selected items from all the layers in that GroupLayer.
-
-  let layerSpecificExportOptions;
-  const simpleExportLayers = exportOptions.simpleExportLayers ? exportOptions.simpleExportLayers : [];
-  const simpleExportUrl = exportOptions.simpleExportUrl;
-  const simpleExportButtonText = exportOptions.simpleExportButtonText || 'Export';
-  const exportedFileName = exportOptions.exportedFileName;
-  const activeLayer = viewer.getLayer(selectionGroup);
-
-  const subexportContainer = document.createElement('div');
-  subexportContainer.classList.add('export-buttons-container');
-
-  if (exportOptions.layerSpecificExport) {
-    layerSpecificExportOptions = exportOptions.layerSpecificExport.find((i) => i.layer === selectionGroup);
-  }
-
-  if (layerSpecificExportOptions) {
-    const exportUrls = layerSpecificExportOptions.exportUrls || [];
-    const attributesToSendToExportPerLayer = layerSpecificExportOptions.attributesToSendToExport;
-
-    exportUrls.forEach((obj) => {
-      const buttonText = obj.buttonText || 'Export';
-      const url = obj.url;
-      const layerSpecificExportedFileName = obj.exportedFileName;
-      const attributesToSendToExport = obj.attributesToSendToExport ? obj.attributesToSendToExport : attributesToSendToExportPerLayer;
-      const exportBtn = createExportButton(buttonText);
-      const btn = exportBtn.querySelector('button');
-      btn.addEventListener('click', () => {
-        if (!url) {
-          createToaster('fail');
-          return;
-        }
-        exportBtn.loadStart();
-        const selectedItems = selectionManager.getSelectedItemsForASelectionGroup(selectionGroup);
-        layerSpecificExportHandler(url, activeLayer, selectedItems, attributesToSendToExport, layerSpecificExportedFileName).then((data) => {
-          if (data) {
-            switch (data.status) {
-              case 'ok':
-                createToaster('ok');
-                break;
-
-              case 'fail':
-                createToaster('fail');
-                break;
-
-              default:
-                break;
-            }
-          }
-          exportBtn.loadStop();
-        }).catch((err) => {
-          console.error(err);
-          createToaster('fail');
-          exportBtn.loadStop();
-        });
-      });
-      subexportContainer.appendChild(exportBtn);
-    });
-  } else if (simpleExportLayers.length) {
-    const exportAllowed = simpleExportLayers.find((l) => l === selectionGroup);
-    if (exportAllowed) {
-      const exportBtn = createExportButton(simpleExportButtonText);
-      const btn = exportBtn.querySelector('button');
-      btn.addEventListener('click', () => {
-        if (!simpleExportUrl) {
-          createToaster('fail');
-          return;
-        }
-        exportBtn.loadStart();
-        const selectedItems = selectionManager.getSelectedItemsForASelectionGroup(selectionGroup);
-        simpleExportHandler(simpleExportUrl, activeLayer, selectedItems, exportedFileName).then(() => {
-          exportBtn.loadStop();
-        }).catch((err) => {
-          console.error(err);
-          createToaster('fail');
-          exportBtn.loadStop();
-        });
-      });
-      subexportContainer.appendChild(exportBtn);
-    }
-  } else if (exportOptions.clientExport) {
-    const conf = exportOptions.clientExport;
-    const exportAllowed = !conf.layers || conf.layers.find((l) => l === selectionGroup);
-    if (exportAllowed) {
-      const exportBtn = createExportButton(conf.buttonText || 'Exportera');
-      const btn = exportBtn.querySelector('button');
-      btn.addEventListener('click', () => {
-        exportBtn.loadStart();
-        const selectedItems = selectionManager.getSelectedItemsForASelectionGroup(selectionGroup);
-        const features = selectedItems.map(i => i.getFeature());
-        exportToFile(features, conf.format, {
-          featureProjection: viewer.getProjection().getCode(),
-          filename: selectionGroup
-        });
-        exportBtn.loadStop();
-      });
-      subexportContainer.appendChild(exportBtn);
-    }
-  }
-
-  return subexportContainer;
-}
-
-function createUrvalElement(selectionGroup, selectionGroupTitle) {
-  const urvalElement = document.createElement('div');
-  urvalElement.classList.add('urvalelement');
-  const textNode = document.createTextNode(selectionGroupTitle);
-  urvalElement.appendChild(textNode);
-  urvalContainer.appendChild(urvalElement);
-  urvalElements.set(selectionGroup, urvalElement);
-  urvalElement.addEventListener('click', () => {
-    showSelectedList(selectionGroup);
-  });
-
-  const sublistContainter = document.createElement('div');
-  sublists.set(selectionGroup, sublistContainter);
-
-  const subexportComponent = createSubexportComponent(selectionGroup);
-  subexports.set(selectionGroup, subexportComponent);
 }
 
 function highlightListElement(featureId) {
@@ -345,6 +177,69 @@ function highlightListElement(featureId) {
       }
     }
   });
+}
+
+function showSelectedList(selectionGroup) {
+  if (activeSelectionGroup === selectionGroup) {
+    return;
+  }
+
+  activeSelectionGroup = selectionGroup;
+  while (listContainer.firstChild) {
+    listContainer.removeChild(listContainer.firstChild);
+  }
+  const sublistToAppend = sublists.get(selectionGroup);
+  listContainer.appendChild(sublistToAppend);
+
+  // Replace the container with this group's content
+  while (groupFooterContainer.firstChild) {
+    groupFooterContainer.removeChild(groupFooterContainer.firstChild);
+  }
+  const footerToAppend = footerContainers.get(selectionGroup);
+  groupFooterContainer.appendChild(footerToAppend);
+
+  while (exportContainer.firstChild) {
+    exportContainer.removeChild(exportContainer.firstChild);
+  }
+  const subexportToAppend = subexports.get(selectionGroup);
+  exportContainer.appendChild(subexportToAppend);
+  selectionManager.clearHighlightedFeatures();
+  selectionManager.refreshAllLayers();
+  urvalElements.forEach((value, key) => {
+    if (key === selectionGroup) {
+      value.classList.add('selectedurvalelement');
+    } else {
+      value.classList.remove('selectedurvalelement');
+    }
+  });
+  highlightListElement();
+}
+
+/**
+ * Creates everything that is needed internally before adding items to a selectionGroup.
+ * Creates some elements, but does not add them to the DOM. That is done when a selectiongroup is displayed.
+ * @param {any} selectionGroup
+ * @param {any} selectionGroupTitle
+ */
+function createUrvalElement(selectionGroup, selectionGroupTitle) {
+  const urvalElement = document.createElement('div');
+  urvalElement.classList.add('urvalelement');
+  const textNode = document.createTextNode(selectionGroupTitle);
+  urvalElement.appendChild(textNode);
+  urvalListContainer.appendChild(urvalElement);
+  urvalElements.set(selectionGroup, urvalElement);
+  urvalElement.addEventListener('click', () => {
+    showSelectedList(selectionGroup);
+  });
+
+  const sublistContainter = document.createElement('div');
+  sublists.set(selectionGroup, sublistContainter);
+
+  const footerContainer = document.createElement('div');
+  footerContainers.set(selectionGroup, footerContainer);
+
+  const subexportComponent = createSubexportComponent({ selectionGroup, viewer, exportOptions });
+  subexports.set(selectionGroup, subexportComponent);
 }
 
 function createExpandableContent(listElementContentContainer, content, elementId) {
@@ -514,21 +409,32 @@ function updateUrvalElementText(selectionGroup, selectionGroupTitle, sum) {
   urvalElement.childNodes[0].nodeValue = newNodeValue;
 }
 
+/**
+ * Updates the footer text for the given selectionGroup.
+ * @param {any} selectionGroup
+ * @param {any} text Some html to display in the footer
+ */
+function updateSelectionGroupFooter(selectionGroup, text) {
+  const footerContainer = footerContainers.get(selectionGroup);
+  footerContainer.innerHTML = text;
+}
+
 function init(options) {
   viewer = options.viewer;
   selectionManager = options.viewer.getSelectionManager();
 
-  const infowindowOptions = options.infowindowOptions ? options.infowindowOptions : {};
+  infowindowOptions = options.infowindowOptions ? options.infowindowOptions : {};
   exportOptions = infowindowOptions.export || {};
-
   sublists = new Map();
   subexports = new Map();
   urvalElements = new Map();
   expandableContents = new Map();
+  footerContainers = new Map();
 
-  render(options.viewer.getId(), infowindowOptions.title);
+  render(options.viewer.getId());
 
   return {
+    getActiveSelectionGroup,
     createListElement,
     removeListElement,
     expandListElement,
@@ -539,7 +445,8 @@ function init(options) {
     showSelectedList,
     scrollListElementToView,
     hide: hideInfowindow,
-    show: showInfowindow
+    show: showInfowindow,
+    updateSelectionGroupFooter
   };
 }
 

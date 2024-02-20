@@ -6,87 +6,120 @@ $flex-grow: 1;
 $flex-grow-all: 2;
 
 .flex {
-  // flex container
-  display: flex;
+    // flex container
+    display: flex;
 
-  &.row {
-    flex-direction: row;
-  }
+    &.row {
+        flex-direction: row;
+    }
 
-  &.row-reverse {
-    flex-direction: row-reverse;
-  }
+    &.row-reverse {
+        flex-direction: row-reverse;
+    }
 
-  &.column {
-    flex-direction: column;
-  }   
+    &.column {
+        flex-direction: column;
+    }
 
-  &.column-reverse {
-    flex-direction: column-reverse;
-  }
-  
-  // flex items
-  .shrink {
-    flex-shrink: $flex-shrink;
-  }
+    &.column-reverse {
+        flex-direction: column-reverse;
+    }
 
-  .grow {
-    flex-grow: $flex-grow;
-  }   
+    // flex items
+    .shrink {
+        flex-shrink: $flex-shrink;
+    }
 
-  .no-shrink {
-    flex-shrink: $flex-no-shrink;
-  }
+    .grow {
+        flex-grow: $flex-grow;
+    }
 
-  .no-grow {
-    flex-grow: $flex-no-grow;
-  }
+    .no-shrink {
+        flex-shrink: $flex-no-shrink;
+    }
 
-  .grow-all {
-    flex-grow: $flex-grow-all;
-  }
+    .no-grow {
+        flex-grow: $flex-no-grow;
+    }
 
-  .no-wrap {
-    flex-wrap: nowrap;
-  }
+    .grow-all {
+        flex-grow: $flex-grow-all;
+    }
 
-  .justify-start {
-    justify-content: flex-start;
-  }
+    .no-wrap {
+        flex-wrap: nowrap;
+    }
 
-  .justify-end {
-    justify-content: flex-end;
-  }
+    .wrap {
+        flex-wrap: wrap;
+    }
+    /* Use this on an empty div to simulate a br in flex. requires that container has flex-wrap: wrap*/
+    .flex-line-break {
+        flex-basis: 100%;
+        height: 0;
+    }
 
-  .justify-center {
-    justify-content: center;
-  }
+    .justify-start {
+        justify-content: flex-start;
+    }
 
-  .justify-space-between {
-    justify-content: space-between;
-  }
+    .justify-end {
+        justify-content: flex-end;
+    }
 
-  .justify-space-evenly {
-    justify-content: space-evenly;
-  }   
+    .justify-center {
+        justify-content: center;
+    }
 
-  .align-start {
-    align-items: flex-start;
-  }
+    .justify-space-between {
+        justify-content: space-between;
+    }
 
-  .align-end {
-    align-items: flex-end;
-  }
+    .justify-space-evenly {
+        justify-content: space-evenly;
+    }
 
-  .align-center {
-    align-items: center;
-  }
+    .align-start {
+        align-items: flex-start;
+    }
 
-  .align-baseline {
-    align-items: baseline;
-  }
+    .align-end {
+        align-items: flex-end;
+    }
+
+    .align-center {
+        align-items: center;
+    }
+
+    .align-baseline {
+        align-items: baseline;
+    }
 
   .align-stretch {
     align-items: stretch;
-  }     
+  }
+
+  .basis-0 {
+    flex-basis: 0;
+  }
+
+  .basis-25 {
+    flex-basis: 25%;
+  }
+
+  .basis-50 {
+    flex-basis: 50%;
+  }
+
+  .basis-75 {
+    flex-basis: 75%;
+  }
+
+  .basis-100 {
+    flex-basis: 100%;
+  }
+  
+  .small-gap {
+    gap: 0.2rem;
+  }
 }

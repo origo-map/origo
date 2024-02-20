@@ -17,7 +17,8 @@ export default function Slidenav(options = {}) {
     mainComponent,
     secondaryComponent,
     style: styleSettings,
-    legendSlideNav = false
+    legendSlideNav = false,
+    viewer
   } = options;
 
   const style = createStyle(styleSettings);
@@ -50,7 +51,8 @@ export default function Slidenav(options = {}) {
     mainEl.classList.toggle('absolute');
     secondaryEl.classList.toggle('absolute');
     if (legendSlideNav) {
-      document.getElementById('legendCollapse').scrollTop = posMem;
+      const containerId = viewer.getControlByName('legend').getOverlaysCollapse().containerId;
+      document.getElementById(containerId).scrollTop = posMem;
     }
     state = 'initial';
   };
@@ -104,7 +106,8 @@ export default function Slidenav(options = {}) {
   const slideToSecondary = function slideToSecondary() {
     state = 'transition';
     if (legendSlideNav) {
-      posMem = document.getElementById('legendCollapse').scrollTop;
+      const containerId = viewer.getControlByName('legend').getOverlaysCollapse().containerId;
+      posMem = document.getElementById(containerId).scrollTop;
     }
     slidenavEl.classList.add('slide-secondary');
     animateHeight(mainEl, secondaryEl);
@@ -129,7 +132,7 @@ export default function Slidenav(options = {}) {
     getState,
     onInit() {
       mainContainer = Element({
-        cls: 'main'
+        cls: 'main overflow-unset'
       });
       backButton = Button({
         cls: 'icon-small padding-small',

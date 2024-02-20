@@ -20,7 +20,7 @@ const Overlays = function Overlays(options) {
     labelOpacitySlider
   } = options;
 
-  const cls = `${clsSettings} o-layerswitcher-overlays flex row overflow-hidden`.trim();
+  const cls = `${clsSettings} o-layerswitcher-overlays flex row overflow-auto`.trim();
   const style = dom.createStyle({
     width: '220px', height: '100%', 'min-width': '220px', ...styleSettings
   });
@@ -51,7 +51,8 @@ const Overlays = function Overlays(options) {
     secondaryComponent: layerProps,
     cls: 'right flex width-100',
     style: { width: '100%' },
-    legendSlideNav: false
+    legendSlideNav: false,
+    viewer
   });
 
   const navContainer = Component({

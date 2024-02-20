@@ -7,7 +7,6 @@ export default function Collapse(options = {}) {
     expanded = false
   } = options;
   const {
-    legendCollapse = false,
     bubble = false,
     cls = '',
     collapseX = true,
@@ -28,7 +27,7 @@ export default function Collapse(options = {}) {
   const contentStyle = createStyle(contentStyleOptions);
   const toggleEvent = 'collapse:toggle';
   const collapseEvent = 'collapse:collapse';
-  let containerId = cuid();
+  const containerId = cuid();
   let collapseEl;
   let containerEl;
   let contentEl;
@@ -42,9 +41,11 @@ export default function Collapse(options = {}) {
 
   // Set tabindex for all buttons to include or exclude in taborder depending on if expanded or not
   const setTabIndex = function setTabIndex(idx) {
-    // Skips the last button since it's slidenav and should be excluded from tab order
-    for (let i = 0; i < containerEl.getElementsByTagName('button').length - 1; i += 1) {
-      containerEl.getElementsByTagName('button')[i].tabIndex = idx;
+    for (let i = 0; i < containerEl.getElementsByTagName('button').length; i += 1) {
+      // Checks if the button is a direct child of the opened group and not a grandchild which shouldn't be activated until that group is opened
+      if (containerEl.id === containerEl.getElementsByTagName('button')[i].closest('.collapse-container').id) {
+        containerEl.getElementsByTagName('button')[i].tabIndex = idx;
+      }
     }
   };
 
@@ -99,13 +100,14 @@ export default function Collapse(options = {}) {
     collapse,
     data,
     expand,
+    containerId,
     onInit() {
-      if ((headerComponent || footerComponent) && contentComponent) {
+      if (contentComponent) {
         if (headerComponent) { this.addComponent(headerComponent); }
         if (footerComponent) { this.addComponent(footerComponent); }
         this.addComponent(contentComponent);
       } else {
-        throw new Error('Header or content component is missing in collapse');
+        throw new Error('Content component is missing in collapse');
       }
     },
     onRender() {
@@ -127,9 +129,6 @@ export default function Collapse(options = {}) {
       const isExpanded = expanded ? 'expanded' : '';
       const header = headerComponent ? headerComponent.render() : '';
       const footer = footerComponent ? footerComponent.render() : '';
-      if (legendCollapse) {
-        containerId = 'legendCollapse';
-      }
       return `<${tagName} id="${this.getId()}" class="${mainCls} ${cls} ${isExpanded}" style="${style}">
                 ${header}
                 <div id="${containerId}" class="${containerCls} ${contentCls}" style="${height} ${width} ${contentStyle}">

@@ -25,7 +25,7 @@ const Overlays = function Overlays(options) {
 
   const cls = `${clsSettings} o-layerswitcher-overlays flex row overflow-hidden`.trim();
   const style = dom.createStyle({
-    width: '220px', height: '100%', 'min-width': '220px', ...styleSettings
+    width: '100%', height: '100%', 'min-width': '220px', ...styleSettings
   });
   const nonGroupNames = ['background', 'none'];
   const rootGroupNames = ['root', '', null, undefined];
@@ -36,7 +36,7 @@ const Overlays = function Overlays(options) {
 
   const groupCmps = viewer.getGroups().reduce((acc, group) => {
     if (nonGroupNames.includes(group.name)) return acc;
-    return acc.concat(Group(group, viewer));
+    return acc.concat(Group(viewer, group));
   }, []);
 
   groupCmps.forEach((groupCmp) => {
@@ -64,7 +64,8 @@ const Overlays = function Overlays(options) {
     secondaryComponent: layerProps,
     cls: 'right flex width-100',
     style: { width: '100%' },
-    legendSlideNav: true
+    legendSlideNav: true,
+    viewer
   });
 
   const navContainer = Component({
@@ -88,7 +89,6 @@ const Overlays = function Overlays(options) {
   });
 
   const overlaysCollapse = Collapse({
-    legendCollapse: true,
     bubble: true,
     collapseX: false,
     cls: 'flex column overflow-hidden width-100',
@@ -182,7 +182,7 @@ const Overlays = function Overlays(options) {
   };
 
   const addGroup = function addGroup(groupOptions) {
-    const groupCmp = Group(groupOptions, viewer);
+    const groupCmp = Group(viewer, groupOptions);
     groupCmps.push(groupCmp);
     if (groupCmp.type === 'grouplayer') {
       const parent = groupCmps.find((cmp) => cmp.name === groupCmp.parent);
@@ -206,7 +206,7 @@ const Overlays = function Overlays(options) {
     const layer = evt.element;
     const layerName = layer.get('name');
     const groupName = layer.get('group');
-    if (groupName) {
+    if (groupName && groupName !== 'root') {
       const groupCmp = groupCmps.find((cmp) => cmp.name === groupName);
       if (groupCmp) {
         groupCmp.removeOverlay(layerName);
@@ -214,7 +214,7 @@ const Overlays = function Overlays(options) {
           document.getElementById(groupCmp.getId()).classList.add('hidden');
         }
       }
-    } else {
+    } else if (groupName === 'root') {
       rootGroup.removeOverlay(layerName);
     }
   };
@@ -238,10 +238,16 @@ const Overlays = function Overlays(options) {
     }
   };
 
+  const getGroups = function getGroups() {
+    return groupCmps;
+  };
+
   return Component({
     onAddGroup,
     onChangeLayer,
     slidenav,
+    getGroups,
+    overlaysCollapse,
     onInit() {
       this.addComponent(overlaysCollapse);
       readOverlays();
@@ -273,10 +279,14 @@ const Overlays = function Overlays(options) {
           const opacityInput = secondaryEl.getElementsByTagName('input')[0];
           backBtn.tabIndex = 0;
           backBtn.focus();
-          opacityInput.tabIndex = 0;
+          if (opacityInput) {
+            opacityInput.tabIndex = 0;
+          }
           backBtn.addEventListener('click', () => {
             backBtn.tabIndex = -99;
-            opacityInput.tabIndex = -99;
+            if (opacityInput) {
+              opacityInput.tabIndex = -99;
+            }
           }, false);
           slidenav.on('slide', () => {
             el.classList.remove('width-100');

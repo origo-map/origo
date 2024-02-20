@@ -1,7 +1,7 @@
 import { Dropdown, Component } from '../../ui';
 import mapUtils from '../../maputils';
 
-export default function SetScaleControl(options = {}, map) {
+export default function SetScaleControl(map, options = {}) {
   const {
     scales = [],
     initialScale
@@ -57,6 +57,9 @@ export default function SetScaleControl(options = {}, map) {
       <div class="padding-smaller o-tooltip active">
         ${selectScale.render()}
       </div>`;
+    },
+    setButtonText(buttonText) {
+      selectScale.setButtonText(buttonText);
     }
   });
 }

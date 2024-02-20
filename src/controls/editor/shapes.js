@@ -5,6 +5,24 @@ export default (drawType) => {
     box: {
       type: 'Circle',
       geometryFunction: createBox()
+    },
+    Line: {
+      type: 'LineString'
+    },
+    MultiLine: {
+      type: 'MultiLineString'
+    },
+    Polygon: {
+      type: 'Polygon'
+    },
+    MultiPolygon: {
+      type: 'MultiPolygon'
+    },
+    Point: {
+      type: 'Point'
+    },
+    MultiPoint: {
+      type: 'MultiPoint'
     }
   };
 

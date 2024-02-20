@@ -13,6 +13,7 @@ const featureLayer = function featureLayer(layerOptions, viewer) {
   const sourceOptions = {};
   sourceOptions.attribution = layerOptions.attribution;
   sourceOptions.features = layerOptions.features;
+  options.layerType = 'vector';
 
   const vectorSource = createSource(sourceOptions);
   return vector(options, vectorSource, viewer);

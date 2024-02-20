@@ -9,13 +9,15 @@ export default function Dropdown(options = {}) {
     cls = '',
     containerCls = 'collapse-container',
     contentCls = 'bg-white',
+    contentStyle = '',
     buttonCls = 'padding-small rounded light box-shadow',
     buttonIconCls = '',
     buttonContainerCls = '',
     style: styleSettings,
     direction = 'down',
     text = ' ',
-    ariaLabel = ''
+    ariaLabel = '',
+    buttonTextCls = 'flex'
   } = options;
 
   let containerElement;
@@ -78,7 +80,7 @@ export default function Dropdown(options = {}) {
         icon: `#ic_arrow_drop_${direction}_24px`,
         iconCls: `${buttonIconCls} icon-smaller flex`,
         ariaLabel,
-        textCls: 'flex'
+        textCls: buttonTextCls
       });
 
       if (direction === 'down') {
@@ -107,7 +109,7 @@ export default function Dropdown(options = {}) {
         cls: 'dropdown',
         containerCls,
         contentCls: `${contentCls}`,
-        contentStyle: `${position}:calc(100% + 2px);`,
+        contentStyle: `${position}:calc(100% + 2px);${contentStyle}`,
         collapseX: false,
         headerComponent,
         contentComponent,

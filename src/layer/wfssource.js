@@ -3,6 +3,7 @@
 import VectorSource from 'ol/source/Vector';
 import GeoJSONFormat from 'ol/format/GeoJSON';
 import * as LoadingStrategy from 'ol/loadingstrategy';
+import { getIntersection } from 'ol/extent';
 import { transformExtent } from 'ol/proj';
 import replacer from '../utils/replacer';
 
@@ -33,7 +34,8 @@ class WfsSource extends VectorSource {
         dataProjection: options.dataProjection,
         featureProjection: options.projectionCode
       }),
-      strategy: options.loadingstrategy
+      strategy: options.loadingstrategy,
+      filterType: options.filterType || 'cql'
     });
     /** The options that this source was created with  */
     this._options = options;
@@ -53,113 +55,169 @@ class WfsSource extends VectorSource {
   }
 
   /**
-   * Called by VectorSource
+   * Called by VectorSource. VectorSource always calls with extent specified. If strategy = 'all' it is an infinite extent.
    * @param {any} extent
    */
   onLoad(extent, resolution, projection, success, failure) {
     this._loaderHelper(extent)
-      .then(f => success(f))
+      .then(f => {
+        super.addFeatures(f);
+        success(f);
+      })
       .catch(() => failure());
   }
 
   /**
-   * Generate a wfs query filter according to the wfs layer source's `filterType`. Combines
-   * the custom filter parameter with any layer filters already present.
-   * @param {string} filterType The filter type used by the layer source (`cql`|`qgis`)
-   * @param {string} customFilter custom filter to combine with preconfigured layer filters
-   * @param {any} extent ignored when customFilter is supplied
+   * Set request method for source
+   * @param {any} method
    */
-  createQueryFilter(filterType, customFilter, extent) {
-    let queryFilter = '';
+  setMethod(method) {
+    this._options.requestMethod = method;
+  }
+
+  /**
+   * Set filter on source
+   * @param {any} filter
+   */
+  setFilter(filter) {
+    this._options.filter = filter;
+    this.refresh();
+  }
+
+  /**
+   * Clear filter on source
+   */
+  clearFilter() {
+    this._options.filter = '';
+    this.refresh();
+  }
+
+  /**
+   * Generate a wfs query filter according to the wfs layer source's `filterType` (`cql`|`qgis`).
+   * If specified, an extra filter is combined with any layer filter already present.
+   * @param {any} extent Extent to query. If specified the result is limited to the intersection of this parameter and layer's extent configuration
+   * @param {any} extraFilter Optional extra filter for this call with syntax matching the source's `filterType` (`cql`|`qgis`). Will be combined with any configured layer filter unless ignoreOriginalFilter is true
+   * @param {any} ignoreOriginalFilter true if configured layer filter should be ignored for this call, making parameter extraFilter the only filter (if specified)
+   */
+  createQueryFilter(extent, extraFilter, ignoreOriginalFilter, ids) {
     let layerFilter = '';
-    if (this.getOptions().filter) {
-      layerFilter = replacer.replace(this.getOptions().filter, window);
+    let queryFilter = '';
+    // Add layer filter unless `ignoreOriginalFilter` is set
+    if (this._options.filter  && !ignoreOriginalFilter) {
+      layerFilter = replacer.replace(this._options.filter, window);
     }
 
-    // Transform the extent if necessary
-    let requestExtent = extent;
-    if (extent && this.getOptions().dataProjection !== this.getOptions().projectionCode) {
-      requestExtent = transformExtent(extent, this.getOptions().projectionCode, this.getOptions().dataProjection);
+    // Prepare extent if used
+    let requestExtent;
+    if(extent && !this._options.isTable) {
+      // Combine the layer's extent with the extent used for this function call
+      const ext = getIntersection(this._options.customExtent, extent) || extent;
+      // Reproject it if the layer's data projection differs from that of the map
+      if (this._options.dataProjection !== this._options.projectionCode) {
+        requestExtent = transformExtent(ext, this._options.projectionCode, this._options.dataProjection);
+      } else {
+        requestExtent = ext;
+      }
     }
 
-    // When using BBOX mode and no filters, just use the BBOX WFS parameter
-    if (extent && this.getOptions().strategy !== 'all' && !this.getOptions().isTable && !customFilter && !layerFilter) {
-      queryFilter = `&BBOX=${requestExtent.join(',')},${this.getOptions().dataProjection}`;
-    } else { // Otherwise, integrate provided layer filters, `customFilter` and extent into a single query filter
-      switch (filterType) {
-        case 'cql': {
-          // Set up the filter as a combination of the layer filter and the temporary filter parameter
-          let cqlfilter = layerFilter;
-          if (layerFilter && customFilter) {
+    // Integrate provided layer filters, `extraFilter` and extent into a single query filter
+    // Both QGIS and GeoServer treats the WFS parameters `BBOX` and `FeatureId` as mutually exclusive,
+    // so instead of BBOX we use the vendor filters also for the extent filtering.
+    switch (this._options.filterType) {
+      case 'cql': {
+        // Set up the filter as a combination of the layer filter and the extraFilter parameter
+        let cqlfilter = layerFilter;
+        if (layerFilter && extraFilter) {
+          cqlfilter += ' AND ';
+        }
+        if (extraFilter) {
+          cqlfilter += `${replacer.replace(extraFilter, window)}`;
+        }
+
+        // If using extent, and the layer is not a geometryless table, integrate it into the query filter
+        if (extent && !this._options.isTable) {
+          if (cqlfilter) {
             cqlfilter += ' AND ';
           }
-          if (customFilter) {
-            cqlfilter += `${replacer.replace(customFilter, window)}`;
-          }
-
-          // If using extent, no `customFilter`, and the layer is not a geometryless table, integrate it into the query filter
-          if (extent && this.getOptions().strategy !== 'all' && !customFilter && !this.getOptions().isTable) {
-            if (cqlfilter) {
-              cqlfilter += ' AND ';
-            }
-            cqlfilter += `BBOX(${this.getOptions().geometryName},${requestExtent.join(',')},'${this.getOptions().dataProjection}')`;
-          }
-
-          // Create the complete CQL query string
-          if (cqlfilter) {
-            queryFilter = `&CQL_FILTER=${cqlfilter}`;
-          }
-          break;
+          cqlfilter += `BBOX(${this._options.geometryName},${requestExtent.join(',')},'${this._options.dataProjection}')`;
         }
-        case 'qgis': {
-          // Set up the filter as a combination of the layer filter and the temporary filter parameter
-          let qgisFilter = layerFilter;
-          if (layerFilter && customFilter) {
+
+        // Create the complete CQL query string
+        if (cqlfilter) {
+          queryFilter = `&CQL_FILTER=${cqlfilter}`;
+        }
+        break;
+      }
+      case 'qgis': {
+        // Set up the filter as a combination of the layer filter and the extraFilter parameter
+        let qgisFilter = layerFilter;
+        if (layerFilter && extraFilter) {
+          qgisFilter += ' AND ';
+        }
+        if (extraFilter) {
+          qgisFilter += `${replacer.replace(extraFilter, window)}`;
+        }
+
+        // If using extent, and the layer is not a geometryless table, integrate it into the query filter
+        if (extent && !this._options.isTable) {
+          if (qgisFilter) {
             qgisFilter += ' AND ';
           }
-          if (customFilter) {
-            qgisFilter += `${replacer.replace(customFilter, window)}`;
-          }
-          // Create the complete QGIS EXP_FILTER query string
-          if (qgisFilter) {
-            qgisFilter = `&EXP_FILTER=${qgisFilter}`;
-          }
-
-          // If using extent, no `customFilter`, and the layer is not a geometryless table, add a BBOX WFS parameter
-          // Because of QGIS Server's lack of support for any SRS other than EPSG:4326 in GeoJSON, layers must be requested
-          // in EPSG:4326. EXP_FILTER comparisons still expects the SRS of the data to be used, which Origo then doesn't know.
-          if (extent && this.getOptions().strategy !== 'all' && !customFilter && !this.getOptions().isTable) {
-            queryFilter = `&BBOX=${requestExtent.join(',')},${this.getOptions().dataProjection}${qgisFilter}`;
-          } else {
-            queryFilter = qgisFilter;
-          }
-          break;
+          const wktBbox = `POLYGON ((${requestExtent[0]} ${requestExtent[3]},${requestExtent[2]} ${requestExtent[3]},${requestExtent[2]} ${requestExtent[1]},${requestExtent[0]} ${requestExtent[1]},${requestExtent[0]} ${requestExtent[3]}))`;
+          qgisFilter += `intersects_bbox(@geometry,geom_from_wkt('${wktBbox},${this._options.dataProjection}'))`;
         }
-        default: break;
+
+        // Create the complete QGIS EXP_FILTER query string
+        if (qgisFilter) {
+          queryFilter = `&EXP_FILTER=${qgisFilter}`;
+        }
+        break;
       }
+      default: break;
     }
     return queryFilter;
   }
 
   /**
-   * Helper to reuse code. Consider it to be private to this class
-   * @param {any} extent
-   * @param {any} filter if provided, extent is ignored
+   * Helper to reuse code. Consider it to be private to this class.
+   * @param {any} extent Extent to query. If specified the result is limited to the intersection of this parameter and layer's extent configuration
+   * @param {any} extraFilter Optional extra filter for this call with syntax matching the source's `filterType` (`cql`|`qgis`)
+   * @param {any} ignoreOriginalFilter true if configured layer filter should be ignored for this call making parameter `extraFilter` the only filter (if specified)
+   * @param {any} ids Comma separated list of feature ids. If specified you probably want to call with extent and extraFilter empty and ignoreOriginalFilter = true.
    */
-  async _loaderHelper(extent, filter) {
+  async _loaderHelper(extent, extraFilter, ignoreOriginalFilter, ids) {
     const serverUrl = this._options.url;
 
     // Create the complete URL
+    // FIXME: rewrite using URL class
     let url = [`${serverUrl}${serverUrl.indexOf('?') < 0 ? '?' : '&'}service=WFS`,
       `&version=1.1.0&request=GetFeature&typeName=${this._options.featureType}&outputFormat=application/json`,
       `&srsname=${this._options.dataProjection}`].join('');
-    url += this.createQueryFilter(this._options.filterType, filter, extent);
+    url += this.createQueryFilter(extent, extraFilter, ignoreOriginalFilter);
+    if (ids || ids === 0) {
+      url += `&FeatureId=${ids}`;
+    }
     url = encodeURI(url);
 
     // Actually fetch some features
-    const JsonFeatures = await fetch(url).then(response => response.json({
-      cache: false
-    }));
+    let JsonFeatures;
+    if (this._options.requestMethod && this._options.requestMethod.toLowerCase() === 'post') { // POST request
+      const split = url.split('?');
+      JsonFeatures = await fetch(split[0], {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+        },
+        body: split[1]
+      }).then(response => response.json({
+        cache: false
+      }));
+    } else { // GET request
+      JsonFeatures = await fetch(url).then(response => response.json({
+        cache: false
+      }));
+    }
+
     const features = super.getFormat().readFeatures(JsonFeatures);
     // Delete the geometry if it is a table (ignoring geometry) as the GeoJSON loader creates an empty geometry and that will
     // mess up saving the feature
@@ -168,7 +226,6 @@ class WfsSource extends VectorSource {
         f.unset(f.getGeometryName(), true);
       });
     }
-    super.addFeatures(features);
     return features;
   }
 
@@ -178,7 +235,26 @@ class WfsSource extends VectorSource {
    * @param {any} filter
    */
   async ensureLoaded(filter) {
-    await this._loaderHelper(null, filter);
+    const features = await this._loaderHelper(null, filter, false);
+    super.addFeatures(features);
+  }
+
+  /**
+   * Fetches features by id. Extent and filters are ignored. Does NOT add the feature to the layer
+   * @param {any} ids Comma separated list of ids
+   */
+  async getFeatureFromSourceByIds(ids) {
+    return this._loaderHelper(null, null, true, ids);
+  }
+
+  /**
+   * Fetches features from server without adding them to the source. Honors filter configuration unless ignoreOriginalFilter is specified.
+   * @param {any} extent Optional extent
+   * @param {any} filter Optional additional filter for this call with syntax matching the source's `filterType` (`cql`|`qgis`)
+   * @param {any} ignoreOriginalFilter true if configured layer filter should be ignored for this request
+   */
+  async getFeaturesFromSource(extent, filter, ignoreOriginalFilter) {
+    return this._loaderHelper(extent, filter, ignoreOriginalFilter);
   }
 }
 

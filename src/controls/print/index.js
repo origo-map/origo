@@ -50,7 +50,8 @@ const Print = function Print(options = {}) {
     filename,
     mapInteractionsActive = false,
     supressResolutionsRecalculation = false,
-    suppressNewDPIMethod = false
+    suppressNewDPIMethod = false,
+    settingsExpanded = false
   } = options;
   let {
     showNorthArrow = true,
@@ -63,9 +64,13 @@ const Print = function Print(options = {}) {
   let screenButton;
   let mapMenu;
   let menuItem;
+  let printComponent;
+
+  const getPrintComponent = () => printComponent;
 
   return Component({
     name: 'print',
+    getPrintComponent,
     onInit() {
       if ('visible' in northArrow) {
         showNorthArrow = northArrow.visible;
@@ -76,7 +81,7 @@ const Print = function Print(options = {}) {
     },
     onAdd(evt) {
       viewer = evt.target;
-      const printComponent = PrintComponent({
+      printComponent = PrintComponent({
         logo,
         northArrow,
         printLegend,
@@ -110,6 +115,7 @@ const Print = function Print(options = {}) {
         showMargins,
         showCreated,
         createdPrefix,
+        settingsExpanded,
         showScale,
         showNorthArrow,
         showPrintLegend,

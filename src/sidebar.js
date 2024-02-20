@@ -1,5 +1,9 @@
 import { dom } from './ui';
-import Featureinfo from './featureinfo';
+
+/*
+ * Will be imported as sort of "static" as it does not contain any creatish function
+ * There can be only one sidebar in an entire page (or iframe)
+ */
 
 function setVisibility(visible) {
   const sideEl = document.getElementById('o-sidebar');
@@ -10,14 +14,20 @@ function setVisibility(visible) {
   }
 }
 
-function closeSidebar() {
+/**
+ * Closes the sidebar and optionally calls a callback.
+ * @param {any} viewer
+ */
+function closeSidebar(cb) {
   setVisibility(false);
-  Featureinfo().clear();
+  if (cb) {
+    cb();
+  }
 }
 
-function bindUIActions() {
+function bindUIActions(closeCb) {
   document.querySelector('#o-sidebar .o-sidebar #o-close-button').addEventListener('click', (evt) => {
-    closeSidebar();
+    closeSidebar(closeCb);
     evt.preventDefault();
   });
 }
@@ -46,7 +56,16 @@ function setContent(config) {
   }
 }
 
-function init(viewer) {
+/**
+ * Creates a new popup and adds it to the dom.
+ * @param {any} viewer the viewer object to attach to
+ * @param {Object} opts options.
+ * @param {function} opts.closeCb Function without parameters to be called when popup is closed from close button.
+ */
+function init(viewer, opts = {}) {
+  const {
+    closeCb
+  } = opts;
   const mapId = viewer.getId();
   const el = `<div id="o-sidebar">
     <div class="o-sidebar o-card">
@@ -65,7 +84,7 @@ function init(viewer) {
     </div>`;
   document.getElementById(mapId).appendChild(dom.html(el));
 
-  bindUIActions();
+  bindUIActions(closeCb);
 }
 
 export default {

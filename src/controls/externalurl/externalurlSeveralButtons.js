@@ -17,6 +17,7 @@ const externalurlSeveralButtons = function externalurlSeveralButtons(options = {
   function toggleMainButton() {
     if (!isMainButtonActive) {
       document.getElementById(externalUrlMainButton.getId()).classList.add('active');
+      viewer.centerMarker.show();
       subButtons.forEach((button) => {
         document.getElementById(button.getId()).classList.remove('hidden');
       });
@@ -24,6 +25,7 @@ const externalurlSeveralButtons = function externalurlSeveralButtons(options = {
       isMainButtonActive = true;
     } else {
       document.getElementById(externalUrlMainButton.getId()).classList.remove('active');
+      viewer.centerMarker.hide();
       subButtons.forEach((button) => {
         document.getElementById(button.getId()).classList.add('hidden');
       });
@@ -84,6 +86,12 @@ const externalurlSeveralButtons = function externalurlSeveralButtons(options = {
       map = viewer.getMap();
       this.addComponents(buttons);
       this.render();
+    },
+    hide() {
+      document.getElementById(containerElement.getId()).classList.add('hidden');
+    },
+    unhide() {
+      document.getElementById(containerElement.getId()).classList.remove('hidden');
     },
     render() {
       let htmlString = `${containerElement.render()}`;

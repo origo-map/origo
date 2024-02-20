@@ -1,14 +1,12 @@
-import { Component, Button, dom } from '../../ui';
-import { HeaderIcon } from '../../utils/legendmaker';
-import PopupMenu from '../../ui/popupmenu';
+import { Component, Button, dom, Collapse } from '../../ui';
+import { HeaderIcon, Legend } from '../../utils/legendmaker';
+import createMoreInfoButton from './moreinfobutton';
 
 const OverlayLayer = function OverlayLayer(options) {
-  let {
-    headerIconCls = ''
-  } = options;
   const {
+    headerIconCls = '',
     cls: clsSettings = '',
-    icon = '#o_list_24px',
+    icon = '#o_legend_24px',
     iconCls = 'grey-lightest',
     layer,
     position = 'top',
@@ -17,15 +15,16 @@ const OverlayLayer = function OverlayLayer(options) {
   } = options;
 
   const buttons = [];
-  const popupMenuItems = [];
-  let layerList;
+  let headerIconClass = headerIconCls;
 
-  const cls = `${clsSettings} flex row align-center padding-left padding-right-smaller item`.trim();
+  const hasStylePicker = viewer.getLayerStylePicker(layer).length > 0;
+  const layerIconCls = `round compact icon-small relative no-shrink light ${hasStylePicker ? 'style-picker' : ''}`;
+  const cls = `${clsSettings} flex row align-center padding-left padding-right-smaller item wrap`.trim();
   const title = layer.get('title') || 'Titel saknas';
   const name = layer.get('name');
   const secure = layer.get('secure');
-  let moreInfoButton;
-  let popupMenu;
+  let hasExtendedLegend = false;
+  let thisComponent;
 
   const checkIcon = '#ic_check_circle_24px';
   let uncheckIcon = '#ic_radio_button_unchecked_24px';
@@ -39,15 +38,9 @@ const OverlayLayer = function OverlayLayer(options) {
   let headerIcon = HeaderIcon(style, opacity);
   if (!headerIcon) {
     headerIcon = icon;
-    headerIconCls = iconCls;
+    headerIconClass = iconCls;
+    hasExtendedLegend = true;
   }
-
-  const eventOverlayProps = new CustomEvent('overlayproperties', {
-    bubbles: true,
-    detail: {
-      layer
-    }
-  });
 
   const getCheckIcon = (visible) => {
     const isVisible = visible ? checkIcon : uncheckIcon;
@@ -67,16 +60,41 @@ const OverlayLayer = function OverlayLayer(options) {
     return !visible;
   };
 
+  // Create a legend for the layer and wrap it in a Collapse.
+  // Always do this even if there is no extended legend, as user may change symbol later and then its nice to have a placeholder.
+  const extendedLegendContent = Component({
+    render() {
+      const legendContent = Legend({ styleRules: style, layer, viewer });
+      if (typeof (legendContent) === 'string') {
+        return `<div id="${this.getId()}" class="padding-left">${hasExtendedLegend ? legendContent : ''}</div>`;
+      }
+      thisComponent.addComponents([legendContent]);
+      return `<div id="${this.getId()}" class="padding-left">${hasExtendedLegend ? legendContent.render() : ''}</div>`;
+    },
+    setContent(content) {
+      const contentEl = document.getElementById(this.getId());
+      contentEl.innerHTML = content;
+    },
+    toggle() {
+      // Throw an event and let it bubble up to Collapse
+      const contentEl = document.getElementById(this.getId());
+      const collapseEvent = 'collapse:toggle';
+      const customEvt = new CustomEvent(collapseEvent, { bubbles: true });
+      contentEl.dispatchEvent(customEvt);
+    }
+  });
+  const extendedLegendCmp = Collapse({ collapseX: false, contentComponent: extendedLegendContent, expanded: layer.get('expanded') });
+
   const layerIcon = Button({
-    cls: `${headerIconCls} round compact icon-small light relative no-shrink`,
+    cls: `${headerIconClass} ${layerIconCls}`,
     click() {
-      if (!secure) {
-        toggleVisible(layer.getVisible());
+      if (hasExtendedLegend) {
+        extendedLegendContent.toggle();
       }
     },
     style: {
-      height: '1.5rem',
-      width: '1.5rem'
+      height: 'calc(1.5rem + 2px)',
+      width: 'calc(1.5rem + 2px)'
     },
     ariaLabel: 'Lager ikon',
     icon: headerIcon,
@@ -84,20 +102,6 @@ const OverlayLayer = function OverlayLayer(options) {
   });
 
   buttons.push(layerIcon);
-
-  const label = Component({
-    onRender() {
-      const labelEl = document.getElementById(this.getId());
-      labelEl.addEventListener('click', (e) => {
-        layerIcon.dispatch('click');
-        e.preventDefault();
-      });
-    },
-    render() {
-      const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
-      return `<div id="${this.getId()}" class="${labelCls}">${title}</div>`;
-    }
-  });
 
   const toggleButton = Button({
     cls: 'round small icon-smaller no-shrink',
@@ -117,159 +121,59 @@ const OverlayLayer = function OverlayLayer(options) {
 
   buttons.push(toggleButton);
 
-  const layerInfoMenuItem = Component({
+  const label = Component({
     onRender() {
       const labelEl = document.getElementById(this.getId());
       labelEl.addEventListener('click', (e) => {
-        popupMenu.setVisibility(false);
-        document.getElementById(moreInfoButton.getId()).dispatchEvent(eventOverlayProps);
+        toggleButton.dispatch('click');
         e.preventDefault();
       });
     },
     render() {
-      const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
-      return `<li id="${this.getId()}" class="${labelCls}">Visa lagerinformation</li>`;
-    }
-  });
-  popupMenuItems.push(layerInfoMenuItem);
-
-  if (layer.get('zoomToExtent')) {
-    const zoomToExtentMenuItem = Component({
-      onRender() {
-        const labelEl = document.getElementById(this.getId());
-        labelEl.addEventListener('click', (e) => {
-          const extent = typeof layer.getSource !== 'undefined' && typeof layer.getSource().getExtent !== 'undefined' ? layer.getSource().getExtent() : layer.getExtent();
-          if (layer.getVisible()) {
-            viewer.getMap().getView().fit(extent, {
-              padding: [50, 50, 50, 50],
-              duration: 1000
-            });
-            e.preventDefault();
-          }
-        });
-      },
-      render() {
-        const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
-        return `<li id="${this.getId()}" class="${labelCls}">Zooma till</li>`;
-      }
-    });
-    popupMenuItems.push(zoomToExtentMenuItem);
-  }
-
-  if (layer.get('removable')) {
-    const removeLayerMenuItem = Component({
-      onRender() {
-        const labelEl = document.getElementById(this.getId());
-        labelEl.addEventListener('click', (e) => {
-          layerList.removeOverlay(layer.get('name'));
-          viewer.getMap().removeLayer(layer);
-          e.preventDefault();
-        });
-      },
-      render() {
-        const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
-        return `<li id="${this.getId()}" class="${labelCls}">Ta bort lager</li>`;
-      }
-    });
-    popupMenuItems.push(removeLayerMenuItem);
-  }
-
-  const popupMenuList = Component({
-    onInit() {
-      this.addComponents(popupMenuItems);
-    },
-    render() {
-      let html = `<ul id="${this.getId()}">`;
-      popupMenuItems.forEach((item) => {
-        html += `${item.render()}`;
-      });
-      html += '</ul>';
-      return html;
+      const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden basis-50 break-word';
+      return `<div id="${this.getId()}" class="${labelCls}">${title}</div>`;
     }
   });
 
-  const getElementOffset = function getElementOffset(el, rootParentEl) {
-    let left = 0;
-    let top = 0;
-    let currentEl = el;
-    while (
-      currentEl
-      && !Number.isNaN(currentEl.offsetLeft)
-      && !Number.isNaN(currentEl.offsetTop)
-      && currentEl.id !== rootParentEl.id
-    ) {
-      left += currentEl.offsetLeft - currentEl.scrollLeft;
-      top += currentEl.offsetTop - currentEl.scrollTop;
-      currentEl = currentEl.offsetParent;
-    }
-    return { top, left };
-  };
-
-  const createPopupMenu = function createPopupMenu() {
-    const moreInfoButtonEl = document.getElementById(moreInfoButton.getId());
-    const onUnfocus = (e) => {
-      if (!moreInfoButtonEl.contains(e.target)) {
-        popupMenu.setVisibility(false);
-      }
-    };
-    const viewerEl = document.getElementById(viewer.getId());
-    const { top, left } = getElementOffset(moreInfoButtonEl, viewerEl);
-    const right = viewerEl.offsetWidth - left - moreInfoButtonEl.offsetWidth;
-    const targetRect = moreInfoButtonEl.getBoundingClientRect();
-    popupMenu = PopupMenu({ onUnfocus });
-    document.getElementById(viewer.getId()).appendChild(dom.html(popupMenu.render()));
-    popupMenu.setContent(popupMenuList.render());
-    popupMenuList.dispatch('render');
-    popupMenu.setPosition({ right: `${right}px`, top: `${top + targetRect.height}px` });
-  };
-
-  const togglePopupMenu = function togglePopupMenu() {
-    if (!popupMenu) {
-      createPopupMenu();
-    } else {
-      popupMenu.toggleVisibility();
-    }
-  };
-
-  moreInfoButton = Button({
-    cls: 'round small icon-smaller no-shrink',
-    click() {
-      if (popupMenuItems.length > 1) {
-        togglePopupMenu();
-      } else {
-        document.getElementById(this.getId()).dispatchEvent(eventOverlayProps);
-      }
-    },
-    style: {
-      'align-self': 'center'
-    },
-    icon: '#ic_more_vert_24px',
-    ariaLabel: 'Visa lagerinfo',
-    tabIndex: -1
-  });
-
+  const moreInfoButton = createMoreInfoButton({ layer, viewer });
   buttons.push(moreInfoButton);
   const ButtonsHtml = `${layerIcon.render()}${label.render()}${toggleButton.render()}${moreInfoButton.render()}`;
 
-  const removeOverlayMenuItem = function removeListeners() {
-    const popupMenuListEl = document.getElementById(popupMenuList.getId());
-    popupMenuListEl.remove();
-  };
-
   const onRemove = function onRemove() {
-    removeOverlayMenuItem();
     const el = document.getElementById(this.getId());
     el.remove();
+  };
+
+  const onLayerStyleChange = function onLayerStyleChange() {
+    const newStyle = viewer.getStyle(layer.get('styleName'));
+    const layerIconCmp = document.getElementById(layerIcon.getId());
+    let newIcon = HeaderIcon(newStyle, opacity);
+    if (!newIcon) {
+      hasExtendedLegend = true;
+      extendedLegendContent.setContent(Legend({ styleRules: newStyle, layer, viewer }).render());
+    } else {
+      hasExtendedLegend = false;
+      extendedLegendContent.setContent('');
+    }
+    headerIconClass = !newIcon ? iconCls : headerIconCls;
+    newIcon = !newIcon ? icon : newIcon;
+    layerIconCmp.className = `${headerIconClass} ${layerIconCls}`;
+    layerIcon.dispatch('change', { icon: newIcon });
+  };
+
+  const onLayerTitleChange = function onLayerTitleChange(newTitle) {
+    const labelEl = document.getElementById(label.getId());
+    labelEl.innerHTML = newTitle;
   };
 
   return Component({
     name,
     getLayer,
     onInit() {
+      thisComponent = this;
       this.on('clear', onRemove.bind(this));
     },
     onAdd(evt) {
-      layerList = evt.target;
       const parentEl = document.getElementById(evt.target.getId());
       const htmlString = this.render();
       const el = dom.html(htmlString);
@@ -281,6 +185,7 @@ const OverlayLayer = function OverlayLayer(options) {
       }
       this.addComponents(buttons);
       this.addComponent(label);
+      this.addComponent(extendedLegendCmp);
       this.dispatch('render');
 
       if (layer.getMaxResolution() !== Infinity || layer.getMinResolution() !== 0) {
@@ -300,9 +205,18 @@ const OverlayLayer = function OverlayLayer(options) {
         });
         document.getElementById(this.getId()).dispatchEvent(visibleEvent);
       });
+      layer.on('change:style', () => {
+        onLayerStyleChange();
+      });
+      layer.on('change:title', (e) => {
+        onLayerTitleChange(e.target.get('title'));
+      });
     },
     render() {
-      return `<li id="${this.getId()}" class="${cls}">${ButtonsHtml}</li>`;
+      let extendedLegendHtml = '';
+      // Inject the extended legend in the same li element to avoid problems with callers that assumes that each layer is one li, but add a linebreak
+      extendedLegendHtml = `<div class="flex-line-break"></div>${extendedLegendCmp.render()}`;
+      return `<li id="${this.getId()}" class="${cls}">${ButtonsHtml}${extendedLegendHtml}</li>`;
     }
   });
 };

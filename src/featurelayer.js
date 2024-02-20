@@ -11,7 +11,7 @@ export default function featurelayer(features, map) {
   const featureLayer = new VectorLayer({
     source: featureLayerStore,
     map,
-    zIndex: 1
+    zIndex: 9
   });
   return {
     addFeature: function addFeature(feature) {

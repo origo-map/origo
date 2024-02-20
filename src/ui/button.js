@@ -15,6 +15,7 @@ export default function Button(options = {}) {
     iconCls = '',
     iconStyle = {},
     click,
+    mouseenter,
     style: styleSettings,
     textCls = '',
     tooltipText,
@@ -108,6 +109,12 @@ export default function Button(options = {}) {
           this.un('click', click.bind(this));
         });
       }
+      if (mouseenter) {
+        this.on('mouseenter', mouseenter);
+        this.on('removeMouseenter', () => {
+          this.un('mouseenter', mouseenter);
+        });
+      }
     },
     onRender() {
       buttonEl = document.getElementById(this.getId());
@@ -115,9 +122,14 @@ export default function Button(options = {}) {
         this.dispatch('click');
         e.preventDefault();
       });
+      buttonEl.addEventListener('mouseenter', (e) => {
+        this.dispatch('mouseenter');
+        e.preventDefault();
+      });
       if (validStates.indexOf(state) > 0) {
         buttonEl.classList.add(state);
       }
+      this.dispatch('render');
     },
     render: function render() {
       return `<button id="${this.getId()}" class="${cls} o-tooltip" style="${style}" aria-label="${ariaLabel}" tabindex="${tabIndex}">

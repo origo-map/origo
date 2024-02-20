@@ -13,6 +13,10 @@ const layerModel = {
   o: {
     name: 'opacity',
     dataType: 'number'
+  },
+  sn: {
+    name: 'altStyleIndex',
+    dataType: 'number'
   }
 };
 
@@ -31,12 +35,15 @@ const layers = function layers(layersStr) {
     });
     Object.getOwnPropertyNames(layerObject).forEach((prop) => {
       const val = layerObject[prop];
-      if (Object.prototype.hasOwnProperty.call(layerModel, prop) && prop !== 'o') {
+      if (Object.prototype.hasOwnProperty.call(layerModel, prop) && prop !== 'o' && prop !== 'sn') {
         const attribute = layerModel[prop];
         obj[attribute.name] = urlparser.strBoolean(val);
       } else if (prop === 'o') {
         const attribute = layerModel[prop];
         obj[attribute.name] = Number(val) / 100;
+      } else if (prop === 'sn') {
+        const attribute = layerModel[prop];
+        obj[attribute.name] = Number(val);
       } else {
         obj[prop] = val;
       }
@@ -83,8 +90,18 @@ const controls = function controls(controlsStr) {
 };
 
 const controlDraw = function controlDraw(drawState) {
-  const features = new GeoJSON().readFeatures(drawState.features);
-  return { features };
+  const drawLayers = drawState.layers || [];
+  const layerArr = [];
+  let features = [];
+  drawLayers.forEach((element) => {
+    const layer = element;
+    layer.features = new GeoJSON().readFeatures(element.features);
+    layerArr.push(layer);
+  });
+  if (drawState.features) {
+    features = new GeoJSON().readFeatures(drawState.features);
+  }
+  return { features, layers: layerArr };
 };
 
 const legend = function legend(stateStr) {
