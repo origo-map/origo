@@ -1,5 +1,4 @@
 import { Component, Modal, Button, Icon, dom } from '../ui';
-import utils from '../utils';
 import stripJSONComments from '../utils/stripjsoncomments';
 import isEmbedded from '../utils/isembedded';
 
