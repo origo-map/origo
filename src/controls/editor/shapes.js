@@ -9,11 +9,20 @@ export default (drawType) => {
     Line: {
       type: 'LineString'
     },
+    MultiLine: {
+      type: 'MultiLineString'
+    },
     Polygon: {
       type: 'Polygon'
     },
+    MultiPolygon: {
+      type: 'MultiPolygon'
+    },
     Point: {
       type: 'Point'
+    },
+    MultiPoint: {
+      type: 'MultiPoint'
     }
   };
 

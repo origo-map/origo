@@ -11,8 +11,11 @@ let layer;
 const drawToolsSelector = function drawToolsSelector(tools, defaultLayer, v) {
   const toolNames = {
     Polygon: 'Polygon',
+    MultiPolygon: 'Polygon',
     Point: 'Punkt',
+    MultiPoint: 'Punkt',
     Line: 'Linje',
+    MultiLine: 'Linje',
     box: 'Rektangel',
     Copy: 'Kopiera'
   };
@@ -73,7 +76,7 @@ const drawToolsSelector = function drawToolsSelector(tools, defaultLayer, v) {
           // Copy tool is handled entirely in copyTool. Only notify edithandler to back off
           // and call copyTool to do its stuff.
           dispatcher.emitChangeEditorShapes('custom');
-          copyTool(viewer, layer, drawTools.find((tool) => tool.toolName === 'Copy'));
+          copyTool(viewer, drawTools.find((tool) => tool.toolName === 'Copy'));
           break;
         default:
           // This is an OL shape tool. Let edithandler handle it

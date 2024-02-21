@@ -20,6 +20,9 @@ function createTileSource(options) {
       STYLES: options.style
     }
   };
+  if (options.imageLoadFunction) {
+    sourceOptions.tileLoadFunction = options.imageLoadFunction;
+  }
   if (options.params) {
     Object.keys(options.params).forEach((element) => {
       sourceOptions.params[element] = options.params[element];
@@ -41,6 +44,9 @@ function createImageSource(options) {
       STYLES: options.style
     }
   };
+  if (options.imageLoadFunction) {
+    sourceOptions.imageLoadFunction = options.imageLoadFunction;
+  }
   if (options.params) {
     Object.keys(options.params).forEach((element) => {
       sourceOptions.params[element] = options.params[element];
@@ -60,7 +66,8 @@ function createWmsStyle({ wmsOptions, source, viewer, initialStyle = false }) {
       newStyle = {
         defaultWMSServerStyle: true,
         hasThemeLegend: wmsOptions.hasThemeLegend || false,
-        legendParams: wmsOptions.legendParams || false
+        legendParams: wmsOptions.legendParams || false,
+        thematicStyling: wmsOptions.thematicStyling || false
       };
     }
   } else {
@@ -74,28 +81,57 @@ function createWmsStyle({ wmsOptions, source, viewer, initialStyle = false }) {
   }
 
   let getLegendString;
+  let getLegendJson;
   let styleName;
 
   if (newStyle.defaultWMSServerStyle) {
     getLegendString = source.getLegendUrl(maxResolution, legendParams);
+    getLegendJson = source.getLegendUrl(maxResolution, Object.assign({}, legendParams, { FORMAT: 'application/json' }));
     styleName = `${wmsOptions.name}_WMSServerDefault`;
   } else {
     getLegendString = source.getLegendUrl(maxResolution, {
       STYLE: newStyle.style,
       ...legendParams
     });
+    getLegendJson = source.getLegendUrl(maxResolution, Object.assign({}, legendParams, { FORMAT: 'application/json' }));
     styleName = newStyle.style;
   }
 
   const hasThemeLegend = newStyle.hasThemeLegend || false;
+  const thematicStyling = newStyle.thematicStyling || false;
   const style = [[{
     icon: {
-      src: `${getLegendString}`
+      src: `${getLegendString}`,
+      json: `${getLegendJson}`
     },
-    extendedLegend: hasThemeLegend
+    extendedLegend: hasThemeLegend,
+    thematicStyling
   }]];
   viewer.addStyle(styleName, style);
   return styleName;
+}
+
+function imageLoadFunction(loadedImage, src) {
+  const xhr = new XMLHttpRequest();
+  xhr.responseType = 'blob';
+  xhr.addEventListener('loadend', function loaded() {
+    const data = this.response;
+    if (data) {
+      const img = loadedImage.getImage();
+      const url = URL.createObjectURL(data);
+      img.addEventListener('load', () => {
+        URL.revokeObjectURL(url);
+      });
+      img.src = url;
+    }
+  });
+  const split = src.split('?');
+  xhr.open('POST', split[0]);
+  xhr.setRequestHeader(
+    'Content-type',
+    'application/x-www-form-urlencoded'
+  );
+  xhr.send(split[1]);
 }
 
 function createWmsLayer(wmsOptions, source, viewer) {
@@ -153,6 +189,7 @@ const wms = function wms(layerOptions, viewer) {
   sourceOptions.filterType = wmsOptions.filterType;
   sourceOptions.params = wmsOptions.sourceParams;
   sourceOptions.format = wmsOptions.format ? wmsOptions.format : sourceOptions.format;
+  sourceOptions.requestMethod = wmsOptions.requestMethod ? wmsOptions.requestMethod : sourceOptions.requestMethod;
   if (!wmsOptions.stylePicker) {
     const styleSettings = viewer.getStyle(wmsOptions.styleName);
     const wmsStyleObject = styleSettings ? styleSettings[0].find(s => s.wmsStyle) : undefined;
@@ -170,6 +207,10 @@ const wms = function wms(layerOptions, viewer) {
       // FIXME: there is no "extent" property to set. Code has no effect. Probably must create a new grid from viewer.getTileGridSettings .
       sourceOptions.tileGrid.extent = wmsOptions.extent;
     }
+  }
+
+  if (sourceOptions.requestMethod && sourceOptions.requestMethod === 'post') {
+    sourceOptions.imageLoadFunction = imageLoadFunction;
   }
 
   if (renderMode === 'image') {

@@ -3,6 +3,7 @@ import ImageLayer from 'ol/layer/Image';
 import TileLayer from 'ol/layer/Tile';
 import VectorLayer from 'ol/layer/Vector';
 import VectorImageLayer from 'ol/layer/VectorImage';
+import VectorTileLayer from 'ol/layer/VectorTile';
 import { OSM, WMTS, XYZ, ImageWMS, ImageArcGISRest, Cluster } from 'ol/source';
 import TileArcGISRest from 'ol/source/TileArcGISRest';
 import agsMap from '../../layer/agsmap';
@@ -18,7 +19,8 @@ export default function PrintResize(options = {}) {
     titleComponent,
     descriptionComponent,
     createdComponent,
-    closeButton
+    closeButton,
+    constrainResolution
   } = options;
 
   let {
@@ -104,6 +106,10 @@ export default function PrintResize(options = {}) {
 
   const isVector = function isVector(layer) {
     return layer instanceof VectorLayer || layer instanceof VectorImageLayer;
+  };
+
+  const isVectorTile = function isVectorTile(layer) {
+    return layer instanceof VectorTileLayer;
   };
 
   const isImage = function isImage(layer) {
@@ -381,9 +387,26 @@ export default function PrintResize(options = {}) {
     }
   };
 
+  const scaleMapboxLayer = function scaleMapboxLayer(layer, styleName, styles, scaleToDpi) {
+    const newStyle = Style.createStyle({
+      style: styleName,
+      viewer,
+      type: 'mapbox',
+      scaleToDpi,
+      file: styles[0][0].custom.file,
+      layer,
+      source: styles[0][0].custom.source
+    });
+    if (newStyle) {
+      layer.setStyle(newStyle);
+    }
+  };
+
   // Alters layer in map, if vector then set scale for feature, if image set DPI parameter for source
   const setLayerScale = function setLayerScale(layer) {
     const source = layer.getSource();
+    const view = map.getView();
+    view.setConstrainResolution(false);
 
     if (isVector(layer)) {
       const styleName = layer.get('styleName');
@@ -422,6 +445,14 @@ export default function PrintResize(options = {}) {
       }
     }
 
+    if (isVectorTile(layer)) {
+      const styleName = layer.get('styleName');
+      const styles = viewer.getStyle(styleName);
+      if (styles && styles[0][0].custom.type === 'mapbox') {
+        scaleMapboxLayer(layer, styleName, styles, resolution);
+      }
+    }
+
     if (isImage(layer) && isValidSource(source)) {
       const params = source.getParams();
       if (getSourceType(layer) === 'Geoserver') {
@@ -439,10 +470,12 @@ export default function PrintResize(options = {}) {
   // "Resets" layer by resetting the style and removing DPI parameter
   const resetLayerScale = function resetLayerScale(layer) {
     const source = layer.getSource();
+    const view = map.getView();
+    view.setConstrainResolution(constrainResolution);
     if (isVector(layer)) {
       const features = source.getFeatures();
       const styleName = layer.get('styleName');
-      let style = viewer.getStyle();
+      let style = viewer.getStyle(styleName);
 
       const clusterStyleName = layer.get('clusterStyle') ? layer.get('clusterStyle') : undefined;
       if (typeof layer.get('styleName') !== 'undefined' && layer.get('styleName') !== 'origoStylefunction' && layer.get('styleName') !== 'default') {
@@ -465,6 +498,14 @@ export default function PrintResize(options = {}) {
             }
           }
         });
+      }
+    }
+
+    if (isVectorTile(layer)) {
+      const styleName = layer.get('styleName');
+      const styles = viewer.getStyle(styleName);
+      if (styles && styles[0][0].custom.type === 'mapbox') {
+        scaleMapboxLayer(layer, styleName, styles);
       }
     }
 

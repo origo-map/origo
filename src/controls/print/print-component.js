@@ -7,7 +7,7 @@ import TileWMSSource from 'ol/source/TileWMS';
 import TileGrid from 'ol/tilegrid/TileGrid';
 import { Group } from 'ol/layer';
 import {
-  Button, Component, cuid, dom
+  Button, Component, cuid, dom, Element as El
 } from '../../ui';
 import pageTemplate from './page.template';
 import PrintMap from './print-map';
@@ -50,7 +50,8 @@ const PrintComponent = function PrintComponent(options = {}) {
     leftFooterText,
     mapInteractionsActive,
     supressResolutionsRecalculation,
-    suppressNewDPIMethod
+    suppressNewDPIMethod,
+    settingsExpanded
   } = options;
 
   let {
@@ -252,6 +253,10 @@ const PrintComponent = function PrintComponent(options = {}) {
 
   const printMapComponent = PrintMap({ logo, northArrow, map, viewer, showNorthArrow, printLegend, showPrintLegend });
 
+  const centerComponent = El({ cls: 'flex column align-start absolute center-center transparent z-index-ontop-middle' });
+  const printMapSpinner = El({ cls: 'print-map-loading-spinner' });
+  centerComponent.addComponent(printMapSpinner);
+
   const closeButton = Button({
     cls: 'fixed top-right medium round icon-smaller light box-shadow z-index-ontop-high',
     icon: '#ic_close_24px',
@@ -266,7 +271,8 @@ const PrintComponent = function PrintComponent(options = {}) {
     titleComponent,
     descriptionComponent,
     createdComponent,
-    closeButton
+    closeButton,
+    constrainResolution: view.getConstrainResolution()
   });
 
   const setScale = function setScale(scale) {
@@ -320,6 +326,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     resolution,
     scales,
     scaleInitial,
+    settingsExpanded,
     showMargins,
     showCreated,
     showScale,
@@ -337,10 +344,12 @@ const PrintComponent = function PrintComponent(options = {}) {
 
   function disablePrintToolbar() {
     printToolbar.setDisabled(true);
+    document.querySelector(`#${printMapSpinner.getId()}`).style.display = '';
   }
 
   function enablePrintToolbar() {
     printToolbar.setDisabled(false);
+    document.querySelector(`#${printMapSpinner.getId()}`).style.display = 'none';
   }
 
   function updateScaleOnMove() {
@@ -696,6 +705,7 @@ const PrintComponent = function PrintComponent(options = {}) {
             </div>
           </div>
         </div>
+        ${centerComponent.render()}
         <div id="o-print-tools-left" class="top-left fixed no-print flex column spacing-vertical-small z-index-ontop-top height-full">
           ${printSettings.render()}
           ${printInteractionToggle.render()}

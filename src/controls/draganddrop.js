@@ -4,7 +4,6 @@ import GeoJSONFormat from 'ol/format/GeoJSON';
 import IGCFormat from 'ol/format/IGC';
 import KMLFormat from 'ol/format/KML';
 import TopoJSONFormat from 'ol/format/TopoJSON';
-import Style from '../style';
 import { Component, InputFile, Button, Element as El } from '../ui';
 
 const DragAndDrop = function DragAndDrop(options = {}) {
@@ -71,7 +70,10 @@ const DragAndDrop = function DragAndDrop(options = {}) {
       const groupName = options.groupName || 'egna-lager';
       const groupTitle = options.groupTitle || 'Egna lager';
       const draggable = options.draggable || true;
+      const promptlessRemoval = options.promptlessRemoval !== false;
       const styleByAttribute = options.styleByAttribute || false;
+      const zoomToExtent = options.zoomToExtent !== false;
+      const zoomToExtentOnLoad = options.zoomToExtentOnLoad !== false;
       const featureStyles = options.featureStyles || {
         Point: [{
           circle: {
@@ -115,7 +117,6 @@ const DragAndDrop = function DragAndDrop(options = {}) {
           }
         }]
       };
-      const vectorStyles = Style.createGeometryStyle(featureStyles);
       dragAndDrop = new olDragAndDrop({
         formatConstructors: [
           GPXFormat,
@@ -153,15 +154,34 @@ const DragAndDrop = function DragAndDrop(options = {}) {
           styleByAttribute,
           queryable: true,
           removable: true,
+          promptlessRemoval,
+          zoomToExtent,
           visible: true,
           source: 'none',
           type: 'GEOJSON',
           features: event.features
         };
         if (!styleByAttribute) {
-          layerOptions.style = vectorStyles[event.features[0].getGeometry().getType()];
+          let styles = [];
+          const types = [];
+          event.features.forEach((feature) => {
+            if (!types.includes(feature.getGeometry().getType())) {
+              styles = styles.concat(featureStyles[feature.getGeometry().getType()]);
+            }
+            types.push(feature.getGeometry().getType());
+          });
+          layerOptions.styleDef = styles;
         }
-        viewer.addLayer(layerOptions);
+        const layer = viewer.addLayer(layerOptions);
+        if (zoomToExtentOnLoad) {
+          const extent = typeof layer.getSource !== 'undefined' && typeof layer.getSource().getExtent !== 'undefined' ? layer.getSource().getExtent() : layer.getExtent();
+          if (layer.getVisible()) {
+            viewer.getMap().getView().fit(extent, {
+              padding: [50, 50, 50, 50],
+              duration: 1000
+            });
+          }
+        }
       });
       this.render();
     },

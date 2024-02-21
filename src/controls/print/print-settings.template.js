@@ -52,7 +52,7 @@ export default function printTemplate({
     </div>
     <div class="padding-top-large"></div>
     <div class="flex padding-right-small">
-      <div class="grow text-normal">Visa legend</div>
+      <div class="grow text-normal">Visa teckenförklaring</div>
       ${printLegendControl.render()}
     </div>
     <div class="padding-bottom-large">

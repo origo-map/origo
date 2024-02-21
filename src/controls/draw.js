@@ -185,7 +185,7 @@ const Draw = function Draw(options = {}) {
 
         const activeButton = Button({
           cls: 'margin-right-small padding-small icon-smaller round light box-shadow relative o-tooltip',
-          icon: '#ic_check_24px',
+          icon: '#ic_check_circle_24px',
           state: drawLayer === activeLayer ? 'active' : 'initial',
           click() {
             drawHandler.setActiveLayer(drawLayer);
@@ -641,6 +641,16 @@ const Draw = function Draw(options = {}) {
       this.on('toggleDraw', drawHandler.toggleDraw);
       if (isActive) {
         viewer.dispatch('toggleClickInteraction', { name: 'draw', active: true });
+      }
+    },
+    hide() {
+      if (placement.some(place => place === 'screen')) {
+        document.getElementById(screenButtonContainer.getId()).classList.add('hidden');
+      }
+    },
+    unhide() {
+      if (placement.some(place => place === 'screen')) {
+        document.getElementById(screenButtonContainer.getId()).classList.remove('hidden');
       }
     },
     render() {

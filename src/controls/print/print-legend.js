@@ -61,7 +61,10 @@ const LayerRow = function LayerRow(options) {
     const layerName = aLayer.get('name');
     const style = viewer.getStyle(aLayer.get('styleName'));
     if (style && style[0] && style[0][0] && style[0][0].icon) {
-      return `${style[0][0].icon.src}&format=${format}`;
+      if (style[0][0].icon.src.includes('?')) {
+        return `${style[0][0].icon.src}&format=${format}`;
+      }
+      return `${style[0][0].icon.src}?format=${format}`;
     }
     return `${url}?SERVICE=WMS&layer=${layerName}&format=${format}&version=1.1.1&request=getLegendGraphic&scale=401&legend_options=dpi:300`;
   };
@@ -234,16 +237,17 @@ const LayerRow = function LayerRow(options) {
     async render() {
       const title = layer.get('title') || 'Titel saknas';
       let content = '';
-
       const style = viewer.getStyle(layer.get('styleName'));
       if (style && style[0] && (!style[0][0].extendedLegend)) {
         content = getStyleContent(title, style);
-      } else if (!layer.get('type')) {
-        content = getTitleWithIcon(title, '');
-      } else if (layer.get('type').includes('AGS') || /\/arcgis\/services\/[^/]+\/[^/]+\/MapServer\/WMSServer/.test(getOneUrl(layer))) {
-        content = await getAGSJSONContent(title, layer.get('id'));
       } else {
-        content = await getWMSJSONContent(title);
+        content = getTitleWithIcon(title, '');
+        const lType = layer.get('type');
+        if ((lType && lType.includes('AGS')) || /\/arcgis\/services\/[^/]+\/[^/]+\/MapServer\/WMSServer/.test(getOneUrl(layer))) {
+          content = await getAGSJSONContent(title, layer.get('id'));
+        } else if (lType && lType.includes('WMS')) {
+          content = await getWMSJSONContent(title);
+        }
       }
       return `
           <li id="${this.getId()}" class="flex row align-center padding-left padding-right item legend-${layer.get('type')}">

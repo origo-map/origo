@@ -1,13 +1,12 @@
 import { Component, Button, dom, Collapse } from '../../ui';
 import { HeaderIcon, Legend } from '../../utils/legendmaker';
-import PopupMenu from '../../ui/popupmenu';
-import exportToFile from '../../utils/exporttofile';
+import createMoreInfoButton from './moreinfobutton';
 
 const OverlayLayer = function OverlayLayer(options) {
   const {
     headerIconCls = '',
     cls: clsSettings = '',
-    icon = '#o_list_24px',
+    icon = '#o_legend_24px',
     iconCls = 'grey-lightest',
     layer,
     position = 'top',
@@ -18,17 +17,14 @@ const OverlayLayer = function OverlayLayer(options) {
   const buttons = [];
   let headerIconClass = headerIconCls;
 
-  const popupMenuItems = [];
-
   const hasStylePicker = viewer.getLayerStylePicker(layer).length > 0;
   const layerIconCls = `round compact icon-small relative no-shrink light ${hasStylePicker ? 'style-picker' : ''}`;
   const cls = `${clsSettings} flex row align-center padding-left padding-right-smaller item wrap`.trim();
   const title = layer.get('title') || 'Titel saknas';
   const name = layer.get('name');
   const secure = layer.get('secure');
-  let moreInfoButton;
-  let popupMenu;
   let hasExtendedLegend = false;
+  let thisComponent;
 
   const checkIcon = '#ic_check_circle_24px';
   let uncheckIcon = '#ic_radio_button_unchecked_24px';
@@ -45,13 +41,6 @@ const OverlayLayer = function OverlayLayer(options) {
     headerIconClass = iconCls;
     hasExtendedLegend = true;
   }
-
-  const eventOverlayProps = new CustomEvent('overlayproperties', {
-    bubbles: true,
-    detail: {
-      layer
-    }
-  });
 
   const getCheckIcon = (visible) => {
     const isVisible = visible ? checkIcon : uncheckIcon;
@@ -75,8 +64,12 @@ const OverlayLayer = function OverlayLayer(options) {
   // Always do this even if there is no extended legend, as user may change symbol later and then its nice to have a placeholder.
   const extendedLegendContent = Component({
     render() {
-      // Need to wrap legend as Collapse requires an id on the content
-      return `<div id="${this.getId()}" class="padding-left">${hasExtendedLegend ? Legend(style) : ''}</div>`;
+      const legendContent = Legend({ styleRules: style, layer, viewer });
+      if (typeof (legendContent) === 'string') {
+        return `<div id="${this.getId()}" class="padding-left">${hasExtendedLegend ? legendContent : ''}</div>`;
+      }
+      thisComponent.addComponents([legendContent]);
+      return `<div id="${this.getId()}" class="padding-left">${hasExtendedLegend ? legendContent.render() : ''}</div>`;
     },
     setContent(content) {
       const contentEl = document.getElementById(this.getId());
@@ -142,166 +135,11 @@ const OverlayLayer = function OverlayLayer(options) {
     }
   });
 
-  const layerInfoMenuItem = Component({
-    onRender() {
-      const labelEl = document.getElementById(this.getId());
-      labelEl.addEventListener('click', (e) => {
-        popupMenu.setVisibility(false);
-        document.getElementById(moreInfoButton.getId()).dispatchEvent(eventOverlayProps);
-        e.preventDefault();
-      });
-    },
-    render() {
-      const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
-      return `<li id="${this.getId()}" class="${labelCls}">Visa lagerinformation</li>`;
-    }
-  });
-  popupMenuItems.push(layerInfoMenuItem);
-
-  if (layer.get('zoomToExtent')) {
-    const zoomToExtentMenuItem = Component({
-      onRender() {
-        const labelEl = document.getElementById(this.getId());
-        labelEl.addEventListener('click', (e) => {
-          const extent = typeof layer.getSource !== 'undefined' && typeof layer.getSource().getExtent !== 'undefined' ? layer.getSource().getExtent() : layer.getExtent();
-          if (layer.getVisible()) {
-            viewer.getMap().getView().fit(extent, {
-              padding: [50, 50, 50, 50],
-              duration: 1000
-            });
-            e.preventDefault();
-          }
-        });
-      },
-      render() {
-        const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
-        return `<li id="${this.getId()}" class="${labelCls}">Zooma till</li>`;
-      }
-    });
-    popupMenuItems.push(zoomToExtentMenuItem);
-  }
-
-  if (layer.get('exportable')) {
-    const exportFormat = layer.get('exportFormat') || layer.get('exportformat');
-    let exportFormatArray = [];
-    if (exportFormat && typeof exportFormat === 'string') {
-      exportFormatArray.push(exportFormat);
-    } else if (exportFormat && Array.isArray(exportFormat)) {
-      exportFormatArray = exportFormat;
-    }
-    const formats = exportFormatArray.map(format => format.toLowerCase()).filter(format => format === 'geojson' || format === 'gpx' || format === 'kml');
-    if (formats.length === 0) { formats.push('geojson'); }
-    formats.forEach((format) => {
-      const exportLayerMenuItem = Component({
-        onRender() {
-          const labelEl = document.getElementById(this.getId());
-          labelEl.addEventListener('click', (e) => {
-            const features = layer.getSource().getFeatures();
-            exportToFile(features, format, {
-              featureProjection: viewer.getProjection().getCode(),
-              filename: layer.get('title') || 'export'
-            });
-            e.preventDefault();
-          });
-        },
-        render() {
-          let exportLabel;
-          if (exportFormatArray.length > 1) {
-            exportLabel = `Spara lager (.${format})`;
-          } else { exportLabel = 'Spara lager'; }
-          const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
-          return `<li id="${this.getId()}" class="${labelCls}">${exportLabel}</li>`;
-        }
-      });
-      popupMenuItems.push(exportLayerMenuItem);
-    });
-  }
-
-  if (layer.get('removable')) {
-    const removeLayerMenuItem = Component({
-      onRender() {
-        const labelEl = document.getElementById(this.getId());
-        labelEl.addEventListener('click', (e) => {
-          if (window.confirm('Vill du radera lagret?')) {
-            viewer.getMap().removeLayer(layer);
-          }
-          e.preventDefault();
-        });
-      },
-      render() {
-        const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
-        return `<li id="${this.getId()}" class="${labelCls}">Ta bort lager</li>`;
-      }
-    });
-    popupMenuItems.push(removeLayerMenuItem);
-  }
-
-  const popupMenuList = Component({
-    onInit() {
-      this.addComponents(popupMenuItems);
-    },
-    render() {
-      let html = `<ul id="${this.getId()}">`;
-      popupMenuItems.forEach((item) => {
-        html += `${item.render()}`;
-      });
-      html += '</ul>';
-      return html;
-    }
-  });
-
-  const createPopupMenu = function createPopupMenu() {
-    const moreInfoButtonEl = document.getElementById(moreInfoButton.getId());
-    const onUnfocus = (e) => {
-      if (!moreInfoButtonEl.contains(e.target)) {
-        popupMenu.setVisibility(false);
-      }
-    };
-    popupMenu = PopupMenu({ onUnfocus, cls: 'overlay-popup' });
-    const newDiv = document.createElement('div');
-    newDiv.classList.add('justify-end', 'flex', 'relative', 'basis-100');
-    moreInfoButtonEl.insertAdjacentElement('afterend', newDiv);
-    newDiv.appendChild(dom.html(popupMenu.render()));
-    popupMenu.setContent(popupMenuList.render());
-    popupMenuList.dispatch('render');
-    popupMenu.setVisibility(true);
-  };
-
-  const togglePopupMenu = function togglePopupMenu() {
-    if (!popupMenu) {
-      createPopupMenu();
-    } else {
-      popupMenu.toggleVisibility();
-    }
-  };
-
-  moreInfoButton = Button({
-    cls: 'round small icon-smaller no-shrink',
-    click() {
-      if (popupMenuItems.length > 1) {
-        togglePopupMenu();
-      } else {
-        document.getElementById(this.getId()).dispatchEvent(eventOverlayProps);
-      }
-    },
-    style: {
-      'align-self': 'center'
-    },
-    icon: '#ic_more_vert_24px',
-    ariaLabel: 'Visa lagerinfo',
-    tabIndex: -1
-  });
-
+  const moreInfoButton = createMoreInfoButton({ layer, viewer });
   buttons.push(moreInfoButton);
   const ButtonsHtml = `${layerIcon.render()}${label.render()}${toggleButton.render()}${moreInfoButton.render()}`;
 
-  const removeOverlayMenuItem = function removeListeners() {
-    const popupMenuListEl = document.getElementById(popupMenuList.getId());
-    if (popupMenuListEl) { popupMenuListEl.remove(); }
-  };
-
   const onRemove = function onRemove() {
-    removeOverlayMenuItem();
     const el = document.getElementById(this.getId());
     el.remove();
   };
@@ -312,7 +150,7 @@ const OverlayLayer = function OverlayLayer(options) {
     let newIcon = HeaderIcon(newStyle, opacity);
     if (!newIcon) {
       hasExtendedLegend = true;
-      extendedLegendContent.setContent(Legend(newStyle));
+      extendedLegendContent.setContent(Legend({ styleRules: newStyle, layer, viewer }).render());
     } else {
       hasExtendedLegend = false;
       extendedLegendContent.setContent('');
@@ -332,6 +170,7 @@ const OverlayLayer = function OverlayLayer(options) {
     name,
     getLayer,
     onInit() {
+      thisComponent = this;
       this.on('clear', onRemove.bind(this));
     },
     onAdd(evt) {

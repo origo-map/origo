@@ -95,6 +95,12 @@ function createStyleOptions(orgStyleParams, scaleToDpi) {
           return new Point(coordinates);
         };
         break;
+      case 'startPoint':
+        styleOptions.geometry = function startPoint(feature) {
+          const coordinates = feature.getGeometry().getFirstCoordinate();
+          return new Point(coordinates);
+        };
+        break;
       default:
       {
         break;
@@ -278,10 +284,13 @@ function checkOptions(options = {}) {
           }
         });
         if (filterMatch) {
-          styleL = styleList[j];
-          return styleL;
+          if (s[j][0].visible !== false) {
+            styleL = styleList[j];
+            return styleL;
+          }
+          return null;
         }
-      } else {
+      } else if (s[j][0].visible !== false) {
         styleL = styleList[j];
         return styleL;
       }
@@ -339,7 +348,7 @@ function createStyle({
       style = getCustomStyle('stylefunction', { name: styleSettings[0][0].custom, params: styleSettings[0][0].params });
     } else if (typeof styleSettings[0][0].custom === 'object') {
       style = getCustomStyle(type, {
-        layer, file, source, name
+        layer, file, source, name, scaleToDpi
       });
     }
     return style || stylefunctions('default');
@@ -425,5 +434,6 @@ export default {
   styleFunction,
   createEditStyle,
   createGeometryStyle,
-  addStyleType
+  addStyleType,
+  multiplyByFactor
 };

@@ -12,7 +12,8 @@
   top: 6em;
   width: 320px;
   z-index: 1;
-  overflow-x: hidden;
+  overflow: visible;
+  max-height: 90%;
   &.expandable_list {
     cursor: move;
   }
@@ -40,8 +41,16 @@
   cursor: move;
   font-size: 12px;
   font-weight: bold;
-  padding: 1em 1em 1em 2em;
+  padding: 1em 0em 1em 2em;
   z-index: 10;
+  border-radius: inherit;
+}
+
+.urvalListContainer {
+  margin-right: 0.5em;
+  max-height: 10em;
+  overflow-y: auto;
+  scroll-behavior: smooth;
 }
 
 .expandable_list {
@@ -105,7 +114,7 @@
   font-weight: normal;
   margin-right: 0.5em;
   max-height: 40em;
-  overflow-y: scroll;
+  overflow-y: auto;
   scroll-behavior: smooth;
 }
 
@@ -165,6 +174,7 @@
 .o-identify-content {
   display: inline-block;
   width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .folded {
@@ -178,7 +188,6 @@
 }
 
 .unfolded {
-  max-height: 20em;
   overflow: hidden;
   transition: max-height 1s;
   transition: max-height 1s;
@@ -208,20 +217,14 @@
 
 .expandable_list {
   .export-buttons-container {
-    padding: 0.5em 0;
-    margin: 0;
+    padding: 0.5em 1.8em;
+    margin-left: 0;
   }
 }
 
 .export-buttons-container {
   margin: 0.5em 0.2em;
   margin-left: 1.8em;
-}
-
-.expandable_list {
-  .export-buttons-container {
-    padding: 0.5em 0;
-  }
 }
 
 .export-button {

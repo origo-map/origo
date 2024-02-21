@@ -5,25 +5,36 @@ import Style from '../../style';
 const OverlayProperties = function OverlayProperties(options = {}) {
   const {
     cls: clsOptions = '',
+    group,
     layer,
     viewer
   } = options;
-
-  const cls = `${clsOptions} item`.trim();
-  const title = layer.get('title') || '';
-  const abstract = layer.get('abstract') || '';
-  const opacity = layer.getOpacity();
-  const opacityControl = layer.get('opacityControl') !== false;
-  const style = viewer.getStyle(layer.get('styleName'));
-  const legend = Legend(style, opacity);
-  const stylePicker = viewer.getLayerStylePicker(layer);
-
-  const legendComponent = Component({
-    render() {
-      return `<div id=${this.getId()}>${legend}</div>`;
-    }
-  });
-
+  let cls = '';
+  let title;
+  let abstract;
+  let description;
+  let opacity;
+  let opacityControl;
+  let style;
+  let legendComponent;
+  let stylePicker = [];
+  if (layer) {
+    cls = `${clsOptions} item`.trim();
+    title = layer.get('title') || '';
+    abstract = layer.get('abstract') || '';
+    description = layer.get('description') || '';
+    opacity = layer.getOpacity();
+    opacityControl = layer.get('opacityControl') !== false;
+    style = viewer.getStyle(layer.get('styleName'));
+    legendComponent = Legend({ styleRules: style, opacity, layer, viewer, clickable: false });
+    stylePicker = viewer.getLayerStylePicker(layer);
+  } else if (group) {
+    title = group.title;
+    abstract = !group.showAbstractInLegend ? group.abstract || '' : '';
+    description = group.description || '';
+    opacity = group.opacity || 1;
+    opacityControl = group.opacityControl === true;
+  }
   let styleSelection;
   let overlayEl;
   let sliderEl;
@@ -58,8 +69,11 @@ const OverlayProperties = function OverlayProperties(options = {}) {
   }
 
   function renderStyleSelection() {
-    const html = `<div class="o-stylepicker-header text-small padding-small">Välj stil</div>${styleSelection.render()}`;
-    return hasStylePicker() ? html : '';
+    if (hasStylePicker()) {
+      const html = `<div class="o-stylepicker-header text-small padding-small">Välj stil</div>${styleSelection.render()}`;
+      return html;
+    }
+    return '';
   }
 
   function getStyleDisplayName(styleName) {
@@ -68,6 +82,23 @@ const OverlayProperties = function OverlayProperties(options = {}) {
       altStyle = stylePicker.find(s => s.defaultWMSServerStyle);
     }
     return (altStyle && altStyle.title) || styleName;
+  }
+
+  function getSubgroups(topGroup) {
+    const groups = viewer.getGroups();
+    const groupArr = [topGroup];
+    function loopGroups(checkGroup) {
+      if (groups) {
+        for (let i = 0; i < groups.length; i += 1) {
+          if (groups[i].parent === checkGroup.name) {
+            groupArr.push(groups[i]);
+            loopGroups(groups[i], groups);
+          }
+        }
+      }
+    }
+    loopGroups(topGroup, groups);
+    return groupArr;
   }
 
   const onSelectStyle = (styleTitle) => {
@@ -111,14 +142,13 @@ const OverlayProperties = function OverlayProperties(options = {}) {
         extendedLegend: altStyle.hasThemeLegend || false
       }]];
       viewer.addStyle(styleToSet, newWmsStyle);
-
-      legendCmp.innerHTML = Legend(viewer.getStyle(styleToSet), opacity);
+      legendCmp.innerHTML = Legend({ styleRules: viewer.getStyle(styleToSet), opacity, layer, viewer, clickable: false }).render();
       layer.dispatchEvent('change:style');
       return;
     }
 
     layer.set('styleName', altStyle.style);
-    legendCmp.innerHTML = Legend(viewer.getStyle(altStyle.style), opacity);
+    legendCmp.innerHTML = Legend({ styleRules: viewer.getStyle(altStyle.style), opacity, layer, viewer, clickable: false }).render();
     const newStyle = Style.createStyle({ style: altStyle.style, clusterStyleName: altStyle.clusterStyle, viewer });
     layer.setStyle(newStyle);
     layer.dispatchEvent('change:style');
@@ -126,40 +156,75 @@ const OverlayProperties = function OverlayProperties(options = {}) {
 
   return Component({
     onInit() {
-      styleSelection = Dropdown({
-        direction: 'up',
-        cls: 'o-stylepicker text-black flex',
-        contentCls: 'bg-grey-lighter text-smaller rounded',
-        buttonCls: 'bg-white border text-black box-shadow',
-        buttonTextCls: 'text-smaller',
-        text: getStyleDisplayName(layer.get('styleName')),
-        buttonIconCls: 'black',
-        ariaLabel: 'Välj stil'
-      });
-      const components = [transparencySlider];
+      const components = [];
+      if (layer) {
+        components.push(legendComponent);
+      }
+      if (opacityControl) {
+        components.push(transparencySlider);
+      }
       if (hasStylePicker()) {
+        styleSelection = Dropdown({
+          direction: 'up',
+          cls: 'o-stylepicker text-black flex',
+          contentCls: 'bg-grey-lighter text-smaller rounded',
+          contentStyle: 'max-height: 12em; overflow-y: auto;',
+          buttonCls: 'bg-white border text-black box-shadow',
+          buttonTextCls: 'text-smaller',
+          text: getStyleDisplayName(layer.get('styleName')),
+          buttonIconCls: 'black',
+          ariaLabel: 'Välj stil'
+        });
         components.push(styleSelection);
       }
       this.addComponents(components);
-      this.on('click', (e) => {
-        extendedLegendZoom(e);
-      });
+      if (layer) {
+        this.on('click', (e) => {
+          extendedLegendZoom(e);
+        });
+      }
     },
     onRender() {
+      if (layer) {
+        viewer.getControlByName('legend').dispatch('renderOverlayProperties', { cmp: this, layer });
+      }
       this.dispatch('render');
-      sliderEl = document.getElementById(transparencySlider.getId());
       overlayEl = document.getElementById(this.getId());
       overlayEl.addEventListener('click', (e) => {
         this.dispatch('click', e);
       });
       if (opacityControl) {
+        sliderEl = document.getElementById(transparencySlider.getId());
         sliderEl.nextElementSibling.value *= 100;
         sliderEl.addEventListener('input', () => {
-          layer.setOpacity(sliderEl.valueAsNumber);
+          if (group) {
+            const groups = viewer.getGroups();
+            const groupArr = getSubgroups(group, groups);
+            groupArr.forEach(grp => {
+              const activeGrp = grp;
+              viewer.getLayersByProperty('group', activeGrp.name).forEach(l => l.setOpacity(sliderEl.valueAsNumber));
+              activeGrp.opacity = sliderEl.valueAsNumber;
+            });
+            viewer.getLayersByProperty('id', `grouplayer-${group.name}`).forEach(l => l.setOpacity(sliderEl.valueAsNumber));
+          }
+          if (layer) {
+            layer.setOpacity(sliderEl.valueAsNumber);
+          }
           sliderEl.nextElementSibling.value *= 100;
         });
         sliderEl.addEventListener('change', () => {
-          layer.setOpacity(sliderEl.valueAsNumber);
+          if (group) {
+            const groupArr = getSubgroups(group);
+            groupArr.forEach(grp => {
+              const activeGrp = grp;
+              viewer.getLayersByProperty('group', activeGrp.name).forEach(l => l.setOpacity(sliderEl.valueAsNumber));
+              activeGrp.opacity = sliderEl.valueAsNumber;
+            });
+            viewer.getLayersByProperty('id', `grouplayer-${group.name}`).forEach(l => l.setOpacity(sliderEl.valueAsNumber));
+          }
+          if (layer) {
+            layer.setOpacity(sliderEl.valueAsNumber);
+          }
         });
       }
       if (hasStylePicker()) {
@@ -173,11 +238,12 @@ const OverlayProperties = function OverlayProperties(options = {}) {
     render() {
       return `<div id="${this.getId()}" class="${cls} border-bottom">
                 <div class="padding-small">
-                  ${legendComponent.render()}
+                  ${legendComponent ? legendComponent.render() : ''}
                   ${renderStyleSelection()}
-                  ${transparencySlider.render()}
+                  ${opacityControl ? transparencySlider.render() : ''}
                 </div>
                 ${abstract ? `<div class="padding-small padding-x text-small">${abstract}</div>` : ''}
+                ${description ? `<div class="padding-small padding-x text-small">${description}</div>` : ''}
               </div>`;
     },
     labelCls: 'text-small text-semibold',

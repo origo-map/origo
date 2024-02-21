@@ -353,6 +353,7 @@ const DrawHandler = function DrawHandler(options = {}) {
         drawLayer.un('change:visible', onChangeVisible);
       }
       drawLayer = layer;
+      drawLayer.setVisible(true);
       drawLayer.on('change:visible', onChangeVisible);
       onChangeVisible();
     } else {
@@ -387,6 +388,7 @@ const DrawHandler = function DrawHandler(options = {}) {
       queryable,
       removable,
       exportable,
+      zoomToExtent = true,
       drawlayer
     } = layerOptions;
     let newLayer;
@@ -408,6 +410,7 @@ const DrawHandler = function DrawHandler(options = {}) {
         queryable,
         removable,
         exportable,
+        zoomToExtent,
         drawlayer,
         type: 'GEOJSON',
         attributes: [
@@ -436,10 +439,10 @@ const DrawHandler = function DrawHandler(options = {}) {
     });
     newLayer.getSource().on('addfeature', (e) => {
       e.feature.on('change:origostyle', () => {
-        onUpdate(e, newLayer.get('name'));
+        onUpdate(e.feature, newLayer.get('name'));
       });
       e.feature.on('change:popuptext', () => {
-        onUpdate(e, newLayer.get('name'));
+        onUpdate(e.feature, newLayer.get('name'));
       });
     });
     return newLayer;

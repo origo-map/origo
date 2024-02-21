@@ -23,13 +23,13 @@ export default function CollapseHeader(options = {}) {
     icon,
     iconCls: 'rotate grey',
     style: {
-      'align-self': 'flex-end'
+      'align-self': 'center'
     }
   });
 
   const titleCmp = Component({
     render() {
-      return `<span id="${this.getId()}" class="grow">${title}</span>`;
+      return `<span id="${this.getId()}" class="grow  basis-0">${title}</span>`;
     }
   });
 
@@ -49,7 +49,7 @@ export default function CollapseHeader(options = {}) {
       });
     },
     render: function render() {
-      return `<div id="${this.getId()}" class="${cls} flex row align-center pointer collapse-header" id="${this.getId()}" style="${style} width: 100%;">
+      return `<div id="${this.getId()}" class="${cls} flex row align-center pointer collapse-header" id="${this.getId()}" style="${style}">
                 ${titleCmp.render()}
                 ${headerButton.render()}
               </div>`;

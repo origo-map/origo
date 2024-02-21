@@ -1,15 +1,14 @@
 import Select from 'ol/interaction/Select';
 import Feature from 'ol/Feature';
-import { MultiPolygon, MultiLineString, MultiPoint } from 'ol/geom';
+
 import dispatcher from './editdispatcher';
 
 // Point of entry. Create on of these each time the tool is selected
 //  viewer: the viewer
 //  editLayer: the destination layer for edits
 //  options: the current drawTools configuration for this layer
-const copyTool = function copyTool(viewer, editLayer, options) {
+const copyTool = function copyTool(viewer, options) {
   const map = viewer.getMap();
-  const destinationLayer = editLayer;
   let selectLayers = [];
   let hasGoups = false;
 
@@ -72,24 +71,7 @@ const copyTool = function copyTool(viewer, editLayer, options) {
       const accept = window.confirm('Kopiera vald geometri? Avbryt för att välja en annan');
       if (accept) {
         const f = new Feature(e.selected[0].getGeometry().clone());
-        const featureGeometryType = f.getGeometry().getType();
-        const layerGeometryType = destinationLayer.get('geometryType');
-        //  Correct geometry type to conform to edit layer
-        //  it will fail in edit handler if geometry is incorrect type
-        if (featureGeometryType !== layerGeometryType) {
-          if (featureGeometryType === 'Polygon' && layerGeometryType === 'MultiPolygon') {
-            const multiPoly = new MultiPolygon([f.getGeometry()]);
-            f.setGeometry(multiPoly);
-          }
-          if (featureGeometryType === 'LineString' && layerGeometryType === 'MultiLineString') {
-            const multiLine = new MultiLineString([f.getGeometry()]);
-            f.setGeometry(multiLine);
-          }
-          if (featureGeometryType === 'Point' && layerGeometryType === 'MultiPoint') {
-            const multiPoint = new MultiPoint([f.getGeometry()]);
-            f.setGeometry(multiPoint);
-          }
-        }
+
         cancelTool();
         // Important! Remove handler so it won't linger
         document.removeEventListener('toggleEdit', onToggleEdit, { once: true });

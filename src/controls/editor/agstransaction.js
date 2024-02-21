@@ -112,6 +112,12 @@ function agsTransaction(transObj, layerName, viewer) {
     }
   }
 
+  function getFormData(object) {
+    const formData = new FormData();
+    Object.keys(object).forEach(key => formData.append(key, object[key]));
+    return formData;
+  }
+
   const cb = {
     update: updateSuccess,
     insert: insertSuccess,
@@ -119,9 +125,7 @@ function agsTransaction(transObj, layerName, viewer) {
   };
   types.forEach((type) => {
     if (transObj[type]) {
-      const u = source.url.slice(-1) === '/' ? source.url : `${source.url}/`;
-      const i = `${id}`.slice(-1) === '/' ? id : `${id}/`;
-      const url = u + i + urlSuffix[type];
+      const url = `${source.url}/${id}/${urlSuffix[type]}`;
 
       const data = writeAgsTransaction(transObj[type], {
         projection,
@@ -129,10 +133,10 @@ function agsTransaction(transObj, layerName, viewer) {
       });
       fetch(url, {
         method: 'POST',
-        body: data
-      }, cb[type])
+        body: getFormData(data)
+      })
         .then(res => res.json())
-        .then(json => json)
+        .then(json => cb[type](json))
         .catch(err => error(err));
     }
   });

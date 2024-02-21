@@ -1,5 +1,4 @@
 import { dom } from './ui';
-import Featureinfo from './featureinfo';
 
 function render(target) {
   const pop = `<div id="o-popup">
@@ -58,27 +57,46 @@ function setContent(config) {
   }
 }
 
-function closePopup() {
+/**
+ * Closes the window and optionally calls a callback set at init
+ * @param {any} cb
+ */
+function closePopupInternal(cb) {
   setVisibility(false);
-  Featureinfo().clear();
+  if (cb) {
+    cb();
+  }
 }
 
-function bindUIActions() {
-  const closeel = document.querySelector('#o-popup .o-popup #o-close-button');
-  closeel.addEventListener('click', (evt) => {
-    closePopup();
-    evt.preventDefault();
-  });
-}
+/**
+ * Creates a new popup and adds it to the dom.
+ * @param {any} target id of parent DOM object
+ * @param {Object} opts options.
+ * @param {function} opts.closeCb Function without parameters to be called when popup is closed from close button.
+ */
+export default function popup(target, opts = {}) {
+  const {
+    closeCb
+  } = opts;
 
-export default function popup(target) {
+  function bindUIActions() {
+    const closeel = document.querySelector('#o-popup .o-popup #o-close-button');
+    closeel.addEventListener('click', (evt) => {
+      closePopupInternal(closeCb);
+      evt.preventDefault();
+    });
+  }
+
   render(target);
   bindUIActions();
+
   return {
     getEl,
     setVisibility,
     setTitle,
     setContent,
-    closePopup
+    closePopup: () => {
+      closePopupInternal(closeCb);
+    }
   };
 }

@@ -1,5 +1,7 @@
 import { Component, Button, Collapse, CollapseHeader, dom } from '../../ui';
 import GroupList from './grouplist';
+import createMoreInfoButton from './moreinfobutton';
+import LayerProperties from './overlayproperties';
 
 /**
  * The Group component can be a group or a subgroup,
@@ -16,13 +18,17 @@ const Group = function Group(viewer, options = {}) {
     name,
     parent,
     abstract,
+    showAbstractInLegend = false,
     position = 'top',
     type = 'group',
     autoExpand = true,
     exclusive = false,
     toggleAll = true,
     draggable = false,
-    zIndexStart = 0.1
+    zIndexStart = 0.1,
+    opacityControl = false,
+    zoomToExtent = false,
+    description
   } = options;
 
   const stateCls = {
@@ -37,8 +43,10 @@ const Group = function Group(viewer, options = {}) {
   let selectedItem;
 
   const listCls = type === 'grouplayer' ? 'divider-start padding-left padding-top-small' : '';
-  const groupList = GroupList({ viewer, cls: listCls, abstract });
+  const groupList = GroupList({ viewer, cls: listCls, abstract, showAbstractInLegend });
   visibleState = groupList.getVisible();
+
+  const thisGroup = viewer.getGroup(name);
 
   const getEl = () => groupEl;
 
@@ -65,10 +73,13 @@ const Group = function Group(viewer, options = {}) {
     iconCls: '',
     state: visibleState,
     style: {
-      'align-self': 'flex-end',
+      'align-self': 'center',
       cursor: 'pointer'
     }
   }) : false;
+
+  const moreInfoButton = (opacityControl || zoomToExtent || description || (abstract && !showAbstractInLegend)) ? createMoreInfoButton({ viewer,
+    group: thisGroup }) : false;
 
   const SubGroupHeader = function SubGroupHeader() {
     const expandButton = Button({
@@ -86,6 +97,9 @@ const Group = function Group(viewer, options = {}) {
         if (tickButton) {
           this.addComponent(tickButton);
         }
+        if (moreInfoButton) {
+          this.addComponent(moreInfoButton);
+        }
       },
       onRender() {
         this.dispatch('render');
@@ -99,12 +113,14 @@ const Group = function Group(viewer, options = {}) {
         });
       },
       render() {
-        return `<div class="flex row align-center padding-left text-smaller pointer collapse-header" style="width: 100%; padding-right: 1.875rem">
-                <div id="${this.getId()}" class="flex row align-center grow">
+        const padding = moreInfoButton ? '0.275rem' : '1.875rem';
+        return `<div class="flex row align-center padding-left text-smaller pointer collapse-header item wrap" style="width: 100%; padding-right: ${padding}">
+                <div id="${this.getId()}" class="flex row align-center grow basis-0">
                    ${expandButton.render()}
-                    <span class="grow padding-x-small" style="word-break: break-all;">${title}</span>
+                    <span class="grow padding-x-small" style="overflow-wrap: anywhere;">${title}</span>
                 </div>
                 ${tickButton ? tickButton.render() : ''}
+                ${moreInfoButton ? moreInfoButton.render() : ''}
               </div>`;
       }
     });
@@ -112,10 +128,18 @@ const Group = function Group(viewer, options = {}) {
 
   const GroupHeader = function GroupHeader() {
     const headerComponent = CollapseHeader({
-      cls: 'hover padding-x padding-y-small grey-lightest border-bottom text-small',
+      cls: 'hover padding-x padding-y-small grey-lightest border-bottom text-small sticky bg-white z-index-low item wrap',
+      style: `top: 0;${moreInfoButton ? 'padding-right: 0.275rem' : ''}`,
       icon,
       title
     });
+    if (moreInfoButton) {
+      headerComponent.on('render', function hcRender() {
+        const el = document.getElementById(this.getId());
+        const html = moreInfoButton.render();
+        el.insertAdjacentHTML('beforeend', html);
+      });
+    }
     return headerComponent;
   };
 
@@ -128,6 +152,10 @@ const Group = function Group(viewer, options = {}) {
     contentComponent: groupList,
     collapseX: false
   });
+
+  if (moreInfoButton && type !== 'grouplayer') {
+    collapse.addComponent(moreInfoButton);
+  }
 
   const addGroup = function addGroup(groupCmp) {
     groupList.addGroup(groupCmp);
@@ -321,6 +349,40 @@ const Group = function Group(viewer, options = {}) {
           e.preventDefault();
           e.stopPropagation();
           updateGroupIndication();
+        });
+      }
+      if (moreInfoButton) {
+        groupEl.addEventListener('overlayproperties', (evt) => {
+          const overlaysCmp = viewer.getControlByName('legend').getOverlays();
+          const slidenav = overlaysCmp.slidenav;
+          if (evt.detail.group) {
+            const group = evt.detail.group;
+            const thisParent = this;
+            const label = group.labelOpacitySlider ? group.labelOpacitySlider : '';
+            const layerProperties = LayerProperties({
+              group, viewer, thisParent, labelOpacitySlider: label
+            });
+            slidenav.setSecondary(layerProperties);
+            slidenav.slideToSecondary();
+            // Include back btn and opacity slider in tab order when opened and remove when closed
+            const secondaryEl = document.getElementById(slidenav.getId()).querySelector('.secondary');
+            const backBtn = secondaryEl.getElementsByTagName('button')[0];
+            const opacityInput = secondaryEl.getElementsByTagName('input')[0];
+            backBtn.tabIndex = 0;
+            backBtn.focus();
+            if (opacityInput) {
+              opacityInput.tabIndex = 0;
+            }
+            backBtn.addEventListener('click', () => {
+              backBtn.tabIndex = -99;
+              if (opacityInput) {
+                opacityInput.tabIndex = -99;
+              }
+            }, false);
+            slidenav.on('slide', () => {
+              groupEl.classList.remove('width-100');
+            });
+          }
         });
       }
       // only listen to tick changes for subgroups
