@@ -33,6 +33,7 @@ const Guide = function Guide(options = {}) {
     hideText,
     confirmText
   } = options;
+  let contentCreated = false;
 
   // Fetches the controls defined in json configuration and origos default controls
   const getActiveControls = async () => {
@@ -196,7 +197,10 @@ const Guide = function Guide(options = {}) {
 
   // Creates the guide modal with its buttons and content
   const createModal = async () => {
-    await createContent();
+    if (!contentCreated) {
+      await createContent();
+    }
+    contentCreated = true;
     component.addComponents([nextButton, prevButton]);
     content = `<ul id="o-guide-slides-container">${contentItems.join(' ')}</ul>`;
     content = moveButtons();
@@ -215,9 +219,7 @@ const Guide = function Guide(options = {}) {
         target,
         style: `text-align: center;${style}`
       });
-      if (!modal) {
-        component.dispatch('render');
-      }
+      component.dispatch('render');
     }
     list = document.getElementById('o-guide-slides-container');
     items = Array.from(list.children);

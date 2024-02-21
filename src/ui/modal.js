@@ -43,6 +43,7 @@ export default function Modal(options = {}) {
 
   const closeModal = function closeModal() {
     modal.parentNode.removeChild(modal);
+
     // Shuts down guide.js target animation
     const guideTarget = document.querySelectorAll('.o-guide-target')[0];
     if (guideTarget) {
