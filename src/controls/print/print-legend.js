@@ -1,6 +1,7 @@
 import { ImageArcGISRest, ImageWMS } from 'ol/source';
 import { Component } from '../../ui';
 import { isHidden, renderSvgIcon } from '../../utils/legendmaker';
+import ImageLayerLegendRules from '../../utils/jsonlegends';
 
 /**
  * More information: https://developers.arcgis.com/rest/services-reference/enterprise/legend-map-service-.htm
@@ -56,7 +57,7 @@ const LayerRow = function LayerRow(options) {
    * @param {"image/png"|"application/json"} format
    * @returns {string|null}
    */
-  const getWMSLegendUrl = (aLayer, format) => {
+  /* const getWMSLegendUrl = (aLayer, format) => {
     const url = getOneUrl(aLayer);
     const layerName = aLayer.get('name');
     const style = viewer.getStyle(aLayer.get('styleName'));
@@ -67,7 +68,7 @@ const LayerRow = function LayerRow(options) {
       return `${style[0][0].icon.src}?format=${format}`;
     }
     return `${url}?SERVICE=WMS&layer=${layerName}&format=${format}&version=1.1.1&request=getLegendGraphic&scale=401&legend_options=dpi:300`;
-  };
+  }; */
 
   /**
    * Returns the JSON-encoded legend from the ArcGIS Legend Map Service
@@ -78,7 +79,7 @@ const LayerRow = function LayerRow(options) {
    * @param {number} dpi
    * @returns {Promise<ArcGISLegendResponse>}
    */
-  const getAGSLegendJSON = async (aLayer, dpi = 150) => {
+  /* const getAGSLegendJSON = async (aLayer, dpi = 150) => {
     // rewrite the URL if needed
     const mapServerUrl = getOneUrl(aLayer).replace(/\/arcgis(\/rest)?\/services\/([^/]+\/[^/]+)\/MapServer\/WMSServer/, '/arcgis/rest/services/$2/MapServer');
     const url = `${mapServerUrl}/legend?f=json&dpi=${dpi}`;
@@ -89,13 +90,13 @@ const LayerRow = function LayerRow(options) {
       console.warn(e);
       return null;
     }
-  };
+  }; */
 
   /**
    * @param {string|null} url
    * @returns {Promise<null|any>}
    */
-  const getLegendGraphicJSON = async (url) => {
+  /* const getLegendGraphicJSON = async (url) => {
     try {
       if (!url) {
         return null;
@@ -106,7 +107,7 @@ const LayerRow = function LayerRow(options) {
       console.warn(e);
       return null;
     }
-  };
+  }; */
 
   /**
    * @param {string} title
@@ -188,10 +189,18 @@ const LayerRow = function LayerRow(options) {
    * @returns {Promise<string>}
    */
   const getWMSJSONContent = async (title) => {
-    const getLegendGraphicUrl = getWMSLegendUrl(layer, 'image/png');
-    const json = await getLegendGraphicJSON(getWMSLegendUrl(layer, 'application/json'));
+    // onst getLegendGraphicUrl = getWMSLegendUrl(layer, 'image/png');
+    const maxResolution = viewer.getResolutions()[viewer.getResolutions().length - 1];
+    const getLegendGraphicUrl = layer.getSource().getLegendUrl(maxResolution, {
+      legend_options: 'dpi:300'
+    });
+    // const json = await getLegendGraphicJSON(getWMSLegendUrl(layer, 'application/json'));
+    const rules = await ImageLayerLegendRules({
+      layer,
+      viewer
+    });
 
-    if (!json) {
+    if (!rules) {
       return `
         <div class="flex row">
           <div class="padding-x-small grow no-select overflow-hidden">${title}</div>
@@ -200,17 +209,17 @@ const LayerRow = function LayerRow(options) {
           <img src="${getLegendGraphicUrl}" alt="${title}" />
         </div>`;
     }
-    if (json.Legend[0].rules.length <= 1) {
+    if (rules.length <= 1) {
       const icon = `<img class="cover" src="${getLegendGraphicUrl}"  alt="${title}"/>`;
       return getTitleWithIcon(title, icon);
     }
 
-    const rules = json.Legend[0].rules.map((rule, index) => {
+    const listItems = rules.map((rule, index) => {
       const ruleImageUrl = `${getLegendGraphicUrl}&rule=${rule.name}`;
       const rowTitle = rule.title ? rule.title : index + 1;
       return getListItem(rowTitle, ruleImageUrl, true);
     });
-    return getTitleWithChildren(title, rules);
+    return getTitleWithChildren(title, listItems);
   };
 
   /**
@@ -221,11 +230,20 @@ const LayerRow = function LayerRow(options) {
    * @returns {Promise<string>}
    */
   const getAGSJSONContent = async (title, id) => {
-    const json = await getAGSLegendJSON(layer);
-    if (!json) {
+    // const json = await getAGSLegendJSON(layer);
+    // const layersDetails = json.layers;
+    const layersDetails = await ImageLayerLegendRules({
+      layer,
+      viewer,
+      legendOpts: {
+        dpi: 200
+      }
+    });
+
+    if (layersDetails.length === 0) {
       return getTitleWithIcon(title, '');
     }
-    const legendLayer = json.layers.find((l) => +l.layerId === +id || l.layerName === id);
+    const legendLayer = layersDetails.find((l) => +l.layerId === +id || l.layerName === id);
     if (!legendLayer) {
       return getTitleWithIcon(title, '');
     }
