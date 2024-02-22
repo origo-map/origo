@@ -119,10 +119,11 @@ export default function Button(options = {}) {
     onRender() {
       buttonEl = document.getElementById(this.getId());
       buttonEl.removeEventListener('click', this.handleButtonClick);
-      buttonEl.addEventListener('click', (e) => {
+      this.handleButtonClick = (e) => {
         this.dispatch('click');
         e.preventDefault();
-      });
+      };
+      buttonEl.addEventListener('click', this.handleButtonClick);
       buttonEl.addEventListener('mouseenter', (e) => {
         this.dispatch('mouseenter');
         e.preventDefault();
