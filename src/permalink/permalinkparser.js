@@ -17,6 +17,10 @@ const layerModel = {
   sn: {
     name: 'altStyleIndex',
     dataType: 'number'
+  },
+  th: {
+    name: 'activeThemes',
+    dataType: 'array'
   }
 };
 
@@ -35,7 +39,7 @@ const layers = function layers(layersStr) {
     });
     Object.getOwnPropertyNames(layerObject).forEach((prop) => {
       const val = layerObject[prop];
-      if (Object.prototype.hasOwnProperty.call(layerModel, prop) && prop !== 'o' && prop !== 'sn') {
+      if (Object.prototype.hasOwnProperty.call(layerModel, prop) && prop !== 'o' && prop !== 'sn' && prop !== 'th') {
         const attribute = layerModel[prop];
         obj[attribute.name] = urlparser.strBoolean(val);
       } else if (prop === 'o') {
@@ -44,6 +48,9 @@ const layers = function layers(layersStr) {
       } else if (prop === 'sn') {
         const attribute = layerModel[prop];
         obj[attribute.name] = Number(val);
+      } else if (prop === 'th') {
+        const attribute = layerModel[prop];
+        obj[attribute.name] = val.split('~').map(theme => decodeURIComponent(theme));
       } else {
         obj[prop] = val;
       }

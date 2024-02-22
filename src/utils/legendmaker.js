@@ -162,6 +162,8 @@ function updateLayer(layer, viewer) {
 async function setIcon(src, cmp, styleRules, layer, viewer, clickable) {
   const styleName = layer.get('styleName');
   const style = viewer.getStyle(styleName);
+  const activeThemes = layer.get('activeThemes');
+  const hasThemeLegend = layer.get('hasThemeLegend');
   if (!style[0].thematic) {
     style[0].thematic = [];
     const paramsString = src.icon.json;
@@ -180,9 +182,14 @@ async function setIcon(src, cmp, styleRules, layer, viewer, clickable) {
           label: row.title || row.name,
           visible: row.visible !== false
         });
+        if (activeThemes && hasThemeLegend) {
+          const lastItem = style[0].thematic[style[0].thematic.length - 1];
+          lastItem.visible = activeThemes.includes(row.name || row.title);
+        }
       }
     });
     viewer.setStyle(styleName, style);
+    updateLayer(layer, viewer);
   }
   const cmps = [];
   for (let index = 0; index < style[0].thematic.length; index += 1) {
@@ -247,6 +254,16 @@ export const Legend = function Legend({
       styleName = layer.get('styleName');
     }
     const thematicStyling = layer.get('thematicStyling');
+    const activeThemes = layer.get('activeThemes');
+    if (activeThemes) {
+      const style = viewer.getStyles()[styleName];
+      if (layer.get('type') !== 'WMS') {
+        for (let i = 0; i < style.length; i += 1) {
+          const combinedStr = style[i][0].id?.toString() || style[i][0].label?.toString();
+          style[i][0].visible = activeThemes.includes(combinedStr);
+        }
+      }
+    }
     let cmps = [];
     styleRules.forEach((rule, index) => {
       if (Array.isArray(rule)) {
