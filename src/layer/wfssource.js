@@ -34,8 +34,7 @@ class WfsSource extends VectorSource {
         dataProjection: options.dataProjection,
         featureProjection: options.projectionCode
       }),
-      strategy: options.loadingstrategy,
-      filterType: options.filterType || 'cql'
+      strategy: options.loadingstrategy
     });
     /** The options that this source was created with  */
     this._options = options;
