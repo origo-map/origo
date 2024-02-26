@@ -1,7 +1,6 @@
-import { ImageArcGISRest, ImageWMS } from 'ol/source';
 import { Component } from '../../ui';
 import { isHidden, renderSvgIcon } from '../../utils/legendmaker';
-import ImageLayerLegendRules from '../../utils/jsonlegends';
+import ImageLayerLegendRules, { getSourceUrl } from '../../utils/imagelayerlegendutils';
 
 /**
  * More information: https://developers.arcgis.com/rest/services-reference/enterprise/legend-map-service-.htm
@@ -35,79 +34,6 @@ const LayerRow = function LayerRow(options) {
     layer,
     viewer
   } = options;
-
-  /**
-   * @param {Layer} aLayer
-   * @returns {string|null}
-   */
-  const getOneUrl = (aLayer) => {
-    const source = aLayer.getSource();
-    if ((source instanceof ImageWMS || source instanceof ImageArcGISRest) && typeof source.getUrl === 'function') {
-      return source.getUrl();
-    } else if (typeof source.getUrls === 'function') {
-      return source.getUrls()[0];
-    }
-    return null;
-  };
-
-  /**
-   * Returns the URL to the WMS legend in the specified format
-   *
-   * @param {Layer} aLayer
-   * @param {"image/png"|"application/json"} format
-   * @returns {string|null}
-   */
-  /* const getWMSLegendUrl = (aLayer, format) => {
-    const url = getOneUrl(aLayer);
-    const layerName = aLayer.get('name');
-    const style = viewer.getStyle(aLayer.get('styleName'));
-    if (style && style[0] && style[0][0] && style[0][0].icon) {
-      if (style[0][0].icon.src.includes('?')) {
-        return `${style[0][0].icon.src}&format=${format}`;
-      }
-      return `${style[0][0].icon.src}?format=${format}`;
-    }
-    return `${url}?SERVICE=WMS&layer=${layerName}&format=${format}&version=1.1.1&request=getLegendGraphic&scale=401&legend_options=dpi:300`;
-  }; */
-
-  /**
-   * Returns the JSON-encoded legend from the ArcGIS Legend Map Service
-   *
-   * More information: https://developers.arcgis.com/rest/services-reference/enterprise/legend-map-service-.htm
-   *
-   * @param {Layer} aLayer
-   * @param {number} dpi
-   * @returns {Promise<ArcGISLegendResponse>}
-   */
-  /* const getAGSLegendJSON = async (aLayer, dpi = 150) => {
-    // rewrite the URL if needed
-    const mapServerUrl = getOneUrl(aLayer).replace(/\/arcgis(\/rest)?\/services\/([^/]+\/[^/]+)\/MapServer\/WMSServer/, '/arcgis/rest/services/$2/MapServer');
-    const url = `${mapServerUrl}/legend?f=json&dpi=${dpi}`;
-    try {
-      const response = await fetch(url);
-      return await response.json();
-    } catch (e) {
-      console.warn(e);
-      return null;
-    }
-  }; */
-
-  /**
-   * @param {string|null} url
-   * @returns {Promise<null|any>}
-   */
-  /* const getLegendGraphicJSON = async (url) => {
-    try {
-      if (!url) {
-        return null;
-      }
-      const response = await fetch(url);
-      return await response.json();
-    } catch (e) {
-      console.warn(e);
-      return null;
-    }
-  }; */
 
   /**
    * @param {string} title
@@ -188,13 +114,11 @@ const LayerRow = function LayerRow(options) {
    * @param {string} title
    * @returns {Promise<string>}
    */
-  const getWMSJSONContent = async (title) => {
-    // onst getLegendGraphicUrl = getWMSLegendUrl(layer, 'image/png');
+  const getWMSJSONContent = async (title, serverVendor) => {
     const maxResolution = viewer.getResolutions()[viewer.getResolutions().length - 1];
     const getLegendGraphicUrl = layer.getSource().getLegendUrl(maxResolution, {
-      legend_options: 'dpi:300'
+      legend_options: 'dpi:150'
     });
-    // const json = await getLegendGraphicJSON(getWMSLegendUrl(layer, 'application/json'));
     const rules = await ImageLayerLegendRules({
       layer,
       viewer
@@ -215,9 +139,14 @@ const LayerRow = function LayerRow(options) {
     }
 
     const listItems = rules.map((rule, index) => {
-      const ruleImageUrl = `${getLegendGraphicUrl}&rule=${rule.name}`;
+      let ruleImageSource;
+      if (serverVendor === 'qgis') {
+        ruleImageSource = `data:image/png;base64,${rule.icon}`;
+      } else {
+        ruleImageSource = `${getLegendGraphicUrl}&rule=${rule.name}`;
+      }
       const rowTitle = rule.title ? rule.title : index + 1;
-      return getListItem(rowTitle, ruleImageUrl, true);
+      return getListItem(rowTitle, ruleImageSource, true);
     });
     return getTitleWithChildren(title, listItems);
   };
@@ -230,13 +159,11 @@ const LayerRow = function LayerRow(options) {
    * @returns {Promise<string>}
    */
   const getAGSJSONContent = async (title, id) => {
-    // const json = await getAGSLegendJSON(layer);
-    // const layersDetails = json.layers;
     const layersDetails = await ImageLayerLegendRules({
       layer,
       viewer,
       legendOpts: {
-        dpi: 200
+        dpi: 150
       }
     });
 
@@ -261,10 +188,13 @@ const LayerRow = function LayerRow(options) {
       } else {
         content = getTitleWithIcon(title, '');
         const lType = layer.get('type');
-        if ((lType && lType.includes('AGS')) || /\/arcgis\/services\/[^/]+\/[^/]+\/MapServer\/WMSServer/.test(getOneUrl(layer))) {
+        const mapSource = viewer.getMapSource();
+        const sourceName = layer.get('sourceName');
+        const serverVendor = mapSource[sourceName].type?.toLowerCase();
+        if ((lType?.includes('AGS')) || ((lType?.includes('WMS')) && (getSourceUrl(layer).includes('/arcgis/'))) || (serverVendor === 'arcgis')) {
           content = await getAGSJSONContent(title, layer.get('id'));
         } else if (lType && lType.includes('WMS')) {
-          content = await getWMSJSONContent(title);
+          content = await getWMSJSONContent(title, serverVendor);
         }
       }
       return `

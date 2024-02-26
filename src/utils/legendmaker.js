@@ -1,5 +1,6 @@
 import { renderIcon, renderSvg } from './legendrender';
 import { Button, Element as El } from '../ui';
+import ImageLayerLegendRules from './imagelayerlegendutils';
 
 const size = 24;
 const checkIcon = '#ic_check_circle_24px';
@@ -166,17 +167,20 @@ async function setIcon(src, cmp, styleRules, layer, viewer, clickable) {
   const hasThemeLegend = layer.get('hasThemeLegend');
   if (!style[0].thematic) {
     style[0].thematic = [];
-    const paramsString = src.icon.json;
-    const searchParams = new URLSearchParams(paramsString);
-    const response = await fetch(src.icon.json);
-    const jsonData = await response.json();
-    jsonData.Legend[0].rules.forEach(row => {
-      searchParams.set('FORMAT', 'image/png');
-      searchParams.set('RULE', row.name);
-      const imgUrl = decodeURIComponent(searchParams.toString());
+    const maxResolution = viewer.getResolutions()[viewer.getResolutions().length - 1];
+    const getLegendGraphicUrl = new URL(layer.getSource().getLegendUrl(maxResolution, {
+      legend_options: 'dpi:150',
+      SCALE: 100
+    }));
+    const rules = await ImageLayerLegendRules({
+      layer,
+      viewer
+    });
+    rules.forEach(row => {
+      getLegendGraphicUrl.searchParams.set('RULE', row.name);
       if (typeof row.filter !== 'undefined') {
         style[0].thematic.push({
-          image: { src: imgUrl },
+          image: { src: getLegendGraphicUrl.href },
           filter: row.filter,
           name: row.name,
           label: row.title || row.name,

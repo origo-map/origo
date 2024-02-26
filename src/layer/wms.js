@@ -81,19 +81,18 @@ function createWmsStyle({ wmsOptions, source, viewer, initialStyle = false }) {
   }
 
   let getLegendString;
-  let getLegendJson;
   let styleName;
 
   if (newStyle.defaultWMSServerStyle) {
     getLegendString = source.getLegendUrl(maxResolution, legendParams);
-    getLegendJson = source.getLegendUrl(maxResolution, Object.assign({}, legendParams, { FORMAT: 'application/json' }));
+    // getLegendJson = source.getLegendUrl(maxResolution, Object.assign({}, legendParams, { FORMAT: 'application/json' }));
     styleName = `${wmsOptions.name}_WMSServerDefault`;
   } else {
     getLegendString = source.getLegendUrl(maxResolution, {
       STYLE: newStyle.style,
       ...legendParams
     });
-    getLegendJson = source.getLegendUrl(maxResolution, Object.assign({}, legendParams, { FORMAT: 'application/json' }));
+    // getLegendJson = source.getLegendUrl(maxResolution, Object.assign({}, legendParams, { FORMAT: 'application/json' }));
     styleName = newStyle.style;
   }
 
@@ -101,8 +100,7 @@ function createWmsStyle({ wmsOptions, source, viewer, initialStyle = false }) {
   const thematicStyling = newStyle.thematicStyling || false;
   const style = [[{
     icon: {
-      src: `${getLegendString}`,
-      json: `${getLegendJson}`
+      src: `${getLegendString}`
     },
     extendedLegend: hasThemeLegend,
     thematicStyling
