@@ -117,6 +117,11 @@ class WfsSource extends VectorSource {
       } else {
         requestExtent = ext;
       }
+      // If extent is used but no filters are set, just use the BBOX parameter.
+      if (!layerFilter && !extraFilter) {
+        queryFilter = `&BBOX=${requestExtent.join(',')},${this._options.dataProjection}`;
+        return queryFilter;
+      }
     }
 
     // Integrate provided layer filters, `extraFilter` and extent into a single query filter
