@@ -187,7 +187,7 @@ class WfsSource extends VectorSource {
    * @param {any} extent Extent to query. If specified the result is limited to the intersection of this parameter and layer's extent configuration
    * @param {any} extraFilter Optional extra filter for this call with syntax matching the source's `filterType` (`cql`|`qgis`)
    * @param {any} ignoreOriginalFilter true if configured layer filter should be ignored for this call making parameter `extraFilter` the only filter (if specified)
-   * @param {any} ids Comma separated list of feature ids. If specified you probably want to call with extent and extraFilter empty and ignoreOriginalFilter = true.
+   * @param {any} ids Comma separated list of feature ids. If specified, extent and other filters will be ignored.
    */
   async _loaderHelper(extent, extraFilter, ignoreOriginalFilter, ids) {
     const serverUrl = this._options.url;
@@ -197,9 +197,29 @@ class WfsSource extends VectorSource {
     let url = [`${serverUrl}${serverUrl.indexOf('?') < 0 ? '?' : '&'}service=WFS`,
       `&version=1.1.0&request=GetFeature&typeName=${this._options.featureType}&outputFormat=application/json`,
       `&srsname=${this._options.dataProjection}`].join('');
-    url += this.createQueryFilter(extent, extraFilter, ignoreOriginalFilter);
+    // Add FeatureId parameter if there are ids requested.
+    // FeatureId is incompatible with BBOX and CQL_FILTER (will override QGIS's EXP_FILTER) so they should not be used together.
+    // QGIS Server expects feature type name to be prepended while GeoServer handles both with and without.
     if (ids || ids === 0) {
+      switch (this._options.filterType) {
+        case 'qgis': {
+          const idArray = ids.toString().split(','); // Split to array
+          idArray.map(id => {
+            // Prepend the layername using id if needed (in case the name is using double underscore notation)
+            if (!id.toString().startsWith(`${this._options.featureType}.`)) {
+              return `${this._options.featureType}.${id}`;
+            }
+            return id;
+          }); // Join to a comma separated string again
+          url += `&FeatureId=${idArray.join(',')}`;
+          break;
+        }
+        default: {
       url += `&FeatureId=${ids}`;
+        }
+      }
+    } else { // If there are no ids requested, append the query filter
+      url += this.createQueryFilter(extent, extraFilter, ignoreOriginalFilter);
     }
     url = encodeURI(url);
 
