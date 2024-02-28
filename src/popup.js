@@ -5,7 +5,7 @@ function render(target) {
       <div class="o-popup o-card">
         <div class="flex row justify-end">
           <div id="o-card-title" class="justify-start margin-y-smaller margin-left text-weight-bold" style="width:100%;"></div>
-          <button id="o-minimize-button" class="small round margin-top-smaller margin-bottom-auto margin-right-small icon-smallest grey-lightest no-shrink" aria-label="Minimera" onclick='var oidentify=document.getElementById("o-identify"),opopup=document.getElementById("o-popup"); if (oidentify.style.display === "none") { oidentify.style.display="block"; opopup.style.width=null; } else { oidentify.style.display="none"; opopup.style.width="auto"; }' >
+          <button id="o-minimize-button" class="small round margin-top-smaller margin-bottom-auto margin-right-small icon-smallest grey-lightest no-shrink" aria-label="Minimera">
             <span class="icon ">_</span>
           </button>
           <button id="o-close-button" class="small round margin-top-smaller margin-bottom-auto margin-right-small icon-smallest grey-lightest no-shrink" aria-label="Stäng">
@@ -60,6 +60,13 @@ function setContent(config) {
   }
 }
 
+function minimizePopup() {
+  const oidentify = document.getElementById('o-identify');
+  const opopup = document.getElementById('o-popup');
+  oidentify.style.display = oidentify.style.display === 'none' ? 'block' : 'none';
+  opopup.style.width = oidentify.style.display === 'none' ? 'auto' : null;
+}
+
 /**
  * Closes the window and optionally calls a callback set at init
  * @param {any} cb
@@ -86,6 +93,11 @@ export default function popup(target, opts = {}) {
     const closeel = document.querySelector('#o-popup .o-popup #o-close-button');
     closeel.addEventListener('click', (evt) => {
       closePopupInternal(closeCb);
+      evt.preventDefault();
+    });
+    const minel = document.querySelector('#o-popup .o-popup #o-minimize-button');
+    minel.addEventListener('click', (evt) => {
+      minimizePopup();
       evt.preventDefault();
     });
   }
