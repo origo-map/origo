@@ -215,7 +215,7 @@ class WfsSource extends VectorSource {
           break;
         }
         default: {
-      url += `&FeatureId=${ids}`;
+          url += `&FeatureId=${ids}`;
         }
       }
     } else { // If there are no ids requested, append the query filter
