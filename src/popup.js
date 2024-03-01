@@ -68,6 +68,7 @@ function minimizePopup() {
   opopup.style.width = oidentify.style.display === 'none' ? 'auto' : null;
   opopup.style.height = oidentify.style.display === 'none' ? '58px' : '78px';
   opopup.children[0].style.position = oidentify.style.display === 'none' ? 'sticky' : null;
+  opopup.children[0].style.width = oidentify.style.display === 'none' ? 'auto' : null;
   ocardtitle.style.display = oidentify.style.display === 'none' ? 'none' : null;
 }
 
