@@ -66,9 +66,9 @@ function minimizePopup() {
   const ocardtitle = document.getElementById('o-card-title');
   oidentify.style.display = oidentify.style.display === 'none' ? 'block' : 'none';
   opopup.style.width = oidentify.style.display === 'none' ? 'auto' : null;
-  opopup.style.height = oidentify.style.display === 'none' ? '78px' : '58px';
-  opopup.children[0].style.position = oidentify.style.display === 'none' ? null : 'sticky';
-  ocardtitle.style.display = oidentify.style.display === 'none' ? null : 'none';
+  opopup.style.height = oidentify.style.display === 'none' ? '58px' : '78px';
+  opopup.children[0].style.position = oidentify.style.display === 'none' ? 'sticky' : null;
+  ocardtitle.style.display = oidentify.style.display === 'none' ? 'none' : null;
 }
 
 /**
