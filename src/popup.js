@@ -5,7 +5,7 @@ function render(target) {
       <div class="o-popup o-card">
         <div class="flex row justify-end">
           <div id="o-card-title" class="justify-start margin-y-smaller margin-left text-weight-bold" style="width:100%;"></div>
-          <button id="o-minimize-button" class="small round margin-top-smaller margin-bottom-auto margin-right-small icon-smallest grey-lightest no-shrink" aria-label="Minimera">
+          <button id="o-minimize-button" class="small round margin-top-smaller margin-bottom-auto margin-left-small margin-right-small icon-smallest grey-lightest no-shrink" aria-label="Minimera">
             <span class="icon ">_</span>
           </button>
           <button id="o-close-button" class="small round margin-top-smaller margin-bottom-auto margin-right-small icon-smallest grey-lightest no-shrink" aria-label="Stäng">
@@ -63,8 +63,12 @@ function setContent(config) {
 function minimizePopup() {
   const oidentify = document.getElementById('o-identify');
   const opopup = document.getElementById('o-popup');
+  const ocardtitle = document.getElementById('o-card-title');
   oidentify.style.display = oidentify.style.display === 'none' ? 'block' : 'none';
   opopup.style.width = oidentify.style.display === 'none' ? 'auto' : null;
+  opopup.style.height = oidentify.style.display === 'none' ? '78px' : '58px';
+  opopup.children[0].style.position = oidentify.style.display === 'none' ? null : 'sticky';
+  ocardtitle.style.display = oidentify.style.display === 'none' ? null : 'none';
 }
 
 /**
