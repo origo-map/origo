@@ -74,49 +74,7 @@ const DragAndDrop = function DragAndDrop(options = {}) {
       const styleByAttribute = options.styleByAttribute || false;
       const zoomToExtent = options.zoomToExtent !== false;
       const zoomToExtentOnLoad = options.zoomToExtentOnLoad !== false;
-      const featureStyles = options.featureStyles || {
-        Point: [{
-          circle: {
-            radius: 5,
-            stroke: {
-              color: [0, 255, 255, 1],
-              width: 0
-            },
-            fill: {
-              color: [0, 255, 255, 1]
-            }
-          }
-        }],
-        LineString: [{
-          stroke: {
-            color: [255, 255, 255, 1],
-            width: 5
-          }
-        },
-        {
-          stroke: {
-            color: [0, 255, 255, 0.5],
-            width: 3
-          }
-        }],
-        Polygon: [{
-          stroke: {
-            color: [255, 255, 255, 1],
-            width: 5
-          }
-        },
-        {
-          stroke: {
-            color: [0, 255, 255, 1],
-            width: 3
-          }
-        },
-        {
-          fill: {
-            color: [0, 255, 255, 0.1]
-          }
-        }]
-      };
+      const featureStyles = options.featureStyles;
       dragAndDrop = new olDragAndDrop({
         formatConstructors: [
           GPXFormat,
@@ -130,6 +88,7 @@ const DragAndDrop = function DragAndDrop(options = {}) {
       this.addInteraction();
 
       dragAndDrop.on('addfeatures', (event) => {
+        const fileExtension = event.file.name.split('.').pop();
         let layerName = event.file.name.split('.')[0].replace(/\W/g, '');
         let layerTitle = event.file.name.split('.')[0];
         if (viewer.getLayer(layerName)) {
@@ -162,15 +121,25 @@ const DragAndDrop = function DragAndDrop(options = {}) {
           features: event.features
         };
         if (!styleByAttribute) {
-          let styles = [];
-          const types = [];
+          const styles = [];
+          const types = new Set();
+          const getStyleFunction = viewer.getStylewindow().getStyleFunction;
           event.features.forEach((feature) => {
-            if (!types.includes(feature.getGeometry().getType())) {
-              styles = styles.concat(featureStyles[feature.getGeometry().getType()]);
+            if (feature.getGeometry() !== null) {
+              const geometryType = feature.getGeometry().getType();
+              if (featureStyles && featureStyles[geometryType]) {
+                if (!types.has(geometryType)) {
+                  styles.push(...featureStyles[geometryType]);
+                  types.add(geometryType);
+                }
+              } else {
+                getStyleFunction(feature);
+              }
             }
-            types.push(feature.getGeometry().getType());
           });
-          layerOptions.styleDef = styles;
+          if (styles.length && (!['kml', 'kmz'].includes(fileExtension.toLowerCase()))) {
+            layerOptions.styleDef = styles;
+          }
         }
         const layer = viewer.addLayer(layerOptions);
         if (zoomToExtentOnLoad) {
