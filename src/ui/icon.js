@@ -4,11 +4,11 @@ import { createStyle, html } from './dom/dom';
 
 export default function Icon(options = {}) {
   let {
-    icon
+    icon,
+    title = ''
   } = options;
   const {
     cls = '',
-    title = '',
     style: styleOptions
   } = options;
 
@@ -19,7 +19,7 @@ export default function Icon(options = {}) {
     render() {
       if (iconType === 'image') {
         return `
-          <img class="${cls}" style="${style}" src=${icon} title="${title}" alt="${title}">
+          <img id="${this.getId()}" class="${cls}" style="${style}" src=${icon} title="${title}" alt="${title}">
         `;
       }
       if (iconType === 'sprite') {
@@ -47,9 +47,10 @@ export default function Icon(options = {}) {
         el.parentNode.replaceChild(newEl, el);
       }
     },
-    setIcon(newIcon) {
+    setIcon(newIcon, newTitle) {
       iconType = typeOfIcon(newIcon);
       icon = newIcon;
+      if (newTitle) title = newTitle;
       this.update();
     }
   });

@@ -137,9 +137,9 @@ export default function Button(options = {}) {
                 ${getTooltip()}
               </button>`;
     },
-    setIcon(newIcon) {
+    setIcon(newIcon, newTitle) {
       if (iconComponent) {
-        iconComponent.setIcon(newIcon);
+        iconComponent.setIcon(newIcon, newTitle);
       }
     },
     setState

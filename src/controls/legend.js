@@ -51,6 +51,7 @@ const Legend = function Legend(options = {}) {
   let visibleOverlaysCmp;
   let mainContainerEl;
   const backgroundLayerButtons = [];
+  const cycleButtons = [];
   let toggleGroup;
   let layerSwitcherEl;
   let addLayerButton;
@@ -81,6 +82,63 @@ const Legend = function Legend(options = {}) {
         }
       }
     }
+  };
+
+  const addCycleButtons = (cycleGroups) => {
+    Object.values(cycleGroups).forEach((cycleGroup) => {
+      let activeLayer = cycleGroup.find((layer) => layer.get('visible') === true);
+      activeLayer = activeLayer || cycleGroup[0];
+      activeLayer = [activeLayer];
+
+      let styleName = activeLayer[0].get('styleName') || 'default';
+      let icon = viewer.getStyle(styleName) ? imageSource(viewer.getStyle(styleName)) : 'img/png/farg.png';
+      const title = activeLayer[0].get('title');
+      const cycleButton = Button({
+        icon,
+        title,
+        cls: 'round smallest border icon-small icon-bg cycle-even',
+        state: activeLayer[0].get('visible') ? 'active' : 'initial',
+        data: {
+          layers: cycleGroup,
+          activeLayer,
+          numberOfLayers: cycleGroup.length,
+          isEven: true
+        },
+        methods: {
+          active: () => {
+            activeLayer[0].setVisible(true);
+          },
+          initial: () => {
+            activeLayer[0].setVisible(false);
+          }
+        },
+        click() {
+          if (this.getState() === 'active') {
+            this.data.activeLayer[0].setVisible(false);
+            const currIndex = this.data.layers.indexOf(this.data.activeLayer[0]);
+            const newIndex = (currIndex + 1) % this.data.numberOfLayers;
+            this.data.activeLayer[0] = this.data.layers[newIndex];
+            this.data.activeLayer[0].setVisible(true);
+
+            styleName = this.data.activeLayer[0].get('styleName') || 'default';
+            icon = viewer.getStyle(styleName) ? imageSource(viewer.getStyle(styleName)) : 'img/png/farg.png';
+            this.setIcon(icon, this.data.activeLayer[0].get('title'));
+            const element = document.getElementById(this.getId());
+
+            if (this.data.isEven) {
+              element.classList.remove('cycle-even');
+              element.classList.add('cycle-odd');
+              this.data.isEven = false;
+            } else {
+              element.classList.add('cycle-even');
+              element.classList.remove('cycle-odd');
+              this.data.isEven = true;
+            }
+          }
+        }
+      });
+      cycleButtons.push(cycleButton);
+    });
   };
 
   const addBackgroundButton = function addBackgroundButton(layer) {
@@ -594,10 +652,26 @@ const Legend = function Legend(options = {}) {
       }
       viewer.on('active:togglevisibleLayers', toggleShowVisibleLayers);
 
-      const backgroundLayers = viewer.getLayersByProperty('group', 'background').reverse();
+      const cycleGroups = {};
+
+      viewer.getLayersByProperty('group', 'background')
+        .forEach(layer => {
+          const cycleGroup = layer.get('cycleGroup');
+          if (cycleGroup) {
+            if (!cycleGroups[cycleGroup]) {
+              cycleGroups[cycleGroup] = [layer];
+            } else {
+              cycleGroups[cycleGroup].push(layer);
+            }
+          }
+        });
+
+      const backgroundLayers = viewer.getLayersByProperty('group', 'background')
+        .filter(layer => !layer.get('cycleGroup')).reverse();
       addBackgroundButtons(backgroundLayers);
+      addCycleButtons(cycleGroups);
       toggleGroup = ToggleGroup({
-        components: backgroundLayerButtons,
+        components: backgroundLayerButtons.concat(cycleButtons),
         cls: 'spacing-horizontal-small'
       });
       this.render();
