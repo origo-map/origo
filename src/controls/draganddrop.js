@@ -125,14 +125,16 @@ const DragAndDrop = function DragAndDrop(options = {}) {
           const types = new Set();
           const getStyleFunction = viewer.getStylewindow().getStyleFunction;
           event.features.forEach((feature) => {
-            const geometryType = feature.getGeometry().getType();
-            if (featureStyles && featureStyles[geometryType]) {
-              if (!types.has(geometryType)) {
-                styles.push(...featureStyles[geometryType]);
-                types.add(geometryType);
+            if (feature.getGeometry() !== null) {
+              const geometryType = feature.getGeometry().getType();
+              if (featureStyles && featureStyles[geometryType]) {
+                if (!types.has(geometryType)) {
+                  styles.push(...featureStyles[geometryType]);
+                  types.add(geometryType);
+                }
+              } else {
+                getStyleFunction(feature);
               }
-            } else {
-              getStyleFunction(feature);
             }
           });
           if (styles.length && (!['kml', 'kmz'].includes(fileExtension.toLowerCase()))) {
