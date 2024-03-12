@@ -85,13 +85,36 @@ const Legend = function Legend(options = {}) {
   };
 
   const addCycleButtons = (cycleGroups) => {
+    const cycleAButton = function cycleAButton(button, layer) {
+      const theButton = button;
+      theButton.data.activeLayer[0].setVisible(false);
+
+      const newIndex = theButton.data.layers.indexOf(layer);
+      theButton.data.activeLayer[0] = theButton.data.layers[newIndex];
+      theButton.data.activeLayer[0].setVisible(true);
+
+      const styleName = theButton.data.activeLayer[0].get('styleName') || 'default';
+      const icon = viewer.getStyle(styleName) ? imageSource(viewer.getStyle(styleName)) : 'img/png/farg.png';
+      theButton.setIcon(icon, theButton.data.activeLayer[0].get('title'));
+      const element = document.getElementById(theButton.getId());
+
+      if (theButton.data.isEven) {
+        element.classList.remove('cycle-even');
+        element.classList.add('cycle-odd');
+        theButton.data.isEven = false;
+      } else {
+        element.classList.add('cycle-even');
+        element.classList.remove('cycle-odd');
+        theButton.data.isEven = true;
+      }
+    };
     Object.values(cycleGroups).forEach((cycleGroup) => {
       let activeLayer = cycleGroup.find((layer) => layer.get('visible') === true);
       activeLayer = activeLayer || cycleGroup[0];
       activeLayer = [activeLayer];
 
-      let styleName = activeLayer[0].get('styleName') || 'default';
-      let icon = viewer.getStyle(styleName) ? imageSource(viewer.getStyle(styleName)) : 'img/png/farg.png';
+      const styleName = activeLayer[0].get('styleName') || 'default';
+      const icon = viewer.getStyle(styleName) ? imageSource(viewer.getStyle(styleName)) : 'img/png/farg.png';
       const title = activeLayer[0].get('title');
       const cycleButton = Button({
         icon,
@@ -106,7 +129,7 @@ const Legend = function Legend(options = {}) {
         },
         methods: {
           active: () => {
-            activeLayer[0].setVisible(true);
+            if (activeLayer[0].getVisible() === false) activeLayer[0].setVisible(true);
           },
           initial: () => {
             activeLayer[0].setVisible(false);
@@ -114,28 +137,25 @@ const Legend = function Legend(options = {}) {
         },
         click() {
           if (this.getState() === 'active') {
-            this.data.activeLayer[0].setVisible(false);
             const currIndex = this.data.layers.indexOf(this.data.activeLayer[0]);
             const newIndex = (currIndex + 1) % this.data.numberOfLayers;
-            this.data.activeLayer[0] = this.data.layers[newIndex];
-            this.data.activeLayer[0].setVisible(true);
-
-            styleName = this.data.activeLayer[0].get('styleName') || 'default';
-            icon = viewer.getStyle(styleName) ? imageSource(viewer.getStyle(styleName)) : 'img/png/farg.png';
-            this.setIcon(icon, this.data.activeLayer[0].get('title'));
-            const element = document.getElementById(this.getId());
-
-            if (this.data.isEven) {
-              element.classList.remove('cycle-even');
-              element.classList.add('cycle-odd');
-              this.data.isEven = false;
-            } else {
-              element.classList.add('cycle-even');
-              element.classList.remove('cycle-odd');
-              this.data.isEven = true;
-            }
+            cycleAButton(this, this.data.layers[newIndex]);
           }
         }
+      });
+      cycleGroup.forEach(layer => {
+        layer.on('change:visible', () => {
+          if (layer.getVisible() === true) {
+            if (layer === cycleButton.data.activeLayer[0]) {
+              cycleButton.setState('active');
+            } else {
+              cycleAButton(cycleButton, layer);
+              cycleButton.setState('active');
+            }
+          } else if (!(cycleGroup.some(aLayer => aLayer.getVisible()))) {
+            cycleButton.setState('initial');
+          }
+        });
       });
       cycleButtons.push(cycleButton);
     });
@@ -150,8 +170,12 @@ const Legend = function Legend(options = {}) {
       title: layer.get('title'),
       state: layer.get('visible') ? 'active' : undefined,
       methods: {
-        active: () => layer.setVisible(true),
-        initial: () => layer.setVisible(false)
+        active: () => {
+          layer.setVisible(true);
+        },
+        initial: () => {
+          layer.setVisible(false);
+        }
       },
       click() {
         const overlayComponent = visibleLayersControl && visibleLayersViewActive ? visibleOverlaysCmp : overlaysCmp;
@@ -443,7 +467,9 @@ const Legend = function Legend(options = {}) {
       const groupExclusive = (viewer.getGroup(layerGroup) && (viewer.getGroup(layerGroup).exclusive || viewer.getGroup(layerGroup).name === 'background'));
       if (groupExclusive) {
         const layers = viewer.getLayersByProperty('group', layerGroup);
-        layers.forEach(l => l.setVisible(false));
+        layers.forEach(l => {
+          l.setVisible(false);
+        });
       }
       layer.setVisible(true);
       document.getElementsByClassName('o-search-layer-field')[0].value = '';
