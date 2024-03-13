@@ -158,12 +158,8 @@ const Legend = function Legend(options = {}) {
       title: layer.get('title'),
       state: layer.get('visible') ? 'active' : undefined,
       methods: {
-        active: () => {
-          layer.setVisible(true);
-        },
-        initial: () => {
-          layer.setVisible(false);
-        }
+        active: () => layer.setVisible(true),
+        initial: () => layer.setVisible(false)
       },
       click() {
         const overlayComponent = visibleLayersControl && visibleLayersViewActive ? visibleOverlaysCmp : overlaysCmp;
@@ -455,9 +451,7 @@ const Legend = function Legend(options = {}) {
       const groupExclusive = (viewer.getGroup(layerGroup) && (viewer.getGroup(layerGroup).exclusive || viewer.getGroup(layerGroup).name === 'background'));
       if (groupExclusive) {
         const layers = viewer.getLayersByProperty('group', layerGroup);
-        layers.forEach(l => {
-          l.setVisible(false);
-        });
+        layers.forEach(l => l.setVisible(false));
       }
       layer.setVisible(true);
       document.getElementsByClassName('o-search-layer-field')[0].value = '';
