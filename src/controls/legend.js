@@ -95,18 +95,7 @@ const Legend = function Legend(options = {}) {
 
       const styleName = theButton.data.activeLayer[0].get('styleName') || 'default';
       const icon = viewer.getStyle(styleName) ? imageSource(viewer.getStyle(styleName)) : 'img/png/farg.png';
-      theButton.setIcon(icon, theButton.data.activeLayer[0].get('title'));
-      const element = document.getElementById(theButton.getId());
-
-      if (theButton.data.isEven) {
-        element.classList.remove('cycle-even');
-        element.classList.add('cycle-odd');
-        theButton.data.isEven = false;
-      } else {
-        element.classList.add('cycle-even');
-        element.classList.remove('cycle-odd');
-        theButton.data.isEven = true;
-      }
+      theButton.setIcon(icon, `Växla: ${theButton.data.activeLayer[0].get('title')}`);
     };
     Object.values(cycleGroups).forEach((cycleGroup) => {
       let activeLayer = cycleGroup.find((layer) => layer.get('visible') === true);
@@ -118,14 +107,13 @@ const Legend = function Legend(options = {}) {
       const title = activeLayer[0].get('title');
       const cycleButton = Button({
         icon,
-        title,
-        cls: 'round smallest border icon-small icon-bg cycle-even',
+        title: `Växla: ${title}`,
+        cls: 'round smallest border icon-small icon-bg cycle',
         state: activeLayer[0].get('visible') ? 'active' : 'initial',
         data: {
           layers: cycleGroup,
           activeLayer,
-          numberOfLayers: cycleGroup.length,
-          isEven: true
+          numberOfLayers: cycleGroup.length
         },
         methods: {
           active: () => {
