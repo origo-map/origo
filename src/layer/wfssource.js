@@ -118,7 +118,7 @@ class WfsSource extends VectorSource {
       } else {
         requestExtent = ext;
       }
-      // If extent is used but no filters are set, just use the BBOX parameter.
+      // If extent is used but no filters are set, just return the BBOX parameter.
       if (!layerFilter && !extraFilter) {
         queryFilter = `&BBOX=${requestExtent.join(',')},${this._options.dataProjection}`;
         return queryFilter;
@@ -126,7 +126,7 @@ class WfsSource extends VectorSource {
     }
 
     // Integrate provided layer filters, `extraFilter` and extent into a single query filter
-    // Both QGIS and GeoServer treats the WFS parameters `BBOX` and `FeatureId` as mutually exclusive,
+    // Both QGIS and GeoServer treats the WFS parameters `BBOX` and `CQL_FILTER`/`EXP_FILTER` as mutually exclusive,
     // so instead of BBOX we use the vendor filters also for the extent filtering.
     switch (this._options.filterType) {
       case 'cql': {
