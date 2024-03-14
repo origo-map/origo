@@ -23,13 +23,9 @@ wfs.request = function request(layer) {
     const serverUrl = options.url;
     let queryFilter;
 
-    if (options.filter) {
-      if (options.filterType === 'qgis') {
-        queryFilter = `&BBOX=${options.extent.join(',')},${options.projectionCode}&EXP_FILTER=${options.filter}`;
-      } else {
     // If cql filter then bbox must be used in the filter.
+    if (options.filter) {
       queryFilter = `&CQL_FILTER=${options.filter} AND BBOX(${options.geometryName},${options.extent.join(',')},'${options.projectionCode}')`;
-      }
     } else {
       queryFilter = `&BBOX=${options.extent.join(',')},${options.projectionCode}`;
     }
