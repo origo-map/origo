@@ -220,7 +220,7 @@ class WfsSource extends VectorSource {
         }
       }
     } else { // If there are no ids requested, append the query filter
-      url += this.createQueryFilter(extent, extraFilter, ignoreOriginalFilter);
+      url += this._createQueryFilter(extent, extraFilter, ignoreOriginalFilter);
     }
     url = encodeURI(url);
 
