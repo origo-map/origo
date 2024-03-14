@@ -10,6 +10,7 @@ wfs.request = function request(layer) {
   sourceOptions.filter = layer.get('filter');
   sourceOptions.projectionCode = viewer.getProjectionCode();
   sourceOptions.extent = layer.get('extent');
+  sourceOptions.projectionCode = viewer.getProjectionCode();
 
   const req = createRequest(sourceOptions);
   return req;
