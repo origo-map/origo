@@ -6,9 +6,8 @@ let projection;
 const sourceType = {};
 
 /**
- * Fetches features from a layer's source but does not add them to the layer. Supports WFS (GeoServer and QGIS Server) and AGS_FEATURE although functionality differs.
- * Mainly used by search, but is also exposed as an api function that MultiSelect uses. As a quirky bonus it also supports fetching features from WMS layers if there
- * is a WFS service at the same endpoint.
+ * Fetches features from a layer's source but does not add them to the layer. Supports WFS and AGS_FEATURE altough functionality differs. Mainly used by search, but
+ * is also exposed as an api function that MultiSelect uses. As a quirky bonus it also supports fetching features from WMS layers if there is a WFS service at the same endpoint.
  *
  * @param {any} id Comma separated list of ids. If specified layer's filter and parameter extent is ignored (even configured map and layer extent is ignored).
  * @param {any} layer Layer instance to fetch from
@@ -22,14 +21,13 @@ export default function getfeature(id, layer, source, projCode, proj, extent) {
   projectionCode = projCode;
   projection = proj;
   const serverUrl = source[layer.get('sourceName')].url;
-  const filterType = source[layer.get('sourceName')].filterType;
   const type = layer.get('type');
   // returns a promise with features as result
   if (type === 'AGS_FEATURE') {
     return sourceType.AGS_FEATURE(id, layer, serverUrl);
   }
   // Note that this includes WMS which MultiSelect utilizes to make an WFS request to an unknown WFS layer assumed to reside on same place as WMS layer!
-  return sourceType.WFS(id, layer, serverUrl, filterType, extent);
+  return sourceType.WFS(id, layer, serverUrl, extent);
 }
 
 function fail(response) {
@@ -67,7 +65,7 @@ sourceType.AGS_FEATURE = function agsFeature(id, layer, serverUrl) {
   })).catch(error => console.error(error));
 };
 
-sourceType.WFS = function wfsSourceType(id, layer, serverUrl, filterType, extent) {
+sourceType.WFS = function wfsSourceType(id, layer, serverUrl, extent) {
   let wfsSource;
   const layerType = layer.get('type');
   // Create a temporary WFS source if layer is WMS.
@@ -80,7 +78,6 @@ sourceType.WFS = function wfsSourceType(id, layer, serverUrl, filterType, extent
       dataProjection: projectionCode,
       projectionCode,
       loadingstrategy: 'all',
-      filterType,
       requestMethod: 'GET',
       url: serverUrl,
       customExtent: layer.get('extent'),
