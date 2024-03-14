@@ -94,11 +94,12 @@ class WfsSource extends VectorSource {
   /**
    * Generate a wfs query filter according to the wfs layer source's `filterType` (`cql`|`qgis`).
    * If specified, an extra filter is combined with any layer filter already present.
+   * Consider this function to be private to this class.
    * @param {any} extent Extent to query. If specified the result is limited to the intersection of this parameter and layer's extent configuration
    * @param {any} extraFilter Optional extra filter for this call with syntax matching the source's `filterType` (`cql`|`qgis`). Will be combined with any configured layer filter unless ignoreOriginalFilter is true
    * @param {any} ignoreOriginalFilter true if configured layer filter should be ignored for this call, making parameter extraFilter the only filter (if specified)
    */
-  createQueryFilter(extent, extraFilter, ignoreOriginalFilter) {
+  _createQueryFilter(extent, extraFilter, ignoreOriginalFilter) {
     let layerFilter = '';
     let queryFilter = '';
     // Add layer filter unless `ignoreOriginalFilter` is set
