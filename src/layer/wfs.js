@@ -8,7 +8,7 @@ export default function wfs(layerOptions, viewer) {
     layerType: 'vector'
   };
   const sourceDefault = {
-    filterType: 'cql'
+    filterType: layerOptions.filterType || 'cql'
   };
   const wfsOptions = Object.assign({}, wfsDefault, layerOptions);
   const sourceOptions = Object.assign({}, sourceDefault, viewer.getMapSource()[layerOptions.sourceName]);
