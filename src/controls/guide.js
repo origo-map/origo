@@ -6,32 +6,23 @@ const Guide = function Guide(options = {}) {
   const contentItems = [];
   const {
     title = 'Guide',
-    cls,
-    style,
-    activeOnstart = false,
     url
+  } = options;
+  let {
+    target
   } = options;
   let viewer;
   let guideButton;
   let guideButtonEl;
-  let hideButton;
   let nextButton;
   let prevButton;
   let modal;
   let component;
   let content;
-  let contentKey;
-  let visibilityKey;
   let items;
   let currentIndex = 0;
   let list;
   let prevElClass;
-  let {
-    target,
-    hideButtonVisible,
-    hideText,
-    confirmText
-  } = options;
   let contentCreated = false;
 
   // Fetches the controls defined in json configuration and origos default controls
@@ -157,25 +148,6 @@ const Guide = function Guide(options = {}) {
     content += prevButtonHtml;
     return content;
   };
-  // Adds the hide button
-  const addHideButton = () => {
-    const hideButtonHtml = hideButton.render();
-    content += hideButtonHtml;
-    return content;
-  };
-  const clearLocalStorage = () => {
-    localStorage.removeItem(visibilityKey);
-    localStorage.removeItem(contentKey);
-  };
-  const setLocalStorage = () => {
-    const newContent = localStorage.getItem(contentKey) !== content;
-    if (localStorage.getItem(visibilityKey) !== 'false' || content) {
-      localStorage.setItem(contentKey, content);
-      if (newContent) {
-        localStorage.setItem(visibilityKey, 'true');
-      }
-    }
-  };
 
   // Uppdates the sliders item to show and toggles the animation for target control
   const updateDisplayedItem = (prevElSelector) => {
@@ -203,26 +175,30 @@ const Guide = function Guide(options = {}) {
     component.addComponents([nextButton, prevButton]);
     content = `<ul id="o-guide-slides-container">${contentItems.join(' ')}</ul>`;
     content = moveButtons();
-    if (hideButton) {
-      setLocalStorage();
-      component.addComponents([hideButton]);
-      content = addHideButton();
-    } else {
-      clearLocalStorage();
-    }
-    if (localStorage.getItem(visibilityKey) !== 'false') {
-      modal = Modal({
-        title,
-        content,
-        cls,
-        target,
-        style: `text-align: center;${style}`
-      });
-      component.dispatch('render');
-    }
+    modal = Modal({
+      title,
+      content,
+      cls: 'guideModal',
+      target,
+      style: 'text-align: center'
+    });
+    component.dispatch('render');
     list = document.getElementById('o-guide-slides-container');
     items = Array.from(list.children);
     updateDisplayedItem();
+
+    // Observers if guide modal is removed from DOM and sets the proper state to guide button
+    const observer = new MutationObserver((mutationsList) => {
+      mutationsList.forEach((mutation) => {
+        mutation.removedNodes.forEach((removedNode) => {
+          if (removedNode.id === modal.getId()) {
+            guideButton.setState('initial');
+            observer.disconnect();
+          }
+        });
+      });
+    });
+    observer.observe(document.getElementsByClassName('o-main')[0], { subtree: false, childList: true });
   };
 
   return Component({
@@ -234,30 +210,16 @@ const Guide = function Guide(options = {}) {
         tooltipText: title,
         tooltipPlacement: 'east',
         click() {
-          createModal();
+          // Creates or removes modal depending of guide button state
+          if (this.getState() === 'initial') {
+            createModal();
+            this.setState('active');
+          } else if (this.getState() === 'active') {
+            modal.closeModal();
+            this.setState('initial');
+          }
         }
       });
-      if (options.hideButton) {
-        hideButtonVisible = Object.prototype.hasOwnProperty.call(options.hideButton, 'visible') ? options.hideButton.visible : false;
-        hideText = Object.prototype.hasOwnProperty.call(options.hideButton, 'hideText') ? options.hideButton.hideText : 'Visa inte igen';
-        confirmText = Object.prototype.hasOwnProperty.call(options.hideButton, 'confirmText') ? options.hideButton.confirmText : 'Är du säker på att du inte vill se guiden igen?';
-      }
-      if (hideButtonVisible) {
-        hideButton = Button({
-          cls: 'rounded margin-top-small padding-y grey-lightest',
-          style: 'display: inline-block;',
-          text: hideText,
-          click() {
-            const proceed = window.confirm(confirmText);
-            if (proceed) {
-              const currentTarget = document.querySelectorAll('.o-guide-target')[0];
-              currentTarget.classList.remove('o-guide-target');
-              modal.closeModal();
-              localStorage.setItem(visibilityKey, false);
-            }
-          }
-        });
-      }
       nextButton = Button({
         cls: 'rounded margin-top-small padding-y icon-small hover',
         style: 'float: right',
@@ -291,11 +253,6 @@ const Guide = function Guide(options = {}) {
       component = this;
       viewer = evt.target;
       target = document.querySelectorAll('.o-main')[0].id;
-      contentKey = `guideContent;${window.location.pathname};${viewer.getMapName().split('.')[0]}`;
-      visibilityKey = `guideVisibility;${window.location.pathname};${viewer.getMapName().split('.')[0]}`;
-      if (activeOnstart) {
-        createModal();
-      }
       this.addComponents([guideButton]);
       this.render();
     },
