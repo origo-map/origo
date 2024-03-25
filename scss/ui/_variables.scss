@@ -132,6 +132,7 @@ $size-full: calc(100% - (#{$app-margin} * 2));
 $size-100: 100%;
 
 // padding
+$padding-largest: $size-7;
 $padding-larger: $size-5;
 $padding-large: $size-2;
 $padding-standard: $size-1;
