@@ -698,7 +698,7 @@ const Legend = function Legend(options = {}) {
         cls: 'flex padding-small no-shrink',
         style: {
           'background-color': '#fff',
-          height: '50px',
+          'max-width: '300px',
           'border-top': '1px solid #dbdbdb',
           'border-radius': '0.5rem'
         },
