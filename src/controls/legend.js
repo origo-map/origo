@@ -196,7 +196,7 @@ const Legend = function Legend(options = {}) {
     },
     style: {
       'vertical-align': 'bottom',
-      'margin-bottom': '4px',
+      'margin-bottom': '7px',
       'padding-right': '6px'
     },
     icon: '#ic_close_fullscreen_24px',
