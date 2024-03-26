@@ -698,7 +698,6 @@ const Legend = function Legend(options = {}) {
         cls: 'flex padding-small no-shrink',
         style: {
           'background-color': '#fff',
-          'max-width': '300px',
           'border-top': '1px solid #dbdbdb',
           'border-radius': '0.5rem'
         },
@@ -711,7 +710,8 @@ const Legend = function Legend(options = {}) {
         cls: 'flex column relative width-100',
         components: mainContainerComponents,
         style: {
-          'max-height': `${maxHeight}px`
+          'max-height': `${maxHeight}px`,
+          'width': 'min-content'
         }
       });
 
