@@ -212,7 +212,8 @@ const Legend = function Legend(options = {}) {
       viewer.dispatch('active:togglevisibleLayers');
     },
     style: {
-      'align-self': 'right',
+      'vertical-align': 'bottom',
+      'margin-bottom': '7px',
       'padding-right': '6px'
     },
     icon: '#ic_open_in_full_24px',
@@ -693,9 +694,11 @@ const Legend = function Legend(options = {}) {
       legendControlCmps.push(closeButton);
 
       const legendControlCmp = El({
-        cls: 'grow flex justify-end align-center no-shrink',
+        cls: 'grow flex no-shrink',
         style: {
-          display: 'inline'
+          display: 'inline',
+          'text-align': 'right',
+          'margin-right': '6px'
         },
         components: legendControlCmps
       });
