@@ -707,7 +707,7 @@ const Legend = function Legend(options = {}) {
       const mainContainerComponents = [overlaysCmp, visibleOverlaysCmp, toolsCmp, baselayersCmp];
 
       mainContainerCmp = El({
-        cls: 'flex column relative width-100',
+        cls: 'flex column relative',
         components: mainContainerComponents,
         style: {
           'max-height': `${maxHeight}px`,
