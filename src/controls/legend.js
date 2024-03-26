@@ -689,6 +689,9 @@ const Legend = function Legend(options = {}) {
 
       const legendControlCmp = El({
         cls: 'grow flex justify-end align-center no-shrink',
+        style: {
+          'display': 'inline'
+        },
         components: legendControlCmps
       });
 
