@@ -195,7 +195,8 @@ const Legend = function Legend(options = {}) {
       viewer.dispatch('active:togglevisibleLayers');
     },
     style: {
-      'align-self': 'right',
+      'vertical-align': 'bottom',
+      'margin-bottom': '4px',
       'padding-right': '6px'
     },
     icon: '#ic_close_fullscreen_24px',
