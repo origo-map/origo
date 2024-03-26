@@ -666,7 +666,7 @@ const Legend = function Legend(options = {}) {
         style: {
           'vertical-align': 'bottom',
           'margin-bottom': '4px'
-        }
+        },
         icon: '#ic_close_24px',
         state: closeButtonState,
         validStates: ['initial', 'hidden'],
