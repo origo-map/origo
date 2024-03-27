@@ -195,7 +195,8 @@ const Legend = function Legend(options = {}) {
       viewer.dispatch('active:togglevisibleLayers');
     },
     style: {
-      'align-self': 'right',
+      'vertical-align': 'bottom',
+      'margin-bottom': '7px',
       'padding-right': '6px'
     },
     icon: '#ic_close_fullscreen_24px',
@@ -211,7 +212,8 @@ const Legend = function Legend(options = {}) {
       viewer.dispatch('active:togglevisibleLayers');
     },
     style: {
-      'align-self': 'right',
+      'vertical-align': 'bottom',
+      'margin-bottom': '7px',
       'padding-right': '6px'
     },
     icon: '#ic_open_in_full_24px',
@@ -662,6 +664,10 @@ const Legend = function Legend(options = {}) {
       const closeButtonState = isExpanded ? 'initial' : 'hidden';
       closeButton = Button({
         cls: 'icon-smaller small round grey-lightest',
+        style: {
+          'vertical-align': 'bottom',
+          'margin-bottom': '4px'
+        },
         icon: '#ic_close_24px',
         state: closeButtonState,
         validStates: ['initial', 'hidden'],
@@ -688,7 +694,12 @@ const Legend = function Legend(options = {}) {
       legendControlCmps.push(closeButton);
 
       const legendControlCmp = El({
-        cls: 'grow flex justify-end align-center no-shrink',
+        cls: 'grow flex no-shrink',
+        style: {
+          display: 'inline',
+          'text-align': 'right',
+          'margin-right': '6px'
+        },
         components: legendControlCmps
       });
 
@@ -698,7 +709,6 @@ const Legend = function Legend(options = {}) {
         cls: 'flex padding-small no-shrink',
         style: {
           'background-color': '#fff',
-          height: '50px',
           'border-top': '1px solid #dbdbdb',
           'border-radius': '0.5rem'
         },
@@ -708,10 +718,11 @@ const Legend = function Legend(options = {}) {
       const mainContainerComponents = [overlaysCmp, visibleOverlaysCmp, toolsCmp, baselayersCmp];
 
       mainContainerCmp = El({
-        cls: 'flex column relative width-100',
+        cls: 'flex column relative',
         components: mainContainerComponents,
         style: {
-          'max-height': `${maxHeight}px`
+          'max-height': `${maxHeight}px`,
+          width: 'min-content'
         }
       });
 
