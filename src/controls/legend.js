@@ -196,7 +196,7 @@ const Legend = function Legend(options = {}) {
     },
     style: {
       'vertical-align': 'bottom',
-      'margin-bottom': '7px',
+      'margin-bottom': '13px',
       'padding-right': '6px'
     },
     icon: '#ic_close_fullscreen_24px',
@@ -213,7 +213,7 @@ const Legend = function Legend(options = {}) {
     },
     style: {
       'vertical-align': 'bottom',
-      'margin-bottom': '7px',
+      'margin-bottom': '13px',
       'padding-right': '6px'
     },
     icon: '#ic_open_in_full_24px',
@@ -666,7 +666,8 @@ const Legend = function Legend(options = {}) {
         cls: 'icon-smaller small round grey-lightest',
         style: {
           'vertical-align': 'bottom',
-          'margin-bottom': '4px'
+          'margin-bottom': '8.5px',
+          'margin-top': '-2px'
         },
         icon: '#ic_close_24px',
         state: closeButtonState,
@@ -710,7 +711,8 @@ const Legend = function Legend(options = {}) {
         style: {
           'background-color': '#fff',
           'border-top': '1px solid #dbdbdb',
-          'border-radius': '0.5rem'
+          'border-radius': '0.5rem',
+          'padding-bottom': '6px'
         },
         components: baselayerCmps
       });
