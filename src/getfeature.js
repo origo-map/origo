@@ -7,7 +7,7 @@ const sourceType = {};
 
 /**
  * Fetches features from a layer's source but does not add them to the layer. Supports WFS and AGS_FEATURE altough functionality differs. Mainly used by search, but
- * is also exposed as an api function that MultiSelect uses. As q quirky bonus it also support fetching features from WMS layers if there is a WFS service at the same endpoint.
+ * is also exposed as an api function that MultiSelect uses. As a quirky bonus it also supports fetching features from WMS layers if there is a WFS service at the same endpoint.
  *
  * @param {any} id Comma separated list of ids. If specified layer's filter and parameter extent is ignored (even configured map and layer extent is ignored).
  * @param {any} layer Layer instance to fetch from
