@@ -170,14 +170,11 @@ const LayerRow = function LayerRow(options) {
       return getTitleWithIcon(title, getStyleIcon(style[0]));
     }
 
-    const hasThematicStyle = (layer.get('thematicStyling') === true);
     const children = style.map((thisStyle, index) => {
-      if (!(isHidden(thisStyle))) {
-        if ((!(hasThematicStyle)) || (!(thisStyle[0]?.visible === false))) {
-          const styleIcon = getStyleIcon(thisStyle);
-          const rowTitle = thisStyle[0].label ? thisStyle[0].label : index + 1;
-          return getListItem(rowTitle, styleIcon);
-        }
+      if (!isHidden(thisStyle)) {
+        const styleIcon = getStyleIcon(thisStyle);
+        const rowTitle = thisStyle[0].label ? thisStyle[0].label : index + 1;
+        return getListItem(rowTitle, styleIcon);
       }
       return '';
     });
@@ -208,16 +205,11 @@ const LayerRow = function LayerRow(options) {
       return getTitleWithIcon(title, icon);
     }
 
-    const thematicStyle = (layer.get('thematicStyling') === true) ? viewer.getStyle(layer.get('styleName')) : undefined;
-    const rules = json.Legend[0].rules.reduce((okRules, rule, index) => {
-      if (!(layer.get('thematicStyling')) || thematicStyle[0]?.thematic[index]?.visible) {
-        const ruleImageUrl = `${getLegendGraphicUrl}&rule=${rule.name}`;
-        const rowTitle = rule.title ? rule.title : index + 1;
-        okRules.push(getListItem(rowTitle, ruleImageUrl, true));
-      }
-      return okRules;
-    }, []);
-
+    const rules = json.Legend[0].rules.map((rule, index) => {
+      const ruleImageUrl = `${getLegendGraphicUrl}&rule=${rule.name}`;
+      const rowTitle = rule.title ? rule.title : index + 1;
+      return getListItem(rowTitle, ruleImageUrl, true);
+    });
     return getTitleWithChildren(title, rules);
   };
 
