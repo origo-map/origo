@@ -652,7 +652,7 @@ const Legend = function Legend(options = {}) {
       visibleOverlaysCmp = VisibleOverlays({
         viewer, cls: `${contentCls} hidden`, style: contentStyle, labelOpacitySlider
       });
-      const baselayerCmps = [toggleGroup];
+      const baselayerCmps = toggleGroup;
 
       toolsCmp = El({
         cls: 'flex padding-small no-shrink hidden',
