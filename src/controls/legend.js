@@ -717,7 +717,7 @@ const Legend = function Legend(options = {}) {
           'border-radius': '0.5rem',
           'padding-bottom': '6px'
         },
-        components: toggleGroup
+        components: backgroundLayerButtons
       });
 
       const mainContainerComponents = [overlaysCmp, visibleOverlaysCmp, toolsCmp, baselayersCmp];
