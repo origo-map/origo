@@ -600,7 +600,10 @@ const Legend = function Legend(options = {}) {
       addBackgroundButtons(backgroundLayers);
       toggleGroup = ToggleGroup({
         components: backgroundLayerButtons,
-        cls: 'spacing-horizontal-small'
+        cls: 'spacing-horizontal-small',
+        style: {
+          'line-height': 'normal'
+        }
       });
       this.render();
       this.dispatch('render');
