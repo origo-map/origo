@@ -600,10 +600,7 @@ const Legend = function Legend(options = {}) {
       addBackgroundButtons(backgroundLayers);
       toggleGroup = ToggleGroup({
         components: backgroundLayerButtons,
-        cls: 'spacing-horizontal-small',
-        style: {
-          'line-height': 'normal'
-        }
+        cls: 'spacing-horizontal-small'
       });
       this.render();
       this.dispatch('render');
@@ -652,7 +649,7 @@ const Legend = function Legend(options = {}) {
       visibleOverlaysCmp = VisibleOverlays({
         viewer, cls: `${contentCls} hidden`, style: contentStyle, labelOpacitySlider
       });
-      const baselayerCmps = toggleGroup;
+      const baselayerCmps = [toggleGroup];
 
       toolsCmp = El({
         cls: 'flex padding-small no-shrink hidden',
@@ -717,7 +714,7 @@ const Legend = function Legend(options = {}) {
           'border-radius': '0.5rem',
           'padding-bottom': '6px'
         },
-        components: backgroundLayerButtons
+        components: baselayerCmps
       });
 
       const mainContainerComponents = [overlaysCmp, visibleOverlaysCmp, toolsCmp, baselayersCmp];
