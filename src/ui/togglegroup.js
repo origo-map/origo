@@ -45,7 +45,7 @@ const ToggleGroup = function ToggleGroup(options = {}) {
       this.dispatch('render');
     },
     render() {
-      return `<div style="line-height:1"><${tagName} id="${this.getId()}" class="${cls}" style="${style}">
+      return `<div><${tagName} id="${this.getId()}" class="${cls}" style="${style}">
                   ${renderToggleItems(this.getComponents())}
               </${tagName}></div>`;
     }
