@@ -2,7 +2,7 @@ import { Icon, Component, Modal } from '../ui';
 
 let viewer;
 let defaults = {
-  toaster: {
+  toast: {
     status: 'light',
     title: 'Meddelande',
     duration: 5000
@@ -57,22 +57,22 @@ const createModal = function createModal(options) {
   }
 };
 
-const createToaster = function createToaster(options = {}) {
-  const toasterSettings = { ...defaults.toaster, ...options };
+const createToast = function createToast(options = {}) {
+  const toastSettings = { ...defaults.toast, ...options };
   const {
     status,
     duration,
     icon,
     title = '',
     message = ''
-  } = toasterSettings;
+  } = toastSettings;
 
-  const toaster = document.createElement('div');
-  const parentElement = document.getElementById(viewer.getId());
-  parentElement.appendChild(toaster);
-  toaster.classList.add('toaster');
   const contentCls = getClass(status);
-  toaster.classList.add(contentCls);
+  const toast = document.createElement('div');
+  const parentElement = document.getElementById(viewer.getId());
+  parentElement.appendChild(toast);
+  toast.classList.add('logger-toast');
+  toast.classList.add(contentCls);
 
   const content = `
   <div>
@@ -83,10 +83,10 @@ const createToaster = function createToaster(options = {}) {
   </div>
   <span>${message}</span>
   `;
-  toaster.innerHTML = content;
+  toast.innerHTML = content;
 
   setTimeout(() => {
-    toaster.parentNode.removeChild(toaster);
+    toast.parentNode.removeChild(toast);
   }, duration > 0 ? duration : 5000);
 };
 
@@ -95,7 +95,7 @@ const Logger = function Logger(options = {}) {
   return Component({
     name: 'logger',
     createModal,
-    createToaster,
+    createToast,
     onAdd(evt) {
       viewer = evt.target;
       this.render();
