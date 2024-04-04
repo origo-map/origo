@@ -3,16 +3,12 @@ import { Icon, Component, Modal } from '../ui';
 let viewer;
 let defaults = {
   toaster: {
-    status: '',
+    status: 'light',
     title: 'Meddelande',
-    toasterMessages: {
-      success: 'Success!',
-      fail: 'Sorry, something went wrong. Please contact your administrator'
-    },
     duration: 5000
   },
   modal: {
-    status: '',
+    status: 'light',
     title: 'Meddelande',
     duration: 0
   }
