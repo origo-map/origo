@@ -100,6 +100,7 @@ class WfsSource extends VectorSource {
    */
   async _loaderHelper(extent, cql, ignoreOriginalFilter, ids) {
     const serverUrl = this._options.url;
+    const queryParams = this._options.queryParams || {};
 
     // Set up the cql filter as a combination of the layer filter and the temporary cql parameter
     let cqlfilter = '';
@@ -142,6 +143,11 @@ class WfsSource extends VectorSource {
     if (ids || ids === 0) {
       url += `&FeatureId=${ids}`;
     }
+
+    Object.keys(queryParams).forEach(key => {
+      url += `&${key}=${queryParams[key]}`;
+    });
+
     url = encodeURI(url);
 
     // Actually fetch some features
