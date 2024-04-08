@@ -195,7 +195,8 @@ const Legend = function Legend(options = {}) {
       viewer.dispatch('active:togglevisibleLayers');
     },
     style: {
-      'vertical-align': 'super'
+      'vertical-align': 'bottom',
+      'margin-bottom': '0.45rem'
     },
     icon: '#ic_close_fullscreen_24px',
     iconStyle: {
@@ -210,7 +211,8 @@ const Legend = function Legend(options = {}) {
       viewer.dispatch('active:togglevisibleLayers');
     },
     style: {
-      'vertical-align': 'super'
+      'vertical-align': 'bottom',
+      'margin-bottom': '0.45rem'
     },
     icon: '#ic_open_in_full_24px',
     iconStyle: {
