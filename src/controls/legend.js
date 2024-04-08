@@ -663,7 +663,8 @@ const Legend = function Legend(options = {}) {
       closeButton = Button({
         cls: 'icon-smaller small round grey-lightest',
         style: {
-          'vertical-align': 'super'
+          'vertical-align': 'bottom',
+          'margin-bottom': '0.2rem'
         },
         icon: '#ic_close_24px',
         state: closeButtonState,
