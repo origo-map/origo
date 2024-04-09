@@ -81,15 +81,9 @@
     "group": [
       {
         "target": "",
-        "name": "about",
-        "description": "Här finner du mer information om kartan",
-        "icon": "#ic_help_outline_24px"
-      },
-      {
-        "target": "",
-        "name": "link",
-        "description": "Tar dig någon annanstans...",
-        "icon": "#ic_launch_24px"
+        "name": "sharemap",
+        "description": "Dela en länk till din karta med en kompis!",
+        "icon": "#ic_screen_share_outline_24px"
       },
       {
         "target": "",
@@ -99,10 +93,16 @@
       },
       {
         "target": "",
-        "name": "sharemap",
-        "description": "Dela en länk till din karta med en kompis!",
-        "icon": "#ic_screen_share_outline_24px"
+        "name": "about",
+        "description": "Här finner du mer information om kartan",
+        "icon": "#ic_info_outline_24px"
       },
+      {
+        "target": "",
+        "name": "link",
+        "description": "Tar dig någon annanstans...",
+        "icon": "#ic_launch_24px"
+      },      
       {
         "target": "",
         "name": "draw",
