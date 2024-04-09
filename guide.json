@@ -8,13 +8,13 @@
       {
         "target": "o-zoom-in",
         "name": "zoom",
-        "description": "Zooma in i kartan",
+        "description": "Zooma in i kartan, även scrollhjulet kan användas",
         "icon": "#ic_add_24px"
       },
       {
         "target": "o-zoom-out",
         "name": "zoom",
-        "description": "Zooma ut i kartan",
+        "description": "Zooma ut i kartan, även scrollhjulet kan användas",
         "icon": "#ic_remove_24px"
       },
       {
@@ -44,7 +44,7 @@
       {
         "target": "o-measure",
         "name": "measure",
-        "description": "Mät avtånd och ytor",
+        "description": "Mät avtånd och ytor, dubbelklicka för att avsluta mätningen",
         "icon": "#ic_straighten_24px"
       },
       {
@@ -64,7 +64,7 @@
   {
     "target": "ol-rotate",
     "name": "rotate",
-    "description": "Rotera kartan med två fingrar på pekskärm, håll ned Shift+Alt på PC. Klicka på symbolen för att återgå. Syns endast vid roterat läge.",
+    "description": "Rotera kartan med två fingrar på pekskärm, alt+shift samt dra med musen på PC. Klicka på symbolen för att återgå. Syns endast vid roterat läge",
     "icon": "#origo-compass"
   },
   {
@@ -106,7 +106,7 @@
       {
         "target": "",
         "name": "draw",
-        "description": "Rita och skriv på kartan i eget kartlager. Det går även att importera och exportera ritade lager i formatet GeoJSON.",
+        "description": "Rita och skriv på kartan i eget kartlager. Det går även att importera och exportera ritade lager i formatet GeoJSON",
         "icon": "#fa-pencil"
       }
     ]
@@ -120,7 +120,7 @@
   {
     "target": "o-position",
     "name": "position",
-    "description": "Klicka på denna symbol om du vill ha positionen från kartans centrum låst och kan definiera egna koordinater vilket tar kartan dit. Byt koordinatsystemet genom att klicka på systemets namn",
+    "description": "Klicka på denna symbol om du vill ha positionen från kartans centrum låst och kan även definiera egna koordinater vilket tar kartan dit. Byt koordinatsystemet genom att klicka på systemets namn",
     "icon": "#ic_gps_not_fixed_24px"
   },
   {
