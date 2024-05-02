@@ -319,23 +319,25 @@ function getFeatureInfoRequests({
   return requests;
 }
 
-function getFeaturesFromRemote(requestOptions, viewer, textHtmlHandler) {
+async function getFeaturesFromRemote(requestOptions, viewer, textHtmlHandler) {
   const requestResult = [];
-  const requestPromises = getFeatureInfoRequests(requestOptions, viewer, textHtmlHandler).map((request) => request.fn.then((features) => {
-    const layer = viewer.getLayer(request.layer);
-    const groupLayers = viewer.getGroupLayers();
-    const map = viewer.getMap();
-    if (features) {
-      features.forEach((feature) => {
+  const requests = getFeatureInfoRequests(requestOptions, viewer, textHtmlHandler);
+  const featureInfoPromises = requests.map((request) => request.fn);
+  const featureInfoPromisesResults = await Promise.allSettled(featureInfoPromises);
+
+  featureInfoPromisesResults.forEach((result, i) => {
+    if (result.status === 'fulfilled' && result.value) {
+      const layer = viewer.getLayer(requests[i].layer);
+      const groupLayers = viewer.getGroupLayers();
+      const map = viewer.getMap();
+      result.value.forEach((feature) => {
         const si = createSelectedItem(feature, layer, map, groupLayers);
         requestResult.push(si);
       });
-      return requestResult;
     }
+  });
 
-    return false;
-  }));
-  return Promise.all([...requestPromises]).then(() => requestResult).catch(error => console.log(error));
+  return requestResult;
 }
 
 function getFeaturesAtPixel({
