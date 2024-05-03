@@ -326,14 +326,16 @@ async function getFeaturesFromRemote(requestOptions, viewer, textHtmlHandler) {
   const featureInfoPromisesResults = await Promise.allSettled(featureInfoPromises);
 
   featureInfoPromisesResults.forEach((result, i) => {
+    const layer = viewer.getLayer(requests[i].layer);
     if (result.status === 'fulfilled' && result.value) {
-      const layer = viewer.getLayer(requests[i].layer);
       const groupLayers = viewer.getGroupLayers();
       const map = viewer.getMap();
       result.value.forEach((feature) => {
         const si = createSelectedItem(feature, layer, map, groupLayers);
         requestResult.push(si);
       });
+    } else {
+      console.warn(`GetFeatureInfo request failed for layer: ${layer.get('name')}`);
     }
   });
 
