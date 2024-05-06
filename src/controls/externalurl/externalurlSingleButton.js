@@ -47,7 +47,7 @@ const ExternalurlSingleButton = function ExternalurlSingleButton(options = {}) {
         cls: 'flex column'
       });
       exUrlBtn = Button({
-        cls: 'o-measure padding-small margin-bottom-smaller icon-smaller round light box-shadow',
+        cls: 'o-external-url padding-small margin-bottom-smaller icon-smaller round light box-shadow',
         icon: buttonImage,
         tooltipText: tooltip,
         tooltipPlacement: 'east',
