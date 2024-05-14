@@ -27,11 +27,13 @@ const Search = function Search(options = {}) {
     northing,
     easting,
     idAttribute,
+    geometryAttribute,
     layerNameAttribute,
     layerName,
     title,
     titleAttribute,
     contentAttribute,
+    l, i, t, c, g,
     groupSuggestions,
     includeSearchableLayers,
     searchableDefault,
@@ -42,7 +44,6 @@ const Search = function Search(options = {}) {
   } = options;
 
   const {
-    geometryAttribute,
     url,
     queryParameterName = 'q',
     autocompletePlacement,
@@ -101,6 +102,8 @@ const Search = function Search(options = {}) {
   }
 
   /** There are several different ways to handle selected search result.
+   * Option X. Feature info is requested from a map service if there is a layer defined, otherwise whatever is in the search result.
+   * Provide l, i, t, c, g as replacements for layerNameAttribute, idAttribute, titleAttribute, contentAttribute and geometryAttribute.
    * Option 1. Feature info is requested from a map service.
    * In this case idAttribute and layerNameAttribute must be provided.
    * A map service is used to get the geometry and attributes. The layer is defined
@@ -123,6 +126,18 @@ const Search = function Search(options = {}) {
     let feature;
     let content;
     let coord;
+    if (l && i && t && c && g) {
+      if (viewer.getLayer(data[l])) {
+        layerNameAttribute = l;
+        idAttribute = i;
+      } else {
+        layerNameAttribute = undefined;
+        idAttribute = undefined;
+        titleAttribute = t;
+        contentAttribute = c;
+        geometryAttribute = g;
+      }
+    }
     if (layerNameAttribute && idAttribute) {
       const source = viewer.getMapSource();
       const projCode = viewer.getProjectionCode();
@@ -247,6 +262,18 @@ const Search = function Search(options = {}) {
     ids.forEach((id) => {
       const item = data[id];
       let typeTitle;
+      if (l && i && t && c && g) {
+        if (viewer.getLayer(data[l])) {
+          layerNameAttribute = l;
+          idAttribute = i;
+        } else {
+          layerNameAttribute = undefined;
+          idAttribute = undefined;
+          titleAttribute = t;
+          contentAttribute = c;
+          geometryAttribute = g;
+        }
+      }
       if (layerNameAttribute && idAttribute) {
         typeTitle = viewer.getLayer(item[layerNameAttribute]).get('title');
       } else if (geometryAttribute && layerName) {
@@ -599,6 +626,11 @@ const Search = function Search(options = {}) {
       if (!title) title = '';
       if (!titleAttribute) titleAttribute = undefined;
       if (!contentAttribute) contentAttribute = undefined;
+      if (!l) l = undefined;
+      if (!i) i = undefined;
+      if (!t) t = undefined;
+      if (!c) c = undefined;
+      if (!g) g = undefined;
       groupSuggestions = Object.prototype.hasOwnProperty.call(options, 'groupSuggestions') ? options.groupSuggestions : false;
       includeSearchableLayers = Object.prototype.hasOwnProperty.call(options, 'includeSearchableLayers') ? options.includeSearchableLayers : false;
       searchableDefault = Object.prototype.hasOwnProperty.call(options, 'searchableDefault') ? options.searchableDefault : false;
