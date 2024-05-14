@@ -196,7 +196,7 @@ const Legend = function Legend(options = {}) {
     },
     style: {
       'vertical-align': 'bottom',
-      'margin': '0.45rem 0.5rem'
+      margin: '0.45rem 0.5rem'
     },
     icon: '#ic_close_fullscreen_24px',
     iconStyle: {
@@ -212,7 +212,7 @@ const Legend = function Legend(options = {}) {
     },
     style: {
       'vertical-align': 'bottom',
-      'margin': '0.45rem 0.5rem'
+      margin: '0.45rem 0.5rem'
     },
     icon: '#ic_open_in_full_24px',
     iconStyle: {
@@ -664,7 +664,7 @@ const Legend = function Legend(options = {}) {
         cls: 'icon-smaller small round grey-lightest',
         style: {
           'vertical-align': 'bottom',
-          'margin': '0.2rem 0'
+          margin: '0.2rem 0'
         },
         icon: '#ic_close_24px',
         state: closeButtonState,
