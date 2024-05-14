@@ -23,8 +23,11 @@ function getQueryVariable(variable, storeMethod) {
 
 function restorePermalink(storeMethod) {
   const mapStateId = getQueryVariable('mapStateId', storeMethod);
+  const id = getQueryVariable('id');
   if (mapStateId) {
     return permalink.readStateFromServer(mapStateId);
+  } else if (id) {
+    return permalink.readStateFromAdminServer(id);
   }
   return Promise.resolve();
 }
