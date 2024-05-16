@@ -118,6 +118,9 @@ export default (() => ({
             else mapObj[key] = data.data[key];
           });
           return mapObj;
+        })
+        .catch(error => {
+          console.error('Error:', error);
         });
     }
   },

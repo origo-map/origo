@@ -2,6 +2,7 @@ import { Component, Button, Element as El, dom } from '../ui';
 import utils from '../utils';
 import permalinkStore from '../permalink/permalinkstore';
 import permalink from '../permalink/permalink';
+import generateUUID from '../utils/generateuuid';
 
 const Favourites = function Favourites(options = {}) {
   const {
@@ -34,11 +35,19 @@ const Favourites = function Favourites(options = {}) {
 
   const favouritesFromServerArr = [];
 
+  // TA BORT INFÖR PROD!
+  const setGetUserIdForTest = () => {
+    if (!localStorage.getItem('userIdForOrigoTest')) {
+      localStorage.setItem('userIdForOrigoTest', generateUUID());
+    }
+    userId = localStorage.getItem('userIdForOrigoTest');
+  };
+
   const toggle = function toggle() {
     favouritesEl.classList.toggle('faded');
     favouritesButtonEl.classList.toggle('active');
     isActive = !isActive;
-    favouritesEl.style.cssText = 'top: 1rem; left: 4rem;';
+    favouritesEl.style.cssText = 'top: 3.5rem; left: 4rem;';
   };
 
   const close = function close() {
@@ -47,12 +56,31 @@ const Favourites = function Favourites(options = {}) {
     }
   };
 
-  const setGetUserIdForTest = () => {
-    if (!localStorage.getItem('userIdForOrigoTest')) {
-      const setUserId = prompt('Ange ditt/ett användarnamn för det här testet');
-      localStorage.setItem('userIdForOrigoTest', setUserId);
+  const getPageId = () => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const pageId = searchParams.get('id');
+    if (searchParams.has('id')) {
+      return pageId;
     }
-    userId = localStorage.getItem('userIdForOrigoTest');
+    return console.warn('Could not find page id');
+  };
+
+  const openFavourite = function openFavourite(id, pageTitle) {
+    const openFav = window.open(`/origo-test/?id=${id}`, '_blank');
+    openFav.document.title = pageTitle;
+  };
+
+  const setPageTitle = async () => {
+    if (getPageId() !== undefined) {
+      await fetch(`${serviceEndpoint}/${getPageId()}`)
+        .then(response => response.json())
+        .then(data => {
+          document.title = `Webb-GIS - ${data.name}`;
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    }
   };
 
   const favourite = function favourite({
@@ -105,11 +133,6 @@ const Favourites = function Favourites(options = {}) {
                 </li>`;
       }
     });
-  };
-
-  const openFavourite = function openFavourite(id, pageTitle) {
-    const openFav = window.open(`/?id=${id}`, '_blank');
-    openFav.document.title = pageTitle;
   };
 
   const requestsHandler = {};
@@ -189,28 +212,6 @@ const Favourites = function Favourites(options = {}) {
       });
   };
 
-  const getPageId = () => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const pageId = searchParams.get('id');
-    if (searchParams.has('id')) {
-      return pageId;
-    }
-    return console.warn('Could not find page id to set page title');
-  };
-
-  const setPageTitle = async () => {
-    if (getPageId() !== undefined) {
-      await fetch(`https://gis.haninge.se/admin-api/api/share-map/${getPageId()}`)
-        .then(response => response.json())
-        .then(data => {
-          document.title = `Webb-GIS - ${data.name}`;
-        })
-        .catch(error => {
-          console.error('Error:', error);
-        });
-    }
-  };
-
   return Component({
     name: 'favourites',
     close,
@@ -259,7 +260,7 @@ const Favourites = function Favourites(options = {}) {
         components: [titleComponent, closeButton]
       });
 
-      await fetch(`https://gis.haninge.se/admin-api/api/share-map/list/${userId}`)
+      await fetch(`${serviceEndpoint}/list/${userId}`)
         .then(response => response.json())
         .then(data => {
           const favouritesFromServer = data;
@@ -291,6 +292,9 @@ const Favourites = function Favourites(options = {}) {
                 if (window.confirm('Vill du radera den här favoriten?')) {
                   requestsHandler.delete(id);
                   document.getElementById(id).remove();
+                  if (id === getPageId()) {
+                    window.open('https://gis.haninge.se/origo-test', '_self');
+                  }
                 }
               },
               id,
@@ -401,6 +405,9 @@ const Favourites = function Favourites(options = {}) {
               if (window.confirm('Vill du radera den här favoriten?')) {
                 requestsHandler.delete(id);
                 document.getElementById(id).remove();
+                if (id === getPageId()) {
+                  window.open('https://gis.haninge.se/origo-test', '_self');
+                }
               }
             },
             id,
