@@ -110,7 +110,7 @@ const Mapmenu = function Mapmenu({
       const menuButtonCls = isExpanded ? ' faded' : '';
       menuButton = Button({
         icon: menuIcon,
-        cls: `control icon-smaller medium round absolute light top-right${menuButtonCls}`,
+        cls: `o-mapmenu control icon-smaller medium round absolute light top-right${menuButtonCls}`,
         tooltipText: 'Meny',
         tooltipPlacement: 'west',
         click() {
@@ -136,7 +136,7 @@ const Mapmenu = function Mapmenu({
         }
       });
       mapMenu = El({
-        cls: 'absolute flex column top-right control box bg-white overflow-hidden z-index-top faded',
+        cls: 'absolute flex column top-right control box bg-white overflow-hidden faded',
         collapseX: true,
         components: [headerComponent, contentComponent]
       });
