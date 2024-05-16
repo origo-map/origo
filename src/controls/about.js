@@ -7,7 +7,7 @@ const About = function About(options = {}) {
   } = options;
   const {
     content = '<p></p>',
-    icon = '#ic_help_outline_24px',
+    icon = '#ic_info_outline_24px',
     title = 'Om kartan'
   } = options;
 

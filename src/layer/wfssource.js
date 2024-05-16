@@ -204,8 +204,8 @@ class WfsSource extends VectorSource {
     if (ids || ids === 0) {
       switch (this._options.filterType) {
         case 'qgis': {
-          const idArray = ids.toString().split(','); // Split to array
-          idArray.map(id => {
+          let idArray = ids.toString().split(','); // Split to array
+          idArray = idArray.map(id => {
             // Prepend the layername using id if needed (in case the name is using double underscore notation)
             if (!id.toString().startsWith(`${this._options.featureType}.`)) {
               return `${this._options.featureType}.${id}`;

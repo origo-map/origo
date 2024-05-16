@@ -688,6 +688,8 @@ const PrintComponent = function PrintComponent(options = {}) {
         map.pixelRatio_ = 1;
       }
       targetElement = document.getElementById(target);
+      const extraPrintControls = viewer.getComponents().filter(control => control.options && control.options.placement && control.options.placement.indexOf('print') > -1);
+      extraPrintControls.forEach(control => this.addComponent(control));
       const htmlString = `
       <div id="${this.getId()}" class="absolute flex no-wrap fade-in no-margin width-full height-full z-index-ontop-low bg-grey-lightest overflow-auto" style="touch-action:none">
         <div
@@ -707,6 +709,8 @@ const PrintComponent = function PrintComponent(options = {}) {
         </div>
         ${centerComponent.render()}
         <div id="o-print-tools-left" class="top-left fixed no-print flex column spacing-vertical-small z-index-ontop-top height-full">
+          ${extraPrintControls.map(control => control.renderForPrintControl()).join(`
+          `)}
           ${printSettings.render()}
           ${printInteractionToggle.render()}
         </div>

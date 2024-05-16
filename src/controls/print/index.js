@@ -10,7 +10,7 @@ const Print = function Print(options = {}) {
     printLegend = {},
     title = 'Skriv ut',
     headerText = '',
-    headerPlaceholderText = 'Här kan du skriva en rubrik',
+    headerPlaceholderText = 'Här kan du skriva en titel',
     headerAlignment = 'center',
     headerSizes = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
     headerSize = 'h4',
