@@ -6,7 +6,8 @@ const Guide = function Guide(options = {}) {
   const contentItems = [];
   const {
     title = 'Guide',
-    url
+    mapConfigUrl,
+    guideConfigUrl
   } = options;
   let {
     target
@@ -27,7 +28,7 @@ const Guide = function Guide(options = {}) {
 
   // Fetches the controls defined in json configuration and origos default controls
   const getActiveControls = async () => {
-    const configUrl = `${window.location.href}${viewer.getMapName()}`;
+    const configUrl = mapConfigUrl || `${window.location.href}${viewer.getMapName()}`;
     try {
       const response = await fetch(configUrl);
       if (!response.ok) {
@@ -48,7 +49,7 @@ const Guide = function Guide(options = {}) {
 
   // Fetches the configuration json for guide
   const getGuideConfig = async () => {
-    const configUrl = url || `${window.location.href}guide.json`;
+    const configUrl = guideConfigUrl || `${window.location.href}guide.json`;
     try {
       const response = await fetch(configUrl);
       if (!response.ok) {
