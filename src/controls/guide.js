@@ -162,6 +162,16 @@ const Guide = function Guide(options = {}) {
       } else {
         itm.style.display = 'none';
       }
+      if (currentIndex === 0) {
+        document.getElementById(prevButton.getId()).classList.add('hidden');
+      } else {
+        document.getElementById(prevButton.getId()).classList.remove('hidden');
+      }
+      if (currentIndex === items.length - 1) {
+        document.getElementById(nextButton.getId()).classList.add('hidden');
+      } else {
+        document.getElementById(nextButton.getId()).classList.remove('hidden');
+      }
     });
     prevEl.classList.remove('o-guide-target');
     currentEl.classList.add('o-guide-target');
