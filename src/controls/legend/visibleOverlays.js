@@ -50,7 +50,7 @@ const Overlays = function Overlays(options) {
     mainComponent: groupContainer,
     secondaryComponent: layerProps,
     cls: 'right flex width-100',
-    style: { width: '100%' },
+    style: { width: '100%', display: 'flex' },
     legendSlideNav: false,
     viewer
   });
