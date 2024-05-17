@@ -198,11 +198,12 @@ const Guide = function Guide(options = {}) {
     items = Array.from(list.children);
     updateDisplayedItem();
 
-    // Observers if guide modal is removed from DOM and sets the proper state to guide button
+    // Observers if guide modal is removed from DOM and sets the proper state to guide menu item
     const observer = new MutationObserver((mutationsList) => {
       mutationsList.forEach((mutation) => {
         mutation.removedNodes.forEach((removedNode) => {
           if (removedNode.id === modal.getId()) {
+            menuItem.getComponents()[0].setState('initial');
             observer.disconnect();
           }
         });
@@ -220,7 +221,13 @@ const Guide = function Guide(options = {}) {
       mapMenu = viewer.getControlByName('mapmenu');
       menuItem = mapMenu.MenuItem({
         click() {
-          createModal();
+          if (this.getState() === 'initial') {
+            createModal();
+            this.setState('active');
+          } else if (this.getState() === 'active') {
+            modal.closeModal();
+            this.setState('initial');
+          }
           mapMenu.close();
         },
         icon: '#ic_routes_24px',
