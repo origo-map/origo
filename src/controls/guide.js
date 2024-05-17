@@ -1,4 +1,4 @@
-import { Component, Modal, Button, Icon, dom } from '../ui';
+import { Component, Modal, Button, Icon } from '../ui';
 import stripJSONComments from '../utils/stripjsoncomments';
 import isEmbedded from '../utils/isembedded';
 
@@ -13,8 +13,6 @@ const Guide = function Guide(options = {}) {
     target
   } = options;
   let viewer;
-  let guideButton;
-  let guideButtonEl;
   let nextButton;
   let prevButton;
   let modal;
@@ -25,6 +23,8 @@ const Guide = function Guide(options = {}) {
   let list;
   let prevElClass;
   let contentCreated = false;
+  let menuItem;
+  let mapMenu;
 
   // Fetches the controls defined in json configuration and origos default controls
   const getActiveControls = async () => {
@@ -162,6 +162,16 @@ const Guide = function Guide(options = {}) {
       } else {
         itm.style.display = 'none';
       }
+      if (currentIndex === 0) {
+        document.getElementById(prevButton.getId()).classList.add('hidden');
+      } else {
+        document.getElementById(prevButton.getId()).classList.remove('hidden');
+      }
+      if (currentIndex === items.length - 1) {
+        document.getElementById(nextButton.getId()).classList.add('hidden');
+      } else {
+        document.getElementById(nextButton.getId()).classList.remove('hidden');
+      }
     });
     prevEl.classList.remove('o-guide-target');
     currentEl.classList.add('o-guide-target');
@@ -193,7 +203,6 @@ const Guide = function Guide(options = {}) {
       mutationsList.forEach((mutation) => {
         mutation.removedNodes.forEach((removedNode) => {
           if (removedNode.id === modal.getId()) {
-            guideButton.setState('initial');
             observer.disconnect();
           }
         });
@@ -204,22 +213,19 @@ const Guide = function Guide(options = {}) {
 
   return Component({
     name: 'guide',
-    onInit() {
-      guideButton = Button({
-        icon: '#fa-signs-post',
-        cls: 'o-guide-btn control icon-smaller medium round light',
-        tooltipText: title,
-        tooltipPlacement: 'east',
+    onAdd(evt) {
+      component = this;
+      viewer = evt.target;
+      target = document.querySelectorAll('.o-main')[0].id;
+      mapMenu = viewer.getControlByName('mapmenu');
+      menuItem = mapMenu.MenuItem({
         click() {
-          // Creates or removes modal depending of guide button state
-          if (this.getState() === 'initial') {
-            createModal();
-            this.setState('active');
-          } else if (this.getState() === 'active') {
-            modal.closeModal();
-            this.setState('initial');
-          }
-        }
+          createModal();
+          mapMenu.close();
+        },
+        icon: '#ic_routes_24px',
+        title,
+        ariaLabel: title
       });
       nextButton = Button({
         cls: 'rounded margin-top-small padding-y icon-small hover',
@@ -249,17 +255,11 @@ const Guide = function Guide(options = {}) {
           }
         }
       });
-    },
-    onAdd(evt) {
-      component = this;
-      viewer = evt.target;
-      target = document.querySelectorAll('.o-main')[0].id;
-      this.addComponents([guideButton]);
+      this.addComponents([menuItem]);
       this.render();
     },
     render() {
-      guideButtonEl = dom.html(guideButton.render());
-      document.getElementById(`${viewer.getMain().getMapTools().getId()}`).appendChild(guideButtonEl);
+      mapMenu.appendMenuItem(menuItem);
       this.dispatch('render');
     }
   });
