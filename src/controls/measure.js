@@ -93,7 +93,7 @@ const Measure = function Measure({
       const segmentLabelStyle = drawStyles.getSegmentLabelStyle(line, projection);
       styles = styles.concat(segmentLabelStyle);
     }
-    if (label) {
+    if (label !== '0 m²') {
       labelStyle.setGeometry(point);
       labelStyle.getText().setText(label);
       styles.push(labelStyle);
