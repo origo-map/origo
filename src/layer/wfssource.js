@@ -192,6 +192,7 @@ class WfsSource extends VectorSource {
    */
   async _loaderHelper(extent, extraFilter, ignoreOriginalFilter, ids) {
     const serverUrl = this._options.url;
+    const queryParams = this._options.queryParams || {};
 
     // Create the complete URL
     // FIXME: rewrite using URL class
@@ -222,6 +223,11 @@ class WfsSource extends VectorSource {
     } else { // If there are no ids requested, append the query filter
       url += this._createQueryFilter(extent, extraFilter, ignoreOriginalFilter);
     }
+
+    Object.keys(queryParams).forEach(key => {
+      url += `&${key}=${queryParams[key]}`;
+    });
+
     url = encodeURI(url);
 
     // Actually fetch some features
