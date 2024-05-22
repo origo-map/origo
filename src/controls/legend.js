@@ -196,8 +196,7 @@ const Legend = function Legend(options = {}) {
     },
     style: {
       'vertical-align': 'bottom',
-      'margin-bottom': '13px',
-      'padding-right': '6px'
+      margin: '0.45rem 0.5rem'
     },
     icon: '#ic_close_fullscreen_24px',
     iconStyle: {
@@ -213,8 +212,7 @@ const Legend = function Legend(options = {}) {
     },
     style: {
       'vertical-align': 'bottom',
-      'margin-bottom': '13px',
-      'padding-right': '6px'
+      margin: '0.45rem 0.5rem'
     },
     icon: '#ic_open_in_full_24px',
     iconStyle: {
@@ -666,8 +664,7 @@ const Legend = function Legend(options = {}) {
         cls: 'icon-smaller small round grey-lightest',
         style: {
           'vertical-align': 'bottom',
-          'margin-bottom': '8.5px',
-          'margin-top': '-2px'
+          margin: '0.2rem 0'
         },
         icon: '#ic_close_24px',
         state: closeButtonState,
@@ -699,7 +696,7 @@ const Legend = function Legend(options = {}) {
         style: {
           display: 'inline',
           'text-align': 'right',
-          'margin-right': '6px'
+          'margin-right': '0.1rem'
         },
         components: legendControlCmps
       });
@@ -712,7 +709,7 @@ const Legend = function Legend(options = {}) {
           'background-color': '#fff',
           'border-top': '1px solid #dbdbdb',
           'border-radius': '0.5rem',
-          'padding-bottom': '6px'
+          'line-height': '0'
         },
         components: baselayerCmps
       });
