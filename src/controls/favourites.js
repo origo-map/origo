@@ -362,6 +362,7 @@ const Favourites = function Favourites(options = {}) {
         user: localStorage.getItem('userIdForOrigoTest'),
         data: permalinkStore.getState(viewer, true)
       };
+      favObj.data.map = viewer.getMapName().replace('.json', '');
       const reqBody = JSON.stringify(favObj);
       e.preventDefault();
       fetch(`${serviceEndpoint}`, {
