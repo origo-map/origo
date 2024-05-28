@@ -104,7 +104,8 @@ permalinkStore.getState = function getState(viewer, isExtended) {
       .join();
   }
   if (viewer.getMapName()) {
-    state.map = viewer.getMapName().split('.json')[0];
+    const lastPointIndex = viewer.getMapName().lastIndexOf('.');
+    state.map = viewer.getMapName().substring(0, lastPointIndex);
   }
 
   Object.keys(additionalMapStateParams).forEach((key) => additionalMapStateParams[key](state));
