@@ -146,8 +146,8 @@ function formatLength(line, projection) {
   return output;
 }
 
-function formatArea(polygon, useHectare, projection) {
-  const area = getArea(polygon, { projection });
+function formatArea(polygon, useHectare, projection, featureArea) {
+  const area = featureArea || getArea(polygon, { projection });
   let output;
   if (area > 10000000) {
     output = `${Math.round((area / 1000000) * 100) / 100} km\xB2`;

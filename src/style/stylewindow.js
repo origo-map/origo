@@ -9,6 +9,7 @@ import * as drawStyles from './drawstyles';
 import styleTemplate from './styletemplate';
 import hexToRgba from './hextorgba';
 import { Component, Button, Element, dom } from '../ui';
+import formatLengthString from '../utils/formatlengthstring';
 
 const Stylewindow = function Stylewindow(optOptions = {}) {
   const {
@@ -139,6 +140,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
           selected
         };
         break;
+      case 'Circle':
       case 'Polygon':
       case 'MultiPolygon':
         styleObject = {
@@ -220,6 +222,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
         document.getElementById('o-draw-style-backgroundStroke').classList.add('hidden');
         document.getElementById('o-draw-style-padding').classList.add('hidden');
         break;
+      case 'Circle':
       case 'Polygon':
       case 'MultiPolygon':
         document.getElementById('o-draw-style-point').classList.add('hidden');
@@ -416,6 +419,29 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
             labelStyle.getText().setText(label);
             style = style.concat(labelStyle);
           });
+        }
+        break;
+      case 'Circle':
+        style[0] = new Style({
+          fill,
+          stroke
+        });
+        if (newStyleObj.showMeasureSegments) {
+          const radius = geom.getRadius();
+          const circ = radius * 2 * Math.PI;
+          const label = formatLengthString(circ, { decimals: 2 });
+          const labelStyle = drawStyles.getBufferLabelStyle(label, styleScale);
+          style = style.concat(labelStyle);
+        }
+        if (newStyleObj.showMeasure) {
+          const radius = geom.getRadius();
+          const area = radius * radius * Math.PI;
+          const label = drawStyles.formatArea(undefined, true, projection, area);
+          const point = new Point(geom.getCenter());
+          const labelStyle = drawStyles.getLabelStyle(styleScale);
+          labelStyle.setGeometry(point);
+          labelStyle.getText().setText(label);
+          style = style.concat(labelStyle);
         }
         break;
       case 'Polygon':
