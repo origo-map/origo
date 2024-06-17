@@ -1,4 +1,4 @@
-import { Component } from '.';
+import Component from './component';
 
 export default function popup(options = {}) {
   const {
