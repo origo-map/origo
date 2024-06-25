@@ -112,7 +112,7 @@ function createCloseButton() {
 function createMinimizeButton() {
   return Button({
     cls: 'minimizebutton-svg-container small round small icon-smaller grey-lightest margin-top-small margin-right-small z-index-ontop-low ',
-    icon: '#ic_close_24px',
+    icon: '#ic_close_fullscreen_24px',
     state: 'initial',
     validStates: ['initial', 'hidden'],
     ariaLabel: 'Minimera'
@@ -125,11 +125,23 @@ function minimizeInfowindow() {
   const urvalListContainer = urvalcontainer.getElementsByClassName('urvalListContainer')[0];
   const listcontainer = sidebarcontainer.getElementsByClassName('listcontainer')[0];
   const exportcontainer = sidebarcontainer.getElementsByClassName('exportcontainer')[0];
-  urvalListContainer.style.display = urvalListContainer.style.display === 'none' ? null : 'none';
-  sidebarcontainer.style.width = urvalListContainer.style.display === 'none' ? 'fit-content' : null;
-  urvalcontainer.style.padding = urvalListContainer.style.display === 'none' ? '9px 5em 2px 0.5em' : null;
-  listcontainer.style.display = listcontainer.style.display === 'none' ? null : 'none';
-  exportcontainer.style.display = exportcontainer.style.display === 'none' ? null : 'none';
+  const buttonuse = urvalcontainer.querySelector('[aria-label="Minimera"]').querySelector('use');
+  if (urvalListContainer.style.display === 'none') {
+    urvalListContainer.style.display = null;
+    sidebarcontainer.style.width = null;
+    urvalcontainer.style.padding = null;
+    listcontainer.style.display = null;
+    exportcontainer.style.display = null;
+    buttonuse.setAttribute('xlink:href', '#ic_close_fullscreen_24px');
+  }
+  else {
+    urvalListContainer.style.display = 'none';
+    sidebarcontainer.style.width = 'fit-content';
+    urvalcontainer.style.padding = '9px 5em 2px 0.5em';
+    listcontainer.style.display = 'none';
+    exportcontainer.style.display = 'none';
+    buttonuse.setAttribute('xlink:href', '#ic_open_in_full_24px');
+  }
 }
 
 function render(viewerId) {
