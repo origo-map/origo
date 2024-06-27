@@ -37,8 +37,13 @@ const Position = function Position(options = {}) {
   let currentCaretPos;
   let inputEl;
 
+  /**
+   * Converts origo spec configuration for placeholder to that of OL MousePosition. Originally they were the same, but since OL ver 7.0
+   * only undefined is treated as "use last known coordinate".
+   * @returns String with placeholder or undefined if last known position should be used.
+   */
   function placeholder() {
-    return noPositionText.length === 0 ? noPositionText === false : noPositionText;
+    return noPositionText.length === 0 ? undefined : noPositionText;
   }
 
   function removeNoCoordsEl() {
