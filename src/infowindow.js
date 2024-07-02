@@ -120,21 +120,18 @@ function createMinimizeButton() {
 }
 
 function minimizeInfowindow() {
-  const urvalTextnodeContainer = urvalContainer.getElementsByClassName('urval-textnode-container')[0];
   const minimizeButtonUse = urvalContainer.querySelector('[aria-label="Minimera"]').querySelector('use');
   if (urvalListContainer.style.display === 'none') {
     urvalListContainer.style.display = null;
     mainContainer.style.width = null;
     urvalContainer.style.padding = null;
-    urvalTextnodeContainer.style.marginRight = null;
     listContainer.style.display = null;
     exportContainer.style.display = null;
     minimizeButtonUse.setAttribute('xlink:href', '#ic_close_fullscreen_24px');
   } else {
     urvalListContainer.style.display = 'none';
     mainContainer.style.width = 'fit-content';
-    urvalContainer.style.padding = '9px 5em 2px 0.5em';
-    urvalTextnodeContainer.style.marginRight = '0.5em';
+    urvalContainer.style.padding = '9px 65px 2px 8px';
     listContainer.style.display = 'none';
     exportContainer.style.display = 'none';
     minimizeButtonUse.setAttribute('xlink:href', '#ic_open_in_full_24px');
