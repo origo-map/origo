@@ -131,7 +131,7 @@ function minimizeInfowindow() {
   } else {
     urvalListContainer.style.display = 'none';
     mainContainer.style.width = 'fit-content';
-    urvalContainer.style.padding = '9px 65px 2px 8px';
+    urvalContainer.style.padding = '0.5rem calc(38px + 2rem) 0 0.5rem';
     listContainer.style.display = 'none';
     exportContainer.style.display = 'none';
     minimizeButtonUse.setAttribute('xlink:href', '#ic_open_in_full_24px');
