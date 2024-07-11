@@ -103,8 +103,9 @@ permalinkStore.getState = function getState(viewer, isExtended) {
     state.pin = getPin().getGeometry().getCoordinates().map(coord => Math.round(coord))
       .join();
   }
-  if (viewer.getMapName()) {
-    state.map = viewer.getMapName().split('.')[0];
+  if (viewer.getMapName() && viewer.getMapName().indexOf('.') !== -1) {
+    const lastPointIndex = viewer.getMapName().lastIndexOf('.');
+    state.map = viewer.getMapName().substring(0, lastPointIndex);
   }
 
   Object.keys(additionalMapStateParams).forEach((key) => additionalMapStateParams[key](state));
