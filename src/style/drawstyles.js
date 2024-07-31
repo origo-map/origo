@@ -10,6 +10,11 @@ import {
 import { getArea, getLength } from 'ol/sphere';
 import { LineString, MultiPoint, Point } from 'ol/geom';
 
+function isValidRgbaString(colorString) {
+  const regex = /^rgba\(\s*(\d{1,3}),\s*(\d{1,3}),\s*(\d{1,3}),\s*(\d+(?:\.\d+)?)\s*\)$/;
+  return regex.test(colorString);
+}
+
 function createRegularShape(type, pointSize, pointFill, pointStroke, pointRotation) {
   let style;
   const size = pointSize || 10;
@@ -219,26 +224,45 @@ const selectionStyle = new Style({
   }
 });
 
-const measureStyle = function measureStyle(scale = 1) {
-  return new Style({
-    fill: new Fill({
-      color: 'rgba(255, 255, 255, 0.4)'
-    }),
-    stroke: new Stroke({
-      color: 'rgba(0, 0, 0, 0.8)',
-      lineDash: [10 * scale, 10 * scale],
-      width: 2 * scale
-    }),
-    image: new CircleStyle({
-      radius: 5 * scale,
-      stroke: new Stroke({
-        color: 'rgba(0, 0, 0, 0.7)'
-      }),
+const measureStyle = function measureStyle({ scale = 1, highlightColor } = {}) {
+  const highlight = isValidRgbaString(highlightColor) ? highlightColor : 'rgba(133, 193, 233, 0.8)';
+  return [
+    new Style({
       fill: new Fill({
-        color: 'rgba(255, 255, 255, 0.2)'
+        color: 'rgba(255, 255, 255, 0.4)'
+      }),
+      stroke: new Stroke({
+        color: highlight,
+        lineDash: [10 * scale, 10 * scale],
+        width: 5 * scale
+      }),
+      image: new CircleStyle({
+        radius: 7 * scale,
+        stroke: new Stroke({
+          color: highlight
+        }),
+        fill: new Fill({
+          color: 'rgba(255, 255, 255, 0.2)'
+        })
+      })
+    }),
+    new Style({
+      stroke: new Stroke({
+        color: 'rgba(0, 0, 0, 0.8)',
+        lineDash: [10 * scale, 10 * scale],
+        width: 2 * scale
+      }),
+      image: new CircleStyle({
+        radius: 5 * scale,
+        stroke: new Stroke({
+          color: 'rgba(0, 0, 0, 0.7)'
+        }),
+        fill: new Fill({
+          color: 'rgba(255, 255, 255, 0.2)'
+        })
       })
     })
-  });
+  ];
 };
 
 const labelStyle = function labelStyle(scale = 1) {
