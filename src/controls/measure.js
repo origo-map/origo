@@ -23,7 +23,8 @@ const Measure = function Measure({
   snap = false,
   snapIsActive = true,
   snapLayers,
-  snapRadius = 15
+  snapRadius = 15,
+  highlightColor
 } = {}) {
   let map;
   let activeButton;
@@ -74,7 +75,7 @@ const Measure = function Measure({
   function styleFunction(feature, segments, drawType, tip) {
     const styleScale = feature.get('styleScale') || 1;
     const labelStyle = drawStyles.getLabelStyle(styleScale);
-    let styles = [measureStyle(styleScale)];
+    let styles = measureStyle({ styleScale, highlightColor });
     const geometry = feature.getGeometry();
     const geomType = geometry.getType();
     let point; let line; let label;
