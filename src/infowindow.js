@@ -119,22 +119,31 @@ function createMinimizeButton() {
   });
 }
 
+function resetInfowindow() {
+  const minimizeButtonUse = urvalContainer.querySelector('[aria-label="Minimera"]').querySelector('use');
+  urvalListContainer.style.display = null;
+  mainContainer.style.width = null;
+  urvalContainer.style.padding = null;
+  listContainer.style.display = null;
+  exportContainer.style.display = null;
+  minimizeButtonUse.setAttribute('xlink:href', '#ic_close_fullscreen_24px');
+}
+
 function minimizeInfowindow() {
   const minimizeButtonUse = urvalContainer.querySelector('[aria-label="Minimera"]').querySelector('use');
+  urvalListContainer.style.display = 'none';
+  mainContainer.style.width = 'fit-content';
+  urvalContainer.style.padding = '0.5rem calc(38px + 2rem) 0 0.5rem';
+  listContainer.style.display = 'none';
+  exportContainer.style.display = 'none';
+  minimizeButtonUse.setAttribute('xlink:href', '#ic_open_in_full_24px');
+}
+
+function toggleInfowindow() {
   if (urvalListContainer.style.display === 'none') {
-    urvalListContainer.style.display = null;
-    mainContainer.style.width = null;
-    urvalContainer.style.padding = null;
-    listContainer.style.display = null;
-    exportContainer.style.display = null;
-    minimizeButtonUse.setAttribute('xlink:href', '#ic_close_fullscreen_24px');
+    resetInfowindow();
   } else {
-    urvalListContainer.style.display = 'none';
-    mainContainer.style.width = 'fit-content';
-    urvalContainer.style.padding = '0.5rem calc(38px + 2rem) 0 0.5rem';
-    listContainer.style.display = 'none';
-    exportContainer.style.display = 'none';
-    minimizeButtonUse.setAttribute('xlink:href', '#ic_open_in_full_24px');
+    minimizeInfowindow();
   }
 }
 
@@ -188,10 +197,13 @@ function render(viewerId) {
     viewer.dispatch('toggleClickInteraction', detail);
     selectionManager.clearSelection();
     hideInfowindow();
+    if (urvalListContainer.style.display === 'none') {
+      resetInfowindow();
+    }
   });
 
   document.getElementById(minimizeButton.getId()).addEventListener('click', () => {
-    minimizeInfowindow();
+    toggleInfowindow();
   });
 
   // Make the DIV element draggagle:
