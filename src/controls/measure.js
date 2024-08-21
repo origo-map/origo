@@ -207,8 +207,12 @@ const Measure = function Measure({
     }
     const pointCenter = feature.getGeometry().getCoordinates();
     const bufferCircle = new Circle(pointCenter, bufferSize);
+
+    feature.setStyle((feat) => {
+      const [styleColl, ...styles] = drawStyles.bufferStyleFunction(feat, highlightColor);
+      return [...styleColl, ...styles];
+    });
     feature.setGeometry(bufferCircle);
-    feature.setStyle((feat) => drawStyles.bufferStyleFunction(feat));
   }
 
   function clearSnapInteractions() {

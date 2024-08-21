@@ -436,11 +436,11 @@ function getBufferPointStyle(scale = 1) {
   });
 }
 
-function bufferStyleFunction(feature) {
+function bufferStyleFunction(feature, highlightColor) {
   const styleScale = feature.get('styleScale') || 1;
   const bufferLabelStyle = getBufferLabelStyle(`${formatRadius(feature)}`, styleScale);
   const pointStyle = getBufferPointStyle(styleScale);
-  return [measureStyle(styleScale), bufferLabelStyle, pointStyle];
+  return [measureStyle({ scale: styleScale, highlightColor }), bufferLabelStyle, pointStyle];
 }
 
 const measure = {
