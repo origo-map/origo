@@ -249,19 +249,19 @@ const Position = function Position(options = {}) {
    */
   function onFind(e) {
     if (currentConfig.dms) {
-      if (e.which === 37) {
+      if (e.key === 'ArrowLeft') {
         moveCaret(true);
-      } else if (e.which === 39) {
+      } else if (e.key === 'ArrowRight') {
         moveCaret(false);
-      } else if (e.which >= 48 && e.which <= 57) {
-        inputEl.value = inputEl.value.substring(0, currentCaretPos) + (e.which - 48) + inputEl.value.substring(currentCaretPos + 1);
+      } else if (e.key >= 0 && e.key <= 9) {
+        inputEl.value = inputEl.value.substring(0, currentCaretPos) + (e.key) + inputEl.value.substring(currentCaretPos + 1);
         moveCaret(false);
-      } else if (e.which === 13) {
+      } else if (e.key === 'Enter') {
         findCoordinate();
       }
       // For DMS, we handle everything ourselves. Ignore all keypresses (including current key) in order to keep browser from interfering
       e.preventDefault();
-    } else if (e.which === 13) {
+    } else if (e.key === 'Enter') {
       findCoordinate();
     }
   }
