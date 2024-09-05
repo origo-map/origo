@@ -1,0 +1,40 @@
+{
+    "id": "sv-SE",
+    "title": "Svenska",
+    "menuTitle": "Språk",
+    "controls": {
+        "measure": {
+            "mainButtonTooltip": "Mäta",
+            "startMeasureTooltip": "Klicka för att börja mäta",
+            "lengthTooltip": "Längd",
+            "areaTooltip": "Yta",
+            "clearTooltip": "Rensa",
+            "bufferTooltip": "Buffert",
+            "bufferModalTitle": "Ange buffert i meter (ex 1000):",
+            "bufferModalOkButton": "OK",
+            "snapTooltip": "Snappning",
+            "showSectionsTooltip": "Visa delsträckor",
+            "addNodeTooltip": "Lägg till punkt",
+            "elevationTooltip": "Höjd",
+            "fetchingElevation": "Hämtar höjd...",
+            "undoTooltip": "Ångra"
+        },
+        "sharemap": {
+            "title": "Dela karta",
+            "linkToMap": "Länk till karta",
+            "shareMapInstruction": "Kopiera och klistra in länken för att dela kartan."
+        }
+    },
+    "style": {
+        "drawStyles": {
+            "modifyTooltip": "Dra för att ändra"
+        },
+        "styleWindow": {
+            "title": "Configure style"
+
+        },
+        "styleTemplate": {
+
+        }
+    }
+}

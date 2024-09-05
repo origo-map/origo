@@ -1,0 +1,40 @@
+{
+    "id": "en-US",
+    "title": "English",
+    "menuTitle": "Language",
+    "controls": {
+        "measure": {
+            "mainButtonTooltip": "Measure",
+            "startMeasureTooltip": "Click to start measuring",
+            "lengthTooltip": "Length",
+            "areaTooltip": "Area",
+            "clearTooltip": "Clear",
+            "bufferTooltip": "Buffer",
+            "bufferModalTitle": "Enter buffer radius in meters (e.g. 1000):",
+            "bufferModalOkButton": "OK",
+            "snapTooltip": "Snap",
+            "showSectionsTooltip": "Show sections",
+            "addNodeTooltip": "Add node",
+            "elevationTooltip": "Elevation",
+            "fetchingElevation": "Fetching elevation...",
+            "undoTooltip": "Undo"
+        },
+        "sharemap": {
+            "title": "Share map",
+            "linkToMap": "Link to map",
+            "shareMapInstruction": "Copy and paste the link in order to share the map"
+        }
+    },
+    "style": {
+        "drawStyles": {
+            "modifyTooltip": "Drag to alter"
+        },
+        "styleWindow": {
+            "title": "Configure style"
+
+        },
+        "styleTemplate": {
+
+        }
+    }
+}

@@ -67,11 +67,22 @@ const Origo = function Origo(configPath, options = {}) {
 
   const initControls = (controlDefs) => {
     const controls = [];
+    const locControl = controlDefs.find(control => control.name === 'localization');
+    const localizationComponent = origoControls.Localization(locControl.options);
+    localizationComponent.options = locControl.options;
+    controls.push(localizationComponent);
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.has('loc')) {
+      const localization = searchParams.get('loc');
+      localizationComponent.setLocale(localization);
+    }
+
     controlDefs.forEach((def) => {
       if ('name' in def) {
         const controlName = titleCase(def.name);
         const controlOptions = def.options || {};
-        if (controlName in origoControls) {
+        if (controlName !== 'Localization') controlOptions.localization = localizationComponent;
+        if ((controlName in origoControls) && (controlName !== 'Localization')) {
           const control = origoControls[controlName](controlOptions);
           control.options = Object.assign(control.options || {}, controlOptions);
           controls.push(control);

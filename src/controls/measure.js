@@ -24,7 +24,8 @@ const Measure = function Measure({
   snapIsActive = true,
   snapLayers,
   snapRadius = 15,
-  highlightColor
+  highlightColor,
+  localization
 } = {}) {
   let map;
   let activeButton;
@@ -67,7 +68,7 @@ const Measure = function Measure({
   let projection;
 
   const tipStyle = drawStyles.tipStyle;
-  const modifyStyle = drawStyles.modifyStyle;
+  const modifyStyle = drawStyles.modifyStyle(localization);
   const measureStyle = drawStyles.measureStyle;
   const source = new VectorSource();
   const modify = new Modify({ source, style: modifyStyle });
@@ -82,16 +83,16 @@ const Measure = function Measure({
     if (!drawType || drawType === geomType) {
       if (geomType === 'Polygon') {
         point = geometry.getInteriorPoint();
-        label = drawStyles.formatArea(geometry, useHectare, projection);
+        label = drawStyles.formatArea(geometry, useHectare, projection, 0, localization);
         line = new LineString(geometry.getCoordinates()[0]);
       } else if (geomType === 'LineString') {
         point = new Point(geometry.getLastCoordinate());
-        label = drawStyles.formatLength(geometry, projection);
+        label = drawStyles.formatLength(geometry, projection, localization);
         line = geometry;
       }
     }
     if (segments && line) {
-      const segmentLabelStyle = drawStyles.getSegmentLabelStyle(line, projection);
+      const segmentLabelStyle = drawStyles.getSegmentLabelStyle({ line, projection, localization });
       styles = styles.concat(segmentLabelStyle);
     }
     if (label !== '0 m²') {
@@ -190,7 +191,7 @@ const Measure = function Measure({
     const styleScale = feature.get('styleScale') || 1;
     const featureStyle = drawStyles.getLabelStyle(styleScale);
     feature.setStyle(featureStyle);
-    feature.getStyle().getText().setText('Hämtar höjd...');
+    feature.getStyle().getText().setText(localization.getStringByKeys({ targetParentKey: 'measure', targetKey: 'fetchingElevation' }));
 
     fetch(url).then(response => response.json({
       cache: false
@@ -209,7 +210,7 @@ const Measure = function Measure({
     const bufferCircle = new Circle(pointCenter, bufferSize);
 
     feature.setStyle((feat) => {
-      const [styleColl, ...styles] = drawStyles.bufferStyleFunction(feat, highlightColor);
+      const [styleColl, ...styles] = drawStyles.bufferStyleFunction(feat, highlightColor, localization);
       return [...styleColl, ...styles];
     });
     feature.setGeometry(bufferCircle);
@@ -233,10 +234,11 @@ const Measure = function Measure({
   }
 
   function createRadiusModal(feature) {
-    const title = 'Ange buffert i meter (ex 1000):';
+    const title = localization.getStringByKeys({ targetParentKey: 'measure', targetKey: 'bufferModalTitle' });
+    const ok = localization.getStringByKeys({ targetParentKey: 'measure', targetKey: 'bufferModalOkButton' });
     const content = `<div>
                       <input type="number" id="bufferradius">
-                      <button id="bufferradiusBtn">OK</button>
+                      <button id="bufferradiusBtn">${ok}</button>
                     </div>`;
     const modal = Modal({
       title,
@@ -342,7 +344,7 @@ const Measure = function Measure({
   function addInteraction() {
     const drawType = type || 'LineString';
     const activeTip = '';
-    const idleTip = 'Klicka för att börja mäta';
+    const idleTip = localization.getStringByKeys({ targetParentKey: 'measure', targetKey: 'startMeasureTooltip' });
     let tip = idleTip;
     measure = new Draw({
       source,
@@ -689,7 +691,7 @@ const Measure = function Measure({
             addNode();
           },
           icon: '#ic_add_24px',
-          tooltipText: 'Lägg till punkt',
+          tooltipText: localization.getStringByKeys({ targetParentKey: 'measure', targetKey: 'addNodeTooltip' }),
           tooltipPlacement: 'east'
         });
         buttons.push(addNodeButton);
@@ -708,7 +710,7 @@ const Measure = function Measure({
             measure.getOverlay().changed();
           },
           icon: '#ic_linear_scale_24px',
-          tooltipText: 'Visa delsträckor',
+          tooltipText: localization.getStringByKeys({ targetParentKey: 'measure', targetKey: 'showSectionsTooltip' }),
           tooltipPlacement: 'east'
         });
         buttons.push(showSegmentLabelButton);
@@ -749,7 +751,7 @@ const Measure = function Measure({
             toggleMeasure();
           },
           icon: '#ic_straighten_24px',
-          tooltipText: 'Mäta',
+          tooltipText: localization.getStringByKeys({ targetParentKey: 'measure', targetKey: 'mainButtonTooltip' }),
           tooltipPlacement: 'east'
         });
         buttons.push(measureButton);
@@ -763,7 +765,7 @@ const Measure = function Measure({
             },
             data: { tool: 'length' },
             icon: '#ic_timeline_24px',
-            tooltipText: 'Längd',
+            tooltipText: localization.getStringByKeys({ targetParentKey: 'measure', targetKey: 'lengthTooltip' }),
             tooltipPlacement: 'east'
           });
           buttons.push(lengthToolButton);
@@ -779,7 +781,7 @@ const Measure = function Measure({
             },
             data: { tool: 'area' },
             icon: '#o_polygon_24px',
-            tooltipText: 'Yta',
+            tooltipText: localization.getStringByKeys({ targetParentKey: 'measure', targetKey: 'areaTooltip' }),
             tooltipPlacement: 'east'
           });
           buttons.push(areaToolButton);
@@ -794,7 +796,7 @@ const Measure = function Measure({
             },
             data: { tool: 'elevation' },
             icon: '#ic_height_24px',
-            tooltipText: 'Höjd',
+            tooltipText: localization.getStringByKeys({ targetParentKey: 'measure', targetKey: 'elevationTooltip' }),
             tooltipPlacement: 'east'
           });
           buttons.push(elevationToolButton);
@@ -809,7 +811,7 @@ const Measure = function Measure({
             },
             data: { tool: 'buffer' },
             icon: '#ic_adjust_24px',
-            tooltipText: 'Buffer',
+            tooltipText: localization.getStringByKeys({ targetParentKey: 'measure', targetKey: 'bufferTooltip' }),
             tooltipPlacement: 'east'
           });
           buttons.push(bufferToolButton);
@@ -835,7 +837,7 @@ const Measure = function Measure({
               undoLastPoint();
             },
             icon: '#ic_undo_24px',
-            tooltipText: 'Ångra',
+            tooltipText: localization.getStringByKeys({ targetParentKey: 'measure', targetKey: 'undoTooltip' }),
             tooltipPlacement: 'east'
           });
           buttons.push(undoButton);
@@ -847,7 +849,7 @@ const Measure = function Measure({
               viewer.removeOverlays(overlayArray);
             },
             icon: '#ic_delete_24px',
-            tooltipText: 'Rensa',
+            tooltipText: localization.getStringByKeys({ targetParentKey: 'measure', targetKey: 'clearTooltip' }),
             tooltipPlacement: 'east'
           });
           buttons.push(clearButton);
@@ -862,7 +864,7 @@ const Measure = function Measure({
               toggleSnap();
             },
             icon: '#fa-magnet',
-            tooltipText: 'Snappning',
+            tooltipText: localization.getStringByKeys({ targetParentKey: 'measure', targetKey: 'snapTooltip' }),
             tooltipPlacement: 'east'
           });
           buttons.push(toggleSnapButton);
