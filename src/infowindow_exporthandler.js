@@ -52,7 +52,7 @@ export function simpleExportHandler(simpleExportUrl, activeLayer, selectedItems,
     });
 }
 
-export function layerSpecificExportHandler(url, urlParameters, activeLayer, selectedItems, attributesToSendToExport, exportedFileName) {
+export function layerSpecificExportHandler(url, requestMethod, urlParameters, activeLayer, selectedItems, attributesToSendToExport, exportedFileName) {
   if (!url) {
     throw new Error('Export URL is not specified.');
   }
@@ -104,6 +104,10 @@ export function layerSpecificExportHandler(url, urlParameters, activeLayer, sele
     requestUrl = new URL(url);
     requestUrl.search = new URLSearchParams(requestParams);
     requestUrl = requestUrl.toString().replace(/=%7B%7Bno_value%7D%7D/gm, '');
+  }
+
+  if (requestMethod === 'OPEN') {
+    return window.open(requestUrl, '_blank') ? Promise.resolve() : Promise.reject();
   }
   // eslint-disable-next-line consistent-return
   return fetch(requestUrl, {
@@ -264,6 +268,7 @@ function createToaster(status, exportOptions, message) {
 
 function createExportButtons(
   obj,
+  requestMethodPerLayer,
   urlParametersPerLayer,
   attributesToSendToExportPerLayer,
   exportedFileNamePerLayer,
@@ -275,6 +280,7 @@ function createExportButtons(
   const roundButton = obj.button.roundButton || false;
   const buttonText = obj.button.buttonText || defaultText;
   const url = obj.url;
+  const requestMethod = obj.requestMethod || requestMethodPerLayer || 'POST_JSON';
   const urlParameters = obj.urlParameters || urlParametersPerLayer;
   const attributesToSendToExport = obj.attributesToSendToExport || attributesToSendToExportPerLayer;
   const exportedFileName = obj.exportedFileName || exportedFileNamePerLayer;
@@ -294,6 +300,7 @@ function createExportButtons(
     const selectedItems = selectionManager.getSelectedItemsForASelectionGroup(selectionGroup);
     layerSpecificExportHandler(
       url,
+      requestMethod,
       urlParameters,
       activeLayer,
       selectedItems,
@@ -341,6 +348,7 @@ export function createSubexportComponent({ selectionGroup, viewer, exportOptions
   }
   if (layerSpecificExportOptions) {
     const exportUrls = layerSpecificExportOptions.exportUrls || [];
+    const requestMethodPerLayer = layerSpecificExportOptions.requestMethod;
     const urlParametersPerLayer = layerSpecificExportOptions.urlParameters;
     const attributesToSendToExportPerLayer = layerSpecificExportOptions.attributesToSendToExport;
     const exportedFileNamePerLayer = layerSpecificExportOptions.exportedFileName;
@@ -349,6 +357,7 @@ export function createSubexportComponent({ selectionGroup, viewer, exportOptions
       .forEach((obj) => {
         const button = createExportButtons(
           obj,
+          requestMethodPerLayer,
           urlParametersPerLayer,
           attributesToSendToExportPerLayer,
           exportedFileNamePerLayer,
