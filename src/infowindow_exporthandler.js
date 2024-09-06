@@ -240,6 +240,7 @@ function createToaster(status, exportOptions, message) {
 function createExportButtons(
   obj,
   attributesToSendToExportPerLayer,
+  exportedFileNamePerLayer,
   selectionGroup,
   activeLayer,
   selectionManager,
@@ -249,9 +250,8 @@ function createExportButtons(
   const buttonText = obj.button.buttonText || defaultText;
   const url = obj.url;
   const layerSpecificExportedFileName = obj.exportedFileName;
-  const attributesToSendToExport = obj.attributesToSendToExport
-    ? obj.attributesToSendToExport
-    : attributesToSendToExportPerLayer;
+  const attributesToSendToExport = obj.attributesToSendToExport || attributesToSendToExportPerLayer;
+  const exportedFileName = obj.exportedFileName || exportedFileNamePerLayer;
   const exportBtn = roundButton
     ? createCustomExportButton(
       obj.button.roundButtonIcon || defaultIcon,
@@ -271,7 +271,7 @@ function createExportButtons(
       activeLayer,
       selectedItems,
       attributesToSendToExport,
-      layerSpecificExportedFileName
+      exportedFileName
     )
       .then((data) => {
         if (data) {
@@ -315,12 +315,14 @@ export function createSubexportComponent({ selectionGroup, viewer, exportOptions
   if (layerSpecificExportOptions) {
     const exportUrls = layerSpecificExportOptions.exportUrls || [];
     const attributesToSendToExportPerLayer = layerSpecificExportOptions.attributesToSendToExport;
+    const exportedFileNamePerLayer = layerSpecificExportOptions.exportedFileName;
 
     exportUrls.sort((exportUrl) => (exportUrl.button.roundButton ? -1 : 1))
       .forEach((obj) => {
         const button = createExportButtons(
           obj,
           attributesToSendToExportPerLayer,
+          exportedFileNamePerLayer,
           selectionGroup,
           activeLayer,
           selectionManager,
