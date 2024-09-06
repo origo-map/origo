@@ -315,35 +315,19 @@ export function createSubexportComponent({ selectionGroup, viewer, exportOptions
   if (layerSpecificExportOptions) {
     const exportUrls = layerSpecificExportOptions.exportUrls || [];
     const attributesToSendToExportPerLayer = layerSpecificExportOptions.attributesToSendToExport;
-    const customButtonExportUrls = exportUrls.filter(
-      (e) => e.button.roundButton
-    );
-    const standardButtonExportUrls = exportUrls.filter(
-      (e) => !e.button.roundButton
-    );
 
-    customButtonExportUrls.forEach((obj) => {
-      const button = createExportButtons(
-        obj,
-        attributesToSendToExportPerLayer,
-        selectionGroup,
-        activeLayer,
-        selectionManager,
-        exportOptions
-      );
-      subexportContainer.appendChild(button);
-    });
-    standardButtonExportUrls.forEach((obj) => {
-      const button = createExportButtons(
-        obj,
-        attributesToSendToExportPerLayer,
-        selectionGroup,
-        activeLayer,
-        selectionManager,
-        exportOptions
-      );
-      subexportContainer.appendChild(button);
-    });
+    exportUrls.sort((exportUrl) => (exportUrl.button.roundButton ? -1 : 1))
+      .forEach((obj) => {
+        const button = createExportButtons(
+          obj,
+          attributesToSendToExportPerLayer,
+          selectionGroup,
+          activeLayer,
+          selectionManager,
+          exportOptions
+        );
+        subexportContainer.appendChild(button);
+      });
   }
   if (exportOptions.simpleExport && exportOptions.simpleExport.url) {
     const simpleExport = exportOptions.simpleExport;
