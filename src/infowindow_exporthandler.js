@@ -52,7 +52,7 @@ export function simpleExportHandler(simpleExportUrl, activeLayer, selectedItems,
     });
 }
 
-export function layerSpecificExportHandler(url, activeLayer, selectedItems, attributesToSendToExport, exportedFileName) {
+export function layerSpecificExportHandler(url, urlParameters, activeLayer, selectedItems, attributesToSendToExport, exportedFileName) {
   if (!url) {
     throw new Error('Export URL is not specified.');
   }
@@ -80,8 +80,33 @@ export function layerSpecificExportHandler(url, activeLayer, selectedItems, attr
     features[layerName].push(obj);
   });
 
+  // Generates the request URL using the urlParameters config option.
+  // Keys and values are translated to url parameters as is, except when a value is an object with
+  // an "attribute" property, in which case the value will be a list of the values from the
+  // corresponding attribute of the selectedItems. Unless specified with a "separator" property,
+  // the list will be separated by semicolons.
+  // Specifying a value as "{{no_value}}" will add a valueless parameter, e g "?Param1&Param2&etc".
+  let requestUrl = url;
+  const requestParams = urlParameters;
+  if (requestParams) {
+    Object.keys(requestParams).forEach((param) => {
+      if (requestParams[param] && typeof requestParams[param] === 'object' && requestParams[param].attribute) {
+        const attributeValues = [];
+        selectedItems.forEach((item) => {
+          const attributeValue = item.getFeature().get(requestParams[param].attribute);
+          if (attributeValue) {
+            attributeValues.push(attributeValue);
+          }
+        });
+        requestParams[param] = attributeValues.join(requestParams[param].separator || ';');
+      }
+    });
+    requestUrl = new URL(url);
+    requestUrl.search = new URLSearchParams(requestParams);
+    requestUrl = requestUrl.toString().replace(/=%7B%7Bno_value%7D%7D/gm, '');
+  }
   // eslint-disable-next-line consistent-return
-  return fetch(url, {
+  return fetch(requestUrl, {
     method: 'POST', // or 'PUT'
     body: JSON.stringify(features), // data can be `string` or {object}!
     headers: {
@@ -239,6 +264,7 @@ function createToaster(status, exportOptions, message) {
 
 function createExportButtons(
   obj,
+  urlParametersPerLayer,
   attributesToSendToExportPerLayer,
   exportedFileNamePerLayer,
   selectionGroup,
@@ -249,7 +275,7 @@ function createExportButtons(
   const roundButton = obj.button.roundButton || false;
   const buttonText = obj.button.buttonText || defaultText;
   const url = obj.url;
-  const layerSpecificExportedFileName = obj.exportedFileName;
+  const urlParameters = obj.urlParameters || urlParametersPerLayer;
   const attributesToSendToExport = obj.attributesToSendToExport || attributesToSendToExportPerLayer;
   const exportedFileName = obj.exportedFileName || exportedFileNamePerLayer;
   const exportBtn = roundButton
@@ -268,6 +294,7 @@ function createExportButtons(
     const selectedItems = selectionManager.getSelectedItemsForASelectionGroup(selectionGroup);
     layerSpecificExportHandler(
       url,
+      urlParameters,
       activeLayer,
       selectedItems,
       attributesToSendToExport,
@@ -314,6 +341,7 @@ export function createSubexportComponent({ selectionGroup, viewer, exportOptions
   }
   if (layerSpecificExportOptions) {
     const exportUrls = layerSpecificExportOptions.exportUrls || [];
+    const urlParametersPerLayer = layerSpecificExportOptions.urlParameters;
     const attributesToSendToExportPerLayer = layerSpecificExportOptions.attributesToSendToExport;
     const exportedFileNamePerLayer = layerSpecificExportOptions.exportedFileName;
 
@@ -321,6 +349,7 @@ export function createSubexportComponent({ selectionGroup, viewer, exportOptions
       .forEach((obj) => {
         const button = createExportButtons(
           obj,
+          urlParametersPerLayer,
           attributesToSendToExportPerLayer,
           exportedFileNamePerLayer,
           selectionGroup,
