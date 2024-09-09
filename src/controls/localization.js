@@ -117,10 +117,7 @@ const Localization = function Localization(options = {}) {
     const headerButton = Button({
       cls: 'icon-smaller compact no-grow o-tooltip',
       icon: '#ic_chevron_right_24px',
-      iconCls: 'rotate',
-      style: {
-        'align-self': 'flex-end'
-      }
+      iconCls: 'rotate'
     });
 
     const headerTitleCmp = Component({
