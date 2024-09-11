@@ -2,11 +2,11 @@
   display: block;
   display: flex;
   flex-flow: column;
-}
-
-.o-tools-left {
   left: 0;
   top: 0;
+  width: 100%;
+  scrollbar-width: none;
+  overflow: auto;
 }
 
 .o-toolbar-maptools {
