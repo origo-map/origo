@@ -6,7 +6,7 @@ const Localization = function Localization(options = {}) {
   const {
     localeId, // name of an existing locale imported above
     fallbackLocaleId = 'sv-SE',
-    showLocMenu = true
+    showLocMenu = false
   } = options;
 
   let localizationMenu;

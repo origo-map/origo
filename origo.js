@@ -50,6 +50,7 @@ const Origo = function Origo(configPath, options = {}) {
     },
     breakPointsPrefix: 'o-media',
     defaultControls: [
+      { name: 'localization' },
       { name: 'scaleline' },
       { name: 'zoom' },
       { name: 'rotate' },
@@ -67,22 +68,31 @@ const Origo = function Origo(configPath, options = {}) {
 
   const initControls = (controlDefs) => {
     const controls = [];
-    const locControl = controlDefs.find(control => control.name === 'localization');
-    const localizationComponent = origoControls.Localization(locControl.options);
-    localizationComponent.options = locControl.options;
-    controls.push(localizationComponent);
+    const locControlDefs = controlDefs.shift(); // Localization is first of the defaultControls;
+
+    if (!(locControlDefs.options)) {
+      locControlDefs.options = {
+        localeId: 'sv-SE'
+      };
+    }
+
+    // a potential loc query param for Localization needs to be set
+    const localizationComponent = origoControls.Localization(locControlDefs.options);
+    localizationComponent.options = locControlDefs.options;
+
     const searchParams = new URLSearchParams(window.location.search);
     if (searchParams.has('loc')) {
       const localization = searchParams.get('loc');
       localizationComponent.setLocale(localization);
     }
+    controls.push(localizationComponent);
 
     controlDefs.forEach((def) => {
       if ('name' in def) {
         const controlName = titleCase(def.name);
         const controlOptions = def.options || {};
-        if (controlName !== 'Localization') controlOptions.localization = localizationComponent;
-        if ((controlName in origoControls) && (controlName !== 'Localization')) {
+        controlOptions.localization = localizationComponent;
+        if (controlName in origoControls) {
           const control = origoControls[controlName](controlOptions);
           control.options = Object.assign(control.options || {}, controlOptions);
           controls.push(control);
