@@ -309,6 +309,7 @@ function createToaster(status, exportOptions, message) {
 
 function createExportButtons(
   obj,
+  buttonPerLayer,
   requestMethodPerLayer,
   urlParametersPerLayer,
   attributesToSendToExportPerLayer,
@@ -320,9 +321,11 @@ function createExportButtons(
   exportOptions,
   responseHandler
 ) {
-  const roundButton = obj.button.roundButton || false;
-  const buttonText = obj.button.buttonText || defaultText;
   const url = obj.url;
+  const buttonText = obj.button?.buttonText || buttonPerLayer?.buttonText || defaultText;
+  const roundButton = obj.button?.roundButton ?? buttonPerLayer?.roundButton ?? false;
+  const roundButtonIcon = obj.button?.roundButtonIcon || buttonPerLayer?.roundButtonIcon || defaultIcon;
+  const roundButtonTooltipText = obj.button?.roundButtonTooltipText || buttonPerLayer?.roundButtonTooltipText || defaultText;
   const requestMethod = obj.requestMethod || requestMethodPerLayer || 'POST_JSON';
   const urlParameters = obj.urlParameters || urlParametersPerLayer;
   const attributesToSendToExport = obj.attributesToSendToExport || attributesToSendToExportPerLayer;
@@ -335,8 +338,8 @@ function createExportButtons(
   }
   const exportBtn = roundButton
     ? createCustomExportButton(
-      obj.button.roundButtonIcon || defaultIcon,
-      obj.button.roundButtonTooltipText || defaultText
+      roundButtonIcon,
+      roundButtonTooltipText
     )
     : createExportButton(buttonText);
   const btn = exportBtn.querySelector('button');
@@ -400,6 +403,7 @@ export function createSubexportComponent({ selectionGroup, viewer, exportOptions
   }
   if (layerSpecificExportOptions) {
     const exportUrls = layerSpecificExportOptions.exportUrls || [];
+    const buttonPerLayer = layerSpecificExportOptions.button;
     const requestMethodPerLayer = layerSpecificExportOptions.requestMethod;
     const urlParametersPerLayer = layerSpecificExportOptions.urlParameters;
     const attributesToSendToExportPerLayer = layerSpecificExportOptions.attributesToSendToExport;
@@ -410,6 +414,7 @@ export function createSubexportComponent({ selectionGroup, viewer, exportOptions
       .forEach((obj) => {
         const button = createExportButtons(
           obj,
+          buttonPerLayer,
           requestMethodPerLayer,
           urlParametersPerLayer,
           attributesToSendToExportPerLayer,
