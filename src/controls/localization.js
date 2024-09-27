@@ -75,6 +75,20 @@ const Localization = function Localization(options = {}) {
     } return false;
   } // returns true if the provided locId exists in the locales object else false
 
+  /**
+   * Adds a new plugin language object to the specified existing locale.
+   *
+   * @param {string} locId - The ID of the locale to add the plugin to.
+   * @param {object} additionObj - The plugin language object to add to the locale.
+   * @return {boolean} True if the plugin language object was added, false otherwise.
+   */
+  function addPluginToLocale(locId, additionObj) {
+    if (getLocaleExists(locId)) {
+      locales[locId].plugins = { ...locales[locId].plugins, ...additionObj };
+      return true;
+    } return false;
+  }
+
   const recursiveSearch = ({ obj, objName = undefined, targetParentKey = undefined, targetKey }) => {
     if (obj === null || obj === undefined) {
       return undefined;
@@ -224,6 +238,7 @@ const Localization = function Localization(options = {}) {
     getCurrentLocaleId,
     addLocales,
     setLocale,
+    addPluginToLocale,
 
     onAdd(evt) {
       if (showLocMenu) {
