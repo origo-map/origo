@@ -27,7 +27,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   let infowindow;
   /** The selectionmanager component itself */
   let component;
-
+ 
   /** Keeps track of highlighted features. Stores pointers to the actual features. */
   let highlightedFeatures = [];
 
@@ -81,10 +81,20 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     }
   }
 
-  function addItems(items) {
+  /**
+  * Adds an array of items to selection.
+  * @param {SelectedItem []} items Array of items to add
+  * @param {object} opts Object with options
+  * @param {boolean} opts.supressDialog If true the dialog is not opened, only selection in map is made
+  */
+  function addItems(items, opts = {}) {
+    const supressDialog = opts.supressDialog;
     items.forEach((item) => {
       addItem(item);
     });
+    if (!supressDialog) {
+      infowindow.show();
+    }
   }
 
   /** Helper that refreshes all urvallayers. Typically called after highlightning or symbology has changed */
@@ -137,8 +147,14 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     infowindow.highlightListElement(featureId);
     infowindow.scrollListElementToView(featureId);
   }
-
-  function addOrHighlightItem(item) {
+  /**
+   * Adds one item and highlights it. If it already is in the list it is just highlighted.
+   * @param {SelectedItem} item Item to add
+   * @param {object} opts Object with options
+   * @param {boolean} opts.supressDialog If true the dialog is not opened, only selection in map is made
+   */
+  function addOrHighlightItem(item, opts = {}) {
+    const supressDialog = opts.supressDialog;
     if (alreadyExists(item)) {
       if (toggleSelectOnClick) {
         removeItems([item]);
@@ -149,6 +165,9 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     } else {
       // add
       selectedItems.push(item);
+      if (!supressDialog) {
+        infowindow.show();
+      }
       if (selectedItems.getLength() === 1) {
         highlightAndExpandItem(item);
       }
@@ -295,10 +314,6 @@ const Selectionmanager = function Selectionmanager(options = {}) {
 
     urval.get(selectionGroup).addFeature(item.getFeature());
     infowindow.createListElement(item);
-
-    if (isInfowindow) {
-      infowindow.show();
-    }
 
     const sum = urval.get(selectionGroup).getFeatures().length;
     infowindow.updateUrvalElementText(selectionGroup, selectionGroupTitle, sum);
