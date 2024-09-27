@@ -52,6 +52,45 @@ export function simpleExportHandler(simpleExportUrl, activeLayer, selectedItems,
     });
 }
 
+/**
+ * Makes a HEAD request to find out what the content type of the response will be, so that the
+ * response can be handled accordingly. Non-images will be blocked by CORS restrictions unless
+ * the server/API is set to allow the client's origin.
+ * @param {string} url The url to fetch
+ * @returns {Promise<string>} HTML content containing the response
+ */
+async function fetchByContentTypes(url) {
+  try {
+    // Perform the HEAD request to check response content type
+    const headResponse = await fetch(url, { method: 'HEAD' });
+    if (!headResponse.ok) {
+      throw new Error(`HEAD request failed with status: ${headResponse.status}`);
+    }
+    // Get the content-type header
+    const contentType = headResponse.headers.get('Content-Type');
+
+    // Generate content to display based on Content-Type
+    if (contentType.startsWith('image/')) {
+      return `<img class="pointer" src="${url}"></img>`;
+    } else if (contentType.startsWith('text/plain') || contentType.startsWith('application/json')) {
+      const getResponse = await fetch(url, { method: 'GET' });
+      if (!getResponse.ok) {
+        throw new Error(`GET request failed with status: ${getResponse.status}`);
+      }
+      const responseText = await getResponse.text();
+      if (contentType.startsWith('text/plain')) {
+        return `<span>${responseText}</span>`;
+      } else if (contentType.startsWith('application/json')) {
+        return `<pre><code>${responseText}</code></pre>`;
+      }
+    }
+    return '<span>Unsupported response Content-Type</span>';
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
+
 export function layerSpecificExportHandler(url, requestMethod, urlParameters, activeLayer, selectedItems, attributesToSendToExport, exportedFileName) {
   if (!url) {
     throw new Error('Export URL is not specified.');
@@ -108,6 +147,8 @@ export function layerSpecificExportHandler(url, requestMethod, urlParameters, ac
 
   if (requestMethod === 'OPEN') {
     return window.open(requestUrl, '_blank') ? Promise.resolve() : Promise.reject();
+  } else if (requestMethod === 'GET') {
+    return fetchByContentTypes(requestUrl);
   }
   // eslint-disable-next-line consistent-return
   return fetch(requestUrl, {
@@ -272,10 +313,12 @@ function createExportButtons(
   urlParametersPerLayer,
   attributesToSendToExportPerLayer,
   exportedFileNamePerLayer,
+  displayExportResponsePerLayer,
   selectionGroup,
   activeLayer,
   selectionManager,
-  exportOptions
+  exportOptions,
+  responseHandler
 ) {
   const roundButton = obj.button.roundButton || false;
   const buttonText = obj.button.buttonText || defaultText;
@@ -284,6 +327,12 @@ function createExportButtons(
   const urlParameters = obj.urlParameters || urlParametersPerLayer;
   const attributesToSendToExport = obj.attributesToSendToExport || attributesToSendToExportPerLayer;
   const exportedFileName = obj.exportedFileName || exportedFileNamePerLayer;
+  const displayExportResponse = obj.displayExportResponse || displayExportResponsePerLayer || false;
+  // No point in creating a button that will make unnecessary GET requests
+  if (requestMethod === 'GET' && !displayExportResponse) {
+    console.warn('Skipping button for GET request with nothing to display.');
+    return '';
+  }
   const exportBtn = roundButton
     ? createCustomExportButton(
       obj.button.roundButtonIcon || defaultIcon,
@@ -319,6 +368,9 @@ function createExportButtons(
             default:
               break;
           }
+          if (requestMethod === 'GET') {
+            responseHandler(selectionGroup, data);
+          }
         }
         btn.loadStop();
       })
@@ -331,7 +383,7 @@ function createExportButtons(
   return exportBtn;
 }
 
-export function createSubexportComponent({ selectionGroup, viewer, exportOptions }) {
+export function createSubexportComponent({ selectionGroup, viewer, exportOptions, responseHandler }) {
   viewerId = viewer.getId();
   const selectionManager = viewer.getSelectionManager();
   // OBS! selectionGroup corresponds to a layer with the same name in most cases, but in case of a group layer it can contain selected items from all the layers in that GroupLayer.
@@ -352,6 +404,7 @@ export function createSubexportComponent({ selectionGroup, viewer, exportOptions
     const urlParametersPerLayer = layerSpecificExportOptions.urlParameters;
     const attributesToSendToExportPerLayer = layerSpecificExportOptions.attributesToSendToExport;
     const exportedFileNamePerLayer = layerSpecificExportOptions.exportedFileName;
+    const displayExportResponsePerLayer = layerSpecificExportOptions.displayExportResponse;
 
     exportUrls.sort((exportUrl) => (exportUrl.button.roundButton ? -1 : 1))
       .forEach((obj) => {
@@ -361,10 +414,12 @@ export function createSubexportComponent({ selectionGroup, viewer, exportOptions
           urlParametersPerLayer,
           attributesToSendToExportPerLayer,
           exportedFileNamePerLayer,
+          displayExportResponsePerLayer,
           selectionGroup,
           activeLayer,
           selectionManager,
-          exportOptions
+          exportOptions,
+          responseHandler
         );
         subexportContainer.appendChild(button);
       });
