@@ -331,11 +331,7 @@ function createExportButtons(
   const attributesToSendToExport = obj.attributesToSendToExport || attributesToSendToExportPerLayer;
   const exportedFileName = obj.exportedFileName || exportedFileNamePerLayer;
   const displayExportResponse = obj.displayExportResponse || displayExportResponsePerLayer || false;
-  // No point in creating a button that will make unnecessary GET requests
-  if (requestMethod === 'GET' && !displayExportResponse) {
-    console.warn('Skipping button for GET request with nothing to display.');
-    return '';
-  }
+
   const exportBtn = roundButton
     ? createCustomExportButton(
       roundButtonIcon,
@@ -371,7 +367,7 @@ function createExportButtons(
             default:
               break;
           }
-          if (requestMethod === 'GET') {
+          if (requestMethod === 'GET' && displayExportResponse) {
             responseHandler(selectionGroup, data);
           }
         }
