@@ -126,7 +126,7 @@ export function layerSpecificExportHandler(url, requestMethod, urlParameters, ac
   // the list will be separated by semicolons.
   // Specifying a value as "{{no_value}}" will add a valueless parameter, e g "?Param1&Param2&etc".
   let requestUrl = url;
-  const requestParams = urlParameters;
+  const requestParams = { ...urlParameters };
   if (requestParams) {
     Object.keys(requestParams).forEach((param) => {
       if (requestParams[param] && typeof requestParams[param] === 'object' && requestParams[param].attribute) {
