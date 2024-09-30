@@ -32,7 +32,6 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   let highlightedFeatures = [];
 
   const multiselectStyleOptions = options.multiSelectionStyles || styleTypes.getStyle('multiselection');
-  const isInfowindow = options.infowindow === 'infowindow' || false;
   const infowindowManager = options.infowindowOptions && options.infowindowOptions.listLayout ? infowindowManagerV2 : infowindowManagerV1;
 
   function alreadyExists(item) {
@@ -295,11 +294,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
 
     urval.get(selectionGroup).addFeature(item.getFeature());
     infowindow.createListElement(item);
-
-    if (isInfowindow) {
-      infowindow.show();
-    }
-
+    infowindow.show();
     const sum = urval.get(selectionGroup).getFeatures().length;
     infowindow.updateUrvalElementText(selectionGroup, selectionGroupTitle, sum);
     const aggregationstring = calculateGroupAggregations(selectionGroup);
