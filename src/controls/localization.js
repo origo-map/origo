@@ -43,19 +43,22 @@ const Localization = function Localization(options = {}) {
  * Adds an array of locales to the locales object and stores them in sessionStorage.
  *
  * @param {Array} locs - An array of locale objects to be added. Defaults to an empty array if not provided.
- * @return {void} This function does not return anything.
+ * If a locale id matches a current locale then the current locale will be overwritten.
+ * @return {boolean} True if locales were added, false otherwise.
  */
   function addLocales(locs = []) {
     if (locs.length > 0) {
       locs.forEach(locale => {
-        if (!(getLocaleExists(locale.id))) {
-        // locales[locale.id] = locale; // Not useful in the current reload-to-apply solution
-          storedLocales.push(locale);
-        }
+        const matchedLocaleIndex = storedLocales.findIndex(storedLocale => storedLocale.id === locale.id);
+        if (matchedLocaleIndex > -1) {
+          storedLocales[matchedLocaleIndex] = locale;
+        } else storedLocales.push(locale);
       });
+      setStoredLocales(storedLocales);
+      window.location.reload();
+      return true;
     }
-    setStoredLocales(storedLocales);
-    window.location.reload();
+    return false;
   }
 
   function getLocale(locId = currentLocaleId) {
