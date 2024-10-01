@@ -28,11 +28,19 @@ const Localization = function Localization(options = {}) {
 
   const storedLocales = getStoredLocales();
 
-  // if there are stored locales at (re)startup then add these locally
+  // if there are session-stored locales at (re)startup then add these locally
   if (storedLocales.length > 0) {
     storedLocales.forEach(locale => {
       locales[locale.id] = locale;
     });
+  }
+
+  // if there is an origoSelectedLocale locale specification in local storage then use that
+  const origoSelectedLocale = localStorage.getItem('origoSelectedLocale');
+  if (origoSelectedLocale) {
+    if (getLocaleExists(origoSelectedLocale)) {
+      currentLocaleId = origoSelectedLocale;
+    }
   }
 
   function setStoredLocales(sessionLocales) {
@@ -71,12 +79,15 @@ const Localization = function Localization(options = {}) {
     return currentLocaleId;
   }
 
+  // setLocale only changes currentLocaleId if the proposed locale exists and if origoSelectedLocale is not already in local storage.
   function setLocale(locId) {
     if (getLocaleExists(locId)) {
-      currentLocaleId = locId;
-      return true;
+      if (!origoSelectedLocale) {
+        currentLocaleId = locId;
+        return true;
+      }
     } return false;
-  } // returns true if the provided locId exists in the locales object else false
+  }
 
   /**
    * Adds a new plugin language object to the specified existing locale.
@@ -183,6 +194,7 @@ const Localization = function Localization(options = {}) {
         const el = document.getElementById(this.getId());
         el.addEventListener('click', () => {
           if (loc.id === currentLocaleId) return;
+          localStorage.setItem('origoSelectedLocale', loc.id);
           const newUrl = new URL(window.location.href);
           newUrl.searchParams.set('loc', el.firstElementChild.dataset.locale);
           window.location.href = newUrl.href;
