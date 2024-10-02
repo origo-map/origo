@@ -73,6 +73,10 @@ const Measure = function Measure({
   const source = new VectorSource();
   const modify = new Modify({ source, style: modifyStyle });
 
+  function localize(key) {
+    return localization.getStringByKeys({ targetParentKey: 'measure', targetKey: key });
+  }
+
   function styleFunction(feature, segments, drawType, tip) {
     const styleScale = feature.get('styleScale') || 1;
     const labelStyle = drawStyles.getLabelStyle(styleScale);
@@ -191,7 +195,7 @@ const Measure = function Measure({
     const styleScale = feature.get('styleScale') || 1;
     const featureStyle = drawStyles.getLabelStyle(styleScale);
     feature.setStyle(featureStyle);
-    feature.getStyle().getText().setText(localization.getStringByKeys({ targetParentKey: 'measure', targetKey: 'fetchingElevation' }));
+    feature.getStyle().getText().setText(localize('fetchingElevation'));
 
     fetch(url).then(response => response.json({
       cache: false
@@ -234,8 +238,8 @@ const Measure = function Measure({
   }
 
   function createRadiusModal(feature) {
-    const title = localization.getStringByKeys({ targetParentKey: 'measure', targetKey: 'bufferModalTitle' });
-    const ok = localization.getStringByKeys({ targetParentKey: 'measure', targetKey: 'bufferModalOkButton' });
+    const title = localize('bufferModalTitle');
+    const ok = localize('bufferModalOkButton');
     const content = `<div>
                       <input type="number" id="bufferradius">
                       <button id="bufferradiusBtn">${ok}</button>
@@ -344,7 +348,7 @@ const Measure = function Measure({
   function addInteraction() {
     const drawType = type || 'LineString';
     const activeTip = '';
-    const idleTip = localization.getStringByKeys({ targetParentKey: 'measure', targetKey: 'startMeasureTooltip' });
+    const idleTip = localize('startMeasureTooltip');
     let tip = idleTip;
     measure = new Draw({
       source,
@@ -691,7 +695,7 @@ const Measure = function Measure({
             addNode();
           },
           icon: '#ic_add_24px',
-          tooltipText: localization.getStringByKeys({ targetParentKey: 'measure', targetKey: 'addNodeTooltip' }),
+          tooltipText: localize('addNodeTooltip'),
           tooltipPlacement: 'east'
         });
         buttons.push(addNodeButton);
@@ -710,7 +714,7 @@ const Measure = function Measure({
             measure.getOverlay().changed();
           },
           icon: '#ic_linear_scale_24px',
-          tooltipText: localization.getStringByKeys({ targetParentKey: 'measure', targetKey: 'showSectionsTooltip' }),
+          tooltipText: localize('showSectionsTooltip'),
           tooltipPlacement: 'east'
         });
         buttons.push(showSegmentLabelButton);
@@ -751,7 +755,7 @@ const Measure = function Measure({
             toggleMeasure();
           },
           icon: '#ic_straighten_24px',
-          tooltipText: localization.getStringByKeys({ targetParentKey: 'measure', targetKey: 'mainButtonTooltip' }),
+          tooltipText: localize('mainButtonTooltip'),
           tooltipPlacement: 'east'
         });
         buttons.push(measureButton);
@@ -765,7 +769,7 @@ const Measure = function Measure({
             },
             data: { tool: 'length' },
             icon: '#ic_timeline_24px',
-            tooltipText: localization.getStringByKeys({ targetParentKey: 'measure', targetKey: 'lengthTooltip' }),
+            tooltipText: localize('lengthTooltip'),
             tooltipPlacement: 'east'
           });
           buttons.push(lengthToolButton);
@@ -781,7 +785,7 @@ const Measure = function Measure({
             },
             data: { tool: 'area' },
             icon: '#o_polygon_24px',
-            tooltipText: localization.getStringByKeys({ targetParentKey: 'measure', targetKey: 'areaTooltip' }),
+            tooltipText: localize('areaTooltip'),
             tooltipPlacement: 'east'
           });
           buttons.push(areaToolButton);
@@ -796,7 +800,7 @@ const Measure = function Measure({
             },
             data: { tool: 'elevation' },
             icon: '#ic_height_24px',
-            tooltipText: localization.getStringByKeys({ targetParentKey: 'measure', targetKey: 'elevationTooltip' }),
+            tooltipText: localize('elevationTooltip'),
             tooltipPlacement: 'east'
           });
           buttons.push(elevationToolButton);
@@ -811,7 +815,7 @@ const Measure = function Measure({
             },
             data: { tool: 'buffer' },
             icon: '#ic_adjust_24px',
-            tooltipText: localization.getStringByKeys({ targetParentKey: 'measure', targetKey: 'bufferTooltip' }),
+            tooltipText: localize('bufferTooltip'),
             tooltipPlacement: 'east'
           });
           buttons.push(bufferToolButton);
@@ -837,7 +841,7 @@ const Measure = function Measure({
               undoLastPoint();
             },
             icon: '#ic_undo_24px',
-            tooltipText: localization.getStringByKeys({ targetParentKey: 'measure', targetKey: 'undoTooltip' }),
+            tooltipText: localize('undoTooltip'),
             tooltipPlacement: 'east'
           });
           buttons.push(undoButton);
@@ -849,7 +853,7 @@ const Measure = function Measure({
               viewer.removeOverlays(overlayArray);
             },
             icon: '#ic_delete_24px',
-            tooltipText: localization.getStringByKeys({ targetParentKey: 'measure', targetKey: 'clearTooltip' }),
+            tooltipText: localize('clearTooltip'),
             tooltipPlacement: 'east'
           });
           buttons.push(clearButton);
@@ -864,7 +868,7 @@ const Measure = function Measure({
               toggleSnap();
             },
             icon: '#fa-magnet',
-            tooltipText: localization.getStringByKeys({ targetParentKey: 'measure', targetKey: 'snapTooltip' }),
+            tooltipText: localize('snapTooltip'),
             tooltipPlacement: 'east'
           });
           buttons.push(toggleSnapButton);

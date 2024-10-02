@@ -10,9 +10,13 @@ const ShareMap = function ShareMap(options = {}) {
     localization
   } = options;
 
+  function localize(key) {
+    return localization.getStringByKeys({ targetParentKey: 'sharemap', targetKey: key });
+  }
+
   const {
     icon = '#ic_screen_share_outline_24px',
-    title = localization.getStringByKeys({ targetParentKey: 'sharemap', targetKey: 'title' }),
+    title = localize('title'),
     storeMethod,
     serviceEndpoint
   } = options;
@@ -22,7 +26,7 @@ const ShareMap = function ShareMap(options = {}) {
   let modal;
 
   const createContent = function createContent() { // Kopiera och klistra in länken för att dela kartan.
-    const shareMapInstruction = localization.getStringByKeys({ targetParentKey: 'sharemap', targetKey: 'shareMapInstruction' });
+    const shareMapInstruction = localize('shareMapInstruction');
     return `<div class="o-share-link"><input type="text"></div><i>${shareMapInstruction}</i>`;
   };
 
@@ -52,7 +56,7 @@ const ShareMap = function ShareMap(options = {}) {
         click() {
           mapMenu.close();
           modal = Modal({
-            title: localization.getStringByKeys({ targetParentKey: 'sharemap', targetKey: 'linkToMap' }),
+            title: localize('linkToMap'),
             content: createContent(),
             target
           });

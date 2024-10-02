@@ -317,7 +317,7 @@ const tipStyle = new Style({
   })
 });
 
-function modifyStyle(loc) {
+function modifyStyle(localization) {
   return new Style({
     image: new CircleStyle({
       radius: 5,
@@ -329,7 +329,7 @@ function modifyStyle(loc) {
       })
     }),
     text: new Text({
-      text: loc.getStringByKeys({ targetParentKey: 'drawStyles', targetKey: 'modifyTooltip' }),
+      text: localization.getStringByKeys({ targetParentKey: 'drawStyles', targetKey: 'modifyTooltip' }),
       font: '12px Calibri,sans-serif',
       fill: new Fill({
         color: 'rgba(255, 255, 255, 1)'
