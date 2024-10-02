@@ -1,6 +1,6 @@
 {
   "name": "origo",
-  "version": "2.10.0-dev",
+  "version": "2.9.1-dev",
   "repository": {
     "type": "git",
     "url": "git://github.com/origo-map/origo.git"
@@ -42,7 +42,7 @@
     "html2canvas": "^1.4.1",
     "ol-mapbox-style": "12.3.5",
     "jspdf": "^2.5.2",
-    "ol": "^10.2.0",
+    "ol": "^10.2.1",
     "pepjs": "^0.5.3",
     "proj4": "^2.12.1"
   },
