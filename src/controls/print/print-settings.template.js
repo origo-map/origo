@@ -12,7 +12,8 @@ export default function printTemplate({
   setScaleControl,
   resolutionControl,
   showScaleControl,
-  printLegendControl
+  printLegendControl,
+  localize
 }) {
   return `
   <div id="${id}" class="flex column no-print padding-x overflow-auto max-height-100">
@@ -20,39 +21,39 @@ export default function printTemplate({
     <div class="padding-top"></div>
     ${descriptionControl.render()}
     <div class="padding-top"></div>
-    <h6>Storlek</h6>
+    <h6>${localize('paperSize')}</h6>
     ${sizeControl.render()}
     <div class="padding-top"></div>
     ${customSizeControl.render()}
     <div class="padding-top"></div>
-    <h6>Orientering</h6>
+    <h6>${localize('orientation')}</h6>
     ${orientationControl.render()}
-    ${resolutionControl ? `<div class="padding-top"></div><h6>Upplösning</h6>${resolutionControl.render()}` : ''}
+    ${resolutionControl ? `<div class="padding-top"></div><h6>${localize('resolution')}</h6>${resolutionControl.render()}` : ''}
     <div class="padding-top"></div>
       ${setScaleControl.render()}
     <div class="padding-top-large"></div>
     <div class="flex padding-right-small">
-      <div class="grow text-normal">Använd marginaler</div>
+      <div class="grow text-normal">${localize('useMargins')}</div>
       ${marginControl.render()}
     </div>
     <div class="padding-top-large"></div>
     <div class="flex padding-right-small">
-      <div class="grow text-normal">Visa skapad tid</div>
+      <div class="grow text-normal">${localize('showCreatedDate')}</div>
       ${createdControl.render()}
     </div>
     <div class="padding-top-large"></div>
     <div class="flex padding-right-small">
-      <div class="grow text-normal">Visa skala</div>
+      <div class="grow text-normal">${localize('showScale')}</div>
       ${showScaleControl.render()}
     </div>
     <div class="padding-top-large"></div>
     <div class="flex padding-right-small">
-      <div class="grow text-normal">Visa norrpil</div>
+      <div class="grow text-normal">${localize('showNorthArrow')}</div>
       ${northArrowControl.render()}
     </div>
     <div class="padding-top-large"></div>
     <div class="flex padding-right-small">
-      <div class="grow text-normal">Visa teckenförklaring</div>
+      <div class="grow text-normal">${localize('showLegend')}</div>
       ${printLegendControl.render()}
     </div>
     <div class="padding-bottom-large">

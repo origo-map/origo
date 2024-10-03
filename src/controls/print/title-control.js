@@ -5,7 +5,8 @@ export default function TitleControl(options = {}) {
     title,
     titlePlaceholderText,
     titleAlignment,
-    titleSizes
+    titleSizes,
+    localize
   } = options;
 
   let {
@@ -43,24 +44,24 @@ export default function TitleControl(options = {}) {
       });
       alignLeftComponent = Button({
         cls: 'grow light text-smaller',
-        text: 'Vänster',
+        text: localize('titleAlignLeft'),
         state: titleAlignment === 'left' ? 'active' : 'initial',
         style: { width: '34%' },
-        ariaLabel: 'Text till vänster'
+        ariaLabel: localize('titleAlignLeftAriaLabel')
       });
       alignCenterComponent = Button({
         cls: 'grow light text-smaller',
-        text: 'Mitten',
+        text: localize('titleAlignCenter'),
         state: titleAlignment === 'center' ? 'active' : 'initial',
         style: { width: '34%' },
-        ariaLabel: 'Text till mitten'
+        ariaLabel: localize('titleAlignCenterAriaLabel')
       });
       alignRightComponent = Button({
         cls: 'grow light text-smaller',
-        text: 'Höger',
+        text: localize('titleAlignRight'),
         state: titleAlignment === 'right' ? 'active' : 'initial',
         style: { width: '33%' },
-        ariaLabel: 'Text till höger'
+        ariaLabel: localize('titleAlignRightAriaLabel')
       });
       alignButtons = [alignLeftComponent, alignCenterComponent, alignRightComponent];
       alignControl = ToggleGroup({
@@ -74,7 +75,7 @@ export default function TitleControl(options = {}) {
         contentCls: 'bg-grey-lighter text-smallest rounded',
         buttonCls: 'bg-white border text-black',
         buttonIconCls: 'black',
-        ariaLabel: 'Storlek på titel'
+        ariaLabel: localize('titleSizeAriaLabel')
       });
 
       this.addComponents([inputTitle, formatButton, alignControl, selectSize]);
@@ -119,7 +120,7 @@ export default function TitleControl(options = {}) {
     render() {
       return `
       <div class="padding-top-large"></div>
-      <h6>Titel</h6>
+      <h6>${localize('titleTitle')}</h6>
       <div class="padding-smaller o-tooltip active">
         <div class="float-left flex align-center">
           ${inputTitle.render()}
@@ -130,11 +131,11 @@ export default function TitleControl(options = {}) {
       </div>
       <div class="${titleFormatIsVisible ? '' : 'hidden'}" id="${formatId}">
         <div class="padding-smaller">
-          <h6>Justering titel</h6>
+          <h6>${localize('titleAdjustment')}</h6>
           ${alignControl.render()}
         </div>
         <div class="padding-smaller">
-          <h6>Storlek titel</h6>
+          <h6>${localize('titleSize')}</h6>
           ${selectSize.render()}
         </div>
         <hr class="divider horizontal"/>
