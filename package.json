@@ -1,6 +1,6 @@
 {
   "name": "origo",
-  "version": "2.8.1",
+  "version": "2.9.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/origo-map/origo.git"
@@ -60,7 +60,7 @@
     "run-sequence": "^2.2.1",
     "source-map-loader": "^5.0.0",
     "terser-webpack-plugin": "^5.3.10",
-    "webpack": "^5.92.0",
+    "webpack": "^5.94.0",
     "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^5.0.4",
