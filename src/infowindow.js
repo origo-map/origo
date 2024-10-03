@@ -130,7 +130,7 @@ function resetInfowindow() {
   mainContainer.classList.remove('fit-width');
   urvalContainer.classList.remove('minimizedurvalelement');
   minimizeButton.setIcon(initialMinimizeButtonIcon);
-  minimizeButton.setState('initial');  
+  minimizeButton.setState('initial');
 }
 
 function minimizeInfowindow() {
@@ -141,7 +141,7 @@ function minimizeInfowindow() {
   mainContainer.classList.add('fit-width');
   urvalContainer.classList.add('minimizedurvalelement');
   minimizeButton.setIcon(hiddenMinimizeButtonIcon);
-  minimizeButton.setState('hidden');  
+  minimizeButton.setState('hidden');
 }
 
 function toggleInfowindow() {
