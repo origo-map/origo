@@ -11,6 +11,7 @@ const Localization = function Localization(options = {}) {
 
   let localizationMenu;
   let viewer;
+  let locMenuId;
 
   let currentLocaleId = localeId || fallbackLocaleId;
 
@@ -28,7 +29,7 @@ const Localization = function Localization(options = {}) {
 
   const storedLocales = getStoredLocales();
 
-  // if there are local-stored locales at (re)startup then add these locally
+  // if there are local-stored locales at startup then add these locally
   if (storedLocales.length > 0) {
     storedLocales.forEach(locale => {
       locales[locale.id] = locale;
@@ -56,14 +57,22 @@ const Localization = function Localization(options = {}) {
  */
   function addLocales(locs = []) {
     if (locs.length > 0) {
-      locs.forEach(locale => {
+      locs.forEach(locale => { // replace if locale already appears to exist (id)
+        locales[locale.id] = locale;
         const matchedLocaleIndex = storedLocales.findIndex(storedLocale => storedLocale.id === locale.id);
         if (matchedLocaleIndex > -1) {
           storedLocales[matchedLocaleIndex] = locale;
         } else storedLocales.push(locale);
       });
       setStoredLocales(storedLocales);
-      window.location.reload();
+      document.getElementById(locMenuId).remove();
+      const mapMenu = viewer.getControlByName('mapmenu');
+      // eslint-disable-next-line no-use-before-define
+      localizationMenu = createLocalizationMenu();
+      mapMenu.appendMenuItem(localizationMenu);
+      localizationMenu.onRender();
+      locMenuId = localizationMenu.getId();
+      localizationMenu.expand(); // to illustrate that there's a new locale available, expand the localization menu
       return true;
     }
     return false;
@@ -167,9 +176,9 @@ const Localization = function Localization(options = {}) {
       },
       render() {
         return `<li id="${this.getId()}" class="flex row align-center padding-x padding-y-smaller hover pointer collapse-header" style="width: 100%;">
-                  ${headerButton.render()}
-                  ${headerTitleCmp.render()}
-                </li>`;
+                    ${headerButton.render()}
+                    ${headerTitleCmp.render()}
+                  </li>`;
       }
     });
   }
@@ -203,8 +212,8 @@ const Localization = function Localization(options = {}) {
       render() {
         const classString = 'class="flex row align-center padding-x padding-y-smaller hover pointer';
         return `<li id="${this.getId()}" ${classString}">
-        ${locTextCmp.render()}
-      </li>`;
+          ${locTextCmp.render()}
+        </li>`;
       }
     });
   }
@@ -225,8 +234,8 @@ const Localization = function Localization(options = {}) {
       },
       render() {
         return `<ul id ="${this.getId()}" class="list margin-left">
-                ${this.renderItems()}
-              </ul>`;
+                  ${this.renderItems()}
+                </ul>`;
       },
       onRender() {
         this.dispatch('render');
@@ -260,6 +269,7 @@ const Localization = function Localization(options = {}) {
         viewer = evt.target;
         const mapMenu = viewer.getControlByName('mapmenu');
         localizationMenu = createLocalizationMenu();
+        locMenuId = localizationMenu.getId();
         mapMenu.appendMenuItem(localizationMenu);
         localizationMenu.onRender();
       }
