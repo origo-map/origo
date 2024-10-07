@@ -23,12 +23,12 @@ const Localization = function Localization(options = {}) {
     return Object.hasOwn(locales, locId);
   }
   function getStoredLocales() {
-    return JSON.parse(sessionStorage.getItem('addedLocales') || '[]');
+    return JSON.parse(localStorage.getItem('origoAddedLocales') || '[]');
   }
 
   const storedLocales = getStoredLocales();
 
-  // if there are session-stored locales at (re)startup then add these locally
+  // if there are local-stored locales at (re)startup then add these locally
   if (storedLocales.length > 0) {
     storedLocales.forEach(locale => {
       locales[locale.id] = locale;
@@ -43,12 +43,12 @@ const Localization = function Localization(options = {}) {
     }
   }
 
-  function setStoredLocales(sessionLocales) {
-    sessionStorage.setItem('addedLocales', JSON.stringify(sessionLocales));
+  function setStoredLocales(localLocales) {
+    localStorage.setItem('origoAddedLocales', JSON.stringify(localLocales));
   }
 
   /**
- * Adds an array of locales to the locales object and stores them in sessionStorage.
+ * Adds an array of locales to the locales object and stores them in localStorage.
  *
  * @param {Array} locs - An array of locale objects to be added. Defaults to an empty array if not provided.
  * If a locale id matches a current locale then the current locale will be overwritten.
