@@ -4,7 +4,8 @@ export default function RotationControl(options = {}) {
   const {
     rotation,
     rotationStep,
-    map
+    map,
+    localize
   } = options;
 
   const rotationSlider = InputRange({
@@ -17,7 +18,7 @@ export default function RotationControl(options = {}) {
       'align-self': 'center'
     },
     unit: '&deg;',
-    label: 'Rotera karta'
+    label: localize('rotateMap')
   });
 
   return Component({

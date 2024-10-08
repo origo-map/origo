@@ -51,7 +51,8 @@ const PrintSettings = function PrintSettings(options = {}) {
     showNorthArrow,
     showPrintLegend,
     rotation,
-    rotationStep
+    rotationStep,
+    localize
   } = options;
 
   let headerComponent;
@@ -116,7 +117,7 @@ const PrintSettings = function PrintSettings(options = {}) {
       openButton = Button({
         cls: 'padding-small icon-smaller round light box-shadow',
         icon: openIcon,
-        tooltipText: 'Visa inställningar',
+        tooltipText: localize('settingsButtonTooltip'),
         tooltipPlacement: 'east',
         state: settingsExpanded === true ? 'hidden' : 'initial',
         validStates: ['initial', 'hidden'],
@@ -129,7 +130,7 @@ const PrintSettings = function PrintSettings(options = {}) {
         icon: closeIcon,
         state: settingsExpanded === true ? 'initial' : 'hidden',
         validStates: ['initial', 'hidden'],
-        ariaLabel: 'Stäng',
+        ariaLabel: localize('closeButtonAriaLabel'),
         click() {
           toggle();
         }
@@ -140,10 +141,11 @@ const PrintSettings = function PrintSettings(options = {}) {
         components: [openButton, closeButton]
       });
 
-      const orientationControl = OrientationControl({ orientation });
+      const orientationControl = OrientationControl({ orientation, localize });
       const sizeControl = SizeControl({
         initialSize: size,
-        sizes: Object.keys(sizes)
+        sizes: Object.keys(sizes),
+        localize
       });
       const titleControl = TitleControl({
         title,
@@ -151,7 +153,8 @@ const PrintSettings = function PrintSettings(options = {}) {
         titleAlignment,
         titleSizes,
         titleSize,
-        titleFormatIsVisible
+        titleFormatIsVisible,
+        localize
       });
       const descriptionControl = DescriptionControl({
         description,
@@ -159,7 +162,8 @@ const PrintSettings = function PrintSettings(options = {}) {
         descriptionAlignment,
         descriptionSizes,
         descriptionSize,
-        descriptionFormatIsVisible
+        descriptionFormatIsVisible,
+        localize
       });
       const marginControl = MarginControl({ checked: showMargins });
       const createdControl = CreatedControl({ checked: showCreated });
@@ -170,7 +174,7 @@ const PrintSettings = function PrintSettings(options = {}) {
       const showScaleControl = ShowScaleControl({ checked: showScale });
       northArrowControl = NorthArrowControl({ showNorthArrow });
       printLegendControl = PrintLegendControl({ showPrintLegend });
-      rotationControl = map.getView().getConstraints().rotation(180) === 180 ? RotationControl({ rotation, rotationStep, map }) : undefined;
+      rotationControl = map.getView().getConstraints().rotation(180) === 180 ? RotationControl({ rotation, rotationStep, map, localize }) : undefined;
       customSizeControl = CustomSizeControl({
         minHeight: sizeCustomMinHeight,
         maxHeight: sizeCustomMaxHeight,
@@ -178,11 +182,13 @@ const PrintSettings = function PrintSettings(options = {}) {
         maxWidth: sizeCustomMaxWidth,
         height: sizes.custom ? sizes.custom[0] : sizeCustomMinHeight,
         width: sizes.custom ? sizes.custom[1] : sizeCustomMinWidth,
-        state: size === 'custom' ? 'active' : 'initial'
+        state: size === 'custom' ? 'active' : 'initial',
+        localize
       });
       setScaleControl = SetScaleControl(map, {
         scales,
-        initialScale: scaleInitial
+        initialScale: scaleInitial,
+        localize
       });
 
       contentComponent = Component({
@@ -202,7 +208,8 @@ const PrintSettings = function PrintSettings(options = {}) {
             setScaleControl,
             resolutionControl,
             showScaleControl,
-            printLegendControl
+            printLegendControl,
+            localize
           });
         }
       });

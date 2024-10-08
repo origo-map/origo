@@ -60,6 +60,37 @@
   padding-top: $padding-large;
 }
 
+// larger padding
+.padding-larger {
+  padding: $padding-larger;
+}
+
+.padding-top-larger {
+  padding-top: $padding-larger;
+}
+
+.padding-right-larger {
+  padding-right: $padding-larger;
+}
+
+.padding-bottom-larger {
+  padding-bottom: $padding-larger;
+}
+
+.padding-left-larger {
+  padding-left: $padding-larger;
+}
+
+.padding-x-larger {
+  padding-left: $padding-larger;
+  padding-right: $padding-larger;
+}
+
+.padding-y-larger {
+  padding-bottom: $padding-larger;
+  padding-top: $padding-larger;
+}
+
 // small padding
 .padding-small {
   padding: $padding-small;

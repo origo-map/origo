@@ -3,20 +3,28 @@ import PrintComponent from './print-component';
 
 const Print = function Print(options = {}) {
   const {
+    localization
+  } = options;
+
+  function localize(key) {
+    return localization.getStringByKeys({ targetParentKey: 'print', targetKey: key });
+  }
+
+  const {
     icon = '#ic_print_24px',
     placement = ['menu'],
     logo = {},
     northArrow = {},
     printLegend = {},
-    title = 'Skriv ut',
+    title = localize('title'),
     headerText = '',
-    headerPlaceholderText = 'Här kan du skriva en titel',
+    headerPlaceholderText = localize('headerPlaceholderText'),
     headerAlignment = 'center',
     headerSizes = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
     headerSize = 'h4',
     headerFormatIsVisible = false,
     descriptionText = '',
-    descriptionPlaceholderText = 'Här kan du skriva en beskrivning',
+    descriptionPlaceholderText = localize('descriptionPlaceholderText'),
     descriptionAlignment = 'center',
     descriptionSizes = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
     descriptionSize = 'h4',
@@ -33,9 +41,9 @@ const Print = function Print(options = {}) {
     sizeCustomMaxWidth = 420,
     orientation = 'portrait',
     resolutions = [
-      { label: 'Låg', value: 75 },
-      { label: 'Mellan', value: 150 },
-      { label: 'Hög', value: 300 }
+      { label: localize('resolutionLabelLow'), value: 75 },
+      { label: localize('resolutionLabelMedium'), value: 150 },
+      { label: localize('resolutionLabelHigh'), value: 300 }
     ],
     resolution = 150,
     scales = [],
@@ -124,7 +132,9 @@ const Print = function Print(options = {}) {
         leftFooterText,
         mapInteractionsActive,
         supressResolutionsRecalculation,
-        suppressNewDPIMethod
+        suppressNewDPIMethod,
+        localize,
+        localeId: localization.getCurrentLocaleId()
       });
       if (placement.indexOf('screen') > -1) {
         mapTools = `${viewer.getMain().getMapTools().getId()}`;

@@ -2,15 +2,15 @@ import { Button, ToggleGroup } from '../../ui';
 import round2 from '../../utils/round';
 import titleCase from '../../utils/titlecase';
 
-export default function SizeControl({ initialSize, sizes }) {
+export default function SizeControl({ initialSize, sizes, localize }) {
   const sizeButtons = sizes.map((size) => {
     if (size === 'custom') {
       return Button({
         cls: 'grow light text-smaller',
-        text: 'Anpassa',
+        text: localize('configureSize'),
         state: initialSize === size ? 'active' : 'initial',
         style: { width: `${String(round2(100 - round2(100 / sizes.length, 1) * (sizes.length - 1), 1))}%` },
-        ariaLabel: 'Anpassa egen storlek'
+        ariaLabel: localize('configureSizeAriaLabel')
       });
     }
     return Button({

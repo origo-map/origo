@@ -1,0 +1,86 @@
+{
+    "id": "en-US",
+    "title": "English",
+    "menuTitle": "Language",
+    "controls": {
+        "measure": {
+            "mainButtonTooltip": "Measure",
+            "startMeasureTooltip": "Click to start measuring",
+            "lengthTooltip": "Length",
+            "areaTooltip": "Area",
+            "clearTooltip": "Clear",
+            "bufferTooltip": "Buffer",
+            "bufferModalTitle": "Enter buffer radius in meters (e.g. 1000):",
+            "bufferModalOkButton": "OK",
+            "snapTooltip": "Snap",
+            "showSectionsTooltip": "Show sections",
+            "addNodeTooltip": "Add node",
+            "elevationTooltip": "Elevation",
+            "fetchingElevation": "Fetching elevation...",
+            "undoTooltip": "Undo"
+        },
+        "sharemap": {
+            "title": "Share map",
+            "linkToMap": "Link to map",
+            "shareMapInstruction": "Copy and paste the link in order to share the map"
+        },
+        "print": {
+            "title": "Print",
+            "headerPlaceholderText": "Please enter a title",
+            "descriptionPlaceholderText": "Please enter a description",
+            "resolutionLabelLow": "Low",
+            "resolutionLabelHigh": "High",
+            "resolutionLabelMedium": "Medium",
+            "pdfButtonTitle": "Create pdf",
+            "pngButtonTitle": "Create png",
+            "settingsButtonTooltip": "Show settings",
+            "closeButtonAriaLabel": "Close",
+            "mapInteractionButtonTooltip": "Toggle map interaction",
+            "titleTitle": "Title",
+            "titleAdjustment": "Adjust title",
+            "titleSize": "Title size",
+            "titleSizeAriaLabel": "Title size",
+            "titleAlignLeft": "Left",
+            "titleAlignCenter": "Center",
+            "titleAlignRight": "Right",
+            "descriptionAlignLeft": "Left",
+            "descriptionAlignCenter": "Center",
+            "descriptionAlignRight": "Right",
+            "description": "Description",
+            "descriptionSize": "Description size",
+            "descriptionAlignment": "Adjust description",
+            "descriptionSizeAriaLabel": "Description size",
+            "paperSize": "Size",
+            "orientation": "Orientation",
+            "resolution": "Resolution",
+            "useMargins": "Use margins",
+            "showCreatedDate": "Show print date",
+            "showScale": "Show scale",
+            "showLegend": "Show legend",
+            "showNorthArrow": "Show north arrow",
+            "selectScale": "Select scale",
+            "selectPrintScale": "Select print scale",
+            "rotateMap": "Rotate map",
+            "configureSize": "Custom",
+            "configureSizeAriaLabel": "Configure size",
+            "height": "Height",
+            "width": "Width",
+            "portrait": "Portrait",
+            "portraitAriaLabel": "Portrait",
+            "landscape": "Landscape",
+            "landscapeAriaLabel": "Landscape"
+        }
+    },
+    "style": {
+        "drawStyles": {
+            "modifyTooltip": "Drag to alter"
+        },
+        "styleWindow": {
+            "title": "Configure style"
+
+        },
+        "styleTemplate": {
+
+        }
+    }
+}

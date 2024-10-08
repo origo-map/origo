@@ -140,39 +140,46 @@ function createRegularShape(type, pointSize, pointFill, pointStroke, pointRotati
   return style;
 }
 
-function formatLength(line, projection) {
+function formatLength(line, projection, localization) {
+  const localeNumberFormat = new Intl.NumberFormat(localization.getCurrentLocaleId());
+
   const length = getLength(line, { projection });
   let output;
   if (length > 1000) {
-    output = `${Math.round((length / 1000) * 100) / 100} km`;
+    output = `${localeNumberFormat.format(Math.round((length / 1000) * 100) / 100)} km`;
   } else {
-    output = `${Math.round(length * 100) / 100} m`;
+    output = `${localeNumberFormat.format(Math.round(length * 100) / 100)} m`;
   }
   return output;
 }
 
-function formatArea(polygon, useHectare, projection, featureArea) {
+function formatArea(polygon, useHectare, projection, featureArea, localization) {
   const area = featureArea || getArea(polygon, { projection });
+  console.log('area');
+  console.log(area);
+
+  const localeNumberFormat = new Intl.NumberFormat(localization.getCurrentLocaleId());
   let output;
   if (area > 10000000) {
-    output = `${Math.round((area / 1000000) * 100) / 100} km\xB2`;
+    output = `${localeNumberFormat.format(Math.round((area / 1000000) * 100) / 100)} km\xB2`;
   } else if (area > 10000 && useHectare) {
-    output = `${Math.round((area / 10000) * 100) / 100} ha`;
+    output = `${localeNumberFormat.format(Math.round((area / 10000) * 100) / 100)} ha`;
   } else {
-    output = `${Math.round(area * 100) / 100} m\xB2`;
+    output = `${localeNumberFormat.format(Math.round(area * 100) / 100)} m\xB2`;
   }
   return output;
 }
 
-function formatRadius(feat) {
+function formatRadius(feat, localization) {
+  const localeNumberFormat = new Intl.NumberFormat(localization.getCurrentLocaleId());
   let output;
   const length = feat.getGeometry().getRadius();
   if (length > 10000) {
-    output = `${Math.round((length / 1000) * 100) / 100} km`;
+    output = `${localeNumberFormat.format(Math.round((length / 1000) * 100) / 100)} km`;
   } else if (length > 100) {
-    output = `${Math.round(length)} m`;
+    output = `${localeNumberFormat.format(Math.round(length))} m`;
   } else {
-    output = `${Math.round(length * 100) / 100} m`;
+    output = `${localeNumberFormat.format(Math.round(length * 100) / 100)} m`;
   }
   return output;
 }
@@ -310,30 +317,32 @@ const tipStyle = new Style({
   })
 });
 
-const modifyStyle = new Style({
-  image: new CircleStyle({
-    radius: 5,
-    stroke: new Stroke({
-      color: 'rgba(0, 0, 0, 0.7)'
+function modifyStyle(localization) {
+  return new Style({
+    image: new CircleStyle({
+      radius: 5,
+      stroke: new Stroke({
+        color: 'rgba(0, 0, 0, 0.7)'
+      }),
+      fill: new Fill({
+        color: 'rgba(0, 153, 255, 0.8)'
+      })
     }),
-    fill: new Fill({
-      color: 'rgba(0, 153, 255, 0.8)'
+    text: new Text({
+      text: localization.getStringByKeys({ targetParentKey: 'drawStyles', targetKey: 'modifyTooltip' }),
+      font: '12px Calibri,sans-serif',
+      fill: new Fill({
+        color: 'rgba(255, 255, 255, 1)'
+      }),
+      backgroundFill: new Fill({
+        color: 'rgba(0, 0, 0, 0.7)'
+      }),
+      padding: [2, 2, 2, 2],
+      textAlign: 'left',
+      offsetX: 15
     })
-  }),
-  text: new Text({
-    text: 'Dra för att ändra',
-    font: '12px Calibri,sans-serif',
-    fill: new Fill({
-      color: 'rgba(255, 255, 255, 1)'
-    }),
-    backgroundFill: new Fill({
-      color: 'rgba(0, 0, 0, 0.7)'
-    }),
-    padding: [2, 2, 2, 2],
-    textAlign: 'left',
-    offsetX: 15
-  })
-});
+  });
+}
 
 const segmentStyle = function segmentStyle(scale = 1) {
   return new Style({
@@ -392,12 +401,12 @@ function getBufferLabelStyle(label = '', scale = 1) {
   });
 }
 
-function getSegmentLabelStyle(line, projection, scale = 1, segmentStyles = []) {
+function getSegmentLabelStyle({ line, projection, scale = 1, segmentStyles = [], localization }) {
   let count = 0;
   const style = [];
   line.forEachSegment((a, b) => {
     const segment = new LineString([a, b]);
-    const segmentLabel = formatLength(segment, projection);
+    const segmentLabel = formatLength(segment, projection, localization);
     if (segmentStyles.length - 1 < count) {
       segmentStyles.push(segmentStyle(scale).clone());
     }
@@ -436,9 +445,9 @@ function getBufferPointStyle(scale = 1) {
   });
 }
 
-function bufferStyleFunction(feature, highlightColor) {
+function bufferStyleFunction(feature, highlightColor, localization) {
   const styleScale = feature.get('styleScale') || 1;
-  const bufferLabelStyle = getBufferLabelStyle(`${formatRadius(feature)}`, styleScale);
+  const bufferLabelStyle = getBufferLabelStyle(`${formatRadius(feature, localization)}`, styleScale);
   const pointStyle = getBufferPointStyle(styleScale);
   return [measureStyle({ scale: styleScale, highlightColor }), bufferLabelStyle, pointStyle];
 }

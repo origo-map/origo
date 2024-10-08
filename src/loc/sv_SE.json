@@ -1,0 +1,87 @@
+{
+    "id": "sv-SE",
+    "title": "Svenska",
+    "menuTitle": "Språk",
+    "controls": {
+        "measure": {
+            "mainButtonTooltip": "Mäta",
+            "startMeasureTooltip": "Klicka för att börja mäta",
+            "lengthTooltip": "Längd",
+            "areaTooltip": "Yta",
+            "clearTooltip": "Rensa",
+            "bufferTooltip": "Buffert",
+            "bufferModalTitle": "Ange buffert i meter (ex 1000):",
+            "bufferModalOkButton": "OK",
+            "snapTooltip": "Snappning",
+            "showSectionsTooltip": "Visa delsträckor",
+            "addNodeTooltip": "Lägg till punkt",
+            "elevationTooltip": "Höjd",
+            "fetchingElevation": "Hämtar höjd...",
+            "undoTooltip": "Ångra"
+        },
+        "sharemap": {
+            "title": "Dela karta",
+            "linkToMap": "Länk till karta",
+            "shareMapInstruction": "Kopiera och klistra in länken för att dela kartan."
+        },
+        "print": {
+            "title": "Skriv ut",
+            "headerPlaceholderText": "Här kan du skriva en titel",
+            "descriptionPlaceholderText": "Här kan du skriva en beskrivning",
+            "resolutionLabelLow": "Låg",
+            "resolutionLabelHigh": "Hög",
+            "resolutionLabelMedium": "Mellan",
+            "pdfButtonTitle": "Skapa pdf",
+            "pngButtonTitle": "Skapa png",
+            "settingsButtonTooltip": "Visa inställningar",
+            "closeButtonAriaLabel": "Stäng",
+            "mapInteractionButtonTooltip": "Ändra kartans läge",
+            "titleTitle": "Titel",
+            "titleAdjustment": "Justera titel",
+            "titleSize": "Storlek titel",
+            "titleSizeAriaLabel": "Storlek på titel",
+            "titleAlignLeft": "Vänster",
+            "titleAlignCenter": "Mitten",
+            "titleAlignRight": "Höger",
+            "descriptionAlignLeft": "Vänster",
+            "descriptionAlignCenter": "Mitten",
+            "descriptionAlignRight": "Höger",
+            "description": "Beskrivning",
+            "descriptionSize": "Storlek på beskrivning",
+            "descriptionAlignment": "Justering på beskrivning",
+            "descriptionSizeAriaLabel": "Storlek på beskrivning",
+            "paperSize": "Storlek",
+            "orientation": "Orientering",
+            "resolution": "Upplösning",
+            "useMargins": "Använd marginaler",
+            "showCreatedDate": "Visa utskriftsdatum",
+            "showScale": "Visa skala",
+            "showLegend": "Visa legend",
+            "showNorthArrow": "Visa nordpil",
+            "selectScale": "Välj skala",
+            "selectPrintScale": "Välj utskriftsskala",
+            "rotateMap": "Rotera karta",
+            "configureSize": "Ändra storlek",
+            "configureSizeAriaLabel": "Ändra storlek",
+            "height": "Höjd",
+            "width": "Bredd",
+            "portrait": "Stående",
+            "portraitAriaLabel": "Stående",
+            "landscape": "Liggande",
+            "landscapeAriaLabel": "Liggande"
+        }
+
+    },
+    "style": {
+        "drawStyles": {
+            "modifyTooltip": "Dra för att ändra"
+        },
+        "styleWindow": {
+            "title": "Configure style"
+
+        },
+        "styleTemplate": {
+
+        }
+    }
+}

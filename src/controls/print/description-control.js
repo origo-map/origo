@@ -5,7 +5,8 @@ export default function DescriptionControl(options = {}) {
     description,
     descriptionPlaceholderText,
     descriptionAlignment,
-    descriptionSizes
+    descriptionSizes,
+    localize
   } = options;
 
   let {
@@ -44,24 +45,24 @@ export default function DescriptionControl(options = {}) {
       });
       alignLeftComponent = Button({
         cls: 'grow light text-smaller',
-        text: 'Vänster',
+        text: localize('descriptionAlignLeft'),
         state: descriptionAlignment === 'left' ? 'active' : 'initial',
         style: { width: '34%' },
-        ariaLabel: 'Text till vänster'
+        ariaLabel: localize('descriptionAlignLeftAriaLabel')
       });
       alignCenterComponent = Button({
         cls: 'grow light text-smaller',
-        text: 'Mitten',
+        text: localize('descriptionAlignCenter'),
         state: descriptionAlignment === 'center' ? 'active' : 'initial',
         style: { width: '34%' },
-        ariaLabel: 'Text till mitten'
+        ariaLabel: localize('descriptionAlignCenterAriaLabel')
       });
       alignRightComponent = Button({
         cls: 'grow light text-smaller',
-        text: 'Höger',
+        text: localize('descriptionAlignRight'),
         state: descriptionAlignment === 'right' ? 'active' : 'initial',
         style: { width: '33%' },
-        ariaLabel: 'Text till höger'
+        ariaLabel: localize('descriptionAlignRightAriaLabel')
       });
       alignButtons = [alignLeftComponent, alignCenterComponent, alignRightComponent];
       alignControl = ToggleGroup({
@@ -75,7 +76,7 @@ export default function DescriptionControl(options = {}) {
         contentCls: 'bg-grey-lighter text-smallest rounded',
         buttonCls: 'bg-white border text-black',
         buttonIconCls: 'black',
-        ariaLabel: 'Storlek på titel'
+        ariaLabel: localize('descriptionSizeAriaLabel')
       });
 
       this.addComponents([textareaDescription, formatButton, alignControl, selectSize]);
@@ -120,7 +121,7 @@ export default function DescriptionControl(options = {}) {
     render() {
       return `
       <div class="padding-top-large"></div>
-      <h6>Beskrivning</h6>
+      <h6>${localize('description')}</h6>
       <div class="padding-smaller o-tooltip active">
         <div class="float-left flex align-center">
           ${textareaDescription.render()}
@@ -131,11 +132,11 @@ export default function DescriptionControl(options = {}) {
       </div>
       <div class="${descriptionFormatIsVisible ? '' : 'hidden'}" id="${formatId}">
       <div class="padding-smaller">
-        <h6>Justering beskrivning</h6>
+        <h6>${localize('descriptionAlignment')}</h6>
         ${alignControl.render()}
       </div>
       <div class="padding-smaller">
-        <h6>Storlek beskrivning</h6>
+        <h6>${localize('descriptionSize')}</h6>
         ${selectSize.render()}
       </div>
       <hr class="divider horizontal"/>
