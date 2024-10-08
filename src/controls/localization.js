@@ -48,6 +48,18 @@ const Localization = function Localization(options = {}) {
     localStorage.setItem('origoAddedLocales', JSON.stringify(localLocales));
   }
 
+  function drawLocMenu(redraw = false) {
+    if (redraw) {
+      document.getElementById(locMenuId).remove();
+    }
+    const mapMenu = viewer.getControlByName('mapmenu');
+    // eslint-disable-next-line no-use-before-define
+    localizationMenu = createLocalizationMenu();
+    mapMenu.appendMenuItem(localizationMenu);
+    localizationMenu.onRender();
+    locMenuId = localizationMenu.getId();
+  }
+
   /**
  * Adds an array of locales to the locales object and stores them in localStorage.
  *
@@ -65,13 +77,7 @@ const Localization = function Localization(options = {}) {
         } else storedLocales.push(locale);
       });
       setStoredLocales(storedLocales);
-      document.getElementById(locMenuId).remove();
-      const mapMenu = viewer.getControlByName('mapmenu');
-      // eslint-disable-next-line no-use-before-define
-      localizationMenu = createLocalizationMenu();
-      mapMenu.appendMenuItem(localizationMenu);
-      localizationMenu.onRender();
-      locMenuId = localizationMenu.getId();
+      drawLocMenu(true);
       localizationMenu.expand(); // to illustrate that there's a new locale available, expand the localization menu
       return true;
     }
@@ -265,13 +271,9 @@ const Localization = function Localization(options = {}) {
     addPluginToLocale,
 
     onAdd(evt) {
+      viewer = evt.target;
       if (showLocMenu) {
-        viewer = evt.target;
-        const mapMenu = viewer.getControlByName('mapmenu');
-        localizationMenu = createLocalizationMenu();
-        locMenuId = localizationMenu.getId();
-        mapMenu.appendMenuItem(localizationMenu);
-        localizationMenu.onRender();
+        drawLocMenu();
       }
     },
     onInit() {
