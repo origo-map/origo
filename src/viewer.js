@@ -130,6 +130,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
   };
 
   const addControls = function addControls() {
+    const locIndex = controls.findIndex((control) => control.name === 'localization');
+    controls.push(controls.splice(locIndex, 1)[0]); // add localization last (after mapmenu)
     controls.forEach((control) => {
       this.addControl(control);
     });

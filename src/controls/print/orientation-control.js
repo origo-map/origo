@@ -1,17 +1,17 @@
 import { Button, ToggleGroup } from '../../ui';
 
-export default function OrientaionControl({ orientation }) {
+export default function OrientaionControl({ orientation, localize }) {
   const portraitButton = Button({
     cls: 'grow light text-smaller padding-left-large',
-    text: 'Stående',
+    text: localize('portrait'),
     state: orientation === 'portrait' ? 'active' : 'initial',
-    ariaLabel: 'Stående'
+    ariaLabel: localize('portraitAriaLabel')
   });
   const landscapeButton = Button({
     cls: 'grow light text-smaller padding-right-large',
-    text: 'Liggande',
+    text: localize('landscape'),
     state: orientation === 'landscape' ? 'active' : 'initial',
-    ariaLabel: 'Liggande'
+    ariaLabel: localize('landscapeAriaLabel')
   });
   const orientationControl = ToggleGroup({
     cls: 'flex rounded bg-inverted border',

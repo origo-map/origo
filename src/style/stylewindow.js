@@ -384,7 +384,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
           stroke
         });
         if (newStyleObj.showMeasureSegments) {
-          const segmentLabelStyle = drawStyles.getSegmentLabelStyle(geom, projection, styleScale);
+          const segmentLabelStyle = drawStyles.getSegmentLabelStyle({ line: geom, projection, scale: styleScale });
           style = style.concat(segmentLabelStyle);
         }
         if (newStyleObj.showMeasure) {
@@ -404,7 +404,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
           const featureCoords = feature.getGeometry().getCoordinates();
           featureCoords.forEach(part => {
             const line = new LineString(part);
-            const segmentLabelStyle = drawStyles.getSegmentLabelStyle(line, projection, styleScale);
+            const segmentLabelStyle = drawStyles.getSegmentLabelStyle({ line, projection, scale: styleScale });
             style = style.concat(segmentLabelStyle);
           });
         }
@@ -451,7 +451,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
         });
         if (newStyleObj.showMeasureSegments) {
           const line = new LineString(geom.getCoordinates()[0]);
-          const segmentLabelStyle = drawStyles.getSegmentLabelStyle(line, projection, styleScale);
+          const segmentLabelStyle = drawStyles.getSegmentLabelStyle({ line, projection, scale: styleScale });
           style = style.concat(segmentLabelStyle);
         }
         if (newStyleObj.showMeasure) {
@@ -473,7 +473,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
           featureCoords.forEach(parts => {
             parts.forEach(part => {
               const line = new LineString(part);
-              const segmentLabelStyle = drawStyles.getSegmentLabelStyle(line, projection, styleScale);
+              const segmentLabelStyle = drawStyles.getSegmentLabelStyle({ line, projection, scale: styleScale });
               style = style.concat(segmentLabelStyle);
             });
           });
