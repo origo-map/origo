@@ -97,10 +97,21 @@
   font-weight: normal;
 }
 
+.minimizedurvalelement {
+  padding: 0.5rem calc(38px + 2rem) 0 0.5rem;
+}
+
 .closebutton-svg-container {
   cursor: pointer;
   position: absolute;
   right: 0;
+  top: 0;
+}
+
+.minimizebutton-svg-container {
+  cursor: pointer;
+  position: absolute;
+  right: 30px;
   top: 0;
 }
 
@@ -269,6 +280,10 @@
 
 .hidden {
   display: none;
+}
+
+.fit-width {
+  width: fit-content;
 }
 
 ::-webkit-scrollbar {

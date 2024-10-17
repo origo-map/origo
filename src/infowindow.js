@@ -18,6 +18,9 @@ let activeSelectionGroup;
 let selectionManager;
 let viewer;
 let infowindowOptions;
+const initialMinimizeButtonIcon = '#ic_close_fullscreen_24px';
+const hiddenMinimizeButtonIcon = '#ic_open_in_full_24px';
+const minimizeButton = createMinimizeButton();
 
 function createSvgElement(id, className) {
   const svgContainer = document.createElement('div');
@@ -109,6 +112,46 @@ function createCloseButton() {
   });
 }
 
+function createMinimizeButton() {
+  return Button({
+    cls: 'minimizebutton-svg-container small round small icon-smaller grey-lightest margin-top-small margin-right-small z-index-ontop-low ',
+    icon: initialMinimizeButtonIcon,
+    state: 'initial',
+    validStates: ['initial', 'hidden'],
+    ariaLabel: 'Minimera'
+  });
+}
+
+function resetInfowindow() {
+  urvalListContainer.classList.remove('hidden');
+  listContainer.classList.remove('hidden');
+  exportContainer.classList.remove('hidden');
+  groupFooterContainer.classList.remove('hidden');
+  mainContainer.classList.remove('fit-width');
+  urvalContainer.classList.remove('minimizedurvalelement');
+  minimizeButton.setIcon(initialMinimizeButtonIcon);
+  minimizeButton.setState('initial');
+}
+
+function minimizeInfowindow() {
+  urvalListContainer.classList.add('hidden');
+  listContainer.classList.add('hidden');
+  exportContainer.classList.add('hidden');
+  groupFooterContainer.classList.add('hidden');
+  mainContainer.classList.add('fit-width');
+  urvalContainer.classList.add('minimizedurvalelement');
+  minimizeButton.setIcon(hiddenMinimizeButtonIcon);
+  minimizeButton.setState('hidden');
+}
+
+function toggleInfowindow() {
+  if (urvalListContainer.classList.contains('hidden')) {
+    resetInfowindow();
+  } else {
+    minimizeInfowindow();
+  }
+}
+
 function render(viewerId) {
   mainContainer = document.createElement('div');
   setInfowindowStyle();
@@ -126,6 +169,7 @@ function render(viewerId) {
   urvalTextNodeContainer.appendChild(urvalTextNode);
   urvalContainer.appendChild(urvalTextNodeContainer);
   const closeButton = createCloseButton();
+  urvalContainer.appendChild(dom.html(minimizeButton.render()));
   urvalContainer.appendChild(dom.html(closeButton.render()));
   urvalContainer.appendChild(urvalListContainer);
   listContainer = document.createElement('div');
@@ -157,6 +201,13 @@ function render(viewerId) {
     viewer.dispatch('toggleClickInteraction', detail);
     selectionManager.clearSelection();
     hideInfowindow();
+    if (urvalListContainer.classList.contains('hidden')) {
+      resetInfowindow();
+    }
+  });
+
+  document.getElementById(minimizeButton.getId()).addEventListener('click', () => {
+    toggleInfowindow();
   });
 
   // Make the DIV element draggagle:
