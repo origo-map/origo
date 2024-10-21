@@ -18,9 +18,9 @@ let activeSelectionGroup;
 let selectionManager;
 let viewer;
 let infowindowOptions;
-const initialMinimizeButtonIcon = '#ic_close_fullscreen_24px';
-const hiddenMinimizeButtonIcon = '#ic_open_in_full_24px';
-const minimizeButton = createMinimizeButton();
+let initialMinimizeButtonIcon;
+let hiddenMinimizeButtonIcon;
+let minimizeButton;
 
 function createSvgElement(id, className) {
   const svgContainer = document.createElement('div');
@@ -169,6 +169,7 @@ function render(viewerId) {
   urvalTextNodeContainer.appendChild(urvalTextNode);
   urvalContainer.appendChild(urvalTextNodeContainer);
   const closeButton = createCloseButton();
+  minimizeButton = createMinimizeButton();
   urvalContainer.appendChild(dom.html(minimizeButton.render()));
   urvalContainer.appendChild(dom.html(closeButton.render()));
   urvalContainer.appendChild(urvalListContainer);
@@ -481,6 +482,8 @@ function init(options) {
   urvalElements = new Map();
   expandableContents = new Map();
   footerContainers = new Map();
+  initialMinimizeButtonIcon = '#ic_close_fullscreen_24px';
+  hiddenMinimizeButtonIcon = '#ic_open_in_full_24px';
 
   render(options.viewer.getId());
 
