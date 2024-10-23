@@ -888,17 +888,21 @@ function onAttributesSave(features, attrs) {
   document.getElementById(`o-save-button-${currentLayer}`).addEventListener('click', (e) => {
     const editEl = {};
     const valid = {};
+    let checkboxValues = [];
     attrs.forEach((attribute) => {
       // Get the input container class
       const containerClass = `.${attribute.elId}`;
       // Get the input attributes
       // FIXME: Don't have to get from DOM, the same values are in 'attribute'
       // and it would be enough to call getElementId once anyway (called numerous times later on).
-      const inputType = document.getElementById(attribute.elId).getAttribute('type');
-      const inputValue = document.getElementById(attribute.elId).value;
-      const inputName = document.getElementById(attribute.elId).getAttribute('name');
-      const inputId = document.getElementById(attribute.elId).getAttribute('id');
-      const inputRequired = document.getElementById(attribute.elId).required;
+
+      let inputType = attribute.type ? attribute.type : '';
+      // Check again for not missing when checkbox is part of multiple choice checkboxes
+      inputType = document.getElementById(`${attribute.elId}-0`) ? document.getElementById(`${attribute.elId}-0`).getAttribute('type') : inputType;
+      const inputValue = document.getElementById(attribute.elId) ? document.getElementById(attribute.elId).value : '';
+      const inputName = attribute.name ? attribute.name : '';
+      const inputId = attribute.elId ? attribute.elId : '';
+      const inputRequired = document.getElementById(attribute.elId) ? document.getElementById(attribute.elId).required : '';
 
       // If hidden element it should be excluded
       // By sheer luck, this prevents attributes to be changed in batch edit mode when checkbox is not checked.
@@ -906,9 +910,31 @@ function onAttributesSave(features, attrs) {
       if (!document.querySelector(containerClass) || document.querySelector(containerClass).classList.contains('o-hidden') === false) {
         // Check if checkbox. If checkbox read state.
         if (inputType === 'checkbox') {
-          const checkedValue = (attribute.config && attribute.config.checkedValue) || 1;
-          const uncheckedValue = (attribute.config && attribute.config.uncheckedValue) || 0;
-          editEl[attribute.name] = document.getElementById(attribute.elId).checked ? checkedValue : uncheckedValue;
+          // Check if this is a multi choice checkbox
+          if (document.getElementById(`${attribute.elId}-0`)) {
+            if (document.getElementById(`${attribute.elId}-0`).getAttribute('type') === 'checkbox') {
+              if (attribute.options && attribute.options.length > 0) {
+                Array.from(document.getElementsByName(attribute.name)).forEach((element) => {
+                  if (element.tagName === 'INPUT' && element.getAttribute("type") === 'checkbox' && element.checked === true) {
+                    // Check if this is a free text checkbox
+                    if (element.nextElementSibling.getAttribute("type") === 'text') {
+                      checkboxValues.push(element.nextElementSibling.value.trim());
+                    } else {
+                      checkboxValues.push(element.getAttribute("value"));
+                    }
+                  }
+                });
+    
+                editEl[attribute.name] = checkboxValues.join('; ');
+              } else {
+                editEl[attribute.name] = $(attribute.elId).is(':checked') ? 1 : 0;
+              }
+            }
+          } else { // Read value from input text, textarea or select
+            const checkedValue = (attribute.config && attribute.config.checkedValue) || 1;
+            const uncheckedValue = (attribute.config && attribute.config.uncheckedValue) || 0;
+            editEl[attribute.name] = document.getElementById(attribute.elId).checked ? checkedValue : uncheckedValue;
+          } 
         } else if (attribute.type === 'searchList') {
           // SearchList may have its value in another place than the input element itself. Query the "Component" instead.
           // Note that inputValue still contains the value of the input element, which is  used to validate required.
@@ -1060,6 +1086,7 @@ function onAttributesSave(features, attrs) {
         default:
       }
       valid.validates = !Object.values(valid).includes(false);
+      checkboxValues = [];
     });
 
     // If valid, continue
@@ -1090,6 +1117,35 @@ function addListener() {
         document.querySelector(containerClass).classList.remove('o-hidden');
       } else {
         document.querySelector(containerClass).classList.add('o-hidden');
+      }
+    });
+  };
+
+  return fn;
+}
+
+/**
+ * Returns a function that adds an event handler to enable/disable the textbox for a free text checkbox
+ * 
+ * @function
+ * @name addCheckboxListener
+ * @kind function
+ * @param {any} ): (obj
+ * @returns {void}
+ */
+function addCheckboxListener() {
+  const fn = (obj) => {
+    Array.from(document.getElementsByName(obj.name)).forEach((element) => {
+      // Add a listener on the checkbox if it has input text as next element
+      if (element.tagName === 'INPUT' && element.getAttribute("type") === 'checkbox' && element.nextElementSibling.getAttribute("type") === 'text') {
+        element.addEventListener('change', (e) => {
+          if (element.checked === true) {
+            element.nextElementSibling.disabled = false;
+          } else {
+            element.nextElementSibling.value = '';
+            element.nextElementSibling.disabled = true;
+          }
+        });
       }
     });
   };
@@ -1235,7 +1291,14 @@ function editAttributes(feat) {
           } else {
             alert('Villkor verkar inte vara rätt formulerat. Villkor formuleras enligt principen change:attribute:value');
           }
-        } else if (obj.type === 'image') {
+        } else if (obj.type === 'checkbox') {
+          if (obj.options && obj.options.length > 0 && obj.val) {
+            obj.val = obj.val.split('; ');
+          }
+          obj.isVisible = true;
+          obj.elId = `input-${obj.name}`;
+          obj.addListener = addCheckboxListener();
+         } else if (obj.type === 'image') {
           obj.isVisible = true;
           obj.elId = `input-${currentLayer}-${obj.name}`;
           obj.addListener = addImageListener();
