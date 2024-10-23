@@ -286,7 +286,7 @@ const LayerRows = function LayerRows(options) {
         async render() {
           const rowPromises = overlayEls.map((item) => item.render());
           const rows = await Promise.all(rowPromises);
-          return `<ul id="${this.getId()}" class="list">${rows.reverse()}</ul>`;
+          return `<ul id="${this.getId()}" class="list">${rows.reverse().join('')}</ul>`;
         }
       });
       return `
