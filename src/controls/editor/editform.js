@@ -19,6 +19,7 @@ const createForm = function createForm(obj) {
   const disabled = obj.readonly ? ' disabled' : '';
   const required = obj.required ? ' required' : '';
   const name = obj.name ? obj.name : '';
+  const options = obj.options || [];
   let el;
   let firstOption;
   let checked;
@@ -31,8 +32,33 @@ const createForm = function createForm(obj) {
       el = `<div class="validate ${cls}"><label>${label}<br><textarea name="textarea${maxLengthText}" id="${id}" rows="3" ${maxLength}${readonly}${required}>${val}</textarea></label></div>`;
       break;
     case 'checkbox':
-      checked = (obj.config && obj.config.uncheckedValue ? obj.config.uncheckedValue !== val : val) ? ' checked' : '';
-      el = `<div class="o-form-checkbox ${cls}"><label for="${id}"><input type="checkbox" id="${id}" value="${val}"${checked}${disabled}/>${label}</label></div>`;
+      // Check if this is a multi choice checkbox
+      if (options.length) {
+        el = `<div class="o-form-checkbox"><label>${label}</label><br />`;
+        options.forEach((opt, index) => {
+          const option = opt.split(':')[0];
+          const subtype = opt.split(':')[1];
+          let textboxVal;
+          let disable;
+
+          // If this is choice with possibility of adding free text add a text input else only a checkbox
+          if (subtype === 'textbox') {
+            checked = val[val.length - 1] && options.indexOf(val[val.length - 1]) === -1 ? ' checked' : '';
+            textboxVal = checked ? val[val.length - 1] : '';
+            disable = checked ? '' : ' disabled';
+            el += `<input id="${id}-${index}" type="checkbox" name="${name}" data-index="${index}" value="${option}"${checked}> ${option}: `;
+            el += `<input id="${id}-${index}-text" type="text" value="${textboxVal}"${maxLength} style="width: auto; padding:0; margin:0; line-height:1.3rem;" ${disable} autocomplete="off">`;
+            el += '<br>';
+          } else {
+            checked = val.indexOf(option) > -1 ? ' checked' : '';
+            el += `<input id="${id}-${index}" type="checkbox" name="${name}" data-index="${index}" value="${option}"${checked}> ${option}<br>`;
+          }
+        });
+        el += '<br></div>';
+      } else {
+        checked = (obj.config && obj.config.uncheckedValue ? obj.config.uncheckedValue !== val : val) ? ' checked' : '';
+        el = `<div class="o-form-checkbox ${cls}"><label for="${id}"><input type="checkbox" id="${id}" value="${val}"${checked}${disabled}/>${label}</label></div>`;
+      }
       break;
     case 'dropdown':
       if (val) {
