@@ -1,5 +1,6 @@
 import TileWMSSource from 'ol/source/TileWMS';
 import ImageWMSSource from 'ol/source/ImageWMS';
+import WmsOfflineSource from './wmsofflinesource.js'
 import tile from './tile';
 import maputils from '../maputils';
 import image from './image';
@@ -27,6 +28,15 @@ function createTileSource(options) {
     Object.keys(options.params).forEach((element) => {
       sourceOptions.params[element] = options.params[element];
     });
+  }
+  if (options.offline) {
+    sourceOptions.offlineStoreName = options.offlineStoreName;
+    sourceOptions.offlineMinZoom = options.offlineMinZoom;
+    sourceOptions.offlineMaxZoom = options.offlineMaxZoom;
+    const offlineSource = new WmsOfflineSource(sourceOptions);
+    // TODO: denna är async ...
+    offlineSource.init();
+    return offlineSource;
   }
   return new TileWMSSource((sourceOptions));
 }
@@ -181,6 +191,10 @@ const wms = function wms(layerOptions, viewer) {
   const renderMode = wmsOptions.renderMode || 'tile';
   wmsOptions.name.split(':').pop();
   const sourceOptions = Object.assign(sourceDefault, viewer.getMapSource()[layerOptions.source]);
+  sourceOptions.offline = wmsOptions.offline;
+  sourceOptions.offlineStoreName = wmsOptions.offlineStoreName;
+  sourceOptions.offlineMaxZoom = wmsOptions.offlineMaxZoom;
+  sourceOptions.offlineMinZoom = wmsOptions.offlineMinZoom;
   sourceOptions.attribution = wmsOptions.attribution;
   sourceOptions.crossOrigin = wmsOptions.crossOrigin ? wmsOptions.crossOrigin : sourceOptions.crossOrigin;
   sourceOptions.projection = viewer.getProjection();
