@@ -12,6 +12,7 @@ import xyz from './xyz';
 import osm from './osm';
 import vectortile from './vectortile';
 import feature from './featurelayer';
+import wmsoffline from './wmsoffline';
 
 const layerType = {};
 
@@ -29,5 +30,6 @@ layerType.XYZ = xyz;
 layerType.OSM = osm;
 layerType.VECTORTILE = vectortile;
 layerType.FEATURE = feature;
+layerType.WMSOFFLINE = wmsoffline;
 
 export default layerType;
