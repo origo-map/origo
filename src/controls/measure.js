@@ -750,7 +750,7 @@ const Measure = function Measure({
         });
 
         measureButton = Button({
-          cls: 'o-measure padding-small margin-bottom-smaller icon-smaller round light box-shadow',
+          cls: 'o-measure padding-small icon-smaller round light box-shadow',
           click() {
             toggleMeasure();
           },
@@ -762,7 +762,7 @@ const Measure = function Measure({
 
         if (lengthTool) {
           lengthToolButton = Button({
-            cls: 'o-measure-length padding-small margin-bottom-smaller icon-smaller round light box-shadow hidden',
+            cls: 'o-measure-length padding-small margin-top-small icon-smaller round light box-shadow hidden',
             click() {
               type = 'LineString';
               toggleType(this);
@@ -778,7 +778,7 @@ const Measure = function Measure({
 
         if (areaTool) {
           areaToolButton = Button({
-            cls: 'o-measure-area padding-small margin-bottom-smaller icon-smaller round light box-shadow hidden',
+            cls: 'o-measure-area padding-small margin-top-small icon-smaller round light box-shadow hidden',
             click() {
               type = 'Polygon';
               toggleType(this);
@@ -793,7 +793,7 @@ const Measure = function Measure({
 
         if (elevationTool) {
           elevationToolButton = Button({
-            cls: 'o-measure-elevation padding-small margin-bottom-smaller icon-smaller round light box-shadow hidden',
+            cls: 'o-measure-elevation padding-small margin-top-small icon-smaller round light box-shadow hidden',
             click() {
               type = 'Point';
               toggleType(this);
@@ -808,7 +808,7 @@ const Measure = function Measure({
 
         if (bufferTool) {
           bufferToolButton = Button({
-            cls: 'o-measure-buffer padding-small margin-bottom-smaller icon-smaller round light box-shadow hidden',
+            cls: 'o-measure-buffer padding-small margin-top-small icon-smaller round light box-shadow hidden',
             click() {
               type = 'Point';
               toggleType(this);
@@ -836,7 +836,7 @@ const Measure = function Measure({
 
         if (lengthTool || areaTool) {
           undoButton = Button({
-            cls: 'o-measure-undo padding-small margin-bottom-smaller icon-smaller round light box-shadow hidden',
+            cls: 'o-measure-undo padding-small margin-top-small icon-smaller round light box-shadow hidden',
             click() {
               undoLastPoint();
             },
@@ -846,7 +846,7 @@ const Measure = function Measure({
           });
           buttons.push(undoButton);
           clearButton = Button({
-            cls: 'o-measure-clear padding-small margin-bottom-smaller icon-smaller round light box-shadow hidden',
+            cls: 'o-measure-clear padding-small margin-top-small icon-smaller round light box-shadow hidden',
             click() {
               measure.abortDrawing();
               vector.getSource().clear();
@@ -861,7 +861,7 @@ const Measure = function Measure({
 
         if (snap) {
           toggleSnapButton = Button({
-            cls: `o-measure-snap padding-small margin-bottom-smaller icon-smaller round light box-shadow hidden activ ${
+            cls: `o-measure-snap padding-small margin-top-small icon-smaller round light box-shadow hidden activ ${
               snapActive && 'active'
             }`,
             click() {
