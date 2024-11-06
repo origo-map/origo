@@ -33,6 +33,8 @@ const ExternalurlSingleButton = function ExternalurlSingleButton(options = {}) {
     } else if (method === 'LatLon') {
       const centerLonlat = toLonLat(transformedCenter);
       replacedUrl = replacer.replace(url, { LON: centerLonlat[0], LAT: centerLonlat[1] });
+    } else if (method === 'none') {
+      replacedUrl = url;
     }
 
     window.open(replacedUrl, '_blank');
