@@ -29,6 +29,7 @@ import 'drag-drop-touch';
 import permalink from './src/permalink/permalink';
 import * as Loader from './src/loading';
 import Spinner from './src/utils/spinner';
+import Infowindow from './src/components/infowindow';
 
 const Origo = function Origo(configPath, options = {}) {
   /** Reference to the returned Component */
@@ -146,6 +147,8 @@ const Origo = function Origo(configPath, options = {}) {
 olInteraction.Draw.createBox = createBox;
 olGeom.Polygon.fromCircle = fromCircle;
 olGeom.Polygon.fromExtent = fromExtent;
+Origo.components = {};
+Origo.components.Infowindow = Infowindow;
 Origo.controls = origoControls;
 Origo.extensions = origoExtensions;
 Origo.ui = ui;

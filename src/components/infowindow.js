@@ -19,17 +19,29 @@ const Infowindow = function Infowindow(options = {}) {
   let titleComponent;
   let infowindow;
   let iwEl;
+  let iwCmp;
   let closeButton;
 
   const toggle = function toggle() {
     iwEl.classList.toggle('faded');
     isActive = !isActive;
+    iwCmp.dispatch('toggle');
   };
 
   const close = function close() {
     if (isActive) {
       toggle();
     }
+  };
+
+  const show = function show() {
+    if (!isActive) {
+      toggle();
+    }
+  };
+
+  const getContentElement = function getContentElement() {
+    return document.getElementById(contentComponent.getId());
   };
 
   const changeContent = function changeContent(component, objTitle) {
@@ -51,12 +63,16 @@ const Infowindow = function Infowindow(options = {}) {
   return Component({
     name: 'infowindow',
     close,
+    show,
+    getStatus() { return isActive },
     changeContent,
+    getContentElement,
     onAdd() {
       this.on('render', this.onRender);
       this.render();
     },
     onInit() {
+      iwCmp = this;
       let iwElCls = isActive ? '' : ' faded';
       let iwElStyle = '';
       let hcElCls = '';
