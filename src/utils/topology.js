@@ -152,6 +152,137 @@ const topology = {
       default: valid = true;
     }
     return valid;
+  },
+
+  /**
+   * Densifies a geometry by adding points along segments.
+   * @param {any} geom The geometry to densify
+   * @param {double} multiple Higher value means more breakpoints
+   * @returns {any} geom The densified geometry
+   */
+  densify: function densify(geom, multiple = 1) {
+
+    function densifyGeom(geometry, mult) {
+      let maxLength = 100;
+      const lineCoords = [];
+      let length = geometry.getLength();
+      if (length < 100) {
+        maxLength = 5 / mult;
+      } else if (length < 1000) {
+        maxLength = 25 / mult;
+      } else if (length < 10000) {
+        maxLength = 50 / mult;
+      }
+      if (maxLength < 1) { maxLength = 1 }
+      let coords = geometry.getCoordinates();
+      lineCoords.push(coords[0]);
+      geometry.forEachSegment(function (start, end) {
+        const segment = new LineString([start, end]);
+        const segmentLength = segment.getLength();
+        var splits = Math.ceil(segmentLength / maxLength);
+        for (let i = 1; i < splits; i++) {
+          const fraction = i / splits;
+          const pt = segment.getCoordinateAt(fraction)
+          lineCoords.push(pt);
+        }
+        lineCoords.push(end);
+      });
+      return lineCoords;
+    }
+
+    const densified = geom.clone()
+    const densifiedCoords = densifyGeom(geom, multiple);
+    if (densifiedCoords) {
+      densified.setCoordinates(densifiedCoords);
+    }
+    return densified;
+  },
+
+  /**
+   * Simplifies a line geometry.
+   * @param {any} geom The line geometry to simplify
+   * @param {double} tolerance
+   * @returns {any} geom The simplified geometry
+   */
+  simplify: function simplify(geom, tolerance = 1) {
+
+    function sqSegDist(p, p1, p2) {
+      let x0 = p[0],
+        x1 = p1[0],
+        x2 = p2[0],
+        y0 = p[1],
+        y1 = p1[1],
+        y2 = p2[1],
+        z0 = p[2] || 0,
+        z1 = p1[2] || 0,
+        z2 = p2[2] || 0,
+        dx = x2 - x1,
+        dy = y2 - y1,
+        dz = z2 - z1;
+      if (dx !== 0 || dy !== 0 || dz !== 0) {
+        const t = ((x0 - x1) * dx + (y0 - y1) * dy + (z0 - z1) * dz) / (dx * dx + dy * dy + dz * dz);
+        if (t > 1) {
+          x1 = x2;
+          y1 = y2;
+          z1 = z2;
+        } else if (t > 0) {
+          x1 += dx * t;
+          y1 += dy * t;
+          z1 += dz * t;
+        }
+      }
+      dx = x0 - x1;
+      dy = y0 - y1;
+      dz = z0 - z1;
+      return dx * dx + dy * dy + dz * dz;
+    }
+
+    function simplifyDouglasPeucker(geometry, sqTolerance) {
+      const points = geometry.getCoordinates();
+      let len = points.length,
+        pArr = new Array(len),
+        first = 0,
+        last = len - 1,
+        stack = [],
+        newPoints = [],
+        i, maxSqDist, sqDist, index;
+      pArr[first] = pArr[last] = 1;
+      while (last) {
+        maxSqDist = 0;
+        for (i = first + 1; i < last; i++) {
+          sqDist = sqSegDist(points[i], points[first], points[last]);
+          if (sqDist > maxSqDist) {
+            index = i;
+            maxSqDist = sqDist;
+          }
+        }
+        if (maxSqDist > sqTolerance) {
+          pArr[index] = 1;
+          stack.push(first, index, index, last);
+        }
+        last = stack.pop();
+        first = stack.pop();
+      }
+      for (i = 0; i < len; i++) {
+        if (pArr[i]) {
+          newPoints.push(points[i]);
+        }
+      }
+      return newPoints;
+    }
+
+    function simplifyGeom(geometry, tol) {
+      const sqTolerance = tol * tol || 1;
+      const points = simplifyDouglasPeucker(geometry, sqTolerance);
+      return points;
+    }
+
+    const simplified = geom.clone();
+    const simplifiedCoords = simplifyGeom(geom, tolerance);
+    if (simplifiedCoords) {
+      simplified.setCoordinates(simplifiedCoords);
+    }
+    return simplified;
   }
 };
 
