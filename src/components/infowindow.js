@@ -64,7 +64,7 @@ const Infowindow = function Infowindow(options = {}) {
     name: 'infowindow',
     close,
     show,
-    getStatus() { return isActive },
+    getStatus() { return isActive; },
     changeContent,
     getContentElement,
     onAdd() {
