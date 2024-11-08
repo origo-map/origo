@@ -337,6 +337,7 @@ const Featureinfo = function Featureinfo(options = {}) {
           } else {
             contentDiv.innerHTML = item.content;
           }
+          component.dispatch('itemadded', item);
         });
         popup.setVisibility(true);
         initCarousel('#o-identify-carousel');
@@ -409,6 +410,7 @@ const Featureinfo = function Featureinfo(options = {}) {
           } else {
             contentDiv.innerHTML = item.content;
           }
+          component.dispatch('itemadded', item);
         });
         sidebar.setVisibility(true);
         const firstFeature = items[0].feature;
