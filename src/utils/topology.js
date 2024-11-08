@@ -161,11 +161,10 @@ const topology = {
    * @returns {any} geom The densified geometry
    */
   densify: function densify(geom, multiple = 1) {
-
     function densifyGeom(geometry, mult) {
       let maxLength = 100;
       const lineCoords = [];
-      let length = geometry.getLength();
+      const length = geometry.getLength();
       if (length < 100) {
         maxLength = 5 / mult;
       } else if (length < 1000) {
@@ -173,16 +172,16 @@ const topology = {
       } else if (length < 10000) {
         maxLength = 50 / mult;
       }
-      if (maxLength < 1) { maxLength = 1 }
-      let coords = geometry.getCoordinates();
+      if (maxLength < 1) { maxLength = 1; }
+      const coords = geometry.getCoordinates();
       lineCoords.push(coords[0]);
-      geometry.forEachSegment(function (start, end) {
+      geometry.forEachSegment((start, end) => {
         const segment = new LineString([start, end]);
         const segmentLength = segment.getLength();
-        var splits = Math.ceil(segmentLength / maxLength);
-        for (let i = 1; i < splits; i++) {
+        const splits = Math.ceil(segmentLength / maxLength);
+        for (let i = 1; i < splits; i += 1) {
           const fraction = i / splits;
-          const pt = segment.getCoordinateAt(fraction)
+          const pt = segment.getCoordinateAt(fraction);
           lineCoords.push(pt);
         }
         lineCoords.push(end);
@@ -190,7 +189,7 @@ const topology = {
       return lineCoords;
     }
 
-    const densified = geom.clone()
+    const densified = geom.clone();
     const densifiedCoords = densifyGeom(geom, multiple);
     if (densifiedCoords) {
       densified.setCoordinates(densifiedCoords);
@@ -205,20 +204,19 @@ const topology = {
    * @returns {any} geom The simplified geometry
    */
   simplify: function simplify(geom, tolerance = 1) {
-
     function sqSegDist(p, p1, p2) {
-      let x0 = p[0],
-        x1 = p1[0],
-        x2 = p2[0],
-        y0 = p[1],
-        y1 = p1[1],
-        y2 = p2[1],
-        z0 = p[2] || 0,
-        z1 = p1[2] || 0,
-        z2 = p2[2] || 0,
-        dx = x2 - x1,
-        dy = y2 - y1,
-        dz = z2 - z1;
+      const x0 = p[0];
+      const x2 = p2[0];
+      const y0 = p[1];
+      const y2 = p2[1];
+      const z0 = p[2] || 0;
+      const z2 = p2[2] || 0;
+      let x1 = p1[0];
+      let y1 = p1[1];
+      let z1 = p1[2] || 0;
+      let dx = x2 - x1;
+      let dy = y2 - y1;
+      let dz = z2 - z1;
       if (dx !== 0 || dy !== 0 || dz !== 0) {
         const t = ((x0 - x1) * dx + (y0 - y1) * dy + (z0 - z1) * dz) / (dx * dx + dy * dy + dz * dz);
         if (t > 1) {
@@ -239,17 +237,22 @@ const topology = {
 
     function simplifyDouglasPeucker(geometry, sqTolerance) {
       const points = geometry.getCoordinates();
-      let len = points.length,
-        pArr = new Array(len),
-        first = 0,
-        last = len - 1,
-        stack = [],
-        newPoints = [],
-        i, maxSqDist, sqDist, index;
-      pArr[first] = pArr[last] = 1;
+      const len = points.length;
+      const pArr = new Array(len);
+      const stack = [];
+      const newPoints = [];
+      let first = 0;
+      let last = len - 1;
+      let i;
+      let maxSqDist;
+      let sqDist;
+      let index;
+      pArr[first] = 1;
+      pArr[last] = 1;
+
       while (last) {
         maxSqDist = 0;
-        for (i = first + 1; i < last; i++) {
+        for (i = first + 1; i < last; i += 1) {
           sqDist = sqSegDist(points[i], points[first], points[last]);
           if (sqDist > maxSqDist) {
             index = i;
@@ -263,7 +266,7 @@ const topology = {
         last = stack.pop();
         first = stack.pop();
       }
-      for (i = 0; i < len; i++) {
+      for (i = 0; i < len; i += 1) {
         if (pArr[i]) {
           newPoints.push(points[i]);
         }
