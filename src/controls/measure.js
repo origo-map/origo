@@ -22,7 +22,7 @@ const Measure = function Measure({
   useHectare = true,
   snap = false,
   snapIsActive = true,
-  queryable = true,
+  queryable = false,
   snapLayers,
   snapRadius = 15,
   highlightColor,
