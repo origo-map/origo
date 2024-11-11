@@ -9,6 +9,7 @@ import * as drawStyles from './drawstyles';
 import styleTemplate from './styletemplate';
 import hexToRgba from './hextorgba';
 import { Component, Button, Element, dom } from '../ui';
+import formatLengthString from '../utils/formatlengthstring';
 
 const Stylewindow = function Stylewindow(optOptions = {}) {
   const {
@@ -139,6 +140,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
           selected
         };
         break;
+      case 'Circle':
       case 'Polygon':
       case 'MultiPolygon':
         styleObject = {
@@ -220,6 +222,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
         document.getElementById('o-draw-style-backgroundStroke').classList.add('hidden');
         document.getElementById('o-draw-style-padding').classList.add('hidden');
         break;
+      case 'Circle':
       case 'Polygon':
       case 'MultiPolygon':
         document.getElementById('o-draw-style-point').classList.add('hidden');
@@ -381,7 +384,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
           stroke
         });
         if (newStyleObj.showMeasureSegments) {
-          const segmentLabelStyle = drawStyles.getSegmentLabelStyle(geom, projection, styleScale);
+          const segmentLabelStyle = drawStyles.getSegmentLabelStyle({ line: geom, projection, scale: styleScale });
           style = style.concat(segmentLabelStyle);
         }
         if (newStyleObj.showMeasure) {
@@ -401,7 +404,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
           const featureCoords = feature.getGeometry().getCoordinates();
           featureCoords.forEach(part => {
             const line = new LineString(part);
-            const segmentLabelStyle = drawStyles.getSegmentLabelStyle(line, projection, styleScale);
+            const segmentLabelStyle = drawStyles.getSegmentLabelStyle({ line, projection, scale: styleScale });
             style = style.concat(segmentLabelStyle);
           });
         }
@@ -418,6 +421,29 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
           });
         }
         break;
+      case 'Circle':
+        style[0] = new Style({
+          fill,
+          stroke
+        });
+        if (newStyleObj.showMeasureSegments) {
+          const radius = geom.getRadius();
+          const circ = radius * 2 * Math.PI;
+          const label = formatLengthString(circ, { decimals: 2 });
+          const labelStyle = drawStyles.getBufferLabelStyle(label, styleScale);
+          style = style.concat(labelStyle);
+        }
+        if (newStyleObj.showMeasure) {
+          const radius = geom.getRadius();
+          const area = radius * radius * Math.PI;
+          const label = drawStyles.formatArea(undefined, true, projection, area);
+          const point = new Point(geom.getCenter());
+          const labelStyle = drawStyles.getLabelStyle(styleScale);
+          labelStyle.setGeometry(point);
+          labelStyle.getText().setText(label);
+          style = style.concat(labelStyle);
+        }
+        break;
       case 'Polygon':
         style[0] = new Style({
           fill,
@@ -425,7 +451,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
         });
         if (newStyleObj.showMeasureSegments) {
           const line = new LineString(geom.getCoordinates()[0]);
-          const segmentLabelStyle = drawStyles.getSegmentLabelStyle(line, projection, styleScale);
+          const segmentLabelStyle = drawStyles.getSegmentLabelStyle({ line, projection, scale: styleScale });
           style = style.concat(segmentLabelStyle);
         }
         if (newStyleObj.showMeasure) {
@@ -447,7 +473,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
           featureCoords.forEach(parts => {
             parts.forEach(part => {
               const line = new LineString(part);
-              const segmentLabelStyle = drawStyles.getSegmentLabelStyle(line, projection, styleScale);
+              const segmentLabelStyle = drawStyles.getSegmentLabelStyle({ line, projection, scale: styleScale });
               style = style.concat(segmentLabelStyle);
             });
           });

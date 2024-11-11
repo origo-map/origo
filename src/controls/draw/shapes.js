@@ -1,10 +1,17 @@
-import { createBox } from 'ol/interaction/Draw';
+import { createBox, createRegularPolygon } from 'ol/interaction/Draw';
 
 export default (drawType) => {
   const types = {
     box: {
       type: 'Circle',
       geometryFunction: createBox()
+    },
+    square: {
+      type: 'Circle',
+      geometryFunction: createRegularPolygon(4)
+    },
+    circle: {
+      type: 'Circle'
     },
     freehand: {
       freehand: true

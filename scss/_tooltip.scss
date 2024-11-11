@@ -21,6 +21,7 @@
   display: inline-block;
   opacity: 1;
   visibility: visible;
+  z-index: 100;
 }
 
 .o-tooltip:hover span[data-tooltip]::after {
@@ -36,7 +37,7 @@
   text-align: center;
   white-space: nowrap;
   width: auto;
-  z-index: 100;
+  pointer-events: none;
 }
 
 @media (hover: none) {

@@ -5,7 +5,8 @@ export default function CustomSizeControl(options = {}) {
     minHeight,
     maxHeight,
     minWidth,
-    maxWidth
+    maxWidth,
+    localize
   } = options;
 
   let {
@@ -27,7 +28,7 @@ export default function CustomSizeControl(options = {}) {
         minValue: minHeight,
         style: { width: '100%' },
         unit: 'mm',
-        label: 'Höjd'
+        label: localize('height')
       });
       rangeWidthComponent = InputRange({
         cls: '',
@@ -36,7 +37,7 @@ export default function CustomSizeControl(options = {}) {
         minValue: minWidth,
         style: { width: '100%' },
         unit: 'mm',
-        label: 'Bredd'
+        label: localize('width')
       });
       this.addComponents([rangeHeightComponent, rangeWidthComponent]);
       rangeHeightComponent.on('change', this.onChangeHeight.bind(this));

@@ -11,6 +11,8 @@ const drawToolsSelector = function drawToolsSelector(extraTools, v, toolCmps) {
     Point: 'Punkt',
     LineString: 'Linje',
     box: 'Rektangel',
+    square: 'Kvadrat',
+    circle: 'Cirkel',
     freehand: 'Frihandsläge'
   };
   viewer = v;

@@ -284,8 +284,9 @@ const LayerRows = function LayerRows(options) {
       });
       const layerListCmp = Component({
         async render() {
-          const content = await overlayEls.reduce(async (acc, item) => await acc + await item.render(), '');
-          return `<ul id="${this.getId()}" class="list">${content}</ul>`;
+          const rowPromises = overlayEls.map((item) => item.render());
+          const rows = await Promise.all(rowPromises);
+          return `<ul id="${this.getId()}" class="list">${rows.reverse().join('')}</ul>`;
         }
       });
       return `
