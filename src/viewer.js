@@ -83,7 +83,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
       const layers = {};
       capabilitiesResults.forEach(result => {
         layers[result.name] = result.capabilites;
-        if(source[result.name].saveCapabilitiesDoc !== false){
+        if(source[result.name]?.saveCapabilitiesDoc !== false){
           source[result.name].capabilitiesDoc = result.capabilitesDoc;
         }
       });
