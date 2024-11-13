@@ -69,8 +69,10 @@
             "portraitAriaLabel": "Stående",
             "landscape": "Liggande",
             "landscapeAriaLabel": "Liggande"
+        },
+        "offline": {
+            "btn_tool_title": "Förbered för att gå offline"
         }
-
     },
     "style": {
         "drawStyles": {
@@ -78,10 +80,7 @@
         },
         "styleWindow": {
             "title": "Configure style"
-
         },
-        "styleTemplate": {
-
-        }
+        "styleTemplate": {}
     }
 }

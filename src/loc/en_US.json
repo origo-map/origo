@@ -69,6 +69,9 @@
             "portraitAriaLabel": "Portrait",
             "landscape": "Landscape",
             "landscapeAriaLabel": "Landscape"
+        },
+        "offline": {
+            "btn_tool_title": "Prepear to go offline"
         }
     },
     "style": {
@@ -77,10 +80,7 @@
         },
         "styleWindow": {
             "title": "Configure style"
-
         },
-        "styleTemplate": {
-
-        }
+        "styleTemplate": {}
     }
 }
