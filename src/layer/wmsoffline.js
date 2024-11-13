@@ -49,7 +49,7 @@ function createTileSource(options, viewer) {
  *
  * Example configuration:
  * {
- *    "offlineStoreName": "multipoly", // Name in indexeddb. Mot same as layer as it can be shared between applications
+ *    "offlineStoreName": "multipoly", // Name in indexeddb. Not same as layer as it can be shared between applications
  *    "offlineMinZoom": 6, // outermost zoom level to cache. Use usual minZoom for visibility.
  *    "offlineMaxZoom": 8, // innermost zoom level to cache. Use usual maxZoom for visibility
  *    "name": "sf:multipolygonlager", // Same as for WMS. id can also be used
