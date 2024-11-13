@@ -190,6 +190,7 @@ export default function Offline({ localization }) {
           icon: '#ic_close_24px',
           click() {
             modal.closeModal();
+            modal.dispatch('closed');
             clearAndRemoveInteraction();
           }
         });
@@ -198,18 +199,17 @@ export default function Offline({ localization }) {
           text: 'Spara',
           icon: '#ic_save_24px',
           click() {
-            console.log('SAVE');
             // Store the extends
             const responses = [];
-            console.log('EXTENT', extent);
 
             offlineLayers.forEach(offlineLayer => {
               responses.push(offlineLayer.getProperties().source.preload(extent));
             });
 
             modal.closeModal();
+            modal.dispatch('closed');
             toastDownload.show();
-            // TODO: Close modal and show progress, when all promises are resolved we show a toast message that the layers are saved.
+
             Promise.all(responses).then((result) => {
               console.log('All tiles saved', result);
               toastSuccessSave.show();
@@ -283,7 +283,6 @@ export default function Offline({ localization }) {
   function clearAndRemoveInteraction() {
     clearDrawings();
     map.removeInteraction(envelope);
-    // if (modal) modal.closeModal();
   }
 
   // Function to clear drawings and restart the draw interaction.
