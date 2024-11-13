@@ -1,4 +1,5 @@
 import ImageTileSource from 'ol/source/ImageTile';
+import { toSize } from 'ol/size';
 
 const databaseName = 'origoOfflineTiles';
 const databaseVersion = 1;
@@ -134,7 +135,8 @@ export default class ImageTileOfflineSource extends ImageTileSource {
    */
   calculateEstimateForExtent(extent) {
     const numberOfTiles = this.calculateTiles(extent).length;
-    const estimateBytes = numberOfTiles * this.tileGrid.getTileSize()[0] * this.tileGrid.getTileSize()[1] * this.compressionFactor;
+    const tileSize = toSize(this.tileGrid.getTileSize());
+    const estimateBytes = numberOfTiles * tileSize[0] * tileSize[1] * this.compressionFactor;
     return { numberOfTiles, estimateBytes };
   }
 
