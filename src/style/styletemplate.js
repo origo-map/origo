@@ -120,8 +120,8 @@ export default function styleTemplate({ palette, swStyle, localization }) {
   <div class="padding-smaller o-tooltip active">
     <select id="o-draw-style-pointType" class="small no-margin width-full">
       <option value="circle"${swStyle.pointType === 'circle' ? ' selected' : ''}>${localize('pointTypeCircle')}</option>
-      <option value="x"${swStyle.pointType === 'x' ? ' selected' : ''}>${localize('pointTypeCheckmark')}</option>
-      <option value="cross"${swStyle.pointType === 'cross' ? ' selected' : ''}>${localize('pointTypeCross')}</option>
+      <option value="x"${swStyle.pointType === 'x' ? ' selected' : ''}>${localize('pointTypeX')}</option>
+      <option value="cross"${swStyle.pointType === 'cross' ? ' selected' : ''}>${localize('pointTypePlus')}</option>
       <option value="star"${swStyle.pointType === 'star' ? ' selected' : ''}>${localize('pointTypeStar')}</option>
       <option value="triangle"${swStyle.pointType === 'triangle' ? ' selected' : ''}>${localize('pointTypeTriangle')}</option>
       <option value="square"${swStyle.pointType === 'square' ? ' selected' : ''}>${localize('pointTypeSquare')}</option>
