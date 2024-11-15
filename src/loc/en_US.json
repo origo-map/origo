@@ -140,7 +140,7 @@
             "pointTypePoint": "Point",
             "pointTypeCircle": "Circle",
             "pointTypeX": "X",
-            "pointTypePlus": "Cross",
+            "pointTypePlus": "Plus",
             "pointTypeStar": "Star",
             "pointTypeTriangle": "Triangle",
             "pointTypeSquare": "Square",
