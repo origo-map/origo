@@ -69,6 +69,42 @@
             "portraitAriaLabel": "Stående",
             "landscape": "Liggande",
             "landscapeAriaLabel": "Liggande"
+        },
+        "draw": {
+            "title": "Rita",
+            "popupSaveButton": "Spara",
+            "popupCancelButton": "Avbryt",
+            "popupPlaceholderText": "Ange popuptext",
+            "popupTextModalTitle": "Popuptext",
+            "layerDialogLayerNamePlaceholder": "Ange lagernamn",
+            "layerDialogActivateLayerTooltip": "Aktivera ritlager",
+            "layerDialogDeleteLayerConfirm": "Vill du radera det här ritlagret?",
+            "layerDialogDeleteLayerTooltip": "Radera ritlager",
+            "layerDialogDownloadLayerTooltip": "Ladda ner ritlager",
+            "layerDialogAddLayerButton": "Nytt ritlager",
+            "layerDialogImportLayerButton": "Importera ritlager",
+            "layerDialogOkButton": "OK",
+            "layerDialogTitle": "Ritlager",
+            "pointButtonTooltip": "Punkt",
+            "lineButtonTooltip": "Linje",
+            "polygonButtonTooltip": "Polygon",
+            "textButtonTooltip": "Text",
+            "attributeButtonTooltip": "Attribut",
+            "styleButtonTooltip": "Stil",
+            "layerButtonTooltip": "Lager",
+            "saveButtonTooltip": "Spara",
+            "downloadButtonTooltip": "Ladda ner",
+            "deleteButtonTooltip": "Ta bort",
+            "closeButtonTooltip": "Stäng",
+            "drawLayerTitleDefault": "Ritlager",
+            "drawGroupTitleDefault": "Ritlager",
+            "drawPolygon": "Polygon",
+            "drawPoint": "Punkt",
+            "drawLine": "Linje",
+            "drawBox": "Rektangel",
+            "drawSquare": "Fyrkant",
+            "drawCircle": "Cirkel",
+            "drawFreehand": "Frihand"
         }
 
     },
@@ -77,11 +113,39 @@
             "modifyTooltip": "Dra för att ändra"
         },
         "styleWindow": {
-            "title": "Configure style"
+            "title": "Definiera stil"
 
         },
         "styleTemplate": {
-
+            "fillColor": "Fyllning",
+            "backgroundFillColor": "Bakgrundsfyllning",
+            "opacity": "Opacitet",
+            "strokeWidth": "Linjebredd",
+            "textSize": "Textstorlek",
+            "pointSize": "Punktstorlek",
+            "showLengthArea": "Visa längd/area",
+            "showSegments": "Visa dellängder",
+            "stroke": "Linje",
+            "strokeTypeSolid": "Heldragen linje",
+            "strokeTypeDotted": "Punktad linje",
+            "strokeTypeDashed" : "Streckad linje",
+            "strokeTypeDashedDotted" : "Streck-punkt-linje",
+            "dimensions": "Mått",
+            "margins": "Marginaler",
+            "rotation": "Rotation",
+            "degreesRotation": "Grader",
+            "marginForText": "Marginal",
+            "frame": "Ram",
+            "margin": "Marginal",
+            "point": "Punkt",
+            "pointTypePoint": "Punkt",
+            "pointTypeCircle": "Cirkel",
+            "pointTypeX": "Kryss",
+            "pointTypePlus": "Kors",
+            "pointTypeStar": "Stjärna",
+            "pointTypeTriangle": "Tringel",
+            "pointTypeSquare": "Fyrkant",
+            "pointTypeMarker": "Markör"
         }
     }
 }

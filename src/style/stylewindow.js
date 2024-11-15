@@ -12,8 +12,13 @@ import { Component, Button, Element, dom } from '../ui';
 import formatLengthString from '../utils/formatlengthstring';
 
 const Stylewindow = function Stylewindow(optOptions = {}) {
+  const { localization } = optOptions;
+  function localize(key) {
+    return localization.getStringByKeys({ targetParentKey: 'styleWindow', targetKey: key });
+  }
+
   const {
-    title = 'Anpassa stil',
+    title = localize('title'),
     cls = 'control overflow-hidden hidden',
     css = '',
     viewer,
@@ -384,11 +389,11 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
           stroke
         });
         if (newStyleObj.showMeasureSegments) {
-          const segmentLabelStyle = drawStyles.getSegmentLabelStyle({ line: geom, projection, scale: styleScale });
+          const segmentLabelStyle = drawStyles.getSegmentLabelStyle({ line: geom, projection, scale: styleScale, localization });
           style = style.concat(segmentLabelStyle);
         }
         if (newStyleObj.showMeasure) {
-          const label = drawStyles.formatLength(geom, projection);
+          const label = drawStyles.formatLength({ line: geom, projection, localization });
           const point = new Point(geom.getLastCoordinate());
           const labelStyle = drawStyles.getLabelStyle(styleScale);
           labelStyle.setGeometry(point);
@@ -404,7 +409,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
           const featureCoords = feature.getGeometry().getCoordinates();
           featureCoords.forEach(part => {
             const line = new LineString(part);
-            const segmentLabelStyle = drawStyles.getSegmentLabelStyle({ line, projection, scale: styleScale });
+            const segmentLabelStyle = drawStyles.getSegmentLabelStyle({ line, projection, scale: styleScale, localization });
             style = style.concat(segmentLabelStyle);
           });
         }
@@ -412,7 +417,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
           const featureCoords = feature.getGeometry().getCoordinates();
           featureCoords.forEach(part => {
             const line = new LineString(part);
-            const label = drawStyles.formatLength(line, projection);
+            const label = drawStyles.formatLength({ line, projection, localization });
             const point = new Point(line.getLastCoordinate());
             const labelStyle = drawStyles.getLabelStyle(styleScale);
             labelStyle.setGeometry(point);
@@ -429,14 +434,14 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
         if (newStyleObj.showMeasureSegments) {
           const radius = geom.getRadius();
           const circ = radius * 2 * Math.PI;
-          const label = formatLengthString(circ, { decimals: 2 });
+          const label = formatLengthString(circ, { decimals: 2, localization });
           const labelStyle = drawStyles.getBufferLabelStyle(label, styleScale);
           style = style.concat(labelStyle);
         }
         if (newStyleObj.showMeasure) {
           const radius = geom.getRadius();
           const area = radius * radius * Math.PI;
-          const label = drawStyles.formatArea(undefined, true, projection, area);
+          const label = drawStyles.formatArea({ useHectare: true, projection, featureArea: area, localization });
           const point = new Point(geom.getCenter());
           const labelStyle = drawStyles.getLabelStyle(styleScale);
           labelStyle.setGeometry(point);
@@ -451,11 +456,11 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
         });
         if (newStyleObj.showMeasureSegments) {
           const line = new LineString(geom.getCoordinates()[0]);
-          const segmentLabelStyle = drawStyles.getSegmentLabelStyle({ line, projection, scale: styleScale });
+          const segmentLabelStyle = drawStyles.getSegmentLabelStyle({ line, projection, scale: styleScale, localization });
           style = style.concat(segmentLabelStyle);
         }
         if (newStyleObj.showMeasure) {
-          const label = drawStyles.formatArea(geom, true, projection);
+          const label = drawStyles.formatArea({ polygon: geom, useHectare: true, projection, localization });
           const point = geom.getInteriorPoint();
           const labelStyle = drawStyles.getLabelStyle(styleScale);
           labelStyle.setGeometry(point);
@@ -482,7 +487,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
           const featureCoords = feature.getGeometry().getCoordinates();
           featureCoords.forEach(parts => {
             const polygon = new Polygon(parts);
-            const label = drawStyles.formatArea(polygon, true, projection);
+            const label = drawStyles.formatArea({ polygon, useHectare: true, projection, localization });
             const point = polygon.getInteriorPoint();
             const labelStyle = drawStyles.getLabelStyle(styleScale);
             labelStyle.setGeometry(point);
@@ -719,7 +724,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
 
       contentEl = Element({
         cls: 'o-draw-stylewindow-content overflow-auto',
-        innerHTML: `${styleTemplate(palette, swStyle)}`
+        innerHTML: `${styleTemplate({ palette, swStyle, localization })}`
       });
 
       this.addComponent(headerEl);
