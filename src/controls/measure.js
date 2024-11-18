@@ -87,11 +87,11 @@ const Measure = function Measure({
     if (!drawType || drawType === geomType) {
       if (geomType === 'Polygon') {
         point = geometry.getInteriorPoint();
-        label = drawStyles.formatArea(geometry, useHectare, projection, 0, localization);
+        label = drawStyles.formatArea({ polygon: geometry, useHectare, projection, featureArea: 0, localization });
         line = new LineString(geometry.getCoordinates()[0]);
       } else if (geomType === 'LineString') {
         point = new Point(geometry.getLastCoordinate());
-        label = drawStyles.formatLength(geometry, projection, localization);
+        label = drawStyles.formatLength({ line: geometry, projection, localization });
         line = geometry;
       }
     }
