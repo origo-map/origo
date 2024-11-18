@@ -15,6 +15,7 @@ const externalurlSeveralButtons = function externalurlSeveralButtons(options = {
   const buttons = [];
   const subButtons = [];
   const direction = options.direction;
+  const linkTarget = options.target || '_blank';
   let containerElementcls;
   let subButtoncls;
   let subButtontooltipPlacement;
@@ -100,7 +101,7 @@ const externalurlSeveralButtons = function externalurlSeveralButtons(options = {
             } else if (link.method === 'none') {
               replacedUrl = link.url;
             }
-            window.open(replacedUrl, '_blank');
+            window.open(replacedUrl, linkTarget);
           }
         });
         buttons.push(subButton);
