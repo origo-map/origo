@@ -3,19 +3,17 @@ import utils from '../../utils';
 
 const createElement = utils.createElement;
 
-let viewer;
-
-const drawToolsSelector = function drawToolsSelector(extraTools, v, toolCmps) {
+const drawToolsSelector = function drawToolsSelector({ extraTools, viewer, toolCmps, localize }) {
   const toolNames = {
-    Polygon: 'Polygon',
-    Point: 'Punkt',
-    LineString: 'Linje',
-    box: 'Rektangel',
-    square: 'Kvadrat',
-    circle: 'Cirkel',
-    freehand: 'Frihandsläge'
+    Polygon: localize('drawPolygon'),
+    Point: localize('drawPoint'),
+    LineString: localize('drawLine'),
+    box: localize('drawBox'),
+    square: localize('drawSquare'),
+    circle: localize('drawCircle'),
+    freehand: localize('drawFreehand')
   };
-  viewer = v;
+
   const drawCmp = viewer.getControlByName('draw');
   let drawTools;
   const map = viewer.getMap();

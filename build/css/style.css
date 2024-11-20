@@ -231,6 +231,8 @@
       align-items: baseline; }
     .o-ui .flex .align-stretch {
       align-items: stretch; }
+    .o-ui .flex .basis-0 {
+      flex-basis: 0; }
     .o-ui .flex .basis-25 {
       flex-basis: 25%; }
     .o-ui .flex .basis-50 {
@@ -784,14 +786,12 @@
     box-sizing: border-box;
     display: inline-block;
     line-height: 0;
-    overflow: hidden;
     position: relative;
     transition: height 0.3s; }
     .o-ui .slidenav > .main {
       box-sizing: border-box;
       display: inline-block;
       left: 0;
-      overflow: hidden;
       position: relative;
       top: 0;
       transition: all 0.3s;
@@ -811,20 +811,24 @@
       transition: all 0.3s;
       width: 100%;
       will-change: transform;
-      z-index: 1000; }
+      z-index: 1000;
+      height: unset; }
       .o-ui .slidenav > .secondary.absolute {
-        position: absolute; }
+        position: absolute;
+        height: 0; }
     .o-ui .slidenav.right .secondary {
       transform: translateX(100%); }
     .o-ui .slidenav.left .secondary {
       transform: translateX(-100%); }
-    .o-ui .slidenav.slide-secondary.right .main {
-      transform: translateX(-20%); }
-    .o-ui .slidenav.slide-secondary.left .main {
-      transform: translateX(20%); }
-    .o-ui .slidenav.slide-secondary .secondary {
-      opacity: 1;
-      transform: none; }
+    .o-ui .slidenav.slide-secondary {
+      overflow: hidden; }
+      .o-ui .slidenav.slide-secondary.right .main {
+        transform: translateX(-20%); }
+      .o-ui .slidenav.slide-secondary.left .main {
+        transform: translateX(20%); }
+      .o-ui .slidenav.slide-secondary .secondary {
+        opacity: 1;
+        transform: none; }
   .o-ui .o-scrollbar::-webkit-scrollbar {
     width: 11px; }
   .o-ui .o-scrollbar {
@@ -1343,6 +1347,8 @@
     overflow-x: auto; }
   .o-ui .overflow-auto-y {
     overflow-y: auto; }
+  .o-ui .overflow-unset {
+    overflow: unset; }
   .o-ui .absolute {
     position: absolute; }
   .o-ui .fixed {
@@ -2420,7 +2426,8 @@ body {
   .o-map .o-tooltip:hover span[data-tooltip] {
     display: inline-block;
     opacity: 1;
-    visibility: visible; }
+    visibility: visible;
+    z-index: 100; }
   .o-map .o-tooltip:hover span[data-tooltip]::after {
     background: rgba(51, 51, 51, 0.85);
     border-radius: 4px;
@@ -2434,7 +2441,7 @@ body {
     text-align: center;
     white-space: nowrap;
     width: auto;
-    z-index: 100; }
+    pointer-events: none; }
   @media (hover: none) {
     .o-map .o-tooltip:hover span[data-tooltip] {
       animation: 0.2s linear 3s forwards fadeout; } }
@@ -2478,6 +2485,10 @@ body {
     margin-top: .5rem; }
   .o-map .o-toolbar-misc {
     margin-top: .5rem; }
+  .o-map .o-navigation button {
+    position: relative; }
+  .o-map .o-maptools button {
+    position: relative; }
   .o-map .o-footer {
     background-color: black;
     background-color: rgba(0, 0, 0, 0.8);
@@ -3154,7 +3165,8 @@ body {
     transition: 0.5s; }
   .o-map .o-identify-content {
     display: inline-block;
-    width: 100%; }
+    width: 100%;
+    overflow-wrap: anywhere; }
   .o-map .folded {
     max-height: 0;
     overflow: hidden;
@@ -3312,6 +3324,50 @@ body {
     margin-left: 0.22em;
     bottom: -3px;
     position: relative; }
+  .o-map .logger-toast {
+    border-radius: 0.5em;
+    box-shadow: 0 0 8px #888;
+    padding: 1em;
+    right: 0;
+    left: 0;
+    margin-right: auto;
+    margin-left: auto;
+    text-align: center;
+    position: fixed;
+    z-index: 999;
+    display: inline-block;
+    max-width: 90%;
+    bottom: 2.5rem; }
+  .o-map .logger-primary {
+    fill: #084298;
+    color: #084298;
+    background-color: #cfe2ff;
+    border-color: #b6d4fe; }
+  .o-map .logger-success {
+    fill: #0f5132;
+    color: #0f5132;
+    background-color: #d1e7dd;
+    border-color: #badbcc; }
+  .o-map .logger-info {
+    fill: #055160;
+    color: #055160;
+    background-color: #cff4fc;
+    border-color: #b6effb; }
+  .o-map .logger-warning {
+    fill: #664d03;
+    color: #664d03;
+    background-color: #fff3cd;
+    border-color: #ffecb5; }
+  .o-map .logger-danger {
+    fill: #842029;
+    color: #842029;
+    background-color: #f8d7da;
+    border-color: #f5c2c7; }
+  .o-map .logger-light {
+    fill: #636464;
+    color: #636464;
+    background-color: #fefefe;
+    border-color: #fdfdfe; }
 
 html,
 body {

@@ -29,6 +29,7 @@ import 'drag-drop-touch';
 import permalink from './src/permalink/permalink';
 import * as Loader from './src/loading';
 import Spinner from './src/utils/spinner';
+import layerType from './src/layer/layertype';
 
 const Origo = function Origo(configPath, options = {}) {
   /** Reference to the returned Component */
@@ -50,6 +51,7 @@ const Origo = function Origo(configPath, options = {}) {
     },
     breakPointsPrefix: 'o-media',
     defaultControls: [
+      { name: 'localization' },
       { name: 'scaleline' },
       { name: 'zoom' },
       { name: 'rotate' },
@@ -67,10 +69,30 @@ const Origo = function Origo(configPath, options = {}) {
 
   const initControls = (controlDefs) => {
     const controls = [];
+    const locControlDefs = controlDefs.shift(); // Localization is first of the defaultControls;
+
+    if (!(locControlDefs.options)) {
+      locControlDefs.options = {
+        localeId: 'sv-SE'
+      };
+    }
+
+    // a potential loc query param for Localization needs to be set
+    const localizationComponent = origoControls.Localization(locControlDefs.options);
+    localizationComponent.options = locControlDefs.options;
+
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.has('loc')) {
+      const localization = searchParams.get('loc');
+      localizationComponent.setLocale(localization);
+    }
+    controls.push(localizationComponent);
+
     controlDefs.forEach((def) => {
       if ('name' in def) {
         const controlName = titleCase(def.name);
         const controlOptions = def.options || {};
+        controlOptions.localization = localizationComponent;
         if (controlName in origoControls) {
           const control = origoControls[controlName](controlOptions);
           control.options = Object.assign(control.options || {}, controlOptions);
@@ -172,5 +194,6 @@ Origo.Loader.show = Loader.showLoading;
 Origo.Loader.hide = Loader.hideLoading;
 Origo.Loader.withLoading = Loader.withLoading;
 Origo.Loader.getInlineSpinner = Spinner;
+Origo.layerType = layerType;
 
 export default Origo;

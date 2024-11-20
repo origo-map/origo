@@ -4,7 +4,8 @@ import mapUtils from '../../maputils';
 export default function SetScaleControl(map, options = {}) {
   const {
     scales = [],
-    initialScale
+    initialScale,
+    localize
   } = options;
 
   let selectScale;
@@ -25,7 +26,7 @@ export default function SetScaleControl(map, options = {}) {
         contentCls: 'bg-grey-lighter text-smallest rounded',
         buttonCls: 'bg-white border text-black',
         buttonIconCls: 'black',
-        text: 'Välj skala'
+        text: localize('selectScale')
       });
       this.addComponents([selectScale]);
     },
@@ -53,7 +54,7 @@ export default function SetScaleControl(map, options = {}) {
     render() {
       return `
       <div class="padding-top-large"></div>
-      <h6>Välj utskriftsskala</h6>
+      <h6>${localize('selectPrintScale')}</h6>
       <div class="padding-smaller o-tooltip active">
         ${selectScale.render()}
       </div>`;

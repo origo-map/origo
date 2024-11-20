@@ -130,6 +130,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
   };
 
   const addControls = function addControls() {
+    const locIndex = controls.findIndex((control) => control.name === 'localization');
+    controls.push(controls.splice(locIndex, 1)[0]); // add localization last (after mapmenu)
     controls.forEach((control) => {
       this.addControl(control);
     });
@@ -565,7 +567,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
       }));
 
       tileGrid = maputils.tileGrid(tileGridSettings);
-      stylewindow = Stylewindow({ palette, viewer: this });
+      stylewindow = Stylewindow({ palette, viewer: this, localization: controls.find((control) => control.name === 'localization') });
 
       setMap(Map(Object.assign(options, { projection, center, zoom, target: this.getId() })));
 

@@ -23,3 +23,4 @@ export { default as Splash } from './controls/splash';
 export { default as Zoom } from './controls/zoom';
 export { default as Externalurl } from './controls/externalurl';
 export { default as Scalepicker } from './controls/scalepicker';
+export { default as Localization } from './controls/localization';
