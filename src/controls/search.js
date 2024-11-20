@@ -48,7 +48,7 @@ const Search = function Search(options = {}) {
     autocompletePlacement,
     searchlistOptions = {},
     queryType,
-    supressDialog,
+    supressDialog
   } = options;
 
   const searchlistPlacement = searchlistOptions.placement;

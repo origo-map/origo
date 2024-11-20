@@ -27,7 +27,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   let infowindow;
   /** The selectionmanager component itself */
   let component;
- 
+
   /** Keeps track of highlighted features. Stores pointers to the actual features. */
   let highlightedFeatures = [];
 
