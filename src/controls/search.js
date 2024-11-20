@@ -48,7 +48,7 @@ const Search = function Search(options = {}) {
     autocompletePlacement,
     searchlistOptions = {},
     queryType,
-    supressDialog
+    suppressDialog
   } = options;
 
   const searchlistPlacement = searchlistOptions.placement;
@@ -85,8 +85,7 @@ const Search = function Search(options = {}) {
     clear();
     // Call featureInfo to display search result in overlay. This does not obey featureInfo's 'infoWindow'-setting.
     // Can't use featureInfo.ShowFeatureInfo here as that requires a layer to format content
-    // TODO: lägg på ignore popupoption
-    featureInfo.render([obj], 'overlay', getCenter(features[0].getGeometry()), { ignorePan: true, supressDialog });
+    featureInfo.render([obj], 'overlay', getCenter(features[0].getGeometry()), { ignorePan: true, suppressDialog });
     viewer.zoomToExtent(features[0].getGeometry(), maxZoomLevel);
   }
 
@@ -97,7 +96,6 @@ const Search = function Search(options = {}) {
    * @param {any} coord where to show the popup
    */
   function showOverlay(data, coord) {
-    // TODO: skall denna sätta en plupp om man supressar popupen?
     clear();
     const newPopup = popup(`#${viewer.getId()}`);
     overlay = new Overlay({
@@ -158,8 +156,7 @@ const Search = function Search(options = {}) {
           let coordWkt;
           if (res.length > 0) {
             const featLayerName = layer.get('name');
-            // TODO: lägg på ignore popupoption
-            featureInfo.showFeatureInfo({ feature: res, layerName: featLayerName }, { maxZoomLevel, supressDialog });
+            featureInfo.showFeatureInfo({ feature: res, layerName: featLayerName }, { maxZoomLevel, suppressDialog });
           } else if (geometryAttribute) {
             // Fallback if the id was not present in the layer. Try to create feature from search endpoint result
             // FIXME: this case is not documented and indicates some configuration error
@@ -175,8 +172,7 @@ const Search = function Search(options = {}) {
       // FIXME: according to description, feature should be fetched from server, not parsed from response and geometryattribute should not be necessary
       // Maybe the intention was to receive a complete feature in geometryAttribute.
       feature = mapUtils.wktToFeature(data[geometryAttribute], projectionCode);
-      // TODO: lägg på ignore popupoption även om det inte funkar
-      featureInfo.showFeatureInfo({ feature: [feature], layerName }, { maxZoomLevel, supressDialog });
+      featureInfo.showFeatureInfo({ feature: [feature], layerName }, { maxZoomLevel, suppressDialog });
     } else if (titleAttribute && contentAttribute && geometryAttribute) {
       // This is option 3 above
       // Search endpoint provides popup title, geometry as WKT and preformatted content.
@@ -432,7 +428,7 @@ const Search = function Search(options = {}) {
                     .then((res) => {
                       if (res.length > 0) {
                         const featureLayerName = layer.get('name');
-                        featureInfo.showFeatureInfo({ feature: res, layerName: featureLayerName }, { maxZoomLevel, supressDialog });
+                        featureInfo.showFeatureInfo({ feature: res, layerName: featureLayerName }, { maxZoomLevel, suppressDialog });
                       }
                     });
                 });

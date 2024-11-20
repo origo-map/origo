@@ -84,14 +84,14 @@ const Selectionmanager = function Selectionmanager(options = {}) {
   * Adds an array of items to selection.
   * @param {SelectedItem []} items Array of items to add
   * @param {object} opts Object with options
-  * @param {boolean} opts.supressDialog If true the dialog is not opened, only selection in map is made
+  * @param {boolean} opts.suppressDialog If true the dialog is not opened, only selection in map is made
   */
   function addItems(items, opts = {}) {
-    const supressDialog = opts.supressDialog;
+    const suppressDialog = opts.suppressDialog;
     items.forEach((item) => {
       addItem(item);
     });
-    if (!supressDialog) {
+    if (!suppressDialog) {
       infowindow.show();
     }
   }
@@ -150,10 +150,10 @@ const Selectionmanager = function Selectionmanager(options = {}) {
    * Adds one item and highlights it. If it already is in the list it is just highlighted.
    * @param {SelectedItem} item Item to add
    * @param {object} opts Object with options
-   * @param {boolean} opts.supressDialog If true the dialog is not opened, only selection in map is made
+   * @param {boolean} opts.suppressDialog If true the dialog is not opened, only selection in map is made
    */
   function addOrHighlightItem(item, opts = {}) {
-    const supressDialog = opts.supressDialog;
+    const suppressDialog = opts.suppressDialog;
     if (alreadyExists(item)) {
       if (toggleSelectOnClick) {
         removeItems([item]);
@@ -164,7 +164,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     } else {
       // add
       selectedItems.push(item);
-      if (!supressDialog) {
+      if (!suppressDialog) {
         infowindow.show();
       }
       if (selectedItems.getLength() === 1) {

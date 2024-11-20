@@ -312,14 +312,14 @@ const Featureinfo = function Featureinfo(options = {}) {
    * @param {any} coordinate
    * @param {bool} ignorePan true if overlay should not be panned into view
    */
-  const doRender = function doRender(identifyItems, target, coordinate, ignorePan, supressDialog) {
+  const doRender = function doRender(identifyItems, target, coordinate, ignorePan, suppressDialog) {
     clear(false);
     items = identifyItems;
     if (target === 'infowindow') {
       if (items.length === 1) {
-        selectionManager.addOrHighlightItem(items[0], { supressDialog });
+        selectionManager.addOrHighlightItem(items[0], { suppressDialog });
       } else if (items.length > 1) {
-        selectionManager.addItems(items, { supressDialog });
+        selectionManager.addItems(items, { suppressDialog });
       }
     } else {
       // Overlay or sidebar goes here
@@ -338,7 +338,7 @@ const Featureinfo = function Featureinfo(options = {}) {
       selectionLayer.setSourceLayer(items[0].layer);
 
       // Create the popup/side bar
-      if (!supressDialog) {
+      if (!suppressDialog) {
         const content = '<div id="o-identify"><div id="o-identify-carousel" class="flex"></div></div>';
         switch (target) {
           case 'overlay':
@@ -452,7 +452,7 @@ const Featureinfo = function Featureinfo(options = {}) {
    * @param {any} opts Additional options. Supported options are : ignorePan, disable auto pan to popup overlay.
    */
   const render = function render(identifyItems, target, coordinate, opts = {}) {
-    doRender(identifyItems, target, coordinate, opts.ignorePan, opts.supressDialog);
+    doRender(identifyItems, target, coordinate, opts.ignorePan, opts.suppressDialog);
   };
   /**
    * Renders the selectedItems after adding async content. Not actually defined as async as it is part of a sync call chain,
@@ -474,7 +474,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         alert('Kunde inte hämta relaterade objekt. En del fält från relaterade objekt kommer att vara tomma.');
       })
       .then(() => {
-        doRender(identifyItems, target, coordinate, opts.ignorePan, opts.supressDialog);
+        doRender(identifyItems, target, coordinate, opts.ignorePan, opts.suppressDialog);
       })
       .catch(err => console.log(err));
   }
