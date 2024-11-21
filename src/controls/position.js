@@ -372,7 +372,7 @@ const Position = function Position(options = {}) {
       // New config format must be an array, as same epsg code can be used several times
       if (options.projections instanceof Array) {
         configArray = options.projections;
-      } else {
+      } else if (options.projections) {
         Object.keys(options.projections).forEach(currKey => configArray.push({ projectionCode: currKey, projectionLabel: options.projections[currKey] }));
       }
 
