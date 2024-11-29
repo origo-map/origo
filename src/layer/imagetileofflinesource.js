@@ -1,8 +1,11 @@
 import ImageTileSource from 'ol/source/ImageTile';
 import { toSize } from 'ol/size';
+import { fromExtent } from 'ol/geom/Polygon';
+import Feature from 'ol/Feature';
 
 const databaseName = 'origoOfflineTiles';
-const databaseVersion = 1;
+// Remember to bump this one (integers only) when table schema changes
+const databaseVersion = 2;
 
 const tilesObjectsStoreName = 'tiles';
 const extentsObjectsStoreName = 'extents';
@@ -17,32 +20,38 @@ const tileYCol = 'y';
 
 /**
    * Static private helper to init db.
-   * TODO: could be rewritten as a static helper in outer space if table definitions and database name are exposed as parameters.
    * @returns
    */
 function initIndexedDb() {
+  // Define the tables as objects so actual creation can be perfomred in a general
+  // If anything is changed here, you must also bumb the version constant at the top of this file.
+  // loop later to keep function less hard coded.
+  // In this way it could be rewritten as a static helper in outer space if table definitions and database name are exposed as parameters.
+  // TODO: rewrite as hardcoded to support migrations.
   const stores = [
     {
+      // Store for the actual tiles
       name: tilesObjectsStoreName,
       // Set up a composite key.
       keyPath: [nameCol, tileZCol, tileXCol, tileYCol],
       autoIncrement: false,
       indices: [extentCol, nameCol]
     },
+    // Store for legendgraphics
     {
       name: legendGraphicsObjectsStoreName,
       keyPath: nameCol,
       autoIncrement: false,
       indices: []
+    },
+    // Store downloaded extents
+    {
+      name: extentsObjectsStoreName,
+      indices: [nameCol],
+      autoIncrement: true
     }
-    // TODO: Store downloaded extents
-    // ,
-    // {
-    //  name: extentsObjectsStoreName,
-    //  autoIncrement: true
-    // }
-    // TODO: store legend graphics
   ];
+  // This is the static general part.
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(databaseName, databaseVersion);
     request.onerror = (event) => {
@@ -91,7 +100,7 @@ export default class ImageTileOfflineSource extends ImageTileSource {
     this.minZoom = options.offlineMinZoom || options.tileGrid.getMinZoom();
     /**
      *  The name used to identify this layer in indexdDb. If same name is used between applications, offline
-     * store can be shared
+     *  store can be shared
      */
     this.layerName = options.offlineStoreName;
     this.viewer = viewer;
@@ -146,7 +155,7 @@ export default class ImageTileOfflineSource extends ImageTileSource {
    *
    */
   // eslint-disable-next-line no-unused-vars, class-methods-use-this
-  async preload(extent) {
+  async preload(extent, progressCallback) {
     throw new Error('async preload(extent) must be overridden');
   }
 
@@ -214,10 +223,12 @@ export default class ImageTileOfflineSource extends ImageTileSource {
    * @returns Id of created database row
    */
   storeExtent(extent) {
+    const newRecord = {};
+    newRecord[nameCol] = this.layerName;
+    newRecord[extentCol] = extent;
     return new Promise((resolve, reject) => {
       const store = this.db.transaction(extentsObjectsStoreName, 'readwrite').objectStore(extentsObjectsStoreName);
-      // TODO: handle exact overlaps.
-      const req = store.put(extent);
+      const req = store.put(newRecord);
 
       req.onsuccess = (event) => {
         console.log('extent saved');
@@ -231,8 +242,43 @@ export default class ImageTileOfflineSource extends ImageTileSource {
     });
   }
 
-  // TODO: Get stored extents. The extent table is likely to be polluted with lots of overlapping extents after a while if no clear is performed.
-  // maybe
+  fetchExtentsFromDb() {
+    return new Promise((resolve, reject) => {
+      try {
+        const transaction = this.db.transaction(extentsObjectsStoreName, 'readonly');
+        const objectStore = transaction.objectStore(extentsObjectsStoreName);
+
+        const index = objectStore.index(nameCol);
+        const getRequest = index.getAll(this.layerName);
+        getRequest.onsuccess = () => {
+          if (getRequest.result) {
+            resolve(getRequest.result);
+          } else {
+            console.log('No saved legend grapichs');
+            resolve(null);
+          }
+        };
+        getRequest.onerror = (event) => {
+          reject(event.target.error);
+        };
+      } catch (error) {
+        console.log(error);
+      }
+    });
+  }
+
+  /**
+   * Get all downloaded extents for this layer
+   * @returns {Feature[]} Array of features representing each downloaded extent
+   */
+  async getExtents() {
+    const extents = await this.fetchExtentsFromDb();
+    return extents.map(currExtent => {
+      const geom = fromExtent(currExtent[extentCol]);
+      const feat = new Feature(geom);
+      return feat;
+    });
+  }
 
   storeLegendGraphic(blob) {
     return new Promise((resolve, reject) => {

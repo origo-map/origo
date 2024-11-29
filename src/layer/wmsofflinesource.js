@@ -31,7 +31,7 @@ export default class WmsOfflineSource extends ImageTileOfflineSource {
    * @param {any} extent
    *
    */
-  async preload(extent) {
+  async preload(extent, progressCallback) {
     // Fetch and store legend graphics
     if (this.legendUrl) {
       const legendReq = await fetch(this.legendUrl);
@@ -39,9 +39,10 @@ export default class WmsOfflineSource extends ImageTileOfflineSource {
       await this.storeLegendGraphic(legendImg);
     }
 
-    // TODO: Save extent
-    // const extentId = await this.storeExtent(extent);
-    const extentId = 1;
+    // Store extent first to get an id to link each tile with.
+    // Usage is limited as a new extent will overwrite the tile and the connection
+    // will be lost. Also if tile load fails, the extent will be bigger than actual extent of existing tiles
+    const extentId = await this.storeExtent(extent);
     const extents = super.calculateTiles(extent);
 
     const allDownloadPromises = extents.map(async (currExtent) => {
@@ -62,9 +63,12 @@ export default class WmsOfflineSource extends ImageTileOfflineSource {
       // Get it back as a Blob
       // ImageBitmap is actually stored as some sort of compressed format, so blob is not larger than original compressed PNG.
       const blob = await new Promise((res) => { canvas.toBlob(res); });
-      // TODO: callback progress?
-      // TODO: adjust compression ratio based on dowloaded tiles for better progress
-
+      // Callback progress. Actually, this tile is not stored yet, but is fetched, which
+      // is the most timeconsuming part. When it is stored happens in the allSettled.
+      if (progressCallback) {
+        progressCallback();
+      }
+      // TODO: adjust compression ratio based on dowloaded tiles for better progress?
       return super.storeTile(currExtent.tileCoord[0], currExtent.tileCoord[1], currExtent.tileCoord[2], blob, extentId);
     });
     // TODO: maybe do some error handling?
