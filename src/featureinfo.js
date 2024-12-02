@@ -150,6 +150,14 @@ const Featureinfo = function Featureinfo(options = {}) {
       component.dispatch('changeselection', item);
     }
   };
+  
+  const dispatchItemAdded = function dispatchItemAdded(item) {
+    // Make sure it actually is a SelectedItem. At least Search can call render() without creating proper selectedItems when
+    // search result is remote.
+    if (item instanceof SelectedItem) {
+      component.dispatch('itemadded', item);
+    }
+  };
 
   const dispatchToggleFeatureEvent = function dispatchToggleFeatureEvent(currentItem) {
     const toggleFeatureinfo = new CustomEvent('toggleFeatureinfo', {
@@ -337,7 +345,6 @@ const Featureinfo = function Featureinfo(options = {}) {
           } else {
             contentDiv.innerHTML = item.content;
           }
-          component.dispatch('itemadded', item);
         });
         popup.setVisibility(true);
         initCarousel('#o-identify-carousel');
@@ -410,7 +417,6 @@ const Featureinfo = function Featureinfo(options = {}) {
           } else {
             contentDiv.innerHTML = item.content;
           }
-          component.dispatch('itemadded', item);
         });
         sidebar.setVisibility(true);
         const firstFeature = items[0].feature;
@@ -434,7 +440,6 @@ const Featureinfo = function Featureinfo(options = {}) {
         } else if (items.length > 1) {
           selectionManager.addItems(items);
         }
-        items.forEach((item) => component.dispatch('itemadded', item));
         break;
       }
       default:
@@ -447,6 +452,10 @@ const Featureinfo = function Featureinfo(options = {}) {
     for (let i = 0; i < modalLinks.length; i += 1) {
       addLinkListener(modalLinks[i]);
     }
+	
+    // Dispatch itemadded event for every item added
+    items.forEach((item) => dispatchItemAdded(item));
+	
     // Don't send event for infowindow. Infowindow will send an event that triggers sending the event later.
     if (target === 'overlay' || target === 'sidebar') {
       dispatchToggleFeatureEvent(items[0]);
