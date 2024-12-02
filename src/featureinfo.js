@@ -434,6 +434,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         } else if (items.length > 1) {
           selectionManager.addItems(items);
         }
+        items.forEach((item) => component.dispatch('itemadded', item));
         break;
       }
       default:
