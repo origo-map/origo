@@ -109,6 +109,9 @@
         "zoom": {
             "zoomInButton": "Zooma in i kartan",
             "zoomOutButton": "Zooma ut i kartan"
+        },
+        "home": {
+            "zoomHomeButton": "Zooma till hela kartan"
         }
     },
     "style": {

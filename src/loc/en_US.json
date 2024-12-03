@@ -109,6 +109,9 @@
         "zoom": {
             "zoomInButton": "Zoom into the map",
             "zoomOutButton": "Zoom out in the map"
+        },
+        "home": {
+            "zoomHomeButton": "Zoom to the entire map"
         }
     },
     "style": {
