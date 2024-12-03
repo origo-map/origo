@@ -115,6 +115,9 @@
         },
         "geoposition": {
             "positionButtonTooltip": "Visa din nuvarande position i kartan"
+        },
+        "about": {
+            "title": "Om kartan"
         }
     },
     "style": {

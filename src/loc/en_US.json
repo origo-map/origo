@@ -115,7 +115,11 @@
         },
         "geoposition": {
             "positionButtonTooltip": "Show your current position on the map"
+        },
+        "about": {
+            "title": "About the map"
         }
+        
     },
     "style": {
         "drawStyles": {
