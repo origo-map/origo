@@ -42,7 +42,7 @@ const Home = function Home(options = {}) {
           zoomToHome();
         },
         icon: '#ic_home_24px',
-        tooltipText: localize('zoomHomeButton'),
+        tooltipText: localize('zoomHomeButtonTooltip'),
         tooltipPlacement: 'east'
       });
     },

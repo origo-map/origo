@@ -107,11 +107,14 @@
             "drawFreehand": "Freehand"
         },
         "zoom": {
-            "zoomInButton": "Zoom into the map",
-            "zoomOutButton": "Zoom out in the map"
+            "zoomInButtonTooltip": "Zoom into the map",
+            "zoomOutButtonTooltip": "Zoom out in the map"
         },
         "home": {
-            "zoomHomeButton": "Zoom to the entire map"
+            "zoomHomeButtonTooltip": "Zoom to the entire map"
+        },
+        "geoposition": {
+            "positionButtonTooltip": "Show your current position on the map"
         }
     },
     "style": {

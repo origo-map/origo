@@ -107,11 +107,14 @@
             "drawFreehand": "Frihand"
         },
         "zoom": {
-            "zoomInButton": "Zooma in i kartan",
-            "zoomOutButton": "Zooma ut i kartan"
+            "zoomInButtonTooltip": "Zooma in i kartan",
+            "zoomOutButtonTooltip": "Zooma ut i kartan"
         },
         "home": {
-            "zoomHomeButton": "Zooma till hela kartan"
+            "zoomHomeButtonTooltip": "Zooma till hela kartan"
+        },
+        "geoposition": {
+            "positionButtonTooltip": "Visa din nuvarande position i kartan"
         }
     },
     "style": {

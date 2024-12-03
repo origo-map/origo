@@ -48,7 +48,7 @@ const Zoom = function Zoom(options = {}) {
           zoomByDelta(delta);
         },
         icon: '#ic_add_24px',
-        tooltipText: localize('zoomInButton'),
+        tooltipText: localize('zoomInButtonTooltip'),
         tooltipPlacement: 'east'
       });
       zoomOut = Button({
@@ -57,7 +57,7 @@ const Zoom = function Zoom(options = {}) {
           zoomByDelta(-delta);
         },
         icon: '#ic_remove_24px',
-        tooltipText: localize('zoomOutButton'),
+        tooltipText: localize('zoomOutButtonTooltip'),
         tooltipPlacement: 'east'
       });
     },
