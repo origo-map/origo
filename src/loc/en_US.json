@@ -105,6 +105,10 @@
             "drawSquare": "Square",
             "drawCircle": "Circle",
             "drawFreehand": "Freehand"
+        },
+        "zoom": {
+            "zoomInButton": "Zoom into the map",
+            "zoomOutButton": "Zoom out in the map"
         }
     },
     "style": {

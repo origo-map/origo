@@ -105,8 +105,11 @@
             "drawSquare": "Fyrkant",
             "drawCircle": "Cirkel",
             "drawFreehand": "Frihand"
+        },
+        "zoom": {
+            "zoomInButton": "Zooma in i kartan",
+            "zoomOutButton": "Zooma ut i kartan"
         }
-
     },
     "style": {
         "drawStyles": {
