@@ -58,7 +58,7 @@ const createForm = function createForm(obj) {
           el += `<input id="${id}-${index}-text" type="text" value="${textboxVal}"${maxLength} style="width: auto; padding:0; margin:0; line-height:1.3rem;" ${disable} autocomplete="off">`;
           el += '<br>';
         } else {
-          checked = val.includes(option.trim()) ? ' checked' : '';
+          checked = val.includes(value.trim()) ? ' checked' : '';
           el += `<input id="${id}-${index}" type="checkbox" name="${name}" data-index="${index}" value="${value}"${checked}> ${option}<br>`;
         }
       });
