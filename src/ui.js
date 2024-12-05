@@ -23,4 +23,3 @@ export { default as ToggleGroup } from './ui/togglegroup';
 export { default as Component } from './ui/component';
 export { default as Eventer } from './ui/utils/eventer';
 export { default as cuid } from './ui/utils/cuid';
-export { default as Toast } from './ui/toast';

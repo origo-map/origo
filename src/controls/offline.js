@@ -3,7 +3,7 @@ import { Draw } from 'ol/interaction';
 import { createBox } from 'ol/interaction/Draw';
 import { Vector as VectorLayer } from 'ol/layer';
 import { Vector as VectorSource } from 'ol/source';
-import { Component, Button, dom, Element, Modal, Toast } from '../ui';
+import { Component, Button, dom, Element, Modal } from '../ui';
 
 /**
  * Creates a component for drawing an envelope whose extent
