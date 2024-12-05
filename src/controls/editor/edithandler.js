@@ -924,7 +924,6 @@ function onAttributesSave(features, attrs) {
               Array.from(document.getElementsByName(attribute.name)).forEach((element) => {
                 if (element.tagName === 'INPUT' && element.getAttribute('type') === 'checkbox' && element.checked === true) {
                   // Check if this is a free text checkbox
-                  console.log(element);
                   if (element.nextElementSibling.getAttribute('type') === 'text') {
                     checkboxValues.push(`${freetextOptionPrefix}${element.getAttribute('value')}${freetextOptionValueSeparator}${element.nextElementSibling.value.trim()}`);
                   } else {
