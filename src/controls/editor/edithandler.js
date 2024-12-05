@@ -898,7 +898,7 @@ function onAttributesSave(features, attrs) {
 
       let inputType = attribute.type ? attribute.type : '';
       // Check again for not missing when checkbox is part of multiple choice checkboxes
-      inputType = document.getElementById(`${attribute.elId}-0`) ? document.getElementById(`${attribute.elId}-0`).getAttribute('type') : inputType;
+      inputType = document.getElementById(`${attribute.elId}-0`) ? 'checkboxgroup' : inputType;
       const inputValue = document.getElementById(attribute.elId) ? document.getElementById(attribute.elId).value : '';
       const inputName = attribute.name ? attribute.name : '';
       const inputId = attribute.elId ? attribute.elId : '';
@@ -909,31 +909,32 @@ function onAttributesSave(features, attrs) {
       // If this code is changed, it may be necessary to excplict check if the batch edit checkbox is checked for this attribute.
       if (!document.querySelector(containerClass) || document.querySelector(containerClass).classList.contains('o-hidden') === false) {
         // Check if checkbox. If checkbox read state.
-        if (inputType === 'checkbox') {
-          // Check if this is a multi choice checkbox
-          if (document.getElementById(`${attribute.elId}-0`)) {
-            if (document.getElementById(`${attribute.elId}-0`).getAttribute('type') === 'checkbox') {
-              if (attribute.options && attribute.options.length > 0) {
-                Array.from(document.getElementsByName(attribute.name)).forEach((element) => {
-                  if (element.tagName === 'INPUT' && element.getAttribute('type') === 'checkbox' && element.checked === true) {
-                    // Check if this is a free text checkbox
-                    if (element.nextElementSibling.getAttribute('type') === 'text') {
-                      checkboxValues.push(element.nextElementSibling.value.trim());
-                    } else {
-                      checkboxValues.push(element.getAttribute('value'));
-                    }
+        if (inputType === 'checkboxgroup') {
+          if (document.getElementById(`${attribute.elId}-0`).getAttribute('type') === 'checkbox') {
+            const separator = attribute.separator ? attribute.separator : ';';
+            const freetextOptionPrefix = attribute.freetextOptionPrefix ? attribute.freetextOptionPrefix : 'freetext_option:';
+            const freetextOptionValueSeparator = attribute.freetextOptionValueSeparator ? attribute.freetextOptionValueSeparator : '=';
+            if (attribute.options && attribute.options.length > 0) {
+              Array.from(document.getElementsByName(attribute.name)).forEach((element) => {
+                if (element.tagName === 'INPUT' && element.getAttribute('type') === 'checkbox' && element.checked === true) {
+                  // Check if this is a free text checkbox
+                  console.log(element);
+                  if (element.nextElementSibling.getAttribute('type') === 'text') {
+                    checkboxValues.push(`${freetextOptionPrefix}${element.getAttribute('value')}${freetextOptionValueSeparator}${element.nextElementSibling.value.trim()}`);
+                  } else {
+                    checkboxValues.push(element.getAttribute('value'));
                   }
-                });
-                editEl[attribute.name] = checkboxValues.join('; ');
-              } else {
-                editEl[attribute.name] = document.getElementById(attribute.elId).checked ? 1 : 0;
-              }
+                }
+              });
+              editEl[attribute.name] = checkboxValues.join(separator);
+            } else {
+              editEl[attribute.name] = document.getElementById(attribute.elId).checked ? 1 : 0;
             }
-          } else { // Read value from input text, textarea or select
-            const checkedValue = (attribute.config && attribute.config.checkedValue) || 1;
-            const uncheckedValue = (attribute.config && attribute.config.uncheckedValue) || 0;
-            editEl[attribute.name] = document.getElementById(attribute.elId).checked ? checkedValue : uncheckedValue;
           }
+        } else if (inputType === 'checkbox') {
+          const checkedValue = (attribute.config && attribute.config.checkedValue) || 1;
+          const uncheckedValue = (attribute.config && attribute.config.uncheckedValue) || 0;
+          editEl[attribute.name] = document.getElementById(attribute.elId).checked ? checkedValue : uncheckedValue;
         } else if (attribute.type === 'searchList') {
           // SearchList may have its value in another place than the input element itself. Query the "Component" instead.
           // Note that inputValue still contains the value of the input element, which is  used to validate required.
@@ -1290,9 +1291,10 @@ function editAttributes(feat) {
           } else {
             alert('Villkor verkar inte vara rätt formulerat. Villkor formuleras enligt principen change:attribute:value');
           }
-        } else if (obj.type === 'checkbox') {
+        } else if (obj.type === 'checkboxgroup') {
           if (obj.options && obj.options.length > 0 && obj.val) {
-            obj.val = obj.val.split('; ');
+            const separator = obj.separator ? obj.separator : ';';
+            obj.val = obj.val.split(separator);
           }
           obj.isVisible = true;
           obj.elId = `input-${obj.name}`;
