@@ -19,9 +19,6 @@ export default function Offline({ localization }) {
   let envelope;
   let map;
   let modal;
-  let toastSuccessSave;
-  let toastDownload;
-  let toastSuccessClear;
 
   function localize(key) {
     return localization.getStringByKeys({ targetParentKey: 'offline', targetKey: key });
@@ -69,7 +66,11 @@ export default function Offline({ localization }) {
       });
       Promise.all(responses).then((result) => {
         console.log('Cleared cache for layers:', result);
-        toastSuccessClear.show();
+        viewer.getLogger().createToast({
+          status: 'success',
+          title: 'Lager rensat',
+          message: 'Dina lager är rensade.'
+        });
       });
     },
     icon: '#ic_delete_24px',
@@ -208,11 +209,19 @@ export default function Offline({ localization }) {
 
             modal.closeModal();
             modal.dispatch('closed');
-            toastDownload.show();
+            viewer.getLogger().createToast({
+              status: 'info',
+              title: 'Nedladdning pågår',
+              message: 'Dina lager sparas ner i bakgrunden.'
+            });
 
             Promise.all(responses).then((result) => {
               console.log('All tiles saved', result);
-              toastSuccessSave.show();
+              viewer.getLogger().createToast({
+                status: 'success',
+                title: 'Lager sparat',
+                message: 'Dina lager är redo att användas offline.'
+              });
             });
           }
         });
@@ -333,24 +342,8 @@ export default function Offline({ localization }) {
       map = viewer.getMap();
       map.addLayer(vector);
 
-      toastSuccessSave = Toast({
-        target: viewer,
-        title: 'Lager sparat',
-        message: 'Dina lager är redo att användas offline.'
-      });
-      toastDownload = Toast({
-        target: viewer,
-        title: 'Nedladdning pågår',
-        message: 'Dina lager sparas ner i bakgrunden.'
-      });
-      toastSuccessClear = Toast({
-        target: viewer,
-        title: 'Lager rensat',
-        message: 'Dina lager är rensade.'
-      });
-
       // Add offlineButton and toolbar components to the current component.
-      this.addComponents([offlineButton, toolbar, toastSuccessSave, toastDownload, toastSuccessClear]);
+      this.addComponents([offlineButton, toolbar]);
 
       // Render the current component, updating its appearance in the viewer.
       this.render();
