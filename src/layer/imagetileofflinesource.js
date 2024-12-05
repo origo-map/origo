@@ -5,7 +5,7 @@ import Feature from 'ol/Feature';
 
 const databaseName = 'origoOfflineTiles';
 // Remember to bump this one (integers only) when table schema changes
-const databaseVersion = 2;
+const databaseVersion = 3;
 
 const tilesObjectsStoreName = 'tiles';
 const extentsObjectsStoreName = 'extents';
@@ -27,7 +27,6 @@ function initIndexedDb() {
   // If anything is changed here, you must also bumb the version constant at the top of this file.
   // loop later to keep function less hard coded.
   // In this way it could be rewritten as a static helper in outer space if table definitions and database name are exposed as parameters.
-  // TODO: rewrite as hardcoded to support migrations.
   const stores = [
     {
       // Store for the actual tiles
@@ -61,8 +60,15 @@ function initIndexedDb() {
       resolve(event.target.result);
     };
     request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+
+      // Do an evil db update: always remove and rebuild, will destroy data but we don't
+      // have to bother with possible migrations
+      while (db.objectStoreNames.length > 0) {
+        db.deleteObjectStore(db.objectStoreNames[0]);
+      }
       stores.forEach((store) => {
-        const objectStore = event.target.result.createObjectStore(store.name, {
+        const objectStore = db.createObjectStore(store.name, {
           keyPath: store.keyPath,
           autoIncrement: store.autoIncrement
         });
