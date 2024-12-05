@@ -21,7 +21,8 @@ const getCapabilities = function getCapabilities(name, getCapabilitiesURL) {
       if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
         resolve({
           name,
-          capabilites: responseParser(xmlHttp.responseText)
+          capabilites: responseParser(xmlHttp.responseText),
+          capabilitesDoc: xmlHttp.responseText
         });
       }
     };
