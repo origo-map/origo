@@ -767,6 +767,9 @@ function onDeleteSelected() {
   }
 }
 
+/**
+ * Starts the draw tool if the current layer has a defined geometryType.
+ */
 function startDraw() {
   if (!editLayers[currentLayer].get('geometryType')) {
     alert(`"geometryType" har inte angivits för ${editLayers[currentLayer].get('name')}`);
@@ -777,6 +780,9 @@ function startDraw() {
   }
 }
 
+/**
+ * Cancels the draw tool and resets relevant states.
+ */
 function cancelDraw() {
   setActive();
   if (hasDraw) {
@@ -1102,6 +1108,10 @@ function onAttributesSave(features, attrs) {
   });
 }
 
+/**
+ * Adds an event listener to a dependency element and toggles the visibility of a container element.
+ * @returns {Function} A function that accepts an object to configure the event listener.
+ */
 function addListener() {
   const fn = (obj) => {
     document.getElementById(obj.elDependencyId).addEventListener(obj.eventType, () => {
@@ -1412,6 +1422,10 @@ function editAttributes(feat) {
   }
 }
 
+/**
+ * Handles toggling of editing tools based on the triggered event.
+ * @param {Event} e - The triggered event containing tool details.
+ */
 function onToggleEdit(e) {
   const { detail: { tool } } = e;
   e.stopPropagation();
@@ -1435,8 +1449,14 @@ function onToggleEdit(e) {
   }
 }
 
+/**
+ * Handles changes in edit state based on the triggered event.
+ * @param {Event} e - The triggered event containing tool and active status details.
+ */
 function onChangeEdit(e) {
   const { detail: { tool, active } } = e;
+
+  // Cancel drawing if another tool becomes active
   if (tool !== 'draw' && active) {
     cancelDraw();
   }

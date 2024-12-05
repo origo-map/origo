@@ -1,4 +1,23 @@
+/**
+ * Generates a form element dynamically based on the provided configuration object.
+ * @param {Object} obj - The configuration object for creating the form element.
+ * @param {string} obj.elId - The ID of the HTML element.
+ * @param {string} obj.cls - Additional CSS classes.
+ * @param {boolean} obj.isVisible - Determines if the element is visible.
+ * @param {string} obj.title - The label for the form element.
+ * @param {*} obj.val - The value of the element.
+ * @param {string} obj.type - The type of the form element (e.g., 'text', 'checkbox').
+ * @param {number} [obj.maxLength] - Maximum length for input fields.
+ * @param {Array} [obj.options] - Options for dropdowns or checkboxes.
+ * @param {boolean} [obj.readonly] - Whether the field is readonly.
+ * @param {boolean} [obj.required] - Whether the field is required.
+ * @param {string} [obj.name] - The name attribute for the element.
+ * @param {string} [obj.defaultDate] - Default value for date fields.
+ * @param {string} [obj.defaultColor] - Default color value for color fields.
+ * @returns {string} The HTML string for the form element.
+ */
 const createForm = function createForm(obj) {
+  // Basic setup of variables
   const id = obj.elId;
   let cls = obj.cls || '';
   cls += id;
@@ -26,18 +45,24 @@ const createForm = function createForm(obj) {
   let firstOption;
   let checked;
   const maxLengthText = maxLength ? `, max ${obj.maxLength} tecken` : '';
+
+  // Switch statement to handle different field types
   switch (type) {
     case 'text':
+      // Create a text input
       el = `<div class="validate ${cls}"><label>${label}<br><input type="text" name="text${maxLengthText}" id="${id}" value="${val}"${maxLength}${readonly}${required}></label></div>`;
       break;
     case 'textarea':
+      // Create a textarea
       el = `<div class="validate ${cls}"><label>${label}<br><textarea name="textarea${maxLengthText}" id="${id}" rows="3" ${maxLength}${readonly}${required}>${val}</textarea></label></div>`;
       break;
     case 'checkbox':
+      // Create a checkbox
       checked = (obj.config && obj.config.uncheckedValue ? obj.config.uncheckedValue !== val : val) ? ' checked' : '';
       el = `<div class="o-form-checkbox ${cls}"><label for="${id}"><input type="checkbox" id="${id}" value="${val}"${checked}${disabled}/>${label}</label></div>`;
       break;
     case 'checkboxgroup':
+      // Create a group of checkboxes
       el = `<div class="o-form-checkbox"><label>${label}</label><br />`;
       options.forEach((opt, index) => {
         const option = opt.text;
@@ -65,6 +90,7 @@ const createForm = function createForm(obj) {
       el += '<br></div>';
       break;
     case 'dropdown':
+      // Create a dropdown
       if (val) {
         firstOption = `<option value="${val}">${val}</option>`;
       } else {
@@ -77,6 +103,7 @@ const createForm = function createForm(obj) {
       el += '</select></label></div>';
       break;
     case 'searchList':
+      // Create a searchList input
       elLabel.innerHTML = label;
       elLabel.appendChild(document.createElement('br'));
 
@@ -105,6 +132,7 @@ const createForm = function createForm(obj) {
       el = elDiv.outerHTML;
       break;
     case 'image': {
+      // Create a image input
       const imageClass = val ? '' : 'o-hidden';
       el = `<div class="validate ${cls}"><label>${label}<br>`;
       el += `<img src="${val}" id="image-upload" class="${imageClass}"/>`;
@@ -114,6 +142,7 @@ const createForm = function createForm(obj) {
       break;
     }
     case 'date':
+      // Create a date input
       if (!val) {
         if (obj.defaultDate === false || obj.defaultDate === 'undefined') {
           val = '';
@@ -127,6 +156,7 @@ const createForm = function createForm(obj) {
       el = `<div class="validate ${cls}"><label>${label}<br><input type="date" name="datum" id="${id}" placeholder="åååå-MM-dd" value="${val}"${readonly}${required}></label></div>`;
       break;
     case 'time':
+      // Create a time input
       if (!val) {
         if (obj.defaultTime === false || obj.defaultDate === 'undefined') {
           val = '';
@@ -142,6 +172,7 @@ const createForm = function createForm(obj) {
       el = `<div class="validate ${cls}"><label>${label}<br><input type="time" name="timmar, minuter och sekunder" id="${id}" step="1" placeholder="--:--:--" value="${val}"${readonly}${required}></label></div>`;
       break;
     case 'datetime':
+      // Create a datetime input
       if (!val) {
         if (obj.defaultDatetime === false || obj.defaultDate === 'undefined') {
           val = '';
@@ -157,32 +188,40 @@ const createForm = function createForm(obj) {
       el = `<div class="validate"><label>${label}<br><input type="datetime-local" name="datum och tid" id="${id}" step="1" placeholder="åååå-MM-dd --:--:--" value="${val}"${readonly}${required}></label></div>`;
       break;
     case 'color':
+      // Create a color input
       if (!val) {
         val = obj.defaultColor ? obj.defaultColor : '';
       }
       el = `<div class="validate ${cls}"><label>${label}<br><input type="color" name="hexadecimal" id="${id}" value="${val}"${readonly}></label></div>`;
       break;
     case 'email':
+      // Create a email input
       el = `<div class="validate ${cls}"><label>${label}<br><input type="email" name="epost" id="${id}" value="${val}"${readonly}${required}></label></div>`;
       break;
     case 'url':
+      // Create a url input
       el = `<div class="validate ${cls}"><label>${label}<br><input type="url" name="hemsida" id="${id}" value="${val}"${readonly}${required}></label></div>`;
       break;
     case 'integer':
+      // Create a integer number input
       el = `<div class="validate ${cls}"><label>${label}<br><input type="number" step="1" min="0" name="heltal" id="${id}" value="${val}"${readonly}${required}></label></div>`;
       break;
     case 'decimal':
+      // Create a decimal number input
       el = `<div class="validate ${cls}"><label>${label}<br><input type="number" step="0.01" min="0" name="decimaltal" id="${id}" value="${val}"${readonly}${required}></label></div>`;
       break;
     case 'hidden':
+      // Create a image input
       // Note that an input with type="hidden" is not the same as an input with class="o-hidden". Type hidden is to roundtrip values invisible to the user
       // class o-hidden is to temporarily hide an input as logic in view says it should not be visible right now (batch edit or constraints).
       el = `<input class="${cls}" type="hidden" id="${id}" value="${val}">`;
       break;
     default:
+      // Handle unknown types
+      console.warn(`Unsupported field type: ${type}`);
       break;
   }
-  return el;
+  return el; // Return the generated HTML
 };
 
 export default createForm;
