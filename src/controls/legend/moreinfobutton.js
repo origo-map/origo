@@ -11,7 +11,7 @@ export default function createMoreInfoButton(params) {
   const popupMenuItems = [];
   let moreInfoButton;
   let popupMenu;
-  const showPopup = group.zoomToExtent && group.extent || group.removable; // In case of zoomToExtent or removable we always want to show popupmenu
+  const showPopup = (group.zoomToExtent && group.extent) || group.removable; // In case of zoomToExtent or removable we always want to show popupmenu
 
   const eventOverlayProps = new CustomEvent('overlayproperties', {
     bubbles: true,
