@@ -133,10 +133,11 @@ const Overlays = function Overlays(options) {
 
   // Hide overlays container when empty
   const onChangeLayer = function onChangeLayer() {
-    const oldNrOverlays = overlays.length;
     const nrOverlays = readOverlays().length;
-    if (oldNrOverlays !== nrOverlays && nrOverlays < 2 && oldNrOverlays < 2) {
-      document.getElementById(this.getId()).classList.toggle('hidden');
+    if(nrOverlays === 0){
+      document.getElementById(this.getId()).classList.add('hidden');
+    } else {
+      document.getElementById(this.getId()).classList.remove('hidden');
     }
   };
 
