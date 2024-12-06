@@ -50,16 +50,16 @@ const createForm = function createForm(obj) {
   switch (type) {
     case 'text':
       // Create a text input
-      el = `<div class="validate ${cls}"><label>${label}<br><input type="text" name="text${maxLengthText}" id="${id}" value="${val}"${maxLength}${readonly}${required}></label></div>`;
+      el = `<div class="validate ${cls}"><label for="${id}">${label}<br><input type="text" name="text${maxLengthText}" id="${id}" class="o-editor-input" value="${val}"${maxLength}${readonly}${required}></label></div>`;
       break;
     case 'textarea':
       // Create a textarea
-      el = `<div class="validate ${cls}"><label>${label}<br><textarea name="textarea${maxLengthText}" id="${id}" rows="3" ${maxLength}${readonly}${required}>${val}</textarea></label></div>`;
+      el = `<div class="validate ${cls}"><label for="${id}">${label}<br><textarea name="textarea${maxLengthText}" id="${id}" rows="3" class="o-editor-input" ${maxLength}${readonly}${required}>${val}</textarea></label></div>`;
       break;
     case 'checkbox':
       // Create a checkbox
       checked = (obj.config && obj.config.uncheckedValue ? obj.config.uncheckedValue !== val : val) ? ' checked' : '';
-      el = `<div class="o-form-checkbox ${cls}"><label for="${id}"><input type="checkbox" id="${id}" value="${val}"${checked}${disabled}/>${label}</label></div>`;
+      el = `<div class="o-form-checkbox ${cls}"><label for="${id}"><input type="checkbox" id="${id}" class="o-editor-input" value="${val}"${checked}${disabled}/>${label}</label></div>`;
       break;
     case 'checkboxgroup':
       // Create a group of checkboxes
@@ -79,12 +79,12 @@ const createForm = function createForm(obj) {
           }
           textboxVal = checked ? matchingValue.split(`${freetextOptionValueSeparator}`)[1] : '';
           disable = checked ? '' : ' disabled';
-          el += `<input id="${id}-${index}" type="checkbox" name="${name}" data-index="${index}" value="${value}"${checked}> ${option}: `;
-          el += `<input id="${id}-${index}-text" type="text" value="${textboxVal}"${maxLength} style="width: auto; padding:0; margin:0; line-height:1.3rem;" ${disable} autocomplete="off">`;
+          el += `<input id="${id}-${index}" type="checkbox" name="${name}" data-index="${index}" class="o-editor-input" aria-label="Val för att aktivera ${label} ${value}" value="${value}"${checked}> ${option}: `;
+          el += `<input id="${id}-${index}-text" type="text" value="${textboxVal}"${maxLength} style="width: auto; padding:0; margin:0; line-height:1.3rem;" class="o-editor-input" aria-label="Värde för ${label} ${value}" ${disable} autocomplete="off">`;
           el += '<br>';
         } else {
           checked = val.includes(value.trim()) ? ' checked' : '';
-          el += `<input id="${id}-${index}" type="checkbox" name="${name}" data-index="${index}" value="${value}"${checked}> ${option}<br>`;
+          el += `<input id="${id}-${index}" type="checkbox" name="${name}" data-index="${index}" class="o-editor-input" aria-label="Val för ${label} ${value}" value="${value}"${checked}> ${option}<br>`;
         }
       });
       el += '<br></div>';
@@ -96,7 +96,7 @@ const createForm = function createForm(obj) {
       } else {
         firstOption = '<option value="">Välj</option>';
       }
-      el = `<div class="validate ${cls}"><label>${label}<br><select id=${id}${disabled}${required}>${firstOption}`;
+      el = `<div class="validate ${cls}"><label for="${id}">${label}<br><select class="o-editor-input" id=${id}${disabled}${required}>${firstOption}`;
       for (let i = 0; i < dropdownOptions.length; i += 1) {
         el += `<option value="${dropdownOptions[i]}">${dropdownOptions[i]}</option>`;
       }
@@ -134,10 +134,10 @@ const createForm = function createForm(obj) {
     case 'image': {
       // Create a image input
       const imageClass = val ? '' : 'o-hidden';
-      el = `<div class="validate ${cls}"><label>${label}<br>`;
+      el = `<div class="validate ${cls}"><label for="${id}">${label}<br>`;
       el += `<img src="${val}" id="image-upload" class="${imageClass}"/>`;
-      el += `<input type="file" name="bildfil" id="${id}" accept="image/*"${disabled}></label>`;
-      el += `<input id="o-delete-image-button" class="${imageClass}" type="button" aria-label="Ta bort bild" value="Ta bort bild"${disabled}>`;
+      el += `<input type="file" name="bildfil" id="${id}" class="o-editor-input" accept="image/*"${disabled}></label>`;
+      el += `<input id="o-delete-image-button" class="${imageClass}" type="button" class="o-editor-input" aria-label="Ta bort bild" value="Ta bort bild"${disabled}>`;
       el += '</div>';
       break;
     }
@@ -153,7 +153,7 @@ const createForm = function createForm(obj) {
       if (val.length > 10) {
         val = val.slice(0, 10);
       }
-      el = `<div class="validate ${cls}"><label>${label}<br><input type="date" name="datum" id="${id}" placeholder="åååå-MM-dd" value="${val}"${readonly}${required}></label></div>`;
+      el = `<div class="validate ${cls}"><label for="${id}">${label}<br><input type="date" name="datum" id="${id}" class="o-editor-input" placeholder="åååå-MM-dd" value="${val}"${readonly}${required}></label></div>`;
       break;
     case 'time':
       // Create a time input
@@ -169,7 +169,7 @@ const createForm = function createForm(obj) {
       } else if (val.length > 8) {
         val = val.slice(11, 19);
       }
-      el = `<div class="validate ${cls}"><label>${label}<br><input type="time" name="timmar, minuter och sekunder" id="${id}" step="1" placeholder="--:--:--" value="${val}"${readonly}${required}></label></div>`;
+      el = `<div class="validate ${cls}"><label for="${id}">${label}<br><input type="time" name="timmar, minuter och sekunder" id="${id}" step="1" class="o-editor-input" placeholder="--:--:--" value="${val}"${readonly}${required}></label></div>`;
       break;
     case 'datetime':
       // Create a datetime input
@@ -185,30 +185,30 @@ const createForm = function createForm(obj) {
       } else if (val.length > 19) {
         val = val.slice(0, 19);
       }
-      el = `<div class="validate"><label>${label}<br><input type="datetime-local" name="datum och tid" id="${id}" step="1" placeholder="åååå-MM-dd --:--:--" value="${val}"${readonly}${required}></label></div>`;
+      el = `<div class="validate"><label for="${id}">${label}<br><input type="datetime-local" name="datum och tid" id="${id}" step="1" class="o-editor-input" placeholder="åååå-MM-dd --:--:--" value="${val}"${readonly}${required}></label></div>`;
       break;
     case 'color':
       // Create a color input
       if (!val) {
         val = obj.defaultColor ? obj.defaultColor : '';
       }
-      el = `<div class="validate ${cls}"><label>${label}<br><input type="color" name="hexadecimal" id="${id}" value="${val}"${readonly}></label></div>`;
+      el = `<div class="validate ${cls}"><label for="${id}"${label}<br><input type="color" name="hexadecimal" id="${id}" class="o-editor-input" value="${val}"${readonly}></label></div>`;
       break;
     case 'email':
       // Create a email input
-      el = `<div class="validate ${cls}"><label>${label}<br><input type="email" name="epost" id="${id}" value="${val}"${readonly}${required}></label></div>`;
+      el = `<div class="validate ${cls}"><label for="${id}">${label}<br><input type="email" name="epost" id="${id}" class="o-editor-input" value="${val}"${readonly}${required}></label></div>`;
       break;
     case 'url':
       // Create a url input
-      el = `<div class="validate ${cls}"><label>${label}<br><input type="url" name="hemsida" id="${id}" value="${val}"${readonly}${required}></label></div>`;
+      el = `<div class="validate ${cls}"><label for="${id}">${label}<br><input type="url" name="hemsida" id="${id}" class="o-editor-input" value="${val}"${readonly}${required}></label></div>`;
       break;
     case 'integer':
       // Create a integer number input
-      el = `<div class="validate ${cls}"><label>${label}<br><input type="number" step="1" min="0" name="heltal" id="${id}" value="${val}"${readonly}${required}></label></div>`;
+      el = `<div class="validate ${cls}"><label for="${id}">${label}<br><input type="number" step="1" min="0" class="o-editor-input" name="heltal" id="${id}" value="${val}"${readonly}${required}></label></div>`;
       break;
     case 'decimal':
       // Create a decimal number input
-      el = `<div class="validate ${cls}"><label>${label}<br><input type="number" step="0.01" min="0" name="decimaltal" id="${id}" value="${val}"${readonly}${required}></label></div>`;
+      el = `<div class="validate ${cls}"><label for="${id}">${label}<br><input type="number" step="0.01" min="0" class="o-editor-input" name="decimaltal" id="${id}" value="${val}"${readonly}${required}></label></div>`;
       break;
     case 'hidden':
       // Create a image input
