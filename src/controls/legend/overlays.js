@@ -134,7 +134,7 @@ const Overlays = function Overlays(options) {
   // Hide overlays container when empty
   const onChangeLayer = function onChangeLayer() {
     const nrOverlays = readOverlays().length;
-    if(nrOverlays === 0){
+    if (nrOverlays === 0) {
       document.getElementById(this.getId()).classList.add('hidden');
     } else {
       document.getElementById(this.getId()).classList.remove('hidden');
