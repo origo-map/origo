@@ -223,6 +223,7 @@ const Legend = function Legend(options = {}) {
   const setVisibleLayersViewActive = function setVisibleLayersViewActive(active) {
     if (!visibleLayersControl) return;
     visibleLayersViewActive = active;
+    overlaysCmp.readOverlays()
     if (visibleLayersViewActive) {
       document.getElementById(overlaysCmp.getId()).classList.add('hidden');
       document.getElementById(visibleOverlaysCmp.getId()).classList.remove('hidden');
@@ -231,7 +232,10 @@ const Legend = function Legend(options = {}) {
       visibleOverlaysCmp.dispatch('readOverlays');
       document.getElementById(toolsCmp.getId()).classList.add('hidden');
     } else {
-      document.getElementById(overlaysCmp.getId()).classList.remove('hidden');
+      const nrOverlays = overlaysCmp.readOverlays().length;
+      if(nrOverlays > 0){
+        document.getElementById(overlaysCmp.getId()).classList.remove('hidden');
+      }
       document.getElementById(visibleOverlaysCmp.getId()).classList.add('hidden');
       document.getElementById(showAllVisibleLayersButton.getId()).classList.add('hidden');
       document.getElementById(showVisibleLayersButton.getId()).classList.remove('hidden');
@@ -720,8 +724,7 @@ const Legend = function Legend(options = {}) {
         cls: 'flex column relative',
         components: mainContainerComponents,
         style: {
-          'max-height': `${maxHeight}px`,
-          width: 'min-content'
+          'max-height': `${maxHeight}px`
         }
       });
 
