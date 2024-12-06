@@ -1306,7 +1306,7 @@ function editAttributes(feat) {
             obj.val = obj.val.split(separator);
           }
           obj.isVisible = true;
-          obj.elId = `input-${obj.name}`;
+          obj.elId = `input-${currentLayer}-${obj.name}`;
           obj.addListener = addCheckboxListener();
         } else if (obj.type === 'image') {
           obj.isVisible = true;
