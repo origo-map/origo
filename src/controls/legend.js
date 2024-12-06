@@ -232,7 +232,7 @@ const Legend = function Legend(options = {}) {
       document.getElementById(toolsCmp.getId()).classList.add('hidden');
     } else {
       const nrOverlays = overlaysCmp.readOverlays().length;
-      if(nrOverlays > 0) {
+      if (nrOverlays > 0) {
         document.getElementById(overlaysCmp.getId()).classList.remove('hidden');
       }
       document.getElementById(visibleOverlaysCmp.getId()).classList.add('hidden');
