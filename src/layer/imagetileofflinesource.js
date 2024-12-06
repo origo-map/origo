@@ -5,7 +5,7 @@ import Feature from 'ol/Feature';
 
 const databaseName = 'origoOfflineTiles';
 // Remember to bump this one (integers only) when table schema changes
-const databaseVersion = 3;
+const databaseVersion = 4;
 
 const tilesObjectsStoreName = 'tiles';
 const extentsObjectsStoreName = 'extents';
@@ -47,6 +47,7 @@ function initIndexedDb() {
     {
       name: extentsObjectsStoreName,
       indices: [nameCol],
+      keyPath: 'rid',
       autoIncrement: true
     }
   ];
@@ -90,7 +91,6 @@ export default class ImageTileOfflineSource extends ImageTileSource {
 
   constructor(options, viewer) {
     super({
-      // TODO: Pass on some more of the relevant options.
       tileGrid: options.tileGrid,
       gutter: 0,
       projection: options.projection,
@@ -408,13 +408,16 @@ export default class ImageTileOfflineSource extends ImageTileSource {
     // Can't call it clear, baseclass has a clear
     return new Promise((resolve, reject) => {
       try {
-        const transaction = this.db.transaction(tilesObjectsStoreName, 'readwrite');
+        // Legend graphics are not cleared as they are overwritten, so we can leave them to have a nice legend.
+        const transaction = this.db.transaction([tilesObjectsStoreName, extentsObjectsStoreName], 'readwrite');
         const objectStore = transaction.objectStore(tilesObjectsStoreName);
+        const extentsStore = transaction.objectStore(extentsObjectsStoreName);
 
         const index = objectStore.index(nameCol);
         const getRequest = index.getAll(this.layerName);
-        // TODO: clear all extents
-        // TODO: clear legend graphics
+
+        const extentsIndex = extentsStore.index(nameCol);
+        const getExtentsReq = extentsIndex.getAll(this.layerName);
         transaction.oncomplete = () => {
           this.refresh();
           console.log('All items deleted');
@@ -425,7 +428,7 @@ export default class ImageTileOfflineSource extends ImageTileSource {
             getRequest.result.forEach(currRow => {
               const delreq = objectStore.delete([currRow[nameCol], currRow[tileZCol], currRow[tileXCol], currRow[tileYCol]]);
               delreq.onsuccess = () => {
-                console.log('Deleted');
+                console.log('Deleted tile');
               };
             });
           } else {
@@ -434,6 +437,22 @@ export default class ImageTileOfflineSource extends ImageTileSource {
           }
         };
         getRequest.onerror = (event) => {
+          reject(event.target.error);
+        };
+        getExtentsReq.onsuccess = () => {
+          if (getExtentsReq.result) {
+            getExtentsReq.result.forEach(currRow => {
+              const delreq = extentsStore.delete(currRow.rid);
+              delreq.onsuccess = () => {
+                console.log('Deleted extent');
+              };
+            });
+          } else {
+            const e = new Error('Hittades inte');
+            reject(e);
+          }
+        };
+        getExtentsReq.onerror = (event) => {
           reject(event.target.error);
         };
       } catch (error) {

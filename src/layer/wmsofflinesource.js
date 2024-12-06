@@ -1,13 +1,12 @@
+import WKT from 'ol/format/WKT';
+import { fromExtent } from 'ol/geom/Polygon';
 import { createLoader, getLegendUrl } from 'ol/source/wms';
 import ImageTileOfflineSource from './imagetileofflinesource';
 
 /**
  * WMS tile offline source class.
- *
-
- *
+ * Handles preloading WMS tiles and WMS legend graphics
  */
-
 export default class WmsOfflineSource extends ImageTileOfflineSource {
   /**
    * Creates a new instance of WmsOfflineSource. Remember to call Init afterwards to set up async stuff.
@@ -17,12 +16,9 @@ export default class WmsOfflineSource extends ImageTileOfflineSource {
     // Most stuff is happening in the base class.
     super(options, viewer);
 
-    // Create a function to fetch WMS tiles. Not to be confused with the ImageTile class loader.
-    // Use the helper from OL. It can be done manully, but someone has already provided it for us.
-    // If request depends on params, a new loader must be created for each request in preload.
-    this.WmsLoader = createLoader({ ratio: 1, url: options.url, params: options.params, crossOrigin: options.crossOrigin, projection: options.projection });
     this.legendUrl = options.styleUrl ? options.styleUrl : getLegendUrl(options, 90);
     this.style = options.style;
+    this.options = options;
   }
 
   /**
@@ -44,12 +40,24 @@ export default class WmsOfflineSource extends ImageTileOfflineSource {
     // will be lost. Also if tile load fails, the extent will be bigger than actual extent of existing tiles
     const extentId = await this.storeExtent(extent);
     const extents = super.calculateTiles(extent);
+    const paramstosend = Object.assign({}, this.options.params);
+    // Clip all tiles to extent to avoid zoomed out levels to cover more area.
+    // only works for GeoServer as clip is a vendor parameter.
+    if (this.options.clip) {
+      const wkt = new WKT();
+      const clipenv = wkt.writeGeometry(fromExtent(extent));
+      paramstosend.clip = clipenv;
+    }
+    // Create a function to fetch WMS tiles. Not to be confused with the ImageTile class loader.
+    // Use the helper from OL. It can be done manully, but someone has already provided it for us.
+    // Request depends on params, so a new loader must be created for each call to preload.
+    const wmsLoader = createLoader({ ratio: 1, url: this.options.url, params: paramstosend, crossOrigin: this.options.crossOrigin, projection: this.options.projection });
 
     const allDownloadPromises = extents.map(async (currExtent) => {
       console.log('One tile to load');
 
       // Fetch the image, returns an Image, which can't be stored in indexeddb as-as. Must convert it to Blob first
-      const wmsResponse = await this.WmsLoader(currExtent.currTileExtent, currExtent.resolution, 1.0);
+      const wmsResponse = await wmsLoader(currExtent.currTileExtent, currExtent.resolution, 1.0);
       // Convert to Blob. Quite a hassle. An alternative would be fetch-ing manually and just .blob() the result,
       // but that would require writing our own loader and the image.src trick used by the loader seems to circumvent
       // some cors limitation.
