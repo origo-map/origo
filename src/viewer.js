@@ -497,22 +497,22 @@ const Viewer = function Viewer(targetOption, options = {}) {
       layers.forEach((layer) => {
         map.removeLayer(layer);
       });
+      const subgroups = groups.filter((item) => {
+        if (item.parent) {
+          return item.parent === groupName;
+        }
+        return false;
+      });
+      if (subgroups.length) {
+        subgroups.forEach((subgroup) => {
+          const name = subgroup.name;
+          this.removeGroup(name);
+        });
+      }
       const groupIndex = groups.indexOf(group);
       groups.splice(groupIndex, 1);
       this.dispatch('remove:group', {
         group
-      });
-    }
-    const subgroups = groups.filter((item) => {
-      if (item.parent) {
-        return item.parent === groupName;
-      }
-      return false;
-    });
-    if (subgroups.length) {
-      subgroups.forEach((subgroup) => {
-        const name = subgroup.name;
-        removeGroup(groups[name]);
       });
     }
   };
