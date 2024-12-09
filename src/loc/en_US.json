@@ -146,5 +146,10 @@
             "pointTypeSquare": "Square",
             "pointTypeMarker": "Marker"
         }
+    },
+    "bookmarks": {
+        "title": "Bookmarks",
+        "close": "Close",
+        "bookmarkLabel": "Bookmark for"
     }
 }
