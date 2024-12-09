@@ -19,6 +19,7 @@ export default function Offline({ localization }) {
   let envelope;
   let map;
   let modal;
+  let layersInProgress = []; // store the layer names that are currently being downloaded
 
   function localize(key) {
     return localization.getStringByKeys({ targetParentKey: 'offline', targetKey: key });
@@ -80,6 +81,61 @@ export default function Offline({ localization }) {
   });
 
   toolbarButtons.push(clearButton);
+
+  const downloadButton = Button({
+    cls: 'padding-small icon-smaller round light box-shadow relative',
+    async click() {
+      const offlineLayers = viewer.getLayers().filter(layer => layer.getProperties().type === 'WMSOFFLINE');
+      const offlineSizes = await getOfflineCalculations(offlineLayers);
+
+      const lagerElements = offlineSizes.map(lager => {
+        console.log();
+        const percent = layersInProgress.includes(lager.name) ? '0%' : '100%';
+        return Element({
+          style: 'display: flex; gap: 4px;',
+          components: [
+            Element({ tagName: 'span', innerHTML: `Lager: ${lager.name}: ${lager.size} (${lager.tiles} tiles)` }),
+            Element({
+              style: 'display: flex; gap: 2px;',
+              components: [
+                Element({ cls: `${lager.name}-progress`, tagName: 'span', innerHTML: 'Progress:' }),
+                Element({ cls: `${lager.name}-progress-percent`, tagName: 'span', innerHTML: percent })
+              ] })
+          ]
+        });
+      });
+
+      const modalContent = Element({
+        style: 'display: flex; flex-direction: column; gap: 4px;',
+        components: [
+          Element({ tagName: 'span', innerHTML: 'Dina sparade lager.' }),
+          Element({
+            style: 'display: flex; flex-direction: column; gap: 4px;',
+            components: [
+              Element({ style: 'padding-top: 8px; padding-bottom: 8px;', components: lagerElements })
+              // Element({ tagName: 'hr' })
+            ]
+          })
+        ]
+      });
+
+      modal = Modal({
+        title: 'Spara ner kartlager',
+        contentCmp: modalContent,
+        cls: 'o-offline-modal',
+        target: viewer.getId(),
+        style: ''
+      });
+
+      envelopeButton.setState('active');
+    },
+    icon: '#ic_crop_square_24px',
+    tooltipText: 'Visa sparade lager',
+    tooltipPlacement: 'south',
+    tooltipStyle: 'bottom:-5px;'
+  });
+
+  toolbarButtons.push(downloadButton);
 
   // Create options object for the toolbar with buttons.
   if (toolbarButtons.length) {
@@ -156,7 +212,7 @@ export default function Offline({ localization }) {
     // Set up an event listener for the 'drawend' event.
     envelope.on(
       'drawend',
-      (evt) => {
+      async (evt) => {
         // Finalize the drawing by removing the draw interaction.
         map.removeInteraction(envelope);
 
@@ -168,22 +224,7 @@ export default function Offline({ localization }) {
         const offlineLayers = viewer.getLayers().filter(layer => layer.getProperties().type === 'WMSOFFLINE');
         const extent = evt.feature.getGeometry().getExtent();
 
-        const offlineSize = offlineLayers.map(layer => {
-          const { numberOfTiles, estimateBytes } = layer.getProperties().source.calculateEstimateForExtent(extent);
-          let size;
-          if (estimateBytes >= 1e9) {
-            size = `${(estimateBytes / 1e9).toFixed(2)} GB`;
-          } else if (estimateBytes >= 1e6) {
-            size = `${(estimateBytes / 1e6).toFixed(2)} MB`;
-          } else {
-            size = `${(estimateBytes / 1e3).toFixed(2)} KB`;
-          }
-          return {
-            name: layer.getProperties().name,
-            size,
-            tiles: numberOfTiles
-          };
-        });
+        const offlineSize = await getOfflineCalculations(offlineLayers, [{ extentid: extent }]);
 
         const modalCloseButton = Button({
           cls: 'o-offline-modal-btn-close icon-smaller',
@@ -204,7 +245,19 @@ export default function Offline({ localization }) {
             const responses = [];
 
             offlineLayers.forEach(offlineLayer => {
-              responses.push(offlineLayer.getProperties().source.preload(extent));
+              layersInProgress.push(offlineLayer.getProperties().name);
+              let tilesDownloaded = 0;
+              const numberOfTilesToDownload = offlineSize.find(lager => lager.name === offlineLayer.getProperties().name).tiles;
+              // THis needs to emit an event that the download modal listens to and can update the progress
+              const progressCallback = () => {
+                tilesDownloaded += 1;
+                const percentElement = document.querySelector(`.${offlineLayer.getProperties().name}-progress-percent`);
+                // Check if the modal is open before we try and update the progress
+                if (percentElement) {
+                  percentElement.innerHTML = `${Math.round((tilesDownloaded / numberOfTilesToDownload) * 100)}%`;
+                }
+              };
+              responses.push(offlineLayer.getProperties().source.preload(extent, progressCallback));
             });
 
             modal.closeModal();
@@ -217,6 +270,8 @@ export default function Offline({ localization }) {
 
             Promise.all(responses).then((result) => {
               console.log('All tiles saved', result);
+              // Remove the layer from the in progress list
+              layersInProgress = [];
               viewer.getLogger().createToast({
                 status: 'success',
                 title: 'Lager sparat',
@@ -266,6 +321,37 @@ export default function Offline({ localization }) {
 
     // Add the draw interaction to the map.
     map.addInteraction(envelope);
+  }
+
+  async function getOfflineCalculations(offlineLayers, extents) {
+    const results = await Promise.all(offlineLayers.map(async layer => {
+      const extentsForLayer = extents ?? await layer.getProperties().source.fetchExtentsFromDb();
+      let totalTiles = 0;
+      let totalBytes = 0;
+
+      extentsForLayer.forEach(extent => {
+        const { numberOfTiles, estimateBytes } = layer.getProperties().source.calculateEstimateForExtent(extent.extentid);
+        totalTiles += numberOfTiles;
+        totalBytes += estimateBytes;
+      });
+
+      let size;
+      if (totalBytes >= 1e9) {
+        size = `${(totalBytes / 1e9).toFixed(2)} GB`;
+      } else if (totalBytes >= 1e6) {
+        size = `${(totalBytes / 1e6).toFixed(2)} MB`;
+      } else {
+        size = `${(totalBytes / 1e3).toFixed(2)} KB`;
+      }
+
+      return {
+        name: layer.getProperties().name,
+        size,
+        tiles: totalTiles
+      };
+    }));
+
+    return results;
   }
 
   // Function to clear drawn features and disable interaction.
