@@ -147,5 +147,10 @@
             "pointTypeSquare": "Fyrkant",
             "pointTypeMarker": "Markör"
         }
+    },
+    "draganddrop": {
+        "addFromFile": "Lägg till från fil",
+        "yourLayersName": "egna-lager",
+        "yourLayersTitle": "Egna lager"
     }
 }

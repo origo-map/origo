@@ -146,5 +146,10 @@
             "pointTypeSquare": "Square",
             "pointTypeMarker": "Marker"
         }
+    },
+    "draganddrop": {
+        "addFromFile": "Add from file",
+        "yourLayersName": "your-layers",
+        "yourLayersTitle": "Your layers"
     }
 }
