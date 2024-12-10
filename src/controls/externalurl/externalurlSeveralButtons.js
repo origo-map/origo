@@ -3,7 +3,13 @@ import { Component, Element as El, Button, dom } from '../../ui';
 import replacer from '../../utils/replacer';
 
 const externalurlSeveralButtons = function externalurlSeveralButtons(options = {}) {
-  const mainbuttonTooltipText = options.tooltipText || 'Visa kartan i en extern karttjänst';
+  const localization = options.localization;
+
+  function localize(key) {
+    return localization.getStringByKeys({ targetParentKey: 'externalurl', targetKey: key });
+  }
+
+  const mainbuttonTooltipText = options.tooltipText || localize('tooltipText');
   const links = options.links;
   const hasValidMethod = links.some(link => link.method !== 'none');
   let map;
@@ -79,7 +85,7 @@ const externalurlSeveralButtons = function externalurlSeveralButtons(options = {
       });
       buttons.push(externalUrlMainButton);
       links.forEach((link) => {
-        const tooltipText = link.tooltipText;
+        const tooltipText = link.tooltipText ? link.tooltipText : localize('linkTooltipText');
         const buttonImage = link.buttonImage || '#fa-external-link';
         const subButton = Button({
           cls: `o-measure-length padding-small ${subButtoncls} icon-smaller round light box-shadow hidden`,

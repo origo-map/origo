@@ -146,5 +146,10 @@
             "pointTypeSquare": "Square",
             "pointTypeMarker": "Marker"
         }
+    },
+    "externalurl": {
+        "tooltipText": "Display the map in an external map service",
+        "noUrl": "No URL is specified in the configuration",
+        "linkTooltipText": "Open link"
     }
 }

@@ -147,5 +147,10 @@
             "pointTypeSquare": "Fyrkant",
             "pointTypeMarker": "Markör"
         }
+    },
+    "externalurl": {
+        "tooltipText": "Visa kartan i en extern karttjänst",
+        "noUrl": "Ingen URL är angiven i konfigurationen",
+        "linkTooltipText": "Öppna länk"
     }
 }
