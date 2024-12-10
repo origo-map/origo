@@ -3,6 +3,8 @@ import { Draw } from 'ol/interaction';
 import { createBox } from 'ol/interaction/Draw';
 import { Vector as VectorLayer } from 'ol/layer';
 import { Vector as VectorSource } from 'ol/source';
+import { Stroke } from 'ol/style';
+// import Feature from 'ol/Feature';
 import { Component, Button, dom, Element, Modal } from '../ui';
 
 /**
@@ -41,8 +43,9 @@ export default function Offline({ localization }) {
   // Create an envelope drawing button to enable interaction.
   const envelopeButton = Button({
     cls: 'padding-small icon-smaller round light box-shadow relative',
-    click() {
+    async click() {
       clearAndRestartInteraction();
+      drawExistingOfflineSelections();
       envelopeButton.setState('active');
     },
     icon: '#ic_crop_square_24px',
@@ -234,6 +237,7 @@ export default function Offline({ localization }) {
             modal.closeModal();
             modal.dispatch('closed');
             clearAndRemoveInteraction();
+            clearOfflineSelections();
           }
         });
         const modalSaveButton = Button({
@@ -262,6 +266,7 @@ export default function Offline({ localization }) {
 
             modal.closeModal();
             modal.dispatch('closed');
+            clearOfflineSelections();
             viewer.getLogger().createToast({
               status: 'info',
               title: 'Nedladdning pågår',
@@ -315,6 +320,7 @@ export default function Offline({ localization }) {
 
         modal.on('closed', () => {
           clearAndRemoveInteraction();
+          clearOfflineSelections();
         });
       }
     );
@@ -365,6 +371,7 @@ export default function Offline({ localization }) {
     document.getElementById(envelopeButton.getId()).classList.remove('active');
     document.getElementById(toolbar.getId()).classList.add('o-hidden');
     setActive(false);
+    clearOfflineSelections();
     clearDrawings();
   }
 
@@ -394,6 +401,44 @@ export default function Offline({ localization }) {
     };
 
     viewer.dispatch('toggleClickInteraction', detail);
+  }
+
+  function drawExistingOfflineSelections() {
+    // Show existing offline layers
+    const scale = 1;
+    const existingOfflineLayers = new VectorLayer({
+      group: 'none',
+      name: 'offline-selection',
+      source: new VectorSource(),
+      // style: {
+      //   'stroke-color': 'rgba(100, 255, 0, 1)',
+      //   'stroke-width': 3
+      // }
+      stroke: new Stroke({
+        color: 'rgba(133, 193, 233, 1)',
+        lineDash: [10 * scale, 10 * scale],
+        width: 5 * scale
+      })
+    });
+    const offlineLayers = viewer.getLayers().filter(layer => layer.getProperties().type === 'WMSOFFLINE');
+    const responses = [];
+    offlineLayers.forEach(layer => {
+      responses.push(layer.getProperties().source.getExtents());
+    });
+    Promise.all(responses).then((features) => {
+      for (let i = 0; i < features.length; i += 1) {
+        existingOfflineLayers.getSource().addFeatures(features[i]);
+      }
+      map.addLayer(existingOfflineLayers);
+    });
+  }
+
+  function clearOfflineSelections() {
+    const existingOfflineLayers = viewer.getLayers().find(layer => layer.getProperties().name === 'offline-selection');
+    if (existingOfflineLayers) {
+      existingOfflineLayers.getSource().clear();
+      map.removeLayer(existingOfflineLayers);
+    }
   }
 
   // Return the main Component with specific properties and methods.
