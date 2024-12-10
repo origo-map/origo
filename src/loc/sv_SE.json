@@ -105,8 +105,17 @@
             "drawSquare": "Fyrkant",
             "drawCircle": "Cirkel",
             "drawFreehand": "Frihand"
+        },
+        "bookmarks": {
+            "title": "Bokmärken",
+            "close": "Stäng",
+            "bookmarkLabel": "Bokmärke för"
+        },
+        "externalurl": {
+            "tooltipText": "Visa kartan i en extern karttjänst",
+            "noUrl": "Ingen URL är angiven i konfigurationen",
+            "linkTooltipText": "Öppna länk"
         }
-
     },
     "style": {
         "drawStyles": {
@@ -147,15 +156,5 @@
             "pointTypeSquare": "Fyrkant",
             "pointTypeMarker": "Markör"
         }
-    },
-    "bookmarks": {
-        "title": "Bokmärken",
-        "close": "Stäng",
-        "bookmarkLabel": "Bokmärke för"
-    },
-    "externalurl": {
-        "tooltipText": "Visa kartan i en extern karttjänst",
-        "noUrl": "Ingen URL är angiven i konfigurationen",
-        "linkTooltipText": "Öppna länk"
     }
 }
