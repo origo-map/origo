@@ -147,6 +147,11 @@
             "pointTypeMarker": "Marker"
         }
     },
+    "bookmarks": {
+        "title": "Bookmarks",
+        "close": "Close",
+        "bookmarkLabel": "Bookmark for"
+    },
     "externalurl": {
         "tooltipText": "Display the map in an external map service",
         "noUrl": "No URL is specified in the configuration",
