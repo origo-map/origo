@@ -147,5 +147,10 @@
             "pointTypeSquare": "Fyrkant",
             "pointTypeMarker": "Markör"
         }
+    },
+    "bookmarks": {
+        "title": "Bokmärken",
+        "close": "Stäng",
+        "bookmarkLabel": "Bokmärke för"
     }
 }
