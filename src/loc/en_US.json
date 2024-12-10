@@ -147,6 +147,11 @@
             "pointTypeMarker": "Marker"
         }
     },
+    "bookmarks": {
+        "title": "Bookmarks",
+        "close": "Close",
+        "bookmarkLabel": "Bookmark for"
+    },
     "draganddrop": {
         "addFromFile": "Add from file",
         "yourLayersName": "your-layers",

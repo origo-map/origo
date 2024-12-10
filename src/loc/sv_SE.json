@@ -148,6 +148,11 @@
             "pointTypeMarker": "Markör"
         }
     },
+    "bookmarks": {
+        "title": "Bokmärken",
+        "close": "Stäng",
+        "bookmarkLabel": "Bokmärke för"
+    },
     "draganddrop": {
         "addFromFile": "Lägg till från fil",
         "yourLayersName": "egna-lager",
