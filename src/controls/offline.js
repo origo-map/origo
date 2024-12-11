@@ -27,11 +27,152 @@ export default function Offline({ localization }) {
     return localization.getStringByKeys({ targetParentKey: 'offline', targetKey: key });
   }
 
-  const offlineButton = Button({
+  function createButton(options) {
+    return Button({
+      cls: options.cls,
+      click: options.click,
+      text: options.text,
+      icon: options.icon,
+      tooltipText: options.tooltipText,
+      tooltipPlacement: options.tooltipPlacement,
+      tooltipStyle: options.tooltipStyle
+    });
+  }
+
+  function createDownloadModalContent(offlineSizes) {
+    const lagerElements = offlineSizes.map(lager => {
+      const percent = layersInProgress.includes(lager.name) ? '0%' : '100%';
+      return Element({
+        style: 'display: flex; gap: 4px;',
+        components: [
+          Element({ tagName: 'span', innerHTML: `Lager: ${lager.name}: ${lager.size} (${lager.tiles} tiles)` }),
+          Element({
+            style: 'display: flex; gap: 2px;',
+            components: [
+              Element({ cls: `${lager.name}-progress`, tagName: 'span', innerHTML: 'Progress:' }),
+              Element({ cls: `${lager.name}-progress-percent`, tagName: 'span', innerHTML: percent })
+            ]
+          })
+        ]
+      });
+    });
+
+    return Element({
+      style: 'display: flex; flex-direction: column; gap: 4px;',
+      components: [
+        Element({ tagName: 'span', innerHTML: 'Dina sparade lager.' }),
+        Element({
+          style: 'display: flex; flex-direction: column; gap: 4px;',
+          components: [
+            Element({ style: 'padding-top: 8px; padding-bottom: 8px;', components: lagerElements })
+          ]
+        })
+      ]
+    });
+  }
+
+  async function createSaveModalContent(feature) {
+    const offlineLayers = viewer.getLayers().filter(layer => layer.getProperties().type === 'WMSOFFLINE');
+    const extent = feature.getGeometry().getExtent();
+
+    const offlineSize = await getOfflineCalculations(offlineLayers, [{ extentid: extent }]);
+
+    const modalCloseButton = createButton({
+      cls: 'o-offline-modal-btn-close icon-smaller',
+      text: 'Stäng',
+      icon: '#ic_close_24px',
+      click() {
+        modal.closeModal();
+        modal.dispatch('closed');
+        clearAndRemoveInteraction();
+        clearOfflineSelections();
+      }
+    });
+
+    const modalSaveButton = createButton({
+      cls: 'o-offline modal btn-save icon-smaller',
+      text: 'Spara',
+      icon: '#ic_save_24px',
+      click() {
+        const responses = offlineLayers.map(offlineLayer => {
+          layersInProgress.push(offlineLayer.getProperties().name);
+          let tilesDownloaded = 0;
+          const numberOfTilesToDownload = offlineSize.find(lager => lager.name === offlineLayer.getProperties().name).tiles;
+          const progressCallback = () => {
+            tilesDownloaded += 1;
+            const percentElement = document.querySelector(`.${offlineLayer.getProperties().name}-progress-percent`);
+            // Check if the modal is open before we try and update the progress
+            if (percentElement) {
+              percentElement.innerHTML = `${Math.round((tilesDownloaded / numberOfTilesToDownload) * 100)}%`;
+            }
+          };
+          return offlineLayer.getProperties().source.preload(extent, progressCallback);
+        });
+
+        modal.closeModal();
+        modal.dispatch('closed');
+        clearOfflineSelections();
+        viewer.getLogger().createToast({
+          status: 'info',
+          title: 'Nedladdning pågår',
+          message: 'Dina lager sparas ner i bakgrunden.'
+        });
+
+        Promise.all(responses).then((result) => {
+          console.log('All tiles saved', result);
+          // Remove the layer from the in progress list
+          layersInProgress = [];
+          viewer.getLogger().createToast({
+            status: 'success',
+            title: 'Lager sparat',
+            message: 'Dina lager är redo att användas offline.'
+          });
+        });
+      }
+    });
+
+    const actionButtons = Element({
+      style: 'display: flex; flex-gap: 2px; justify-content: end;',
+      components: [modalCloseButton, modalSaveButton]
+    });
+
+    const lagerElements = offlineSize.map(lager => Element({
+      tagName: 'span', innerHTML: `Lager: ${lager.name}: ${lager.size} (${lager.tiles} tiles)`
+    }));
+
+    return Element({
+      style: 'display: flex; flex-direction: column; gap: 4px;',
+      components: [
+        Element({ tagName: 'span', innerHTML: 'Följande data kommer att sparas ner för att användas online.' }),
+        Element({
+          style: 'display: flex; flex-direction: column; gap: 4px;',
+          components: [
+            Element({ style: 'padding-top: 8px; padding-bottom: 8px;', components: lagerElements }),
+            Element({ tagName: 'hr' }),
+            actionButtons
+          ]
+        })
+      ]
+    });
+  }
+
+  function createModal(options) {
+    const { title, content, onClose } = options;
+    const localModal = Modal({
+      title,
+      contentCmp: content,
+      cls: 'o-offline-modal',
+      target: viewer.getId(),
+      style: ''
+    });
+
+    localModal.on('closed', onClose);
+    return localModal;
+  }
+
+  const offlineButton = createButton({
     cls: 'o-offline-in padding-small icon-smaller round light box-shadow',
-    click() {
-      toggleOffline();
-    },
+    click: toggleOffline,
     icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M21 11l2-2c-3.73-3.73-8.87-5.15-13.7-4.31l2.58 2.58c3.3-.02 6.61 1.22 9.12 3.73zm-2 2c-1.08-1.08-2.36-1.85-3.72-2.33l3.02 3.02.7-.69zM9 17l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zM3.41 1.64L2 3.05 5.05 6.1C3.59 6.83 2.22 7.79 1 9l2 2c1.23-1.23 2.65-2.16 4.17-2.78l2.24 2.24C7.79 10.89 6.27 11.74 5 13l2 2c1.35-1.35 3.11-2.04 4.89-2.06l7.08 7.08 1.41-1.41L3.41 1.64z"/></svg>',
     tooltipText: localize('btn_tool_title'),
     tooltipPlacement: 'east'
@@ -41,7 +182,7 @@ export default function Offline({ localization }) {
   let toolbarButtons = [];
 
   // Create an envelope drawing button to enable interaction.
-  const envelopeButton = Button({
+  const envelopeButton = createButton({
     cls: 'padding-small icon-smaller round light box-shadow relative',
     async click() {
       clearAndRestartInteraction();
@@ -58,16 +199,13 @@ export default function Offline({ localization }) {
 
   // Create a clear button to remove drawings and disable interaction.
   // TODO: Button should not be visible if no cache is stored
-  const clearButton = Button({
+  const clearButton = createButton({
     cls: 'padding-small icon-smaller round light box-shadow relative',
     click() {
       clearAndRemoveInteraction();
       envelopeButton.setState('initial');
       const offlineLayers = viewer.getLayers().filter(layer => layer.getProperties().type === 'WMSOFFLINE');
-      const responses = [];
-      offlineLayers.forEach(layer => {
-        responses.push(layer.getProperties().source.clearStorage());
-      });
+      const responses = offlineLayers.map(layer => layer.getProperties().source.clearStorage());
       Promise.all(responses).then((result) => {
         console.log('Cleared cache for layers:', result);
         viewer.getLogger().createToast({
@@ -85,55 +223,17 @@ export default function Offline({ localization }) {
 
   toolbarButtons.push(clearButton);
 
-  const downloadButton = Button({
+  const downloadButton = createButton({
     cls: 'padding-small icon-smaller round light box-shadow relative',
     async click() {
       const offlineLayers = viewer.getLayers().filter(layer => layer.getProperties().type === 'WMSOFFLINE');
       const offlineSizes = await getOfflineCalculations(offlineLayers);
-
-      const lagerElements = offlineSizes.map(lager => {
-        console.log();
-        const percent = layersInProgress.includes(lager.name) ? '0%' : '100%';
-        return Element({
-          style: 'display: flex; gap: 4px;',
-          components: [
-            Element({ tagName: 'span', innerHTML: `Lager: ${lager.name}: ${lager.size} (${lager.tiles} tiles)` }),
-            Element({
-              style: 'display: flex; gap: 2px;',
-              components: [
-                Element({ cls: `${lager.name}-progress`, tagName: 'span', innerHTML: 'Progress:' }),
-                Element({ cls: `${lager.name}-progress-percent`, tagName: 'span', innerHTML: percent })
-              ] })
-          ]
-        });
-      });
-
-      const modalContent = Element({
-        style: 'display: flex; flex-direction: column; gap: 4px;',
-        components: [
-          Element({ tagName: 'span', innerHTML: 'Dina sparade lager.' }),
-          Element({
-            style: 'display: flex; flex-direction: column; gap: 4px;',
-            components: [
-              Element({ style: 'padding-top: 8px; padding-bottom: 8px;', components: lagerElements })
-              // Element({ tagName: 'hr' })
-            ]
-          })
-        ]
-      });
-
-      modal = Modal({
+      const modalContent = createDownloadModalContent(offlineSizes);
+      modal = createModal({
         title: 'Spara ner kartlager',
-        contentCmp: modalContent,
-        cls: 'o-offline-modal',
-        target: viewer.getId(),
-        style: ''
+        content: modalContent,
+        onClose: () => downloadButton.setState('inactive')
       });
-
-      modal.on('closed', () => {
-        downloadButton.setState('inactive');
-      });
-
       downloadButton.setState('active');
     },
     icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M439-82q-76-8-141.5-42.5t-113.5-88Q136-266 108.5-335T81-481q0-155 102.5-268.5T440-880v80q-121 17-200 107.5T161-481q0 121 79 211.5T439-162v80Zm40-198L278-482l57-57 104 104v-245h80v245l103-103 57 58-200 200Zm40 198v-80q43-6 82.5-23t73.5-43l58 58q-47 37-101 59.5T519-82Zm158-652q-35-26-74.5-43T520-800v-80q59 6 113 28.5T733-792l-56 58Zm112 506-56-57q26-34 42-73.5t22-82.5h82q-8 59-30 113.5T789-228Zm8-293q-6-43-22-82.5T733-677l56-57q38 45 61 99.5T879-521h-82Z"/></svg>',
@@ -144,12 +244,10 @@ export default function Offline({ localization }) {
 
   toolbarButtons.push(downloadButton);
 
-  const goOfflineButton = Button({
+  const goOfflineButton = createButton({
     cls: 'padding-small icon-smaller round light box-shadow relative',
     async click() {
-      // Go offline
       const currentState = goOfflineButton.getState();
-      console.log('Current state:', currentState);
       const onlineLayers = viewer.getLayers().filter(layer => layer.getProperties().type !== 'WMSOFFLINE');
       if (currentState === 'active') {
         goOfflineButton.setState('inactive');
@@ -164,7 +262,6 @@ export default function Offline({ localization }) {
         goOfflineButton.setState('active');
         localStorage.setItem('offline_state', 'true');
         // Check current state and store it in localstorage so we remember to reactivate them when user goes online again
-
         onlineLayers.forEach(layer => {
           localStorage.setItem(`offline_existing_state:${layer.getProperties().name}`, layer.getVisible());
           layer.setVisible(false);
@@ -261,105 +358,15 @@ export default function Offline({ localization }) {
         // Reset the state of the envelopeButton to 'initial'.
         envelopeButton.setState('initial');
 
-        // Calculate the total size of the layers to be saved.
-        // Get each offline layer and calculate the estimate for the extent.
-        const offlineLayers = viewer.getLayers().filter(layer => layer.getProperties().type === 'WMSOFFLINE');
-        const extent = evt.feature.getGeometry().getExtent();
+        const modalContent = await createSaveModalContent(evt.feature);
 
-        const offlineSize = await getOfflineCalculations(offlineLayers, [{ extentid: extent }]);
-
-        const modalCloseButton = Button({
-          cls: 'o-offline-modal-btn-close icon-smaller',
-          text: 'Stäng',
-          icon: '#ic_close_24px',
-          click() {
-            modal.closeModal();
-            modal.dispatch('closed');
+        modal = createModal({
+          title: 'Spara ner kartlager',
+          content: modalContent,
+          onClose: () => {
             clearAndRemoveInteraction();
             clearOfflineSelections();
           }
-        });
-        const modalSaveButton = Button({
-          cls: 'o-offline modal btn-save icon-smaller',
-          text: 'Spara',
-          icon: '#ic_save_24px',
-          click() {
-            // Store the extends
-            const responses = [];
-
-            offlineLayers.forEach(offlineLayer => {
-              layersInProgress.push(offlineLayer.getProperties().name);
-              let tilesDownloaded = 0;
-              const numberOfTilesToDownload = offlineSize.find(lager => lager.name === offlineLayer.getProperties().name).tiles;
-              // THis needs to emit an event that the download modal listens to and can update the progress
-              const progressCallback = () => {
-                tilesDownloaded += 1;
-                const percentElement = document.querySelector(`.${offlineLayer.getProperties().name}-progress-percent`);
-                // Check if the modal is open before we try and update the progress
-                if (percentElement) {
-                  percentElement.innerHTML = `${Math.round((tilesDownloaded / numberOfTilesToDownload) * 100)}%`;
-                }
-              };
-              responses.push(offlineLayer.getProperties().source.preload(extent, progressCallback));
-            });
-
-            modal.closeModal();
-            modal.dispatch('closed');
-            clearOfflineSelections();
-            viewer.getLogger().createToast({
-              status: 'info',
-              title: 'Nedladdning pågår',
-              message: 'Dina lager sparas ner i bakgrunden.'
-            });
-
-            Promise.all(responses).then((result) => {
-              console.log('All tiles saved', result);
-              // Remove the layer from the in progress list
-              layersInProgress = [];
-              viewer.getLogger().createToast({
-                status: 'success',
-                title: 'Lager sparat',
-                message: 'Dina lager är redo att användas offline.'
-              });
-            });
-          }
-        });
-
-        const actionButtons = Element({
-          style: 'display: flex; flex-gap: 2px; justify-content: end;',
-          components: [modalCloseButton, modalSaveButton]
-        });
-
-        const lagerElements = offlineSize.map(lager => Element({
-          tagName: 'span', innerHTML: `Lager: ${lager.name}: ${lager.size} (${lager.tiles} tiles)`
-        }));
-
-        const modalContent = Element({
-          style: 'display: flex; flex-direction: column; gap: 4px;',
-          components: [
-            Element({ tagName: 'span', innerHTML: 'Följande data kommer att sparas ner för att användas online.' }),
-            Element({
-              style: 'display: flex; flex-direction: column; gap: 4px;',
-              components: [
-                Element({ style: 'padding-top: 8px; padding-bottom: 8px;', components: lagerElements }),
-                Element({ tagName: 'hr' }),
-                actionButtons
-              ]
-            })
-          ]
-        });
-
-        modal = Modal({
-          title: 'Spara ner kartlager',
-          contentCmp: modalContent,
-          cls: 'o-offline-modal',
-          target: viewer.getId(),
-          style: ''
-        });
-
-        modal.on('closed', () => {
-          clearAndRemoveInteraction();
-          clearOfflineSelections();
         });
       }
     );
