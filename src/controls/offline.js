@@ -43,6 +43,9 @@ export default function Offline({ localization }) {
 
   function createDownloadModalContent(offlineSizes) {
     const lagerElements = offlineSizes.map(lager => {
+      if (lager.tiles === 0) {
+        return Element({});
+      }
       const percent = layersInProgress.includes(lager.name) ? '0%' : '100%';
       return Element({
         style: 'display: flex; gap: 4px;',
@@ -149,7 +152,7 @@ export default function Offline({ localization }) {
         Element({
           style: 'display: flex; flex-direction: column; gap: 4px;',
           components: [
-            Element({ style: 'padding-top: 8px; padding-bottom: 8px;', components: lagerElements }),
+            Element({ style: 'padding-top: 8px; padding-bottom: 8px; display: flex; flex-direction: column; gap: 4px;', components: lagerElements }),
             Element({ tagName: 'hr' }),
             actionButtons
           ]
@@ -215,7 +218,7 @@ export default function Offline({ localization }) {
         const offlineSizes = await getOfflineCalculations(offlineLayers);
         const modalContent = createDownloadModalContent(offlineSizes);
         modal = createModal({
-          title: 'Spara ner kartlager',
+          title: 'Sparade lager',
           content: modalContent,
           onClose: () => downloadButton.setState('inactive')
         });
