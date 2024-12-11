@@ -22,6 +22,8 @@ export default function Offline({ localization }) {
   let map;
   let modal;
   let layersInProgress = []; // store the layer names that are currently being downloaded
+  let envelopeButton;
+  let goOfflineButton;
 
   function localize(key) {
     return localization.getStringByKeys({ targetParentKey: 'offline', targetKey: key });
@@ -170,6 +172,107 @@ export default function Offline({ localization }) {
     return localModal;
   }
 
+  function createToolbarButtons() {
+    envelopeButton = createButton({
+      cls: 'padding-small icon-smaller round light box-shadow relative',
+      async click() {
+        clearAndRestartInteraction();
+        drawExistingOfflineSelections();
+        envelopeButton.setState('active');
+      },
+      icon: '#ic_crop_square_24px',
+      tooltipText: 'Rita ett område som ska sparas ned',
+      tooltipPlacement: 'south',
+      tooltipStyle: 'bottom:-5px;'
+    });
+
+    const clearButton = createButton({
+      cls: 'padding-small icon-smaller round light box-shadow relative',
+      click() {
+        clearAndRemoveInteraction();
+        envelopeButton.setState('initial');
+        const offlineLayers = viewer.getLayers().filter(layer => layer.getProperties().type === 'WMSOFFLINE');
+        const responses = offlineLayers.map(layer => layer.getProperties().source.clearStorage());
+        Promise.all(responses).then((result) => {
+          console.log('Cleared cache for layers:', result);
+          viewer.getLogger().createToast({
+            status: 'success',
+            title: 'Lager rensat',
+            message: 'Dina lager är rensade.'
+          });
+        });
+      },
+      icon: '#ic_delete_24px',
+      tooltipText: 'Rensa cache',
+      tooltipPlacement: 'south',
+      tooltipStyle: 'bottom:-5px;'
+    });
+
+    const downloadButton = createButton({
+      cls: 'padding-small icon-smaller round light box-shadow relative',
+      async click() {
+        const offlineLayers = viewer.getLayers().filter(layer => layer.getProperties().type === 'WMSOFFLINE');
+        const offlineSizes = await getOfflineCalculations(offlineLayers);
+        const modalContent = createDownloadModalContent(offlineSizes);
+        modal = createModal({
+          title: 'Spara ner kartlager',
+          content: modalContent,
+          onClose: () => downloadButton.setState('inactive')
+        });
+        downloadButton.setState('active');
+      },
+      icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M439-82q-76-8-141.5-42.5t-113.5-88Q136-266 108.5-335T81-481q0-155 102.5-268.5T440-880v80q-121 17-200 107.5T161-481q0 121 79 211.5T439-162v80Zm40-198L278-482l57-57 104 104v-245h80v245l103-103 57 58-200 200Zm40 198v-80q43-6 82.5-23t73.5-43l58 58q-47 37-101 59.5T519-82Zm158-652q-35-26-74.5-43T520-800v-80q59 6 113 28.5T733-792l-56 58Zm112 506-56-57q26-34 42-73.5t22-82.5h82q-8 59-30 113.5T789-228Zm8-293q-6-43-22-82.5T733-677l56-57q38 45 61 99.5T879-521h-82Z"/></svg>',
+      tooltipText: 'Visa sparade lager',
+      tooltipPlacement: 'south',
+      tooltipStyle: 'bottom:-5px;'
+    });
+
+    goOfflineButton = createButton({
+      cls: 'padding-small icon-smaller round light box-shadow relative',
+      async click() {
+        const currentState = goOfflineButton.getState();
+        const onlineLayers = viewer.getLayers().filter(layer => layer.getProperties().type !== 'WMSOFFLINE');
+        if (currentState === 'active') {
+          goOfflineButton.setState('inactive');
+          localStorage.setItem('offline_state', 'false');
+
+          onlineLayers.forEach(layer => {
+            const existingState = localStorage.getItem(`offline_existing_state:${layer.getProperties().name}`);
+            layer.setVisible(existingState === 'true');
+            localStorage.removeItem(`offline_existing_state:${layer.getProperties().name}`);
+          });
+        } else {
+          goOfflineButton.setState('active');
+          localStorage.setItem('offline_state', 'true');
+          // Check current state and store it in localstorage so we remember to reactivate them when user goes online again
+          onlineLayers.forEach(layer => {
+            localStorage.setItem(`offline_existing_state:${layer.getProperties().name}`, layer.getVisible());
+            layer.setVisible(false);
+          });
+        }
+      },
+      icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M21 11l2-2c-3.73-3.73-8.87-5.15-13.7-4.31l2.58 2.58c3.3-.02 6.61 1.22 9.12 3.73zm-2 2c-1.08-1.08-2.36-1.85-3.72-2.33l3.02 3.02.7-.69zM9 17l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zM3.41 1.64L2 3.05 5.05 6.1C3.59 6.83 2.22 7.79 1 9l2 2c1.23-1.23 2.65-2.16 4.17-2.78l2.24 2.24C7.79 10.89 6.27 11.74 5 13l2 2c1.35-1.35 3.11-2.04 4.89-2.06l7.08 7.08 1.41-1.41L3.41 1.64z"/></svg>',
+      tooltipText: 'Offlineläge',
+      tooltipPlacement: 'south',
+      tooltipStyle: 'bottom:-5px;'
+    });
+
+    return [envelopeButton, clearButton, downloadButton, goOfflineButton];
+  }
+
+  function createToolbar(toolbarButtons) {
+    const toolbarElement = Element({
+      cls: 'flex fixed bottom-center divider-horizontal bg-inverted z-index-ontop-high no-print',
+      components: toolbarButtons
+    });
+
+    return Element({
+      cls: 'o-go-offline-toolbar o-toolbar o-toolbar-horizontal o-padding-horizontal-8 o-rounded-top o-hidden',
+      tagName: 'div',
+      components: [toolbarElement]
+    });
+  }
+
   const offlineButton = createButton({
     cls: 'o-offline-in padding-small icon-smaller round light box-shadow',
     click: toggleOffline,
@@ -178,130 +281,8 @@ export default function Offline({ localization }) {
     tooltipPlacement: 'east'
   });
 
-  // Initialize an empty array for toolbar buttons.
-  let toolbarButtons = [];
-
-  // Create an envelope drawing button to enable interaction.
-  const envelopeButton = createButton({
-    cls: 'padding-small icon-smaller round light box-shadow relative',
-    async click() {
-      clearAndRestartInteraction();
-      drawExistingOfflineSelections();
-      envelopeButton.setState('active');
-    },
-    icon: '#ic_crop_square_24px',
-    tooltipText: 'Rita ett område som ska sparas ned',
-    tooltipPlacement: 'south',
-    tooltipStyle: 'bottom:-5px;'
-  });
-
-  toolbarButtons.push(envelopeButton);
-
-  // Create a clear button to remove drawings and disable interaction.
-  // TODO: Button should not be visible if no cache is stored
-  const clearButton = createButton({
-    cls: 'padding-small icon-smaller round light box-shadow relative',
-    click() {
-      clearAndRemoveInteraction();
-      envelopeButton.setState('initial');
-      const offlineLayers = viewer.getLayers().filter(layer => layer.getProperties().type === 'WMSOFFLINE');
-      const responses = offlineLayers.map(layer => layer.getProperties().source.clearStorage());
-      Promise.all(responses).then((result) => {
-        console.log('Cleared cache for layers:', result);
-        viewer.getLogger().createToast({
-          status: 'success',
-          title: 'Lager rensat',
-          message: 'Dina lager är rensade.'
-        });
-      });
-    },
-    icon: '#ic_delete_24px',
-    tooltipText: 'Rensa cache',
-    tooltipPlacement: 'south',
-    tooltipStyle: 'bottom:-5px;'
-  });
-
-  toolbarButtons.push(clearButton);
-
-  const downloadButton = createButton({
-    cls: 'padding-small icon-smaller round light box-shadow relative',
-    async click() {
-      const offlineLayers = viewer.getLayers().filter(layer => layer.getProperties().type === 'WMSOFFLINE');
-      const offlineSizes = await getOfflineCalculations(offlineLayers);
-      const modalContent = createDownloadModalContent(offlineSizes);
-      modal = createModal({
-        title: 'Spara ner kartlager',
-        content: modalContent,
-        onClose: () => downloadButton.setState('inactive')
-      });
-      downloadButton.setState('active');
-    },
-    icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M439-82q-76-8-141.5-42.5t-113.5-88Q136-266 108.5-335T81-481q0-155 102.5-268.5T440-880v80q-121 17-200 107.5T161-481q0 121 79 211.5T439-162v80Zm40-198L278-482l57-57 104 104v-245h80v245l103-103 57 58-200 200Zm40 198v-80q43-6 82.5-23t73.5-43l58 58q-47 37-101 59.5T519-82Zm158-652q-35-26-74.5-43T520-800v-80q59 6 113 28.5T733-792l-56 58Zm112 506-56-57q26-34 42-73.5t22-82.5h82q-8 59-30 113.5T789-228Zm8-293q-6-43-22-82.5T733-677l56-57q38 45 61 99.5T879-521h-82Z"/></svg>',
-    tooltipText: 'Visa sparade lager',
-    tooltipPlacement: 'south',
-    tooltipStyle: 'bottom:-5px;'
-  });
-
-  toolbarButtons.push(downloadButton);
-
-  const goOfflineButton = createButton({
-    cls: 'padding-small icon-smaller round light box-shadow relative',
-    async click() {
-      const currentState = goOfflineButton.getState();
-      const onlineLayers = viewer.getLayers().filter(layer => layer.getProperties().type !== 'WMSOFFLINE');
-      if (currentState === 'active') {
-        goOfflineButton.setState('inactive');
-        localStorage.setItem('offline_state', 'false');
-
-        onlineLayers.forEach(layer => {
-          const existingState = localStorage.getItem(`offline_existing_state:${layer.getProperties().name}`);
-          layer.setVisible(existingState === 'true');
-          localStorage.removeItem(`offline_existing_state:${layer.getProperties().name}`);
-        });
-      } else {
-        goOfflineButton.setState('active');
-        localStorage.setItem('offline_state', 'true');
-        // Check current state and store it in localstorage so we remember to reactivate them when user goes online again
-        onlineLayers.forEach(layer => {
-          localStorage.setItem(`offline_existing_state:${layer.getProperties().name}`, layer.getVisible());
-          layer.setVisible(false);
-        });
-      }
-    },
-    icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M21 11l2-2c-3.73-3.73-8.87-5.15-13.7-4.31l2.58 2.58c3.3-.02 6.61 1.22 9.12 3.73zm-2 2c-1.08-1.08-2.36-1.85-3.72-2.33l3.02 3.02.7-.69zM9 17l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zM3.41 1.64L2 3.05 5.05 6.1C3.59 6.83 2.22 7.79 1 9l2 2c1.23-1.23 2.65-2.16 4.17-2.78l2.24 2.24C7.79 10.89 6.27 11.74 5 13l2 2c1.35-1.35 3.11-2.04 4.89-2.06l7.08 7.08 1.41-1.41L3.41 1.64z"/></svg>',
-    tooltipText: 'Offlineläge',
-    tooltipPlacement: 'south',
-    tooltipStyle: 'bottom:-5px;'
-  });
-
-  toolbarButtons.push(goOfflineButton);
-
-  // Create options object for the toolbar with buttons.
-  if (toolbarButtons.length) {
-    toolbarButtons = toolbarButtons.flatMap((button, index) => {
-      // Add a separator unless it's the last button.
-      if (index < toolbarButtons.length - 1) {
-        return [button, Element({ cls: 'padding-smaller', tagName: 'div' })];
-      }
-      return [button];
-    });
-  }
-
-  // Create the offline toolbar.
-  const toolbarElement = Element({
-    cls: 'flex fixed bottom-center divider-horizontal bg-inverted z-index-ontop-high no-print',
-    // style: 'height: 2rem;',
-    components: toolbarButtons
-  });
-
-  // Wrap the toolbar element in a wrapper element.
-  const toolbar = Element({
-    cls: 'o-go-offline-toolbar o-toolbar o-toolbar-horizontal o-padding-horizontal-8 o-rounded-top o-hidden',
-    tagName: 'div',
-    components: [toolbarElement]
-  });
-
-  // Create an offline button to toggle offline interaction.
+  const toolbarButtons = createToolbarButtons();
+  const toolbar = createToolbar(toolbarButtons);
 
   // Create a vector source for drawn features.
   const source = new VectorSource();
