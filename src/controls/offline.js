@@ -130,7 +130,11 @@ export default function Offline({ localization }) {
         style: ''
       });
 
-      envelopeButton.setState('active');
+      modal.on('closed', () => {
+        downloadButton.setState('inactive');
+      });
+
+      downloadButton.setState('active');
     },
     icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M439-82q-76-8-141.5-42.5t-113.5-88Q136-266 108.5-335T81-481q0-155 102.5-268.5T440-880v80q-121 17-200 107.5T161-481q0 121 79 211.5T439-162v80Zm40-198L278-482l57-57 104 104v-245h80v245l103-103 57 58-200 200Zm40 198v-80q43-6 82.5-23t73.5-43l58 58q-47 37-101 59.5T519-82Zm158-652q-35-26-74.5-43T520-800v-80q59 6 113 28.5T733-792l-56 58Zm112 506-56-57q26-34 42-73.5t22-82.5h82q-8 59-30 113.5T789-228Zm8-293q-6-43-22-82.5T733-677l56-57q38 45 61 99.5T879-521h-82Z"/></svg>',
     tooltipText: 'Visa sparade lager',
@@ -139,6 +143,41 @@ export default function Offline({ localization }) {
   });
 
   toolbarButtons.push(downloadButton);
+
+  const goOfflineButton = Button({
+    cls: 'padding-small icon-smaller round light box-shadow relative',
+    async click() {
+      // Go offline
+      const currentState = goOfflineButton.getState();
+      console.log('Current state:', currentState);
+      const onlineLayers = viewer.getLayers().filter(layer => layer.getProperties().type !== 'WMSOFFLINE');
+      if (currentState === 'active') {
+        goOfflineButton.setState('inactive');
+        localStorage.setItem('offline_state', 'false');
+
+        onlineLayers.forEach(layer => {
+          const existingState = localStorage.getItem(`offline_existing_state:${layer.getProperties().name}`);
+          layer.setVisible(existingState === 'true');
+          localStorage.removeItem(`offline_existing_state:${layer.getProperties().name}`);
+        });
+      } else {
+        goOfflineButton.setState('active');
+        localStorage.setItem('offline_state', 'true');
+        // Check current state and store it in localstorage so we remember to reactivate them when user goes online again
+
+        onlineLayers.forEach(layer => {
+          localStorage.setItem(`offline_existing_state:${layer.getProperties().name}`, layer.getVisible());
+          layer.setVisible(false);
+        });
+      }
+    },
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M21 11l2-2c-3.73-3.73-8.87-5.15-13.7-4.31l2.58 2.58c3.3-.02 6.61 1.22 9.12 3.73zm-2 2c-1.08-1.08-2.36-1.85-3.72-2.33l3.02 3.02.7-.69zM9 17l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zM3.41 1.64L2 3.05 5.05 6.1C3.59 6.83 2.22 7.79 1 9l2 2c1.23-1.23 2.65-2.16 4.17-2.78l2.24 2.24C7.79 10.89 6.27 11.74 5 13l2 2c1.35-1.35 3.11-2.04 4.89-2.06l7.08 7.08 1.41-1.41L3.41 1.64z"/></svg>',
+    tooltipText: 'Offlineläge',
+    tooltipPlacement: 'south',
+    tooltipStyle: 'bottom:-5px;'
+  });
+
+  toolbarButtons.push(goOfflineButton);
 
   // Create options object for the toolbar with buttons.
   if (toolbarButtons.length) {
@@ -378,7 +417,12 @@ export default function Offline({ localization }) {
   // Function to enable interaction and update button states.
   function enableInteraction() {
     setActive(true);
+    // Check if we are in offline mode
+    const offlineState = localStorage.getItem('offline_state');
     document.getElementById(toolbar.getId()).classList.remove('o-hidden');
+    if (offlineState === 'true') {
+      goOfflineButton.setState('active');
+    }
   }
 
   // Function to clear drawings and remove the draw interaction.
@@ -399,7 +443,7 @@ export default function Offline({ localization }) {
       name: 'offline',
       active: !isActive
     };
-
+    //
     viewer.dispatch('toggleClickInteraction', detail);
   }
 
@@ -410,10 +454,6 @@ export default function Offline({ localization }) {
       group: 'none',
       name: 'offline-selection',
       source: new VectorSource(),
-      // style: {
-      //   'stroke-color': 'rgba(100, 255, 0, 1)',
-      //   'stroke-width': 3
-      // }
       stroke: new Stroke({
         color: 'rgba(133, 193, 233, 1)',
         lineDash: [10 * scale, 10 * scale],
@@ -464,6 +504,17 @@ export default function Offline({ localization }) {
     onAdd(evt) {
       // Set the viewer variable to the target of the event (viewer instance).
       viewer = evt.target;
+      const offlineState = localStorage.getItem('offline_state');
+      if (offlineState === 'true') {
+        // If we are in offlinestate we need to hide all online layers
+        const onlineLayers = viewer.getLayers().filter(layer => layer.getProperties().type !== 'WMSOFFLINE');
+        onlineLayers.forEach(layer => {
+          // Check layer property to see if it should be keept online.
+          if (!layer.getProperties().offline) {
+            layer.setVisible(false);
+          }
+        });
+      }
 
       // Initialize the target for the offline button and toolbar if not already set.
       if (!offlineButtonTarget) offlineButtonTarget = viewer.getMain().getMapTools().getId();
@@ -485,11 +536,9 @@ export default function Offline({ localization }) {
         if (detail.name === 'offline' && detail.active) {
           // Enable interaction and set the state of offlineButton to 'active'.
           enableInteraction();
-          offlineButton.setState('active');
         } else {
           // Disable interaction and set the state of offlineButton to 'initial'.
           disableInteraction();
-          offlineButton.setState('initial');
         }
       });
     },
@@ -497,7 +546,15 @@ export default function Offline({ localization }) {
     /**
      * Called when the component is initialized.
      */
-    onInit() { },
+    onInit() {
+      console.log('Offline component initialized', viewer);
+      window.onoffline = () => {
+        console.log('The network connection has been lost.');
+      };
+      window.ononline = () => {
+        console.log('The network connection has been reconnected.');
+      };
+    },
 
     /**
      * Hides the offline button.
