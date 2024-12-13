@@ -48,8 +48,8 @@ export default function Dropdown(options = {}) {
     const contentCmps = contentComponent.getComponents();
     if (contentCmps) return contentCmps;
     return false;
-  }
-  
+  };
+
   const setItems = function setItems(listItems) {
     items = listItems;
     const contentEl = document.getElementById(contentComponent.getId());
