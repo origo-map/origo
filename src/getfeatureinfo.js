@@ -5,6 +5,15 @@ import infoTemplates from './featureinfotemplates';
 import maputils from './maputils';
 import SelectedItem from './models/SelectedItem';
 
+const isValidJSON = str => {
+  try {
+    JSON.parse(str);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};
+    
 /**
  * Factory method to create a SelectedItem instance. Note that this method is exposed in api.
  * Does not add async content (related tables and attachments). If you need async content use
@@ -134,12 +143,21 @@ async function getFeatureInfoUrl({
   }
 
   if (layer.get('infoFormat') === 'application/geo+json' || layer.get('infoFormat') === 'application/geojson') {
-    const url = layer.getSource().getFeatureInfoUrl(coordinate, resolution, projection, {
-      INFO_FORMAT: layer.get('infoFormat'),
-      FEATURE_COUNT: '20'
-    });
-    const res = await fetch(url, { method: 'GET' });
-    const text = await res.text();
+    let format = layer.get('infoFormat');
+    let formatArr = [...new Set([format, 'application/geo+json', 'application/geojson', 'application/json'])];
+    let text;
+    for (const f of formatArr) {
+      const url = layer.getSource().getFeatureInfoUrl(coordinate, resolution, projection, {
+        INFO_FORMAT: f,
+        FEATURE_COUNT: '20'
+      });
+      const res = await fetch(url, { method: 'GET' });
+      text = await res.text();
+      if(isValidJSON(text)){
+        layer.set('infoFormat', f);
+        break;
+      }
+    };
     let json = {};
     try {
       json = JSON.parse(text);
