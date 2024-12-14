@@ -143,8 +143,8 @@ async function getFeatureInfoUrl({
   }
 
   if (layer.get('infoFormat') === 'application/geo+json' || layer.get('infoFormat') === 'application/geojson') {
-    const format = layer.get('infoFormat');
-    const formatArr = [...new Set([format, 'application/geo+json', 'application/geojson', 'application/json'])];
+    const infoFormat = layer.get('infoFormat');
+    const formatArr = [...new Set([infoFormat, 'application/geo+json', 'application/geojson', 'application/json'])];
     let text;
     for (let i = 0; i < formatArr.length; i += 1) {
       const format = formatArr[i];
@@ -154,7 +154,7 @@ async function getFeatureInfoUrl({
       });
       // eslint-disable-next-line no-await-in-loop
       const result = await fetch(url, { method: 'GET' }).then((res) => res.text())
-      .catch(error => console.error(error));
+        .catch(error => console.error(error));
       if (isValidJSON(result)) {
         text = result;
         layer.set('infoFormat', format);
