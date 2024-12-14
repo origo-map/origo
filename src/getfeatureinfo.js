@@ -146,15 +146,18 @@ async function getFeatureInfoUrl({
     const format = layer.get('infoFormat');
     const formatArr = [...new Set([format, 'application/geo+json', 'application/geojson', 'application/json'])];
     let text;
-    for (const f of formatArr) {
+    for (let i = 0; i < formatArr.length; i += 1) {
+      const format = formatArr[i];
       const url = layer.getSource().getFeatureInfoUrl(coordinate, resolution, projection, {
-        INFO_FORMAT: f,
+        INFO_FORMAT: format,
         FEATURE_COUNT: '20'
       });
-      const res = await fetch(url, { method: 'GET' });
-      text = await res.text();
-      if (isValidJSON(text)) {
-        layer.set('infoFormat', f);
+      // eslint-disable-next-line no-await-in-loop
+      const result = await fetch(url, { method: 'GET' }).then((res) => res.text())
+      .catch(error => console.error(error));
+      if (isValidJSON(result)) {
+        text = result;
+        layer.set('infoFormat', format);
         break;
       }
     }
