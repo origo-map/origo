@@ -38,10 +38,10 @@ const Group = function Group(viewer, options = {}) {
   };
   const checkIcon = '#ic_check_circle_24px';
   const uncheckIcon = '#ic_radio_button_unchecked_24px';
+  const draggableGroups = [];
   let visibleState = 'all';
   let groupEl;
   let selectedItem;
-  let draggableGroups = [];
 
   const listCls = type === 'grouplayer' ? 'divider-start padding-left padding-top-small' : '';
   const groupList = GroupList({ viewer, cls: listCls, abstract, showAbstractInLegend });
@@ -198,7 +198,8 @@ const Group = function Group(viewer, options = {}) {
   };
 
   function orderZIndex(list, groupCmp) {
-    
+    let layerArr = [];
+
     function recList(listEl, grpCmp) {
       const elementIds = [...listEl.children].map(x => x.id).reverse();
       const overlayArray = grpCmp.getOverlayList().getOverlays();
@@ -207,13 +208,14 @@ const Group = function Group(viewer, options = {}) {
         doCheck(element, overlayArray, groupArray);
       });
     }
-    
-    function doCheck(element, overlays, groups){
-      let foundLayer = overlays.find((overlay) => element === overlay.getId());
+
+    // eslint-disable-next-line no-use-before-define
+    function doCheck(element, overlays, groups) {
+      const foundLayer = overlays.find((overlay) => element === overlay.getId());
       if (foundLayer) {
-        layerArr.push(foundLayer)
+        layerArr.push(foundLayer);
       } else {
-        let foundGroup = groups.find((group) => element === group.getId());
+        const foundGroup = groups.find((group) => element === group.getId());
         if (foundGroup) {
           const listEl = document.getElementById(foundGroup.getId())?.getElementsByTagName('ul')[0];
           if (listEl) {
@@ -223,7 +225,6 @@ const Group = function Group(viewer, options = {}) {
       }
     }
 
-    let layerArr = [];
 
     recList(list, groupCmp);
 
@@ -231,7 +232,7 @@ const Group = function Group(viewer, options = {}) {
       const layerIndex = idx;
       element.getLayer().setZIndex(zIndexStart + (layerIndex / 100));
     });
-    
+
   }
 
   function handleDragStart(evt) {
