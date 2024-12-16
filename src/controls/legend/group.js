@@ -198,18 +198,18 @@ const Group = function Group(viewer, options = {}) {
   };
 
   function orderZIndex(list, groupCmp) {
-    let layerArr = [];
+    const layerArr = [];
 
     function recList(listEl, grpCmp) {
       const elementIds = [...listEl.children].map(x => x.id).reverse();
       const overlayArray = grpCmp.getOverlayList().getOverlays();
       const groupArray = grpCmp.getOverlayList().getGroups();
       elementIds.forEach(element => {
+        // eslint-disable-next-line no-use-before-define
         doCheck(element, overlayArray, groupArray);
       });
     }
 
-    // eslint-disable-next-line no-use-before-define
     function doCheck(element, overlays, groups) {
       const foundLayer = overlays.find((overlay) => element === overlay.getId());
       if (foundLayer) {
@@ -225,14 +225,12 @@ const Group = function Group(viewer, options = {}) {
       }
     }
 
-
     recList(list, groupCmp);
 
     layerArr.forEach((element, idx) => {
       const layerIndex = idx;
       element.getLayer().setZIndex(zIndexStart + (layerIndex / 100));
     });
-
   }
 
   function handleDragStart(evt) {
