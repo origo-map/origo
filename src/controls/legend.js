@@ -721,7 +721,7 @@ const Legend = function Legend(options = {}) {
         components: mainContainerComponents,
         style: {
           'max-height': `${maxHeight}px`,
-          width: 'min-content'
+          'min-width': '220px'
         }
       });
 
