@@ -136,14 +136,11 @@ const Overlays = function Overlays(options) {
     const legend = viewer.getControlByName('legend');
     const state = legend.getState();
     if (!state.visibleLayersViewActive) {
-      const oldNrOverlays = overlays.length;
       const nrOverlays = readOverlays().length;
       if (nrOverlays === 0) {
         document.getElementById(this.getId()).classList.add('hidden');
-      } else {
-        if (!state.visibleLayersViewActive) {
-          document.getElementById(this.getId()).classList.remove('hidden');
-        }
+      } else if (!state.visibleLayersViewActive) {
+        document.getElementById(this.getId()).classList.remove('hidden');
       }
     }
   };
