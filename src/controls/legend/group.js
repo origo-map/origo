@@ -205,24 +205,19 @@ const Group = function Group(viewer, options = {}) {
       const overlayArray = grpCmp.getOverlayList().getOverlays();
       const groupArray = grpCmp.getOverlayList().getGroups();
       elementIds.forEach(element => {
-        // eslint-disable-next-line no-use-before-define
-        doCheck(element, overlayArray, groupArray);
-      });
-    }
-
-    function doCheck(element, overlays, groups) {
-      const foundLayer = overlays.find((overlay) => element === overlay.getId());
-      if (foundLayer) {
-        layerArr.push(foundLayer);
-      } else {
-        const foundGroup = groups.find((group) => element === group.getId());
-        if (foundGroup) {
-          const listEl = document.getElementById(foundGroup.getId())?.getElementsByTagName('ul')[0];
-          if (listEl) {
-            recList(listEl, foundGroup);
+        let foundLayer = overlayArray.find((overlay) => element === overlay.getId());
+          if (foundLayer) {
+            layerArr.push(foundLayer)
+          } else {
+            let foundGroup = groupArray.find((group) => element === group.getId());
+            if (foundGroup) {
+              const listEl = document.getElementById(foundGroup.getId())?.getElementsByTagName('ul')[0];
+              if (listEl) {
+                recList(listEl, foundGroup);
+              }
+            }
           }
-        }
-      }
+      });
     }
 
     recList(list, groupCmp);
