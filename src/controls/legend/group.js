@@ -205,18 +205,18 @@ const Group = function Group(viewer, options = {}) {
       const overlayArray = grpCmp.getOverlayList().getOverlays();
       const groupArray = grpCmp.getOverlayList().getGroups();
       elementIds.forEach(element => {
-        let foundLayer = overlayArray.find((overlay) => element === overlay.getId());
-          if (foundLayer) {
-            layerArr.push(foundLayer)
-          } else {
-            let foundGroup = groupArray.find((group) => element === group.getId());
-            if (foundGroup) {
-              const listEl = document.getElementById(foundGroup.getId())?.getElementsByTagName('ul')[0];
-              if (listEl) {
-                recList(listEl, foundGroup);
-              }
+        const foundLayer = overlayArray.find((overlay) => element === overlay.getId());
+        if (foundLayer) {
+          layerArr.push(foundLayer);
+        } else {
+          const foundGroup = groupArray.find((group) => element === group.getId());
+          if (foundGroup) {
+            const ulList = document.getElementById(foundGroup.getId())?.getElementsByTagName('ul')[0];
+            if (ulList) {
+              recList(ulList, foundGroup);
             }
           }
+        }
       });
     }
 
