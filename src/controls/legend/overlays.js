@@ -139,7 +139,7 @@ const Overlays = function Overlays(options) {
       const nrOverlays = readOverlays().length;
       if (nrOverlays === 0) {
         document.getElementById(this.getId()).classList.add('hidden');
-      } else if (!state.visibleLayersViewActive) {
+      } else {
         document.getElementById(this.getId()).classList.remove('hidden');
       }
     }
@@ -252,6 +252,9 @@ const Overlays = function Overlays(options) {
     onChangeLayer,
     slidenav,
     getGroups,
+    getOverlays() {
+      return readOverlays();
+    },
     overlaysCollapse,
     onInit() {
       this.addComponent(overlaysCollapse);
