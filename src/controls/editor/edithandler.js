@@ -23,6 +23,7 @@ import topology from '../../utils/topology';
 import attachmentsform from './attachmentsform';
 import relatedTablesForm from './relatedtablesform';
 import relatedtables from '../../utils/relatedtables';
+import { squaredDistance, toFixed } from 'ol/math';
 
 const editsStore = store();
 let editLayers = {};
@@ -57,6 +58,31 @@ let breadcrumbs = [];
 let autoCreatedFeature = false;
 let infowindowCmp = false;
 let preselectedFeature;
+let cutSnap;
+
+// TODO:Klipp linje
+// Alt 1. Använd befintlig modify interaction. När man valt en feature tänds toolet. Klicka toolet och sedan på linje. Intercepta onModifyEnd
+//        och kolla om cut är aktiv och gör det som skall göras. Enklast för detta tool, men funkar dårligt med att bygga upp en modifyToolsmeny
+// Alt 2. Gör en ny draw interaction som sätter ut en punkt. 
+// Alt 3. Gör en ny linjeinteraction. Blir svårare att hitta skärningspunkten och kanske inte lika intuitivt för enkla linjer, men bättre för polygoner
+//        även om vi inte gör polygoner nu. Det kräver troligtvis turf. Borde kunna nyttja min topologifunktionalitet för att hitta skärning.
+// hur görs själva klippet? Måste troligtvis loopa alla segment för att hitta rätt index att splitta. Vid modify kan man ev sätta en ny punkt först och sedan 
+// leta upp den. Har man delat exakt har man redan rärr koordinater. Delar man med linje skriver man det så att man vet segmentet.
+// Sätt ut den nya punkten med closest pointonline eller vad den nu heter.
+// Skall man ta höjd för att kunna plugga in turfberoende? Räcker extensions eller skall man kunna skriva ett helt plugintool. Drawtools är ju lite förberett,
+// men detta kanske är modifytools? kanse kan drawtoolet ändra befintlig feature och injecta en ny => drawtool! NEEJ! Drawtools är en meny oskönt invävd.
+// Skapa en ny modify-tool select mojungers utan den där sjuka eventhanteringen.
+// Gör det konfigurerbart vilka modifytools som kan finnas på ett lager. Bara på lagernivå.
+// Försök att lägg till modifyTools som en ny COMPONENT under EditToolbar (som då måste skrivas om till en Component) => Johan?
+// Troligtvis göra denna Handler till en Component så att den kan eventa. Åtminstone en Eventer.
+//   När en feature är val: emitta den
+//   controllen plockar upp den och meddelar toolbar -> enablar modify toolbar.
+//   Modify toolbar emittar vald tool, som toolbar emittar vidare
+//  Controllen plockar upp vald tool och aktiverar toolet som är implementerad i en helt egen fil, eller handlern? Måste nog gå via handlern.
+//  Börja med en api-funktion på handlern för att sätta aktiv modifyTool.
+ 
+
+
 
 function isActive() {
   // FIXME: this only happens at startup as they are set to null on closing. If checking for null/falsley/not truely it could work as isVisible with
@@ -1584,6 +1610,143 @@ function setActiveLayerApi(layerName) {
   }
   setEditLayer(layerName);
 }
+
+// TODO: move to some utils
+/**
+ * Simple coordinate comparator.
+ * @param {any} c1 First coordinate as an array as [x,y]
+ * @param {any} c2 Second coordinate as an array as [x,y]
+ * @returns true if coordinates are equal
+ */
+function coordIsEqual(c1, c2) {
+  return ((c1[0] === c2[0]) && (c1[1] === c2[1]));
+}
+
+
+/**
+ * Callback when split-line-by-point tool finishes drawing. Performs the actual splitting
+ * @param {any} evt a OL DrawEvent
+ */
+function onSplitLineByPointEnd(evt) {
+  // TODO: Need to verify?
+  const selectedFeature = select.getFeatures().item(0);
+  // Clear selection to avoid it being stuck selected
+  select.getFeatures().clear();
+  const line = selectedFeature.getGeometry();
+  const originalCoords = line.getCoordinates();
+  const cuttingCoord = evt.feature.getGeometry().getCoordinates();
+  let segmentNo = 0;
+  let part1Coords = [];
+  let part2Coords = [];
+  // TODO: remove empty if statement and inverse logic or toast
+  if (coordIsEqual(cuttingCoord, line.getFirstCoordinate()) || coordIsEqual(cuttingCoord, line.getLastCoordinate())) {
+    // Can only happen on actual first point as we would trigger on lastCoord on the semgment before this happens
+    // Nothing to do, can't cut on first or last
+    console.log('Första eller sista. Inget att dela');
+  }
+  else {
+    // Find the segmen where to split
+    line.forEachSegment((startCoord, endCoord) => {
+      const currSegment = new LineString([startCoord, endCoord]);
+      const nearestPoint = currSegment.getClosestPoint(cuttingCoord);
+      // Round distance so we can determine if point is on line. It still is pretty small so
+      // snapping must be activated in order to have any chance at actually hitting a line.
+      const squaredD = toFixed(squaredDistance(cuttingCoord[0], cuttingCoord[1], nearestPoint[0], nearestPoint[1]), 10);
+      if (squaredD === 0) {
+        // Check if we hit an existing vertex, then split here, otherwise insert new point.
+        if (coordIsEqual(cuttingCoord, currSegment.getLastCoordinate())) {
+          part1Coords = originalCoords.slice(0, segmentNo + 2);
+          part2Coords = originalCoords.slice(segmentNo + 1);
+
+        } else {
+          // Have to insert a new vertex where clicked
+          part1Coords = originalCoords.slice(0, segmentNo + 1);
+          part1Coords.push(cuttingCoord);
+          part2Coords = originalCoords.slice(segmentNo + 1);
+          part2Coords.unshift(cuttingCoord);
+        }
+        // Return from forEach. We found our point, no need to loop further.
+        return true; 
+      }
+      segmentNo += 1;
+      // Consistent return for forEach , keep lopping until found.
+      return false; 
+    });
+  }
+  if (part2Coords.length > 1) {
+    // Click actually hit the line
+    // Start with the easy one, change geom of original line
+    selectedFeature.getGeometry().setCoordinates(part1Coords);
+    saveFeature({
+      feature: selectedFeature,
+      layerName: currentLayer,
+      action: 'update'
+    });
+    // The litte tricker, create a copy with the rest of the line
+    const newFeature = selectedFeature.clone();
+    newFeature.setGeometry(new LineString(part2Coords));
+    newFeature.setId(generateUUID());
+    const layer = viewer.getLayer(currentLayer);
+    layer.getSource().addFeature(newFeature);
+    saveFeature({
+      feature: newFeature,
+      layerName: currentLayer,
+      action: 'insert'
+    });
+  }
+  // TODO: handle if not found
+  // Alternatives are: 1. Just rseore state, you missed
+  //                   2. Keep on trying, but then, how do you give up?
+  //                   3. Toast "Missed me!"
+  //                   4. Rewrite it to use a trace locked to feature? Nah, would require a give up operation.
+
+  // Reset editor state.
+  map.removeInteraction(cutSnap);
+  cutSnap = null;
+  map.removeInteraction(evt.target);
+  setActive();
+}
+
+/**
+ * Selects a modify too as the active interaction
+ * Only to be called when a feature has already been selected and user has pressed
+ * the corresponding tool button.
+ * 
+ * TODO: Gör en ny modifiera feature verktygslåda i editormenyn. Det skall vara en ny knapp till höger om attributverktyget.
+ * Knappen skall öppna en dropdown som ser ut som lagerväljaren, men utan state (inget val tool)
+ * I modifyverktygslådan skall det bara visas de verktyg som är konfigurerade och giltiga för det lagret, det måste alltså till
+ * ny konfiguration på lagret, typ modifytools i likhet med drawtools.
+ * Antingen gör man det på det gamla sättet med editDispatcher, eller så bygger man det lite modernare genom att göra
+ * edittoolbar till en Component och göra modifyverktygslådan till en subComponent och låta den eveta tillbaka sin tryck till edit-controllen
+ * som sedan anropar handlern. Helst skulle man ju gjort så överallt, men if it ain't broken.
+ * @param {any} toolName Name of the tool
+ */
+function setModifyToolApi(toolName) {
+  // TODO: switch toolname and possible break out each tool to separate file.
+  // TODO: Verify that there is exactly one feature selected (or the correct amount for each tool)
+  const selectedFeature = select.getFeatures().item(0);
+  // TODO: kolla om det är tillåtet för detta lager? Enforca toolbar alltså
+  // TODO: kolla om det är tillåtet på denna geometrityp, vi hanterar bara enkel LineString.
+  //       Hur klipper man en multiline, var var hamnar de olika delarna? Antingen måste man explodera
+
+  // Create a new temporary draw interaction depending on toolName
+  // This can be removed in the handler as it is a part of the event.
+  const drawInterationProps = {
+    type: 'Point',
+    // Don't emit click events as it will activate select interaction when finished.
+    // The drawend handler will still be called.
+    stopClick: true
+  };
+  const modifyDrawInteraction = new Draw(drawInterationProps);
+  modifyDrawInteraction.on('drawend', onSplitLineByPointEnd);
+  // TODO: set up callback for drawabort
+  // This must be remembered to be removed
+  cutSnap = new Snap({ features: new Collection([selectedFeature]) });
+  map.addInteraction(modifyDrawInteraction);
+  map.addInteraction(cutSnap);
+
+  setActive('custom');
+}
 /**
  * Eventhandler called from relatedTableForm when delete button is pressed
  * @param { any } e Event containing layers and features necessary
@@ -1647,6 +1810,7 @@ export default function editHandler(options, v) {
     editAttributesDialog: editAttributesDialogApi,
     deleteFeature: deleteFeatureApi,
     setActiveLayer: setActiveLayerApi,
+    setModifyTool: setModifyToolApi,
     preselectFeature
   };
 }

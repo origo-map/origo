@@ -172,6 +172,11 @@ const Editor = function Editor(options = {}) {
     createFeature,
     editFeatureAttributes,
     deleteFeature,
+    // TODO: Ta bort, skall ej exponeras, bara anropas från menyn.
+    clip: () => {
+      editHandler.setModifyTool('split-line-by-point');
+    },
+
     changeActiveLayer: (layerName) => {
       // Only need to actually change layer if editor is active. Otherwise state is just set in toolbar and will
       // activate set layer when toggled visible
