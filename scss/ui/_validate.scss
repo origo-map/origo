@@ -1,35 +1,37 @@
+@use './variables';
+
 .validate {
   .errorMsg {
-    color: $orange;
+    color: variables.$orange;
   }
 
   input:optional {
-    border-color: $grey-lightest;
+    border-color: variables.$grey-lightest;
   }
 
   input:required:invalid {
-    border-color: $orange;
+    border-color: variables.$orange;
   }
 
   input:invalid {
-    border-color: $orange;
+    border-color: variables.$orange;
   }
 
   textarea:required:invalid {
-    border-color: $orange;
+    border-color: variables.$orange;
   }
 
   select:required:invalid {
-    border-color: $orange;
+    border-color: variables.$orange;
   }
 
   select:required:invalid {
-    border-color: $orange;
+    border-color: variables.$orange;
   }
 }
 
 // Awesome input is not direct child of .validate, needs special treatment.
 input.awesome:required:invalid {
-    border-color: $orange;
+    border-color: variables.$orange;
 }
 

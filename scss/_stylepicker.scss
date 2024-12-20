@@ -1,3 +1,5 @@
+@use './ui/variables';
+
 .o-stylepicker {
   height: 1.25rem;
   margin-right: 5px;
@@ -18,5 +20,5 @@
 }
 
 .o-stylepicker .dropdown li:hover {
-  color: $grey-darker;
+  color: variables.$grey-darker;
 }

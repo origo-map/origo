@@ -1,12 +1,14 @@
-$control-shadow: $shadow;
-$control-background-color: $white !default;
-$control-radius: $radius-base;
-$control-z: $z-middle;
+@use './variables';
+
+$control-shadow: variables.$shadow;
+$control-background-color: variables.$white !default;
+$control-radius: variables.$radius-base;
+$control-z: variables.$z-middle;
 
 .control {
   background-color: $control-background-color;
   border-radius: $control-radius;
   box-shadow: $control-shadow;
   display: inline-block;
-  z-index: $z-middle;
+  z-index: variables.$z-middle;
 }

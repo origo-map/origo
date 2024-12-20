@@ -1,32 +1,34 @@
-$text-black: $black;
-$text-grey-dark: $grey-darker;
-$text-grey: $grey;
-$text-grey-light: $grey-light;
-$text-grey-ligthter: $grey-lighter;
-$text-smallest: $font-size-smallest;
-$text-smaller: $font-size-smaller;
-$text-small: $font-size-small;
-$text-normal: $font-size-normal;
-$text-large: $font-size-large;
-$text-weight-light: $font-weight-light;
-$text-weight-normal: $font-weight-normal;
-$text-weight-semibold: $font-weight-semibold;
-$text-weight-bold: $font-weight-bold;
-$text-height-large: $line-height-large * $font-size-base;
-$text-height-normal: $line-height-base * $font-size-base;
-$text-height-small: $line-height-small * $font-size-base;
-$text-height-smaller: $line-height-smaller * $font-size-base;
-$text-height-smallest: $line-height-smallest * $font-size-base;
+@use '../variables';
+
+$text-black: variables.$black;
+$text-grey-dark: variables.$grey-darker;
+$text-grey: variables.$grey;
+$text-grey-light: variables.$grey-light;
+$text-grey-ligthter: variables.$grey-lighter;
+$text-smallest: variables.$font-size-smallest;
+$text-smaller: variables.$font-size-smaller;
+$text-small: variables.$font-size-small;
+$text-normal: variables.$font-size-normal;
+$text-large: variables.$font-size-large;
+$text-weight-light: variables.$font-weight-light;
+$text-weight-normal: variables.$font-weight-normal;
+$text-weight-semibold: variables.$font-weight-semibold;
+$text-weight-bold: variables.$font-weight-bold;
+$text-height-large: variables.$line-height-large * variables.$font-size-base;
+$text-height-normal: variables.$line-height-base * variables.$font-size-base;
+$text-height-small: variables.$line-height-small * variables.$font-size-base;
+$text-height-smaller: variables.$line-height-smaller * variables.$font-size-base;
+$text-height-smallest: variables.$line-height-smallest * variables.$font-size-base;
 $text-fade-width: 4rem;
 $text-fade-background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) 50%);
 
 // font color
 .text-primary {
-  color: $primary-text-color;
+  color: variables.$primary-text-color;
 }
 
 .text-inverse {
-  color: $primary-text-color-inverse;
+  color: variables.$primary-text-color-inverse;
 }
 
 .text-black {
@@ -34,7 +36,7 @@ $text-fade-background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(25
 }
 
 .text-white {
-  color: $white;
+  color: variables.$white;
 }
 
 .text-grey-dark {
@@ -54,31 +56,31 @@ $text-fade-background: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(25
 }
 
 .text-red {
-  color: $red;
+  color: variables.$red;
 }
 
 .text-orange {
-  color: $orange;
+  color: variables.$orange;
 }
 
 .text-yellow {
-  color: $yellow;
+  color: variables.$yellow;
 }
 
 .text-green {
-  color: $green;
+  color: variables.$green;
 }
 
 .text-blue {
-  color: $blue;
+  color: variables.$blue;
 }
 
 .text-purple {
-  color: $purple;
+  color: variables.$purple;
 }
 
 .text-pink {
-  color: $pink;
+  color: variables.$pink;
 }
 
 // font size

@@ -1,10 +1,12 @@
-&[class*=#{$media-l-m-s}] {
+@use './variables' as vars;
+
+[class*=#{vars.$media-l-m-s}] {
   #o-sidebar {
     max-width: 230px;
     width: 100%;
   }
 }
-&[class*=#{$media-l-m-s-xs}] {
+[class*=#{vars.$media-l-m-s-xs}] {
   #o-sidebar {
     display: none;
   }
