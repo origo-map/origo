@@ -212,7 +212,8 @@ const LayerRow = function LayerRow(options) {
           <img src="${getLegendGraphicUrl}" alt="${title}" />
         </div>`;
     }
-    if (json.Legend[0].rules.length <= 1) {
+    // Handle the simple one first. One layer, one rule
+    if (json.Legend.length === 1 && json.Legend[0].rules.length <= 1) {
       const icon = `<img class="cover" src="${getLegendGraphicUrl}"  alt="${title}"/>`;
       return getTitleWithIcon(title, icon);
     }
@@ -251,7 +252,13 @@ const LayerRow = function LayerRow(options) {
           } else {
             layerImageUrl = getLegendGraphicUrl;
           }
-          const ruleImageUrl = `${layerImageUrl}&rule=${currRule.name}`;
+          let ruleImageUrl = `${layerImageUrl}`;
+          // Add specific rule if necessary. If there is only one rule there is no need (in fact it will probably break as most
+          // styles using only one rule will not have a named rule). This is to handle Layer Groups without rules in some of the contained
+          // layer's style
+          if (currLayer.rules.length > 1) {
+            ruleImageUrl += `&rule=${currRule.name}`;
+          }
           const rowTitle = currRule.title ? currRule.title : index + 1;
           rules.push(getListItem(rowTitle, ruleImageUrl, true));
         }
