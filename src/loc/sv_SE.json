@@ -105,8 +105,35 @@
             "drawSquare": "Fyrkant",
             "drawCircle": "Cirkel",
             "drawFreehand": "Frihand"
+        },
+        "legend": {
+            "placeholderText": "Sök lager",
+            "turnOffTitle": "Släck alla lager",
+            "showVisibleTitle": "Visa endast tända lager",
+            "showAllVisibleTitle": "Visa alla lager",
+            "turnOnLayersTitle": "Tänd alla lager utom bakgrundslager",
+            "addLayerTitle": "Lägg till lager",
+            "selectHandlerError": "Search options are missing",
+            "titleMissing": "Titel saknas",
+            "layerSwitcher": "Lagerbytare",
+            "close": "Stäng",
+            "layer": "Lager",
+            "addLayerWarningGroup": "Grupp",
+            "addLayerWarningDNE": "finns inte",
+            "layerTitleMissing": "Titel saknas",
+            "layerIcon": "Lager ikon",
+            "toggleLayer": "Växla lagersynlighet",
+            "showInfoMenuItem": "Visa",
+            "layerInfoMenuItem": "lagerinformation",
+            "groupInfoMenuItem": "gruppinformation",
+            "zoomToExtentMenuItem": "Zooma till",
+            "exportLayerTitle": "export",
+            "exportLayerSave": "Spara lager",
+            "removeLayerQuestion": "Vill du radera lagret?",
+            "removeLayer": "Ta bort lager",
+            "moreInfoButtonLabel": "Visa lagerinfo",
+            "renderStyleSelect": "Välj stil"
         }
-
     },
     "style": {
         "drawStyles": {
