@@ -112,6 +112,7 @@ export default class ImageTileOfflineSource extends ImageTileSource {
     this.viewer = viewer;
     this.legendLayerName = options.name;
     this.noRemoteStyle = options.noRemoteStyle;
+    this.extendedLegend = options.hasThemeLegend;
 
     this.viewer.on('loaded', () => {
 
@@ -205,8 +206,8 @@ export default class ImageTileOfflineSource extends ImageTileSource {
         const style = [[{
           icon: {
             src: urlen
-          }
-
+          },
+          extendedLegend: this.extendedLegend
         }]];
         // A bit complicated way of updating the legend, but it how style picker works.
         // Other solution would be doing this manually be finding the DOM element somehow and replace it.
