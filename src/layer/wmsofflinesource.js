@@ -33,6 +33,7 @@ export default class WmsOfflineSource extends ImageTileOfflineSource {
       const legendReq = await fetch(this.legendUrl);
       const legendImg = await legendReq.blob();
       await this.storeLegendGraphic(legendImg);
+      await this.updateLegend();
     }
 
     // Store extent first to get an id to link each tile with.
