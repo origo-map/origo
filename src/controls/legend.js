@@ -180,7 +180,7 @@ const Legend = function Legend(options = {}) {
 
   const turnOffLayersButton = Button({
     cls: 'round compact icon-small margin-x-smaller',
-    title: localize('turnOffTitle'),
+    title: localize('turnOffLayersTitle'),
     click() {
       viewer.dispatch('active:turnofflayers');
     },

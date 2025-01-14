@@ -107,7 +107,8 @@ const Overlays = function Overlays(options) {
       layer,
       style: layerStyle,
       position,
-      viewer
+      viewer,
+      localization
     });
     const groupName = layer.get('group');
     if (!nonGroupNames.includes(groupName)) {

@@ -108,10 +108,10 @@
         },
         "legend": {
             "placeholderText": "Sök lager",
-            "turnOffTitle": "Släck alla lager",
+            "turnOffLayersTitle": "Släck alla lager",
             "showVisibleTitle": "Visa endast tända lager",
             "showAllVisibleTitle": "Visa alla lager",
-            "turnOnLayersTitle": "Tänd alla lager utom bakgrundslager",
+            "turnOnLayersTitle": "Tänd alla lager",
             "addLayerTitle": "Lägg till lager",
             "selectHandlerError": "Search options are missing",
             "titleMissing": "Titel saknas",
