@@ -28,7 +28,8 @@ const Group = function Group(viewer, options = {}) {
     zIndexStart = 0.1,
     opacityControl = false,
     zoomToExtent = false,
-    description
+    description,
+    localization
   } = options;
 
   const stateCls = {
@@ -79,8 +80,7 @@ const Group = function Group(viewer, options = {}) {
     }
   }) : false;
 
-  const moreInfoButton = (opacityControl || zoomToExtent || description || (abstract && !showAbstractInLegend)) ? createMoreInfoButton({ viewer,
-    group: thisGroup }) : false;
+  const moreInfoButton = (opacityControl || zoomToExtent || description || (abstract && !showAbstractInLegend)) ? createMoreInfoButton({ viewer, group: thisGroup, localization }) : false;
 
   const SubGroupHeader = function SubGroupHeader() {
     const expandButton = Button({
@@ -395,7 +395,7 @@ const Group = function Group(viewer, options = {}) {
             const thisParent = this;
             const label = group.labelOpacitySlider ? group.labelOpacitySlider : '';
             const layerProperties = LayerProperties({
-              group, viewer, thisParent, labelOpacitySlider: label
+              group, viewer, thisParent, labelOpacitySlider: label, localization
             });
             slidenav.setSecondary(layerProperties);
             slidenav.slideToSecondary();
