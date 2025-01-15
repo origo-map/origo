@@ -115,7 +115,21 @@
             "tooltipText": "Display the map in an external map service",
             "noUrl": "No URL is specified in the configuration",
             "linkTooltipText": "Open link"
+        },
+        "zoom": {
+            "zoomInButtonTooltip": "Zoom into the map",
+            "zoomOutButtonTooltip": "Zoom out in the map"
+        },
+        "home": {
+            "zoomHomeButtonTooltip": "Zoom to the entire map"
+        },
+        "geoposition": {
+            "positionButtonTooltip": "Show your current position on the map"
+        },
+        "about": {
+            "title": "About the map"
         }
+        
     },
     "style": {
         "drawStyles": {

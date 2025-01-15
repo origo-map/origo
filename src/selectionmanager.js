@@ -80,10 +80,20 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     }
   }
 
-  function addItems(items) {
+  /**
+  * Adds an array of items to selection.
+  * @param {SelectedItem []} items Array of items to add
+  * @param {object} opts Object with options
+  * @param {boolean} opts.suppressDialog If true the dialog is not opened, only selection in map is made
+  */
+  function addItems(items, opts = {}) {
+    const suppressDialog = opts.suppressDialog;
     items.forEach((item) => {
       addItem(item);
     });
+    if (!suppressDialog) {
+      infowindow.show();
+    }
   }
 
   /** Helper that refreshes all urvallayers. Typically called after highlightning or symbology has changed */
@@ -136,8 +146,14 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     infowindow.highlightListElement(featureId);
     infowindow.scrollListElementToView(featureId);
   }
-
-  function addOrHighlightItem(item) {
+  /**
+   * Adds one item and highlights it. If it already is in the list it is just highlighted.
+   * @param {SelectedItem} item Item to add
+   * @param {object} opts Object with options
+   * @param {boolean} opts.suppressDialog If true the dialog is not opened, only selection in map is made
+   */
+  function addOrHighlightItem(item, opts = {}) {
+    const suppressDialog = opts.suppressDialog;
     if (alreadyExists(item)) {
       if (toggleSelectOnClick) {
         removeItems([item]);
@@ -148,6 +164,9 @@ const Selectionmanager = function Selectionmanager(options = {}) {
     } else {
       // add
       selectedItems.push(item);
+      if (!suppressDialog) {
+        infowindow.show();
+      }
       if (selectedItems.getLength() === 1) {
         highlightAndExpandItem(item);
       }
@@ -294,7 +313,7 @@ const Selectionmanager = function Selectionmanager(options = {}) {
 
     urval.get(selectionGroup).addFeature(item.getFeature());
     infowindow.createListElement(item);
-    infowindow.show();
+
     const sum = urval.get(selectionGroup).getFeatures().length;
     infowindow.updateUrvalElementText(selectionGroup, selectionGroupTitle, sum);
     const aggregationstring = calculateGroupAggregations(selectionGroup);

@@ -115,6 +115,19 @@
             "tooltipText": "Visa kartan i en extern karttjänst",
             "noUrl": "Ingen URL är angiven i konfigurationen",
             "linkTooltipText": "Öppna länk"
+        },
+        "zoom": {
+            "zoomInButtonTooltip": "Zooma in i kartan",
+            "zoomOutButtonTooltip": "Zooma ut i kartan"
+        },
+        "home": {
+            "zoomHomeButtonTooltip": "Zooma till hela kartan"
+        },
+        "geoposition": {
+            "positionButtonTooltip": "Visa din nuvarande position i kartan"
+        },
+        "about": {
+            "title": "Om kartan"
         }
     },
     "style": {
