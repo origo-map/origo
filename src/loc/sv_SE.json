@@ -105,8 +105,20 @@
             "drawSquare": "Fyrkant",
             "drawCircle": "Cirkel",
             "drawFreehand": "Frihand"
+        },
+        "zoom": {
+            "zoomInButtonTooltip": "Zooma in i kartan",
+            "zoomOutButtonTooltip": "Zooma ut i kartan"
+        },
+        "home": {
+            "zoomHomeButtonTooltip": "Zooma till hela kartan"
+        },
+        "geoposition": {
+            "positionButtonTooltip": "Visa din nuvarande position i kartan"
+        },
+        "about": {
+            "title": "Om kartan"
         }
-
     },
     "style": {
         "drawStyles": {
