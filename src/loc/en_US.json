@@ -115,7 +115,21 @@
             "addFromFile": "Add from file",
             "yourLayersName": "your-layers",
             "yourLayersTitle": "Your layers"
+        },
+        "zoom": {
+            "zoomInButtonTooltip": "Zoom into the map",
+            "zoomOutButtonTooltip": "Zoom out in the map"
+        },
+        "home": {
+            "zoomHomeButtonTooltip": "Zoom to the entire map"
+        },
+        "geoposition": {
+            "positionButtonTooltip": "Show your current position on the map"
+        },
+        "about": {
+            "title": "About the map"
         }
+        
     },
     "style": {
         "drawStyles": {

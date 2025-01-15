@@ -115,6 +115,19 @@
             "addFromFile": "Lägg till från fil",
             "yourLayersName": "egna-lager",
             "yourLayersTitle": "Egna lager"
+        },
+        "zoom": {
+            "zoomInButtonTooltip": "Zooma in i kartan",
+            "zoomOutButtonTooltip": "Zooma ut i kartan"
+        },
+        "home": {
+            "zoomHomeButtonTooltip": "Zooma till hela kartan"
+        },
+        "geoposition": {
+            "positionButtonTooltip": "Visa din nuvarande position i kartan"
+        },
+        "about": {
+            "title": "Om kartan"
         }
     },
     "style": {
