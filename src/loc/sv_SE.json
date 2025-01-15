@@ -129,7 +129,7 @@
             "zoomToExtentMenuItem": "Zooma till",
             "exportLayerTitle": "export",
             "exportLayerSave": "Spara lager",
-            "removeLayerQuestion": "Vill du radera lagret?",
+            "removeLayerQuestion": "Vill du ta bort lagret?",
             "removeLayer": "Ta bort lager",
             "moreInfoButtonLabel": "Visa lagerinfo",
             "renderStyleSelect": "Välj stil"
