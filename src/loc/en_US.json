@@ -106,6 +106,11 @@
             "drawCircle": "Circle",
             "drawFreehand": "Freehand"
         },
+        "bookmarks": {
+            "title": "Bookmarks",
+            "close": "Close",
+            "bookmarkLabel": "Bookmark for"
+        },
         "legend": {
             "placeholderText": "Search for layer",
             "turnOffLayersTitle": "Turn off all layers",
@@ -133,7 +138,21 @@
             "removeLayer": "Remove layer",
             "moreInfoButtonLabel": "Show layer info",
             "renderStyleSelect": "Select style"
+        },
+        "zoom": {
+            "zoomInButtonTooltip": "Zoom into the map",
+            "zoomOutButtonTooltip": "Zoom out in the map"
+        },
+        "home": {
+            "zoomHomeButtonTooltip": "Zoom to the entire map"
+        },
+        "geoposition": {
+            "positionButtonTooltip": "Show your current position on the map"
+        },
+        "about": {
+            "title": "About the map"
         }
+        
     },
     "style": {
         "drawStyles": {
@@ -174,10 +193,5 @@
             "pointTypeSquare": "Square",
             "pointTypeMarker": "Marker"
         }
-    },
-    "bookmarks": {
-        "title": "Bookmarks",
-        "close": "Close",
-        "bookmarkLabel": "Bookmark for"
     }
 }
