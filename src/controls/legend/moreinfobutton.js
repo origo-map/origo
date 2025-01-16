@@ -125,11 +125,11 @@ export default function createMoreInfoButton(params) {
         labelEl.addEventListener('click', (e) => {
           const doRemove = (layer.get('promptlessRemoval') === true) || window.confirm(localize('removeLayerQuestion'));
           if (doRemove) {
+            popupMenu.setVisibility(false);
             viewer.getMap().removeLayer(layer);
             e.preventDefault();
             e.stopPropagation();
-          }
-          popupMenu.setVisibility(false);
+          } else popupMenu.setVisibility(false);
         });
       },
       render() {
