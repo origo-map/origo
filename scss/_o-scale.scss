@@ -1,7 +1,9 @@
+@use './ui/variables';
+
 .o-scale {
   font-family: Arial, 'Helvetica Neue', sans-serif;
   font-size: .625rem;
-  line-height: $line-height-larger;
+  line-height: variables.$line-height-larger;
   padding-right: 5px;
   padding-right: 10px;
 }

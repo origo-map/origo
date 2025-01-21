@@ -1,5 +1,6 @@
+@use './variables';
 
-$list-border: 1px solid $border-color;
+$list-border: 1px solid variables.$border-color;
 $list-spacer: .25rem;
 $list-spacer-divided: .75rem;
 

@@ -1,3 +1,5 @@
+@use './ui/variables';
+
 .o-popover-container {
   display: inline-block;
   position: relative;
@@ -32,7 +34,7 @@
 }
 
 .o-popover::after {
-  border-top-color: $white;
+  border-top-color: variables.$white;
   border-width: 10px;
   bottom: -20px;
   left: 50%;

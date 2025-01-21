@@ -1,95 +1,97 @@
+@use '../variables';
+
 // background colors
 .bg-primary {
-  background-color: $primary-color;
+  background-color: variables.$primary-color;
 }
 
 .bg-black {
-  background-color: $black;
+  background-color: variables.$black;
 }
 
 .bg-white {
-  background-color: $white;
+  background-color: variables.$white;
 }
 
 .bg-red {
-  background-color: $red;
+  background-color: variables.$red;
 }
 
 .bg-orange {
-  background-color: $orange;
+  background-color: variables.$orange;
 }
 
 .bg-yellow {
-  background-color: $yellow;
+  background-color: variables.$yellow;
 }
 
 .bg-green {
-  background-color: $green;
+  background-color: variables.$green;
 }
 
 .bg-blue {
-  background-color: $blue;
+  background-color: variables.$blue;
 }
 
 .bg-purple {
-  background-color: $purple;
+  background-color: variables.$purple;
 }
 
 .bg-pink {
-  background-color: $pink;
+  background-color: variables.$pink;
 }
 
 .bg-grey-darker {
-  background-color: $grey-darker;
+  background-color: variables.$grey-darker;
 }
 
 .bg-grey-dark {
-  background-color: $grey-dark;
+  background-color: variables.$grey-dark;
 }
 
 .bg-grey {
-  background-color: $grey;
+  background-color: variables.$grey;
 }
 
 .bg-grey-light {
-  background-color: $grey-light;
+  background-color: variables.$grey-light;
 }
 
 .bg-grey-lighter {
-  background-color: $grey-lighter;
+  background-color: variables.$grey-lighter;
 }
 
 .bg-grey-lightest {
-  background-color: $grey-lightest;
+  background-color: variables.$grey-lightest;
 }
 @media (hover: hover) and (pointer: fine) {
   .hover {
     &:hover {
-      background-color: $grey-lighter;
+      background-color: variables.$grey-lighter;
     }
 
     &.light:hover {
-      background-color: $grey-lighter;
+      background-color: variables.$grey-lighter;
     }
 
     &.primary:hover {
-      background-color: $primary-color-dark;
+      background-color: variables.$primary-color-dark;
     }
 
     &.danger:hover {
-      background-color: $danger-color-dark;
+      background-color: variables.$danger-color-dark;
     }
 
     &.grey-light:hover {
-      background-color: $grey-light;
+      background-color: variables.$grey-light;
     }
 
     &.grey-lighter:hover {
-      background-color: $grey-lighter;
+      background-color: variables.$grey-lighter;
     }
 
     &.grey-lightest:hover {
-      background-color: $grey-lightest;
+      background-color: variables.$grey-lightest;
     }
   }
 }

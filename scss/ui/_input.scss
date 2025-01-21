@@ -1,6 +1,8 @@
-$button-padding-medium: $padding-small $padding-small * 1.5;
-$placeholder-text-smaller: $font-size-smaller;
-$placeholder-text-small: $font-size-small;
+@use './variables';
+
+$button-padding-medium: variables.$padding-small variables.$padding-small * 1.5;
+$placeholder-text-smaller: variables.$font-size-smaller;
+$placeholder-text-small: variables.$font-size-small;
 
 input::-ms-clear {
   display: none;
@@ -10,32 +12,32 @@ input::-ms-clear {
 textarea,
 select,
 input {
-  border: 1px solid $border-color;
+  border: 1px solid variables.$border-color;
   border-radius: 3px;
   box-sizing: border-box;
   font-family: Arial;
-  font-size: $font-size-normal;
-  line-height: $line-height-base;
+  font-size: variables.$font-size-normal;
+  line-height: variables.$line-height-base;
   margin-bottom: .375rem;
   padding: $button-padding-medium;
   resize: vertical;
 
   &.grey {
-    background-color: $grey-lightest;
+    background-color: variables.$grey-lightest;
   }
 
   &.grey::placeholder {
-    color: $grey-dark;
+    color: variables.$grey-dark;
   }
 
   &.small {
-    font-size: $font-size-small;
-    line-height: $line-height-small;
+    font-size: variables.$font-size-small;
+    line-height: variables.$line-height-small;
   }
 
   &.smaller {
-    font-size: $font-size-smaller;
-    line-height: $line-height-small;
+    font-size: variables.$font-size-smaller;
+    line-height: variables.$line-height-small;
   }
 
   &.placeholder-text-small::placeholder {
@@ -53,18 +55,18 @@ input[type=text] {
     margin: 0;
     max-width: 100%;
     outline: none;
-    padding: 0 $padding-smaller;
+    padding: 0 variables.$padding-smaller;
   }
 }
 
 label {
-  font-size: $font-size-normal;
-  font-weight: $font-weight-bold;
-  line-height: $line-height-base;
+  font-size: variables.$font-size-normal;
+  font-weight: variables.$font-weight-bold;
+  line-height: variables.$line-height-base;
 }
 
 input[type=checkbox] {
-  color: $white;
+  color: variables.$white;
   height: 1rem;
   line-height: 1.5rem;
   margin: .25rem;
@@ -73,13 +75,13 @@ input[type=checkbox] {
 }
 
 input[type=button] {
-  background-color: $white;
+  background-color: variables.$white;
   border-radius: 3px;
   cursor: pointer;
 }
 
 input[type=button]:hover {
-  background-color: $border-color;
+  background-color: variables.$border-color;
 }
 
 // range
@@ -95,7 +97,7 @@ input[type=range] {
 
 input[type=range]:focus {
   outline: none;
-  border: 1px solid $black;
+  border: 1px solid variables.$black;
 }
 
 input[type=range]:focus:not(:focus-visible) {
@@ -105,7 +107,7 @@ input[type=range]:focus:not(:focus-visible) {
 
 input[type=range]::-webkit-slider-runnable-track {
   animation: 0.2s;
-  background: $primary-color;
+  background: variables.$primary-color;
   border-radius: 3px;
   cursor: pointer;
   height: 4px;
@@ -113,10 +115,10 @@ input[type=range]::-webkit-slider-runnable-track {
 
 input[type=range]::-webkit-slider-thumb {
   appearance: none;
-  background: $white;
-  border: 1px solid $grey-lightest;
+  background: variables.$white;
+  border: 1px solid variables.$grey-lightest;
   border-radius: 25px;
-  box-shadow: 1px 1px 4px $grey-dark;
+  box-shadow: 1px 1px 4px variables.$grey-dark;
   cursor: pointer;
   height: 16px;
   margin-top: -6.5px;
@@ -124,22 +126,22 @@ input[type=range]::-webkit-slider-thumb {
 }
 
 input[type=range]:focus::-webkit-slider-runnable-track {
-  background: $primary-color;
+  background: variables.$primary-color;
 }
 
 input[type=range]::-moz-range-track {
   animation: 0.2s;
-  background: $primary-color;
+  background: variables.$primary-color;
   border-radius: 3px;
   cursor: pointer;
   height: 4px;
 }
 
 input[type=range]::-moz-range-thumb {
-  background: $white;
-  border: 1px solid $grey-lightest;
+  background: variables.$white;
+  border: 1px solid variables.$grey-lightest;
   border-radius: 25px;
-  box-shadow: 1px 1px 4px $grey-dark;
+  box-shadow: 1px 1px 4px variables.$grey-dark;
   cursor: pointer;
   height: 16px;
   width: 16px;
@@ -155,20 +157,20 @@ input[type=range]::-ms-track {
 }
 
 input[type=range]::-ms-fill-lower {
-  background: $primary-color;
+  background: variables.$primary-color;
   border-radius: 6px;
 }
 
 input[type=range]::-ms-fill-upper {
-  background: $primary-color;
+  background: variables.$primary-color;
   border-radius: 6px;
 }
 
 input[type=range]::-ms-thumb {
-  background: $white;
-  border: 1px solid $grey-lightest;
+  background: variables.$white;
+  border: 1px solid variables.$grey-lightest;
   border-radius: 25px;
-  box-shadow: 1px 1px 4px $grey-dark;
+  box-shadow: 1px 1px 4px variables.$grey-dark;
   cursor: pointer;
   height: 14px;
   margin-top: 1px;
@@ -176,11 +178,11 @@ input[type=range]::-ms-thumb {
 }
 
 input[type=range]:focus::-ms-fill-lower {
-  background: $primary-color;
+  background: variables.$primary-color;
 }
 
 input[type=range]:focus::-ms-fill-upper {
-  background: $primary-color;
+  background: variables.$primary-color;
 }
 
 input[type=range]::-ms-tooltip {

@@ -1,3 +1,6 @@
+@use './ui/variables';
+@use './variables' as vars;
+
 .o-tools-left {
   display: block;
   display: flex;
@@ -26,33 +29,33 @@
 }
 
 .o-footer {
-  background-color: $black;
+  background-color: variables.$black;
   background-color: rgba(0, 0, 0, 0.8);
-  color: $white;
+  color: variables.$white;
   font-size: 0.7em;
   height: 2.5em;
-  line-height: $line-height-medium;
+  line-height: variables.$line-height-medium;
   width: 100%;
   z-index: 1;
 }
 
 .o-footer a {
-  color: $white;
+  color: variables.$white;
   text-decoration: none;
 }
 
 .o-footer a:hover {
-  color: $white;
+  color: variables.$white;
   text-decoration: underline;
 }
 
 .o-footer a:focus {
-  color: $white;
+  color: variables.$white;
   text-decoration: underline;
 }
 
 .o-footer a:focus:not(:focus-visible) {
-  color: $white;
+  color: variables.$white;
   text-decoration: none;
 }
 
@@ -74,7 +77,7 @@
 
 .o-footer .o-footer-middle .o-footer-middle-content p {
   display: inline;
-  line-height: $line-height-medium;
+  line-height: variables.$line-height-medium;
   vertical-align: top;
 }
 
@@ -114,12 +117,12 @@
   border-right: 'none';
   padding-right: 0;
 }
-&[class*= #{$media-l}] {
+[class*= #{vars.$media-l}] {
   .o-footer {
     display: none;
   }
 }
-&[class*=#{$media-l-m}] {
+[class*=#{vars.$media-l-m}] {
   .o-tools-left {
     bottom: 0;
     top: auto;
@@ -130,7 +133,7 @@
     order: -1;
   }
 }
-&[class*=#{$media-l-m-s-xs}] {
+[class*=#{vars.$media-l-m-s-xs}] {
   .o-toolbar-maptools,
   .o-toolbar-navigation {
     display: none;
