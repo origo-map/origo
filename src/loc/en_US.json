@@ -111,6 +111,11 @@
             "close": "Close",
             "bookmarkLabel": "Bookmark for"
         },
+        "draganddrop": {
+            "addFromFile": "Add from file",
+            "yourLayersName": "your-layers",
+            "yourLayersTitle": "Your layers"
+        },
         "legend": {
             "placeholderText": "Search for layer",
             "turnOffLayersTitle": "Turn off all layers",

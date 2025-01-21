@@ -111,6 +111,11 @@
             "close": "Stäng",
             "bookmarkLabel": "Bokmärke för"
         },
+        "draganddrop": {
+            "addFromFile": "Lägg till från fil",
+            "yourLayersName": "egna-lager",
+            "yourLayersTitle": "Egna lager"
+        },
         "legend": {
             "placeholderText": "Sök lager",
             "turnOffLayersTitle": "Släck alla lager",
