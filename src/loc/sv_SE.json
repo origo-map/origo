@@ -111,6 +111,11 @@
             "close": "Stäng",
             "bookmarkLabel": "Bokmärke för"
         },
+        "externalurl": {
+            "tooltipText": "Visa kartan i en extern karttjänst",
+            "noUrl": "Ingen URL är angiven i konfigurationen",
+            "linkTooltipText": "Öppna länk"
+        },
         "draganddrop": {
             "addFromFile": "Lägg till från fil",
             "yourLayersName": "egna-lager",
