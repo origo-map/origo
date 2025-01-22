@@ -112,6 +112,7 @@ export default class ImageTileOfflineSource extends ImageTileSource {
     this.viewer = viewer;
     this.legendLayerName = options.name;
     this.noRemoteStyle = options.noRemoteStyle;
+    this.extendedLegend = options.hasThemeLegend;
 
     this.viewer.on('loaded', () => {
 
@@ -180,6 +181,34 @@ export default class ImageTileOfflineSource extends ImageTileSource {
     // If tile is not is in store, calling function will receive exception from fetchTileFromDb and ignores the tile
   };
 
+  async updateLegend() {
+    const imagen = await this.fetchLegendGrapicFromDb();
+    // This style will leave the objectUrl lingering as we don't know when it's loaded unless we can get hands on
+    // the img tag that is created and attach a load event handler. Lucky for us, it only happens once and images are small.
+    // Other solutions is to rewrite the style object to accept a clean up handler or when the tag is created a removeUrl handler
+    // is attached if url has objectUrl format (src="blob:....") or possibly embed the image in the src attr but that would probaby waste more memory
+    if (imagen) {
+      const urlen = URL.createObjectURL(imagen);
+      // This requires that viewer already has added us and that legend has been created.
+      // Currently it should as there is no async code in viewer init so the await above will ensure that
+      // viewer init has run to completion.
+      // If that changes there will be a race condition between viewer added legend and initindexdDb.
+      const l = this.viewer.getLayer(this.legendLayerName);
+      const style = [[{
+        icon: {
+          src: urlen
+        },
+        extendedLegend: this.extendedLegend
+      }]];
+      // A bit complicated way of updating the legend, but it how style picker works.
+      // Other solution would be doing this manually be finding the DOM element somehow and replace it.
+      const styleName = `${this.layerName}__offlinestyle`;
+      this.viewer.addStyle(styleName, style);
+      l.set('styleName', styleName);
+      l.dispatchEvent('change:style');
+    }
+  }
+
   /**
    * You must call init after constructor, before this method is finished the layer is not rendered.
    * No need to actually await unless you want to handle errors.
@@ -190,34 +219,10 @@ export default class ImageTileOfflineSource extends ImageTileSource {
 
     // Don't load image if client side symbol
     if (!this.noRemoteStyle) {
-      const imagen = await this.fetchLegendGrapicFromDb();
-      // This style will leave the objectUrl lingering as we don't know when it's loaded unless we can get hands on
-      // the img tag that is created and attach a load event handler. Lucky for us, it only happens once and images are small.
-      // Other solutions is to rewrite the style object to accept a clean up handler or when the tag is created a removeUrl handler
-      // is attached if url has objectUrl format (src="blob:....") or possibly embed the image in the src attr but that would probaby waste more memory
-      if (imagen) {
-        const urlen = URL.createObjectURL(imagen);
-        // This requires that viewer already has added us and that legend has been created.
-        // Currently it should as there is no async code in viewer init so the await above will ensure that
-        // viewer init has run to completion.
-        // If that changes there will be a race condition between viewer added legend and initindexdDb.
-        const l = this.viewer.getLayer(this.legendLayerName);
-        const style = [[{
-          icon: {
-            src: urlen
-          }
-
-        }]];
-        // A bit complicated way of updating the legend, but it how style picker works.
-        // Other solution would be doing this manually be finding the DOM element somehow and replace it.
-        const styleName = `${this.layerName}__offlinestyle`;
-        this.viewer.addStyle(styleName, style);
-        l.set('styleName', styleName);
-        l.dispatchEvent('change:style');
-      }
-
-      console.log('Laddad');
+      await this.updateLegend();
     }
+
+    console.log('Laddad');
     // Notify OL that we are ready to display some data
     super.setState('ready');
   }
