@@ -124,10 +124,11 @@ export function layerSpecificExportHandler(url, requestMethod, urlParameters, ac
   // an "attribute" property, in which case the value will be a list of the values from the
   // corresponding attribute of the selectedItems. Unless specified with a "separator" property,
   // the list will be separated by semicolons.
-  // Specifying a value as "_null_" will add a valueless parameter, e g "?Param1&Param2&etc".
+  // Specifying a value as null will add a valueless parameter, e g "?Param1&Param2&etc".
   let requestUrl = url;
   const requestParams = { ...urlParameters };
   if (requestParams) {
+    const uniquePlaceholder = '8c155776-cbd7-4b24-a384-87c694a39ff2';
     Object.keys(requestParams).forEach((param) => {
       if (requestParams[param] && typeof requestParams[param] === 'object' && requestParams[param].attribute) {
         const attributeValues = [];
@@ -138,11 +139,13 @@ export function layerSpecificExportHandler(url, requestMethod, urlParameters, ac
           }
         });
         requestParams[param] = attributeValues.join(requestParams[param].separator || ';');
+      } else if (requestParams[param] === null) {
+        requestParams[param] = uniquePlaceholder;
       }
     });
     requestUrl = new URL(url);
     requestUrl.search = new URLSearchParams(requestParams);
-    requestUrl = requestUrl.toString().replace(/=_null_(&|$)/gm, '$1');
+    requestUrl = requestUrl.toString().replace(new RegExp(`=${uniquePlaceholder}(&|$)`, 'gm'), '$1');
   }
 
   if (requestMethod === 'OPEN') {
