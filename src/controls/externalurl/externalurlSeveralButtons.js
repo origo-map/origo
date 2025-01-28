@@ -10,6 +10,7 @@ const externalurlSeveralButtons = function externalurlSeveralButtons(options = {
   }
 
   const mainbuttonTooltipText = options.tooltipText || localize('tooltipText');
+  const mainbuttonIcon = options.icon || '#ic_baseline_link_24px';
   const links = options.links;
   const hasValidMethod = links.some(link => link.method !== 'none');
   let map;
@@ -76,7 +77,7 @@ const externalurlSeveralButtons = function externalurlSeveralButtons(options = {
 
       externalUrlMainButton = Button({
         cls: 'o-measure padding-small icon-smaller round light box-shadow',
-        icon: '#ic_baseline_link_24px',
+        icon: mainbuttonIcon,
         tooltipText: mainbuttonTooltipText,
         tooltipPlacement: 'east',
         click() {
