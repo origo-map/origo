@@ -9,7 +9,7 @@ import { noModifierKeys } from 'ol/events/condition';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import { squaredDistance, toFixed } from 'ol/math';
-import { Button, Element as El, Modal } from '../../ui';
+import { Button, Element as El, Modal, Component } from '../../ui';
 import Infowindow from '../../components/infowindow';
 import store from './editsstore';
 import generateUUID from '../../utils/generateuuid';
@@ -66,6 +66,9 @@ let snapTolerance;
 let snapSources;
 let traceSource;
 let useTrace;
+let modifyDrawSnapInteraction;
+let modifyDrawInteraction;
+let component;
 
 function isActive() {
   // FIXME: this only happens at startup as they are set to null on closing. If checking for null/falsley/not truely it could work as isVisible with
@@ -78,6 +81,11 @@ function isActive() {
 }
 
 function setActive(editType) {
+  map.removeInteraction(modifyDrawSnapInteraction);
+  modifyDrawSnapInteraction = null;
+  map.removeInteraction(modifyDrawInteraction);
+  modifyDrawInteraction = null;
+
   switch (editType) {
     case 'modify':
       draw.setActive(false);
@@ -519,6 +527,9 @@ function removeInteractions() {
     select = null;
     draw = null;
     snap = null;
+    // The select interaction is deleted and recreated so we must send the select event manually as
+    // the selection collection events are not fired when interaction is destroyed effectively selecting nothing.
+    component.dispatch('select', []);
   }
 }
 
@@ -660,6 +671,17 @@ function setInteractions(drawType) {
   select = new Select({
     layers: [editLayer],
     multi: !!infowindowCmp
+  });
+  // Dispatch Component event when selection changes. 'change' is never emitted from Collection, so it's both 'add' and 'remove'.
+  // select interaction's 'select' event is not fired when the feature collection is manipulated manually, so we take events from
+  // the collection instead.
+  select.getFeatures().on('add', () => {
+    const featureArray = select.getFeatures().getArray();
+    component.dispatch('select', featureArray);
+  });
+  select.getFeatures().on('remove', () => {
+    const featureArray = select.getFeatures().getArray();
+    component.dispatch('select', featureArray);
   });
   if (infowindowCmp) {
     infowindowCmp.close();
@@ -1704,6 +1726,110 @@ function setActiveLayerApi(layerName) {
   }
   setEditLayer(layerName);
 }
+
+/**
+ * Callback when split-line-by-point tool finishes drawing. Performs the actual splitting
+ * @param {any} evt a OL DrawEvent
+ */
+function onSplitLineByPointEnd(evt) {
+  // TODO: Need to verify?
+  const selectedFeature = select.getFeatures().item(0);
+  // Clear selection to avoid it being stuck selected
+  select.getFeatures().clear();
+  const line = selectedFeature.getGeometry();
+  const originalCoords = line.getCoordinates();
+  const cuttingCoord = evt.feature.getGeometry().getCoordinates();
+  let segmentNo = 0;
+  let part1Coords = [];
+  let part2Coords = [];
+  // TODO: remove empty if statement and inverse logic or toast
+  if (topology.coordIsEqual(cuttingCoord, line.getFirstCoordinate()) || topology.coordIsEqual(cuttingCoord, line.getLastCoordinate())) {
+    // Can only happen on actual first point as we would trigger on lastCoord on the semgment before this happens
+    // Nothing to do, can't cut on first or last
+    console.log('Första eller sista. Inget att dela');
+  } else {
+    // Find the segmen where to split
+    line.forEachSegment((startCoord, endCoord) => {
+      const currSegment = new LineString([startCoord, endCoord]);
+      const nearestPoint = currSegment.getClosestPoint(cuttingCoord);
+      // Round distance so we can determine if point is on line. It still is pretty small so
+      // snapping must be activated in order to have any chance at actually hitting a line.
+      const squaredD = toFixed(squaredDistance(cuttingCoord[0], cuttingCoord[1], nearestPoint[0], nearestPoint[1]), 10);
+      if (squaredD === 0) {
+        // Check if we hit an existing vertex, then split here, otherwise insert new point.
+        if (topology.coordIsEqual(cuttingCoord, currSegment.getLastCoordinate())) {
+          part1Coords = originalCoords.slice(0, segmentNo + 2);
+          part2Coords = originalCoords.slice(segmentNo + 1);
+        } else {
+          // Have to insert a new vertex where clicked
+          part1Coords = originalCoords.slice(0, segmentNo + 1);
+          part1Coords.push(cuttingCoord);
+          part2Coords = originalCoords.slice(segmentNo + 1);
+          part2Coords.unshift(cuttingCoord);
+        }
+        // Return from forEach. We found our point, no need to loop further.
+        return true;
+      }
+      segmentNo += 1;
+      // Consistent return for forEach , keep lopping until found.
+      return false;
+    });
+  }
+  if (part2Coords.length > 1) {
+    // Click actually hit the line, split where clicked.
+    // Start with the easy one, change geom of original line
+    selectedFeature.getGeometry().setCoordinates(part1Coords);
+    saveFeature({
+      feature: selectedFeature,
+      layerName: currentLayer,
+      action: 'update'
+    });
+    // The litte tricker, create a copy with the rest of the line
+    const newFeature = selectedFeature.clone();
+    newFeature.setGeometry(new LineString(part2Coords));
+    newFeature.setId(generateUUID());
+    const layer = viewer.getLayer(currentLayer);
+    layer.getSource().addFeature(newFeature);
+    saveFeature({
+      feature: newFeature,
+      layerName: currentLayer,
+      action: 'insert'
+    });
+  }
+
+  // We're done, either the line is split or user clicked outside geometry.
+  // Reset editor state.
+  setActive();
+}
+
+/**
+ * Selects a modify too as the active interaction
+ * Only to be called when a feature has already been selected and user has pressed
+ * the corresponding tool button.
+ * @param {any} toolName Name of the tool
+ */
+function setModifyToolApi(toolName) {
+  // This function is a placeholder for future tools. It should switch out tool name and act accordingly
+  if (toolName === 'split-line-by-point') {
+    const selectedFeature = select.getFeatures().item(0);
+    // Create a new temporary draw interaction depending on toolName
+    // This can be removed in the handler as it is a part of the event.
+    const drawInterationProps = {
+      type: 'Point',
+      // Don't emit click events as it will activate select interaction when finished.
+      // The drawend handler will still be called.
+      stopClick: true
+    };
+    // Disable the handler's normal interactions while we're splitting and add or own
+    setActive('custom');
+    modifyDrawInteraction = new Draw(drawInterationProps);
+    modifyDrawInteraction.on('drawend', onSplitLineByPointEnd);
+    modifyDrawSnapInteraction = new Snap({ features: new Collection([selectedFeature]) });
+
+    map.addInteraction(modifyDrawInteraction);
+    map.addInteraction(modifyDrawSnapInteraction);
+  }
+}
 /**
  * Eventhandler called from relatedTableForm when delete button is pressed
  * @param { any } e Event containing layers and features necessary
@@ -1722,72 +1848,77 @@ function preselectFeature(feature) {
 }
 
 /**
- * Creates the handler. It is used as sort of a singelton, but in theory there could be many handlers.
- * It communicates with the editor toolbar and forms using DOM events, which makes it messy to have more than one instance as they would use the same events.
+ * Creates the handler Component. In reality only one instance can be created as it relies on global variables and DOM ids and DOM events
+ * It isn't a traditional Component as it has no visual elements but it can emit Eventer events.
+ * It communicates with the editor toolbar and forms using DOM events.
  * @param {any} options
  * @param {any} v The viewer object
+ * @returns {any} a Component
  */
 export default function editHandler(options, v) {
-  viewer = v;
-  map = viewer.getMap();
+  return Component({
+    onInit() {
+      component = this;
+      viewer = v;
+      map = viewer.getMap();
 
-  // Set up a layer for displaying trace possibilities. Do it up front as it may become possible to turn it on later
-  traceHighligtLayer = new VectorLayer({
-    source: new VectorSource(),
-    style: {
-      'stroke-color': 'rgba(100, 255, 0, 1)',
-      'stroke-width': 3
+      // Set up a layer for displaying trace possibilities. Do it up front as it may become possible to turn it on later
+      traceHighligtLayer = new VectorLayer({
+        source: new VectorSource(),
+        style: {
+          'stroke-color': 'rgba(100, 255, 0, 1)',
+          'stroke-width': 3
+        },
+        visible: true
+      });
+      if (options.traceStyle) {
+        const s = Style.createStyle({ style: options.traceStyle, viewer });
+        traceHighligtLayer.setStyle(s);
+      }
+      map.addLayer(traceHighligtLayer);
+      traceSource = new VectorSource();
+      useTrace = options.trace;
+
+      featureInfo = viewer.getControlByName('featureInfo');
+      if (options.featureList) {
+        infowindowCmp = Infowindow({ viewer, type: 'floating', title: 'Välj objekt' });
+        infowindowCmp.render();
+      }
+      currentLayer = options.currentLayer;
+      editableLayers = options.editableLayers;
+
+      // set edit properties for editable layers
+      editLayers = setEditProps(options);
+      editableLayers.forEach((layerName) => {
+        verifyLayer(layerName);
+        if (layerName === currentLayer && options.isActive) {
+          dispatcher.emitEnableInteraction();
+          setEditLayer(layerName);
+        }
+      });
+
+      autoSave = options.autoSave;
+      autoForm = options.autoForm;
+      validateOnDraw = options.validateOnDraw;
+      // We set tolerace as we can't read default from OL, but we can set it
+      // Cant' set 0, but that case you can disable snap
+      snapTolerance = options.snapTolerance || 10;
+
+      // Listen to DOM events from menus and forms
+      document.addEventListener('toggleEdit', onToggleEdit);
+      document.addEventListener('changeEdit', onChangeEdit);
+      document.addEventListener('editorShapes', onChangeShape);
+      document.addEventListener('customDrawEnd', onCustomDrawEnd);
+      document.addEventListener(dispatcher.EDIT_CHILD_EVENT, onEditChild);
+      document.addEventListener(dispatcher.ADD_CHILD_EVENT, onAddChild);
+      document.addEventListener(dispatcher.DELETE_CHILD_EVENT, onDeleteChild);
     },
-    visible: true
-  });
-  if (options.traceStyle) {
-    const s = Style.createStyle({ style: options.traceStyle, viewer });
-    traceHighligtLayer.setStyle(s);
-  }
-  map.addLayer(traceHighligtLayer);
-  traceSource = new VectorSource();
-  useTrace = options.trace;
-
-  featureInfo = viewer.getControlByName('featureInfo');
-  if (options.featureList) {
-    infowindowCmp = Infowindow({ viewer, type: 'floating', title: 'Välj objekt' });
-    infowindowCmp.render();
-  }
-  currentLayer = options.currentLayer;
-  editableLayers = options.editableLayers;
-
-  // set edit properties for editable layers
-  editLayers = setEditProps(options);
-  editableLayers.forEach((layerName) => {
-    verifyLayer(layerName);
-    if (layerName === currentLayer && options.isActive) {
-      dispatcher.emitEnableInteraction();
-      setEditLayer(layerName);
-    }
-  });
-
-  autoSave = options.autoSave;
-  autoForm = options.autoForm;
-  validateOnDraw = options.validateOnDraw;
-  // We set tolerace as we can't read default from OL, but we can set it
-  // Cant' set 0, but that case you can disable snap
-  snapTolerance = options.snapTolerance || 10;
-
-  // Listen to DOM events from menus and forms
-  document.addEventListener('toggleEdit', onToggleEdit);
-  document.addEventListener('changeEdit', onChangeEdit);
-  document.addEventListener('editorShapes', onChangeShape);
-  document.addEventListener('customDrawEnd', onCustomDrawEnd);
-  document.addEventListener(dispatcher.EDIT_CHILD_EVENT, onEditChild);
-  document.addEventListener(dispatcher.ADD_CHILD_EVENT, onAddChild);
-  document.addEventListener(dispatcher.DELETE_CHILD_EVENT, onDeleteChild);
-
-  return {
     // These functions are called from Editor Component, possibly from its Api so change these calls with caution.
     createFeature: createFeatureApi,
     editAttributesDialog: editAttributesDialogApi,
     deleteFeature: deleteFeatureApi,
     setActiveLayer: setActiveLayerApi,
+    setModifyTool: setModifyToolApi,
     preselectFeature
-  };
+  });
 }

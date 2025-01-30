@@ -8,6 +8,16 @@ import { intersects } from 'ol/extent';
 const topology = {
 
   /**
+   * Simple coordinate comparator.
+   * @param {any} c1 First coordinate as an array as [x,y]
+   * @param {any} c2 Second coordinate as an array as [x,y]
+   * @returns true if coordinates are equal
+   */
+  coordIsEqual: function coordIsEqual(c1, c2) {
+    return ((c1[0] === c2[0]) && (c1[1] === c2[1]));
+  },
+
+  /**
    * Intersects two line segments and returns the intersection. If lines are crossing it returns a point, if overlapping it return a line.
    * Two consecutive line segments in a linestring will always intersect in at least one point (but possibly a line if turning 180 deg).
    * @param {LineString} s1 First line
