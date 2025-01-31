@@ -39,6 +39,16 @@ export const findStyleType = function findStyleType(styles) {
     return 'Line';
   } else if (styleTypes.circle) {
     return 'Circle';
+  } else if (styleTypes.square) {
+    return 'Square';
+  } else if (styleTypes.triangle) {
+    return 'Triangle';
+  } else if (styleTypes.star) {
+    return 'Star';
+  } else if (styleTypes.cross) {
+    return 'Cross';
+  } else if (styleTypes.x) {
+    return 'X';
   } else if (styleTypes.icon) {
     return 'Icon';
   } else if (styleTypes.image) {
@@ -110,6 +120,46 @@ export const renderSvgIcon = function renderSvgIcon(styleRule, {
         return prev;
       }, '');
       return `${renderSvg(icon, { opacity, size: circleSize })}`;
+    } else if (styleType === 'Square') {
+      const icon = styleRule.reduce((prev, style) => {
+        if (style.square) {
+          return prev + renderIcon.Square(style.square);
+        }
+        return prev;
+      }, '');
+      return `${renderSvg(icon, { opacity })}`;
+    } else if (styleType === 'Triangle') {
+      const icon = styleRule.reduce((prev, style) => {
+        if (style.triangle) {
+          return prev + renderIcon.Triangle(style.triangle);
+        }
+        return prev;
+      }, '');
+      return `${renderSvg(icon, { opacity })}`;
+    } else if (styleType === 'Star') {
+      const icon = styleRule.reduce((prev, style) => {
+        if (style.star) {
+          return prev + renderIcon.Star(style.star);
+        }
+        return prev;
+      }, '');
+      return `${renderSvg(icon, { opacity })}`;
+    } else if (styleType === 'Cross') {
+      const icon = styleRule.reduce((prev, style) => {
+        if (style.cross) {
+          return prev + renderIcon.Cross(style.cross);
+        }
+        return prev;
+      }, '');
+      return `${renderSvg(icon, { opacity })}`;
+    } else if (styleType === 'X') {
+      const icon = styleRule.reduce((prev, style) => {
+        if (style.x) {
+          return prev + renderIcon.X(style.x);
+        }
+        return prev;
+      }, '');
+      return `${renderSvg(icon, { opacity })}`;
     } else if (styleType === 'Text') {
       const textOptions = styleRule.find(style => style.text);
       const icon = renderIcon.Text(textOptions.text);
