@@ -123,8 +123,11 @@ const Overlays = function Overlays(options) {
     });
     readOverlays();
     overlays.forEach(overlay => {
-      if (!existing.find(eOverlay => eOverlay.name === overlay.name)) {
+      const exist = existing.find(eOverlay => eOverlay.name === (overlay.name || overlay.get('name')));
+      if (!exist) {
         addLayer(overlay, { position: 'bottom' });
+      } else {
+        document.getElementById(exist.getId()).classList.remove('hidden');
       }
     });
 
@@ -144,6 +147,7 @@ const Overlays = function Overlays(options) {
       this.on('readOverlays', () => {
         updateVisibleOverlays();
       });
+      viewer.getMap().getLayers().on('add', updateVisibleOverlays.bind(this));
     },
     hasOverlays,
     onRender() {
