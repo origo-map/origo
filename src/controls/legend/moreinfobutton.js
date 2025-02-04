@@ -12,7 +12,7 @@ export default function createMoreInfoButton(params) {
   const popupMenuItems = [];
   let moreInfoButton;
   let popupMenu;
-  const showPopup = group.zoomToExtent && group.extent; // In case of zoomToExtent we always want to show popupmenu
+  const showPopup = (group.zoomToExtent && group.extent) || group.removable; // In case of zoomToExtent or removable we always want to show popupmenu
 
   function localize(key) {
     return localization.getStringByKeys({ targetParentKey: 'legend', targetKey: key });
@@ -138,6 +138,28 @@ export default function createMoreInfoButton(params) {
       }
     });
     popupMenuItems.push(removeLayerMenuItem);
+  }
+
+  if (group && group.removable) {
+    const removeGroupMenuItem = Component({
+      onRender() {
+        const labelEl = document.getElementById(this.getId());
+        labelEl.addEventListener('click', (e) => {
+          popupMenu.setVisibility(false);
+          const doRemove = (group.promptlessRemoval === true) || window.confirm('Vill du radera gruppen?');
+          if (doRemove) {
+            viewer.removeGroup(group.name);
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        });
+      },
+      render() {
+        const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
+        return `<li id="${this.getId()}" class="${labelCls}">Ta bort grupp</li>`;
+      }
+    });
+    popupMenuItems.push(removeGroupMenuItem);
   }
 
   const popupMenuList = Component({
