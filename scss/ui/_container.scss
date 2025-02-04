@@ -1,4 +1,6 @@
-$container-margin: $app-margin * 2;
+@use './variables';
+
+$container-margin: variables.$app-margin * 2;
 
 .container {
   display: flex;

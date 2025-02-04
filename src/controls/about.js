@@ -5,11 +5,16 @@ const About = function About(options = {}) {
     buttonText,
     target
   } = options;
+  const localization = options.localization;
+
+  function localize(key) {
+    return localization.getStringByKeys({ targetParentKey: 'about', targetKey: key });
+  }
   const {
     content = '<p></p>',
     icon = '#ic_help_outline_24px',
     placement = ['menu'],
-    title = 'Om kartan',
+    title = localize('title'),
     style
   } = options;
 

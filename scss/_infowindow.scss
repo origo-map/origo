@@ -1,8 +1,11 @@
 
+@use './ui/variables';
+@use './variables' as vars;
+
 .sidebarcontainer {
   display: flex;
   flex-direction: column;
-  background-color: $white;
+  background-color: variables.$white;
   border-radius: 0.5em;
   box-shadow: 0 0 8px #888;
   font-size: 12px;
@@ -83,7 +86,7 @@
 }
 
 .urvalelement {
-  border-bottom: 3px solid  $white;
+  border-bottom: 3px solid  variables.$white;
   cursor: pointer;
   display: inline-block;
   font-weight: normal;
@@ -208,7 +211,7 @@
 }
 
 .highlighted {
-  background-color: $whitesmoke;
+  background-color: variables.$whitesmoke;
   border-radius: 0 1em 1em 0;
   transition: background-color 0.5s;
   transition: background-color 0.5s;
@@ -239,10 +242,10 @@
 }
 
 .export-button {
-  background-color: $whitesmoke;
+  background-color: variables.$whitesmoke;
   border: 1px solid #ccc;
   border-radius: 2em;
-  color: $black;
+  color: variables.$black;
   font-size: 12px;
   font-weight: normal;
   max-width: 280px;
@@ -295,7 +298,7 @@
   border-radius: 4px;
 }
 
-&[class*=#{$media-l}] {
+[class*=#{vars.$media-l}] {
   .sidebarcontainer {
     left: 50%;
     top: 5em;
@@ -317,13 +320,13 @@
   }
 }
 
-&[class*=#{$media-l-m}] {
+[class*=#{vars.$media-l-m}] {
   .sidebarcontainer {
     width: 250px;
   }
 }
 
-&[class*=#{$media-l-m-s}] {
+[class*=#{vars.$media-l-m-s}] {
   .sidebarcontainer {
     left: 5em;
     transform: none;

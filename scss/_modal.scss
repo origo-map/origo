@@ -1,3 +1,6 @@
+@use './ui/variables';
+@use './variables' as vars;
+
 #o-modal {
   font-size: 1em;
   line-height: 1.42857143;
@@ -14,7 +17,7 @@
 }
 
 .o-modal {
-  background-color: $white;
+  background-color: variables.$white;
   border-radius: 6px;
   bottom: auto;
   box-shadow: 0 2px 8px 1px rgba(0, 0, 0, 0.45);
@@ -73,7 +76,7 @@
   padding: 3px 5px;
 }
 
-&[class*=#{$media-l}] {
+[class*=#{vars.$media-l}] {
   .o-modal {
     max-width: 300px;
     width: 90%;

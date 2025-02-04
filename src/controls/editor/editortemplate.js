@@ -29,6 +29,14 @@ export default `<div id="o-editor-toolbar" class="o-editor-toolbar o-toolbar o-t
         <span data-tooltip="Lager" data-placement="north"></span>
       </button>
     </div>
+     <div class="o-popover-container">
+      <button id="o-editor-modifytools" class="o-button-lg o-tooltip o-disabled" style aria-label="Modifiera" type="button" name="button">
+        <svg class="o-icon-24">
+            <use xlink:href="#ic_edit_24px"></use>
+        </svg>
+        <span data-tooltip="Modifiera" data-placement="north"></span>
+      </button>
+    </div>
     <button id="o-editor-save" class="o-button-lg o-disabled o-tooltip" style aria-label="Spara" type="button" name="button">
       <svg class="o-icon-24">
           <use xlink:href="#ic_save_24px"></use>

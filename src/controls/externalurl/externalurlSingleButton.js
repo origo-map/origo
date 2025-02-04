@@ -3,13 +3,19 @@ import { Component, Element as El, Button, dom } from '../../ui';
 import replacer from '../../utils/replacer';
 
 const ExternalurlSingleButton = function ExternalurlSingleButton(options = {}) {
+  const localization = options.localization;
+
+  function localize(key) {
+    return localization.getStringByKeys({ targetParentKey: 'externalurl', targetKey: key });
+  }
+
   let map;
   let viewer;
   let exUrlElement;
   let exUrlBtn;
   let target;
   const buttons = [];
-  const tooltip = options.links[0].tooltipText || options.tooltipText || 'Visa kartan i en extern karttjänst';
+  const tooltip = options.links[0].tooltipText || options.tooltipText || localize('tooltipText');
   const buttonImage = options.links[0].buttonImage || '#ic_baseline_link_24px';
   const url = options.links[0].url;
   const method = options.links[0].method;
@@ -17,7 +23,7 @@ const ExternalurlSingleButton = function ExternalurlSingleButton(options = {}) {
 
   function onClick() {
     if (!url) {
-      alert('No URL is specified in the configurations');
+      alert(localize('noUrl'));
       return;
     }
 

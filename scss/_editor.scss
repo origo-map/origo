@@ -5,3 +5,8 @@
     width: 1em;
   }
 }
+
+.o-editor-input:focus {
+  border-color: #808080; /* Grey edge */
+  box-shadow: 0 0 10px rgba(169, 169, 169, 0.5); /* Grey glow */
+}

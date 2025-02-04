@@ -6,12 +6,17 @@ export default function createMoreInfoButton(params) {
   const {
     layer,
     group = {},
-    viewer
+    viewer,
+    localization
   } = params;
   const popupMenuItems = [];
   let moreInfoButton;
   let popupMenu;
   const showPopup = (group.zoomToExtent && group.extent) || group.removable; // In case of zoomToExtent or removable we always want to show popupmenu
+
+  function localize(key) {
+    return localization.getStringByKeys({ targetParentKey: 'legend', targetKey: key });
+  }
 
   const eventOverlayProps = new CustomEvent('overlayproperties', {
     bubbles: true,
@@ -35,7 +40,7 @@ export default function createMoreInfoButton(params) {
       },
       render() {
         const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
-        return `<li id="${this.getId()}" class="${labelCls}">Visa ${layer ? 'lagerinformation' : 'gruppinformation'}</li>`;
+        return `<li id="${this.getId()}" class="${labelCls}">${localize('showInfoMenuItem')} ${layer ? localize('layerInfoMenuItem') : localize('groupInfoMenuItem')}</li>`;
       }
     });
     popupMenuItems.push(layerInfoMenuItem);
@@ -69,7 +74,7 @@ export default function createMoreInfoButton(params) {
       },
       render() {
         const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
-        return `<li id="${this.getId()}" class="${labelCls}">Zooma till</li>`;
+        return `<li id="${this.getId()}" class="${labelCls}">${localize('zoomToExtentMenuItem')}</li>`;
       }
     });
     popupMenuItems.push(zoomToExtentMenuItem);
@@ -93,7 +98,7 @@ export default function createMoreInfoButton(params) {
             const features = layer.getSource().getFeatures();
             exportToFile(features, format, {
               featureProjection: viewer.getProjection().getCode(),
-              filename: layer.get('title') || 'export'
+              filename: layer.get('title') || localize('exportLayerTitle')
             });
             e.preventDefault();
             e.stopPropagation();
@@ -103,8 +108,8 @@ export default function createMoreInfoButton(params) {
         render() {
           let exportLabel;
           if (exportFormatArray.length > 1) {
-            exportLabel = `Spara lager (.${format})`;
-          } else { exportLabel = 'Spara lager'; }
+            exportLabel = `${localize('exportLayerSave')} (.${format})`;
+          } else { exportLabel = localize('exportLayerSave'); }
           const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
           return `<li id="${this.getId()}" class="${labelCls}">${exportLabel}</li>`;
         }
@@ -118,7 +123,7 @@ export default function createMoreInfoButton(params) {
       onRender() {
         const labelEl = document.getElementById(this.getId());
         labelEl.addEventListener('click', (e) => {
-          const doRemove = (layer.get('promptlessRemoval') === true) || window.confirm('Vill du radera lagret?');
+          const doRemove = (layer.get('promptlessRemoval') === true) || window.confirm(localize('removeLayerQuestion'));
           if (doRemove) {
             viewer.getMap().removeLayer(layer);
             e.preventDefault();
@@ -129,7 +134,7 @@ export default function createMoreInfoButton(params) {
       },
       render() {
         const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
-        return `<li id="${this.getId()}" class="${labelCls}">Ta bort lager</li>`;
+        return `<li id="${this.getId()}" class="${labelCls}">${localize('removeLayer')}</li>`;
       }
     });
     popupMenuItems.push(removeLayerMenuItem);
@@ -210,7 +215,7 @@ export default function createMoreInfoButton(params) {
         'align-self': 'center'
       },
       icon: '#ic_more_vert_24px',
-      ariaLabel: 'Visa lagerinfo',
+      ariaLabel: localize('moreInfoButtonLabel'),
       tabIndex: -1
     });
     moreInfoButton.on('render', function onRenderButton() {
