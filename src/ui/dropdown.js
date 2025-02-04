@@ -15,9 +15,12 @@ export default function Dropdown(options = {}) {
     buttonContainerCls = '',
     style: styleSettings,
     direction = 'down',
-    text = ' ',
     ariaLabel = '',
     buttonTextCls = 'flex'
+  } = options;
+  let {
+    text = ' ',
+    items = []
   } = options;
 
   let containerElement;
@@ -28,31 +31,43 @@ export default function Dropdown(options = {}) {
 
   const style = createStyle(styleSettings);
 
-  const selectItem = function selectItem(item) {
+  const selectItem = function selectItem(item, doClick = true) {
     const customEvt = new CustomEvent('dropdown:select', {
       bubbles: true
     });
     document.getElementById(item.getId()).dispatchEvent(customEvt);
-    dropdownButton.dispatch('click');
+    if (doClick) dropdownButton.dispatch('click');
   };
 
   const setButtonText = function setButtonText(buttonText) {
-    document.getElementById(`${dropdownButton.getId()}`).getElementsByTagName('span')[1].innerHTML = buttonText;
+    text = buttonText;
+    document.getElementById(`${dropdownButton.getId()}`).getElementsByTagName('span')[1].innerHTML = text;
+  };
+
+  const getItems = function getItems() {
+    const contentCmps = contentComponent.getComponents();
+    if (contentCmps) return contentCmps;
+    return false;
   };
 
   const setItems = function setItems(listItems) {
-    listItems.forEach((listItem) => {
-      const itemEl = El({
-        tagName: 'li',
-        innerHTML: `<span>${listItem}</span>`
+    items = listItems;
+    const contentEl = document.getElementById(contentComponent.getId());
+    if (contentEl) {
+      contentComponent.clearComponents();
+      contentEl.replaceChildren();
+      listItems.forEach((listItem) => {
+        const itemEl = El({
+          tagName: 'li',
+          innerHTML: `<span>${listItem}</span>`
+        });
+        contentComponent.addComponent(itemEl);
+        contentEl.appendChild(html(itemEl.render()));
+        document.getElementById(itemEl.getId()).addEventListener('click', () => {
+          selectItem(itemEl);
+        });
       });
-
-      document.getElementById(contentComponent.getId()).appendChild(html(itemEl.render()));
-
-      document.getElementById(itemEl.getId()).addEventListener('click', () => {
-        selectItem(itemEl);
-      });
-    });
+    }
   };
 
   const toggle = function toggle() {
@@ -64,7 +79,10 @@ export default function Dropdown(options = {}) {
 
   return Component({
     setButtonText,
+    getItems,
     setItems,
+    selectItem,
+    toggle,
     onInit() {
       let position;
 
@@ -75,7 +93,8 @@ export default function Dropdown(options = {}) {
           toggle();
         },
         style: {
-          padding: '0 .5rem'
+          padding: '0 .5rem',
+          overflow: 'hidden'
         },
         icon: `#ic_arrow_drop_${direction}_24px`,
         iconCls: `${buttonIconCls} icon-smaller flex`,
@@ -120,6 +139,7 @@ export default function Dropdown(options = {}) {
     },
     onRender() {
       setButtonText(text);
+      setItems(items);
       this.dispatch('render');
     },
     render() {
