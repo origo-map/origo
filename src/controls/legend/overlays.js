@@ -10,7 +10,7 @@ import Overlay from './overlay';
 /**
  * The Overlays component works as a container for
  * all group components, besides the background group.
- * The component is divivded in two main cointainers,
+ * The component is divided in two main containers,
  * one for theme groups and one root container for layers
  * and grouplayers that don't belong to a theme.
  */
@@ -225,15 +225,15 @@ const Overlays = function Overlays(options) {
     if (groupCmp) {
       const index = groupCmps.indexOf(groupCmp);
       groupCmps.splice(index, 1);
-      if (groupCmp.parent) {
+      if (groupCmp.type === 'grouplayer') {
         const parentCmp = groupCmps.find((cmp) => cmp.name === groupCmp.parent);
-        if (groupCmp.parent === 'root') {
-          rootGroup.removeGroup(groupCmp);
-        } else if (parentCmp) {
+        if (parentCmp) {
           parentCmp.removeGroup(groupCmp);
+        } else {
+          rootGroup.removeGroup(groupCmp);
         }
       } else {
-        rootGroup.removeGroup(groupCmp);
+        themeGroups.removeGroup(groupCmp);
       }
     }
   };

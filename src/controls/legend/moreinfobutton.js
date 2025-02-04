@@ -140,13 +140,13 @@ export default function createMoreInfoButton(params) {
       onRender() {
         const labelEl = document.getElementById(this.getId());
         labelEl.addEventListener('click', (e) => {
+          popupMenu.setVisibility(false);
           const doRemove = (group.promptlessRemoval === true) || window.confirm('Vill du radera gruppen?');
           if (doRemove) {
             viewer.removeGroup(group.name);
             e.preventDefault();
             e.stopPropagation();
           }
-          popupMenu.setVisibility(false);
         });
       },
       render() {
