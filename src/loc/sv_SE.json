@@ -4,6 +4,7 @@
     "menuTitle": "Språk",
     "controls": {
         "measure": {
+            "layerTitle": "Mätresultat",
             "mainButtonTooltip": "Mäta",
             "startMeasureTooltip": "Klicka för att börja mäta",
             "lengthTooltip": "Längd",
