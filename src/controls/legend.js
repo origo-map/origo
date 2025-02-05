@@ -565,7 +565,9 @@ const Legend = function Legend(options = {}) {
         addPopupMenuItems(button, this);
       } else {
         const toolsEl = document.getElementById(toolsCmp.getId());
-        toolsEl.classList.remove('hidden');
+        if (!visibleLayersViewActive) {
+          toolsEl.classList.remove('hidden')
+        }
         if (toolsCmp.getComponents().length > 0) {
           toolsEl.style.justifyContent = 'space-between';
           toolsEl.insertBefore(dom.html(divider.render()), toolsEl.firstChild);
