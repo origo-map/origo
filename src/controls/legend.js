@@ -566,7 +566,7 @@ const Legend = function Legend(options = {}) {
       } else {
         const toolsEl = document.getElementById(toolsCmp.getId());
         if (!visibleLayersViewActive) {
-          toolsEl.classList.remove('hidden')
+          toolsEl.classList.remove('hidden');
         }
         if (toolsCmp.getComponents().length > 0) {
           toolsEl.style.justifyContent = 'space-between';
