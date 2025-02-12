@@ -4,6 +4,7 @@ const replacer = function replacer() {
   let helper;
   let helperNS;
   let helperArg;
+  let localization;
 
   function getArgs(str) {
     const args = str.match(/\((.*?)\)/);
@@ -24,7 +25,7 @@ const replacer = function replacer() {
         if (nsIndex) {
           const helperParts = getArgs(matches[1]);
           const helperName = helperParts[1].substring(nsIndex - 1);
-          const args = helperArg.concat(helperParts[0], map);
+          const args = helperArg.concat(helperParts[0], map, localization);
           val = Object.prototype.hasOwnProperty.call(helper, helperName) ? helper[helperName].apply(null, args).toString() : '';
         }
         if (matches[1].indexOf('.') > 0) {
@@ -60,6 +61,7 @@ const replacer = function replacer() {
     helper = options.helper || {};
     helperNS = options.helperNS || '@';
     helperArg = [options.helperArg] || [];
+    localization = options?.localization;
 
     const result = searchAndReplace(name, obj, map);
     return result;

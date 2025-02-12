@@ -6,8 +6,11 @@
 function formatAreaString(area, opts = {}) {
   const {
     useHectare = true,
-    decimals
+    decimals,
+    localization
   } = opts;
+
+  const localeNumberFormat = new Intl.NumberFormat(localization.getCurrentLocaleId());
   let result = area;
   let unit = 'm<sup>2</sup>';
   if (result > 10000000) {
@@ -18,7 +21,7 @@ function formatAreaString(area, opts = {}) {
     unit = 'ha';
   }
   if (decimals !== undefined) {
-    result = result.toFixed(decimals);
+    result = localeNumberFormat.format(result.toFixed(decimals));
   }
   const retstr = `${result} ${unit}`;
   return retstr;

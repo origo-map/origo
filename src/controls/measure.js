@@ -129,8 +129,12 @@ const Measure = function Measure({
     zIndex: 8,
     styleName: 'origoStylefunction',
     attributes: [
-      { html: `${locLength}: {{@length(1)}}` },
-      { html: `${locArea}: {{@area(1)}}` }
+      { html: `${locLength}: {{@length(1)}}`,
+        localization
+      },
+      { html: `${locArea}: {{@area(1)}}`,
+        localization
+      }
     ],
     style(feature) {
       return styleFunction(feature, showSegmentLabels);
