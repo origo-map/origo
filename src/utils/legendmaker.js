@@ -243,16 +243,18 @@ export const renderExtendedThematicLegendItem = function renderExtendedThematicL
   return returnCmp;
 };
 
-let allFeatures = null;
+const allFeaturesMap = new Map();
 // Function to update the cluster layer based on the rule
 function updateCluster(layer, rule) {
   if (layer.get('layerType') !== 'cluster') {
     return;
   }
   const source = layer.getSource().getSource();
-  if (!allFeatures) {
-    allFeatures = source.getFeatures().slice();
+  const layerId = layer.get('id'); // Unique identifier for the layer
+  if (!allFeaturesMap.has(layerId)) {
+    allFeaturesMap.set(layerId, source.getFeatures().slice());
   }
+  const allFeatures = allFeaturesMap.get(layerId);
   const ruleFilter = rule[0].filter;
   const ruleVisibility = rule[0].visible;
   const modifiedRule = ruleFilter
