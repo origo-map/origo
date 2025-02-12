@@ -173,12 +173,14 @@ const getContent = {
       helperArg: feature.getGeometry(),
       localization: attribute.localization
     }, map);
-    const newElement = document.createElement('li');
-    if (typeof (attribute.cls) !== 'undefined') {
-      newElement.classList.add(attribute.cls);
-    }
-    newElement.innerHTML = val;
-    return newElement;
+    if (val) {
+      const newElement = document.createElement('li');
+      if (typeof (attribute.cls) !== 'undefined') {
+        newElement.classList.add(attribute.cls);
+      }
+      newElement.innerHTML = val;
+      return newElement;
+    } return null;
   }
 };
 

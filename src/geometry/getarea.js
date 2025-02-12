@@ -7,5 +7,7 @@ export default function getArea(geometryIn, decimals, map, localization) {
   if (geomType === 'Polygon' || geomType === 'MultiPolygon') {
     area = olGetArea(geometryIn, { projection: map.getView().getProjection() });
   }
+  if (area === 0) return 0;
+
   return formatAreaString(area, { decimals: decimals || 2, localization });
 }
