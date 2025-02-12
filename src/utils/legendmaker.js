@@ -243,6 +243,37 @@ export const renderExtendedThematicLegendItem = function renderExtendedThematicL
   return returnCmp;
 };
 
+let allFeatures = null;
+// Function to update the cluster layer based on the rule
+function updateCluster(layer, rule) {
+  if (layer.get('layerType') !== 'cluster') {
+    return;
+  }
+  const source = layer.getSource().getSource();
+  if (!allFeatures) {
+    allFeatures = source.getFeatures().slice();
+  }
+  const ruleFilter = rule[0].filter;
+  const ruleVisibility = rule[0].visible;
+  const modifiedRule = ruleFilter
+    .replace(/\bAND\b/g, '&&')
+    .replace(/\bOR\b/g, '||')
+    .replace(/\[([^\]]+)\]/g, (match, p1) => `feature.getProperties().${p1}`);
+  const visibleFeatures = [];
+  allFeatures.forEach((feature) => {
+    if (feature.get('isVisible') === undefined) {
+      feature.set('isVisible', true);
+    }
+    if (eval(modifiedRule)) {
+      feature.set('isVisible', ruleVisibility);
+    }
+    if (feature.get('isVisible')) {
+      visibleFeatures.push(feature);
+    }
+  });
+  source.clear();
+  source.addFeatures(visibleFeatures);
+}
 export const Legend = function Legend({
   styleRules, layer, viewer, clickable = true, opacity = 1
 } = {}) {
@@ -289,6 +320,7 @@ export const Legend = function Legend({
                     this.setIcon(!visible ? checkIcon : uncheckIcon);
                     thisStyle[index][0].visible = !visible;
                     layer.changed();
+                    updateCluster(layer, rule);
                   }
                 },
                 style: {
