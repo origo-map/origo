@@ -8,7 +8,6 @@ function formatLengthString(length, opts = {}) {
     decimals,
     localization
   } = opts;
-  const localeNumberFormat = new Intl.NumberFormat(localization.getCurrentLocaleId());
   let result = length;
   let unit = 'm';
   if (result > 1000) {
@@ -17,7 +16,9 @@ function formatLengthString(length, opts = {}) {
   }
 
   if (decimals !== undefined) {
-    result = localeNumberFormat.format(result.toFixed(decimals));
+    result = result.toFixed(decimals);
+    const localeNumberFormat = new Intl.NumberFormat(localization?.getCurrentLocaleId());
+    result = localeNumberFormat.format(result);
   }
   const retstr = `${result} ${unit}`;
   return retstr;

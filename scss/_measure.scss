@@ -1,3 +1,6 @@
+@use './ui/variables';
+@use './variables' as vars;
+
 .o-icon-minicons-square-vector {
   height: 1.4em;
   padding: .3em;
@@ -13,7 +16,7 @@
 .o-tooltip-measure {
   background: rgba(0, 0, 0, 0.4);
   border-radius: 4px;
-  color: $white;
+  color: variables.$white;
   font: 70% normal, sans-serif;
   opacity: 0.6;
   padding: 1px 2px;
@@ -26,7 +29,7 @@
 .o-measure-button-true .o-icon-steady-measure,
 .o-measure-button-true .o-icon-minicons-square-vector,
 .o-measure-button-true .o-icon-minicons-line-vector {
-  fill: $o-btn-active-color;
+  fill: vars.$o-btn-active-color;
 }
 
 .o-measure-snap .icon svg,

@@ -83,6 +83,9 @@ const Viewer = function Viewer(targetOption, options = {}) {
       const layers = {};
       capabilitiesResults.forEach(result => {
         layers[result.name] = result.capabilites;
+        if (source[result.name]?.saveCapabilitiesDoc !== false) {
+          source[result.name].capabilitiesDoc = result.capabilitesDoc;
+        }
       });
       return layers;
     }).catch(error => console.log(error));
@@ -494,22 +497,22 @@ const Viewer = function Viewer(targetOption, options = {}) {
       layers.forEach((layer) => {
         map.removeLayer(layer);
       });
+      const subgroups = groups.filter((item) => {
+        if (item.parent) {
+          return item.parent === groupName;
+        }
+        return false;
+      });
+      if (subgroups.length) {
+        subgroups.forEach((subgroup) => {
+          const name = subgroup.name;
+          this.removeGroup(name);
+        });
+      }
       const groupIndex = groups.indexOf(group);
       groups.splice(groupIndex, 1);
       this.dispatch('remove:group', {
         group
-      });
-    }
-    const subgroups = groups.filter((item) => {
-      if (item.parent) {
-        return item.parent === groupName;
-      }
-      return false;
-    });
-    if (subgroups.length) {
-      subgroups.forEach((subgroup) => {
-        const name = subgroup.name;
-        removeGroup(groups[name]);
       });
     }
   };
@@ -567,7 +570,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
       }));
 
       tileGrid = maputils.tileGrid(tileGridSettings);
-      stylewindow = Stylewindow({ palette, viewer: this });
+      stylewindow = Stylewindow({ palette, viewer: this, localization: controls.find((control) => control.name === 'localization') });
 
       setMap(Map(Object.assign(options, { projection, center, zoom, target: this.getId() })));
 

@@ -17,7 +17,8 @@ const Overlays = function Overlays(options) {
     cls: clsSettings = '',
     style: styleSettings = {},
     viewer,
-    labelOpacitySlider
+    labelOpacitySlider,
+    localization
   } = options;
 
   const cls = `${clsSettings} o-layerswitcher-overlays flex row overflow-auto`.trim();
@@ -106,7 +107,8 @@ const Overlays = function Overlays(options) {
       layer,
       style: layerStyle,
       position,
-      viewer
+      viewer,
+      localization
     });
     const groupName = layer.get('group');
     if (!nonGroupNames.includes(groupName)) {
@@ -121,8 +123,11 @@ const Overlays = function Overlays(options) {
     });
     readOverlays();
     overlays.forEach(overlay => {
-      if (!existing.find(eOverlay => eOverlay.name === overlay.name)) {
+      const exist = existing.find(eOverlay => eOverlay.name === (overlay.name || overlay.get('name')));
+      if (!exist) {
         addLayer(overlay, { position: 'bottom' });
+      } else {
+        document.getElementById(exist.getId()).classList.remove('hidden');
       }
     });
 
@@ -142,6 +147,7 @@ const Overlays = function Overlays(options) {
       this.on('readOverlays', () => {
         updateVisibleOverlays();
       });
+      viewer.getMap().getLayers().on('add', updateVisibleOverlays.bind(this));
     },
     hasOverlays,
     onRender() {
@@ -154,7 +160,7 @@ const Overlays = function Overlays(options) {
           const layer = evt.detail.layer;
           const parent = this;
           const layerProperties = LayerProperties({
-            layer, viewer, parent, labelOpacitySlider
+            layer, viewer, parent, labelOpacitySlider, localization
           });
           slidenav.setSecondary(layerProperties);
           slidenav.slideToSecondary();

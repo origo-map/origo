@@ -1,12 +1,14 @@
-$button-color-default: $white;
-$button-scale: $base-scale;
-$button-round: $radius-round;
+@use './variables';
+
+$button-color-default: variables.$white;
+$button-scale: variables.$base-scale;
+$button-round: variables.$radius-round;
 $button-padding-compact: 0;
-$button-padding-smallest: $padding-smallest;
-$button-padding-small: $padding-smaller $padding-smaller * 1.5;
-$button-padding-medium: $padding-small $padding-small * 1.5;
-$button-padding-large: $padding-standard $padding-standard * 1.5;
-$button-divider-color: $grey-lighter;
+$button-padding-smallest: variables.$padding-smallest;
+$button-padding-small: variables.$padding-smaller variables.$padding-smaller * 1.5;
+$button-padding-medium: variables.$padding-small variables.$padding-small * 1.5;
+$button-padding-large: variables.$padding-standard variables.$padding-standard * 1.5;
+$button-divider-color: variables.$grey-lighter;
 
 .button,
 button {
@@ -27,7 +29,7 @@ button {
     padding: $button-padding-medium;
 
     &.round {
-      padding: $padding-small;
+      padding: variables.$padding-small;
     }
   }
 
@@ -35,7 +37,7 @@ button {
     padding: $button-padding-large;
 
     &.round {
-      padding: $padding-standard;
+      padding: variables.$padding-standard;
     }
   }
 
@@ -43,7 +45,7 @@ button {
     padding: $button-padding-small;
 
     &.round {
-      padding: $padding-smaller;
+      padding: variables.$padding-smaller;
     }
   }
 
@@ -51,7 +53,7 @@ button {
     padding: $button-padding-smallest;
 
     &.round {
-      padding: $padding-smallest;
+      padding: variables.$padding-smallest;
     }
   }
 
@@ -60,85 +62,85 @@ button {
   }
 
   &.primary {
-    background-color: $primary-color;
+    background-color: variables.$primary-color;
   }
 
   &.danger {
-    background-color: $danger-color;
+    background-color: variables.$danger-color;
   }
 
   &.light {
-    background-color: $light-color;
+    background-color: variables.$light-color;
   }
 
   &.grey {
-    background-color: $grey;
+    background-color: variables.$grey;
   }
 
   &.grey-light {
-    background-color: $grey-light;
+    background-color: variables.$grey-light;
   }
 
   &.grey-lighter {
-    background-color: $grey-lighter;
+    background-color: variables.$grey-lighter;
   }
 
   &.grey-lightest {
-    background-color: $grey-lightest;
+    background-color: variables.$grey-lightest;
   }
 
   &.border {
-    border: 2px solid $white;
+    border: 2px solid variables.$white;
 
     &.active {
-      border: 2px solid $grey-light;
+      border: 2px solid variables.$grey-light;
     }
 
     &.active:hover {
-      border: 2px solid $grey-light;
+      border: 2px solid variables.$grey-light;
     }
 
     &.active:focus {
-      border: 2px solid $grey-light;
+      border: 2px solid variables.$grey-light;
     }
 
     &.active:focus:not(:focus-visible) {
-      border: 2px solid $grey-light;
+      border: 2px solid variables.$grey-light;
     }
   }
 
   &.border:hover {
-    border: 2px solid $grey-lighter;
+    border: 2px solid variables.$grey-lighter;
   }
 
   &.border:focus {
-    border: 2px solid $grey-lighter;
+    border: 2px solid variables.$grey-lighter;
   }
 
   &.border:focus:not(:focus-visible) {
-    border: 2px solid $grey-lighter;
+    border: 2px solid variables.$grey-lighter;
   }
 
   &.border {
     &.primary {
-      border: 2px solid $primary-color-light;
+      border: 2px solid variables.$primary-color-light;
     }
 
     &.primary:hover {
-      border: 2px solid $primary-color-dark;
+      border: 2px solid variables.$primary-color-dark;
     }
 
     &.primary:focus {
-      border: 2px solid $primary-color-dark;
+      border: 2px solid variables.$primary-color-dark;
     }
 
     &.primary:focus:not(:focus-visible) {
-      border: 2px solid $primary-color-dark;
+      border: 2px solid variables.$primary-color-dark;
     }
 
     &.primary {
       &.active {
-        border: 2px solid $primary-color-dark;
+        border: 2px solid variables.$primary-color-dark;
       }
     }
   }
@@ -162,109 +164,109 @@ button,
 button:hover,
 .button:hover {
   &.light:hover {
-    background-color: $grey-lightest;
+    background-color: variables.$grey-lightest;
   }
 
   &.primary:hover {
-    background-color: $primary-color-dark;
+    background-color: variables.$primary-color-dark;
   }
 
   &.danger:hover {
-    background-color: $danger-color-dark;
+    background-color: variables.$danger-color-dark;
   }
 
   &.grey-light:hover {
-    background-color: $grey;
+    background-color: variables.$grey;
   }
 
   &.grey-lighter:hover {
-    background-color: $grey-light;
+    background-color: variables.$grey-light;
   }
 
   &.grey-lightest:hover {
-    background-color: $grey-lighter;
+    background-color: variables.$grey-lighter;
   }
 }
 
 button:focus,
 .button:focus {
   &.light:focus {
-    background-color: $grey-light;
-    border: 1px solid $black;
+    background-color: variables.$grey-light;
+    border: 1px solid variables.$black;
   }
 
   &.primary:focus {
-    background-color: $primary-color-dark;
-    border: 1px solid $black;
+    background-color: variables.$primary-color-dark;
+    border: 1px solid variables.$black;
   }
 
   &.danger:focus {
-    background-color: $danger-color-dark;
-    border: 1px solid $black;
+    background-color: variables.$danger-color-dark;
+    border: 1px solid variables.$black;
   }
 
   &.grey-light:focus {
-    background-color: $grey;
-    border: 1px solid $black;
+    background-color: variables.$grey;
+    border: 1px solid variables.$black;
   }
 
   &.grey-lighter:focus {
-    background-color: $grey-light;
-    border: 1px solid $black;
+    background-color: variables.$grey-light;
+    border: 1px solid variables.$black;
   }
 
   &.grey-lightest:focus {
-    background-color: $grey-lighter;
-    border: 1px solid $black;
+    background-color: variables.$grey-lighter;
+    border: 1px solid variables.$black;
   }
 
   &.icon-small:focus {
-    border: 1px solid $black;
+    border: 1px solid variables.$black;
   }
 
   &.icon-smaller:focus {
-    border: 1px solid $black;
+    border: 1px solid variables.$black;
   }
 
   &.icon-smallest:focus {
-    border: 1px solid $black;
+    border: 1px solid variables.$black;
   }
 }
 
 button:focus:not(:focus-visible),
 .button:focus:not(:focus-visible) {
   &.light:focus:not(:focus-visible) {
-    background-color: $light-color;
+    background-color: variables.$light-color;
     border: 0;
   }
 
   &.light:focus:not([class*='icon']):not(:focus-visible) {
-    background-color: $grey-lighter;
+    background-color: variables.$grey-lighter;
     border: 0;
   }
 
   &.primary:focus:not(:focus-visible) {
-    background-color: $primary-color;
+    background-color: variables.$primary-color;
     border: 0;
   }
 
   &.danger:focus:not(:focus-visible) {
-    background-color: $danger-color;
+    background-color: variables.$danger-color;
     border: 0;
   }
 
   &.grey-light:focus:not(:focus-visible) {
-    background-color: $grey-light;
+    background-color: variables.$grey-light;
     border: 0;
   }
 
   &.grey-lighter:focus:not(:focus-visible) {
-    background-color: $grey-lighter;
+    background-color: variables.$grey-lighter;
     border: 0;
   }
 
   &.grey-lightest:focus:not(:focus-visible) {
-    background-color: $grey-lightest;
+    background-color: variables.$grey-lightest;
     border: 0;
   }
 
@@ -273,7 +275,7 @@ button:focus:not(:focus-visible),
   }
 
   &.icon-bg:focus:not(:focus-visible) {
-    border: 2px solid $grey-light;
+    border: 2px solid variables.$grey-light;
   }
 
   &.icon-smaller:focus:not(:focus-visible) {
@@ -288,7 +290,7 @@ button:focus:not(:focus-visible),
 button.active,
 .button.active {
   &.light:not([class*='icon']) {
-    background-color: $grey-lighter;
+    background-color: variables.$grey-lighter;
   }
 }
 

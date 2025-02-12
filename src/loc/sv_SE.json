@@ -70,19 +70,138 @@
             "portraitAriaLabel": "Stående",
             "landscape": "Liggande",
             "landscapeAriaLabel": "Liggande"
+        },
+        "draw": {
+            "title": "Rita",
+            "popupSaveButton": "Spara",
+            "popupCancelButton": "Avbryt",
+            "popupPlaceholderText": "Ange popuptext",
+            "popupTextModalTitle": "Popuptext",
+            "layerDialogLayerNamePlaceholder": "Ange lagernamn",
+            "layerDialogActivateLayerTooltip": "Aktivera ritlager",
+            "layerDialogDeleteLayerConfirm": "Vill du radera det här ritlagret?",
+            "layerDialogDeleteLayerTooltip": "Radera ritlager",
+            "layerDialogDownloadLayerTooltip": "Ladda ner ritlager",
+            "layerDialogAddLayerButton": "Nytt ritlager",
+            "layerDialogImportLayerButton": "Importera ritlager",
+            "layerDialogOkButton": "OK",
+            "layerDialogTitle": "Ritlager",
+            "pointButtonTooltip": "Punkt",
+            "lineButtonTooltip": "Linje",
+            "polygonButtonTooltip": "Polygon",
+            "textButtonTooltip": "Text",
+            "attributeButtonTooltip": "Attribut",
+            "styleButtonTooltip": "Stil",
+            "layerButtonTooltip": "Lager",
+            "saveButtonTooltip": "Spara",
+            "downloadButtonTooltip": "Ladda ner",
+            "deleteButtonTooltip": "Ta bort",
+            "closeButtonTooltip": "Stäng",
+            "drawLayerTitleDefault": "Ritlager",
+            "drawGroupTitleDefault": "Ritlager",
+            "drawPolygon": "Polygon",
+            "drawPoint": "Punkt",
+            "drawLine": "Linje",
+            "drawBox": "Rektangel",
+            "drawSquare": "Fyrkant",
+            "drawCircle": "Cirkel",
+            "drawFreehand": "Frihand"
+        },
+        "bookmarks": {
+            "title": "Bokmärken",
+            "close": "Stäng",
+            "bookmarkLabel": "Bokmärke för"
+        },
+        "externalurl": {
+            "tooltipText": "Visa kartan i en extern karttjänst",
+            "noUrl": "Ingen URL är angiven i konfigurationen",
+            "linkTooltipText": "Öppna länk"
+        },
+        "draganddrop": {
+            "addFromFile": "Lägg till från fil",
+            "yourLayersName": "egna-lager",
+            "yourLayersTitle": "Egna lager"
+        },
+        "legend": {
+            "placeholderText": "Sök lager",
+            "turnOffLayersTitle": "Släck alla lager",
+            "showVisibleTitle": "Visa endast tända lager",
+            "showAllVisibleTitle": "Visa alla lager",
+            "turnOnLayersTitle": "Tänd alla lager",
+            "addLayerTitle": "Lägg till lager",
+            "selectHandlerError": "Search options are missing",
+            "titleMissing": "Titel saknas",
+            "layerSwitcher": "Lagerbytare",
+            "close": "Stäng",
+            "layer": "Lager",
+            "addLayerWarningGroup": "Grupp",
+            "addLayerWarningDNE": "finns inte",
+            "layerTitleMissing": "Titel saknas",
+            "layerIcon": "Lager ikon",
+            "toggleLayer": "Växla lagersynlighet",
+            "showInfoMenuItem": "Visa",
+            "layerInfoMenuItem": "lagerinformation",
+            "groupInfoMenuItem": "gruppinformation",
+            "zoomToExtentMenuItem": "Zooma till",
+            "exportLayerTitle": "export",
+            "exportLayerSave": "Spara lager",
+            "removeLayerQuestion": "Vill du ta bort lagret?",
+            "removeLayer": "Ta bort lager",
+            "moreInfoButtonLabel": "Visa lagerinfo",
+            "renderStyleSelect": "Välj stil"
+        },
+        "zoom": {
+            "zoomInButtonTooltip": "Zooma in i kartan",
+            "zoomOutButtonTooltip": "Zooma ut i kartan"
+        },
+        "home": {
+            "zoomHomeButtonTooltip": "Zooma till hela kartan"
+        },
+        "geoposition": {
+            "positionButtonTooltip": "Visa din nuvarande position i kartan"
+        },
+        "about": {
+            "title": "Om kartan"
         }
-
     },
     "style": {
         "drawStyles": {
             "modifyTooltip": "Dra för att ändra"
         },
         "styleWindow": {
-            "title": "Configure style"
+            "title": "Definiera stil"
 
         },
         "styleTemplate": {
-
+            "fillColor": "Fyllning",
+            "backgroundFillColor": "Bakgrundsfyllning",
+            "opacity": "Opacitet",
+            "strokeWidth": "Linjebredd",
+            "textSize": "Textstorlek",
+            "pointSize": "Punktstorlek",
+            "showLengthArea": "Visa längd/area",
+            "showSegments": "Visa dellängder",
+            "stroke": "Linje",
+            "strokeTypeSolid": "Heldragen linje",
+            "strokeTypeDotted": "Punktad linje",
+            "strokeTypeDashed" : "Streckad linje",
+            "strokeTypeDashedDotted" : "Streck-punkt-linje",
+            "dimensions": "Mått",
+            "margins": "Marginaler",
+            "rotation": "Rotation",
+            "degreesRotation": "Grader",
+            "marginForText": "Marginal",
+            "frame": "Ram",
+            "margin": "Marginal",
+            "point": "Punkt",
+            "pointTypePoint": "Punkt",
+            "pointTypeCircle": "Cirkel",
+            "pointTypeX": "Kryss",
+            "pointTypePlus": "Kors",
+            "pointTypeStar": "Stjärna",
+            "pointTypeTriangle": "Tringel",
+            "pointTypeSquare": "Fyrkant",
+            "pointTypeMarker": "Markör"
         }
     }
 }

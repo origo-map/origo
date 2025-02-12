@@ -1,3 +1,5 @@
+@use './variables';
+
 .glide {
   &__bullets {
     position: relative;
@@ -8,18 +10,18 @@
   }
 
   &__bullet {
-    background-color: $o-glide-bullets-color;
+    background-color: variables.$o-glide-bullets-color;
     padding: 0.4em;
 
     &--active {
-      background-color: $o-glide-bullets-color--active;
+      background-color: variables.$o-glide-bullets-color--active;
     }
 
     &:hover {
-      background-color: $o-glide-bullets-color-hover
+      background-color: variables.$o-glide-bullets-color-hover
     }
     &:focus {
-      background-color: $o-glide-bullets-color-focus
+      background-color: variables.$o-glide-bullets-color-focus
     }
 
   }

@@ -1,3 +1,5 @@
+@use './variables';
+
 .o-button-container {
   border-radius: 4px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
@@ -9,10 +11,10 @@
 }
 
 .o-button {
-  background-color: $o-btn-bg;
+  background-color: variables.$o-btn-bg;
   border: 0;
   border-radius: 4px;
-  color: $o-btn-color;
+  color: variables.$o-btn-color;
   cursor: pointer;
   display: inline-block;
   font-size: 1rem;
@@ -31,8 +33,8 @@
 
 .o-button:hover,
 .o-button:focus {
-  background-color: $o-btn-hover-bg;
-  color: $o-btn-hover-color;
+  background-color: variables.$o-btn-hover-bg;
+  color: variables.$o-btn-hover-color;
   text-decoration: none;
 }
 
@@ -56,12 +58,12 @@
 }
 
 .o-button-lg {
-  background-color: $o-btn-bg;
+  background-color: variables.$o-btn-bg;
   border: 0;
   border-radius: 50%;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
-  color: $o-btn-color;
+  color: variables.$o-btn-color;
   cursor: pointer;
   display: inline-block;
   height: 2.5rem;

@@ -1,6 +1,8 @@
+@use './variables' as vars;
+
 [class^='o-icon-'],
 [class*=' o-icon-'] {
-  fill: $o-btn-color;
+  fill: vars.$o-btn-color;
   float: right;
   height: 1.3em;
   padding: .35em;
@@ -9,7 +11,7 @@
 
 [class^='o-icon-24'],
 [class*=' o-icon-24'] {
-  fill: $o-btn-color;
+  fill: vars.$o-btn-color;
   height: 1.5rem;
   padding: 0;
   width: 1.5rem;
@@ -24,19 +26,19 @@
 
 .o-image-carousel [class^='o-icon-'],
 .o-image-carousel [class*=' o-icon-'] {
-  fill: $o-btn-color;
+  fill: vars.$o-btn-color;
 }
 
 .ol-control>button:hover [class^='o-icon-'],
 .ol-control>button:hover [class*=' o-icon-'],
 .o-button:hover [class^='o-icon-'],
 .o-button:hover [class*='o-icon-'] {
-  fill: $o-btn-bg;
+  fill: vars.$o-btn-bg;
 }
 
 .o-toolbar button:hover [class^='o-icon-'],
 .o-toolbar button:hover [class*='o-icon-'] {
-  fill: $o-btn-active-color;
+  fill: vars.$o-btn-active-color;
 }
 
 button.o-disabled:hover [class^='o-icon-'],

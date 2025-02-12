@@ -140,8 +140,8 @@ function createRegularShape(type, pointSize, pointFill, pointStroke, pointRotati
   return style;
 }
 
-function formatLength(line, projection, localization) {
-  const localeNumberFormat = new Intl.NumberFormat(localization.getCurrentLocaleId());
+function formatLength({ line, projection, localization }) {
+  const localeNumberFormat = localization?.getCurrentLocaleId() ? new Intl.NumberFormat(localization?.getCurrentLocaleId()) : new Intl.NumberFormat();
 
   const length = getLength(line, { projection });
   let output;
@@ -153,12 +153,10 @@ function formatLength(line, projection, localization) {
   return output;
 }
 
-function formatArea(polygon, useHectare, projection, featureArea, localization) {
+function formatArea({ polygon, useHectare, projection, featureArea, localization }) {
   const area = featureArea || getArea(polygon, { projection });
-  console.log('area');
-  console.log(area);
 
-  const localeNumberFormat = new Intl.NumberFormat(localization.getCurrentLocaleId());
+  const localeNumberFormat = localization?.getCurrentLocaleId() ? new Intl.NumberFormat(localization?.getCurrentLocaleId()) : new Intl.NumberFormat();
   let output;
   if (area > 10000000) {
     output = `${localeNumberFormat.format(Math.round((area / 1000000) * 100) / 100)} km\xB2`;
@@ -171,7 +169,7 @@ function formatArea(polygon, useHectare, projection, featureArea, localization) 
 }
 
 function formatRadius(feat, localization) {
-  const localeNumberFormat = new Intl.NumberFormat(localization.getCurrentLocaleId());
+  const localeNumberFormat = localization?.getCurrentLocaleId() ? new Intl.NumberFormat(localization?.getCurrentLocaleId()) : new Intl.NumberFormat();
   let output;
   const length = feat.getGeometry().getRadius();
   if (length > 10000) {
@@ -406,7 +404,7 @@ function getSegmentLabelStyle({ line, projection, scale = 1, segmentStyles = [],
   const style = [];
   line.forEachSegment((a, b) => {
     const segment = new LineString([a, b]);
-    const segmentLabel = formatLength(segment, projection, localization);
+    const segmentLabel = formatLength({ line: segment, projection, localization });
     if (segmentStyles.length - 1 < count) {
       segmentStyles.push(segmentStyle(scale).clone());
     }

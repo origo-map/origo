@@ -1,4 +1,6 @@
-$position-margin: $app-margin;
+@use '../variables';
+
+$position-margin: variables.$app-margin;
 $position-no-margin: 0;
 
 .bottom-right {

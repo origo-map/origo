@@ -1,12 +1,13 @@
-@import './animations';
-@import './colors';
-@import './margin';
-@import './padding';
-@import './position';
-@import './sizes';
-@import './spacing';
-@import './text';
-@import './zindex';
+@use '../variables';
+@use './animations';
+@use './colors';
+@use './margin';
+@use './padding';
+@use './position';
+@use './sizes';
+@use './spacing';
+@use './text';
+@use './zindex';
 
 .transparent {
   background-color: transparent;
@@ -31,7 +32,7 @@
 }
 
 .boxshadow-subtle {
-  box-shadow: $shadow-subtle;
+  box-shadow: variables.$shadow-subtle;
 }
 
 
@@ -100,73 +101,73 @@
 
 // box-shadow
 .box-shadow {
-  box-shadow: $shadow;
+  box-shadow: variables.$shadow;
 }
 
 .box-shadow-subtle {
-  box-shadow: $shadow-subtle;
+  box-shadow: variables.$shadow-subtle;
 }
 
 // border-radius
 .round {
-  border-radius: $radius-round;
+  border-radius: variables.$radius-round;
   overflow: hidden;
 }
 
 .rounded {
-  border-radius: $radius-small;
+  border-radius: variables.$radius-small;
   overflow: hidden;
 }
 
 .rounded-large {
-  border-radius: $radius-large;
+  border-radius: variables.$radius-large;
   overflow: hidden;
 }
 
 .rounded-larger {
-  border-radius: $radius-larger;
+  border-radius: variables.$radius-larger;
   overflow: hidden;
 }
 
 .rounded-top {
-  border-radius: $radius-small $radius-small 0 0;
+  border-radius: variables.$radius-small variables.$radius-small 0 0;
   overflow: hidden;
 }
 
 .rounded-right {
-  border-radius: 0 $radius-small $radius-small 0;
+  border-radius: 0 variables.$radius-small variables.$radius-small 0;
   overflow: hidden;
 }
 
 .rounded-bottom {
-  border-radius: 0 0 $radius-small $radius-small;
+  border-radius: 0 0 variables.$radius-small variables.$radius-small;
   overflow: hidden;
 }
 
 .rounded-left {
-  border-radius: $radius-small 0  0 $radius-small;
+  border-radius: variables.$radius-small 0  0 variables.$radius-small;
   overflow: hidden;
 }
 
 // border
 .border {
-  border: 1px solid $border-color;
+  border: 1px solid variables.$border-color;
 }
 
 .border-top {
-  border-top: 1px solid $border-color;
+  border-top: 1px solid variables.$border-color;
 }
 
 .border-bottom {
-  border-bottom: 1px solid $border-color;
+  border-bottom: 1px solid variables.$border-color;
 }
 
 .border-left {
-  border-left: 1px solid $border-color;
+  border-left: 1px solid variables.$border-color;
 }
 
 .border-right {
-  border-right: 1px solid $border-color;
+  border-right: 1px solid variables.$border-color;
 }
 
 // box-sizing

@@ -1,187 +1,189 @@
+@use '../variables';
+
 // standard padding
 .padding {
-  padding: $padding-standard;
+  padding: variables.$padding-standard;
 }
 
 .padding-top {
-  padding-top: $padding-standard;
+  padding-top: variables.$padding-standard;
 }
 
 .padding-right {
-  padding-right: $padding-standard;
+  padding-right: variables.$padding-standard;
 }
 
 .padding-bottom {
-  padding-bottom: $padding-standard;
+  padding-bottom: variables.$padding-standard;
 }
 
 .padding-left {
-  padding-left: $padding-standard;
+  padding-left: variables.$padding-standard;
 }
 
 .padding-x {
-  padding-left: $padding-standard;
-  padding-right: $padding-standard;
+  padding-left: variables.$padding-standard;
+  padding-right: variables.$padding-standard;
 }
 
 .padding-y {
-  padding-bottom: $padding-standard;
-  padding-top: $padding-standard;
+  padding-bottom: variables.$padding-standard;
+  padding-top: variables.$padding-standard;
 }
 
 // large padding
 .padding-large {
-  padding: $padding-large;
+  padding: variables.$padding-large;
 }
 
 .padding-top-large {
-  padding-top: $padding-large;
+  padding-top: variables.$padding-large;
 }
 
 .padding-right-large {
-  padding-right: $padding-large;
+  padding-right: variables.$padding-large;
 }
 
 .padding-bottom-large {
-  padding-bottom: $padding-large;
+  padding-bottom: variables.$padding-large;
 }
 
 .padding-left-large {
-  padding-left: $padding-large;
+  padding-left: variables.$padding-large;
 }
 
 .padding-x-large {
-  padding-left: $padding-large;
-  padding-right: $padding-large;
+  padding-left: variables.$padding-large;
+  padding-right: variables.$padding-large;
 }
 
 .padding-y-large {
-  padding-bottom: $padding-large;
-  padding-top: $padding-large;
+  padding-bottom: variables.$padding-large;
+  padding-top: variables.$padding-large;
 }
 
 // larger padding
 .padding-larger {
-  padding: $padding-larger;
+  padding: variables.$padding-larger;
 }
 
 .padding-top-larger {
-  padding-top: $padding-larger;
+  padding-top: variables.$padding-larger;
 }
 
 .padding-right-larger {
-  padding-right: $padding-larger;
+  padding-right: variables.$padding-larger;
 }
 
 .padding-bottom-larger {
-  padding-bottom: $padding-larger;
+  padding-bottom: variables.$padding-larger;
 }
 
 .padding-left-larger {
-  padding-left: $padding-larger;
+  padding-left: variables.$padding-larger;
 }
 
 .padding-x-larger {
-  padding-left: $padding-larger;
-  padding-right: $padding-larger;
+  padding-left: variables.$padding-larger;
+  padding-right: variables.$padding-larger;
 }
 
 .padding-y-larger {
-  padding-bottom: $padding-larger;
-  padding-top: $padding-larger;
+  padding-bottom: variables.$padding-larger;
+  padding-top: variables.$padding-larger;
 }
 
 // small padding
 .padding-small {
-  padding: $padding-small;
+  padding: variables.$padding-small;
 }
 
 .padding-top-small {
-  padding-top: $padding-small;
+  padding-top: variables.$padding-small;
 }
 
 .padding-right-small {
-  padding-right: $padding-small;
+  padding-right: variables.$padding-small;
 }
 
 .padding-bottom-small {
-  padding-bottom: $padding-small;
+  padding-bottom: variables.$padding-small;
 }
 
 .padding-left-small {
-  padding-left: $padding-small;
+  padding-left: variables.$padding-small;
 }
 
 .padding-x-small {
-  padding-left: $padding-small;
-  padding-right: $padding-small;
+  padding-left: variables.$padding-small;
+  padding-right: variables.$padding-small;
 }
 
 .padding-y-small {
-  padding-bottom: $padding-small;
-  padding-top: $padding-small;
+  padding-bottom: variables.$padding-small;
+  padding-top: variables.$padding-small;
 }
 
 // smaller padding
 .padding-smaller {
-  padding: $padding-smaller;
+  padding: variables.$padding-smaller;
 }
 
 .padding-top-smaller {
-  padding-top: $padding-smaller;
+  padding-top: variables.$padding-smaller;
 }
 
 .padding-right-smaller {
-  padding-right: $padding-smaller;
+  padding-right: variables.$padding-smaller;
 }
 
 .padding-bottom-smaller {
-  padding-bottom: $padding-smaller;
+  padding-bottom: variables.$padding-smaller;
 }
 
 .padding-left-smaller {
-  padding-left: $padding-smaller;
+  padding-left: variables.$padding-smaller;
 }
 
 .padding-x-smaller {
-  padding-left: $padding-smaller;
-  padding-right: $padding-smaller;
+  padding-left: variables.$padding-smaller;
+  padding-right: variables.$padding-smaller;
 }
 
 .padding-y-smaller {
-  padding-bottom: $padding-smaller;
-  padding-top: $padding-smaller;
+  padding-bottom: variables.$padding-smaller;
+  padding-top: variables.$padding-smaller;
 }
 
 // smallest padding
 .padding-smallest {
-  padding: $padding-smallest;
+  padding: variables.$padding-smallest;
 }
 
 .padding-top-smallest {
-  padding-top: $padding-smallest;
+  padding-top: variables.$padding-smallest;
 }
 
 .padding-right-smallest {
-  padding-right: $padding-smallest;
+  padding-right: variables.$padding-smallest;
 }
 
 .padding-bottom-smallest {
-  padding-bottom: $padding-smallest;
+  padding-bottom: variables.$padding-smallest;
 }
 
 .padding-left-smallest {
-  padding-left: $padding-smallest;
+  padding-left: variables.$padding-smallest;
 }
 
 .padding-x-smallest {
-  padding-left: $padding-smallest;
-  padding-right: $padding-smallest;
+  padding-left: variables.$padding-smallest;
+  padding-right: variables.$padding-smallest;
 }
 
 .padding-y-smallest {
-  padding-bottom: $padding-smallest;
-  padding-top: $padding-smallest;
+  padding-bottom: variables.$padding-smallest;
+  padding-top: variables.$padding-smallest;
 }
 
 // no padding
