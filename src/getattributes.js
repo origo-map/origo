@@ -129,7 +129,7 @@ const getContent = {
       if (featGet) {
         const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.img), attributes, null, map));
         const attribution = attribute.attribution ? `<div class="o-image-attribution">${attribute.attribution}</div>` : '';
-        val = `<div class="o-image-container"><a class="o-identify-link-modal" href="${url}" target="modal-full" title="Bild" onclickmodal="true"><img src="${url}"></a>${attribution}</div>`;
+        val = `<div class="o-image-container"><img src="${url}">${attribution}</div>`;
       }
     }
     const newElement = document.createElement('li');
