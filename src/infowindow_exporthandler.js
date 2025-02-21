@@ -126,7 +126,7 @@ export function layerSpecificExportHandler(url, requestMethod, urlParameters, ac
   // the list will be separated by semicolons.
   // Specifying a value as null will add a valueless parameter, e g "?Param1&Param2&etc".
   let requestUrl = url;
-  const requestParams = { ...urlParameters };
+  const requestParams = urlParameters ? { ...urlParameters } : undefined;
   if (requestParams) {
     const uniquePlaceholder = '8c155776-cbd7-4b24-a384-87c694a39ff2';
     Object.keys(requestParams).forEach((param) => {
@@ -144,7 +144,7 @@ export function layerSpecificExportHandler(url, requestMethod, urlParameters, ac
       }
     });
     requestUrl = new URL(url);
-    requestUrl.search = new URLSearchParams(requestParams);
+    requestUrl.search = new URLSearchParams([...new URLSearchParams(requestUrl.search), ...new URLSearchParams(requestParams)]);
     requestUrl = requestUrl.toString().replace(new RegExp(`=${uniquePlaceholder}(&|$)`, 'gm'), '$1');
   }
 
