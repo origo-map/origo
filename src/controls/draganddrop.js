@@ -11,6 +11,11 @@ const DragAndDrop = function DragAndDrop(options = {}) {
   let viewer;
   let map;
   let legendButton;
+  const localization = options.localization;
+
+  function localize(key) {
+    return localization.getStringByKeys({ targetParentKey: 'draganddrop', targetKey: key });
+  }
 
   if (options.showLegendButton) {
     const fileInput = InputFile({
@@ -45,8 +50,8 @@ const DragAndDrop = function DragAndDrop(options = {}) {
         inputEl.value = null;
         inputEl.click();
       },
-      text: 'Lägg till från fil',
-      ariaLabel: 'Lägg till från fil'
+      text: localize('addFromFile'),
+      ariaLabel: localize('addFromFile')
     });
 
     legendButton = El({
@@ -67,8 +72,8 @@ const DragAndDrop = function DragAndDrop(options = {}) {
         const legend = viewer.getControlByName('legend');
         legend.addButtonToTools(legendButton, 'addLayerButton');
       }
-      const groupName = options.groupName || 'egna-lager';
-      const groupTitle = options.groupTitle || 'Egna lager';
+      const groupName = options.groupName || localize('yourLayersName');
+      const groupTitle = options.groupTitle || localize('yourLayersTitle');
       const draggable = options.draggable || true;
       const promptlessRemoval = options.promptlessRemoval !== false;
       const styleByAttribute = options.styleByAttribute || false;

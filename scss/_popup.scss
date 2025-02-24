@@ -1,3 +1,6 @@
+@use './ui/variables';
+@use './variables' as vars;
+
 #o-popup {
   display: none;
   width: 270px;
@@ -51,7 +54,7 @@
 }
 
 .popup-top-center .o-popup::after {
-  border-bottom-color: $white;
+  border-bottom-color: variables.$white;
   border-width: 10px;
   top: -20px;
   left: 50%;
@@ -59,7 +62,7 @@
 }
 
 .popup-bottom-center .o-popup::after {
-  border-top-color: $white;
+  border-top-color: variables.$white;
   border-width: 10px;
   bottom: -20px;
   left: 50%;
@@ -67,7 +70,7 @@
 }
 
 .popup-center-left .o-popup::after {
-  border-right-color: $white;
+  border-right-color: variables.$white;
   border-width: 10px;
   left: -10px;
   top: calc(50% - 6px);
@@ -75,7 +78,7 @@
 }
 
 .popup-center-right .o-popup::after {
-  border-left-color: $white;
+  border-left-color: variables.$white;
   border-width: 10px;
   right: -20px;
   top: calc(50% - 6px);
@@ -94,12 +97,12 @@
   pointer-events: none;
   display: block;
 }
-&[class*=#{$media-l-m-s}] {
+[class*=#{vars.$media-l-m-s}] {
   #o-popup, .o-popup {
     width: 240px;
   }
 }
-&[class*=#{$media-l-m-s-xs}] {
+[class*=#{vars.$media-l-m-s-xs}] {
   #o-popup, .o-popup {
     width: 200px;
   }

@@ -40,7 +40,7 @@
       "name": "legend",
       "options": {
         "labelOpacitySlider": "Opacity",
-        "useGroupIndication" : true
+        "useGroupIndication": true
       }
     },
     {

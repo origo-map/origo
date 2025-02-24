@@ -1,14 +1,16 @@
-$icon-size-smallest: $size-1;
-$icon-size-smaller: $size-1-125;
-$icon-size-small: $size-4;
-$icon-size-medium: $size-5;
-$icon-size-large: $size-6;
-$icon-active-color: $primary-color;
-$icon-inactive-color: $grey;
-$icon-disabled-color: $grey-light;
-$icon-default-color: $grey-dark;
-$icon-primary-color: $primary-color;
-$icon-primary-inverse-color: $primary-color-inverse;
+@use './variables';
+
+$icon-size-smallest: variables.$size-1;
+$icon-size-smaller: variables.$size-1-125;
+$icon-size-small: variables.$size-4;
+$icon-size-medium: variables.$size-5;
+$icon-size-large: variables.$size-6;
+$icon-active-color: variables.$primary-color;
+$icon-inactive-color: variables.$grey;
+$icon-disabled-color: variables.$grey-light;
+$icon-default-color: variables.$grey-dark;
+$icon-primary-color: variables.$primary-color;
+$icon-primary-inverse-color: variables.$primary-color-inverse;
 
 .icon-smallest:not(.button):not(button) {
   height: $icon-size-smallest;
@@ -120,7 +122,7 @@ button.grey-light svg,
 .button.grey-light svg,
 .button.grey svg,
 button.grey svg {
-  fill: $white;
+  fill: variables.$white;
 }
 
 svg {
@@ -133,27 +135,27 @@ svg {
   }
 
   &.grey-dark {
-    fill: $grey-dark;
+    fill: variables.$grey-dark;
   }
 
   &.grey {
-    fill: $grey;
+    fill: variables.$grey;
   }
 
   &.grey-light {
-    fill: $grey-light;
+    fill: variables.$grey-light;
   }
 
   &.grey-lighter {
-    fill: $grey-lighter;
+    fill: variables.$grey-lighter;
   }
 
   &.grey-lightest {
-    fill: $grey-lightest;
+    fill: variables.$grey-lightest;
   }
 
   &.white {
-    fill: $white;
+    fill: variables.$white;
   }
 }
 

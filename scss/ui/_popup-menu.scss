@@ -1,12 +1,14 @@
-$popup-background-color: $white !default;
-$popup-radius: $radius-base;
-$popup-border-color: $grey-light;
+@use './variables';
+
+$popup-background-color: variables.$white !default;
+$popup-radius: variables.$radius-base;
+$popup-border-color: variables.$grey-light;
 
 .popup-menu {
   position: absolute;
   background-color: $popup-background-color;
   border-radius: $popup-radius;
-  box-shadow: $shadow;
+  box-shadow: variables.$shadow;
   overflow-x: hidden;
   overflow-y: hidden;
 }
@@ -14,7 +16,7 @@ $popup-border-color: $grey-light;
 .popup-menu > ul {
 
   > li {
-    margin: $margin-small;
+    margin: variables.$margin-small;
   }
 }
 

@@ -1,6 +1,7 @@
-@import './variables';
-@import './controls';
-@import './bullets';
+@use '../variables' as vars;
+@use './variables';
+@use './controls';
+@use './bullets';
 
 .glide {
   &__track {
@@ -25,7 +26,7 @@
   &__arrow {
     transform: translateY(-100%);
     box-shadow: none;
-    border: 1px solid $o-glide-border-color;
+    border: 1px solid variables.$o-glide-border-color;
     padding: .2em;
     background-color: rgba(255,255,255,0.6);
     transition: background-color 0.5s;
@@ -46,16 +47,16 @@
     padding: 0;
     border-radius: 0;
     &--active {
-      background-color: $o-btn-active-color;
+      background-color: vars.$o-btn-active-color;
     }
     &:hover {
-      background-color: $o-glide-bullets-color-hover
+      background-color: variables.$o-glide-bullets-color-hover
     }
   }
 }
 
 .o-image-carousel button.glide {
-  color: $o-glide-border-color;
+  color: variables.$o-glide-border-color;
   &__arrow {
     &--left {
       left: 1rem;
@@ -71,6 +72,6 @@
 
 @media (hover: none) {
   .glide__arrow:hover {
-    border-color: $o-glide-border-color;
+    border-color: variables.$o-glide-border-color;
   }
 }

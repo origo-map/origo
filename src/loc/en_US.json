@@ -69,7 +69,100 @@
             "portraitAriaLabel": "Portrait",
             "landscape": "Landscape",
             "landscapeAriaLabel": "Landscape"
+        },
+        "draw": {
+            "title": "Draw",
+            "popupSaveButton": "Save",
+            "popupCancelButton": "Cancel",
+            "popupPlaceholderText": "Enter popup text",
+            "popupTextModalTitle": "Popup text",
+            "layerDialogLayerNamePlaceholder": "Enter layer name",
+            "layerDialogActivateLayerTooltip": "Activate layer",
+            "layerDialogDeleteLayerConfirm": "Delete draw layer?",
+            "layerDialogDeleteLayerTooltip": "Delete draw layer",
+            "layerDialogDownloadLayerTooltip": "Download draw layer",
+            "layerDialogAddLayerButton": "New",
+            "layerDialogImportLayerButton": "Import",
+            "layerDialogOkButton": "OK",
+            "layerDialogTitle": "Draw layers",
+            "pointButtonTooltip": "Point",
+            "lineButtonTooltip": "Line",
+            "polygonButtonTooltip": "Polygon",
+            "textButtonTooltip": "Text",
+            "attributeButtonTooltip": "Attributes",
+            "styleButtonTooltip": "Style",
+            "layerButtonTooltip": "Layers",
+            "saveButtonTooltip": "Save",
+            "downloadButtonTooltip": "Download",
+            "deleteButtonTooltip": "Delete",
+            "closeButtonTooltip": "Close",
+            "drawLayerTitleDefault": "Draw layer",
+            "drawGroupTitleDefault": "Draw layers",
+            "drawPolygon": "Polygon",
+            "drawPoint": "Point",
+            "drawLine": "Line",
+            "drawBox": "Rectangle",
+            "drawSquare": "Square",
+            "drawCircle": "Circle",
+            "drawFreehand": "Freehand"
+        },
+        "bookmarks": {
+            "title": "Bookmarks",
+            "close": "Close",
+            "bookmarkLabel": "Bookmark for"
+        },
+        "externalurl": {
+            "tooltipText": "Display the map in an external map service",
+            "noUrl": "No URL is specified in the configuration",
+            "linkTooltipText": "Open link"
+        },
+        "draganddrop": {
+            "addFromFile": "Add from file",
+            "yourLayersName": "your-layers",
+            "yourLayersTitle": "Your layers"
+        },
+        "legend": {
+            "placeholderText": "Search for layer",
+            "turnOffLayersTitle": "Turn off all layers",
+            "showVisibleTitle": "Show only visible layers",
+            "showAllVisibleTitle": "Show all layers",
+            "turnOnLayersTitle": "Turn on all layers",
+            "addLayerTitle": "Add layer",
+            "selectHandlerError": "Search options are missing",
+            "titleMissing": "Title missing",
+            "layerSwitcher": "Layer Switcher",
+            "close": "Close",
+            "layer": "Layer",
+            "addLayerWarningGroup": "Group",
+            "addLayerWarningDNE": "does not exist",
+            "layerTitleMissing": "Title missing",
+            "layerIcon": "Layer icon",
+            "toggleLayer": "Toggle layer visibility",
+            "showInfoMenuItem": "Show",
+            "layerInfoMenuItem": "layer information",
+            "groupInfoMenuItem": "group information",
+            "zoomToExtentMenuItem": "Zoom to",
+            "exportLayerTitle": "export",
+            "exportLayerSave": "Save layer",
+            "removeLayerQuestion": "Do you want to remove the layer?",
+            "removeLayer": "Remove layer",
+            "moreInfoButtonLabel": "Show layer info",
+            "renderStyleSelect": "Select style"
+        },
+        "zoom": {
+            "zoomInButtonTooltip": "Zoom into the map",
+            "zoomOutButtonTooltip": "Zoom out in the map"
+        },
+        "home": {
+            "zoomHomeButtonTooltip": "Zoom to the entire map"
+        },
+        "geoposition": {
+            "positionButtonTooltip": "Show your current position on the map"
+        },
+        "about": {
+            "title": "About the map"
         }
+        
     },
     "style": {
         "drawStyles": {
@@ -80,7 +173,35 @@
 
         },
         "styleTemplate": {
-
+            "fillColor": "Fill",
+            "backgroundFillColor": "Background fill",
+            "opacity": "Opacity",
+            "strokeWidth": "Line width",
+            "textSize": "Text size",
+            "pointSize": "Point size",
+            "showLengthArea": "Show length/area",
+            "showSegments": "Show segments",
+            "stroke": "Line",
+            "strokeTypeSolid": "Solid line",
+            "strokeTypeDotted": "Dotted line",
+            "strokeTypeDashed" : "Dashed line",
+            "strokeTypeDashedDotted" : "Dash-dotted line",
+            "dimensions": "Dimensions",
+            "margins": "Margins",
+            "rotation": "Rotation",
+            "degreesRotation": "Degrees",
+            "marginForText": "Margin",
+            "frame": "Frame",
+            "margin": "Margin",
+            "point": "Point",
+            "pointTypePoint": "Point",
+            "pointTypeCircle": "Circle",
+            "pointTypeX": "X",
+            "pointTypePlus": "Plus",
+            "pointTypeStar": "Star",
+            "pointTypeTriangle": "Triangle",
+            "pointTypeSquare": "Square",
+            "pointTypeMarker": "Marker"
         }
     }
 }

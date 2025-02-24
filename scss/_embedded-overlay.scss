@@ -1,3 +1,5 @@
+@use './ui/variables';
+
 .o-embedded-overlay {
   background-color: rgba(37, 129, 196, 0.5);
   border-width: 0;
@@ -18,7 +20,7 @@
 }
 
 .o-embedded-overlay p {
-  color: $white;
+  color: variables.$white;
   font-family: Roboto,Arial,sans-serif;
   font-size: 20px;
   margin: 0 50px;

@@ -1,55 +1,57 @@
+@use './ui/variables';
+
 .o-bookmark-button:focus {
-  background-color: $grey-lighter;
+  background-color: variables.$grey-lighter;
 }
 
 .o-bookmark-button.light:focus {
-  background-color: $grey-lighter;
+  background-color: variables.$grey-lighter;
 }
 
 .o-bookmark-button.primary:focus {
-  background-color: $primary-color-dark;
+  background-color: variables.$primary-color-dark;
 }
 
 .o-bookmark-button.danger:focus {
-  background-color: $danger-color-dark;
+  background-color: variables.$danger-color-dark;
 }
 
 .o-bookmark-button.grey-light:focus {
-  background-color: $grey-light;
+  background-color: variables.$grey-light;
 }
 
 .o-bookmark-button.grey-lighter:focus {
-  background-color: $grey-lighter;
+  background-color: variables.$grey-lighter;
 }
 
 .o-bookmark-button.grey-lightest:focus {
-  background-color: $grey-lightest;
+  background-color: variables.$grey-lightest;
 }
 
 .o-bookmark-button:focus:not(:focus-visible) {
-  background-color: $light-color;
+  background-color: variables.$light-color;
 }
 
 .o-bookmark-button.light:focus:not(:focus-visible) {
-  background-color: $light-color;
+  background-color: variables.$light-color;
 }
 
 .o-bookmark-button.primary:focus:not(:focus-visible) {
-  background-color: $primary-color;
+  background-color: variables.$primary-color;
 }
 
 .o-bookmark-button.danger:focus:not(:focus-visible) {
-  background-color: $danger-color;
+  background-color: variables.$danger-color;
 }
 
 .o-bookmark-button.grey-light:focus:not(:focus-visible) {
-  background-color: $grey-light;
+  background-color: variables.$grey-light;
 }
 
 .o-bookmark-button.grey-lighter:focus:not(:focus-visible) {
-  background-color: $grey-lighter;
+  background-color: variables.$grey-lighter;
 }
 
 .o-bookmark-button.grey-lightest:focus:not(:focus-visible) {
-  background-color: $grey-lightest;
+  background-color: variables.$grey-lightest;
 }

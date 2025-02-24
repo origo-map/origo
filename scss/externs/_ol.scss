@@ -1,3 +1,6 @@
+@use '../ui/variables';
+@use '../variables' as vars;
+
 .ol-unsupported {
   display: none;
 }
@@ -48,7 +51,7 @@
 }
 
 .ol-control button {
-  background-color: $white;
+  background-color: variables.$white;
   border: 0;
   border-radius: 4px;
   color: #424242;
@@ -251,7 +254,7 @@ button.ol-zoom-out {
 }
 
 .ol-box {
-  border: 2px solid $blue;
+  border: 2px solid variables.$blue;
   border-radius: 2px;
   box-sizing: border-box;
 }
@@ -261,7 +264,7 @@ button.ol-zoom-out {
   border-color: #007aff;
   border-width: 3px;
 }
-&[class*=#{$media-l}] {
+[class*=#{vars.$media-l}] {
   .ol-scale-line,
   .ol-scale-line-inner {
     display: none;
@@ -304,7 +307,7 @@ button.ol-zoom-out {
   }
 }
 
-&[class*=#{$media-l}] {
+[class*=#{vars.$media-l}] {
   .ol-attribution {
     bottom: 1rem;
     left: 1rem;

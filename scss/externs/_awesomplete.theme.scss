@@ -1,10 +1,13 @@
+@use '../ui/variables';
+@use '../variables' as vars;
+
 .awesomplete > ul {
   background: hsla(0, 0%, 100%, .9);
-  background: linear-gradient(to bottom right, $white, hsla(0, 0%, 100%, .8));
+  background: linear-gradient(to bottom right, variables.$white, hsla(0, 0%, 100%, .8));
   border-radius: 0.3rem;
-  box-shadow: $shadow;
+  box-shadow: variables.$shadow;
   margin: 0.2em 0 0;
-  min-width: $search-width;
+  min-width: vars.$search-width;
   text-shadow: none;
 }
 @supports (transform: scale(0)) {
@@ -23,7 +26,7 @@
 }
 
 .awesomplete > ul > li {
-  border-bottom: 1px solid $search-border-color;
+  border-bottom: 1px solid vars.$search-border-color;
   cursor: pointer;
   font-size: 0.75rem;
   padding: 0;
@@ -43,7 +46,7 @@
 }
 
 .awesomplete > ul > li > .heading {
-  background-color: $search-heading-backround;
+  background-color: vars.$search-heading-backround;
   cursor: default;
   display: block;
   font-size: .75rem;
@@ -55,12 +58,12 @@
 }
 
 .awesomplete > ul > li .suggestion:hover {
-  background-color: $search-hover-backround;
+  background-color: vars.$search-hover-backround;
   color: #000;
 }
 
 .awesomplete > ul > li[aria-selected='true'] > .suggestion {
-  background-color: $search-hover-backround;
+  background-color: vars.$search-hover-backround;
   color: #000;
 }
 
@@ -74,7 +77,7 @@
 }
 
 .awesomplete li .suggestion:hover mark {
-  background-color: $search-hover-backround;
+  background-color: vars.$search-hover-backround;
 }
 
 .black li .suggestion:hover mark {
@@ -82,5 +85,5 @@
 }
 
 .awesomplete li[aria-selected='true'] mark {
-  background-color: $search-hover-backround;
+  background-color: vars.$search-hover-backround;
 }

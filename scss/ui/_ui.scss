@@ -1,32 +1,33 @@
-@import './variables';
+@use "sass:meta";
+@use './variables';
 
 .o-ui {
-  @import './utils/mixins';
-  @import './base/base';
-  @import './control';
-  @import './container';
-  @import './dropdown';
-  @import './flex';
-  @import './grid';
-  @import './box';
-  @import './input';
-  @import './button';
-  @import './collapse';
-  @import './icon';
-  @import './divider';
-  @import './list';
-  @import './toggle-group';
-  @import './slidenav';
-  @import './scrollbar';
-  @import './helpers/helpers';
-  @import './group-indication';
-  @import './popup-menu';
-  font-family: $font-family-base;
-  font-size: $font-size-base;
-  font-weight: $font-weight-base;
-  line-height: $line-height-base;
+  font-family: variables.$font-family-base;
+  font-size: variables.$font-size-base;
+  font-weight: variables.$font-weight-base;
+  line-height: variables.$line-height-base;
   position: absolute;
   width: 100%;
+  @include meta.load-css('utils/mixins');
+  @include meta.load-css('base/base');
+  @include meta.load-css('control');
+  @include meta.load-css('container');
+  @include meta.load-css('dropdown');
+  @include meta.load-css('flex');
+  @include meta.load-css('grid');
+  @include meta.load-css('box');
+  @include meta.load-css('input');
+  @include meta.load-css('button');
+  @include meta.load-css('collapse');
+  @include meta.load-css('icon');
+  @include meta.load-css('divider');
+  @include meta.load-css('list');
+  @include meta.load-css('toggle-group');
+  @include meta.load-css('slidenav');
+  @include meta.load-css('scrollbar');
+  @include meta.load-css('helpers/helpers');
+  @include meta.load-css('group-indication');
+  @include meta.load-css('popup-menu');
 }
 
 .app {

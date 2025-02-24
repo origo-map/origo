@@ -1,2 +1,2 @@
-@import 'awesomplete.base';
-@import 'awesomplete.theme';
+@use 'awesomplete.base' as awesompleteBase;
+@use 'awesomplete.theme' as awesompleteTheme;
