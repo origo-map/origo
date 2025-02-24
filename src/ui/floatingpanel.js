@@ -37,7 +37,7 @@ const FloatingPanel = function FloatingPanel(options = {}) {
     fpCmp?.dispatch('show');
     isActive = true;
   };
-  
+
   const remove = function remove() {
     fpEl?.parentNode.removeChild(fpEl);
     fpCmp?.dispatch('remove');
@@ -95,7 +95,11 @@ const FloatingPanel = function FloatingPanel(options = {}) {
         ariaLabel: 'Stäng',
         icon: closeIcon,
         click() {
-          removeOnClose ? remove() : hide();
+          if (removeOnClose) {
+            remove();
+          } else {
+            hide();
+          }
         }
       });
 
@@ -122,7 +126,7 @@ const FloatingPanel = function FloatingPanel(options = {}) {
     },
     render() {
       if (document.getElementById(floatingPanel.getId())) {
-        console.error("Already rendered");
+        console.error('Already rendered');
       } else {
         const newEl = html(floatingPanel.render());
         document.getElementById(viewer.getMain().getId()).appendChild(newEl);
