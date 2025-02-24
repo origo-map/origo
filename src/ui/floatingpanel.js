@@ -10,6 +10,7 @@ const FloatingPanel = function FloatingPanel(options = {}) {
     title = 'Inforuta',
     viewer,
     type = 'floating',
+    removeOnClose = false,
     contentComponent = El({
       tagName: 'div',
       cls: 'padding-y-small overflow-auto text-small'
@@ -25,22 +26,21 @@ const FloatingPanel = function FloatingPanel(options = {}) {
   let fpCmp;
   let closeButton;
 
-  const toggle = function toggle() {
-    fpEl.classList.toggle('faded');
-    isActive = !isActive;
-    fpCmp.dispatch('toggle');
-  };
-
-  const close = function close() {
-    if (isActive) {
-      toggle();
-    }
+  const hide = function hide() {
+    fpEl?.classList.add('faded');
+    fpCmp?.dispatch('hide');
+    isActive = false;
   };
 
   const show = function show() {
-    if (!isActive) {
-      toggle();
-    }
+    fpEl?.classList.remove('faded');
+    fpCmp?.dispatch('show');
+    isActive = true;
+  };
+  
+  const remove = function remove() {
+    fpEl?.parentNode.removeChild(fpEl);
+    fpCmp?.dispatch('remove');
   };
 
   const getContentElement = function getContentElement() {
@@ -55,9 +55,6 @@ const FloatingPanel = function FloatingPanel(options = {}) {
     }
     contentComponent.clearComponents();
     contentComponent.addComponent(component);
-    if (!isActive) {
-      toggle();
-    }
     const el = html(`<div id="${component.getId()}">${component.render()}</div>`);
     contentEl.appendChild(el);
     component.dispatch('render');
@@ -65,8 +62,9 @@ const FloatingPanel = function FloatingPanel(options = {}) {
 
   return Component({
     name: 'floatingPanel',
-    close,
+    hide,
     show,
+    remove,
     getStatus() { return isActive; },
     changeContent,
     getContentElement,
@@ -98,7 +96,7 @@ const FloatingPanel = function FloatingPanel(options = {}) {
         ariaLabel: 'Stäng',
         icon: closeIcon,
         click() {
-          toggle();
+          removeOnClose ? remove() : hide();
         }
       });
 

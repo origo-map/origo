@@ -542,6 +542,7 @@ const Search = function Search(options = {}) {
       });
       const searchlistTitle = searchlistOptions.title || 'Sökresultat för "{{value}}"';
       infowindow.changeContent(listcomponent, `${searchlistTitle.replace('{{value}}', searchVal)}`);
+      infowindow.show();
     };
 
     function makeRequest(params) {
@@ -610,7 +611,7 @@ const Search = function Search(options = {}) {
           case 'floating':
           case 'left':
             infowindowHandler([], '');
-            infowindow.close();
+            infowindow.hide();
             break;
           default:
             break;

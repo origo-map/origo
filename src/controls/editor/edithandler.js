@@ -684,7 +684,7 @@ function setInteractions(drawType) {
     component.dispatch('select', featureArray);
   });
   if (floatingPanelCmp) {
-    floatingPanelCmp.close();
+    floatingPanelCmp.hide();
     select.on('select', () => {
       if (select.getFeatures().getLength() > 1) {
         const featureListAttributes = editLayer.get('featureListAttributes');
@@ -745,8 +745,9 @@ function setInteractions(drawType) {
           components: listCmp
         });
         floatingPanelCmp.changeContent(content);
+        floatingPanelCmp.show();
       } else {
-        floatingPanelCmp.close();
+        floatingPanelCmp.hide();
       }
     });
   }
