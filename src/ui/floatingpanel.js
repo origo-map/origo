@@ -69,7 +69,6 @@ const FloatingPanel = function FloatingPanel(options = {}) {
     changeContent,
     getContentElement,
     onAdd() {
-      this.on('render', this.onRender);
       this.render();
     },
     onInit() {
@@ -122,11 +121,15 @@ const FloatingPanel = function FloatingPanel(options = {}) {
       this.addComponent(floatingPanel);
     },
     render() {
-      const newEl = html(floatingPanel.render());
-      document.getElementById(viewer.getMain().getId()).appendChild(newEl);
-      fpEl = document.getElementById(floatingPanel.getId());
-      utils.makeElementDraggable(fpEl);
-      this.dispatch('render');
+      if (document.getElementById(floatingPanel.getId())) {
+        console.error("Already rendered");
+      } else {
+        const newEl = html(floatingPanel.render());
+        document.getElementById(viewer.getMain().getId()).appendChild(newEl);
+        fpEl = document.getElementById(floatingPanel.getId());
+        utils.makeElementDraggable(fpEl);
+        this.dispatch('render');
+      }
     }
   });
 };
