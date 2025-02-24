@@ -1,7 +1,10 @@
-import { Component, Button, Element as El, dom } from '../ui';
+import Component from './component';
+import El from './element';
+import Button from './button';
+import { html } from './dom/dom';
 import utils from '../utils';
 
-const Infowindow = function Infowindow(options = {}) {
+const FloatingPanel = function FloatingPanel(options = {}) {
   const {
     closeIcon = '#ic_close_24px',
     title = 'Inforuta',
@@ -17,15 +20,15 @@ const Infowindow = function Infowindow(options = {}) {
   } = options;
   let headerComponent;
   let titleComponent;
-  let infowindow;
-  let iwEl;
-  let iwCmp;
+  let floatingPanel;
+  let fpEl;
+  let fpCmp;
   let closeButton;
 
   const toggle = function toggle() {
-    iwEl.classList.toggle('faded');
+    fpEl.classList.toggle('faded');
     isActive = !isActive;
-    iwCmp.dispatch('toggle');
+    fpCmp.dispatch('toggle');
   };
 
   const close = function close() {
@@ -55,13 +58,13 @@ const Infowindow = function Infowindow(options = {}) {
     if (!isActive) {
       toggle();
     }
-    const el = dom.html(`<div id="${component.getId()}">${component.render()}</div>`);
+    const el = html(`<div id="${component.getId()}">${component.render()}</div>`);
     contentEl.appendChild(el);
     component.dispatch('render');
   };
 
   return Component({
-    name: 'infowindow',
+    name: 'floatingPanel',
     close,
     show,
     getStatus() { return isActive; },
@@ -72,22 +75,22 @@ const Infowindow = function Infowindow(options = {}) {
       this.render();
     },
     onInit() {
-      iwCmp = this;
-      let iwElCls = isActive ? '' : ' faded';
-      let iwElStyle = '';
+      fpCmp = this;
+      let fpElCls = isActive ? '' : ' faded';
+      let fpElStyle = '';
       let hcElCls = '';
 
       switch (type) {
         case 'floating':
           hcElCls = ' draggable move';
-          iwElStyle = 'top: 4rem; left: 4rem; max-height: calc(100% - (6rem))';
+          fpElStyle = 'top: 4rem; left: 4rem; max-height: calc(100% - (6rem))';
           break;
         case 'left':
-          iwElCls += ' top-left no-margin height-full';
+          fpElCls += ' top-left no-margin height-full';
           break;
         default:
           hcElCls = ' draggable move';
-          iwElStyle = 'top: 4rem; left: 4rem; max-height: calc(100% - (6rem))';
+          fpElStyle = 'top: 4rem; left: 4rem; max-height: calc(100% - (6rem))';
       }
 
       closeButton = Button({
@@ -111,23 +114,23 @@ const Infowindow = function Infowindow(options = {}) {
         components: [titleComponent, closeButton]
       });
 
-      infowindow = El({
-        cls: `absolute flex column control bg-white overflow-hidden z-index-top no-select${iwElCls}`,
-        style: iwElStyle,
+      floatingPanel = El({
+        cls: `absolute flex column control bg-white overflow-hidden z-index-top no-select${fpElCls}`,
+        style: fpElStyle,
         collapseX: true,
         components: [headerComponent, contentComponent]
       });
 
-      this.addComponent(infowindow);
+      this.addComponent(floatingPanel);
     },
     render() {
-      const newEl = dom.html(infowindow.render());
+      const newEl = html(floatingPanel.render());
       document.getElementById(viewer.getMain().getId()).appendChild(newEl);
-      iwEl = document.getElementById(infowindow.getId());
-      utils.makeElementDraggable(iwEl);
+      fpEl = document.getElementById(floatingPanel.getId());
+      utils.makeElementDraggable(fpEl);
       this.dispatch('render');
     }
   });
 };
 
-export default Infowindow;
+export default FloatingPanel;
