@@ -6,6 +6,7 @@ import { Vector as VectorSource } from 'ol/source';
 import { Stroke } from 'ol/style';
 // import Feature from 'ol/Feature';
 import { Component, Button, dom, Element, Modal } from '../ui';
+import ImageTileOfflineSource from '../layer/imagetileofflinesource';
 
 /**
  * Creates a component for drawing an envelope whose extent
@@ -234,7 +235,9 @@ export default function Offline({ localization }) {
       cls: 'padding-small icon-smaller round light box-shadow relative',
       async click() {
         const currentState = goOfflineButton.getState();
-        const onlineLayers = viewer.getLayers().filter(layer => layer.getProperties().type !== 'WMSOFFLINE');
+        // Layers that are explicitly declared with "offline" are kept visible, assuming they can handle it.
+        // Layers implementing any of the known offline source types are also kept visible
+        const onlineLayers = viewer.getLayers().filter(layer => !(layer.getSource && layer.getSource() instanceof ImageTileOfflineSource) && !layer.getProperties().offline);
         if (currentState === 'active') {
           goOfflineButton.setState('inactive');
           localStorage.setItem('offline_state', 'false');
@@ -244,6 +247,12 @@ export default function Offline({ localization }) {
             layer.setVisible(existingState === 'true');
             localStorage.removeItem(`offline_existing_state:${layer.getProperties().name}`);
           });
+          const temporyBackgroundlayerName = localStorage.getItem('offline_temporary_background');
+          if (temporyBackgroundlayerName) {
+            const temporyBackgroundlayer = viewer.getLayer(temporyBackgroundlayerName);
+            temporyBackgroundlayer.setVisible(false);
+            localStorage.removeItem('offline_temporary_background');
+          }
         } else {
           goOfflineButton.setState('active');
           localStorage.setItem('offline_state', 'true');
@@ -252,6 +261,18 @@ export default function Offline({ localization }) {
             localStorage.setItem(`offline_existing_state:${layer.getProperties().name}`, layer.getVisible());
             layer.setVisible(false);
           });
+          // Switch to an offline background map if available
+          const bglayers = viewer.getLayersByProperty('group', 'background');
+          if (bglayers && bglayers.length > 0) {
+            const visibleofflinebg = bglayers.find(l => l.getProperties().offline && l.getProperties().visible);
+            if (!visibleofflinebg) {
+              const firstofflinebg = bglayers.find(l => l.getProperties().offline);
+              if (firstofflinebg) {
+                firstofflinebg.setVisible(true);
+                localStorage.setItem('offline_temporary_background', firstofflinebg.getProperties().name);
+              }
+            }
+          }
         }
       },
       icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M21 11l2-2c-3.73-3.73-8.87-5.15-13.7-4.31l2.58 2.58c3.3-.02 6.61 1.22 9.12 3.73zm-2 2c-1.08-1.08-2.36-1.85-3.72-2.33l3.02 3.02.7-.69zM9 17l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zM3.41 1.64L2 3.05 5.05 6.1C3.59 6.83 2.22 7.79 1 9l2 2c1.23-1.23 2.65-2.16 4.17-2.78l2.24 2.24C7.79 10.89 6.27 11.74 5 13l2 2c1.35-1.35 3.11-2.04 4.89-2.06l7.08 7.08 1.41-1.41L3.41 1.64z"/></svg>',
