@@ -170,14 +170,17 @@ const getContent = {
   html(feature, attribute, attributes, map) {
     const val = replacer.replace(attribute.html, attributes, {
       helper: geom,
-      helperArg: feature.getGeometry()
+      helperArg: feature.getGeometry(),
+      localization: attribute.localization
     }, map);
-    const newElement = document.createElement('li');
-    if (typeof (attribute.cls) !== 'undefined') {
-      newElement.classList.add(attribute.cls);
-    }
-    newElement.innerHTML = val;
-    return newElement;
+    if (val) {
+      const newElement = document.createElement('li');
+      if (typeof (attribute.cls) !== 'undefined') {
+        newElement.classList.add(attribute.cls);
+      }
+      newElement.innerHTML = val;
+      return newElement;
+    } return null;
   }
 };
 
