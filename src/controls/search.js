@@ -8,7 +8,7 @@ import getFeature from '../getfeature';
 import mapUtils from '../maputils';
 import popup from '../popup';
 import utils from '../utils';
-import Infowindow from '../components/infowindow';
+import FloatingPanel from '../ui/floatingpanel';
 import { listExportHandler } from '../infowindow_exporthandler';
 
 const Search = function Search(options = {}) {
@@ -542,6 +542,7 @@ const Search = function Search(options = {}) {
       });
       const searchlistTitle = searchlistOptions.title || 'Sökresultat för "{{value}}"';
       infowindow.changeContent(listcomponent, `${searchlistTitle.replace('{{value}}', searchVal)}`);
+      infowindow.show();
     };
 
     function makeRequest(params) {
@@ -610,7 +611,7 @@ const Search = function Search(options = {}) {
           case 'floating':
           case 'left':
             infowindowHandler([], '');
-            infowindow.close();
+            infowindow.hide();
             break;
           default:
             break;
@@ -706,7 +707,7 @@ const Search = function Search(options = {}) {
       bindUIActions();
 
       if (autocompletePlacement === 'floating' || searchlistPlacement === 'floating') {
-        infowindow = Infowindow({ viewer,
+        infowindow = FloatingPanel({ viewer,
           type: 'floating',
           contentComponent: El({
             tagName: 'div',
@@ -716,7 +717,7 @@ const Search = function Search(options = {}) {
         });
         this.addComponent(infowindow);
       } else if (autocompletePlacement === 'left' || searchlistPlacement === 'left') {
-        infowindow = Infowindow({ viewer,
+        infowindow = FloatingPanel({ viewer,
           type: 'left',
           contentComponent: El({
             tagName: 'div',

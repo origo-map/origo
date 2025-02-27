@@ -10,7 +10,7 @@ import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import { squaredDistance, toFixed } from 'ol/math';
 import { Button, Element as El, Modal, Component } from '../../ui';
-import Infowindow from '../../components/infowindow';
+import FloatingPanel from '../../ui/floatingpanel';
 import store from './editsstore';
 import generateUUID from '../../utils/generateuuid';
 import transactionHandler from './transactionhandler';
@@ -59,7 +59,7 @@ let allowEditGeometry;
 /** List that tracks the state when editing related tables */
 let breadcrumbs = [];
 let autoCreatedFeature = false;
-let infowindowCmp = false;
+let floatingPanelCmp = false;
 let preselectedFeature;
 let traceHighligtLayer;
 let snapTolerance;
@@ -670,7 +670,7 @@ function setInteractions(drawType) {
   hasDraw = false;
   select = new Select({
     layers: [editLayer],
-    multi: !!infowindowCmp
+    multi: !!floatingPanelCmp
   });
   // Dispatch Component event when selection changes. 'change' is never emitted from Collection, so it's both 'add' and 'remove'.
   // select interaction's 'select' event is not fired when the feature collection is manipulated manually, so we take events from
@@ -683,8 +683,8 @@ function setInteractions(drawType) {
     const featureArray = select.getFeatures().getArray();
     component.dispatch('select', featureArray);
   });
-  if (infowindowCmp) {
-    infowindowCmp.close();
+  if (floatingPanelCmp) {
+    floatingPanelCmp.hide();
     select.on('select', () => {
       if (select.getFeatures().getLength() > 1) {
         const featureListAttributes = editLayer.get('featureListAttributes');
@@ -714,14 +714,14 @@ function setInteractions(drawType) {
             click() {
               select.getFeatures().clear();
               select.getFeatures().push(feature);
-              infowindowCmp.dispatch('resetButtonStates');
-              infowindowCmp.dispatch('removeMouseenter');
+              floatingPanelCmp.dispatch('resetButtonStates');
+              floatingPanelCmp.dispatch('removeMouseenter');
               this.setState('active');
             },
             mouseenter() {
               select.getFeatures().clear();
               select.getFeatures().push(feature);
-              infowindowCmp.dispatch('resetButtonStates');
+              floatingPanelCmp.dispatch('resetButtonStates');
               this.setState('active');
             }
           });
@@ -730,13 +730,13 @@ function setInteractions(drawType) {
             components: [featureButton]
           });
           listCmp.push(listItem);
-          infowindowCmp.on('resetButtonStates', () => {
+          floatingPanelCmp.on('resetButtonStates', () => {
             featureButton.setState('initial');
             if (document.getElementById(featureButton.getId())) {
               document.getElementById(featureButton.getId()).blur();
             }
           });
-          infowindowCmp.on('removeMouseenter', () => {
+          floatingPanelCmp.on('removeMouseenter', () => {
             featureButton.dispatch('removeMouseenter');
           });
         });
@@ -744,9 +744,10 @@ function setInteractions(drawType) {
           tagName: 'ul',
           components: listCmp
         });
-        infowindowCmp.changeContent(content);
+        floatingPanelCmp.changeContent(content);
+        floatingPanelCmp.show();
       } else {
-        infowindowCmp.close();
+        floatingPanelCmp.hide();
       }
     });
   }
@@ -1881,8 +1882,8 @@ export default function editHandler(options, v) {
 
       featureInfo = viewer.getControlByName('featureInfo');
       if (options.featureList) {
-        infowindowCmp = Infowindow({ viewer, type: 'floating', title: 'Välj objekt' });
-        infowindowCmp.render();
+        floatingPanelCmp = FloatingPanel({ viewer, type: 'floating', title: 'Välj objekt' });
+        floatingPanelCmp.render();
       }
       currentLayer = options.currentLayer;
       editableLayers = options.editableLayers;
