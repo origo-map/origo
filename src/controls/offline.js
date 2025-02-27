@@ -25,6 +25,7 @@ export default function Offline({ localization }) {
   let layersInProgress = []; // store the layer names that are currently being downloaded
   let envelopeButton;
   let goOfflineButton;
+  let existingOfflineLayers;
 
   function localize(key) {
     return localization.getStringByKeys({ targetParentKey: 'offline', targetKey: key });
@@ -43,6 +44,7 @@ export default function Offline({ localization }) {
   }
 
   function createDownloadModalContent(offlineSizes) {
+    // TODO: use Origo modal or floating panel
     const lagerElements = offlineSizes.map(lager => {
       if (lager.tiles === 0) {
         return Element({});
@@ -77,15 +79,24 @@ export default function Offline({ localization }) {
     });
   }
 
+  /**
+   * Returns all layers that have offline capability
+   * @returns array of layers
+   */
+  function getOfflineLayers() {
+    return viewer.getLayers().filter(layer => layer.getSource && layer.getSource() instanceof ImageTileOfflineSource);
+  }
+
   async function createSaveModalContent(feature) {
-    const offlineLayers = viewer.getLayers().filter(layer => layer.getProperties().type === 'WMSOFFLINE');
+    const offlineLayers = getOfflineLayers();
     const extent = feature.getGeometry().getExtent();
 
     const offlineSize = await getOfflineCalculations(offlineLayers, [{ extentid: extent }]);
 
     const modalCloseButton = createButton({
       cls: 'o-offline-modal-btn-close icon-smaller',
-      text: 'Stäng',
+      // TODO: localize
+      text: 'Avbryt',
       icon: '#ic_close_24px',
       click() {
         modal.closeModal();
@@ -97,6 +108,7 @@ export default function Offline({ localization }) {
 
     const modalSaveButton = createButton({
       cls: 'o-offline modal btn-save icon-smaller',
+      // TODO: localize
       text: 'Spara',
       icon: '#ic_save_24px',
       click() {
@@ -119,6 +131,7 @@ export default function Offline({ localization }) {
         modal.dispatch('closed');
         clearOfflineSelections();
         viewer.getLogger().createToast({
+          // TODO: localize
           status: 'info',
           title: 'Nedladdning pågår',
           message: 'Dina lager sparas ner i bakgrunden.'
@@ -129,6 +142,7 @@ export default function Offline({ localization }) {
           // Remove the layer from the in progress list
           layersInProgress = [];
           viewer.getLogger().createToast({
+            // TODO: localize
             status: 'success',
             title: 'Lager sparat',
             message: 'Dina lager är redo att användas offline.'
@@ -149,6 +163,7 @@ export default function Offline({ localization }) {
     return Element({
       style: 'display: flex; flex-direction: column; gap: 4px;',
       components: [
+        // TODO: localize
         Element({ tagName: 'span', innerHTML: 'Följande data kommer att sparas ner för att användas online.' }),
         Element({
           style: 'display: flex; flex-direction: column; gap: 4px;',
@@ -176,15 +191,60 @@ export default function Offline({ localization }) {
     return localModal;
   }
 
+  function toggleOfflineLayers() {
+    const currentState = goOfflineButton.getState();
+    // Layers that are explicitly declared with "offline" are kept visible, assuming they can handle it.
+    // Layers implementing any of the known offline source types are also kept visible
+    const onlineLayers = viewer.getLayers().filter(layer => !(layer.getSource && layer.getSource() instanceof ImageTileOfflineSource) && !layer.getProperties().offline);
+    if (currentState === 'active') {
+      goOfflineButton.setState('inactive');
+      localStorage.setItem('offline_state', 'false');
+
+      onlineLayers.forEach(layer => {
+        const existingState = localStorage.getItem(`offline_existing_state:${layer.getProperties().name}`);
+        layer.setVisible(existingState === 'true');
+        localStorage.removeItem(`offline_existing_state:${layer.getProperties().name}`);
+      });
+      const temporyBackgroundlayerName = localStorage.getItem('offline_temporary_background');
+      if (temporyBackgroundlayerName) {
+        const temporyBackgroundlayer = viewer.getLayer(temporyBackgroundlayerName);
+        temporyBackgroundlayer.setVisible(false);
+        localStorage.removeItem('offline_temporary_background');
+      }
+    } else {
+      goOfflineButton.setState('active');
+      localStorage.setItem('offline_state', 'true');
+      // Check current state and store it in localstorage so we remember to reactivate them when user goes online again
+      onlineLayers.forEach(layer => {
+        localStorage.setItem(`offline_existing_state:${layer.getProperties().name}`, layer.getVisible());
+        layer.setVisible(false);
+      });
+      // Switch to an offline background map if available
+      const bglayers = viewer.getLayersByProperty('group', 'background');
+      if (bglayers && bglayers.length > 0) {
+        const visibleofflinebg = bglayers.find(l => l.getProperties().offline && l.getProperties().visible);
+        if (!visibleofflinebg) {
+          const firstofflinebg = bglayers.find(l => l.getProperties().offline);
+          if (firstofflinebg) {
+            firstofflinebg.setVisible(true);
+            localStorage.setItem('offline_temporary_background', firstofflinebg.getProperties().name);
+          }
+        }
+      }
+    }
+  }
+
   function createToolbarButtons() {
     envelopeButton = createButton({
       cls: 'padding-small icon-smaller round light box-shadow relative',
       async click() {
+        // TODO: Check state. If active clear and deactivate or make sure drawExistingOfflineSelections clears before adding.
         clearAndRestartInteraction();
         drawExistingOfflineSelections();
         envelopeButton.setState('active');
       },
       icon: '#ic_crop_square_24px',
+      // TODO: Localize
       tooltipText: 'Rita ett område som ska sparas ned',
       tooltipPlacement: 'south',
       tooltipStyle: 'bottom:-5px;'
@@ -195,11 +255,13 @@ export default function Offline({ localization }) {
       click() {
         clearAndRemoveInteraction();
         envelopeButton.setState('initial');
-        const offlineLayers = viewer.getLayers().filter(layer => layer.getProperties().type === 'WMSOFFLINE');
-        const responses = offlineLayers.map(layer => layer.getProperties().source.clearStorage());
+        // Pick all known offline sources
+        const offlineLayers = getOfflineLayers();
+        const responses = offlineLayers.map(layer => layer.getSource().clearStorage());
         Promise.all(responses).then((result) => {
           console.log('Cleared cache for layers:', result);
           viewer.getLogger().createToast({
+            // TODO: localize
             status: 'success',
             title: 'Lager rensat',
             message: 'Dina lager är rensade.'
@@ -207,6 +269,7 @@ export default function Offline({ localization }) {
         });
       },
       icon: '#ic_delete_24px',
+      // TODO: localize
       tooltipText: 'Rensa cache',
       tooltipPlacement: 'south',
       tooltipStyle: 'bottom:-5px;'
@@ -215,10 +278,11 @@ export default function Offline({ localization }) {
     const downloadButton = createButton({
       cls: 'padding-small icon-smaller round light box-shadow relative',
       async click() {
-        const offlineLayers = viewer.getLayers().filter(layer => layer.getProperties().type === 'WMSOFFLINE');
+        const offlineLayers = getOfflineLayers();
         const offlineSizes = await getOfflineCalculations(offlineLayers);
         const modalContent = createDownloadModalContent(offlineSizes);
         modal = createModal({
+          // TODO: Localize
           title: 'Sparade lager',
           content: modalContent,
           onClose: () => downloadButton.setState('inactive')
@@ -234,46 +298,7 @@ export default function Offline({ localization }) {
     goOfflineButton = createButton({
       cls: 'padding-small icon-smaller round light box-shadow relative',
       async click() {
-        const currentState = goOfflineButton.getState();
-        // Layers that are explicitly declared with "offline" are kept visible, assuming they can handle it.
-        // Layers implementing any of the known offline source types are also kept visible
-        const onlineLayers = viewer.getLayers().filter(layer => !(layer.getSource && layer.getSource() instanceof ImageTileOfflineSource) && !layer.getProperties().offline);
-        if (currentState === 'active') {
-          goOfflineButton.setState('inactive');
-          localStorage.setItem('offline_state', 'false');
-
-          onlineLayers.forEach(layer => {
-            const existingState = localStorage.getItem(`offline_existing_state:${layer.getProperties().name}`);
-            layer.setVisible(existingState === 'true');
-            localStorage.removeItem(`offline_existing_state:${layer.getProperties().name}`);
-          });
-          const temporyBackgroundlayerName = localStorage.getItem('offline_temporary_background');
-          if (temporyBackgroundlayerName) {
-            const temporyBackgroundlayer = viewer.getLayer(temporyBackgroundlayerName);
-            temporyBackgroundlayer.setVisible(false);
-            localStorage.removeItem('offline_temporary_background');
-          }
-        } else {
-          goOfflineButton.setState('active');
-          localStorage.setItem('offline_state', 'true');
-          // Check current state and store it in localstorage so we remember to reactivate them when user goes online again
-          onlineLayers.forEach(layer => {
-            localStorage.setItem(`offline_existing_state:${layer.getProperties().name}`, layer.getVisible());
-            layer.setVisible(false);
-          });
-          // Switch to an offline background map if available
-          const bglayers = viewer.getLayersByProperty('group', 'background');
-          if (bglayers && bglayers.length > 0) {
-            const visibleofflinebg = bglayers.find(l => l.getProperties().offline && l.getProperties().visible);
-            if (!visibleofflinebg) {
-              const firstofflinebg = bglayers.find(l => l.getProperties().offline);
-              if (firstofflinebg) {
-                firstofflinebg.setVisible(true);
-                localStorage.setItem('offline_temporary_background', firstofflinebg.getProperties().name);
-              }
-            }
-          }
-        }
+        toggleOfflineLayers();
       },
       icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M21 11l2-2c-3.73-3.73-8.87-5.15-13.7-4.31l2.58 2.58c3.3-.02 6.61 1.22 9.12 3.73zm-2 2c-1.08-1.08-2.36-1.85-3.72-2.33l3.02 3.02.7-.69zM9 17l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zM3.41 1.64L2 3.05 5.05 6.1C3.59 6.83 2.22 7.79 1 9l2 2c1.23-1.23 2.65-2.16 4.17-2.78l2.24 2.24C7.79 10.89 6.27 11.74 5 13l2 2c1.35-1.35 3.11-2.04 4.89-2.06l7.08 7.08 1.41-1.41L3.41 1.64z"/></svg>',
       tooltipText: 'Offlineläge',
@@ -308,22 +333,6 @@ export default function Offline({ localization }) {
   const toolbarButtons = createToolbarButtons();
   const toolbar = createToolbar(toolbarButtons);
 
-  // Create a vector source for drawn features.
-  const source = new VectorSource();
-
-  // Create a vector layer to display drawn features.
-  const vector = new VectorLayer({
-    group: 'none',
-    name: 'offline',
-    title: 'Offline',
-    source,
-    zIndex: 8,
-    styleName: 'origoStylefunction'
-    // style(feature) {
-    //   return styleFunction(feature);
-    // }
-  });
-
   // Function to set the active state of the component.
   function setActive(state) {
     isActive = state;
@@ -341,11 +350,6 @@ export default function Offline({ localization }) {
   function addInteraction() {
     // Configure draw options including the source and styling function.
     const drawOptions = {
-      source,
-      //   style(feature) {
-      //     // Use the specified style function to style the drawn feature.
-      //     return styleFunction(feature);
-      //   },
       type: 'Circle',
       geometryFunction: createBox()
     };
@@ -414,7 +418,6 @@ export default function Offline({ localization }) {
   // Function to clear drawn features and disable interaction.
   function clearDrawings() {
     if (envelope) envelope.abortDrawing();
-    vector.getSource().clear();
   }
 
   // Function to disable interaction and update button states.
@@ -461,36 +464,23 @@ export default function Offline({ localization }) {
 
   function drawExistingOfflineSelections() {
     // Show existing offline layers
-    const scale = 1;
-    const existingOfflineLayers = new VectorLayer({
-      group: 'none',
-      name: 'offline-selection',
-      source: new VectorSource(),
-      stroke: new Stroke({
-        color: 'rgba(133, 193, 233, 1)',
-        lineDash: [10 * scale, 10 * scale],
-        width: 5 * scale
-      })
-    });
-    const offlineLayers = viewer.getLayers().filter(layer => layer.getProperties().type === 'WMSOFFLINE');
+    const offlineLayers = getOfflineLayers();
     const responses = [];
     offlineLayers.forEach(layer => {
       responses.push(layer.getProperties().source.getExtents());
     });
+    existingOfflineLayers.getSource().clear();
     Promise.all(responses).then((features) => {
       for (let i = 0; i < features.length; i += 1) {
         existingOfflineLayers.getSource().addFeatures(features[i]);
       }
-      map.addLayer(existingOfflineLayers);
+      existingOfflineLayers.setVisible(true);
     });
   }
 
   function clearOfflineSelections() {
-    const existingOfflineLayers = viewer.getLayers().find(layer => layer.getProperties().name === 'offline-selection');
-    if (existingOfflineLayers) {
-      existingOfflineLayers.getSource().clear();
-      map.removeLayer(existingOfflineLayers);
-    }
+    existingOfflineLayers.getSource().clear();
+    existingOfflineLayers.setVisible(false);
   }
 
   // Return the main Component with specific properties and methods.
@@ -518,23 +508,27 @@ export default function Offline({ localization }) {
       viewer = evt.target;
       const offlineState = localStorage.getItem('offline_state');
       if (offlineState === 'true') {
-        // If we are in offlinestate we need to hide all online layers
-        const onlineLayers = viewer.getLayers().filter(layer => layer.getProperties().type !== 'WMSOFFLINE');
-        onlineLayers.forEach(layer => {
-          // Check layer property to see if it should be keept online.
-          if (!layer.getProperties().offline) {
-            layer.setVisible(false);
-          }
-        });
+        toggleOfflineLayers();
       }
 
       // Initialize the target for the offline button and toolbar if not already set.
       if (!offlineButtonTarget) offlineButtonTarget = viewer.getMain().getMapTools().getId();
       if (!toolbarTarget) toolbarTarget = 'o-tools-bottom';
 
+      const scale = 1;
+      existingOfflineLayers = new VectorLayer({
+        group: 'none',
+        name: 'offline-selection',
+        source: new VectorSource(),
+        stroke: new Stroke({
+          color: 'rgba(133, 193, 233, 1)',
+          lineDash: [10 * scale, 10 * scale],
+          width: 5 * scale
+        })
+      });
       // Get the map instance and add the vector layer.
       map = viewer.getMap();
-      map.addLayer(vector);
+      map.addLayer(existingOfflineLayers);
 
       // Add offlineButton and toolbar components to the current component.
       this.addComponents([offlineButton, toolbar]);
