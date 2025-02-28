@@ -10,6 +10,7 @@ let exportContainer;
 let groupFooterContainer;
 let sublists;
 let subexports;
+let subexportResponses;
 let urvalElements;
 let footerContainers;
 let expandableContents;
@@ -255,6 +256,8 @@ function showSelectedList(selectionGroup) {
   }
   const subexportToAppend = subexports.get(selectionGroup);
   exportContainer.appendChild(subexportToAppend);
+  const subexportResponseToAppend = subexportResponses.get(selectionGroup);
+  exportContainer.appendChild(subexportResponseToAppend);
   selectionManager.clearHighlightedFeatures();
   selectionManager.refreshAllLayers();
   urvalElements.forEach((value, key) => {
@@ -290,8 +293,18 @@ function createUrvalElement(selectionGroup, selectionGroupTitle) {
   const footerContainer = document.createElement('div');
   footerContainers.set(selectionGroup, footerContainer);
 
-  const subexportComponent = createSubexportComponent({ selectionGroup, viewer, exportOptions });
+  // Updates the response content for the given selectionGroup
+  const responseHandler = function responseHandler(responseSelectionGroup, text) {
+    const responseContainer = subexportResponses.get(responseSelectionGroup);
+    responseContainer.innerHTML = text;
+  };
+
+  const subexportComponent = createSubexportComponent({ selectionGroup, viewer, exportOptions, responseHandler });
   subexports.set(selectionGroup, subexportComponent);
+
+  const subexportResponseComponent = document.createElement('div');
+  subexportResponseComponent.classList.add('export-response-container');
+  subexportResponses.set(selectionGroup, subexportResponseComponent);
 }
 
 function createExpandableContent(listElementContentContainer, content, elementId) {
@@ -479,6 +492,7 @@ function init(options) {
   exportOptions = infowindowOptions.export || {};
   sublists = new Map();
   subexports = new Map();
+  subexportResponses = new Map();
   urvalElements = new Map();
   expandableContents = new Map();
   footerContainers = new Map();
