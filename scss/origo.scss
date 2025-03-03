@@ -52,6 +52,8 @@
   @include meta.load-css('spinner');
   @include meta.load-css('logger');
   @include meta.load-css('localization');
+  @include meta.load-css('audio');
+  @include meta.load-css('video');
 }
 
 html,
