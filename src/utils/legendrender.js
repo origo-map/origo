@@ -46,12 +46,8 @@ export const renderIcon = {
   Circle(options = {}, circleSize = size) {
     const fillOptions = options.fill || {};
     const strokeOptions = options.stroke || {};
-    let {
-      color: fillColor
-    } = fillOptions;
-    let {
-      color: strokeColor
-    } = strokeOptions;
+    const fillColor = fillOptions.color ? fillOptions.color : 'rgba(0, 0, 0, 1)';
+    const strokeColor = strokeOptions.color ? strokeOptions.color : 'rgba(0, 0, 0, 1)';
     const {
       lineDash,
       width: widthOption = 2
@@ -62,15 +58,9 @@ export const renderIcon = {
     const width = widthOption > 4 ? 4 : widthOption;
     const radius = radiusOption - width;
     let stroke = 'stroke: none;';
-    if (strokeColor && typeof strokeColor === 'object') {
-      strokeColor = `rgba(${strokeColor[0]},${strokeColor[1]},${strokeColor[2]},${strokeColor[3] || 1})`;
-    }
     if (strokeColor) {
-      const strokeDasharray = lineDash ? 'stroke-dasharray: 4 4;' : '';
+      const strokeDasharray = lineDash ? `stroke-dasharray: ${lineDash};` : '';
       stroke = `stroke: ${strokeColor}; stroke-width: ${width}; ${strokeDasharray}`;
-    }
-    if (typeof fillColor === 'object') {
-      fillColor = `rgba(${fillColor[0]},${fillColor[1]},${fillColor[2]},${fillColor[3] || 1})`;
     }
     const fill = fillColor ? `fill: ${fillColor};` : 'fill: none;';
     const centerDistance = circleSize / 2;
@@ -80,126 +70,92 @@ export const renderIcon = {
   Square(options = {}) {
     const fillOptions = options.fill || {};
     const strokeOptions = options.stroke || {};
-    let {
-      color: fillColor
-    } = fillOptions;
-    let {
-      color: strokeColor
-    } = strokeOptions;
+    const fillColor = fillOptions.color ? fillOptions.color : 'rgba(0, 0, 0, 1)';
+    const strokeColor = strokeOptions.color ? strokeOptions.color : 'rgba(0, 0, 0, 1)';
     const {
       lineDash,
       width: widthOption = 2
     } = strokeOptions;
     const width = widthOption > 4 ? 4 : widthOption;
     let stroke = 'stroke: none;';
-    if (strokeColor && typeof strokeColor === 'object') {
-      strokeColor = `rgba(${strokeColor[0]},${strokeColor[1]},${strokeColor[2]},${strokeColor[3] || 1})`;
-    }
     if (strokeColor) {
-      const strokeDasharray = lineDash ? 'stroke-dasharray: 4 4;' : '';
+      const strokeDasharray = lineDash ? `stroke-dasharray: ${lineDash};` : '';
       stroke = `stroke: ${strokeColor}; stroke-width: ${width}; ${strokeDasharray}`;
     }
-    if (typeof fillColor === 'object') {
-      fillColor = `rgba(${fillColor[0]},${fillColor[1]},${fillColor[2]},${fillColor[3] || 1})`;
-    }
     const fill = fillColor ? `fill: ${fillColor};` : 'fill: none;';
-    return `<rect x="3" y="5" height="12" width="12" style="${fill} ${stroke}"/>`;
+    const rotationInRad = options.rotation ? options.rotation : 0;
+    const rotationInDeg = rotationInRad * (180 / Math.PI);
+    const rotateImage = `transform="rotate(${rotationInDeg} 12 12)"`;
+    return `<rect x="6" y="6" height="12" width="12" style="${fill} ${stroke}" ${rotateImage}/>`;
   },
   Triangle(options = {}) {
     const fillOptions = options.fill || {};
     const strokeOptions = options.stroke || {};
-    let {
-      color: fillColor
-    } = fillOptions;
-    let {
-      color: strokeColor
-    } = strokeOptions;
+    const fillColor = fillOptions.color ? fillOptions.color : 'rgba(0, 0, 0, 1)';
+    const strokeColor = strokeOptions.color ? strokeOptions.color : 'rgba(0, 0, 0, 1)';
     const {
       lineDash,
       width: widthOption = 2
     } = strokeOptions;
     const width = widthOption > 4 ? 4 : widthOption;
     let stroke = 'stroke: none;';
-    if (strokeColor && typeof strokeColor === 'object') {
-      strokeColor = `rgba(${strokeColor[0]},${strokeColor[1]},${strokeColor[2]},${strokeColor[3] || 1})`;
-    }
     if (strokeColor) {
-      const strokeDasharray = lineDash ? 'stroke-dasharray: 4 4;' : '';
+      const strokeDasharray = lineDash ? `stroke-dasharray: ${lineDash};` : '';
       stroke = `stroke: ${strokeColor}; stroke-width: ${width}; ${strokeDasharray}`;
     }
-    if (typeof fillColor === 'object') {
-      fillColor = `rgba(${fillColor[0]},${fillColor[1]},${fillColor[2]},${fillColor[3] || 1})`;
-    }
     const fill = fillColor ? `fill: ${fillColor};` : 'fill: none;';
-    return `<polygon points="10,2 2,18 18,18" style="${fill} ${stroke}"/>`;
+    const rotationInRad = options.rotation ? options.rotation : 0;
+    const rotationInDeg = rotationInRad * (180 / Math.PI);
+    const rotateImage = `transform="rotate(${rotationInDeg} 12 12)"`;
+    return `<polygon points="12,6 4,20 20,20" style="${fill} ${stroke}" ${rotateImage}/>`;
   },
   Star(options = {}) {
     const fillOptions = options.fill || {};
     const strokeOptions = options.stroke || {};
-    let {
-      color: fillColor
-    } = fillOptions;
-    let {
-      color: strokeColor
-    } = strokeOptions;
+    const fillColor = fillOptions.color ? fillOptions.color : 'rgba(0, 0, 0, 1)';
+    const strokeColor = strokeOptions.color ? strokeOptions.color : 'rgba(0, 0, 0, 1)';
     const {
       lineDash,
       width: widthOption = 2
     } = strokeOptions;
     const width = widthOption > 4 ? 4 : widthOption;
     let stroke = 'stroke: none;';
-    if (strokeColor && typeof strokeColor === 'object') {
-      strokeColor = `rgba(${strokeColor[0]},${strokeColor[1]},${strokeColor[2]},${strokeColor[3] || 1})`;
-    }
     if (strokeColor) {
-      const strokeDasharray = lineDash ? 'stroke-dasharray: 4 4;' : '';
+      const strokeDasharray = lineDash ? `stroke-dasharray: ${lineDash};` : '';
       stroke = `stroke: ${strokeColor}; stroke-width: ${width}; ${strokeDasharray}`;
     }
-    if (typeof fillColor === 'object') {
-      fillColor = `rgba(${fillColor[0]},${fillColor[1]},${fillColor[2]},${fillColor[3] || 1})`;
-    }
     const fill = fillColor ? `fill: ${fillColor};` : 'fill: none;';
-    return `<polygon points="10,1 12,7 18,7 13,11 15,18 10,14 5,18 7,11 2,7 8,7" style="${fill} ${stroke}"/>`;
+    return `<polygon points="12,2 15,8 22,9 17,14 18,21 12,17 6,21 7,14 2,9 9,8" style="${fill} ${stroke}"/>`;
   },
   Cross(options = {}) {
     const strokeOptions = options.stroke || {};
-    let {
-      color: strokeColor
-    } = strokeOptions;
+    const strokeColor = strokeOptions.color ? strokeOptions.color : 'rgba(0, 0, 0, 1)';
     const {
       lineDash,
       width: widthOption = 2
     } = strokeOptions;
     const width = widthOption > 4 ? 4 : widthOption;
     let stroke = 'stroke: none;';
-    if (strokeColor && typeof strokeColor === 'object') {
-      strokeColor = `rgba(${strokeColor[0]},${strokeColor[1]},${strokeColor[2]},${strokeColor[3] || 1})`;
-    }
     if (strokeColor) {
-      const strokeDasharray = lineDash ? 'stroke-dasharray: 4 4;' : '';
+      const strokeDasharray = lineDash ? `stroke-dasharray: ${lineDash};` : '';
       stroke = `stroke: ${strokeColor}; stroke-width: ${width}; ${strokeDasharray}`;
     }
-    return `<line x1="12" y1="0" x2="12" y2="24" style="${stroke}" /><line x1="0" y1="12" x2="24" y2="12" style="${stroke}" />`;
+    return `<line x1="12" y1="2" x2="12" y2="22" style="${stroke}" /><line x1="2" y1="12" x2="22" y2="12" style="${stroke}" />`;
   },
   X(options = {}) {
     const strokeOptions = options.stroke || {};
-    let {
-      color: strokeColor
-    } = strokeOptions;
+    const strokeColor = strokeOptions.color ? strokeOptions.color : 'rgba(0, 0, 0, 1)';
     const {
       lineDash,
       width: widthOption = 2
     } = strokeOptions;
     const width = widthOption > 4 ? 4 : widthOption;
     let stroke = 'stroke: none;';
-    if (strokeColor && typeof strokeColor === 'object') {
-      strokeColor = `rgba(${strokeColor[0]},${strokeColor[1]},${strokeColor[2]},${strokeColor[3] || 1})`;
-    }
     if (strokeColor) {
-      const strokeDasharray = lineDash ? 'stroke-dasharray: 4 4;' : '';
+      const strokeDasharray = lineDash ? `stroke-dasharray: ${lineDash};` : '';
       stroke = `stroke: ${strokeColor}; stroke-width: ${width}; ${strokeDasharray}`;
     }
-    return `<line x1="2" y1="2" x2="18" y2="18" style="${stroke}" stroke-width="4" /><line x1="2" y1="18" x2="18" y2="2" style="${stroke}" stroke-width="4" />`;
+    return `<line x1="6" y1="6" x2="18" y2="18" style="${stroke}" /><line x1="6" y1="18" x2="18" y2="6" style="${stroke}" />`;
   },
   Icon(iconStyle) {
     const fit = iconStyle.fit ? 'contain' : 'cover';
