@@ -1,5 +1,6 @@
 import Point from 'ol/geom/Point';
 import Circle from 'ol/style/Circle';
+import RegularShape from 'ol/style/RegularShape';
 import Fill from 'ol/style/Fill';
 import Icon from 'ol/style/Icon';
 import Stroke from 'ol/style/Stroke';
@@ -18,11 +19,32 @@ const styleTypes = {
     return stylefunctions(name, params);
   }
 };
+
+/**
+ * Add a new style type
+ *
+ * @function
+ * @name addStyleType
+ * @kind variable
+ * @param {any} styleType
+ * @param {any) => { stylefunction({ name, params }: { name: any params: any }} fn
+ * @returns {any; }}
+ */
 const addStyleType = function addStyleType(styleType, fn) {
   styleTypes[styleType] = fn;
   return styleTypes;
 };
 
+/**
+ * Get custom style
+ *
+ * @function
+ * @name getCustomStyle
+ * @kind function
+ * @param {any} type
+ * @param {object} options?
+ * @returns {any}
+ */
 function getCustomStyle(type, options = {}) {
   if (styleTypes[type]) {
     return styleTypes[type](options);
@@ -72,11 +94,31 @@ const editStyleOptions = {
   ]
 };
 
-// Will become an issue if 150 dpi is no longer the "standard" dpi setting
+/**
+ * Take a value and multiple by a factor
+ * OBS! Will become an issue if 150 dpi is no longer the "standard" dpi setting
+ *
+ * @function
+ * @name multiplyByFactor
+ * @kind function
+ * @param {any} value
+ * @param {number} scaleToDpi?
+ * @returns {number}
+  */
 function multiplyByFactor(value, scaleToDpi = 150) {
   return value * (scaleToDpi / 150);
 }
 
+/**
+ * Create vector style from config options
+ *
+ * @function
+ * @name createStyleOptions
+ * @kind function
+ * @param {any} orgStyleParams
+ * @param {any): { geometry(feature: any} scaleToDpi
+ * @returns {any; zIndex: any; fill: any; stroke: any; text: any; image: any; }}
+ */
 function createStyleOptions(orgStyleParams, scaleToDpi) {
   const styleParams = JSON.parse(JSON.stringify(orgStyleParams));
   const styleScale = scaleToDpi ? multiplyByFactor(1.5, scaleToDpi) : undefined;
@@ -151,13 +193,102 @@ function createStyleOptions(orgStyleParams, scaleToDpi) {
   }
   if ('circle' in styleParams) {
     styleOptions.image = new Circle({
-      radius: styleParams.circle.radius,
+      radius: styleParams.circle.radius ? styleParams.circle.radius : 7,
       scale: styleParams.circle.scale || undefined,
       fill: new Fill(styleParams.circle.fill) || undefined,
       stroke: new Stroke(styleParams.circle.stroke) || undefined
     });
     if (scaleToDpi) {
       const imageScale = styleParams.circle.scale ? multiplyByFactor(styleParams.circle.scale, scaleToDpi) : styleScale;
+      styleOptions.image.setScale(imageScale);
+    }
+  }
+  if ('square' in styleParams) {
+    styleOptions.image = new RegularShape({
+      radius: styleParams.square.radius ? styleParams.square.radius : 7,
+      scale: styleParams.square.scale || undefined,
+      fill: new Fill(styleParams.square.fill) || undefined,
+      stroke: new Stroke(styleParams.square.stroke) || undefined,
+      points: 4,
+      rotation: styleParams.square.rotation || 0,
+      angle: Math.PI / 4
+    });
+    if (scaleToDpi) {
+      const imageScale = styleParams.square.scale ? multiplyByFactor(styleParams.square.scale, scaleToDpi) : styleScale;
+      styleOptions.image.setScale(imageScale);
+    }
+  }
+  if ('triangle' in styleParams) {
+    styleOptions.image = new RegularShape({
+      radius: styleParams.triangle.radius ? styleParams.triangle.radius : 7,
+      scale: styleParams.triangle.scale || undefined,
+      fill: new Fill(styleParams.triangle.fill) || undefined,
+      stroke: new Stroke(styleParams.triangle.stroke) || undefined,
+      points: 3,
+      rotation: styleParams.triangle.rotation || 0,
+      angle: 0
+    });
+    if (scaleToDpi) {
+      const imageScale = styleParams.triangle.scale ? multiplyByFactor(styleParams.triangle.scale, scaleToDpi) : styleScale;
+      styleOptions.image.setScale(imageScale);
+    }
+  }
+  if ('star' in styleParams) {
+    const radius = styleParams.star.radius ? styleParams.star.radius : 7;
+    styleOptions.image = new RegularShape({
+      radius,
+      scale: styleParams.star.scale || undefined,
+      fill: new Fill(styleParams.star.fill) || undefined,
+      stroke: new Stroke(styleParams.star.stroke) || undefined,
+      points: 5,
+      radius2: radius / 2,
+      angle: 0
+    });
+    if (scaleToDpi) {
+      const imageScale = styleParams.star.scale ? multiplyByFactor(styleParams.star.scale, scaleToDpi) : styleScale;
+      styleOptions.image.setScale(imageScale);
+    }
+  }
+  if ('pentagon' in styleParams) {
+    styleOptions.image = new RegularShape({
+      radius: styleParams.pentagon.radius ? styleParams.pentagon.radius : 7,
+      scale: styleParams.pentagon.scale || undefined,
+      fill: new Fill(styleParams.pentagon.fill) || undefined,
+      stroke: new Stroke(styleParams.pentagon.stroke) || undefined,
+      points: 5,
+      rotation: styleParams.pentagon.rotation || 0,
+      angle: 0
+    });
+    if (scaleToDpi) {
+      const imageScale = styleParams.pentagon.scale ? multiplyByFactor(styleParams.pentagon.scale, scaleToDpi) : styleScale;
+      styleOptions.image.setScale(imageScale);
+    }
+  }
+  if ('cross' in styleParams) {
+    styleOptions.image = new RegularShape({
+      radius: styleParams.cross.radius ? styleParams.cross.radius : 7,
+      scale: styleParams.cross.scale || undefined,
+      stroke: styleParams.cross.stroke ? new Stroke(styleParams.cross.stroke) : new Stroke({ color: 'rgba(0,0,0,1)', width: 2 }),
+      points: 4,
+      radius2: 0,
+      angle: 0
+    });
+    if (scaleToDpi) {
+      const imageScale = styleParams.cross.scale ? multiplyByFactor(styleParams.cross.scale, scaleToDpi) : styleScale;
+      styleOptions.image.setScale(imageScale);
+    }
+  }
+  if ('x' in styleParams) {
+    styleOptions.image = new RegularShape({
+      radius: styleParams.x.radius ? styleParams.x.radius : 7,
+      scale: styleParams.x.scale || undefined,
+      stroke: styleParams.x.stroke ? new Stroke(styleParams.x.stroke) : new Stroke({ color: 'rgba(0,0,0,1)', width: 2 }),
+      points: 4,
+      radius2: 0,
+      angle: Math.PI / 4
+    });
+    if (scaleToDpi) {
+      const imageScale = styleParams.x.scale ? multiplyByFactor(styleParams.x.scale, scaleToDpi) : styleScale;
       styleOptions.image.setScale(imageScale);
     }
   }
