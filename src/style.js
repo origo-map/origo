@@ -234,17 +234,33 @@ function createStyleOptions(orgStyleParams, scaleToDpi) {
     }
   }
   if ('star' in styleParams) {
+    const radius = styleParams.star.radius ? styleParams.star.radius : 7;
     styleOptions.image = new RegularShape({
-      radius: styleParams.star.radius ? styleParams.star.radius : 7,
+      radius,
       scale: styleParams.star.scale || undefined,
       fill: new Fill(styleParams.star.fill) || undefined,
       stroke: new Stroke(styleParams.star.stroke) || undefined,
       points: 5,
-      radius2: styleParams.star.radius / 2,
+      radius2: radius / 2,
       angle: 0
     });
     if (scaleToDpi) {
       const imageScale = styleParams.star.scale ? multiplyByFactor(styleParams.star.scale, scaleToDpi) : styleScale;
+      styleOptions.image.setScale(imageScale);
+    }
+  }
+  if ('pentagon' in styleParams) {
+    styleOptions.image = new RegularShape({
+      radius: styleParams.pentagon.radius ? styleParams.pentagon.radius : 7,
+      scale: styleParams.pentagon.scale || undefined,
+      fill: new Fill(styleParams.pentagon.fill) || undefined,
+      stroke: new Stroke(styleParams.pentagon.stroke) || undefined,
+      points: 5,
+      rotation: styleParams.pentagon.rotation || 0,
+      angle: 0
+    });
+    if (scaleToDpi) {
+      const imageScale = styleParams.pentagon.scale ? multiplyByFactor(styleParams.pentagon.scale, scaleToDpi) : styleScale;
       styleOptions.image.setScale(imageScale);
     }
   }

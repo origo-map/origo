@@ -127,6 +127,27 @@ export const renderIcon = {
     const fill = fillColor ? `fill: ${fillColor};` : 'fill: none;';
     return `<polygon points="12,2 15,8 22,9 17,14 18,21 12,17 6,21 7,14 2,9 9,8" style="${fill} ${stroke}"/>`;
   },
+  Pentagon(options = {}) {
+    const fillOptions = options.fill || {};
+    const strokeOptions = options.stroke || {};
+    const fillColor = fillOptions.color ? fillOptions.color : 'rgba(0, 0, 0, 1)';
+    const strokeColor = strokeOptions.color ? strokeOptions.color : 'rgba(0, 0, 0, 1)';
+    const {
+      lineDash,
+      width: widthOption = 2
+    } = strokeOptions;
+    const width = widthOption > 4 ? 4 : widthOption;
+    let stroke = 'stroke: none;';
+    if (strokeColor) {
+      const strokeDasharray = lineDash ? `stroke-dasharray: ${lineDash};` : '';
+      stroke = `stroke: ${strokeColor}; stroke-width: ${width}; ${strokeDasharray}`;
+    }
+    const fill = fillColor ? `fill: ${fillColor};` : 'fill: none;';
+    const rotationInRad = options.rotation ? options.rotation : 0;
+    const rotationInDeg = rotationInRad * (180 / Math.PI);
+    const rotateImage = `transform="rotate(${rotationInDeg} 12 12)"`;
+    return `<polygon points="12,2 22,9 18,22 6,22 2,9" style="${fill} ${stroke}" ${rotateImage} />`;
+  },
   Cross(options = {}) {
     const strokeOptions = options.stroke || {};
     const strokeColor = strokeOptions.color ? strokeOptions.color : 'rgba(0, 0, 0, 1)';

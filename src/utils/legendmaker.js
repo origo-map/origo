@@ -45,6 +45,8 @@ export const findStyleType = function findStyleType(styles) {
     return 'Triangle';
   } else if (styleTypes.star) {
     return 'Star';
+  } else if (styleTypes.pentagon) {
+    return 'Pentagon';
   } else if (styleTypes.cross) {
     return 'Cross';
   } else if (styleTypes.x) {
@@ -140,6 +142,14 @@ export const renderSvgIcon = function renderSvgIcon(styleRule, {
       const icon = styleRule.reduce((prev, style) => {
         if (style.star) {
           return prev + renderIcon.Star(style.star);
+        }
+        return prev;
+      }, '');
+      return `${renderSvg(icon, { opacity })}`;
+    } else if (styleType === 'Pentagon') {
+      const icon = styleRule.reduce((prev, style) => {
+        if (style.pentagon) {
+          return prev + renderIcon.Pentagon(style.pentagon);
         }
         return prev;
       }, '');
