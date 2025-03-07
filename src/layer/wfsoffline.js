@@ -40,7 +40,7 @@ export default function wfs(layerOptions, viewer) {
     wfsOptions.visible = true;
   }
   
-  const wfsSource = new WfsOfflineSource(sourceOptions);
+  const wfsSource = new WfsOfflineSource(sourceOptions, viewer);
   // This call is async, but we can't await it here. Let it just finish when it's done.
   wfsSource.init().then(() => {
     // TODO: remove debug logging

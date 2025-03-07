@@ -1,6 +1,5 @@
 import VectorSource from 'ol/source/Vector';
 import * as LoadingStrategy from 'ol/loadingstrategy';
-import { toSize } from 'ol/size';
 import { fromExtent } from 'ol/geom/Polygon';
 import Feature from 'ol/Feature';
 import GeoJson from 'ol/format/GeoJSON'
@@ -20,7 +19,6 @@ const extentCol = 'extentid';
 const geoJsonCol = 'json';
 const fidCol = 'fid';
 
-const geomName = 'geom';
 
 /**
    * Static private helper to init db.
@@ -149,12 +147,11 @@ export default class VectorOfflineSource extends VectorSource {
   async _loaderHelper(extent) {
     console.log('Loader called');
     const geoJsonFormatter = new GeoJson({
-     // geometryName: geomName
+      geometryName: this.viewer.getLayer(this.legendLayerName).get('geometryName')
     });
     const dbRes = await this.fetchLayerFromDb();
     const res = [];
     dbRes.forEach(currFeature => {
-      // TODO: set geom name to configname?
       const newFeature = geoJsonFormatter.readFeature(currFeature.json);
       // This will loop twice, but it prevents sending an event for each feature
       res.push(newFeature);
@@ -224,6 +221,7 @@ export default class VectorOfflineSource extends VectorSource {
     return extents.map(currExtent => {
       const geom = fromExtent(currExtent[extentCol]);
       const feat = new Feature(geom);
+      feat.setId(currExtent.rid);
       return feat;
     });
   }
@@ -248,6 +246,7 @@ export default class VectorOfflineSource extends VectorSource {
         newRecord[nameCol] = this.layerName;
         newRecord[fidCol] = currFeature.getId();
         newRecord[geoJsonCol] = currJsonFeature;
+        newRecord[extentId] = extentId;
         store.put(newRecord);
       });
       store.transaction.oncomplete = (event) => {
@@ -303,26 +302,36 @@ export default class VectorOfflineSource extends VectorSource {
     // Can't call it clear, baseclass has a clear
     return new Promise((resolve, reject) => {
       try {
-        // TODO: remove edits
-        const transaction = this.db.transaction([featuresObjectsStoreName, extentsObjectsStoreName], 'readwrite');
+        // TODO: clean up code. Not all empty checks and error handling is needed
+        // only check error on transaction and ignore empty
+
+        // As all layers are in the same table we have to search all objects using index and iterate to delete
+        // them individually. There is no function similar to SQL "delete from where ..."
+        const transaction = this.db.transaction([featuresObjectsStoreName, extentsObjectsStoreName, editsObjectsStoreName], 'readwrite');
         const objectStore = transaction.objectStore(featuresObjectsStoreName);
         const extentsStore = transaction.objectStore(extentsObjectsStoreName);
+        const editsStore = transaction.objectStore(editsObjectsStoreName);
 
         const index = objectStore.index(nameCol);
         const getRequest = index.getAll(this.layerName);
 
         const extentsIndex = extentsStore.index(nameCol);
         const getExtentsReq = extentsIndex.getAll(this.layerName);
+
+        const editsIndex = editsStore.index(nameCol);
+        const getEditsReq = editsIndex.getAll(this.layerName);
+
         transaction.oncomplete = () => {
           this.refresh();
           console.log('All items deleted');
           resolve(true);
         };
+
+        // Delete all features
         getRequest.onsuccess = () => {
           if (getRequest.result) {
             getRequest.result.forEach(currRow => {
-              // TODO: use correct composite key
-              const delreq = objectStore.delete([currRow[nameCol], currRow[tileZCol], currRow[tileXCol], currRow[tileYCol]]);
+              const delreq = objectStore.delete([this.layerName, currRow[fidCol]]);
               delreq.onsuccess = () => {
                 console.log('Deleted tile');
               };
@@ -335,12 +344,32 @@ export default class VectorOfflineSource extends VectorSource {
         getRequest.onerror = (event) => {
           reject(event.target.error);
         };
+
+        // Delete all extents
         getExtentsReq.onsuccess = () => {
           if (getExtentsReq.result) {
             getExtentsReq.result.forEach(currRow => {
               const delreq = extentsStore.delete(currRow.rid);
               delreq.onsuccess = () => {
                 console.log('Deleted extent');
+              };
+            });
+          } else {
+            const e = new Error('Hittades inte');
+            reject(e);
+          }
+        };
+        getExtentsReq.onerror = (event) => {
+          reject(event.target.error);
+        };
+
+        // Delete all edits
+        getEditsReq.onsuccess = () => {
+          if (getEditsReq.result) {
+            getEditsReq.result.forEach(currRow => {
+              const delreq = editsStore.delete([this.layerName, currRow[fidCol]]);
+              delreq.onsuccess = () => {
+                console.log('Deleted edits');
               };
             });
           } else {
@@ -372,7 +401,9 @@ export default class VectorOfflineSource extends VectorSource {
 
           // To be fair, ins does not need to know if there is a previous edit as there can't be one,
           // but the implementation is almost the same as update
-          const oldEditReq = editsStore.get([this.layerName, currFid]);
+        const oldEditReq = editsStore.get([this.layerName, currFid]);
+        // TODO: Lookup existing feature in indexddb to get extent? put completely overwrites
+        // Inserts will lack extentid, and usage is limited?
         oldEditReq.onsuccess = () => {
           const oldEdit = oldEditReq.result;
           if (currEdit.type === 'ins' || currEdit.type === 'upd') {
@@ -494,8 +525,64 @@ export default class VectorOfflineSource extends VectorSource {
       });
     }
   }
-  // TODO: declare as abstract, impl must be in wfsofflinesource with possibly a litte help from us
+  // Must be overridden with an implementation adapted to the actual source, e.g. wfs.
+  // eslint-disable-next-line no-unused-vars, class-methods-use-this
   async syncEdits() {
-   
+    throw new Error("Class is of abstract type and can't be instantiated");
+  }
+
+  // TODO: could be parameterized and consolidated with extents and features
+  fetchEditsFromDb() {
+    return new Promise((resolve, reject) => {
+      try {
+        const transaction = this.db.transaction(editsObjectsStoreName, 'readonly');
+        const objectStore = transaction.objectStore(editsObjectsStoreName);
+
+        const index = objectStore.index(nameCol);
+        const getRequest = index.getAll(this.layerName);
+        getRequest.onsuccess = () => {
+          if (getRequest.result) {
+            resolve(getRequest.result);
+          } else {
+            console.log('No edits in db');
+            resolve([]);
+          }
+        };
+        getRequest.onerror = (event) => {
+          reject(event.target.error);
+        };
+      } catch (error) {
+        console.log(error);
+      }
+    });
+  }
+
+  async readEdits() {
+    const edits = await this.fetchEditsFromDb();
+    // Rebuild the quirky edit structure that editstore uses. This is also done in edithandler but that is not exposed and does it from
+    // another source format
+    const transaction = {
+      insert: [],
+      delete: [],
+      update: []
+    };
+    edits.forEach(currEdit => {
+      if (currEdit.type === 'ins') {
+        transaction.insert.push(super.getFeatureById(currEdit[fidCol]));
+      } else if (currEdit.type === 'upd') {
+        transaction.update.push(super.getFeatureById(currEdit[fidCol]));
+      } else {
+        const dummy = new Feature()
+        dummy.setId(currEdit[fidCol]);
+        transaction.delete.push(dummy);
+      }
+
+    });
+    // Later logic depends on null, so can't send empty lists. We created them empty to simplify loop
+    // TODO: check if necessary
+    if (transaction.insert.length === 0) transaction.insert = null;
+    if (transaction.update.length === 0) transaction.update = null;
+    if (transaction.delete.length === 0) transaction.delete = null;
+    return transaction;
   }
 }
