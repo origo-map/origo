@@ -157,7 +157,6 @@ button.ol-zoom-out {
 .ol-attribution {
   bottom: .5em;
   max-width: calc(100% - 3.5em);
-  padding: .35em 0;
   position: absolute;
   right: .5em;
   text-align: right;
@@ -206,13 +205,18 @@ button.ol-zoom-out {
 }
 
 .ol-attribution:not(.ol-collapsed) button {
-  background: transparent;
   color: #000;
+  rotate: 180deg;
 }
 
 .ol-attribution:not(.ol-collapsed) button:hover {
   background: #424242;
   color: #fff;
+}
+
+.ol-control.ol-attribution.ol-collapsed.ol-unselectable {
+  background-color: transparent;
+  box-shadow: none;
 }
 
 .ol-attribution.ol-collapsed button {
@@ -229,6 +233,7 @@ button.ol-zoom-out {
   height: 1.1em;
   line-height: 1em;
   right: 0;
+  padding: .35em 0;
 }
 
 .ol-attribution.ol-logo-only {
@@ -282,11 +287,6 @@ button.ol-zoom-out {
   .ol-control.ol-attribution:not(.ol-collapsed) {
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.45);
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.45);
-  }
-
-  .ol-control.ol-attribution.ol-collapsed {
-    background-color: transparent;
-    box-shadow: none;
   }
 
   .ol-attribution:not(.ol-collapsed) {
