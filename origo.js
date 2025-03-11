@@ -67,8 +67,7 @@ const Origo = function Origo(configPath, options = {}) {
     return null;
   }
 
-  const initControls = (controlDefs) => {
-    const controls = [];
+  const initControls = async (controlDefs) => {
     const locControlDefs = controlDefs.shift(); // Localization is first of the defaultControls;
 
     if (!(locControlDefs.options)) {
@@ -86,21 +85,27 @@ const Origo = function Origo(configPath, options = {}) {
       const localization = searchParams.get('loc');
       localizationComponent.setLocale(localization);
     }
-    controls.push(localizationComponent);
 
-    controlDefs.forEach((def) => {
-      if ('name' in def) {
-        const controlName = titleCase(def.name);
-        const controlOptions = def.options || {};
-        controlOptions.localization = localizationComponent;
-        if (controlName in origoControls) {
-          const control = origoControls[controlName](controlOptions);
-          control.options = Object.assign(control.options || {}, controlOptions);
-          controls.push(control);
-        }
-      }
-    });
-    return controls;
+    const restControls = await Promise.all(
+      controlDefs
+        .filter((def) => 'name' in def)
+        .map(async (def) => {
+          // support both built-in and user-supplied (which might be lazy-loaded) controls
+          const controlFactory = origoControls[titleCase(def.name)] ?? options.controls[def.name];
+          if (!controlFactory) {
+            throw new Error(`Unknown control '${def.name}'`);
+          }
+
+          const controlOptions = { ...def.options, localization: localizationComponent };
+          // controlFactory can be either a function to create a control (built-in and non-lazy loaded) or a function
+          // to create a Promise that loads the function that creates the control
+          const controlOrLazyLoadedFactory = await controlFactory(controlOptions);
+          const control = typeof controlOrLazyLoadedFactory === 'function' ? controlOrLazyLoadedFactory(controlOptions) : controlOrLazyLoadedFactory;
+          control.options = { ...control.options, ...controlOptions };
+          return control;
+        })
+    );
+    return [localizationComponent, ...restControls];
   };
 
   const initExtensions = (extensionDefs) => {
@@ -128,10 +133,13 @@ const Origo = function Origo(configPath, options = {}) {
   const initViewer = () => {
     const defaultConfig = Object.assign({}, origoConfig, options);
     loadResources(configPath, defaultConfig)
-      .then((data) => {
+      .then(async (data) => {
         const viewerOptions = data.options;
-        viewerOptions.controls = initControls(viewerOptions.controls);
+        viewerOptions.controls = await initControls(viewerOptions.controls);
         viewerOptions.extensions = initExtensions(viewerOptions.extensions || []);
+        return viewerOptions;
+      })
+      .then((viewerOptions) => {
         const target = viewerOptions.target;
         viewer = Viewer(target, viewerOptions);
         viewer.on('loaded', () => {
