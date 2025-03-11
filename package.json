@@ -33,18 +33,18 @@
     "copy-plugins": "copyfiles plugins/* build"
   },
   "dependencies": {
-    "@glidejs/glide": "^3.6.2",
+    "@glidejs/glide": "^3.7.1",
     "awesomplete": "^1.1.7",
     "cuid": "^2.1.8",
     "downloadjs": "^1.4.7",
     "drag-drop-touch": "^1.3.1",
     "elm-pep": "^1.0.6",
     "html2canvas": "^1.4.1",
-    "jspdf": "^2.5.2",
-    "ol": "^10.2.1",
-    "ol-mapbox-style": "12.3.5",
+    "jspdf": "^3.0.0",
+    "ol": "^10.4.0",
+    "ol-mapbox-style": "12.5.0",
     "pepjs": "^0.5.3",
-    "proj4": "^2.12.1"
+    "proj4": "^2.15.0"
   },
   "devDependencies": {
     "copy-webpack-plugin": "^12.0.2",
