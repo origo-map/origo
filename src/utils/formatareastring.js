@@ -10,7 +10,7 @@ function formatAreaString(area, opts = {}) {
     localization
   } = opts;
 
-  const localeNumberFormat = new Intl.NumberFormat(localization.getCurrentLocaleId());
+  const localeNumberFormat = new Intl.NumberFormat(localization?.getCurrentLocaleId() || undefined);
   let result = area;
   let unit = 'm<sup>2</sup>';
   if (result > 10000000) {

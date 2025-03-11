@@ -17,7 +17,7 @@ function formatLengthString(length, opts = {}) {
 
   if (decimals !== undefined) {
     result = result.toFixed(decimals);
-    const localeNumberFormat = new Intl.NumberFormat(localization?.getCurrentLocaleId());
+    const localeNumberFormat = new Intl.NumberFormat(localization?.getCurrentLocaleId() || undefined);
     result = localeNumberFormat.format(result);
   }
   const retstr = `${result} ${unit}`;
