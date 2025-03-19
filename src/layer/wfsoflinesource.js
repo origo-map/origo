@@ -27,18 +27,24 @@ export default class WfsOfflineSource extends VectorOfflineSource {
    * @param {any} extent
    *
    */
-  async preload(extent, progressCallback) {
-    if (this.options.offlineIgnoreExtent) {
-      // TODO: ignore extent and use customExtent if present or or map extent
-
-      // TODO: don't store the extent in db it won't be useful for anything
+  async preload(extent, progressCallback, opts = {}) {
+    let myExtent = extent;
+    let extentId = 0;
+    // Sparse layers can benefit from ignoring the download extent drawn by user and always download
+    // entire extent. customExtent contains layer's extent if specified, otherwise map's extent if specified.
+    // Requires that at least one of them are specified.
+    // In that case there is no need to store the extent, it will just be confusing.
+    if (this.options.offlineUseLayerExtent) {
+      myExtent = this.options.customExtent;
+    } else {
+      // Store extent first to get an id to link each feature.
+      // The linking has limited usage as a new overlapping extent will overwrite the feature and the connection to the old extent is lost
+      extentId = await super.storeExtent(extent);
     }
-    // Store extent first to get an id to link each feature.
-    // Usage is limited as a new extent will overwrite the feature and the connection to the old extent is lost
-    const extentId = await super.storeExtent(extent);
+    // Create a temporary wfs source to avoid implementing the WFS protocol again.
     const wfsLoader = new WfsSource(this.options);
     // TODO: which CRS is this? Map probably.
-    const features = await wfsLoader.getFeaturesFromSource(extent);
+    const features = await wfsLoader.getFeaturesFromSource(myExtent);
     await super.storeFeatures(features, extentId);
 
     // TODO: pretty useless with one last progress. In order for it to work, we must also
@@ -52,8 +58,9 @@ export default class WfsOfflineSource extends VectorOfflineSource {
     // from localdb. This will get new edits from server as saving to indexddb overwrites unlike OL that keeps the old in a source
     // Drawback is that we're missing deletes on server. That would require a complete reload which quickly becomes messy if we
     // have many extents or we need to do a full re-read of all extents. If only allowing one extent we could empty indexddb first.
-    // TODO: Move to base? No can do. We're overriding.
-    super.refresh();
+    if (!opts.supressRefresh) {
+      super.refresh();
+    }
   }
 
   async syncEdits() {
@@ -68,29 +75,27 @@ export default class WfsOfflineSource extends VectorOfflineSource {
     // and that should count as sucessful. As javascript will interpret 0 as falsely we must check if no reposne at all
     // which implies a swallowed exception as wfstransaction does not throw.
     if (postResult != undefined) {
-      // TODO: handle wfs transaction response. Best to clear and reload to get latest from db.
+      // Handle wfs transaction response. Best to clear and reload to get latest from db.
       // 1. empty features and edits
       // 2. refresh known extents or entire extent if layer/map extent is used. Not neccessary, we could leave it empty.
       //    Drawback with leaving it empty is that it requires a new pull and as it is not done per layer it would mean that all layers
       //    have to be fetched just to get one layer.
       // Reload all previous extents
       const extentsToFetch = [];
-      if (!this.options.offlineIgnoreExtent) {
+      if (!this.options.offlineUseLayerExtent) {
         const extents = await super.getExtents();
         extents.forEach(currExtent => {
           extentsToFetch.push(currExtent.getGeometry().getExtent());
         });
       } else {
-        // TODO: verify that this contains layer or map extent
-        extentsToFetch.push(this.options.extent);
+        extentsToFetch.push(this.options.customExtent);
       }
       await super.clearStorage();
       const extentPromises = extentsToFetch.map(async (currExtent) => {
-        // TODO: rewrite preload to not refresh
-        // This wastes rid in extent table as old extents are deleted and added again.
+        // This wastes rid:s in extent table as old extents are deleted and added again.
         // It would be possible to reuse extents, but that requires a clean only feature and edits tables function and
         // possibility to read existing extentid to reconnect. Still extentid has a limited usage as on now.
-        return this.preload(currExtent);
+        return this.preload(currExtent, null, {supressRefresh: true});
       });
       // TODO: allSettled or handle exception?
       await Promise.all(extentPromises);

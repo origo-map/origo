@@ -333,7 +333,7 @@ export default class VectorOfflineSource extends VectorSource {
             getRequest.result.forEach(currRow => {
               const delreq = objectStore.delete([this.layerName, currRow[fidCol]]);
               delreq.onsuccess = () => {
-                console.log('Deleted tile');
+                console.log('Deleted feature');
               };
             });
           } else {

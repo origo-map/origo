@@ -22,7 +22,7 @@ export default function wfs(layerOptions, viewer) {
   sourceOptions.attribution = wfsOptions.attribution;
   sourceOptions.customExtent = wfsOptions.extent;
   sourceOptions.name = wfsOptions.name;
-  sourceOptions.offlineIgnoreExtent = wfsOptions.offlineIgnoreExtent;
+  sourceOptions.offlineUseLayerExtent = wfsOptions.offlineUseLayerExtent;
   wfsOptions.extent = undefined;
   sourceOptions.resolutions = viewer.getResolutions();
   sourceOptions.projectionCode = viewer.getProjectionCode();
