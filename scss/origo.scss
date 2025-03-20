@@ -4,6 +4,8 @@
 @use 'variables';
 @use 'ui/ui';
 @use 'bookmark';
+@use 'ol';
+@use 'viewer';
 
 .o-map {
   display: flex;
@@ -13,7 +15,7 @@
   position: relative;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   @include meta.load-css('reset');
-  @include meta.load-css('ol');
+  @include ol.default;
   @include meta.load-css('externs/glidejs/import.scss');
   @include meta.load-css('glide/custom');
   @include meta.load-css('card');
@@ -29,8 +31,8 @@
   @include meta.load-css('stylepicker');
   @include meta.load-css('close');
   @include meta.load-css('icon');
+  @include viewer.default;
   @include meta.load-css('tooltip');
-  @include meta.load-css('viewer');
   @include meta.load-css('rotate');
   @include meta.load-css('mapmenu');
   @include meta.load-css('draw');
