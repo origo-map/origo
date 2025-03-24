@@ -128,8 +128,7 @@ export default function createMoreInfoButton(params) {
             viewer.getMap().removeLayer(layer);
             e.preventDefault();
             e.stopPropagation();
-          }
-          popupMenu.setVisibility(false);
+          } else popupMenu.setVisibility(false);
         });
       },
       render() {
