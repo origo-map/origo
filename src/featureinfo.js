@@ -26,7 +26,8 @@ const Featureinfo = function Featureinfo(options = {}) {
     savedPin: savedPinOptions,
     savedSelection,
     selectionStyles: selectionStylesOptions,
-    autoplay = false
+    autoplay = false,
+    localization
   } = options;
 
   let selectionLayer;
@@ -560,7 +561,7 @@ const Featureinfo = function Featureinfo(options = {}) {
       hitTolerance,
       map,
       pixel
-    }, viewer);
+    }, viewer, localization);
     // Abort if clientResult is false
     if (clientResult !== false) {
       getFeatureInfo.getFeaturesFromRemote({
