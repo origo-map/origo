@@ -7,6 +7,7 @@ import { Stroke } from 'ol/style';
 // import Feature from 'ol/Feature';
 import { Component, Button, dom, Element, Modal } from '../ui';
 import ImageTileOfflineSource from '../layer/imagetileofflinesource';
+import VectorOfflineSource from '../layer/vectorofflinesource';
 
 /**
  * Creates a component for drawing an envelope whose extent
@@ -25,6 +26,8 @@ export default function Offline({ localization }) {
   let layersInProgress = []; // store the layer names that are currently being downloaded
   let envelopeButton;
   let goOfflineButton;
+  let syncButton;
+  let clearEditsButton;
   let existingOfflineLayers;
 
   function localize(key) {
@@ -37,6 +40,7 @@ export default function Offline({ localization }) {
       click: options.click,
       text: options.text,
       icon: options.icon,
+      state: options.state || 'initial',
       tooltipText: options.tooltipText,
       tooltipPlacement: options.tooltipPlacement,
       tooltipStyle: options.tooltipStyle
@@ -46,14 +50,14 @@ export default function Offline({ localization }) {
   function createDownloadModalContent(offlineSizes) {
     // TODO: use Origo modal or floating panel
     const lagerElements = offlineSizes.map(lager => {
-      if (lager.tiles === 0) {
-        return Element({});
-      }
+      // if (lager.tiles === 0) {
+      //   return Element({});
+      // }
       const percent = layersInProgress.includes(lager.name) ? '0%' : '100%';
       return Element({
         style: 'display: flex; gap: 4px;',
         components: [
-          Element({ tagName: 'span', innerHTML: `Lager: ${lager.name}: ${lager.size} (${lager.tiles} tiles)` }),
+          Element({ tagName: 'span', innerHTML: `Lager: ${lager.name}: ${lager.isVector ? '(vector)' : `${lager.size}(${lager.tiles} tiles)`}` }),
           Element({
             style: 'display: flex; gap: 2px;',
             components: [
@@ -84,7 +88,8 @@ export default function Offline({ localization }) {
    * @returns array of layers
    */
   function getOfflineLayers() {
-    return viewer.getLayers().filter(layer => layer.getSource && layer.getSource() instanceof ImageTileOfflineSource);
+    // TODO: add vetor offline layers
+    return viewer.getLayers().filter(layer => layer.getSource && (layer.getSource() instanceof VectorOfflineSource || layer.getSource() instanceof ImageTileOfflineSource));
   }
 
   async function createSaveModalContent(feature) {
@@ -157,14 +162,14 @@ export default function Offline({ localization }) {
     });
 
     const lagerElements = offlineSize.map(lager => Element({
-      tagName: 'span', innerHTML: `Lager: ${lager.name}: ${lager.size} (${lager.tiles} tiles)`
+      tagName: 'span', innerHTML: `Lager: ${lager.name}: ${lager.isVector ? '(vector)' : `${lager.size}(${lager.tiles} tiles)`}`
     }));
 
     return Element({
       style: 'display: flex; flex-direction: column; gap: 4px;',
       components: [
         // TODO: localize
-        Element({ tagName: 'span', innerHTML: 'Följande data kommer att sparas ner för att användas online.' }),
+        Element({ tagName: 'span', innerHTML: 'Följande data kommer att sparas ner för att användas offline.' }),
         Element({
           style: 'display: flex; flex-direction: column; gap: 4px;',
           components: [
@@ -232,6 +237,36 @@ export default function Offline({ localization }) {
         }
       }
     }
+  }
+
+  function syncOfflineLayers() {
+    console.log('Syncing offline layers');
+    const offlineLayers = getOfflineLayers();
+    const responses = offlineLayers.map(layer => layer.getSource().syncEdits());
+    Promise.all(responses).then((result) => {
+      console.log('Synced offline layers:', result);
+      viewer.getLogger().createToast({
+        // TODO: localize
+        status: 'success',
+        title: 'Synkroniserat',
+        message: 'Lokala lager synkroniserat.'
+      });
+    });
+  }
+
+  function clearLocalEdits() {
+    console.log('Clearing local edits');
+    const offlineLayers = getOfflineLayers();
+    const responses = offlineLayers.map(layer => layer.getSource().clearStorage());
+    Promise.all(responses).then((result) => {
+      console.log('Cleared local edits:', result);
+      viewer.getLogger().createToast({
+        // TODO: localize
+        status: 'success',
+        title: 'Rensat',
+        message: 'Lokala ändringar rensade.'
+      });
+    });
   }
 
   function createToolbarButtons() {
@@ -306,12 +341,34 @@ export default function Offline({ localization }) {
       tooltipStyle: 'bottom:-5px;'
     });
 
-    return [envelopeButton, clearButton, downloadButton, goOfflineButton];
+    syncButton = createButton({
+      cls: 'padding-small icon-smaller round light box-shadow relative',
+      async click() {
+        syncOfflineLayers();
+      },
+      icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><path d="M12,4 L12,1 L8,5 L12,9 L12,6 C15.31,6 18,8.69 18,12 C18,13.01 17.75,13.97 17.3,14.8 L18.76,16.26 C19.54,15.03 20,13.57 20,12 C20,7.58 16.42,4 12,4 Z M12,18 C8.69,18 6,15.31 6,12 C6,10.99 6.25,10.03 6.7,9.2 L5.24,7.74 C4.46,8.97 4,10.43 4,12 C4,16.42 7.58,20 12,20 L12,23 L16,19 L12,15 L12,18 Z" fill="#000000"></path></g></svg>',
+      tooltipText: 'Synkronisera lokala ändringar',
+      tooltipPlacement: 'south',
+      tooltipStyle: 'bottom:-5px;'
+    });
+
+    clearEditsButton = createButton({
+      cls: 'padding-small icon-smaller round light box-shadow relative',
+      async click() {
+        clearLocalEdits();
+      },
+      icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed"><path stroke-linecap="round" stroke-linejoin="round" d="m3 3 1.664 1.664M21 21l-1.5-1.5m-5.485-1.242L12 17.25 4.5 21V8.742m.164-4.078a2.15 2.15 0 0 1 1.743-1.342 48.507 48.507 0 0 1 11.186 0c1.1.128 1.907 1.077 1.907 2.185V19.5M4.664 4.664 19.5 19.5" /></svg>',
+      tooltipText: 'Rensa lokala ändringar',
+      tooltipPlacement: 'south',
+      tooltipStyle: 'bottom:-5px;'
+    });
+
+    return [envelopeButton, clearButton, downloadButton, goOfflineButton, syncButton, clearEditsButton];
   }
 
   function createToolbar(toolbarButtons) {
     const toolbarElement = Element({
-      cls: 'flex fixed bottom-center divider-horizontal bg-inverted z-index-ontop-high no-print',
+      cls: 'flex fixed bottom-center divider-horizontal bg-inverted z-index-ontop-high no-print small-gap',
       components: toolbarButtons
     });
 
@@ -336,6 +393,7 @@ export default function Offline({ localization }) {
   // Function to set the active state of the component.
   function setActive(state) {
     isActive = state;
+    document.getElementById(offlineButton.getId()).classList.toggle('active', isActive);
   }
 
   /**
@@ -391,6 +449,7 @@ export default function Offline({ localization }) {
       let totalBytes = 0;
 
       extentsForLayer.forEach(extent => {
+        if (!layer.getProperties().source.calculateEstimateForExtent) return;
         const { numberOfTiles, estimateBytes } = layer.getProperties().source.calculateEstimateForExtent(extent.extentid);
         totalTiles += numberOfTiles;
         totalBytes += estimateBytes;
@@ -408,7 +467,8 @@ export default function Offline({ localization }) {
       return {
         name: layer.getProperties().name,
         size,
-        tiles: totalTiles
+        tiles: totalTiles,
+        isVector: layer.getProperties().layerType === 'vector'
       };
     }));
 
@@ -426,7 +486,7 @@ export default function Offline({ localization }) {
     document.getElementById(toolbar.getId()).classList.add('o-hidden');
     setActive(false);
     clearOfflineSelections();
-    clearDrawings();
+    clearAndRemoveInteraction();
   }
 
   // Function to enable interaction and update button states.
@@ -459,6 +519,7 @@ export default function Offline({ localization }) {
       active: !isActive
     };
     //
+
     viewer.dispatch('toggleClickInteraction', detail);
   }
 
