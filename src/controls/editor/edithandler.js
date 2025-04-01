@@ -1088,8 +1088,8 @@ function onAttributesSave(features, attrs) {
           // No other validation is performed on searchList as the only thing that can be checked now is that value is in list
           // and that is handled inside the searchList itself.
           editEl[attribute.name] = attribute.searchList.getValue();
-        } else if (attribute.type === 'image') {
-          // File input's value is the filename, but the image itself is stored in the model
+        } else if (attribute.type === 'image' || attribute.type === 'audio' || attribute.type === 'video') {
+          // File input's value is the filename, but the media itself is stored in the model
           editEl[attribute.name] = attribute.val;
         } else { // Read value from input text, textarea or select
           editEl[attribute.name] = inputValue;
@@ -1212,6 +1212,16 @@ function onAttributesSave(features, attrs) {
         case 'image':
           valid.image = validate.image(inputValue) || inputValue === '' ? inputValue : false;
           if (!valid.image && inputValue !== '') {
+            if (!errorMsg) {
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            }
+          } else if (errorMsg) {
+            errorMsg.remove();
+          }
+          break;
+        case 'audio':
+          valid.audio = validate.audio(inputValue) || inputValue === '' ? inputValue : false;
+          if (!valid.audio && inputValue !== '') {
             if (!errorMsg) {
               errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
             }
@@ -1348,6 +1358,90 @@ function addImageListener() {
 }
 
 /**
+ * Returns a function that adds an event handler to read an audio file when user selects a file.
+ *
+ * @function
+ * @name addAudioListener
+ * @kind function
+ * @param {any} ): (obj
+ * @returns {void}
+ */
+function addAudioListener() {
+  const fn = (obj) => {
+    const fileReader = new FileReader();
+    const containerElement = document.getElementsByClassName(`.${obj.elId}`);
+
+    if (!containerElement) return;
+    const inputElement = document.querySelector(`.${obj.elId} > input[type='file']`);
+    const audioElement = document.querySelector(`.${obj.elId} > audio:first-of-type`);
+    const buttonElement = document.querySelector(`.${obj.elId} > input[type='button']`);
+
+    inputElement.addEventListener('change', (ev) => {
+      if (ev.target.files && ev.target.files[0]) {
+        audioElement.classList.remove('o-hidden');
+        buttonElement.classList.remove('o-hidden');
+        fileReader.onload = (e) => {
+          audioElement.src = e.target.result;
+          // eslint-disable-next-line no-param-reassign
+          obj.val = e.target.result;
+        };
+        fileReader.readAsDataURL(ev.target.files[0]);
+      }
+    });
+
+    buttonElement.addEventListener('click', () => {
+      inputElement.value = '';
+      audioElement.classList.add('o-hidden');
+      buttonElement.classList.add('o-hidden');
+    });
+  };
+
+  return fn;
+}
+
+/**
+ * Returns a function that adds an event handler to read an video file when user selects a file.
+ *
+ * @function
+ * @name addVideoListener
+ * @kind function
+ * @param {any} ): (obj
+ * @returns {void}
+ */
+function addVideoListener() {
+  const fn = (obj) => {
+    const fileReader = new FileReader();
+    const containerElement = document.getElementsByClassName(`.${obj.elId}`);
+
+    if (!containerElement) return;
+    const inputElement = document.querySelector(`.${obj.elId} > input[type='file']`);
+    const videoElement = document.querySelector(`.${obj.elId} > video:first-of-type`);
+    const buttonElement = document.querySelector(`.${obj.elId} > input[type='button']`);
+
+    inputElement.addEventListener('change', (ev) => {
+      if (ev.target.files && ev.target.files[0]) {
+        videoElement.classList.remove('o-hidden');
+        buttonElement.classList.remove('o-hidden');
+        fileReader.onload = (e) => {
+          videoElement.src = e.target.result;
+          // eslint-disable-next-line no-param-reassign
+          obj.val = e.target.result;
+        };
+        fileReader.readAsDataURL(ev.target.files[0]);
+      }
+    });
+
+    buttonElement.addEventListener('click', () => {
+      inputElement.value = '';
+      videoElement.classList.add('o-hidden');
+      buttonElement.classList.add('o-hidden');
+    });
+  };
+
+  return fn;
+}
+
+/**
  * Returns a click handler that should be attached to batch edit checkboxes to show or hide the input field
  * */
 function addBatchEditListener() {
@@ -1454,6 +1548,14 @@ function editAttributes(feat) {
           obj.isVisible = true;
           obj.elId = `input-${currentLayer}-${obj.name}`;
           obj.addListener = addImageListener();
+        } else if (obj.type === 'audio') {
+          obj.isVisible = true;
+          obj.elId = `input-${currentLayer}-${obj.name}`;
+          obj.addListener = addAudioListener();
+        } else if (obj.type === 'video') {
+          obj.isVisible = true;
+          obj.elId = `input-${currentLayer}-${obj.name}`;
+          obj.addListener = addVideoListener();
         } else {
           obj.isVisible = true;
           obj.elId = `input-${currentLayer}-${obj.name}`;

@@ -141,6 +141,24 @@ const createForm = function createForm(obj) {
       el += '</div>';
       break;
     }
+    case 'audio': {
+      const audioClass = val ? '' : 'o-hidden';
+      el = `<div class="${cls}"><label>${label}</label><br>`;
+      el += `<audio src="${val}" id="audio-upload" controls>Your browser does not support the audio tag.</audio>`;
+      el += `<input type="file" id="${id}" value="${val}" accept="audio/*"${disabled}>`;
+      el += `<input id="o-delete-audio-button" class="${audioClass}" type="button" value="Ta bort ljud"${disabled}>`;
+      el += '</div>';
+      break;
+    }
+    case 'video': {
+      const videoClass = val ? '' : 'o-hidden';
+      el = `<div class="${cls}"><label>${label}</label><br>`;
+      el += `<video src="${val}" id="video-upload" controls>Your browser does not support the video tag.</video>`;
+      el += `<input type="file" id="${id}" value="${val}" accept="video/*"${disabled}>`;
+      el += `<input id="o-delete-video-button" class="${videoClass}" type="button" value="Ta bort video"${disabled}>`;
+      el += '</div>';
+      break;
+    }
     case 'date':
       // Create a date input
       if (!val) {

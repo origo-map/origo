@@ -141,7 +141,11 @@ const getContent = {
   },
   audio(feature, attribute, attributes, map) {
     let val = '';
+    let title = '';
     if (typeof (feature.get(attribute.audio)) !== 'undefined') {
+      if (attribute.title) {
+        title = `<b>${attribute.title}</b>`;
+      }
       if (attribute.splitter) {
         const audioArr = feature.get(attribute.audio).split(attribute.splitter);
         audioArr.forEach((audio) => {
@@ -162,12 +166,16 @@ const getContent = {
     if (typeof (attribute.cls) !== 'undefined') {
       newElement.classList.add(attribute.cls);
     }
-    newElement.innerHTML = val;
+    newElement.innerHTML = `${title}${val}`;
     return newElement;
   },
   video(feature, attribute, attributes, map) {
     let val = '';
+    let title = '';
     if (typeof (feature.get(attribute.video)) !== 'undefined') {
+      if (attribute.title) {
+        title = `<b>${attribute.title}</b>`;
+      }
       if (attribute.splitter) {
         const videoArr = feature.get(attribute.video).split(attribute.splitter);
         videoArr.forEach((video) => {
@@ -188,7 +196,7 @@ const getContent = {
     if (typeof (attribute.cls) !== 'undefined') {
       newElement.classList.add(attribute.cls);
     }
-    newElement.innerHTML = val;
+    newElement.innerHTML = `${title}${val}`;
     return newElement;
   },
   carousel(feature, attribute, attributes, map) {
@@ -294,6 +302,14 @@ function getAttributesHelper(feature, layer, map) {
             ulList.classList.add('o-carousel-list');
           } else if (attribute.name) {
             val = getContent.name(feature, attribute, attributes, map);
+          } else if (attribute.audio) {
+            if (attributes[attribute.audio] !== '') {
+              val = getContent.audio(feature, attribute, attributes, map);
+            }
+          } else if (attribute.video) {
+            if (attributes[attribute.video] !== '') {
+              val = getContent.video(feature, attribute, attributes, map);
+            }
           } else {
             val = customAttribute(feature, attribute, attributes, map);
           }
