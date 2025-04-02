@@ -78,6 +78,22 @@ validate.image = (image) => {
   return false;
 };
 
+validate.audio = (audio) => {
+  if (audio) {
+    const regex = /\.(opus|flac|webm|weba|wav|ogg|m4a|mid|mp3|aiff|wma|au)$/i;
+    return regex.test(audio);
+  }
+  return false;
+};
+
+validate.video = (video) => {
+  if (video) {
+    const regex = /\.(ogm|wmv|mpg|webm|ogv|mov|asx|mpeg|mp4|m4v|avi|xbm)$/i;
+    return regex.test(video);
+  }
+  return false;
+};
+
 validate.color = (color) => {
   if (color) {
     const regex = /#([a-f0-9]{3}){1,2}\b/;
