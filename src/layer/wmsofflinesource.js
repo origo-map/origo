@@ -11,6 +11,7 @@ export default class WmsOfflineSource extends ImageTileOfflineSource {
   /**
    * Creates a new instance of WmsOfflineSource. Remember to call Init afterwards to set up async stuff.
    * @param {any} options The options to use.
+   * @param {any} viewer The one and only viewer
    */
   constructor(options, viewer) {
     // Most stuff is happening in the base class.
@@ -24,7 +25,8 @@ export default class WmsOfflineSource extends ImageTileOfflineSource {
   /**
    * Overrides base class.
    * Preloads the given extent. Does not resolve until all tiles have been stored in indexddb.
-   * @param {any} extent
+   * @param {any} extent The extent to download
+   * @param progressCallback function that is called for each preloaded tile
    *
    */
   async preload(extent, progressCallback) {
@@ -32,15 +34,16 @@ export default class WmsOfflineSource extends ImageTileOfflineSource {
     if (this.legendUrl) {
       const legendReq = await fetch(this.legendUrl);
       const legendImg = await legendReq.blob();
-      await this.storeLegendGraphic(legendImg);
-      await this.updateLegend();
+      // await this._storeLegendGraphic(legendImg);
+      // await this._updateLegend();
+      await super.setLegendGraphics(legendImg);
     }
 
     // Store extent first to get an id to link each tile with.
     // Usage is limited as a new extent will overwrite the tile and the connection
     // will be lost. Also if tile load fails, the extent will be bigger than actual extent of existing tiles
-    const extentId = await this.storeExtent(extent);
-    const extents = super.calculateTiles(extent);
+    const extentId = await super.storeExtent(extent);
+    const tiles = super.calculateTiles(extent);
     const paramstosend = Object.assign({}, this.options.params);
     // Clip all tiles to extent to avoid zoomed out levels to cover more area.
     // only works for GeoServer as clip is a vendor parameter.
@@ -54,11 +57,9 @@ export default class WmsOfflineSource extends ImageTileOfflineSource {
     // Request depends on params, so a new loader must be created for each call to preload.
     const wmsLoader = createLoader({ ratio: 1, url: this.options.url, params: paramstosend, crossOrigin: this.options.crossOrigin, projection: this.options.projection });
 
-    const allDownloadPromises = extents.map(async (currExtent) => {
-      console.log('One tile to load');
-
+    const allDownloadPromises = tiles.map(async (currExtent) => {
       // Fetch the image, returns an Image, which can't be stored in indexeddb as-as. Must convert it to Blob first
-      const wmsResponse = await wmsLoader(currExtent.currTileExtent, currExtent.resolution, 1.0);
+      const wmsResponse = await wmsLoader(currExtent.extent, currExtent.resolution, 1.0);
       // Convert to Blob. Quite a hassle. An alternative would be fetch-ing manually and just .blob() the result,
       // but that would require writing our own loader and the image.src trick used by the loader seems to circumvent
       // some cors limitation.
@@ -77,11 +78,10 @@ export default class WmsOfflineSource extends ImageTileOfflineSource {
       if (progressCallback) {
         progressCallback();
       }
-      // TODO: adjust compression ratio based on dowloaded tiles for better progress?
       return super.storeTile(currExtent.tileCoord[0], currExtent.tileCoord[1], currExtent.tileCoord[2], blob, extentId);
     });
-    // TODO: maybe do some error handling?
-    // Those who work work, all others fail ...
+    // Don't really care if each tile succeeded or not.
+    // Those who work work, those who fail will be missing in local storage when layer is displayed.
     await Promise.allSettled(allDownloadPromises);
 
     // Need to refresh to show tiles

@@ -1,18 +1,22 @@
+// We use underscore to denote private class methods. JS has no good support for that.
+/* eslint no-underscore-dangle: ["error", { "allowAfterThis": true }] */
 import ImageTileSource from 'ol/source/ImageTile';
 import { toSize } from 'ol/size';
 import { fromExtent } from 'ol/geom/Polygon';
 import Feature from 'ol/Feature';
+import createObjectStores from '../utils/createobjectstores';
 
 const databaseName = 'origoOfflineTiles';
 // Remember to bump this one (integers only) when table schema changes
-const databaseVersion = 4;
+const databaseVersion = 5;
 
 const tilesObjectsStoreName = 'tiles';
 const extentsObjectsStoreName = 'extents';
 const legendGraphicsObjectsStoreName = 'legendgraphics';
 
 const nameCol = 'layer';
-const extentCol = 'extentid';
+const extentIdCol = 'extentid';
+const extentCol = 'extent';
 const blobCol = 'file';
 const tileZCol = 'z';
 const tileXCol = 'x';
@@ -20,13 +24,11 @@ const tileYCol = 'y';
 
 /**
    * Static private helper to init db.
-   * @returns
+   * @returns {Promise<any>} A promise that resolves when init is done.
    */
 function initIndexedDb() {
-  // Define the tables as objects so actual creation can be perfomred in a general
-  // If anything is changed here, you must also bumb the version constant at the top of this file.
-  // loop later to keep function less hard coded.
-  // In this way it could be rewritten as a static helper in outer space if table definitions and database name are exposed as parameters.
+  // Define the tables as objects so actual creation can be performed in a general function
+  // If anything is changed here, you must also bump the version constant at the top of this file.
   const stores = [
     {
       // Store for the actual tiles
@@ -34,7 +36,7 @@ function initIndexedDb() {
       // Set up a composite key.
       keyPath: [nameCol, tileZCol, tileXCol, tileYCol],
       autoIncrement: false,
-      indices: [extentCol, nameCol]
+      indices: [extentIdCol, nameCol]
     },
     // Store for legendgraphics
     {
@@ -43,7 +45,7 @@ function initIndexedDb() {
       autoIncrement: false,
       indices: []
     },
-    // Store downloaded extents
+    // Store for downloaded extents
     {
       name: extentsObjectsStoreName,
       indices: [nameCol],
@@ -51,42 +53,17 @@ function initIndexedDb() {
       autoIncrement: true
     }
   ];
-  // This is the static general part.
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(databaseName, databaseVersion);
-    request.onerror = (event) => {
-      reject(event.target.error);
-    };
-    request.onsuccess = (event) => {
-      resolve(event.target.result);
-    };
-    request.onupgradeneeded = (event) => {
-      const db = event.target.result;
-
-      // Do an evil db update: always remove and rebuild, will destroy data but we don't
-      // have to bother with possible migrations
-      while (db.objectStoreNames.length > 0) {
-        db.deleteObjectStore(db.objectStoreNames[0]);
-      }
-      stores.forEach((store) => {
-        const objectStore = db.createObjectStore(store.name, {
-          keyPath: store.keyPath,
-          autoIncrement: store.autoIncrement
-        });
-        if (store.indices) {
-          store.indices.forEach((index) => {
-            objectStore.createIndex(index, index, { unique: false });
-          });
-        }
-      });
-    };
-  });
+  return createObjectStores(databaseName, databaseVersion, stores);
 }
 
 /**
- * Abstract class that implements an offline capable source for tiled image layers. Implement and override async preload(extent)
+ * Abstract class that implements an offline capable source for tiled image layers. Implement and override async preload(extent) to
+ * support any image source.
  */
 export default class ImageTileOfflineSource extends ImageTileSource {
+  /**
+   * Private pointer to db
+   */
   #db = null;
 
   constructor(options, viewer) {
@@ -97,6 +74,7 @@ export default class ImageTileOfflineSource extends ImageTileSource {
       attributions: options.attributions
     });
 
+    // Make sure this class is never instantiated
     if (this.constructor === ImageTileOfflineSource) {
       throw new Error("Class is of abstract type and can't be instantiated");
     }
@@ -114,20 +92,17 @@ export default class ImageTileOfflineSource extends ImageTileSource {
     this.noRemoteStyle = options.noRemoteStyle;
     this.extendedLegend = options.hasThemeLegend;
 
-    this.viewer.on('loaded', () => {
-
-    });
     // Set our loader for this source
     // As no loader is set in super constructor, this source state is 'loading' until we explitily set it to 'ready',
     // which is done in init() when db has been set up
     // One could argue for that a call to setLoader should also set state to ready as other sources seem to do ...
-    super.setLoader(this.myLoader);
+    super.setLoader(this._myLoader);
   }
 
   /**
-   * internal helper to calculate the tiles that will be fetched for the given extent
+   * Calculates the tiles that will be fetched for the given extent
    * @param {any} extent Extent to calculate tiles for
-   * @returns Array of objects with currTileExtent, resolution, tileCoord
+   * @returns Array of objects with extent, resolution, tileCoord
    */
   calculateTiles(extent) {
     const start = this.minZoom;
@@ -138,7 +113,7 @@ export default class ImageTileOfflineSource extends ImageTileSource {
       this.tileGrid.forEachTileCoord(extent, i, (tileCoord) => {
         const currTileExtent = this.tileGrid.getTileCoordExtent(tileCoord);
         const resolution = this.tileGrid.getResolution(i);
-        extents.push({ currTileExtent, resolution, tileCoord });
+        extents.push({ extent: currTileExtent, resolution, tileCoord });
       });
     }
     return extents;
@@ -157,7 +132,8 @@ export default class ImageTileOfflineSource extends ImageTileSource {
   }
 
   /**
-   * Preloads the given extent. Does not resolve until all tiles have been stored in indexddb.
+   * Preloads the given extent. Must not resolve until all tiles have been stored in indexddb.
+   * Override this method in your specialized class
    * @param {any} extent
    *
    */
@@ -173,22 +149,25 @@ export default class ImageTileOfflineSource extends ImageTileSource {
    * @param {any} y
    * @returns
    */
-  myLoader = async (z, x, y) => {
+  _myLoader = async (z, x, y) => {
     // Written as arrow function to bind "this", as it is called from outer space
-    const blob = await this.fetchTileFromDb(this.layerName, z, x, y);
+    const blob = await this._fetchTileFromDb(this.layerName, z, x, y);
     return createImageBitmap(blob);
 
     // If tile is not is in store, calling function will receive exception from fetchTileFromDb and ignores the tile
   };
 
-  async updateLegend() {
-    const imagen = await this.fetchLegendGrapicFromDb();
+  /**
+   * Updates the legend graphic when a symbol has been preloaded into db
+   */
+  async _updateLegend() {
+    const theImage = await this._fetchLegendGrapicFromDb();
     // This style will leave the objectUrl lingering as we don't know when it's loaded unless we can get hands on
     // the img tag that is created and attach a load event handler. Lucky for us, it only happens once and images are small.
     // Other solutions is to rewrite the style object to accept a clean up handler or when the tag is created a removeUrl handler
     // is attached if url has objectUrl format (src="blob:....") or possibly embed the image in the src attr but that would probaby waste more memory
-    if (imagen) {
-      const urlen = URL.createObjectURL(imagen);
+    if (theImage) {
+      const urlen = URL.createObjectURL(theImage);
       // This requires that viewer already has added us and that legend has been created.
       // Currently it should as there is no async code in viewer init so the await above will ensure that
       // viewer init has run to completion.
@@ -210,25 +189,33 @@ export default class ImageTileOfflineSource extends ImageTileSource {
   }
 
   /**
+   * Sets the legendgraphics persitantly
+   * @param {any} legendImg
+   */
+  async setLegendGraphics(legendImg) {
+    await this._storeLegendGraphic(legendImg);
+    await this._updateLegend();
+  }
+
+  /**
    * You must call init after constructor, before this method is finished the layer is not rendered.
    * No need to actually await unless you want to handle errors.
    * */
   async init() {
     // Connect to indexdDb
-    this.db = await initIndexedDb();
+    this.#db = await initIndexedDb();
 
     // Don't load image if client side symbol
     if (!this.noRemoteStyle) {
-      await this.updateLegend();
+      await this._updateLegend();
     }
 
-    console.log('Laddad');
     // Notify OL that we are ready to display some data
     super.setState('ready');
   }
 
   /**
-   * Private helper to store all downloaded extents
+   * Stores one extent
    *
    * @param {any} extent
    * @returns Id of created database row
@@ -238,43 +225,37 @@ export default class ImageTileOfflineSource extends ImageTileSource {
     newRecord[nameCol] = this.layerName;
     newRecord[extentCol] = extent;
     return new Promise((resolve, reject) => {
-      const store = this.db.transaction(extentsObjectsStoreName, 'readwrite').objectStore(extentsObjectsStoreName);
+      const store = this.#db.transaction(extentsObjectsStoreName, 'readwrite').objectStore(extentsObjectsStoreName);
       const req = store.put(newRecord);
 
       req.onsuccess = (event) => {
-        console.log('extent saved');
         // Return the created key
         resolve(event.target.result);
       };
       req.onerror = (event) => {
-        console.log(`Det sket sig ${event}`);
+        // Turn into Error
         reject(event.target.error);
       };
     });
   }
 
-  fetchExtentsFromDb() {
+  /**
+   * private helper to fetch all preloaded extents
+   * @returns
+   */
+  _fetchExtentsFromDb() {
     return new Promise((resolve, reject) => {
-      try {
-        const transaction = this.db.transaction(extentsObjectsStoreName, 'readonly');
-        const objectStore = transaction.objectStore(extentsObjectsStoreName);
+      const transaction = this.#db.transaction(extentsObjectsStoreName, 'readonly');
+      const objectStore = transaction.objectStore(extentsObjectsStoreName);
 
-        const index = objectStore.index(nameCol);
-        const getRequest = index.getAll(this.layerName);
-        getRequest.onsuccess = () => {
-          if (getRequest.result) {
-            resolve(getRequest.result);
-          } else {
-            console.log('No saved legend grapichs');
-            resolve(null);
-          }
-        };
-        getRequest.onerror = (event) => {
-          reject(event.target.error);
-        };
-      } catch (error) {
-        console.log(error);
-      }
+      const index = objectStore.index(nameCol);
+      const getRequest = index.getAll(this.layerName);
+      getRequest.onsuccess = () => {
+        resolve(getRequest.result);
+      };
+      getRequest.onerror = (event) => {
+        reject(event.target.error);
+      };
     });
   }
 
@@ -283,7 +264,7 @@ export default class ImageTileOfflineSource extends ImageTileSource {
    * @returns {Feature[]} Array of features representing each downloaded extent
    */
   async getExtents() {
-    const extents = await this.fetchExtentsFromDb();
+    const extents = await this._fetchExtentsFromDb();
     return extents.map(currExtent => {
       const geom = fromExtent(currExtent[extentCol]);
       const feat = new Feature(geom);
@@ -291,29 +272,32 @@ export default class ImageTileOfflineSource extends ImageTileSource {
     });
   }
 
-  storeLegendGraphic(blob) {
+  /**
+   * Stores a legend grapichs for this source in db.
+   * @param {any} blob
+   * @returns
+   */
+  _storeLegendGraphic(blob) {
     return new Promise((resolve, reject) => {
       const newRecord = {};
       newRecord[nameCol] = this.layerName;
       newRecord[blobCol] = blob;
 
-      const store = this.db.transaction(legendGraphicsObjectsStoreName, 'readwrite').objectStore(legendGraphicsObjectsStoreName);
+      const store = this.#db.transaction(legendGraphicsObjectsStoreName, 'readwrite').objectStore(legendGraphicsObjectsStoreName);
       store.put(newRecord);
-      // use trabsaction callback. It determines if anything actually was saved. Request's callback has more info on each record,
+      // use transaction callback. It determines if anything actually was saved. Request's callback has more info on each record,
       // but does not know if transaction actually was comitted
       store.transaction.oncomplete = (event) => {
-        console.log('file saved');
         resolve(event.target.result);
       };
       store.transaction.onerror = (event) => {
-        console.log(`Det sket sig ${event}`);
         reject(event.target.error);
       };
     });
   }
 
   /**
-   * Private helper to store one tile. Each tile is stored in its own transaction to not block table for other layers
+   * Stores one tile. Each tile is stored in its own transaction to not block table for other layers
    * (all layers are stored in the same table)
    * @param {any} layer
    * @param {any} z
@@ -331,18 +315,15 @@ export default class ImageTileOfflineSource extends ImageTileSource {
       tiledata[tileXCol] = x;
       tiledata[tileYCol] = y;
       tiledata[blobCol] = file;
-      tiledata[extentCol] = extentId;
+      tiledata[extentIdCol] = extentId;
 
-      const store = this.db.transaction(tilesObjectsStoreName, 'readwrite').objectStore(tilesObjectsStoreName);
+      const store = this.#db.transaction(tilesObjectsStoreName, 'readwrite').objectStore(tilesObjectsStoreName);
       // Use put to always overwrite. We don't care what's already in db
       store.put(tiledata);
-      // TODO: maybe use the request's callback. This is transaction, but we use one transaction for each tile not block table for other layers
       store.transaction.oncomplete = (event) => {
-        console.log('file saved');
         resolve(event.target.result);
       };
       store.transaction.onerror = (event) => {
-        console.log(`Det sket sig ${event}`);
         reject(event.target.error);
       };
     });
@@ -354,55 +335,52 @@ export default class ImageTileOfflineSource extends ImageTileSource {
    * @param {any} z
    * @param {any} x
    * @param {any} y
-   * @returns
+   * @returns {Promise<any>} When resolved returns the tile data
    */
 
-  fetchTileFromDb(layer, z, x, y) {
+  _fetchTileFromDb(layer, z, x, y) {
     return new Promise((resolve, reject) => {
-      try {
-        const transaction = this.db.transaction(tilesObjectsStoreName, 'readonly');
-        const objectStore = transaction.objectStore(tilesObjectsStoreName);
+      const transaction = this.#db.transaction(tilesObjectsStoreName, 'readonly');
+      const objectStore = transaction.objectStore(tilesObjectsStoreName);
 
-        // Table uses composite key. Must get using values in the same order as keyPath
-        const getRequest = objectStore.get([layer, z, x, y]);
-        getRequest.onsuccess = () => {
-          if (getRequest.result) {
-            resolve(getRequest.result.file);
-          } else {
-            const e = new Error('Hittades inte');
-            reject(e);
-          }
-        };
-        getRequest.onerror = (event) => {
-          reject(event.target.error);
-        };
-      } catch (error) {
-        console.log(error);
-      }
+      // Table uses composite key. Must get using values in the same order as keyPath
+      const getRequest = objectStore.get([layer, z, x, y]);
+      getRequest.onsuccess = () => {
+        if (getRequest.result) {
+          resolve(getRequest.result.file);
+        } else {
+          // Signal to OL that tile is missing so it can be ignored instead of blocking other tiles
+          const e = new Error('Tile not in store');
+          reject(e);
+        }
+      };
+      getRequest.onerror = (event) => {
+        reject(event.target.error);
+      };
     });
   }
 
-  fetchLegendGrapicFromDb() {
+  /**
+   * Private helper to fetch a legend grapics from db
+   * @returns
+   */
+  _fetchLegendGrapicFromDb() {
     return new Promise((resolve, reject) => {
-      try {
-        const transaction = this.db.transaction(legendGraphicsObjectsStoreName, 'readonly');
-        const objectStore = transaction.objectStore(legendGraphicsObjectsStoreName);
+      const transaction = this.#db.transaction(legendGraphicsObjectsStoreName, 'readonly');
+      const objectStore = transaction.objectStore(legendGraphicsObjectsStoreName);
 
-        const getRequest = objectStore.get(this.layerName);
-        getRequest.onsuccess = () => {
-          if (getRequest.result) {
-            resolve(getRequest.result[blobCol]);
-          } else {
-            console.log('No saved legend grapichs');
-            resolve(null);
-          }
-        };
-        getRequest.onerror = (event) => {
-          reject(event.target.error);
-        };
-      } catch (error) {
-        console.log(error);
-      }
+      const getRequest = objectStore.get(this.layerName);
+      getRequest.onsuccess = () => {
+        if (getRequest.result) {
+          resolve(getRequest.result[blobCol]);
+        } else {
+          // No graphic in db. This is not really an error. It is probably due to configuration changes.
+          resolve(null);
+        }
+      };
+      getRequest.onerror = (event) => {
+        reject(event.target.error);
+      };
     });
   }
 
@@ -412,57 +390,50 @@ export default class ImageTileOfflineSource extends ImageTileSource {
   clearStorage() {
     // Can't call it clear, baseclass has a clear
     return new Promise((resolve, reject) => {
-      try {
-        // Legend graphics are not cleared as they are overwritten, so we can leave them to have a nice legend.
-        const transaction = this.db.transaction([tilesObjectsStoreName, extentsObjectsStoreName], 'readwrite');
-        const objectStore = transaction.objectStore(tilesObjectsStoreName);
-        const extentsStore = transaction.objectStore(extentsObjectsStoreName);
+      // Legend graphics are not cleared as they are overwritten, so we can leave them to have a nice legend ready for next preload.
+      const transaction = this.#db.transaction([tilesObjectsStoreName, extentsObjectsStoreName], 'readwrite');
+      const objectStore = transaction.objectStore(tilesObjectsStoreName);
+      const extentsStore = transaction.objectStore(extentsObjectsStoreName);
 
-        const index = objectStore.index(nameCol);
-        const getRequest = index.getAll(this.layerName);
+      // indexeddb can't delete by index. We have to get by index and loop all items and delete
+      const index = objectStore.index(nameCol);
+      const getRequest = index.getAll(this.layerName);
 
-        const extentsIndex = extentsStore.index(nameCol);
-        const getExtentsReq = extentsIndex.getAll(this.layerName);
-        transaction.oncomplete = () => {
-          this.refresh();
-          console.log('All items deleted');
-          resolve(true);
-        };
-        getRequest.onsuccess = () => {
-          if (getRequest.result) {
-            getRequest.result.forEach(currRow => {
-              const delreq = objectStore.delete([currRow[nameCol], currRow[tileZCol], currRow[tileXCol], currRow[tileYCol]]);
-              delreq.onsuccess = () => {
-                console.log('Deleted tile');
-              };
-            });
-          } else {
-            const e = new Error('Hittades inte');
-            reject(e);
-          }
-        };
-        getRequest.onerror = (event) => {
-          reject(event.target.error);
-        };
-        getExtentsReq.onsuccess = () => {
-          if (getExtentsReq.result) {
-            getExtentsReq.result.forEach(currRow => {
-              const delreq = extentsStore.delete(currRow.rid);
-              delreq.onsuccess = () => {
-                console.log('Deleted extent');
-              };
-            });
-          } else {
-            const e = new Error('Hittades inte');
-            reject(e);
-          }
-        };
-        getExtentsReq.onerror = (event) => {
-          reject(event.target.error);
-        };
-      } catch (error) {
-        console.log(error);
-      }
+      // indexeddb can't delete by index. We have to get by index and loop all items and delete
+      const extentsIndex = extentsStore.index(nameCol);
+      const getExtentsReq = extentsIndex.getAll(this.layerName);
+
+      // When transaction completes (all gets and deletes are done) we are done and can resolve
+      transaction.oncomplete = () => {
+        this.refresh();
+        resolve(true);
+      };
+      getRequest.onsuccess = () => {
+        // Only delete if there are something to delete
+        if (getRequest.result) {
+          getRequest.result.forEach(currRow => {
+            // Delete deletes by key.
+            // Don't really care if this actually deletes the row so no need to set up handlers.
+            objectStore.delete([currRow[nameCol], currRow[tileZCol], currRow[tileXCol], currRow[tileYCol]]);
+          });
+        }
+      };
+      getRequest.onerror = (event) => {
+        reject(event.target.error);
+      };
+      getExtentsReq.onsuccess = () => {
+        // Only delete if there are something to delete
+        if (getExtentsReq.result) {
+          getExtentsReq.result.forEach(currRow => {
+            // Delete deletes by key.
+            // Don't really care if this actually deletes the row so no need to set up handlers
+            extentsStore.delete(currRow.rid);
+          });
+        }
+      };
+      getExtentsReq.onerror = (event) => {
+        reject(event.target.error);
+      };
     });
   }
 }

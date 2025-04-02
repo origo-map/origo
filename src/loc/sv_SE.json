@@ -70,9 +70,36 @@
             "landscape": "Liggande",
             "landscapeAriaLabel": "Liggande"
         },
-        "offline": {
-            "btn_tool_title": "Förbered för att gå offline"
-        }
+      "offline": {
+        "btn_tool_title": "Offline verktygslåda",
+        "dlg_download_tile": "Pågående nedladdningar",
+        "dlg_download_progress": "Förlopp",
+        "dlg_download_layers": "Pågående nedladdningar",
+        "dlg_download_no_active": "Inga pågående nedladdningar",
+        "btn_envelope_pending_edits": "Du har osynkroniserade lokala redigeringar. Du måste antingen synkronisera dem eller tömma allt lokalt data.",
+        "dlg_save_abort": "Avbryt",
+        "dlg_save_save": "Starta",
+        "toast_starting_title": "Nedladdning påbörjad",
+        "toast_starting_body": "Lagren laddas ner i bakgrunden.",
+        "toast_finished_title": "Nedladdning klar",
+        "toast_finished_body": "Dina lager är klara att användas offline",
+        "global_layer": "Lager",
+        "global_tiles": "tiles",
+        "global_vector": "vektor",
+        "global_error": "Fel!",
+        "dlg_save_body": "Följande data kommer att laddas ner",
+        "dlg_save_title": "Ladda ner lager",
+        "toast_sync_title": "Synchronized",
+        "toast_sync_body": "Alla lokala redigeringar har synkroniserats",
+        "btn_envelope_tooltip": "Rita en rektangel för att ladda ner",
+        "btn_clear_confirm": "Detta kommer att radera alla lokala lager inklusive osynkronsierade lokala redigeringar. Fortsätt?",
+        "btn_clear_tooltip": "Radera allt lokalt data",
+        "toast_clear_title": "Lokalt data raderat",
+        "toast_clear_body": "Allt loklat data har raderats",
+        "btn_download_tooltip": "Visa pågående nedladdningar",
+        "btn_offline_tooltip": "Växla onlineläge",
+        "btn_sync_tooltip": "Synkronisera lokala redigeringar"
+      }
     },
     "style": {
         "drawStyles": {

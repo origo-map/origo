@@ -70,9 +70,36 @@
             "landscape": "Landscape",
             "landscapeAriaLabel": "Landscape"
         },
-        "offline": {
-            "btn_tool_title": "Prepear to go offline"
-        }
+      "offline": {
+        "btn_tool_title": "Offline toolbar",
+        "dlg_download_tile":  "Ongoing downloads",
+        "dlg_download_progress": "Progress",
+        "dlg_download_layers": "Ongoing downloads",
+        "dlg_download_no_active": "No ongoing downloads",
+        "btn_envelope_pending_edits": "You have pending edits. Either sync or clear local storage",
+        "dlg_save_abort": "Abort",
+        "dlg_save_save": "Start",
+        "toast_starting_title": "Preloading in progress",
+        "toast_starting_body": "Your layers are being downloaded in the background",
+        "toast_finished_title": "Layers saved",
+        "toast_finished_body": "Your layers are ready to be used offline",
+        "global_layer": "Layer",
+        "global_tiles": "tiles",
+        "global_vector": "vector",
+        "global_error": "Error!",
+        "dlg_save_body": "The following data will be downloaded",
+        "dlg_save_title": "Download layers",
+        "toast_sync_title": "Synchronized",
+        "toast_sync_body": "All local edits have been synchronised",
+        "btn_envelope_tooltip": "Draw a rectangle to download",
+        "btn_clear_confirm": "This will remove all downloaded layers including unsynced edits. Proceed?",
+        "btn_clear_tooltip":  "Delete downladed data",
+        "toast_clear_title": "Local layers deleted",
+        "toast_clear_body": "All local layer data has been deleted",
+        "btn_download_tooltip": "Ongoing downloads",
+        "btn_offline_tooltip": "Toggle offline mode",
+        "btn_sync_tooltip" :  "Synchronize local edits"
+      }
     },
     "style": {
         "drawStyles": {

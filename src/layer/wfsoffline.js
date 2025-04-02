@@ -1,10 +1,6 @@
-import { createXYZ } from 'ol/tilegrid';
 import vector from './vector';
-import WfsSource from './wfssource';
-import WfsOfflineSource from './wfsoflinesource';
+import WfsOfflineSource from './wfsofflinesource';
 
-// TODO: Add option for overriding preload extent? Can set layer's extent, map's extent, infinity (could be a problem with geoserver) or specific extent?
-// This can be useful for sparse data. If used, no extent should be recorded or returned.
 export default function wfs(layerOptions, viewer) {
   const wfsDefault = {
     layerType: 'vector'
@@ -39,23 +35,16 @@ export default function wfs(layerOptions, viewer) {
     sourceOptions.isTable = true;
     wfsOptions.visible = true;
   }
-  
+
   const wfsSource = new WfsOfflineSource(sourceOptions, viewer);
   // This call is async, but we can't await it here. Let it just finish when it's done.
-  wfsSource.init().then(() => {
-    // TODO: remove debug logging
-    console.log(`init offline layer ${wfsOptions.id}`);
-  })
+  wfsSource.init()
     .catch((e) => {
+      // TODO: Localize. How? Controls are added later.
       const msg = `Failed to initialise offline database${e}`;
       viewer.getLogger().createToast({ status: 'danger', message: msg });
-      // TODO: remove debug logging
-      console.error(`Failed to initialise offline database${e}`);
     });
   const newlayer = vector(wfsOptions, wfsSource, viewer);
-  // TODO: remove it's just a test
-  newlayer.on('sourceready', e => {
-    console.log(e);
-  });
+
   return newlayer;
 }

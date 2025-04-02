@@ -13,7 +13,7 @@ export default function transactionhandler(transaction, layerName, viewer) {
   const layer = viewer.getLayer(layerName);
   // Some layers don't have source, but all editable will
   if (layer.getSource() instanceof VectorOfflineSource) {
-    return layer.getSource().persistEdits(transaction)
+    return layer.getSource().persistEdits(transaction);
   }
   const type = viewer.getLayer(layerName).get('type');
   if (Object.prototype.hasOwnProperty.call(transactions, type)) {

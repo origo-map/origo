@@ -2,31 +2,14 @@ import WmsOfflineSource from './wmsofflinesource';
 import tile from './tile';
 import maputils from '../maputils';
 
+/** Name of temporary legend style */
+const offlineStyleName = 'wmsofflinestyle';
 /**
  * Factory method for wmsoffline layer.
  *
- * Example configuration:
- * {
- *    "offlineStoreName": "multipoly", // Name in indexeddb. Not same as layer as it can be shared between applications
- *    "offlineMinZoom": 6, // outermost zoom level to cache. Use usual minZoom for visibility.
- *    "offlineMaxZoom": 8, // innermost zoom level to cache. Use usual maxZoom for visibility
- *    "name": "sf:multipolygonlager", // Same as for WMS. id can also be used
- *    "title": "Offline", // Title in legend
- *    "group": "root",
- *    "type": "WMSOFFLINE", // This type,
- *    "visible": true,
- *    "source": "local", // named WMS source
- *    "compressionRatio": 0.1 // To calculate esimated download size
- *  }
- *
- * More options are available:
- *
- * style: Only support for named style with one icon or image or client side symbol for legend. Image, icon and affects legend. Also supports wmsStyle for alternative
- *        server style. If no style is specified or style contain no icon, image or client side symbol, server side style is queried on preload using getLegendGraphics
- * params: any optional WMS params. Necessary params will be overridden (LAYERS, MINX etc)
- * @param {any} layerOptions
- * @param {any} viewer
- * @returns
+ * @param {Object} layerOptions All options as per documentation
+ * @param {any} viewer The one and only viewer
+ * @returns {any} An OL Layer instance
  */
 const wmsoffline = function wmsoffline(layerOptions, viewer) {
   const wmsDefault = {
@@ -54,8 +37,8 @@ const wmsoffline = function wmsoffline(layerOptions, viewer) {
   sourceOptions.name = wmsOptions.name;
   sourceOptions.clip = wmsOptions.clip;
   sourceOptions.hasThemeLegend = wmsOptions.hasThemeLegend;
-  // Style handling is a bit messy as we can't call network. Could possibly reworked to rely on SW caching, but then we need to
-  // cache server side generated legend URL
+  // Style handling is a bit messy as we can't call network. The source will have to fetch from server and store in indexedDb
+  // if a server side image is to be used.
   if (wmsOptions.style) {
     const namedStyle = viewer.getStyle(wmsOptions.style);
     // Hijack remote styles as they must be performed by source
@@ -86,15 +69,15 @@ const wmsoffline = function wmsoffline(layerOptions, viewer) {
   if (!sourceOptions.noRemoteStyle) {
     // Set a temmporary default style until the real deal can be fetched from indexeddb
     // which can only happen after first preload.
-    // TODO: Add symbol to svg file and reference from there (how?)
+    // This is the offline wifi svg, but setting styles this way does not support referencing the linked svg.
     const svg = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M21 11l2-2c-3.73-3.73-8.87-5.15-13.7-4.31l2.58 2.58c3.3-.02 6.61 1.22 9.12 3.73zm-2 2c-1.08-1.08-2.36-1.85-3.72-2.33l3.02 3.02.7-.69zM9 17l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zM3.41 1.64L2 3.05 5.05 6.1C3.59 6.83 2.22 7.79 1 9l2 2c1.23-1.23 2.65-2.16 4.17-2.78l2.24 2.24C7.79 10.89 6.27 11.74 5 13l2 2c1.35-1.35 3.11-2.04 4.89-2.06l7.08 7.08 1.41-1.41L3.41 1.64z"/></svg>';
     const style = [[{
       image: {
         src: `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`
       }
     }]];
-    viewer.addStyle('wmsofflinestyle', style);
-    wmsOptions.styleName = 'wmsofflinestyle';
+    viewer.addStyle(offlineStyleName, style);
+    wmsOptions.styleName = offlineStyleName;
   }
 
   if (wmsOptions.tileGrid) {
@@ -126,15 +109,11 @@ const wmsoffline = function wmsoffline(layerOptions, viewer) {
 
   const source = new WmsOfflineSource(sourceOptions, viewer);
   // This call is async, but we can't await it here. Let it just finish when it's done.
-  source.init().then(() => {
-    // TODO: remove debug logging
-    console.log(`init offline layer ${wmsOptions.id}`);
-  })
+  source.init()
     .catch((e) => {
+      // TODO: How to localize outside a control?
       const msg = `Failed to initialise offline database${e}`;
       viewer.getLogger().createToast({ status: 'danger', message: msg });
-      // TODO: remove debug logging
-      console.error(`Failed to initialise offline database${e}`);
     });
   // All wmsOptions will by magic become properties on the layer.
   return tile(wmsOptions, source);
