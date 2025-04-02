@@ -1,10 +1,11 @@
-@import './minireset';
+@use './minireset';
+@use '../variables';
 
 button,
 input,
 select,
 textarea {
-  font-family: $font-family-base;
+  font-family: variables.$font-family-base;
 }
 
 input[type=text],
@@ -31,35 +32,35 @@ h6,
 .h5,
 .h6 {
   margin: 0;
-  margin-bottom: $headings-margin-bottom;
+  margin-bottom: variables.$headings-margin-bottom;
 }
 
 h1,
 .h1 {
-  font-size: $h1-font-size;
-  line-height: $line-height-smaller;
+  font-size: variables.$h1-font-size;
+  line-height: variables.$line-height-smaller;
 }
 
 h2,
 .h2 {
-  font-size: $h2-font-size;
-  line-height: $line-height-small;
+  font-size: variables.$h2-font-size;
+  line-height: variables.$line-height-small;
 }
 
 h3,
-.h3 { font-size: $h3-font-size; }
+.h3 { font-size: variables.$h3-font-size; }
 
 h4,
-.h4 { font-size: $h4-font-size; }
+.h4 { font-size: variables.$h4-font-size; }
 
 h5,
-.h5 { font-size: $h5-font-size; }
+.h5 { font-size: variables.$h5-font-size; }
 
 h6,
-.h6 { font-size: $h6-font-size; }
+.h6 { font-size: variables.$h6-font-size; }
 
 p {
-  line-height: $line-height-small;
+  line-height: variables.$line-height-small;
 }
 
 li {
@@ -67,14 +68,14 @@ li {
 }
 
 a {
-  color: $link-color;
+  color: variables.$link-color;
 
   strong {
     color: currentColor;
   }
 
   &:hover {
-    color: $link-hover;
+    color: variables.$link-hover;
   }
 }
 // Workaround for IE. If not applied causes IE to freeze if svg is removed from dom

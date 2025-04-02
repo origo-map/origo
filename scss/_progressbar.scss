@@ -1,5 +1,7 @@
+@use './ui/variables';
+
 .o-progress {
-  background: $blue;
+  background: variables.$blue;
   bottom: 0;
   height: 0.2em;
   left: 0;

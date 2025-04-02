@@ -6,6 +6,7 @@ let mainContainer;
 let urvalContainer;
 let sublists;
 let subexports;
+let subexportResponses;
 let urvalElements;
 let urvalElementContents;
 let expandableContents;
@@ -184,9 +185,19 @@ function createUrvalElement(selectionGroup, selectionGroupTitle) {
   sublistContainer.classList.add('sublist');
   sublists.set(selectionGroup, sublistContainer);
 
-  const subexportComponent = createSubexportComponent({ selectionGroup, viewer, exportOptions });
+  // Updates the response content for the given selectionGroup
+  const responseHandler = function responseHandler(responseSelectionGroup, text) {
+    const responseContainer = subexportResponses.get(responseSelectionGroup);
+    responseContainer.innerHTML = text;
+  };
+
+  const subexportComponent = createSubexportComponent({ selectionGroup, viewer, exportOptions, responseHandler });
   subexportComponent.classList.add('sublist');
   subexports.set(selectionGroup, subexportComponent);
+
+  const subexportResponseComponent = document.createElement('div');
+  subexportResponseComponent.classList.add('export-response-container');
+  subexportResponses.set(selectionGroup, subexportResponseComponent);
 
   const urvalContentCmp = Component({
     render() {
@@ -337,6 +348,8 @@ function createListElement(item) {
 
   const subexportToAppend = subexports.get(item.getSelectionGroup());
   urvalContent.appendChild(subexportToAppend);
+  const subexportResponseToAppend = subexportResponses.get(item.getSelectionGroup());
+  urvalContent.appendChild(subexportResponseToAppend);
 }
 
 function expandListElement(featureId) {
@@ -424,6 +437,7 @@ function init(options) {
 
   sublists = new Map();
   subexports = new Map();
+  subexportResponses = new Map();
   urvalElements = new Map();
   urvalElementContents = new Map();
   expandableContents = new Map();

@@ -1,5 +1,5 @@
 import { Component, Button, dom } from '../ui';
-import editorToolbar from './editor/editortoolbar';
+import EditorToolbar from './editor/editortoolbar';
 import EditHandler from './editor/edithandler';
 
 const Editor = function Editor(options = {}) {
@@ -13,6 +13,7 @@ const Editor = function Editor(options = {}) {
   let target;
   let viewer;
   let isVisible = isActive;
+  let editorToolbar;
   let toolbarVisible = false;
   /** Keeps track of the last selected item in featureinfo. We need to use our own variable for this
    * in order to determine if editor got activated directly from featureinfo or some other tool has been active between. */
@@ -77,7 +78,9 @@ const Editor = function Editor(options = {}) {
         autoSave,
         currentLayer,
         editableLayers: editableFeatureLayers,
-        isActive
+        isActive,
+        viewer,
+        modifyTools: options.modifyTools
       });
       const handlerOptions = Object.assign({}, options, {
         autoForm,
@@ -88,6 +91,15 @@ const Editor = function Editor(options = {}) {
         featureList
       });
       editHandler = EditHandler(handlerOptions, viewer);
+      // Relay selected features from handler to toolbar so toolbar can calculate which tools are available for the current situation
+      editHandler.on('select', (f) => {
+        editorToolbar.setSelection(f);
+      });
+      editorToolbar = EditorToolbar(toolbarOptions);
+      // Set active modify tool when selected in toolbar
+      editorToolbar.on('modifytoolchanged', (e) => {
+        editHandler.setModifyTool(e);
+      });
 
       // Set up eventhandler for when featureinfo selects (or highlights) a feature
       const featureInfo = viewer.getFeatureinfo();
@@ -126,9 +138,8 @@ const Editor = function Editor(options = {}) {
         }
       });
       this.addComponent(editorButton);
-      this.on('render', this.onRender);
+      this.addComponent(editorToolbar);
       this.render();
-      editorToolbar.init(toolbarOptions, viewer);
     },
     onInit() {
       const state = isActive ? 'active' : 'initial';
@@ -163,6 +174,8 @@ const Editor = function Editor(options = {}) {
       const htmlString = editorButton.render();
       const el = dom.html(htmlString);
       document.getElementById(target).appendChild(el);
+      // Toolbar injects itself to DOM, so no need to handle return value
+      editorToolbar.render();
       this.dispatch('render');
       viewer.dispatch('toggleClickInteraction', {
         name: 'editor',
@@ -172,6 +185,7 @@ const Editor = function Editor(options = {}) {
     createFeature,
     editFeatureAttributes,
     deleteFeature,
+
     changeActiveLayer: (layerName) => {
       // Only need to actually change layer if editor is active. Otherwise state is just set in toolbar and will
       // activate set layer when toggled visible

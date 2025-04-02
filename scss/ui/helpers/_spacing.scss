@@ -1,25 +1,27 @@
+@use '../variables';
+
 .spacing-horizontal-large > * {
-  margin: 0 $spacing-large;
+  margin: 0 variables.$spacing-large;
 }
 
 .spacing-horizontal > * {
-  margin: 0 $spacing-standard;
+  margin: 0 variables.$spacing-standard;
 }
 
 .spacing-horizontal-small > * {
-  margin: 0 $spacing-small;
+  margin: 0 variables.$spacing-small;
 }
 
 .spacing-vertical-large > * {
-  margin: 0 0 $spacing-large 0;
+  margin: 0 0 variables.$spacing-large 0;
 }
 
 .spacing-vertical > * {
-  margin: 0 0 $spacing-standard 0;
+  margin: 0 0 variables.$spacing-standard 0;
 }
 
 .spacing-vertical-small > * {
-  margin: 0 0 $spacing-standard 0;
+  margin: 0 0 variables.$spacing-standard 0;
 }
 
 .spacing-horizontal-large:first-child,

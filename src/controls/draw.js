@@ -5,8 +5,14 @@ import exportToFile from '../utils/exporttofile';
 import validate from '../utils/validate';
 
 const Draw = function Draw(options = {}) {
+  const localization = options.localization;
+
+  function localize(key) {
+    return localization.getStringByKeys({ targetParentKey: 'draw', targetKey: key });
+  }
+
   const {
-    buttonText = 'Rita',
+    buttonText = localize('title'),
     placement = ['menu'],
     icon = '#fa-pencil',
     annotation,
@@ -21,9 +27,9 @@ const Draw = function Draw(options = {}) {
   } = options;
 
   const drawDefaults = {
-    layerTitle: 'Ritlager',
+    layerTitle: localize('drawLayerTitleDefault'),
     groupName: 'none',
-    groupTitle: 'Ritlager',
+    groupTitle: localize('drawGroupTitleDefault'),
     visible: true,
     styleByAttribute: true,
     queryable: false,
@@ -105,19 +111,19 @@ const Draw = function Draw(options = {}) {
           cls: 'margin-small icon-smaller light box-shadow',
           style: 'border-radius: 3px',
           icon: '#ic_save_24px',
-          text: 'Spara'
+          text: localize('popupSaveButton')
         });
 
         const cancelButton = Button({
           cls: 'margin-small icon-smaller light box-shadow',
           style: 'border-radius: 3px',
           icon: '#ic_close_24px',
-          text: 'Avbryt'
+          text: localize('popupCancelButton')
         });
 
         const inputEl = Input({
           cls: 'no-margin',
-          placeholderText: 'Ange popuptext',
+          placeholderText: localize('popupPlaceholderText'),
           value: val
         });
 
@@ -127,7 +133,7 @@ const Draw = function Draw(options = {}) {
         });
 
         const modal = Modal({
-          title: 'Popuptext',
+          title: localize('popupTextModalTitle'),
           contentCmp: modalContent,
           target: viewer.getId()
         });
@@ -175,7 +181,7 @@ const Draw = function Draw(options = {}) {
 
         const inputEl = Input({
           cls: 'margin-right',
-          placeholderText: 'Ange lagernamn',
+          placeholderText: localize('layerDialogLayerNamePlaceholder'),
           value: layerTitle
         });
 
@@ -191,7 +197,7 @@ const Draw = function Draw(options = {}) {
             drawHandler.setActiveLayer(drawLayer);
             thisForm.dispatch('activeLayerChange', { layername: layerName });
           },
-          tooltipText: 'Aktivera ritlager',
+          tooltipText: localize('layerDialogActivateLayerTooltip'),
           tooltipPlacement: 'west'
         });
 
@@ -203,13 +209,13 @@ const Draw = function Draw(options = {}) {
           cls: 'padding-small icon-smaller round light box-shadow relative o-tooltip',
           icon: '#ic_delete_24px',
           async click() {
-            if (window.confirm('Vill du radera det här ritlagret?') === true) {
+            if (window.confirm(localize('layerDialogDeleteLayerConfirm')) === true) {
               await map.removeLayer(drawLayer);
               modal.closeModal();
               thisForm.show();
             }
           },
-          tooltipText: 'Radera ritlager',
+          tooltipText: localize('layerDialogDeleteLayerTooltip'),
           tooltipPlacement: 'west'
         });
 
@@ -223,7 +229,7 @@ const Draw = function Draw(options = {}) {
               filename: drawLayer.get('title') || 'export'
             });
           },
-          tooltipText: 'Ladda ner ritlager',
+          tooltipText: localize('layerDialogDownloadLayerTooltip'),
           tooltipPlacement: 'west'
         });
 
@@ -240,7 +246,7 @@ const Draw = function Draw(options = {}) {
         cls: 'icon-smaller light box-shadow',
         style: 'border-radius: 3px',
         icon: '#ic_add_24px',
-        text: 'Nytt ritlager',
+        text: localize('layerDialogAddLayerButton'),
         async click() {
           let title = drawOptions.layerTitle;
           if (viewer.getLayersByProperty('title', title).length > 0) {
@@ -295,15 +301,15 @@ const Draw = function Draw(options = {}) {
           inputEl.value = null;
           inputEl.click();
         },
-        text: 'Importera ritlager',
-        ariaLabel: 'Importera ritlager'
+        text: localize('layerDialogImportLayerButton'),
+        ariaLabel: localize('layerDialogImportLayerButton')
       });
 
       const okButton = Button({
         cls: 'icon-smaller light box-shadow',
         style: 'border-radius: 3px',
         icon: '#ic_check_24px',
-        text: 'OK',
+        text: localize('layerDialogOkButton'),
         click() {
           modal.closeModal();
         }
@@ -324,7 +330,7 @@ const Draw = function Draw(options = {}) {
       });
 
       modal = Modal({
-        title: 'Ritlager',
+        title: localize('layerDialogTitle'),
         contentCmp: modalContent,
         target: viewer.getId(),
         style: 'max-width:100%;width:400px;'
@@ -344,7 +350,7 @@ const Draw = function Draw(options = {}) {
       }
     },
     icon: '#ic_place_24px',
-    tooltipText: 'Punkt',
+    tooltipText: localize('pointButtonTooltip'),
     tooltipPlacement: 'south',
     tooltipStyle: 'bottom:-5px;',
     state: 'inactive'
@@ -360,7 +366,7 @@ const Draw = function Draw(options = {}) {
       }
     },
     icon: '#ic_timeline_24px',
-    tooltipText: 'Linje',
+    tooltipText: localize('lineButtonTooltip'),
     tooltipPlacement: 'south',
     tooltipStyle: 'bottom:-5px;'
   });
@@ -375,7 +381,7 @@ const Draw = function Draw(options = {}) {
       }
     },
     icon: '#o_polygon_24px',
-    tooltipText: 'Polygon',
+    tooltipText: localize('polygonButtonTooltip'),
     tooltipPlacement: 'south',
     tooltipStyle: 'bottom:-5px;'
   });
@@ -390,7 +396,7 @@ const Draw = function Draw(options = {}) {
       }
     },
     icon: '#ic_title_24px',
-    tooltipText: 'Text',
+    tooltipText: localize('textButtonTooltip'),
     tooltipPlacement: 'south',
     tooltipStyle: 'bottom:-5px;'
   });
@@ -404,7 +410,7 @@ const Draw = function Draw(options = {}) {
         attributeForm.show();
       },
       icon: '#ic_textsms_24px',
-      tooltipText: 'Attribut',
+      tooltipText: localize('attributeButtonTooltip'),
       tooltipPlacement: 'south',
       tooltipStyle: 'bottom:-5px;',
       state: 'disabled'
@@ -423,7 +429,7 @@ const Draw = function Draw(options = {}) {
       } else { this.setState('active'); }
     },
     icon: '#ic_palette_24px',
-    tooltipText: 'Stil',
+    tooltipText: localize('styleButtonTooltip'),
     tooltipPlacement: 'south',
     tooltipStyle: 'bottom:-5px;'
   });
@@ -437,7 +443,7 @@ const Draw = function Draw(options = {}) {
         layerForm.show();
       },
       icon: '#ic_layers_24px',
-      tooltipText: 'Lager',
+      tooltipText: localize('layerButtonTooltip'),
       tooltipPlacement: 'south',
       tooltipStyle: 'bottom:-5px;'
     });
@@ -452,7 +458,7 @@ const Draw = function Draw(options = {}) {
         thisComponent.dispatch('saveFeatures', true);
       },
       icon: '#ic_save_24px',
-      tooltipText: 'Spara',
+      tooltipText: localize('saveButtonTooltip'),
       tooltipPlacement: 'south',
       tooltipStyle: 'bottom:-5px;',
       state: 'disabled'
@@ -473,7 +479,7 @@ const Draw = function Draw(options = {}) {
         });
       },
       icon: '#ic_download_24px',
-      tooltipText: 'Ladda ner',
+      tooltipText: localize('downloadButtonTooltip'),
       tooltipPlacement: 'south',
       tooltipStyle: 'bottom:-5px;'
     });
@@ -488,7 +494,7 @@ const Draw = function Draw(options = {}) {
       }
     },
     icon: '#ic_delete_24px',
-    tooltipText: 'Ta bort',
+    tooltipText: localize('deleteButtonTooltip'),
     tooltipPlacement: 'south',
     tooltipStyle: 'bottom:-5px;',
     state: 'disabled'
@@ -505,7 +511,7 @@ const Draw = function Draw(options = {}) {
       viewer.dispatch('toggleClickInteraction', { name: 'draw', active: false });
     },
     icon: '#ic_close_24px',
-    tooltipText: 'Stäng',
+    tooltipText: localize('closeButtonTooltip'),
     tooltipPlacement: 'south',
     tooltipStyle: 'bottom:-5px;'
   });
@@ -549,7 +555,7 @@ const Draw = function Draw(options = {}) {
         Text: textButton
       };
       const extraTools = drawOptions.drawTools || [];
-      drawExtraTools(extraTools, viewer, drawTools);
+      drawExtraTools({ extraTools, viewer, toolCmps: drawTools, localize });
     },
     onAdd(evt) {
       viewer = evt.target;

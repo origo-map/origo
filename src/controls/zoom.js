@@ -10,6 +10,11 @@ const Zoom = function Zoom(options = {}) {
   let viewer;
   let zoomIn;
   let zoomOut;
+  const localization = options.localization;
+
+  function localize(key) {
+    return localization.getStringByKeys({ targetParentKey: 'zoom', targetKey: key });
+  }
 
   const zoomByDelta = function zoomByDelta(deltaValue) {
     const map = viewer.getMap();
@@ -43,7 +48,7 @@ const Zoom = function Zoom(options = {}) {
           zoomByDelta(delta);
         },
         icon: '#ic_add_24px',
-        tooltipText: 'Zooma in i kartan',
+        tooltipText: localize('zoomInButtonTooltip'),
         tooltipPlacement: 'east'
       });
       zoomOut = Button({
@@ -52,7 +57,7 @@ const Zoom = function Zoom(options = {}) {
           zoomByDelta(-delta);
         },
         icon: '#ic_remove_24px',
-        tooltipText: 'Zooma ut i kartan',
+        tooltipText: localize('zoomOutButtonTooltip'),
         tooltipPlacement: 'east'
       });
     },

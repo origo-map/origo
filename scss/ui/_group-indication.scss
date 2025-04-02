@@ -1,9 +1,11 @@
+@use './variables';
+
 .group-indication {
-  border-left: medium solid $primary-color;
+  border-left: medium solid variables.$primary-color;
   transition: border-left 0.3s linear;
 }
 
 .no-group-indication {
-  border-left: 0 solid $primary-color;
+  border-left: 0 solid variables.$primary-color;
   transition: border-left 0.3s linear;
 }

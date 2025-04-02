@@ -10,3 +10,22 @@ $media-l: o-media-l;
 $media-l-m: o-media-l-m;
 $media-l-m-s: o-media-l-m-s;
 $media-l-m-s-xs: o-media-l-m-s-xs;
+
+// search variables
+$search-heading-backround: rgba(238, 238, 238, 0.5);
+$search-hover-backround: rgba(238, 238, 238, 1);
+$search-border-color: $search-hover-backround;
+$search-width: 310px;
+$search-padding: .5rem;
+$search-button-l: 2.5rem;
+$search-button-s: 2rem;
+$search-button-padding: .25rem;
+$search-button-l-full: $search-button-l + ($search-button-padding * 2);
+$search-button-s-full: $search-button-s + ($search-button-padding * 2);
+$search-field-padding: $search-padding;
+$search-field-width: calc(#{$search-width} - calc(#{$search-button-l-full} + #{$search-padding}));
+$search-field-width-l: 170px;
+$search-field-width-l-focus: calc(100% - #{$search-button-s-full});
+$search-field-width-m: $search-field-width-l-focus;
+$search-menu-button-width: 2.5rem;
+$search-width-l: calc(100% - calc(#{$search-menu-button-width} + #{$search-padding} * 2));

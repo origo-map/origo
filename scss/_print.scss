@@ -1,14 +1,17 @@
+@use './ui/variables';
+@use './variables' as vars;
+
 $print-control-position: .5rem;
-$print-control-bg-color: rgba($primary-color-inverse, .7);
-$print-control-border-radius: $radius-small - 0.0625rem;
-$print-control-font-size: $font-size-smallest;
+$print-control-bg-color: rgba(variables.$primary-color-inverse, .7);
+$print-control-border-radius: variables.$radius-small - 0.0625rem;
+$print-control-font-size: variables.$font-size-smallest;
 $print-control-padding: .1875rem;
-$print-control-z-index: $z-middle;
+$print-control-z-index: variables.$z-middle;
 $print-margin: 10mm 15mm;
 
-$print-scale-line-color: $grey-darker;
+$print-scale-line-color: variables.$grey-darker;
 $print-scale-line-inner-border-radius: $print-control-border-radius;
-$print-scale-line-font-size: $font-size-smallest;
+$print-scale-line-font-size: variables.$font-size-smallest;
 
 #o-print-tools-left > .collapse-scroll.expanded {
   background-color: white;
@@ -87,7 +90,7 @@ $print-scale-line-font-size: $font-size-smallest;
 }
 
 .print-attribution a {
-  color: $primary-text-color;
+  color: variables.$primary-text-color;
   font-size: $print-control-font-size;
   text-decoration: none;
 }
