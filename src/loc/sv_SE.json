@@ -191,7 +191,8 @@
         "toast_clear_body": "Allt loklat data har raderats",
         "btn_download_tooltip": "Visa pågående nedladdningar",
         "btn_offline_tooltip": "Växla onlineläge",
-        "btn_sync_tooltip": "Synkronisera lokala redigeringar"
+        "btn_sync_tooltip": "Synkronisera lokala redigeringar",
+        "btn_sync_pending_edits" : "Det finns osparade redigeringar. Spara dem först."
       }
     },
     "style": {

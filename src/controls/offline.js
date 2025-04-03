@@ -87,11 +87,15 @@ export default function Offline(opts = {}) {
     });
     existingOfflineExtentsLayer.getSource().clear();
     Promise.all(responses).then((features) => {
-      for (let i = 0; i < features.length; i += 1) {
-        // TODO: only add if unique. Several layers may have same extents
-        // Det finns en utility i nyare origo
-        existingOfflineExtentsLayer.getSource().addFeatures(features[i]);
-      }
+      // Only add unique extents as all layers will have the same extents as we can't (yet) select which layers to preload
+      // and each layer stores their own extents
+      features.flat().forEach(currFeat => {
+        // Do a simple string comparison, the extent structure is a simple array and the extent is pretty much the same as the geometry.
+        if (!existingOfflineExtentsLayer.getSource().getFeatures().some(f => f.getGeometry().getExtent().toString() === currFeat.getGeometry().getExtent().toString())) {
+          existingOfflineExtentsLayer.getSource().addFeature(currFeat);
+        }
+      });
+
       existingOfflineExtentsLayer.setVisible(true);
     });
   }
@@ -467,8 +471,7 @@ export default function Offline(opts = {}) {
         clearAndRemoveInteraction();
         envelopeButton.setState('initial');
         // If Origo had a confirm modal, this would be a great place to use it.
-        // eslint-disable-next-line no-restricted-globals
-        if (confirm(localize('btn_clear_confirm'))) {
+        if (window.confirm(localize('btn_clear_confirm'))) {
           const offlineLayers = getOfflineLayers();
           // Pick all known offline sources
           const responses = offlineLayers.map(layer => layer.getSource().clearStorage());
@@ -519,9 +522,17 @@ export default function Offline(opts = {}) {
     syncButton = createButton({
       cls: 'padding-small icon-smaller round light box-shadow relative',
       async click() {
-        // TODO: If there are unsaved edits we must not sync, otherwise local edits will be lost but editstore remembers them.
-        // Must fix so editor emits events to grey out sync or exposes a method to check if there are pending edits.
-        syncOfflineLayers();
+        // If there are unsaved edits we must not sync, otherwise local edits will be lost but editstore remembers them.
+        // Just block, no fancy grey out of button as that requires events from editStore
+        if (viewer.getControlByName('editor').hasEdits()) {
+          viewer.getLogger().createModal({
+            title: localize('global_error'),
+            message: localize('btn_sync_pending_edits'),
+            status: 'danger'
+          });
+        } else {
+          syncOfflineLayers();
+        }
       },
       icon: '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#e8eaed"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><path d="M12,4 L12,1 L8,5 L12,9 L12,6 C15.31,6 18,8.69 18,12 C18,13.01 17.75,13.97 17.3,14.8 L18.76,16.26 C19.54,15.03 20,13.57 20,12 C20,7.58 16.42,4 12,4 Z M12,18 C8.69,18 6,15.31 6,12 C6,10.99 6.25,10.03 6.7,9.2 L5.24,7.74 C4.46,8.97 4,10.43 4,12 C4,16.42 7.58,20 12,20 L12,23 L16,19 L12,15 L12,18 Z" fill="#000000"></path></g></svg>',
       tooltipText: `${localize('btn_sync_tooltip')}`,

@@ -165,7 +165,7 @@
         },
       "offline": {
         "btn_tool_title": "Offline toolbar",
-        "dlg_download_tile":  "Ongoing downloads",
+        "dlg_download_tile": "Ongoing downloads",
         "dlg_download_progress": "Progress",
         "dlg_download_layers": "Ongoing downloads",
         "dlg_download_no_active": "No ongoing downloads",
@@ -186,12 +186,13 @@
         "toast_sync_body": "All local edits have been synchronised",
         "btn_envelope_tooltip": "Draw a rectangle to download",
         "btn_clear_confirm": "This will remove all downloaded layers including unsynced edits. Proceed?",
-        "btn_clear_tooltip":  "Delete downladed data",
+        "btn_clear_tooltip": "Delete downladed data",
         "toast_clear_title": "Local layers deleted",
         "toast_clear_body": "All local layer data has been deleted",
         "btn_download_tooltip": "Ongoing downloads",
         "btn_offline_tooltip": "Toggle offline mode",
-        "btn_sync_tooltip" :  "Synchronize local edits"
+        "btn_sync_tooltip": "Synchronize local edits",
+        "btn_sync_pending_edits": "There are unsaved edits. Save them first."
       }
         
     },

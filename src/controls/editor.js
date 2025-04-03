@@ -193,6 +193,9 @@ const Editor = function Editor(options = {}) {
         editHandler.setActiveLayer(layerName);
       }
       editorToolbar.changeActiveLayer(layerName);
+    },
+    hasEdits() {
+      return editHandler.hasEdits();
     }
   });
 };
