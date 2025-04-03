@@ -1,17 +1,14 @@
 import wfsTransaction from './wfstransaction';
 import agsTransaction from './agstransaction';
-import indexedDb from './indexeddb';
 import VectorOfflineSource from '../../layer/vectorofflinesource';
 
 const transactions = {
   WFS: wfsTransaction,
-  AGS_FEATURE: agsTransaction,
-  // TODO: Remove it's the old offline impl.
-  OFFLINE: indexedDb
+  AGS_FEATURE: agsTransaction
 };
 export default function transactionhandler(transaction, layerName, viewer) {
   const layer = viewer.getLayer(layerName);
-  // Some layers don't have source, but all editable will
+  // Offline layers handle their own transactions in the layer source
   if (layer.getSource() instanceof VectorOfflineSource) {
     return layer.getSource().persistEdits(transaction);
   }
