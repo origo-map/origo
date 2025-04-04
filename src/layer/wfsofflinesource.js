@@ -56,8 +56,9 @@ export default class WfsOfflineSource extends VectorOfflineSource {
   */
   async preload(extent, progressCallback) {
     await this._preload(extent);
-    // TODO: pretty useless with one last progress. In order for it to work, we must also
-    // provide a function that calculates how many callbacks there should be.
+    // Pretty useless with only one last progress. In order for it to work, we must also
+    // provide a function that calculates how many callbacks there should be. Right now the Control
+    // assumes vectors makes exactly one callback
     if (progressCallback) {
       progressCallback();
     }

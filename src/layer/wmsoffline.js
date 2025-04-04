@@ -111,9 +111,13 @@ const wmsoffline = function wmsoffline(layerOptions, viewer) {
   // This call is async, but we can't await it here. Let it just finish when it's done.
   source.init()
     .catch((e) => {
-      // TODO: How to localize outside a control?
-      const msg = `Failed to initialise offline database${e}`;
+      // Layers are init before controls are added so localization control is not accessible earlier
+      // but when error arises it will. This is not a race condition, it is the result of run to completion
+      // as there is no other async stuff going on.
+      const loc = viewer.getControlByName('localization');
+      const msg = loc.getStringByKeys({ targetParentKey: 'wmsoffline', targetKey: 'init_failed' });
       viewer.getLogger().createToast({ status: 'danger', message: msg });
+      console.error(e);
     });
   // All wmsOptions will by magic become properties on the layer.
   return tile(wmsOptions, source);
