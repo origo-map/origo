@@ -1848,6 +1848,11 @@ function preselectFeature(feature) {
   preselectedFeature = feature;
 }
 
+function hasEdits() {
+  const edits = editsStore.getEdits();
+  return Object.keys(edits).length > 0;
+}
+
 /**
  * Creates the handler Component. In reality only one instance can be created as it relies on global variables and DOM ids and DOM events
  * It isn't a traditional Component as it has no visual elements but it can emit Eventer events.
@@ -1921,6 +1926,7 @@ export default function editHandler(options, v) {
     deleteFeature: deleteFeatureApi,
     setActiveLayer: setActiveLayerApi,
     setModifyTool: setModifyToolApi,
-    preselectFeature
+    preselectFeature,
+    hasEdits
   });
 }
