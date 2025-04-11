@@ -139,6 +139,66 @@ const getContent = {
     newElement.innerHTML = val;
     return newElement;
   },
+  audio(feature, attribute, attributes, map) {
+    let val = '';
+    let title = '';
+    if (typeof (feature.get(attribute.audio)) !== 'undefined') {
+      if (attribute.title) {
+        title = `<b>${attribute.title}</b>`;
+      }
+      if (attribute.splitter) {
+        const audioArr = feature.get(attribute.audio).split(attribute.splitter);
+        audioArr.forEach((audio) => {
+          const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(audio, attributes, null, map));
+          const attribution = attribute.attribution ? `<div class="o-audio-attribution">${attribute.attribution}</div>` : '';
+          val += `<div class="o-audio-container"><audio src="${url}" controls>Your browser does not support the audio tag.</audio>${attribution}</div>`;
+        });
+      } else {
+        const featGet = attribute.audio ? feature.get(attribute.audio) : feature.get(attribute.name);
+        if (featGet) {
+          const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.audio), attributes, null, map));
+          const attribution = attribute.attribution ? `<div class="o-audio-attribution">${attribute.attribution}</div>` : '';
+          val = `<div class="o-audio-container"><audio src="${url}" controls>Your browser does not support the audio tag.</audio>${attribution}</div>`;
+        }
+      }
+    }
+    const newElement = document.createElement('li');
+    if (typeof (attribute.cls) !== 'undefined') {
+      newElement.classList.add(attribute.cls);
+    }
+    newElement.innerHTML = `${title}${val}`;
+    return newElement;
+  },
+  video(feature, attribute, attributes, map) {
+    let val = '';
+    let title = '';
+    if (typeof (feature.get(attribute.video)) !== 'undefined') {
+      if (attribute.title) {
+        title = `<b>${attribute.title}</b>`;
+      }
+      if (attribute.splitter) {
+        const videoArr = feature.get(attribute.video).split(attribute.splitter);
+        videoArr.forEach((video) => {
+          const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(video, attributes, null, map));
+          const attribution = attribute.attribution ? `<div class="o-video-attribution">${attribute.attribution}</div>` : '';
+          val += `<div class="o-video-container"><video src="${url}" controls>Your browser does not support the video tag.</video>${attribution}</div>`;
+        });
+      } else {
+        const featGet = attribute.video ? feature.get(attribute.video) : feature.get(attribute.name);
+        if (featGet) {
+          const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.video), attributes, null, map));
+          const attribution = attribute.attribution ? `<div class="o-video-attribution">${attribute.attribution}</div>` : '';
+          val = `<div class="o-video-container"><video src="${url}" controls>Your browser does not support the video tag.</video>${attribution}</div>`;
+        }
+      }
+    }
+    const newElement = document.createElement('li');
+    if (typeof (attribute.cls) !== 'undefined') {
+      newElement.classList.add(attribute.cls);
+    }
+    newElement.innerHTML = `${title}${val}`;
+    return newElement;
+  },
   carousel(feature, attribute, attributes, map) {
     let val = '';
     let slides = '';
@@ -245,6 +305,14 @@ function getAttributesHelper(feature, layer, map) {
             ulList.classList.add('o-carousel-list');
           } else if (attribute.name) {
             val = getContent.name(feature, attribute, attributes, map);
+          } else if (attribute.audio) {
+            if (attributes[attribute.audio] !== '') {
+              val = getContent.audio(feature, attribute, attributes, map);
+            }
+          } else if (attribute.video) {
+            if (attributes[attribute.video] !== '') {
+              val = getContent.video(feature, attribute, attributes, map);
+            }
           } else {
             val = customAttribute(feature, attribute, attributes, map);
           }
