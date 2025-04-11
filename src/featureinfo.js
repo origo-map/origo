@@ -439,16 +439,16 @@ const Featureinfo = function Featureinfo(options = {}) {
             break;
           }
         }
-        const modalLinks = document.getElementsByClassName('o-identify-link-modal');
-        for (let i = 0; i < modalLinks.length; i += 1) {
-          addLinkListener(modalLinks[i]);
-        }
       }
     }
 
     // Dispatch itemadded event for every item added
     items.forEach((item) => dispatchItemAdded(item));
 
+    const modalLinks = document.getElementsByClassName('o-identify-link-modal');
+    for (let i = 0; i < modalLinks.length; i += 1) {
+      addLinkListener(modalLinks[i]);
+    }
     // Don't send event for infowindow. Infowindow will send an event that triggers sending the event later.
     if (target === 'overlay' || target === 'sidebar') {
       dispatchToggleFeatureEvent(items[0]);
