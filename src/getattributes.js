@@ -197,7 +197,7 @@ function customAttribute(feature, attribute, attributes, map) {
  * @param {any} map
  * @returns
  */
-function getAttributesHelper(feature, layer, map) {
+function getAttributesHelper(feature, layer, map, localization) {
   const featureinfoElement = document.createElement('div');
   featureinfoElement.classList.add('o-identify-content');
   const ulList = document.createElement('ul');
@@ -239,6 +239,7 @@ function getAttributesHelper(feature, layer, map) {
           } else if (attribute.url) {
             val = getContent.url(feature, attribute, attributes, map);
           } else if (attribute.html) {
+            attribute.localization = localization;
             val = getContent.html(feature, attribute, attributes, map);
           } else if (attribute.carousel) {
             val = getContent.carousel(feature, attribute, attributes, map);
@@ -274,7 +275,7 @@ function getAttributesHelper(feature, layer, map) {
  * @param {any} map
  * @returns
  */
-function getAttributes(feature, layer, map) {
+function getAttributes(feature, layer, map, localization) {
   // Add all hoisting attributes as actual properties on feature beacuse attributes configuration may try to use them
   // Should only happen if user calls from api and has configured async content but are using sync function to create content
   // Properties are removed when content is created because if we leave them they will exist permanently on the feature,
@@ -304,7 +305,7 @@ function getAttributes(feature, layer, map) {
       }
     });
   }
-  const content = getAttributesHelper(feature, layer, map);
+  const content = getAttributesHelper(feature, layer, map, localization);
   // remove the temporary attributes now that we're done with them
   attributesToRemove.forEach(currAttrToRemove => feature.unset(currAttrToRemove, true));
   return content;
@@ -406,12 +407,12 @@ async function hoistRelatedAttributes(parentLayer, parentFeature, hoistedAttribu
  * @param {any} layer
  * @param {any} map
  */
-async function getAttributesAsync(feature, layer, map) {
+async function getAttributesAsync(feature, layer, map, localization) {
   const hoistedAttributes = [];
   const layers = map.getLayers().getArray();
   // Add the temporary attributes with their values
   await hoistRelatedAttributes(layer, feature, hoistedAttributes, layers);
-  const content = getAttributesHelper(feature, layer, map);
+  const content = getAttributesHelper(feature, layer, map, localization);
 
   // Remove all temporary added attributes. They mess up saving edits as there are no such fields in db.
   hoistedAttributes.forEach(hoist => {
