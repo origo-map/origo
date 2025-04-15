@@ -1229,6 +1229,16 @@ function onAttributesSave(features, attrs) {
             errorMsg.remove();
           }
           break;
+        case 'video':
+          valid.video = validate.video(inputValue) || inputValue === '' ? inputValue : false;
+          if (!valid.video && inputValue !== '') {
+            if (!errorMsg) {
+              errorOn.insertAdjacentHTML('afterend', `<div class="o-${inputId} errorMsg fade-in padding-bottom-small">${errorText}</div>`);
+            }
+          } else if (errorMsg) {
+            errorMsg.remove();
+          }
+          break;
         case 'color':
           valid.color = validate.color(inputValue) || inputValue === '' ? inputValue : false;
           if (!valid.color && inputValue !== '') {
@@ -1373,6 +1383,7 @@ function addAudioListener() {
 
     if (!containerElement) return;
     const inputElement = document.querySelector(`.${obj.elId} > input[type='file']`);
+    const inputUrlElement = document.querySelector(`.${obj.elId} > input[type='url']`);
     const audioElement = document.querySelector(`.${obj.elId} > audio:first-of-type`);
     const buttonElement = document.querySelector(`.${obj.elId} > input[type='button']`);
 
@@ -1388,11 +1399,26 @@ function addAudioListener() {
         fileReader.readAsDataURL(ev.target.files[0]);
       }
     });
+    inputUrlElement.addEventListener('input', () => {
+      audioElement.classList.remove('o-hidden');
+      buttonElement.classList.remove('o-hidden');
+      audioElement.src = inputUrlElement.value;
+      // eslint-disable-next-line no-param-reassign
+      obj.val = inputUrlElement.value;
+    });
 
-    buttonElement.addEventListener('click', () => {
+    // Find the remove button and attach event handler.
+    buttonElement.addEventListener('click', (e) => {
+      // Clear the filename
+      document.getElementById(obj.elId).value = '';
+      // Also clear the model value
+      // eslint-disable-next-line no-param-reassign
+      obj.val = '';
       inputElement.value = '';
+      inputUrlElement.value = '';
       audioElement.classList.add('o-hidden');
       buttonElement.classList.add('o-hidden');
+      e.target.classList.add('o-hidden');
     });
   };
 
@@ -1415,6 +1441,7 @@ function addVideoListener() {
 
     if (!containerElement) return;
     const inputElement = document.querySelector(`.${obj.elId} > input[type='file']`);
+    const inputUrlElement = document.querySelector(`.${obj.elId} > input[type='url']`);
     const videoElement = document.querySelector(`.${obj.elId} > video:first-of-type`);
     const buttonElement = document.querySelector(`.${obj.elId} > input[type='button']`);
 
@@ -1430,11 +1457,26 @@ function addVideoListener() {
         fileReader.readAsDataURL(ev.target.files[0]);
       }
     });
+    inputUrlElement.addEventListener('input', () => {
+      videoElement.classList.remove('o-hidden');
+      buttonElement.classList.remove('o-hidden');
+      videoElement.src = inputUrlElement.value;
+      // eslint-disable-next-line no-param-reassign
+      obj.val = inputUrlElement.value;
+    });
 
-    buttonElement.addEventListener('click', () => {
+    // Find the remove button and attach event handler.
+    buttonElement.addEventListener('click', (e) => {
+      // Clear the filename
+      document.getElementById(obj.elId).value = '';
+      // Also clear the model value
+      // eslint-disable-next-line no-param-reassign
+      obj.val = '';
       inputElement.value = '';
+      inputUrlElement.value = '';
       videoElement.classList.add('o-hidden');
       buttonElement.classList.add('o-hidden');
+      e.target.classList.add('o-hidden');
     });
   };
 

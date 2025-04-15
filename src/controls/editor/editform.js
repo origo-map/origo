@@ -145,7 +145,13 @@ const createForm = function createForm(obj) {
       const audioClass = val ? '' : 'o-hidden';
       el = `<div class="${cls}"><label>${label}</label><br>`;
       el += `<audio src="${val}" id="audio-upload" controls>Your browser does not support the audio tag.</audio>`;
-      el += `<input type="file" id="${id}" value="${val}" accept="audio/*"${disabled}>`;
+      if (val.startsWith('data:')) {
+        el += `<label for="${id}">Lägg till en fil:</label><input type="file" id="${id}" value="${val}" accept="audio/*"${disabled}>`;
+        el += `<label for="${id}-url">eller ange en URL:</label><input type="url" id="${id}-url" value="" placeholder="https://example.com" ${disabled}>`;
+      } else {
+        el += `<label for="${id}">Lägg till en fil:</label><input type="file" id="${id}" value="${val}" accept="audio/*"${disabled}>`;
+        el += `<label for="${id}-url">eller ange en URL:</label><input type="url" id="${id}-url" value="${val}" placeholder="https://example.com" ${disabled}>`;
+      }
       el += `<input id="o-delete-audio-button" class="${audioClass}" type="button" value="Ta bort ljud"${disabled}>`;
       el += '</div>';
       break;
@@ -154,7 +160,13 @@ const createForm = function createForm(obj) {
       const videoClass = val ? '' : 'o-hidden';
       el = `<div class="${cls}"><label>${label}</label><br>`;
       el += `<video src="${val}" id="video-upload" controls>Your browser does not support the video tag.</video>`;
-      el += `<input type="file" id="${id}" value="${val}" accept="video/*"${disabled}>`;
+      if (val.startsWith('data:')) {
+        el += `<label for="${id}">Lägg till en fil:</label><input type="file" id="${id}" value="${val}" accept="video/*"${disabled}>`;
+        el += `<label for="${id}-url">eller ange en URL:</label><input type="url" id="${id}-url" value="" placeholder="https://example.com" ${disabled}>`;
+      } else {
+        el += `<label for="${id}">Lägg till en fil:</label><input type="file" id="${id}" value="" accept="video/*"${disabled}>`;
+        el += `<label for="${id}-url">eller ange en URL:</label><input type="url" id="${id}-url" value="${val}" placeholder="https://example.com" ${disabled}>`;
+      }
       el += `<input id="o-delete-video-button" class="${videoClass}" type="button" value="Ta bort video"${disabled}>`;
       el += '</div>';
       break;
