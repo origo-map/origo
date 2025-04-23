@@ -4,95 +4,134 @@
 @use 'variables';
 @use 'ui/ui';
 @use 'bookmark';
+@use 'ol';
+@use 'viewer';
+@use 'reset';
+@use 'glide/custom' as glideCustom;
+@use 'card';
+@use 'container';
+@use 'toolbar';
+@use 'button';
+@use 'image';
+@use 'modal';
+@use 'popup';
+@use 'popover';
+@use 'dropdown';
+@use 'sidebar';
+@use 'stylepicker';
+@use 'close';
+@use 'icon';
+@use 'tooltip';
+@use 'rotate';
+@use 'mapmenu';
+@use 'draw';
+@use 'editor';
+@use 'editor-toolbar';
+@use 'position';
+@use 'progressbar';
+@use 'measure';
+@use 'print';
+@use 'search';
+@use 'searchList';
+@use 'hidden';
+@use 'featureinfo';
+@use 'infowindow';
+@use 'ui/validate' as uiValidate;
+@use 'o-scale';
+@use 'scalepicker';
+@use 'embedded-overlay';
+@use 'spinner';
+@use 'logger';
+@use 'localization';
+
 
 .o-map {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
-  position: relative;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-  @include meta.load-css('reset');
-  @include meta.load-css('ol');
-  @include meta.load-css('externs/glidejs/import.scss');
-  @include meta.load-css('glide/custom');
-  @include meta.load-css('card');
-  @include meta.load-css('container');
-  @include meta.load-css('toolbar');
-  @include meta.load-css('button');
-  @include meta.load-css('image');
-  @include meta.load-css('modal');
-  @include meta.load-css('popup');
-  @include meta.load-css('popover');
-  @include meta.load-css('dropdown');
-  @include meta.load-css('sidebar');
-  @include meta.load-css('stylepicker');
-  @include meta.load-css('close');
-  @include meta.load-css('icon');
-  @include meta.load-css('tooltip');
-  @include meta.load-css('viewer');
-  @include meta.load-css('rotate');
-  @include meta.load-css('mapmenu');
-  @include meta.load-css('draw');
-  @include meta.load-css('editor');
-  @include meta.load-css('editor-toolbar');
-  @include meta.load-css('position');
-  @include meta.load-css('progressbar');
-  @include meta.load-css('measure');
-  @include meta.load-css('print');
-  @include meta.load-css('search');
-  @include meta.load-css('searchList');
-  @include meta.load-css('hidden');
-  @include meta.load-css('featureinfo');
-  @include meta.load-css('infowindow');
-  @include meta.load-css('ui/validate');
-  @include meta.load-css('o-scale');
-  @include meta.load-css('scalepicker');
-  @include meta.load-css('embedded-overlay');
-  @include meta.load-css('spinner');
-  @include meta.load-css('logger');
-  @include meta.load-css('localization');
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    @include reset.default;
+    @include ol.default;
+    // Use precompiled glide CSS
+    @include meta.load-css('externs/glidejs/import.scss');
+    @include glideCustom.default;
+    @include card.default;
+    @include container.default;
+    @include toolbar.default;
+    @include button.default;
+    @include image.default;
+    @include modal.default;
+    @include popup.default;
+    @include popover.default;
+    @include dropdown.default;
+    @include sidebar.default;
+    @include stylepicker.default;
+    @include close.default;
+    @include icon.default;
+    @include tooltip.default;
+    @include viewer.default;
+    @include rotate.default;
+    @include mapmenu.default;
+    @include draw.default;
+    @include editor.default;
+    @include editor-toolbar.default;
+    @include position.default;
+    @include progressbar.default;
+    @include measure.default;
+    @include print.default;
+    @include search.default;
+    @include searchList.default;
+    @include hidden.default;
+    @include featureinfo.default;
+    @include infowindow.default;
+    @include uiValidate.default;
+    @include o-scale.default;
+    @include scalepicker.default;
+    @include embedded-overlay.default;
+    @include spinner.default;
+    @include logger.default;
+    @include localization.default;
 }
 
 html,
 body {
-  height: 100%;
-  margin: 0;
-  overscroll-behavior-y: contain;
+    height: 100%;
+    margin: 0;
+    overscroll-behavior-y: contain;
 }
 
 #o-wrapper,
 #app-wrapper {
-  height: 100%;
-  overflow: hidden;
-  position: relative;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
 }
 
 #loading {
-  width: 100vw;
-  height: 100vh;
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 9999999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 9999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.7);
 
-  background-color: rgba(0, 0, 0, 0.7);
-
-  &.hide {
-    display: none;
-  }
-
-  // based on code from https://codepen.io/mandelid/pen/kNBYLJ
-  .loading-spinner {
-    display: inline-block;
-    width: 75px;
-    height: 75px;
-    border: 5px solid rgba(255,255,255,.3);
-    border-radius: 50%;
-    border-top-color: #fff;
-    animation: spin 1s ease-in-out infinite;
-  }
+    &.hide {
+        display: none;
+    }
+    // based on code from https://codepen.io/mandelid/pen/kNBYLJ
+    .loading-spinner {
+        display: inline-block;
+        width: 75px;
+        height: 75px;
+        border: 5px solid rgba(255,255,255,.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+    }
 }

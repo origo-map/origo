@@ -1,11 +1,13 @@
 @use './ui/variables';
 
-.o-progress {
-  background: variables.$blue;
-  bottom: 0;
-  height: 0.2em;
-  left: 0;
-  position: absolute;
-  transition: width 1ms;
-  width: 0;
+@mixin default {
+    .o-progress {
+        background: variables.$blue;
+        bottom: 0;
+        height: 0.2em;
+        left: 0;
+        position: absolute;
+        transition: width 1ms;
+        width: 0;
+    }
 }

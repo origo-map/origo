@@ -1,84 +1,87 @@
 @use './ui/variables';
 @use './variables' as vars;
 
-#o-modal {
-  font-size: 1em;
-  line-height: 1.42857143;
-}
+@mixin default {
 
-.o-modal-screen {
-  background-color: rgba(0, 0, 0, 0.5);
-  height: 100%;
-  left: 0;
-  position: absolute;
-  top: 0;
-  width: 100%;
-  z-index: 1050;
-}
+    #o-modal {
+        font-size: 1em;
+        line-height: 1.42857143;
+    }
 
-.o-modal {
-  background-color: variables.$white;
-  border-radius: 6px;
-  bottom: auto;
-  box-shadow: 0 2px 8px 1px rgba(0, 0, 0, 0.45);
-  font-family: Arial,sans-serif;
-  left: 50%;
-  position: absolute;
-  right: auto;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 300px;
-  z-index: 1100;
-}
+    .o-modal-screen {
+        background-color: rgba(0, 0, 0, 0.5);
+        height: 100%;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
+        z-index: 1050;
+    }
 
-.o-no-csstransforms .o-modal {
-  margin-left: -150px;
-  margin-top: -50px;
-}
+    .o-modal {
+        background-color: variables.$white;
+        border-radius: 6px;
+        bottom: auto;
+        box-shadow: 0 2px 8px 1px rgba(0, 0, 0, 0.45);
+        font-family: Arial,sans-serif;
+        left: 50%;
+        position: absolute;
+        right: auto;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 300px;
+        z-index: 1100;
+    }
 
-.o-modal-title {
-  background-color: #f7f7f7;
-  border-bottom: 1px solid #ebebeb;
-  border-radius: 6px 6px 0 0;
-  font-size: 1em;
-  font-weight: bold;
-  padding: 10px;
-}
+    .o-no-csstransforms .o-modal {
+        margin-left: -150px;
+        margin-top: -50px;
+    }
 
-.o-modal-content {
-  font-size: 0.9em;
-  height: 100%;
-  line-height: 1.1em;
-  max-height: calc(100vh - 120px);
-  overflow-y: auto;
-  padding: 10px 15px;
-}
+    .o-modal-title {
+        background-color: #f7f7f7;
+        border-bottom: 1px solid #ebebeb;
+        border-radius: 6px 6px 0 0;
+        font-size: 1em;
+        font-weight: bold;
+        padding: 10px;
+    }
 
-.o-modal-content .o-share-link {
-  padding: 10px 5px;
-}
+    .o-modal-content {
+        font-size: 0.9em;
+        height: 100%;
+        line-height: 1.1em;
+        max-height: calc(100vh - 120px);
+        overflow-y: auto;
+        padding: 10px 15px;
+    }
 
-.o-modal input[type=button],
-.o-modal select,
-.o-modal textarea,
-.o-modal img,
-.o-modal input[type=file],
-.o-modal input[type=text] {
-  width: 100%;
-}
+    .o-modal-content .o-share-link {
+        padding: 10px 5px;
+    }
 
-.o-modal li {
-  font-family: Arial,sans-serif;
-  font-size: 14px;
-  line-height: 14px;
-  margin-left: -15px;
-  margin-right: -15px;
-  padding: 3px 5px;
-}
+    .o-modal input[type=button],
+    .o-modal select,
+    .o-modal textarea,
+    .o-modal img,
+    .o-modal input[type=file],
+    .o-modal input[type=text] {
+        width: 100%;
+    }
 
-[class*=#{vars.$media-l}] {
-  .o-modal {
-    max-width: 300px;
-    width: 90%;
-  }
+    .o-modal li {
+        font-family: Arial,sans-serif;
+        font-size: 14px;
+        line-height: 14px;
+        margin-left: -15px;
+        margin-right: -15px;
+        padding: 3px 5px;
+    }
+
+    &[class*=#{vars.$media-l}] {
+        .o-modal {
+            max-width: 300px;
+            width: 90%;
+        }
+    }
 }
