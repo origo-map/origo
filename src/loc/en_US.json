@@ -162,6 +162,9 @@
         },
         "about": {
             "title": "About the map"
+        },
+        "scale": {
+            "scaleText": "Scale 1:"
         }
         
     },

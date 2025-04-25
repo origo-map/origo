@@ -3,6 +3,7 @@ import maputils from '../maputils';
 import numberFormatter from '../utils/numberformatter';
 
 const Scale = function Scale(options = {}) {
+  const localization = options.localization;
   let {
     scaleText
   } = options;
@@ -10,6 +11,10 @@ const Scale = function Scale(options = {}) {
   let viewer;
   let map;
   let container;
+
+  function localize(key) {
+    return localization.getStringByKeys({ targetParentKey: 'scale', targetKey: key });
+  }
 
   function onZoomChange(evt) {
     map.once('moveend', () => {
@@ -40,7 +45,7 @@ const Scale = function Scale(options = {}) {
       map = viewer.getMap();
       this.on('render', this.onRender);
       this.addComponents([container]);
-      if (!scaleText) scaleText = 'Skala 1:';
+      if (!scaleText) scaleText = localize('scaleText');
       const initialState = Object.prototype.hasOwnProperty.call(options, 'isActive') ? options.isActive : true;
       setActive(initialState);
       this.render();
