@@ -162,6 +162,9 @@
         },
         "about": {
             "title": "Om kartan"
+        },
+        "fullscreen": {
+            "fullscreenButtonTooltip": "Visa stor karta"
         }
     },
     "style": {

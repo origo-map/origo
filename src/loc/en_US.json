@@ -162,6 +162,9 @@
         },
         "about": {
             "title": "About the map"
+        },
+        "fullscreen": {
+            "fullscreenButtonTooltip": "Show large map"
         }
         
     },
