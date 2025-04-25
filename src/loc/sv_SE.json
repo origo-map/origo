@@ -162,6 +162,10 @@
         },
         "about": {
             "title": "Om kartan"
+        },
+        "mapmenu": {
+            "menuButtonTooltip": "Meny",
+            "closeButtonLabel": "Stäng"
         }
     },
     "style": {

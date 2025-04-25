@@ -162,6 +162,10 @@
         },
         "about": {
             "title": "About the map"
+        },
+        "mapmenu": {
+            "menuButtonTooltip": "Menu",
+            "closeButtonLabel": "Close"
         }
         
     },
