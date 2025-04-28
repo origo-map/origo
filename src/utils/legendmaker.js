@@ -98,7 +98,7 @@ export const renderSvgIcon = function renderSvgIcon(styleRule, {
   if (styleType in renderIcon) {
     if (styleType === 'Polygon') {
       const polygonOptions = styleRule.find(style => style.fill);
-      const icon = renderIcon.Circle({
+      const icon = renderIcon.Polygon({
         fill: polygonOptions.fill,
         stroke: polygonOptions.stroke
       });
@@ -106,7 +106,7 @@ export const renderSvgIcon = function renderSvgIcon(styleRule, {
     } else if (styleType === 'Line') {
       const icon = styleRule.reduce((prev, style) => {
         if (style.stroke) {
-          return prev + renderIcon.Circle({
+          return prev + renderIcon.Line({
             stroke: style.stroke
           });
         }
