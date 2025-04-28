@@ -43,6 +43,8 @@
 @use 'spinner';
 @use 'logger';
 @use 'localization';
+@use 'audio';
+@use 'video';
 
 
 .o-map {
@@ -93,8 +95,8 @@
     @include spinner.default;
     @include logger.default;
     @include localization.default;
-    @include meta.load-css('audio');
-    @include meta.load-css('video');
+    @include audio.default;
+    @include video.default;
 }
 
 html,
