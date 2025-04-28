@@ -93,6 +93,8 @@
     @include spinner.default;
     @include logger.default;
     @include localization.default;
+    @include meta.load-css('audio');
+    @include meta.load-css('video');
 }
 
 html,
