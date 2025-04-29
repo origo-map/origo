@@ -12,12 +12,17 @@ const Position = function Position(options = {}) {
   const {
     noPositionText = '&nbsp;'
   } = options;
+  const localization = options.localization;
+
+  function localize(key) {
+    return localization.getStringByKeys({ targetParentKey: 'position', targetKey: key });
+  }
 
   let viewer;
   let map;
   let view;
-  const characterError = 'Ogiltigt tecken för koordinat, vänligen försök igen.';
-  const extentError = 'Angivna koordinater ligger inte inom kartans utsträckning, vänligen försök igen.';
+  const characterError = localize('characterError');
+  const extentError = localize('extentError');
 
   /** Current Map projection code */
   let mapProjection;
@@ -382,7 +387,7 @@ const Position = function Position(options = {}) {
       }
 
       if (configArray.length === 0) {
-        alert('No title or projection is set for position');
+        alert(localize('configError'));
       }
       currentConfig = configArray[0];
       if (!suffix) suffix = '';
@@ -398,12 +403,12 @@ const Position = function Position(options = {}) {
           onTogglePosition();
         },
         icon: '#ic_gps_not_fixed_24px',
-        ariaLabel: 'Position ikon',
+        ariaLabel: localize('centerButtonLabel'),
         iconCls: 'o-icon-position'
       });
       projButton = Button({
         cls: 'o-position-button',
-        ariaLabel: 'Projektion',
+        ariaLabel: localize('projButtonLabel'),
         click() {
           onToggleProjection();
         }

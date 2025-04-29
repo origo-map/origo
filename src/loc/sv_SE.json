@@ -165,6 +165,13 @@
         },
         "scalepicker": {
             "selectScaleAriaLabel": "Välj skala"
+        },
+        "position": {
+            "characterError": "Ogiltigt tecken för koordinat, vänligen försök igen.",
+            "extentError": "Angivna koordinater ligger inte inom kartans utsträckning, vänligen försök igen.",
+            "configError": "Ingen titel eller projektion har angetts för positionskontrollen",
+            "centerButtonLabel": "Position ikon",
+            "projButtonLabel": "Projektion"
         }
     },
     "style": {
