@@ -14,7 +14,7 @@ const Scalepicker = function Scalepicker(options = {}) {
   let dropdown;
 
   function localize(key) {
-    return localization.getStringByKeys({ targetParentKey: 'draw', targetKey: key });
+    return localization.getStringByKeys({ targetParentKey: 'scalepicker', targetKey: key });
   }
 
   function getScales() {
