@@ -166,6 +166,13 @@
         "mapmenu": {
             "menuButtonTooltip": "Menu",
             "closeButtonLabel": "Close"
+        },
+        "position": {
+            "characterError": "Invalid character for coordinate, please try again.",
+            "extentError": "The coordinates provided are not within the map's extent, please try again.",
+            "configError": "No title or projection was set for the position control",
+            "centerButtonLabel": "Position icon",
+            "projButtonLabel": "Projection"
         }
         
     },
