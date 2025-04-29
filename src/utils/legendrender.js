@@ -12,36 +12,44 @@ export const renderSvg = function renderSvg(content, {
 };
 
 export const renderIcon = {
-  Line({
-    color,
-    lineDash,
-    width: widthOption = 2
-  } = {}) {
-    const strokeDasharray = lineDash ? 'stroke-dasharray: 4 4;' : '';
-    const width = widthOption > 7 ? 7 : widthOption;
-    const margin = 4;
-    const stroke = `stroke: ${color}; stroke-width: ${width}; ${strokeDasharray}`;
-    return `<line x1 ="${margin}" y1="${(size - margin)}" x2="${(size - margin)}" y2="${margin}" style="${stroke}"/>`;
-  },
-  Polygon(
-    {
+  Polygon(options = {}, circleSize = size) {
+    const fillOptions = options.fill || {};
+    const strokeOptions = options.stroke || {};
+    let {
       color: fillColor
-    } = {},
-    {
-      color: strokeColor,
-      lineDash
-    } = {}
-  ) {
-    const r = 2;
-    const strokeWidth = 2;
-    const margin = 2;
-    const fill = fillColor ? `fill: ${fillColor};` : 'fill: none;';
+    } = fillOptions;
+    let {
+      color: strokeColor
+    } = strokeOptions;
+    const {
+      lineDash,
+      width: widthOption = 2
+    } = strokeOptions;
+    const {
+      radius: radiusOption = circleSize / 2
+    } = options;
+    const width = widthOption > 4 ? 4 : widthOption;
+    const radius = radiusOption - width;
     let stroke = 'stroke: none;';
+    if (strokeColor && typeof strokeColor === 'object') {
+      strokeColor = `rgba(${strokeColor[0]},${strokeColor[1]},${strokeColor[2]},${strokeColor[3] || 1})`;
+    }
     if (strokeColor) {
       const strokeDasharray = lineDash ? 'stroke-dasharray: 4 4;' : '';
-      stroke = `stroke: ${strokeColor}; stroke-width: ${strokeWidth}; ${strokeDasharray}`;
+      stroke = `stroke: ${strokeColor}; stroke-width: ${width}; ${strokeDasharray}`;
     }
-    return `<rect x="${strokeWidth + margin}" y="${strokeWidth + margin}" height="${size - (strokeWidth * 2) - (margin * 2)}" width="${size - (strokeWidth * 2) - (margin * 2)}" rx="${r}" style="${fill} ${stroke}"/>`;
+    if (typeof fillColor === 'object') {
+      fillColor = `rgba(${fillColor[0]},${fillColor[1]},${fillColor[2]},${fillColor[3] || 1})`;
+    }
+    const fill = fillColor ? `fill: ${fillColor};` : 'fill: none;';
+    const centerDistance = circleSize / 2;
+    // Actually depictures it as a circle.
+    return `<circle cx="${centerDistance}" cy="${centerDistance}" r="${radius}" style="${fill} ${stroke}"/>`;
+  },
+  Line(options = {}, circleSize = size) {
+    // Right now we're treating the same way as a polygon, but the Line property must exist on the
+    // renderIcon object as legendmaker checks style type
+    return this.Polygon(options, circleSize);
   },
   Circle(options = {}, circleSize = size) {
     const fillOptions = options.fill || {};
