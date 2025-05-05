@@ -163,6 +163,9 @@
         "about": {
             "title": "About the map"
         },
+        "scalepicker": {
+            "selectScaleAriaLabel": "Pick scale"
+        },
         "position": {
             "characterError": "Invalid character for coordinate, please try again.",
             "extentError": "The coordinates provided are not within the map's extent, please try again.",

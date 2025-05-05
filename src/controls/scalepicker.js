@@ -4,7 +4,8 @@ import mapUtils from '../maputils';
 const Scalepicker = function Scalepicker(options = {}) {
   const {
     buttonPrefix = '',
-    listItemPrefix = ''
+    listItemPrefix = '',
+    localization
   } = options;
   let map;
   let viewer;
@@ -12,8 +13,12 @@ const Scalepicker = function Scalepicker(options = {}) {
   let resolutions;
   let dropdown;
 
+  function localize(key) {
+    return localization.getStringByKeys({ targetParentKey: 'scalepicker', targetKey: key });
+  }
+
   function getScales() {
-    return resolutions.map(resolution => `${listItemPrefix}${mapUtils.resolutionToFormattedScale(resolution, projection)}`);
+    return resolutions.map(resolution => `${listItemPrefix}${mapUtils.resolutionToFormattedScale(resolution, projection, localization)}`);
   }
 
   function setMapScale(scale) {
@@ -24,7 +29,7 @@ const Scalepicker = function Scalepicker(options = {}) {
   }
 
   function onZoomChange() {
-    dropdown.setButtonText(`${buttonPrefix}${mapUtils.resolutionToFormattedScale(map.getView().getResolution(), projection)}`);
+    dropdown.setButtonText(`${buttonPrefix}${mapUtils.resolutionToFormattedScale(map.getView().getResolution(), projection, localization)}`);
   }
 
   return Component({
@@ -50,7 +55,7 @@ const Scalepicker = function Scalepicker(options = {}) {
         cls: 'o-scalepicker text-white flex',
         contentCls: 'bg-grey-darker text-smallest rounded',
         buttonCls: 'bg-black text-white',
-        ariaLabel: 'Välj skala',
+        ariaLabel: localize('selectScaleAriaLabel'),
         buttonIconCls: 'white'
       });
     },

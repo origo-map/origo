@@ -1,27 +1,14 @@
-export default function numberFormatter(numberToFormat) {
+export default function numberFormatter(numberToFormat, localization) {
   let nr = numberToFormat;
   const length = nr.toString().length;
+
+  // Round (by factor)
   if (length > 3) {
-    const delimiter = ' '; // white space as delimiter
-
-    // Round by factor
-    if (nr >= 1000) {
-      const factor = (10 ** length) / 10000;
-      nr = Math.round(nr / factor) * factor;
-    }
-
-    let nrStr = nr.toString();
-    const a = [];
-    while (nrStr.length > 3) {
-      const n = nrStr.substr(nrStr.length - 3);
-      a.unshift(n);
-      nrStr = nrStr.substr(0, nrStr.length - 3);
-    }
-    if (nrStr.length > 0) {
-      a.unshift(nrStr);
-    }
-    nrStr = a.join(delimiter);
-    return nrStr;
+    const factor = 10 ** (length - 3);
+    nr = Math.round(nr / factor) * factor;
   }
-  return nr.toString();
+
+  // Format acc to locale
+  const formatter = localization?.getCurrentLocaleId() ? new Intl.NumberFormat(localization?.getCurrentLocaleId()) : new Intl.NumberFormat();
+  return formatter.format(nr);
 }
