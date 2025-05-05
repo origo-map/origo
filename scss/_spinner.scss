@@ -1,15 +1,17 @@
-// Must win over o-map o-modal img...
-img.spinner {
-    height: 1.5em;
-    margin: 0 0.3em;
-    transform: translateY(3px);
-    width: auto; // o-modal sets width to 100%, we don't want that.
-}
+@mixin default {
+    // Must win over o-map o-modal img...
+    img.spinner {
+        height: 1.5em;
+        margin: 0 0.3em;
+        transform: translateY(3px);
+        width: auto; // o-modal sets width to 100%, we don't want that.
+    }
 
-img.spinner-large {
-    height: 2.1em;
-    margin-right: 1.18em;
-    margin-left: 0.22em;
-    bottom: -3px;
-    position: relative;
+    img.spinner-large {
+        height: 2.1em;
+        margin-right: 1.18em;
+        margin-left: 0.22em;
+        bottom: -3px;
+        position: relative;
+    }
 }

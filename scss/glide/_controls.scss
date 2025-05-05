@@ -1,28 +1,32 @@
 @use './variables';
 
-.glide {
-  &_arrows {
-    padding: variables.$o-glide-button-padding;
-    position: relative;
-    padding-bottom: 0.2em;
-  }
-   &__arrow {
-    padding: .3em;
-    border: 1px solid variables.$o-glide-border-color;
-    color: variables.$o-glide-arrow-color;
-    border-radius: 50%;
-  }
- }
+@mixin default {
+    .glide {
+        &_arrows {
+            padding: variables.$o-glide-button-padding;
+            position: relative;
+            padding-bottom: 0.2em;
+        }
 
- button.glide {
-   color: variables.$o-glide-border-color;
-  &__arrow {
-    &--left {
-      left: variables.$o-glide-button-spsce;
+        &__arrow {
+            padding: .3em;
+            border: 1px solid variables.$o-glide-border-color;
+            color: variables.$o-glide-arrow-color;
+            border-radius: 50%;
+        }
     }
 
-    &--right {
-      right: variables.$o-glide-button-spsce;
+    button.glide {
+        color: variables.$o-glide-border-color;
+
+        &__arrow {
+            &--left {
+                left: variables.$o-glide-button-spsce;
+            }
+
+            &--right {
+                right: variables.$o-glide-button-spsce;
+            }
+        }
     }
-  }
 }

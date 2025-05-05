@@ -1,56 +1,59 @@
-.awesomplete [hidden] {
-  display: none;
-}
+@mixin default {
 
-.awesomplete .visually-hidden {
-  clip: rect(0, 0, 0, 0);
-  position: absolute;
-}
+    .awesomplete [hidden] {
+        display: none;
+    }
 
-.awesomplete {
-  display: flex;
-  flex-direction: row;
-  flex-grow: 1;
-  position: relative;
-  width: 100%;
-}
+    .awesomplete .visually-hidden {
+        clip: rect(0, 0, 0, 0);
+        position: absolute;
+    }
 
-.awesomplete > input {
-  display: block;
-}
+    .awesomplete {
+        display: flex;
+        flex-direction: row;
+        flex-grow: 1;
+        position: relative;
+        width: 100%;
+    }
 
-.awesomplete > ul {
-  background: #fff;
-  box-sizing: border-box;
-  left: 0;
-  list-style: none;
-  margin: 0;
-  min-width: 100%;
-  padding: 0;
-  position: absolute;
-  top: 40px;
-  z-index: 1;
-  overflow-y: auto;
-}
+    .awesomplete > input {
+        display: block;
+    }
 
-.awesomplete.black > ul {
-  background: #000 !important;
-  box-sizing: border-box;
-  color: #fff;
-  left: 0px;
-  list-style: none;
-  margin: 0;
-  width: 100%;
-  min-width: unset;
-  overflow-wrap: break-word;
-  padding: 0;
-  position: absolute;
-  top: auto;
-  bottom: 100%;
-  z-index: 9999999;
-  overflow-y: auto;
-}
+    .awesomplete > ul {
+        background: #fff;
+        box-sizing: border-box;
+        left: 0;
+        list-style: none;
+        margin: 0;
+        min-width: 100%;
+        padding: 0;
+        position: absolute;
+        top: 40px;
+        z-index: 1;
+        overflow-y: auto;
+    }
 
-.awesomplete > ul:empty {
-  display: none;
+    .awesomplete.black > ul {
+        background: #000 !important;
+        box-sizing: border-box;
+        color: #fff;
+        left: 0px;
+        list-style: none;
+        margin: 0;
+        width: 100%;
+        min-width: unset;
+        overflow-wrap: break-word;
+        padding: 0;
+        position: absolute;
+        top: auto;
+        bottom: 100%;
+        z-index: 9999999;
+        overflow-y: auto;
+    }
+
+    .awesomplete > ul:empty {
+        display: none;
+    }
 }

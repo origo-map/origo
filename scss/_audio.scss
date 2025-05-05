@@ -1,7 +1,9 @@
-.o-audio-container audio {
-  vertical-align: top;
-  width: 100%;
-  height: revert;
-  padding-top: 5px;
-  padding-bottom: 5px;
+@mixin default {
+    .o-audio-container audio {
+        vertical-align: top;
+        width: 100%;
+        height: revert;
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
 }

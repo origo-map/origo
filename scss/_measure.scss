@@ -1,40 +1,42 @@
 @use './ui/variables';
 @use './variables' as vars;
 
-.o-icon-minicons-square-vector {
-  height: 1.4em;
-  padding: .3em;
-  width: 1.4em;
-}
+@mixin default {
+    .o-icon-minicons-square-vector {
+        height: 1.4em;
+        padding: .3em;
+        width: 1.4em;
+    }
 
-.o-icon-minicons-line-vector {
-  height: 1.4em;
-  padding: .3em;
-  width: 1.4em;
-}
+    .o-icon-minicons-line-vector {
+        height: 1.4em;
+        padding: .3em;
+        width: 1.4em;
+    }
 
-.o-tooltip-measure {
-  background: rgba(0, 0, 0, 0.4);
-  border-radius: 4px;
-  color: variables.$white;
-  font: 70% normal, sans-serif;
-  opacity: 0.6;
-  padding: 1px 2px;
-  pointer-events: none;
-  position: relative;
-  white-space: nowrap;
-}
+    .o-tooltip-measure {
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 4px;
+        color: variables.$white;
+        font: 70% normal, sans-serif;
+        opacity: 0.6;
+        padding: 1px 2px;
+        pointer-events: none;
+        position: relative;
+        white-space: nowrap;
+    }
 
-.o-measure-button-true .o-icon-fa-pencil,
-.o-measure-button-true .o-icon-steady-measure,
-.o-measure-button-true .o-icon-minicons-square-vector,
-.o-measure-button-true .o-icon-minicons-line-vector {
-  fill: vars.$o-btn-active-color;
-}
+    .o-measure-button-true .o-icon-fa-pencil,
+    .o-measure-button-true .o-icon-steady-measure,
+    .o-measure-button-true .o-icon-minicons-square-vector,
+    .o-measure-button-true .o-icon-minicons-line-vector {
+        fill: vars.$o-btn-active-color;
+    }
 
-.o-measure-snap .icon svg,
-.o-measure-length .icon svg,
-.o-measure-area .icon svg {
-  border-radius: 0;
-  overflow: visible;
+    .o-measure-snap .icon svg,
+    .o-measure-length .icon svg,
+    .o-measure-area .icon svg {
+        border-radius: 0;
+        overflow: visible;
+    }
 }
