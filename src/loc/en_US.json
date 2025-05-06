@@ -184,6 +184,7 @@
       "dlg_save_title": "Download layers",
       "toast_sync_title": "Synchronized",
       "toast_sync_body": "All local edits have been synchronised",
+      "toast_sync_body_fail": "Failed to synchronize edits",
       "btn_envelope_tooltip": "Draw a rectangle to download",
       "btn_clear_confirm": "This will remove all downloaded layers including unsynced edits. Proceed?",
       "btn_clear_tooltip": "Delete downladed data",

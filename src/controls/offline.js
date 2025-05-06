@@ -422,6 +422,13 @@ export default function Offline(opts = {}) {
         title: `${localize('toast_sync_title')}`,
         message: `${localize('toast_sync_body')}`
       });
+    }).catch(e => {
+      console.error(e);
+      viewer.getLogger().createToast({
+        status: 'danger',
+        title: `${localize('toast_sync_title')}`,
+        message: `${localize('toast_sync_body_fail')}`
+      });
     });
   }
 

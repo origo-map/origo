@@ -184,6 +184,7 @@
       "dlg_save_title": "Ladda ner lager",
       "toast_sync_title": "Synchronized",
       "toast_sync_body": "Alla lokala redigeringar har synkroniserats",
+      "toast_sync_body_fail": "Misslyckades med att synkronisera ändringar",
       "btn_envelope_tooltip": "Rita en rektangel för att ladda ner",
       "btn_clear_confirm": "Detta kommer att radera alla lokala lager inklusive osynkronsierade lokala redigeringar. Fortsätt?",
       "btn_clear_tooltip": "Radera allt lokalt data",

@@ -71,41 +71,32 @@ export default class WfsOfflineSource extends VectorOfflineSource {
   }
 
   /**
-   * Overrides base class
-   * @returns
+   * Overrides base class. Sychronizes all edits
+   * @returns nothing. Throws on error
    */
   async syncEdits() {
-    // Read edits from db
-    const transaction = await super.getLocalEdits();
+    // performs a sync by posting edits first, then clear local edits and reload to get latest from db.
     // What happens on conflict?
     // insert: no actual conflict as per definition they are different objects but could represent the same real world object
     // edit: Latest wins (in this case we regardless of when the edit itself was made). If deleted in db, it is still deleted
     // delete: it is deleted
+
+    // Read edits from db
+    const transaction = await super.getLocalEdits();
+
     const postResult = await wfstransaction(transaction, this.options.name, this.viewer, true);
     // wfstransaction returns number of sucessfully features, which could be 0 if a deleted feature was already deleted
     // and that should count as sucessful. As javascript will interpret 0 as falsely we must check if no response at all
     // which implies a swallowed exception as wfstransaction does not throw.
     if (postResult !== undefined) {
-      // Handle wfs transaction response. Best to clear and reload to get latest from db.
-      // 1. empty features and edits
-      // 2. Re-preload known extents or entire extent if layer/map extent is used. Not neccessary, we could leave it empty.
-      //    Drawback with leaving it empty is that it requires a new pull and as it is not done per layer it would mean that all layers
-      //    have to be fetched just to get one layer.
-      // const extentsToFetch = [];
-      // if (!this.options.offlineUseLayerExtent) {
-      //  const extents = await super.getExtentsToRefresh();
-      //  extents.forEach(currExtent => {
-      //    extentsToFetch.push(currExtent.getGeometry().getExtent());
-      //  });
-      // } else {
-      //  extentsToFetch.push(this.options.customExtent);
-      // }
       const extentsToFetch = await super.getExtentsToRefresh();
       await super.clearStorage();
       const extentPromises = extentsToFetch.map(async (currExtent) => this._preload(currExtent.extent));
       // If one or more extents fail entire call fail and state is undefined
       await Promise.all(extentPromises);
       super.refresh();
+    } else {
+      throw new Error('wfstransaction failed. No further information is available');
     }
   }
 }
