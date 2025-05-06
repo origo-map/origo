@@ -167,6 +167,9 @@
             "menuButtonTooltip": "Meny",
             "closeButtonLabel": "Stäng"
         },
+        "scalepicker": {
+            "selectScaleAriaLabel": "Välj skala"
+        },
         "position": {
             "characterError": "Ogiltigt tecken för koordinat, vänligen försök igen.",
             "extentError": "Angivna koordinater ligger inte inom kartans utsträckning, vänligen försök igen.",

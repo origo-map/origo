@@ -1,8 +1,11 @@
-*:focus {
-  outline: none;
-}
+@mixin default {
 
-svg,
-object {
-  width: 100%;
+    *:focus {
+        outline: none;
+    }
+
+    svg,
+    object {
+        width: 100%;
+    }
 }
