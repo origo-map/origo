@@ -24,7 +24,7 @@ const Scale = function Scale(options = {}) {
       const currentZoom = parseInt(view.getZoom(), 10);
       if (currentZoom !== mapZoom) {
         const scale = maputils.resolutionToScale(map.getView().getResolution(), viewer.getProjection());
-        document.getElementById(container.getId()).innerHTML = (scaleText + numberFormatter(scale));
+        document.getElementById(container.getId()).innerHTML = (scaleText + numberFormatter(scale, localization));
       }
     });
   }
