@@ -24,7 +24,7 @@ const isValidJSON = str => {
  * @param {any} groupLayers
  * @returns {SelectedItem}
  */
-function createSelectedItem(feature, layer, map, groupLayers) {
+function createSelectedItem(feature, layer, map, groupLayers, localization) {
   // Above functions have no way of knowing whether the layer is part of a LayerGroup or not, therefore we need to check every layer against the groupLayers.
   const layerName = layer.get('name');
   let groupLayer;
@@ -47,7 +47,7 @@ function createSelectedItem(feature, layer, map, groupLayers) {
     selectionGroupTitle = layer.get('title');
   }
 
-  return new SelectedItem(feature, layer, map, selectionGroup, selectionGroupTitle);
+  return new SelectedItem(feature, layer, map, selectionGroup, selectionGroupTitle, localization);
 }
 
 async function getFeatureInfoUrl({
@@ -356,7 +356,7 @@ function getFeaturesAtPixel({
   hitTolerance,
   map,
   pixel
-}, viewer) {
+}, viewer, localization) {
   const result = [];
   let cluster = false;
   const resolutions = map.getView().getResolutions();
@@ -379,15 +379,15 @@ function getFeaturesAtPixel({
           return true;
         }
         collection.forEach((f) => {
-          const si = createSelectedItem(f, layer, map, groupLayers);
+          const si = createSelectedItem(f, layer, map, groupLayers, localization);
           result.push(si);
         });
       } else if (collection.length === 1 && queryable) {
-        const si = createSelectedItem(collection[0], layer, map, groupLayers);
+        const si = createSelectedItem(collection[0], layer, map, groupLayers, localization);
         result.push(si);
       }
     } else if (queryable) {
-      const si = createSelectedItem(feature, layer, map, groupLayers);
+      const si = createSelectedItem(feature, layer, map, groupLayers, localization);
       result.push(si);
     }
 
