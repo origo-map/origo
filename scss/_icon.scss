@@ -1,73 +1,76 @@
 @use './variables' as vars;
 
-[class^='o-icon-'],
-[class*=' o-icon-'] {
-  fill: vars.$o-btn-color;
-  float: right;
-  height: 1.3em;
-  padding: .35em;
-  width: 1.3em;
-}
+@mixin default {
 
-[class^='o-icon-24'],
-[class*=' o-icon-24'] {
-  fill: vars.$o-btn-color;
-  height: 1.5rem;
-  padding: 0;
-  width: 1.5rem;
-}
+    [class^='o-icon-'],
+    [class*=' o-icon-'] {
+        fill: vars.$o-btn-color;
+        float: right;
+        height: 1.3em;
+        padding: .35em;
+        width: 1.3em;
+    }
 
-.o-menu-button [class^='o-icon-'],
-.o-menu-button [class*=' o-icon-'] {
-  height: 1em;
-  padding: 0.25em;
-  width: 1em;
-}
+    [class^='o-icon-24'],
+    [class*=' o-icon-24'] {
+        fill: vars.$o-btn-color;
+        height: 1.5rem;
+        padding: 0;
+        width: 1.5rem;
+    }
 
-.o-image-carousel [class^='o-icon-'],
-.o-image-carousel [class*=' o-icon-'] {
-  fill: vars.$o-btn-color;
-}
+    .o-menu-button [class^='o-icon-'],
+    .o-menu-button [class*=' o-icon-'] {
+        height: 1em;
+        padding: 0.25em;
+        width: 1em;
+    }
 
-.ol-control>button:hover [class^='o-icon-'],
-.ol-control>button:hover [class*=' o-icon-'],
-.o-button:hover [class^='o-icon-'],
-.o-button:hover [class*='o-icon-'] {
-  fill: vars.$o-btn-bg;
-}
+    .o-image-carousel [class^='o-icon-'],
+    .o-image-carousel [class*=' o-icon-'] {
+        fill: vars.$o-btn-color;
+    }
 
-.o-toolbar button:hover [class^='o-icon-'],
-.o-toolbar button:hover [class*='o-icon-'] {
-  fill: vars.$o-btn-active-color;
-}
+    .ol-control > button:hover [class^='o-icon-'],
+    .ol-control > button:hover [class*=' o-icon-'],
+    .o-button:hover [class^='o-icon-'],
+    .o-button:hover [class*='o-icon-'] {
+        fill: vars.$o-btn-bg;
+    }
 
-button.o-disabled:hover [class^='o-icon-'],
-button.o-disabled:hover [class*=' o-icon-'],
-.o-disabled [class^='o-icon-'],
-.o-disabled [class*=' o-icon-'] {
-  fill: rgba(0, 0, 0, 0.26);
-}
+    .o-toolbar button:hover [class^='o-icon-'],
+    .o-toolbar button:hover [class*='o-icon-'] {
+        fill: vars.$o-btn-active-color;
+    }
 
-.owl-prev .o-icon-fa-chevron-left,
-.owl-next .o-icon-fa-chevron-right {
-  fill: #424242;
-  height: 1em;
-  padding: .3em;
-  width: 1em;
-}
+    button.o-disabled:hover [class^='o-icon-'],
+    button.o-disabled:hover [class*=' o-icon-'],
+    .o-disabled [class^='o-icon-'],
+    .o-disabled [class*=' o-icon-'] {
+        fill: rgba(0, 0, 0, 0.26);
+    }
 
-.o-subicon-expand-false .o-icon-fa-chevron-down,
-.o-subicon-expand-true .o-icon-fa-chevron-right,
-.ol-collapsed .o-icon-fa-angle-double-right,
-.ol-attribution:not(.ol-collapsed) .o-icon-fa-info,
-.o-toggle-button-max .o-icon-fa-angle-double-up,
-.o-toggle-button-min .o-icon-fa-angle-double-down,
-.o-checkbox-true .o-icon-fa-square-o,
-.o-checkbox-false .o-icon-fa-check-square-o,
-.o-check-false .o-icon-fa-check,
-.o-icon-expand-false .o-icon-fa-chevron-down,
-.o-icon-expand-true .o-icon-fa-chevron-right,
-.o-search-true .o-search-button,
-.o-search-false .o-search-button-close {
-  display: none;
+    .owl-prev .o-icon-fa-chevron-left,
+    .owl-next .o-icon-fa-chevron-right {
+        fill: #424242;
+        height: 1em;
+        padding: .3em;
+        width: 1em;
+    }
+
+    .o-subicon-expand-false .o-icon-fa-chevron-down,
+    .o-subicon-expand-true .o-icon-fa-chevron-right,
+    .ol-collapsed .o-icon-fa-angle-double-right,
+    .ol-attribution:not(.ol-collapsed) .o-icon-fa-info,
+    .o-toggle-button-max .o-icon-fa-angle-double-up,
+    .o-toggle-button-min .o-icon-fa-angle-double-down,
+    .o-checkbox-true .o-icon-fa-square-o,
+    .o-checkbox-false .o-icon-fa-check-square-o,
+    .o-check-false .o-icon-fa-check,
+    .o-icon-expand-false .o-icon-fa-chevron-down,
+    .o-icon-expand-true .o-icon-fa-chevron-right,
+    .o-search-true .o-search-button,
+    .o-search-false .o-search-button-close {
+        display: none;
+    }
 }

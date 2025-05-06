@@ -130,9 +130,9 @@ const maputils = {
     scale = Math.round(scale);
     return scale;
   },
-  resolutionToFormattedScale: function resolutionToFormattedScale(resolution, projection) {
+  resolutionToFormattedScale: function resolutionToFormattedScale(resolution, projection, localization) {
     const scale = this.roundScale(this.resolutionToScale(resolution, projection));
-    return `1:${numberFormatter(scale)}`;
+    return `1:${numberFormatter(scale, localization)}`;
   },
   scaleToResolution: function scaleToResolution(scale, projection) {
     const dpi = 25.4 / 0.28;

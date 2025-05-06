@@ -1,11 +1,13 @@
-.o-editor-toolbar {
-  bottom: 0;
-  left: 50%;
-  margin-bottom: .5rem;
-  max-width: 80%;
-  position: relative;
-  transform: translate(-50%, 0);
-  transform: translate(-50%, 0);
-  transform: translate(-50%, 0);
-  z-index: 10;
+@mixin default {
+    .o-editor-toolbar {
+        bottom: 0;
+        left: 50%;
+        margin-bottom: .5rem;
+        max-width: 80%;
+        position: relative;
+        transform: translate(-50%, 0);
+        transform: translate(-50%, 0);
+        transform: translate(-50%, 0);
+        z-index: 10;
+    }
 }
