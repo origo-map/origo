@@ -1,4 +1,7 @@
-.o-image-container img {
-  vertical-align: top;
-  width: 100%;
+@mixin default {
+
+    .o-image-container img {
+        vertical-align: top;
+        width: 100%;
+    }
 }

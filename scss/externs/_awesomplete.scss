@@ -1,2 +1,7 @@
 @use 'awesomplete.base' as awesompleteBase;
 @use 'awesomplete.theme' as awesompleteTheme;
+
+@mixin default {
+    @include awesompleteBase.default;
+    @include awesompleteTheme.default;
+}

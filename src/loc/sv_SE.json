@@ -166,6 +166,9 @@
         "fullscreen": {
             "fullscreenButtonTooltip": "Visa stor karta"
         },
+        "scalepicker": {
+            "selectScaleAriaLabel": "Välj skala"
+        },
         "position": {
             "characterError": "Ogiltigt tecken för koordinat, vänligen försök igen.",
             "extentError": "Angivna koordinater ligger inte inom kartans utsträckning, vänligen försök igen.",

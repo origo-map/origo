@@ -1,5 +1,5 @@
 // Required Core Stylesheet
-@use 'node_modules/@glidejs/glide/src/assets/sass/glide.core' as glideCore;
+@use 'node_modules/@glidejs/glide/dist/css/glide.core.css' as glideCore;
+    // Optional Theme Stylesheet
+@use 'node_modules/@glidejs/glide/dist/css/glide.theme.css' as glideTheme;
 
-// Optional Theme Stylesheet
-@use 'node_modules/@glidejs/glide/src/assets/sass/glide.theme' as glideTheme;
