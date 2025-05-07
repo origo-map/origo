@@ -167,6 +167,9 @@
             "menuButtonTooltip": "Meny",
             "closeButtonLabel": "Stäng"
         },
+        "scale": {
+            "scaleText": "Skala 1:"
+        },
         "scalepicker": {
             "selectScaleAriaLabel": "Välj skala"
         },

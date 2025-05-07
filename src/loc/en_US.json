@@ -167,6 +167,9 @@
             "menuButtonTooltip": "Menu",
             "closeButtonLabel": "Close"
         },
+        "scale": {
+            "scaleText": "Scale 1:"
+        },
         "scalepicker": {
             "selectScaleAriaLabel": "Pick scale"
         },
