@@ -163,6 +163,9 @@
         "about": {
             "title": "Om kartan"
         },
+        "scale": {
+            "scaleText": "Skala 1:"
+        },
         "scalepicker": {
             "selectScaleAriaLabel": "Välj skala"
         },
