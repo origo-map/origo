@@ -154,6 +154,9 @@
             "zoomInButtonTooltip": "Zoom into the map",
             "zoomOutButtonTooltip": "Zoom out in the map"
         },
+        "fullscreen": {
+            "fullscreenButtonTooltip": "Show large map"
+        },
         "home": {
             "zoomHomeButtonTooltip": "Zoom to the entire map"
         },
@@ -163,8 +166,8 @@
         "about": {
             "title": "About the map"
         },
-        "fullscreen": {
-            "fullscreenButtonTooltip": "Show large map"
+        "scale": {
+            "scaleText": "Scale 1:"
         },
         "scalepicker": {
             "selectScaleAriaLabel": "Pick scale"
