@@ -5,7 +5,8 @@ import {
 const Mapmenu = function Mapmenu({
   autoHide = 'never',
   closeIcon = '#ic_close_24px',
-  menuIcon = '#ic_menu_24px'
+  menuIcon = '#ic_menu_24px',
+  localization
 } = {}) {
   let headerComponent;
   let contentComponent;
@@ -17,6 +18,10 @@ const Mapmenu = function Mapmenu({
   let isExpanded = false;
   let mapMenuEl;
   let menuButtonEl;
+
+  function localize(key) {
+    return localization.getStringByKeys({ targetParentKey: 'mapmenu', targetKey: key });
+  }
 
   // Set tabindex for all buttons to include or exclude in taborder depending on if expanded or not
   const setTabIndex = function setTabIndex() {
@@ -111,7 +116,7 @@ const Mapmenu = function Mapmenu({
       menuButton = Button({
         icon: menuIcon,
         cls: `control icon-smaller medium round absolute light top-right${menuButtonCls}`,
-        tooltipText: 'Meny',
+        tooltipText: localize('menuButtonTooltip'),
         tooltipPlacement: 'west',
         click() {
           toggle();
@@ -119,7 +124,7 @@ const Mapmenu = function Mapmenu({
       });
       closeButton = Button({
         cls: 'small round margin-top-small margin-right-small icon-smaller grey-lightest',
-        ariaLabel: 'Stäng',
+        ariaLabel: localize('closeButtonLabel'),
         icon: closeIcon,
         click() {
           toggle();

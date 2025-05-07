@@ -163,6 +163,10 @@
         "about": {
             "title": "Om kartan"
         },
+        "mapmenu": {
+            "menuButtonTooltip": "Meny",
+            "closeButtonLabel": "Stäng"
+        },
         "scale": {
             "scaleText": "Skala 1:"
         },
