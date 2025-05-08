@@ -69,7 +69,7 @@ export default function Dropdown(options = {}) {
         const itemEl = El({
           tagName: 'li',
           innerHTML: `<span>${listItem.label}</span>`, // Use label for display
-          attributes: { data: { value: listItem.value } } // Employ the data prop for the value (will become a data-value attribute)
+          attributes: { data: { value: JSON.stringify(listItem.value) } } // Employ the data prop for the value (will become a data-value attribute)
         });
         contentComponent.addComponent(itemEl);
         contentEl.appendChild(html(itemEl.render()));
