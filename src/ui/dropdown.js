@@ -35,7 +35,7 @@ export default function Dropdown(options = {}) {
     const value = document.getElementById(itemEl.getId()).getAttribute('data-value');
     const customEvt = new CustomEvent('dropdown:select', {
       bubbles: true,
-      detail: value // Pass the value in the event detail
+      detail: JSON.parse(value) // Pass the value in the event detail
     });
     document.getElementById(itemEl.getId()).dispatchEvent(customEvt);
     if (doClick) dropdownButton.dispatch('click');
