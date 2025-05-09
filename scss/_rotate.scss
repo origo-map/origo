@@ -1,5 +1,8 @@
-.o-icon-compass {
-  height: 2rem;
-  padding: 0;
-  width: 2rem;
+@mixin default {
+
+    .o-icon-compass {
+        height: 2rem;
+        padding: 0;
+        width: 2rem;
+    }
 }

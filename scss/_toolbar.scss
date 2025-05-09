@@ -1,36 +1,39 @@
-.o-toolbar-vertical {
-  flex-flow: column;
-  position: relative;
+@mixin default {
 
-  .o-button-container,
-  .ol-control {
-    display: block;
-    margin: 0;
-    margin-bottom: .5rem;
-    position: relative;
-  }
-}
+    .o-toolbar-vertical {
+        flex-flow: column;
+        position: relative;
 
-.o-toolbar-horizontal {
-  display: block;
-  float: left;
-  margin: 0;
-  position: relative;
+        .o-button-container,
+        .ol-control {
+            display: block;
+            margin: 0;
+            margin-bottom: .5rem;
+            position: relative;
+        }
+    }
 
-  .o-button-container,
-  .ol-control {
-    display: inline-block;
-    margin: 0;
-    margin-right: .5rem;
-    position: relative;
-  }
+    .o-toolbar-horizontal {
+        display: block;
+        float: left;
+        margin: 0;
+        position: relative;
 
-  .o-button-container.o-hidden {
-    display: none;
-  }
+        .o-button-container,
+        .ol-control {
+            display: inline-block;
+            margin: 0;
+            margin-right: .5rem;
+            position: relative;
+        }
 
-  > div,
-  > button {
-    margin-right: .5rem;
-  }
+        .o-button-container.o-hidden {
+            display: none;
+        }
+
+        > div,
+        > button {
+            margin-right: .5rem;
+        }
+    }
 }

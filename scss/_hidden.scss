@@ -1,3 +1,5 @@
-.o-hidden {
-  display: none;
+@mixin default {
+    .o-hidden {
+        display: none;
+    }
 }
