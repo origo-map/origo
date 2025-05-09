@@ -1,6 +1,6 @@
 /**
  * Creates a set of objectsstores in indexexDb. If it exists, the schema is migrated to
- * the new version but all data is deleted as we don't know how to migrate tha data on a genaral basis
+ * the new version but all data is deleted as we don't know how to migrate the data on a general basis
  * @param {string} databaseName Name of the database
  * @param {string} databaseVersion Desired version
  * @param {any[]} stores Array of objectstore definitions. Valid fields are name, keyPath, autoIncrement, indices = array of index names.
