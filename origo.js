@@ -30,6 +30,7 @@ import permalink from './src/permalink/permalink';
 import * as Loader from './src/loading';
 import Spinner from './src/utils/spinner';
 import layerType from './src/layer/layertype';
+import registerServiceWorker from './src/utils/registerserviceworker';
 
 const Origo = function Origo(configPath, options = {}) {
   /** Reference to the returned Component */
@@ -161,6 +162,17 @@ const Origo = function Origo(configPath, options = {}) {
       document.getElementsByTagName('head')[0].appendChild(base);
       origo = this;
       initViewer();
+
+      // Service worker config is not in index.json as it may come handy to have the filename exposed in
+      // index.html in order to trigger a new install when all assets are cached.
+      // Defer until everything is in place so we can use localization and does not have to compete
+      // with downloads to get app starting.
+      if (defaultConfig.serviceWorker) {
+        origo.on('load', (e) => {
+          console.log(e);
+          registerServiceWorker(e, defaultConfig.serviceWorker);
+        });
+      }
     }
   });
 };
