@@ -164,13 +164,13 @@ const Origo = function Origo(configPath, options = {}) {
       initViewer();
 
       // Service worker config is not in index.json as it may come handy to have the filename exposed in
-      // index.html in order to trigger a new install when all assets are cached.
+      // index.html in order to trigger a new install if using a SW with queryparameters and all assets are cached.
       // Defer until everything is in place so we can use localization and does not have to compete
       // with downloads to get app starting.
-      if (defaultConfig.serviceWorker) {
+      if (options.serviceWorker) {
         origo.on('load', (e) => {
           console.log(e);
-          registerServiceWorker(e, defaultConfig.serviceWorker);
+          registerServiceWorker(e, options.serviceWorker.url);
         });
       }
     }

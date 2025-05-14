@@ -1,9 +1,9 @@
-import floatingPanel from '../ui/floatingpanel';
+import FloatingPanel from '../ui/floatingpanel';
 import Button from '../ui/button';
 import El from '../ui/element';
 
 /**
- * Static helper to register a service worker. Is seriously async, but caller is not in posistion
+ * Static helper to register a service worker. Is seriously async, but caller is not in position
  * to await, so everything happens in a then() clause and is finished when it's done.
  * @param {any} viewer The one and only viewer
  * @param {any} serviceWorkerFilename Name of service-worker file, as relative path inlcuding extension
@@ -50,7 +50,7 @@ const registerServiceWorker = (viewer, serviceWorkerFilename) => {
       components: [txt, btn],
       cls: 'flex align-center column o-card'
     });
-    const notifiction = floatingPanel(
+    const notifiction = FloatingPanel(
       {
         viewer,
         isActive: true,
@@ -66,40 +66,22 @@ const registerServiceWorker = (viewer, serviceWorkerFilename) => {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register(serviceWorkerFilename).then(reg => {
       registration = reg;
-      if (registration.installing) {
-        console.log('Service Worker installing for the first time');
-      } else if (registration.waiting) {
-        console.log('We got a new Service Worker waiting to be activated');
+      if (registration.waiting) {
         alertSW(viewer, registration);
-      } else if (registration.active) {
-        console.log('The current Service worker is active');
       }
 
       registration.addEventListener('updatefound', () => {
-        console.log('We found a new Service Worker to update');
-        if (registration.installing) {
-          console.log('The new Service Worker is installing');
-        }
         registration.installing.addEventListener('statechange', () => {
-          console.log('[UPDATE] Service worker installing state change', registration);
-
-          if (registration.installing) {
-            console.log('The new Service Worker is installing');
-          } else if (registration.waiting) {
-            console.log('The new Service Worker is waiting to be activated');
+          if (registration.waiting) {
             // our new instance is now waiting for activation (its state is 'installed')
-
             alertSW(viewer, registration);
-          } else {
-            // apparently installation must have failed (SW state is 'redundant')
-            // it makes no sense to think about this update any more
           }
         });
       });
 
       // The controllerchange event of the ServiceWorkerContainer interface fires when the Service Worker has forcefully
       // activated itself. Most likely because the user pressed the button in the floating panel.
-      // Force page reload to reload content
+      // Force page reload to reload content as caches have been preloaded with new data
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         window.location.reload();
       });

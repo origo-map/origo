@@ -2,15 +2,16 @@
 /**
  * This is an example boilerplate code for caching an offline application. It is not production ready code
  * 
- * This example demonstrates how to use the offline configuration of Origo and only makes the applicatin itselv,origo cities and mask to
- * be available offline. The OSM background will fail. For an offline application to be meaningful it should probably have some
- * background map, such as a cached geojson or WMSOFFLINE/WFSOFFLINE layers.
+ * This example demonstrates how to use the offline configuration of Origo and only makes the applicatin itself, 
+ * origo cities and mask to be available offline. The OSM background will fail. For an offline application to be
+ * meaningful it should probably have some background map, such as a cached geojson or WMSOFFLINE/WFSOFFLINE layers.
  * 
  * This example uses the simplest form of cache first strategy to cache static assets.
  * 
  * All static assets are preloaded and stored in the offline cache (Storage -> Cache in devtools) by its version name
  * There can only be one version active at any time, but it is important to bump the version number when any of the controlled
- * assets are updated, as many versions can be installed.
+ * assets are updated, as many versions can be installed and the installation is done before activation (and thus deactivation
+ * of previous version)
  * 
  * The assets are hardcoded at the bottom of this file. If files are added or removed the version should also be bumped.
  * Changes to this file will trigger a new version install, so it is safest to bump the version.
@@ -19,7 +20,7 @@
  * but that require some knowledge on the actual aplication. The list of assets could also be given as a parameter or file to download
  * but that requires a good strategy for how to trigger a new version when the configuration itself may be cached.
  * 
- * In order for a service-worker to work in conjunction with Origo, the SKIP_WAITING event handler must be present.
+ * In order for a service-worker to work in conjunction with Origo, the SKIP_WAITING message handler must be present.
  */
 
 
@@ -29,7 +30,7 @@
  * MUST change this version number when any asset (including this file) has changed.
  * Version number is not significant, but an increasing number is preferrable.
  */
-const VERSION = 'v1.0.30';
+const VERSION = 'v1.0.1';
 
 /**
  * Adds all provided resources to the cache
@@ -37,19 +38,15 @@ const VERSION = 'v1.0.30';
  * @param {string[]} resources list of resources to add to the cache. Provided with url string.
  */
 const addResourcesToCache = async (resources) => {
-  console.log('Service Worker trying to add all resources to cache ...');
   const cache = await caches.open(VERSION);
 
   for (const url of resources) {
     const urlToCache = new URL(url, location.href);
     // Bust web cache if assets are not version named
     const response = await fetch(urlToCache, { cache: 'no-store' });
-    console.log('Caching url', urlToCache);
 
     await cache.put(urlToCache.href, response);
   }
-  console.log('Service Worker added all resources to cache');
-
 };
 
 
@@ -72,8 +69,6 @@ const cacheFirst = async (request) => {
   // First try to get the resource from the cache
   const responseFromCache = await caches.match(request);
   if (responseFromCache) {
-    console.log('Found match in cache', request.url);
-
     return responseFromCache;
   }
 
@@ -105,7 +100,6 @@ const deleteOldCaches = async () => {
 
 // Add event handler for service worker activation
 self.addEventListener('activate', (event) => {
-  console.log(`Service worker version ${VERSION} activating...`);
   // We don't need old caches anymore. There can be only one version active
   event.waitUntil(deleteOldCaches());
   // Make sure preload is off. We don't use it in the simple cache first approach
@@ -115,9 +109,8 @@ self.addEventListener('activate', (event) => {
 
 // Add event handler for service worker install
 self.addEventListener('install', (event) => {
-  console.log(`Service worker version ${VERSION} installing...`);
 
-  // Files needed to cache to be able to run the app offline
+  // Files needed in cache to be able to run the app offline
   // Change this list to suit your needs
   event.waitUntil(addResourcesToCache([
     './', // This is index, but the client doesn't know that
@@ -148,7 +141,7 @@ self.addEventListener('fetch', (event) => {
 // This event is fired from Origo to instantly activate a new version. Without this event the user would have to close all
 // tabs and reload the application to get the new version.
 // It is important to implement this in your own service worker for the dialog in Origo to be able to activate this version,
-// it is not a event that the browser will fire.
+// it is not an event that the browser will fire.
 self.addEventListener('message', (event) => {
   if (event.data === 'SKIP_WAITING') {
     self.skipWaiting();
