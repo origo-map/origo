@@ -176,7 +176,14 @@
             "centerButtonLabel": "Position icon",
             "projButtonLabel": "Projection"
         }
-        
+
+    },
+    "serviceWorker": {
+        "newVersionTitle": "New version available",
+        "newVersionText": "There is a new version ready to install",
+        "newVersionButton": "Install",
+        "installErrorTitle": "Install failed",
+        "installErrorText":  "Appliction will not work offline"
     },
     "style": {
         "drawStyles": {
