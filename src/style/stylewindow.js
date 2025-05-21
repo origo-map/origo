@@ -337,7 +337,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     newStyleObj.pointSize *= styleScale;
     newStyleObj.backgroundStrokeColor = stringToRgba(newStyleObj.backgroundStrokeColor, newStyleObj.backgroundStrokeOpacity);
     newStyleObj.backgroundStrokeWidth *= styleScale;
-    newStyleObj.backgroundFill = stringToRgba(newStyleObj.backgroundFillColor, newStyleObj.backgroundFillOpacity);
+    newStyleObj.backgroundFill = featureStyle.backgroundFill ? featureStyle.backgroundFill : stringToRgba(newStyleObj.backgroundFillColor, newStyleObj.backgroundFillOpacity);
     newStyleObj.paddingText = paddingToArray(newStyleObj.paddingText);
     const geom = feature.getGeometry();
     let geometryType = feature.getGeometry().getType();
