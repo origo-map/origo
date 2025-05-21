@@ -594,6 +594,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
           }
 
           featureinfoOptions.viewer = this;
+          featureinfoOptions.localization = controls.find((control) => control.name === 'localization');
 
           selectionmanager = Selectionmanager(featureinfoOptions);
           featureinfo = Featureinfo(featureinfoOptions);
