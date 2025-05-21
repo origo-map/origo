@@ -12,7 +12,7 @@ export default class SelectedItem {
    * @param {any} map
    * @param {any} selectionGroup
    * @param {any} selectionGroupTitle
-   * @param {any} localization
+   * @param {any} [localization]
    */
   constructor(feature, layer, map, selectionGroup, selectionGroupTitle, localization) {
     this.feature = feature;

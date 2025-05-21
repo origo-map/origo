@@ -22,6 +22,7 @@ const isValidJSON = str => {
  * @param {any} layer
  * @param {any} map
  * @param {any} groupLayers
+ * @param {any} [localization]
  * @returns {SelectedItem}
  */
 function createSelectedItem(feature, layer, map, groupLayers, localization) {
