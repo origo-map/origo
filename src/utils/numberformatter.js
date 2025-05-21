@@ -8,7 +8,10 @@ export default function numberFormatter(numberToFormat, localization) {
     nr = Math.round(nr / factor) * factor;
   }
 
-  // Format acc to locale
-  const formatter = localization?.getCurrentLocaleId() ? new Intl.NumberFormat(localization?.getCurrentLocaleId()) : new Intl.NumberFormat();
-  return formatter.format(nr);
+  // Format acc to locale if localization object was provided
+  if (localization) {
+    const formatter = new Intl.NumberFormat(localization.getCurrentLocaleId());
+    nr = formatter.format(nr);
+  }
+  return nr;
 }

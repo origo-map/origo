@@ -18,7 +18,7 @@ const Scalepicker = function Scalepicker(options = {}) {
   }
 
   function getScales() {
-    return resolutions.map(resolution => `${listItemPrefix}${mapUtils.resolutionToFormattedScale(resolution, projection, localization)}`);
+    return resolutions.map(resolution => `${listItemPrefix}${mapUtils.resolutionToFormattedScale(resolution, projection)}`);
   }
 
   function setMapScale(scale) {
@@ -29,7 +29,7 @@ const Scalepicker = function Scalepicker(options = {}) {
   }
 
   function onZoomChange() {
-    dropdown.setButtonText(`${buttonPrefix}${mapUtils.resolutionToFormattedScale(map.getView().getResolution(), projection, localization)}`);
+    dropdown.setButtonText(`${buttonPrefix}${mapUtils.resolutionToFormattedScale(map.getView().getResolution(), projection)}`);
   }
 
   return Component({
