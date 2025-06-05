@@ -53,15 +53,11 @@ export default function Dropdown(options = {}) {
   };
 
   const setItems = function setItems(listItems) {
-    // Check if listItems are strings (or numbers) and if so then convert them to objects for backward compatibility
     items = listItems.map(item => {
-      if (typeof item === 'string') {
-        return { label: item, value: item };
+      if (typeof item === 'object' && Object.hasOwn(item, 'label') && Object.hasOwn(item, 'value')) {
+        return item;
       }
-      if (typeof item === 'number') {
-        return { label: item, value: item };
-      }
-      return item;
+      return { label: item, value: item };
     });
 
     const contentEl = document.getElementById(contentComponent.getId());
