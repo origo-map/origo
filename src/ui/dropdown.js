@@ -31,11 +31,13 @@ export default function Dropdown(options = {}) {
 
   const style = createStyle(styleSettings);
 
-  const selectItem = function selectItem(item, doClick = true) {
+  const selectItem = function selectItem(itemEl, doClick = true) {
+    const value = document.getElementById(itemEl.getId()).getAttribute('data-value');
     const customEvt = new CustomEvent('dropdown:select', {
-      bubbles: true
+      bubbles: true,
+      detail: JSON.parse(value) // Pass the value in the event detail
     });
-    document.getElementById(item.getId()).dispatchEvent(customEvt);
+    document.getElementById(itemEl.getId()).dispatchEvent(customEvt);
     if (doClick) dropdownButton.dispatch('click');
   };
 
@@ -51,15 +53,22 @@ export default function Dropdown(options = {}) {
   };
 
   const setItems = function setItems(listItems) {
-    items = listItems;
+    items = listItems.map(item => {
+      if (typeof item === 'object' && Object.hasOwn(item, 'label') && Object.hasOwn(item, 'value')) {
+        return item;
+      }
+      return { label: item, value: item };
+    });
+
     const contentEl = document.getElementById(contentComponent.getId());
     if (contentEl) {
       contentComponent.clearComponents();
       contentEl.replaceChildren();
-      listItems.forEach((listItem) => {
+      items.forEach((listItem) => {
         const itemEl = El({
           tagName: 'li',
-          innerHTML: `<span>${listItem}</span>`
+          innerHTML: `<span>${listItem.label}</span>`, // Use label for display
+          attributes: { data: { value: JSON.stringify(listItem.value) } } // Employ the data prop for the value (will become a data-value attribute)
         });
         contentComponent.addComponent(itemEl);
         contentEl.appendChild(html(itemEl.render()));
