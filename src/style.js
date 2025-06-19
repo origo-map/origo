@@ -332,7 +332,13 @@ function checkOptions(options = {}) {
           styleList[j][index].getText().setText(replacer.replace(element.text.text, feature.getProperties()));
         }
         if (element.icon && Object.prototype.hasOwnProperty.call(element.icon, 'rotation')) {
-          const degrees = replacer.replace(element.icon.rotation, feature.getProperties());
+          let degrees;
+          const rotationFromAttribute = typeof element.icon.rotation === "string" && element.icon.rotation.match(/{{(.+)}}/i)[1];
+          if (rotationFromAttribute) {
+            degrees = feature.getProperties()[rotationFromAttribute] || 0;
+          } else {
+            degrees = replacer.replace(element.icon.rotation, feature.getProperties());
+          }
           const radians = degrees * (Math.PI / 180);
           styleList[j][index].getImage().setRotation(radians);
         }
