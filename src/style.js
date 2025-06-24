@@ -333,7 +333,7 @@ function checkOptions(options = {}) {
         }
         if (element.icon && Object.prototype.hasOwnProperty.call(element.icon, 'rotation')) {
           let degrees;
-          const rotationFromAttribute = typeof element.icon.rotation === "string" && element.icon.rotation.match(/{{(.+)}}/i)[1];
+          const rotationFromAttribute = typeof element.icon.rotation === 'string' && element.icon.rotation.match(/^{{(.+)}}$/i)[1];
           if (rotationFromAttribute) {
             degrees = feature.getProperties()[rotationFromAttribute] || 0;
           } else {
