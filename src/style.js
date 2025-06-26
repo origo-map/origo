@@ -336,13 +336,13 @@ function checkOptions(options = {}) {
           const radians = degrees * (Math.PI / 180);
           styleList[j][index].getImage().setRotation(radians);
         }
-        if (element.icon?.referenceMapScale) {
-          let iconScale = element.icon.referenceMapScale / scale;
-          if (element.icon.maxScale) {
-            iconScale = Math.min(iconScale, element.icon.maxScale);
+        if (Number(element.icon?.referenceMapScale)) {
+          let iconScale = Number(element.icon.referenceMapScale) / scale;
+          if (Number(element.icon.maxScale)) {
+            iconScale = Math.min(iconScale, Number(element.icon.maxScale));
           }
-          if (element.icon.minScale) {
-            iconScale = Math.max(iconScale, element.icon.minScale);
+          if (Number(element.icon.minScale)) {
+            iconScale = Math.max(iconScale, Number(element.icon.minScale));
           }
           styleList[j][index].getImage().setScale(iconScale);
         }
