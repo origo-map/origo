@@ -336,6 +336,16 @@ function checkOptions(options = {}) {
           const radians = degrees * (Math.PI / 180);
           styleList[j][index].getImage().setRotation(radians);
         }
+        if (Number(element.icon?.referenceMapScale)) {
+          let iconScale = Number(element.icon.referenceMapScale) / scale;
+          if (Number(element.icon.maxScale)) {
+            iconScale = Math.min(iconScale, Number(element.icon.maxScale));
+          }
+          if (Number(element.icon.minScale)) {
+            iconScale = Math.max(iconScale, Number(element.icon.minScale));
+          }
+          styleList[j][index].getImage().setScale(iconScale);
+        }
         return null;
       });
       if (Object.prototype.hasOwnProperty.call(s[j][0], 'filter')) {
