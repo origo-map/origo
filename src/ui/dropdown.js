@@ -32,10 +32,10 @@ export default function Dropdown(options = {}) {
   const style = createStyle(styleSettings);
 
   const selectItem = function selectItem(itemEl, doClick = true) {
-    const value = document.getElementById(itemEl.getId()).getAttribute('data-value');
+    const selectedItem = document.getElementById(itemEl.getId()).getAttribute('data-item');
     const customEvt = new CustomEvent('dropdown:select', {
       bubbles: true,
-      detail: JSON.parse(value) // Pass the value in the event detail
+      detail: JSON.parse(selectedItem) // Pass both value and label inside an object as the detail
     });
     document.getElementById(itemEl.getId()).dispatchEvent(customEvt);
     if (doClick) dropdownButton.dispatch('click');
@@ -67,8 +67,12 @@ export default function Dropdown(options = {}) {
       items.forEach((listItem) => {
         const itemEl = El({
           tagName: 'li',
-          innerHTML: `<span>${listItem.label}</span>`, // Use label for display
-          attributes: { data: { value: JSON.stringify(listItem.value) } } // Employ the data prop for the value (will become a data-value attribute)
+          innerHTML: `<span>${listItem.label}</span>`,
+          attributes: {
+            data: {
+              item: JSON.stringify({ value: listItem.value, label: listItem.label })
+            }
+          }
         });
         contentComponent.addComponent(itemEl);
         contentEl.appendChild(html(itemEl.render()));
