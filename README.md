@@ -36,7 +36,6 @@ Not convinced? Or maybe you need some inspiration? Check out these examples of w
  * [Demo of latest release](http://origo-map.github.io/origo-map-demo/index.html)
  * [Enakartan](http://karta.enkoping.se)
  * [Eskilstunakartan](https://karta.eskilstuna.se)
- * [Hallstakartan](http://karta.hallstahammar.se)
  * [Haninge kommun webbkarta](https://karta.haninge.se/)
  * [Karlstadskartan](http://gi.karlstad.se)
  * [Malmö](https://stadsatlas.malmo.se/stadsatlas/)

@@ -139,6 +139,82 @@ const getContent = {
     newElement.innerHTML = val;
     return newElement;
   },
+  audio(feature, attribute, attributes, map) {
+    let val = '';
+    let title = '';
+    const audioAttr = feature.get(attribute.audio);
+    if (typeof audioAttr !== 'undefined') {
+      if (attribute.splitter) {
+        // Splitting characters that doesn't work with data/base64
+        const splitterSet = new Set([';', ':', '/', ',', '+']);
+        if (!(audioAttr.startsWith('data:') && splitterSet.has(attribute.splitter))) {
+          const audioArr = audioAttr.split(attribute.splitter);
+          if (attribute.title) {
+            title = `<b>${attribute.title}</b>`;
+          }
+          audioArr.forEach((audio) => {
+            const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(audio, attributes, null, map));
+            const attribution = attribute.attribution ? `<div class="o-audio-attribution">${attribute.attribution}</div>` : '';
+            val += `<div class="o-audio-container"><audio src="${url}" controls>Your browser does not support the audio tag.</audio>${attribution}</div>`;
+          });
+        }
+      } else {
+        const featGet = attribute.audio ? audioAttr : feature.get(attribute.name);
+        if (featGet) {
+          if (attribute.title) {
+            title = `<b>${attribute.title}</b>`;
+          }
+          const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(audioAttr, attributes, null, map));
+          const attribution = attribute.attribution ? `<div class="o-audio-attribution">${attribute.attribution}</div>` : '';
+          val = `<div class="o-audio-container"><audio src="${url}" controls>Your browser does not support the audio tag.</audio>${attribution}</div>`;
+        }
+      }
+    }
+    const newElement = document.createElement('li');
+    if (typeof (attribute.cls) !== 'undefined') {
+      newElement.classList.add(attribute.cls);
+    }
+    newElement.innerHTML = `${title}${val}`;
+    return newElement;
+  },
+  video(feature, attribute, attributes, map) {
+    let val = '';
+    let title = '';
+    const videoAttr = feature.get(attribute.video);
+    if (typeof videoAttr !== 'undefined') {
+      if (attribute.splitter) {
+        // Splitting characters that doesn't work with data/base64
+        const splitterSet = new Set([';', ':', '/', ',', '+']);
+        if (!(videoAttr.startsWith('data:') && splitterSet.has(attribute.splitter))) {
+          const videoArr = videoAttr.split(attribute.splitter);
+          if (attribute.title) {
+            title = `<b>${attribute.title}</b>`;
+          }
+          videoArr.forEach((video) => {
+            const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(video, attributes, null, map));
+            const attribution = attribute.attribution ? `<div class="o-video-attribution">${attribute.attribution}</div>` : '';
+            val += `<div class="o-video-container"><video src="${url}" controls>Your browser does not support the video tag.</video>${attribution}</div>`;
+          });
+        }
+      } else {
+        const featGet = attribute.video ? videoAttr : feature.get(attribute.name);
+        if (featGet) {
+          if (attribute.title) {
+            title = `<b>${attribute.title}</b>`;
+          }
+          const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(videoAttr, attributes, null, map));
+          const attribution = attribute.attribution ? `<div class="o-video-attribution">${attribute.attribution}</div>` : '';
+          val = `<div class="o-video-container"><video src="${url}" controls>Your browser does not support the video tag.</video>${attribution}</div>`;
+        }
+      }
+    }
+    const newElement = document.createElement('li');
+    if (typeof (attribute.cls) !== 'undefined') {
+      newElement.classList.add(attribute.cls);
+    }
+    newElement.innerHTML = `${title}${val}`;
+    return newElement;
+  },
   carousel(feature, attribute, attributes, map) {
     let val = '';
     let slides = '';
@@ -197,7 +273,7 @@ function customAttribute(feature, attribute, attributes, map) {
  * @param {any} map
  * @returns
  */
-function getAttributesHelper(feature, layer, map) {
+function getAttributesHelper(feature, layer, map, localization) {
   const featureinfoElement = document.createElement('div');
   featureinfoElement.classList.add('o-identify-content');
   const ulList = document.createElement('ul');
@@ -239,12 +315,21 @@ function getAttributesHelper(feature, layer, map) {
           } else if (attribute.url) {
             val = getContent.url(feature, attribute, attributes, map);
           } else if (attribute.html) {
+            attribute.localization = localization;
             val = getContent.html(feature, attribute, attributes, map);
           } else if (attribute.carousel) {
             val = getContent.carousel(feature, attribute, attributes, map);
             ulList.classList.add('o-carousel-list');
           } else if (attribute.name) {
             val = getContent.name(feature, attribute, attributes, map);
+          } else if (attribute.audio) {
+            if (attributes[attribute.audio] !== '') {
+              val = getContent.audio(feature, attribute, attributes, map);
+            }
+          } else if (attribute.video) {
+            if (attributes[attribute.video] !== '') {
+              val = getContent.video(feature, attribute, attributes, map);
+            }
           } else {
             val = customAttribute(feature, attribute, attributes, map);
           }
@@ -274,7 +359,7 @@ function getAttributesHelper(feature, layer, map) {
  * @param {any} map
  * @returns
  */
-function getAttributes(feature, layer, map) {
+function getAttributes(feature, layer, map, localization) {
   // Add all hoisting attributes as actual properties on feature beacuse attributes configuration may try to use them
   // Should only happen if user calls from api and has configured async content but are using sync function to create content
   // Properties are removed when content is created because if we leave them they will exist permanently on the feature,
@@ -304,7 +389,7 @@ function getAttributes(feature, layer, map) {
       }
     });
   }
-  const content = getAttributesHelper(feature, layer, map);
+  const content = getAttributesHelper(feature, layer, map, localization);
   // remove the temporary attributes now that we're done with them
   attributesToRemove.forEach(currAttrToRemove => feature.unset(currAttrToRemove, true));
   return content;
@@ -406,12 +491,12 @@ async function hoistRelatedAttributes(parentLayer, parentFeature, hoistedAttribu
  * @param {any} layer
  * @param {any} map
  */
-async function getAttributesAsync(feature, layer, map) {
+async function getAttributesAsync(feature, layer, map, localization) {
   const hoistedAttributes = [];
   const layers = map.getLayers().getArray();
   // Add the temporary attributes with their values
   await hoistRelatedAttributes(layer, feature, hoistedAttributes, layers);
-  const content = getAttributesHelper(feature, layer, map);
+  const content = getAttributesHelper(feature, layer, map, localization);
 
   // Remove all temporary added attributes. They mess up saving edits as there are no such fields in db.
   hoistedAttributes.forEach(hoist => {

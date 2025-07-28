@@ -1,9 +1,11 @@
-.o-close-button {
-  float: right;
-  height: 2.429em;
-  width: 2.429em;
-}
+@mixin default {
+    .o-close-button {
+        float: right;
+        height: 2.429em;
+        width: 2.429em;
+    }
 
-.o-close-button:hover {
-  cursor: pointer;
+    .o-close-button:hover {
+        cursor: pointer;
+    }
 }

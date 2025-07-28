@@ -154,6 +154,9 @@
             "zoomInButtonTooltip": "Zoom into the map",
             "zoomOutButtonTooltip": "Zoom out in the map"
         },
+        "fullscreen": {
+            "fullscreenButtonTooltip": "Show large map"
+        },
         "home": {
             "zoomHomeButtonTooltip": "Zoom to the entire map"
         },
@@ -162,6 +165,23 @@
         },
         "about": {
             "title": "About the map"
+        },
+        "mapmenu": {
+            "menuButtonTooltip": "Menu",
+            "closeButtonLabel": "Close"
+        },
+        "scale": {
+            "scaleText": "Scale 1:"
+        },
+        "scalepicker": {
+            "selectScaleAriaLabel": "Pick scale"
+        },
+        "position": {
+            "characterError": "Invalid character for coordinate, please try again.",
+            "extentError": "The coordinates provided are not within the map's extent, please try again.",
+            "configError": "No title or projection was set for the position control",
+            "centerButtonLabel": "Position icon",
+            "projButtonLabel": "Projection"
         }
         
     },

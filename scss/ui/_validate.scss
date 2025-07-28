@@ -1,37 +1,37 @@
 @use './variables';
 
-.validate {
-  .errorMsg {
-    color: variables.$orange;
-  }
+@mixin default {
+    .validate {
+        .errorMsg {
+            color: variables.$orange;
+        }
 
-  input:optional {
-    border-color: variables.$grey-lightest;
-  }
+        input:optional {
+            border-color: variables.$grey-lightest;
+        }
 
-  input:required:invalid {
-    border-color: variables.$orange;
-  }
+        input:required:invalid {
+            border-color: variables.$orange;
+        }
 
-  input:invalid {
-    border-color: variables.$orange;
-  }
+        input:invalid {
+            border-color: variables.$orange;
+        }
 
-  textarea:required:invalid {
-    border-color: variables.$orange;
-  }
+        textarea:required:invalid {
+            border-color: variables.$orange;
+        }
 
-  select:required:invalid {
-    border-color: variables.$orange;
-  }
+        select:required:invalid {
+            border-color: variables.$orange;
+        }
 
-  select:required:invalid {
-    border-color: variables.$orange;
-  }
+        select:required:invalid {
+            border-color: variables.$orange;
+        }
+    }
+    // Awesome input is not direct child of .validate, needs special treatment.
+    input.awesome:required:invalid {
+        border-color: variables.$orange;
+    }
 }
-
-// Awesome input is not direct child of .validate, needs special treatment.
-input.awesome:required:invalid {
-    border-color: variables.$orange;
-}
-
