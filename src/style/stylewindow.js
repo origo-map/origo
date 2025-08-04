@@ -23,7 +23,8 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     css = '',
     viewer,
     closeIcon = '#ic_close_24px',
-    palette = ['rgb(166,206,227)', 'rgb(31,120,180)', 'rgb(178,223,138)', 'rgb(51,160,44)', 'rgb(251,154,153)', 'rgb(227,26,28)', 'rgb(253,191,111)']
+    palette = ['rgb(166,206,227)', 'rgb(31,120,180)', 'rgb(178,223,138)', 'rgb(51,160,44)', 'rgb(251,154,153)', 'rgb(227,26,28)', 'rgb(253,191,111)'],
+    svgMarkers = []
   } = optOptions;
 
   let annotationField;
@@ -498,7 +499,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
         break;
       case 'Point':
       case 'MultiPoint':
-        style[0] = drawStyles.createRegularShape(newStyleObj.pointType, newStyleObj.pointSize, fill, stroke, newStyleObj.objRotation);
+        style[0] = drawStyles.createRegularShape(newStyleObj.pointType, newStyleObj.pointSize, fill, stroke, newStyleObj.objRotation, svgMarkers);
         break;
       case 'TextPoint':
         style[0] = new Style({
@@ -724,7 +725,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
 
       contentEl = Element({
         cls: 'o-draw-stylewindow-content overflow-auto',
-        innerHTML: `${styleTemplate({ palette, swStyle, localization })}`
+        innerHTML: `${styleTemplate({ palette, swStyle, localization, svgMarkers })}`
       });
 
       this.addComponent(headerEl);

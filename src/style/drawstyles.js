@@ -15,7 +15,7 @@ function isValidRgbaString(colorString) {
   return regex.test(colorString);
 }
 
-function createRegularShape(type, pointSize, pointFill, pointStroke, pointRotation) {
+function createRegularShape(type, pointSize, pointFill, pointStroke, pointRotation, svgMarkers) {
   let style;
   const size = pointSize || 10;
   const stroke = pointStroke || new Stroke({
@@ -128,14 +128,51 @@ function createRegularShape(type, pointSize, pointFill, pointStroke, pointRotati
       });
       break;
     }
+
     default:
-      style = new Style({
-        image: new CircleStyle({
-          fill,
-          stroke,
-          radius: size
-        })
-      });
+      // Check if there is a corresponding SVG marker.
+      if ('name' in svgMarkers.find(({ name }) => name === type)) {
+        const foundMarker = svgMarkers.find(({ name }) => name === type);
+        let fillColor = 'blue';
+        let strokeColor = 'black';
+
+        // Get fill color if available
+        if (fill && fill.getColor) {
+          fillColor = encodeURIComponent(fill.getColor());
+        }
+
+        // Get stroke color if available
+        if (stroke && stroke.getColor) {
+          strokeColor = encodeURIComponent(stroke.getColor());
+        }
+
+        // Create and modify SVG string
+        let svg = foundMarker.svg;
+        svg = svg.replace('$fillColor$', fillColor)
+          .replace('$strokeColor$', strokeColor)
+          .replace('$height$', 15 + size)
+          .replace('$width$', 15 + size);
+
+        // Create style with an SVG icon
+        style = new Style({
+          image: new Icon({
+            src: `data:image/svg+xml;utf8,${svg}`,
+            scale: 1,
+            rotation: (rotation / 360) * Math.PI,
+            anchor: [0.5, 0.85],
+            color: fill.getColor()
+          })
+        });
+      } else {
+        // Fallback to default CircleStyle
+        style = new Style({
+          image: new CircleStyle({
+            fill,
+            stroke,
+            radius: size
+          })
+        });
+      }
   }
   return style;
 }
