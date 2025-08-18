@@ -25,6 +25,7 @@ function createRegularShape(type, pointSize, pointFill, pointStroke, pointRotati
     color: 'rgba(0, 153, 255, 0.8)'
   });
   const rotation = pointRotation || 0;
+  const foundMarker = svgMarkers.find(({ name }) => name === type);
   switch (type) {
     case 'square':
       style = new Style({
@@ -131,8 +132,7 @@ function createRegularShape(type, pointSize, pointFill, pointStroke, pointRotati
 
     default:
       // Check if there is a corresponding SVG marker.
-      if ('name' in svgMarkers.find(({ name }) => name === type)) {
-        const foundMarker = svgMarkers.find(({ name }) => name === type);
+      if (foundMarker) {
         let fillColor = 'blue';
         let strokeColor = 'black';
 
