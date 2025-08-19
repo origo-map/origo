@@ -57,7 +57,8 @@ const Viewer = function Viewer(targetOption, options = {}) {
     tileGridOptions = {},
     loggerOptions = {},
     url,
-    palette
+    palette,
+    svgMarkers
   } = options;
 
   let {
@@ -570,7 +571,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
       }));
 
       tileGrid = maputils.tileGrid(tileGridSettings);
-      stylewindow = Stylewindow({ palette, viewer: this, localization: controls.find((control) => control.name === 'localization') });
+      stylewindow = Stylewindow({ palette, viewer: this, localization: controls.find((control) => control.name === 'localization'), svgMarkers });
 
       setMap(Map(Object.assign(options, { projection, center, zoom, target: this.getId() })));
 
