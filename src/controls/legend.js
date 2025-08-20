@@ -390,13 +390,35 @@ const Legend = function Legend(options = {}) {
     if (name) {
       // Todo
       const layer = viewer.getLayer(label);
-      const layerGroup = layer.get('group');
+      let layerGroup;
+      let isGroup;
+      if (typeof layer !== 'undefined') {
+        layerGroup = layer.get('group');
+      } else {
+        layerGroup = viewer.getGroup(label);
+        isGroup = true;
+      }
       const groupExclusive = (viewer.getGroup(layerGroup) && (viewer.getGroup(layerGroup).exclusive || viewer.getGroup(layerGroup).name === 'background'));
       if (groupExclusive) {
         const layers = viewer.getLayersByProperty('group', layerGroup);
         layers.forEach(l => l.setVisible(false));
       }
-      layer.setVisible(true);
+      if (isGroup) {
+        const layers = viewer.getLayersByProperty('group', label);
+        if (layerGroup.exclusive) { // If group is exclusive only make the first layer visible.
+          for (let i = 0; i < layers.length; i += 1) {
+            if (i === 0) {
+              layers[i].setVisible(true);
+            } else {
+              layers[i].setVisible(false);
+            }
+          }
+        } else {
+          layers.forEach(l => l.setVisible(true));
+        }
+      } else {
+        layer.setVisible(true);
+      }
       document.getElementsByClassName('o-search-layer-field')[0].value = '';
     } else {
       console.error(localize('selectHandlerError'));
@@ -466,24 +488,26 @@ const Legend = function Legend(options = {}) {
 
     function makeRequest(obj) {
       const layersArr = viewer.getLayers();
+      const groupsArr = viewer.getGroups();
       const hitArr = [];
+      const searchValue = obj.value.toLowerCase();
       layersArr.forEach((layer) => {
         if (layer.get('group') !== 'none') {
           let found = false;
           const label = layer.get('name');
           let value = label;
-          if (label.toLowerCase().search(obj.value.toLowerCase()) !== -1 && searchLayersParameters.includes('name')) {
+          if (label.toLowerCase().search(searchValue) !== -1 && searchLayersParameters.includes('name')) {
             found = true;
           }
           if (typeof layer.get('title') !== 'undefined' && searchLayersParameters.includes('title')) {
             value = layer.get('title');
-            if (value.toLowerCase().search(obj.value.toLowerCase()) !== -1) {
+            if (value.toLowerCase().search(searchValue) !== -1) {
               found = true;
             }
           }
           if (typeof layer.get('abstract') !== 'undefined' && searchLayersParameters.includes('abstract') && !found) {
             value = layer.get('abstract');
-            if (value.toLowerCase().search(obj.value.toLowerCase()) !== -1) {
+            if (value.toLowerCase().search(searchValue) !== -1) {
               found = true;
             }
             if (typeof layer.get('title') === 'undefined') {
@@ -498,6 +522,26 @@ const Legend = function Legend(options = {}) {
             dataItem.value = value;
             hitArr.push(dataItem);
           }
+        }
+      });
+      groupsArr.forEach((group) => {
+        let found = false;
+        const label = group.name;
+        let value = label;
+        if (label.toLowerCase().search(searchValue) !== -1 && searchLayersParameters.includes('name')) {
+          found = true;
+        }
+        if (typeof group.title !== 'undefined' && searchLayersParameters.includes('title')) {
+          value = group.title;
+          if (value.toLowerCase().search(searchValue) !== -1) {
+            found = true;
+          }
+        }
+        if (found) {
+          const dataItem = {};
+          dataItem.label = label;
+          dataItem.value = `${value} ${localize('legendSearchGroupSuffix')}`;
+          hitArr.push(dataItem);
         }
       });
       awesomplete.list = hitArr;
