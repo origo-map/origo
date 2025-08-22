@@ -150,6 +150,17 @@ function getDefaultValueForAttribute(attribConf) {
       return sessionStorage.getItem(defaultsConfig.key);
     } else if (defaultsConfig.type === 'localStorage') {
       return localStorage.getItem(defaultsConfig.key);
+    } else if (defaultsConfig.type === 'sessionStorageJSON' || defaultsConfig.type === 'localStorageJSON') {
+      let keys = defaultsConfig.key.split('.');
+      let result = JSON.parse(
+        defaultsConfig.type === 'sessionStorageJSON' ? sessionStorage.getItem(keys.shift()) : localStorage.getItem(keys.shift())
+      );
+      while (result && keys.length) {
+        if (result[keys[0]]) {
+          result = result[keys.shift()];
+        } 
+      }
+      return result;
     } else if (defaultsConfig.type === 'timestamp') {
       // If an exact timestamp is needed, use a database default or trigger, this is taken when editor opens
       const today = new Date();
