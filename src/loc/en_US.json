@@ -154,6 +154,9 @@
             "zoomInButtonTooltip": "Zoom into the map",
             "zoomOutButtonTooltip": "Zoom out in the map"
         },
+        "fullscreen": {
+            "fullscreenButtonTooltip": "Show large map"
+        },
         "home": {
             "zoomHomeButtonTooltip": "Zoom to the entire map"
         },
@@ -162,6 +165,10 @@
         },
         "about": {
             "title": "About the map"
+        },
+        "mapmenu": {
+            "menuButtonTooltip": "Menu",
+            "closeButtonLabel": "Close"
         },
         "offline": {
             "btn_tool_title": "Offline toolbar",

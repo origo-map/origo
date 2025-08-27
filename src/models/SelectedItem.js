@@ -12,15 +12,17 @@ export default class SelectedItem {
    * @param {any} map
    * @param {any} selectionGroup
    * @param {any} selectionGroupTitle
+   * @param {any} [localization]
    */
-  constructor(feature, layer, map, selectionGroup, selectionGroupTitle) {
+  constructor(feature, layer, map, selectionGroup, selectionGroupTitle, localization) {
     this.feature = feature;
     this.layer = layer;
     this.map = map;
+    this.localization = localization;
     if (layer && map) {
       // Create the visual representation of this feature
       // must not fail or be async as this is called from the contructor
-      this.content = getAttributes(feature, layer, map);
+      this.content = getAttributes(feature, layer, map, localization);
     }
 
     this.selectionGroup = selectionGroup || layer.get('name');
@@ -31,7 +33,7 @@ export default class SelectedItem {
    * Builds the content including async content.
    */
   async createContentAsync() {
-    this.content = await getAttributesAsync(this.feature, this.layer, this.map);
+    this.content = await getAttributesAsync(this.feature, this.layer, this.map, this.localization);
   }
 
   getId() {

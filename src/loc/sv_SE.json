@@ -154,6 +154,9 @@
             "zoomInButtonTooltip": "Zooma in i kartan",
             "zoomOutButtonTooltip": "Zooma ut i kartan"
         },
+        "fullscreen": {
+            "fullscreenButtonTooltip": "Visa stor karta"
+        },
         "home": {
             "zoomHomeButtonTooltip": "Zooma till hela kartan"
         },
@@ -194,6 +197,10 @@
             "btn_offline_tooltip": "Växla onlineläge",
             "btn_sync_tooltip": "Synkronisera lokala redigeringar",
             "btn_sync_pending_edits": "Det finns osparade redigeringar. Spara dem först."
+        },
+        "mapmenu": {
+            "menuButtonTooltip": "Meny",
+            "closeButtonLabel": "Stäng"
         },
         "scale": {
             "scaleText": "Skala 1:"
