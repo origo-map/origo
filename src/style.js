@@ -337,7 +337,7 @@ function checkOptions(options = {}) {
           styleList[j][index].getImage().setRotation(radians);
         }
         if (Number(element.icon?.referenceMapScale)) {
-          let iconScale = Number(element.icon.referenceMapScale) / scale;
+          let iconScale = (Number(element.icon.scale) || 1) * Number(element.icon.referenceMapScale) / scale;
           if (Number(element.icon.maxIconScaleFactor)) {
             iconScale = Math.min(iconScale, Number(element.icon.maxIconScaleFactor));
           }
