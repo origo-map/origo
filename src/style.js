@@ -338,11 +338,11 @@ function checkOptions(options = {}) {
         }
         if (Number(element.icon?.referenceMapScale)) {
           let iconScale = Number(element.icon.referenceMapScale) / scale;
-          if (Number(element.icon.maxScale)) {
-            iconScale = Math.min(iconScale, Number(element.icon.maxScale));
+          if (Number(element.icon.maxIconScaleFactor)) {
+            iconScale = Math.min(iconScale, Number(element.icon.maxIconScaleFactor));
           }
-          if (Number(element.icon.minScale)) {
-            iconScale = Math.max(iconScale, Number(element.icon.minScale));
+          if (Number(element.icon.minIconScaleFactor)) {
+            iconScale = Math.max(iconScale, Number(element.icon.minIconScaleFactor));
           }
           styleList[j][index].getImage().setScale(iconScale);
         }
