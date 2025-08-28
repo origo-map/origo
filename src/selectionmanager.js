@@ -13,7 +13,8 @@ const styleTypes = StyleTypes();
 
 const Selectionmanager = function Selectionmanager(options = {}) {
   const {
-    toggleSelectOnClick = false
+    toggleSelectOnClick = false,
+    localization
   } = options;
 
   let aggregations = [];
@@ -273,9 +274,9 @@ const Selectionmanager = function Selectionmanager(options = {}) {
           // Correct result depending on type
           let resultstring;
           if (helperName === 'area' && !currAggregation.unit) {
-            resultstring = formatAreaString(result, { useHectare, decimals });
+            resultstring = formatAreaString(result, { useHectare, decimals, localization });
           } else if (helperName === 'length' && !currAggregation.unit) {
-            resultstring = formatLengthString(result, { decimals });
+            resultstring = formatLengthString(result, { decimals, localization });
           } else {
             if (currAggregation.scalefactor) {
               result *= currAggregation.scalefactor;
