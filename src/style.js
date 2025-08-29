@@ -345,7 +345,7 @@ function checkOptions(options = {}) {
           }
           // Handle the scale parameter on the style itself, which can be either a number or an array of two numbers (width and height scale).
           if (!Number(iconScale) && (!Array.isArray(iconScale) || iconScale.some((e) => !Number(e)) || iconScale.length !== 2)) {
-            iconScale = element.icon.scale;console.error('Invalid style parameter: "scale"\nA style\'s scale parameter must be a number or an array of two numbers.');
+            // Invalid style parameter: "scale". A style's scale parameter must be a number or an array of two numbers.
             iconScale = 1;
           }
           if (Number(iconScale)) {
