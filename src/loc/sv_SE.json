@@ -174,7 +174,9 @@
             "scaleText": "Skala 1:"
         },
         "scalepicker": {
-            "selectScaleAriaLabel": "Välj skala"
+            "selectScaleAriaLabel": "Välj skala",
+            "buttonPrefix": "",
+            "scaleListItemPrefix": ""
         },
         "position": {
             "characterError": "Ogiltigt tecken för koordinat, vänligen försök igen.",

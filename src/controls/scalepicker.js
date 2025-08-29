@@ -3,8 +3,7 @@ import mapUtils from '../maputils';
 
 const Scalepicker = function Scalepicker(options = {}) {
   const {
-    buttonPrefix = '',
-    listItemPrefix = '',
+
     localization
   } = options;
   let map;
@@ -21,7 +20,7 @@ const Scalepicker = function Scalepicker(options = {}) {
     const theScales = resolutions.map(resolution => {
       const scale = mapUtils.resolutionToScale(resolution, projection);
       return {
-        label: `${listItemPrefix}${mapUtils.resolutionToFormattedScale(resolution, projection, localization)}`,
+        label: `${localize('scaleListItemPrefix')}${mapUtils.resolutionToFormattedScale(resolution, projection, localization)}`,
         value: scale
       };
     });
@@ -34,7 +33,7 @@ const Scalepicker = function Scalepicker(options = {}) {
   }
 
   function onZoomChange() {
-    dropdown.setButtonText(`${buttonPrefix}${mapUtils.resolutionToFormattedScale(map.getView().getResolution(), projection, localization)}`);
+    dropdown.setButtonText(`${localize('buttonPrefix')}${mapUtils.resolutionToFormattedScale(map.getView().getResolution(), projection, localization)}`);
   }
 
   return Component({
@@ -49,7 +48,7 @@ const Scalepicker = function Scalepicker(options = {}) {
       this.addComponent(dropdown);
       this.render();
 
-      dropdown.setButtonText(`${buttonPrefix}${mapUtils.resolutionToFormattedScale(map.getView().getResolution(), projection, localization)}`);
+      dropdown.setButtonText(`${localize('buttonPrefix')}${mapUtils.resolutionToFormattedScale(map.getView().getResolution(), projection, localization)}`);
       dropdown.setItems(getScales());
 
       map.getView().on('change:resolution', onZoomChange);
