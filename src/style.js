@@ -337,13 +337,29 @@ function checkOptions(options = {}) {
           styleList[j][index].getImage().setRotation(radians);
         }
         if (Number(element.icon?.referenceMapScale)) {
-          let iconScale = (Number(element.icon.scale) || 1) * Number(element.icon.referenceMapScale) / scale;
-          if (Number(element.icon.maxIconScaleFactor)) {
-            iconScale = Math.min(iconScale, Number(element.icon.maxIconScaleFactor));
+          let iconScale;
+
+          // Handle the scale parameter on the style itself, which can be either a number or an array of two numbers (width and height scale).
+          if (Number(element.icon.scale) || (Array.isArray(element.icon.scale) && element.icon.scale.every((e) => Number(e)) && element.icon.scale.length === 2)) {
+            iconScale = element.icon.scale;
+          } else {
+            console.error('Invalid style parameter: "scale"\nA style\'s scale parameter must be a number or an array of two numbers.');
+            iconScale = 1;
           }
-          if (Number(element.icon.minIconScaleFactor)) {
-            iconScale = Math.max(iconScale, Number(element.icon.minIconScaleFactor));
+          if (Number(iconScale)) {
+            iconScale = [iconScale, iconScale];
           }
+
+          // Update the scale according to the referenceMapScale, constrained within the min- and maxIconScaleFactor parameters if set
+          let mapScaleFactor = element.icon.referenceMapScale / scale;
+          if (Number(element.icon.maxIconScaleFactor) && element.icon.maxIconScaleFactor >= 1) {
+            mapScaleFactor = Math.min(mapScaleFactor, element.icon.maxIconScaleFactor);
+          }
+          if (Number(element.icon.minIconScaleFactor) && element.icon.minIconScaleFactor <= 1) {
+            mapScaleFactor = Math.max(mapScaleFactor, element.icon.minIconScaleFactor);
+          }
+          iconScale = iconScale.map((e) => e * mapScaleFactor);
+
           styleList[j][index].getImage().setScale(iconScale);
         }
         return null;
