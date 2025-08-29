@@ -337,13 +337,15 @@ function checkOptions(options = {}) {
           styleList[j][index].getImage().setRotation(radians);
         }
         if (Number(element.icon?.referenceMapScale)) {
-          let iconScale;
+          let iconScale = element.icon.scale || 1;
 
+          // Use feature attribute as scale parameter if scale is a string with curly brackets
+          if (typeof iconScale === 'string') {
+            iconScale = replacer.replace(iconScale, feature.getProperties()) || 1;
+          }
           // Handle the scale parameter on the style itself, which can be either a number or an array of two numbers (width and height scale).
-          if (Number(element.icon.scale) || (Array.isArray(element.icon.scale) && element.icon.scale.every((e) => Number(e)) && element.icon.scale.length === 2)) {
-            iconScale = element.icon.scale;
-          } else {
-            console.error('Invalid style parameter: "scale"\nA style\'s scale parameter must be a number or an array of two numbers.');
+          if (!Number(iconScale) && (!Array.isArray(iconScale) || iconScale.some((e) => !Number(e)) || iconScale.length !== 2)) {
+            iconScale = element.icon.scale;console.error('Invalid style parameter: "scale"\nA style\'s scale parameter must be a number or an array of two numbers.');
             iconScale = 1;
           }
           if (Number(iconScale)) {
