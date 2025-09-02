@@ -331,8 +331,16 @@ function checkOptions(options = {}) {
         } else if (Object.prototype.hasOwnProperty.call(element, 'text') && feature) {
           styleList[j][index].getText().setText(replacer.replace(element.text.text, feature.getProperties()));
         }
-        if (element.text || element.icon || element.circle) {
-          const styleElement = element.text || element.icon || element.circle;
+        if (element.text
+            || element.icon
+            || element.circle
+            || element.square
+            || element.triangle
+            || element.star
+            || element.pentagon
+            || element.cross
+            || element.x) {
+          const styleElement = element.text || element.icon || element.circle || element.square || element.triangle || element.star || element.pentagon || element.cross || element.x;
 
           if (Object.prototype.hasOwnProperty.call(styleElement, 'rotation')) {
             const degrees = replacer.replace(styleElement.rotation, feature.getProperties());
