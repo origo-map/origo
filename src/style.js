@@ -331,38 +331,54 @@ function checkOptions(options = {}) {
         } else if (Object.prototype.hasOwnProperty.call(element, 'text') && feature) {
           styleList[j][index].getText().setText(replacer.replace(element.text.text, feature.getProperties()));
         }
-        if (element.icon && Object.prototype.hasOwnProperty.call(element.icon, 'rotation')) {
-          const degrees = replacer.replace(element.icon.rotation, feature.getProperties());
-          const radians = degrees * (Math.PI / 180);
-          styleList[j][index].getImage().setRotation(radians);
-        }
-        if (Number(element.icon?.referenceMapScale)) {
-          let iconScale = element.icon.scale || 1;
+        if(element.text || element.icon || element.circle) {
+          const styleElement = element.text || element.icon || element.circle;
 
-          // Use feature attribute as scale parameter if scale is a string with curly brackets
-          if (typeof iconScale === 'string') {
-            iconScale = replacer.replace(iconScale, feature.getProperties()) || 1;
+          if (Object.prototype.hasOwnProperty.call(styleElement, 'rotation')) {
+            const degrees = replacer.replace(styleElement.rotation, feature.getProperties());
+            const radians = degrees * (Math.PI / 180);
+            if (element.text) {
+              styleList[j][index].getText().setRotation(radians);
+            } else {
+              styleList[j][index].getImage().setRotation(radians);
+            }              
           }
-          // Handle the scale parameter on the style itself, which can be either a number or an array of two numbers (width and height scale).
-          if (!Number(iconScale) && (!Array.isArray(iconScale) || iconScale.some((e) => !Number(e)) || iconScale.length !== 2)) {
-            // Invalid style parameter: "scale". A style's scale parameter must be a number or an array of two numbers.
-            iconScale = 1;
+          if (Number(styleElement.referenceMapScale)) {
+            let styleScale = styleElement.scale || 1;
+  
+            // Use feature attribute as scale parameter if scale is a string with curly brackets
+            if (typeof styleScale === 'string') {
+              styleScale = replacer.replace(styleScale, feature.getProperties()) || 1;
+            }
+            // Handle the scale parameter on the style itself, which can be either a number or an array of two numbers (width and height scale).
+            if (!Number(styleScale) && (!Array.isArray(styleScale) || styleScale.some((e) => !Number(e)) || styleScale.length !== 2)) {
+              // Invalid style parameter: "scale". A style's scale parameter must be a number or an array of two numbers.
+              styleScale = 1;
+            }
+            if (Number(styleScale)) {
+              styleScale = [styleScale, styleScale];
+            }
+  
+            // Update the scale according to the referenceMapScale, constrained within the min- and maxStyleScaleFactor parameters if set
+            let mapScaleFactor = styleElement.referenceMapScale / scale;
+            if (Number(styleElement.maxStyleScaleFactor) && styleElement.maxStyleScaleFactor >= 1) {
+              mapScaleFactor = Math.min(mapScaleFactor, styleElement.maxStyleScaleFactor);
+            }
+            if (Number(styleElement.minStyleScaleFactor) && styleElement.minStyleScaleFactor <= 1) {
+              mapScaleFactor = Math.max(mapScaleFactor, styleElement.minStyleScaleFactor);
+            }
+            styleScale = styleScale.map((e) => e * mapScaleFactor);
+  
+            if (element.text) {
+              let textElement = styleList[j][index].getText();
+              textElement.setScale(styleScale);
+              textElement.setOffsetX(styleElement.offsetX * mapScaleFactor);
+              textElement.setOffsetY(styleElement.offsetY * mapScaleFactor);
+            } else {
+              styleList[j][index].getImage().setScale(styleScale);
+            }
+            
           }
-          if (Number(iconScale)) {
-            iconScale = [iconScale, iconScale];
-          }
-
-          // Update the scale according to the referenceMapScale, constrained within the min- and maxIconScaleFactor parameters if set
-          let mapScaleFactor = element.icon.referenceMapScale / scale;
-          if (Number(element.icon.maxIconScaleFactor) && element.icon.maxIconScaleFactor >= 1) {
-            mapScaleFactor = Math.min(mapScaleFactor, element.icon.maxIconScaleFactor);
-          }
-          if (Number(element.icon.minIconScaleFactor) && element.icon.minIconScaleFactor <= 1) {
-            mapScaleFactor = Math.max(mapScaleFactor, element.icon.minIconScaleFactor);
-          }
-          iconScale = iconScale.map((e) => e * mapScaleFactor);
-
-          styleList[j][index].getImage().setScale(iconScale);
         }
         return null;
       });
