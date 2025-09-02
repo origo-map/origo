@@ -331,7 +331,7 @@ function checkOptions(options = {}) {
         } else if (Object.prototype.hasOwnProperty.call(element, 'text') && feature) {
           styleList[j][index].getText().setText(replacer.replace(element.text.text, feature.getProperties()));
         }
-        if(element.text || element.icon || element.circle) {
+        if (element.text || element.icon || element.circle) {
           const styleElement = element.text || element.icon || element.circle;
 
           if (Object.prototype.hasOwnProperty.call(styleElement, 'rotation')) {
@@ -341,11 +341,11 @@ function checkOptions(options = {}) {
               styleList[j][index].getText().setRotation(radians);
             } else {
               styleList[j][index].getImage().setRotation(radians);
-            }              
+            }
           }
           if (Number(styleElement.referenceMapScale)) {
             let styleScale = styleElement.scale || 1;
-  
+
             // Use feature attribute as scale parameter if scale is a string with curly brackets
             if (typeof styleScale === 'string') {
               styleScale = replacer.replace(styleScale, feature.getProperties()) || 1;
@@ -358,7 +358,7 @@ function checkOptions(options = {}) {
             if (Number(styleScale)) {
               styleScale = [styleScale, styleScale];
             }
-  
+
             // Update the scale according to the referenceMapScale, constrained within the min- and maxStyleScaleFactor parameters if set
             let mapScaleFactor = styleElement.referenceMapScale / scale;
             if (Number(styleElement.maxStyleScaleFactor) && styleElement.maxStyleScaleFactor >= 1) {
@@ -368,16 +368,15 @@ function checkOptions(options = {}) {
               mapScaleFactor = Math.max(mapScaleFactor, styleElement.minStyleScaleFactor);
             }
             styleScale = styleScale.map((e) => e * mapScaleFactor);
-  
+
             if (element.text) {
-              let textElement = styleList[j][index].getText();
+              const textElement = styleList[j][index].getText();
               textElement.setScale(styleScale);
               textElement.setOffsetX(styleElement.offsetX * mapScaleFactor);
               textElement.setOffsetY(styleElement.offsetY * mapScaleFactor);
             } else {
               styleList[j][index].getImage().setScale(styleScale);
             }
-            
           }
         }
         return null;
