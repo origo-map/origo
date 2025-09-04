@@ -21,6 +21,7 @@ import getImageOrientation from '../../utils/getimageorientation';
 import shapes from './shapes';
 import searchList from './addons/searchList/searchList';
 import validate from '../../utils/validate';
+import searchjson from '../../utils/searchjson';
 import slugify from '../../utils/slugify';
 import topology from '../../utils/topology';
 import attachmentsform from './attachmentsform';
@@ -146,21 +147,18 @@ function getDefaultValueForAttribute(attribConf) {
       return defaultsConfig;
     }
     // Else look for some properties
+    // First, get the initial key
+    let key = defaultsConfig.key;
+    if (defaultsConfig.keyType === 'json_path') {
+      // Only use the first part of the key (stop at a dot or left square bracket)
+      key = defaultsConfig.key.substring(0, defaultsConfig.key.search(/[.[]/));
+    }
+    // Then get the properties using the key
+    let result;
     if (defaultsConfig.type === 'sessionStorage') {
-      return sessionStorage.getItem(defaultsConfig.key);
+      result = sessionStorage.getItem(key);
     } else if (defaultsConfig.type === 'localStorage') {
-      return localStorage.getItem(defaultsConfig.key);
-    } else if (defaultsConfig.type === 'sessionStorageJSON' || defaultsConfig.type === 'localStorageJSON') {
-      let keys = defaultsConfig.key.split('.');
-      let result = JSON.parse(
-        defaultsConfig.type === 'sessionStorageJSON' ? sessionStorage.getItem(keys.shift()) : localStorage.getItem(keys.shift())
-      );
-      while (result && keys.length) {
-        if (result[keys[0]]) {
-          result = result[keys.shift()];
-        } 
-      }
-      return result;
+      result = localStorage.getItem(key);
     } else if (defaultsConfig.type === 'timestamp') {
       // If an exact timestamp is needed, use a database default or trigger, this is taken when editor opens
       const today = new Date();
@@ -182,6 +180,12 @@ function getDefaultValueForAttribute(attribConf) {
           return isoDate.slice(0, 19);
       }
     }
+    // If the target is some subvalue in the response, extract it
+    if (defaultsConfig.keyType === 'json_path') {
+      const jsonPath = defaultsConfig.key.substring(defaultsConfig.key.search(/[.[]/) + 1);
+      return searchjson(result, jsonPath);
+    }
+    return result;
   } else if (attribConf.type === 'checkbox' && attribConf.config && attribConf.config.uncheckedValue) {
     // Checkboxes defaults to unchecked value if no default value is specified. If no uncheckedValue is specified it
     // will default to unchecked by some magic javascript falsly comparison later.
