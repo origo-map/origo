@@ -1,4 +1,5 @@
-import { Component, Modal, Button, Icon, dom } from '../ui';
+import Origo from '../../origo';
+import { Component, Modal, Button, Icon } from '../ui';
 import stripJSONComments from '../utils/stripjsoncomments';
 import isEmbedded from '../utils/isembedded';
 
@@ -6,14 +7,13 @@ const Guide = function Guide(options = {}) {
   const contentItems = [];
   const {
     title = 'Guide',
-    url
+    mapConfigUrl,
+    guideConfigUrl
   } = options;
   let {
     target
   } = options;
   let viewer;
-  let guideButton;
-  let guideButtonEl;
   let nextButton;
   let prevButton;
   let modal;
@@ -24,10 +24,12 @@ const Guide = function Guide(options = {}) {
   let list;
   let prevElClass;
   let contentCreated = false;
+  let menuItem;
+  let mapMenu;
 
   // Fetches the controls defined in json configuration and origos default controls
   const getActiveControls = async () => {
-    const configUrl = `${window.location.href}${viewer.getMapName()}`;
+    const configUrl = mapConfigUrl || `${window.location.href}${viewer.getMapName()}`;
     try {
       const response = await fetch(configUrl);
       if (!response.ok) {
@@ -36,7 +38,7 @@ const Guide = function Guide(options = {}) {
       const strippedOfComments = stripJSONComments(await response.text());
       const data = JSON.parse(strippedOfComments);
       // eslint-disable-next-line no-undef
-      const defaultControls = origo.getConfig().defaultControls;
+      const defaultControls = Origo().getConfig().defaultControls;
       const configControls = data.controls;
       const activeControls = defaultControls.concat(configControls);
       return activeControls;
@@ -48,7 +50,7 @@ const Guide = function Guide(options = {}) {
 
   // Fetches the configuration json for guide
   const getGuideConfig = async () => {
-    const configUrl = url || `${window.location.href}guide.json`;
+    const configUrl = guideConfigUrl || `${window.location.href}guide.json`;
     try {
       const response = await fetch(configUrl);
       if (!response.ok) {
@@ -161,6 +163,16 @@ const Guide = function Guide(options = {}) {
       } else {
         itm.style.display = 'none';
       }
+      if (currentIndex === 0) {
+        document.getElementById(prevButton.getId()).classList.add('hidden');
+      } else {
+        document.getElementById(prevButton.getId()).classList.remove('hidden');
+      }
+      if (currentIndex === items.length - 1) {
+        document.getElementById(nextButton.getId()).classList.add('hidden');
+      } else {
+        document.getElementById(nextButton.getId()).classList.remove('hidden');
+      }
     });
     prevEl.classList.remove('o-guide-target');
     currentEl.classList.add('o-guide-target');
@@ -187,12 +199,12 @@ const Guide = function Guide(options = {}) {
     items = Array.from(list.children);
     updateDisplayedItem();
 
-    // Observers if guide modal is removed from DOM and sets the proper state to guide button
+    // Observers if guide modal is removed from DOM and sets the proper state to guide menu item
     const observer = new MutationObserver((mutationsList) => {
       mutationsList.forEach((mutation) => {
         mutation.removedNodes.forEach((removedNode) => {
           if (removedNode.id === modal.getId()) {
-            guideButton.setState('initial');
+            menuItem.getComponents()[0].setState('initial');
             observer.disconnect();
           }
         });
@@ -203,14 +215,13 @@ const Guide = function Guide(options = {}) {
 
   return Component({
     name: 'guide',
-    onInit() {
-      guideButton = Button({
-        icon: '#fa-signs-post',
-        cls: 'o-guide-btn control icon-smaller medium round light',
-        tooltipText: title,
-        tooltipPlacement: 'east',
+    onAdd(evt) {
+      component = this;
+      viewer = evt.target;
+      target = document.querySelectorAll('.o-main')[0].id;
+      mapMenu = viewer.getControlByName('mapmenu');
+      menuItem = mapMenu.MenuItem({
         click() {
-          // Creates or removes modal depending of guide button state
           if (this.getState() === 'initial') {
             createModal();
             this.setState('active');
@@ -218,7 +229,11 @@ const Guide = function Guide(options = {}) {
             modal.closeModal();
             this.setState('initial');
           }
-        }
+          mapMenu.close();
+        },
+        icon: '#ic_routes_24px',
+        title,
+        ariaLabel: title
       });
       nextButton = Button({
         cls: 'rounded margin-top-small padding-y icon-small hover',
@@ -248,17 +263,11 @@ const Guide = function Guide(options = {}) {
           }
         }
       });
-    },
-    onAdd(evt) {
-      component = this;
-      viewer = evt.target;
-      target = document.querySelectorAll('.o-main')[0].id;
-      this.addComponents([guideButton]);
+      this.addComponents([menuItem]);
       this.render();
     },
     render() {
-      guideButtonEl = dom.html(guideButton.render());
-      document.getElementById(`${viewer.getMain().getMapTools().getId()}`).appendChild(guideButtonEl);
+      mapMenu.appendMenuItem(menuItem);
       this.dispatch('render');
     }
   });
