@@ -27,8 +27,10 @@ const Group = function Group(viewer, options = {}) {
     draggable = false,
     zIndexStart = 0.1,
     opacityControl = false,
+    removable = false,
     zoomToExtent = false,
-    description
+    description,
+    localization
   } = options;
 
   const stateCls = {
@@ -38,6 +40,7 @@ const Group = function Group(viewer, options = {}) {
   };
   const checkIcon = '#ic_check_circle_24px';
   const uncheckIcon = '#ic_radio_button_unchecked_24px';
+  const draggableGroups = [];
   let visibleState = 'all';
   let groupEl;
   let selectedItem;
@@ -78,8 +81,7 @@ const Group = function Group(viewer, options = {}) {
     }
   }) : false;
 
-  const moreInfoButton = (opacityControl || zoomToExtent || description || (abstract && !showAbstractInLegend)) ? createMoreInfoButton({ viewer,
-    group: thisGroup }) : false;
+  const moreInfoButton = (opacityControl || removable || zoomToExtent || description || (abstract && !showAbstractInLegend)) ? createMoreInfoButton({ viewer, group: thisGroup, localization }) : false;
 
   const SubGroupHeader = function SubGroupHeader() {
     const expandButton = Button({
@@ -159,7 +161,7 @@ const Group = function Group(viewer, options = {}) {
 
   const addGroup = function addGroup(groupCmp) {
     groupList.addGroup(groupCmp);
-    this.dispatch('add:group');
+    this.dispatch('add:group', groupCmp);
   };
 
   const appendGroup = function appendGroup(targetCmp) {
@@ -197,10 +199,32 @@ const Group = function Group(viewer, options = {}) {
   };
 
   function orderZIndex(list, groupCmp) {
-    const elementIds = [...list.children].map(x => x.id).reverse();
-    const overlayArray = groupCmp.getOverlayList().getOverlays();
-    overlayArray.forEach(element => {
-      const layerIndex = 1 + elementIds.indexOf(element.getId());
+    const layerArr = [];
+
+    function recList(listEl, grpCmp) {
+      const elementIds = [...listEl.children].map(x => x.id).reverse();
+      const overlayArray = grpCmp.getOverlayList().getOverlays();
+      const groupArray = grpCmp.getOverlayList().getGroups();
+      elementIds.forEach(element => {
+        const foundLayer = overlayArray.find((overlay) => element === overlay.getId());
+        if (foundLayer) {
+          layerArr.push(foundLayer);
+        } else {
+          const foundGroup = groupArray.find((group) => element === group.getId());
+          if (foundGroup) {
+            const ulList = document.getElementById(foundGroup.getId())?.getElementsByTagName('ul')[0];
+            if (ulList) {
+              recList(ulList, foundGroup);
+            }
+          }
+        }
+      });
+    }
+
+    recList(list, groupCmp);
+
+    layerArr.forEach((element, idx) => {
+      const layerIndex = idx;
       element.getLayer().setZIndex(zIndexStart + (layerIndex / 100));
     });
   }
@@ -242,11 +266,13 @@ const Group = function Group(viewer, options = {}) {
 
   function enableDragItem(el, groupCmp) {
     const item = el;
-    item.setAttribute('draggable', true);
-    item.ondragstart = handleDragStart;
-    item.ondragenter = handleDragEnter;
-    item.ondragover = handleDragOver;
-    item.ondragend = (evt) => { handleDragEnd(evt, groupCmp); };
+    if (item) {
+      item.setAttribute('draggable', true);
+      item.ondragstart = handleDragStart;
+      item.ondragenter = handleDragEnter;
+      item.ondragover = handleDragOver;
+      item.ondragend = (evt) => { handleDragEnd(evt, groupCmp); };
+    }
   }
 
   return Component({
@@ -288,11 +314,20 @@ const Group = function Group(viewer, options = {}) {
           enableDragItem(el, this);
         }
       });
-      this.on('add:group', () => {
+      this.on('add:group', (group) => {
         visibleState = groupList.getVisible();
         if (tickButton) {
           tickButton.setState(stateCls[visibleState]);
           tickButton.setIcon(getCheckIcon(visibleState));
+        }
+        if (draggable && typeof group.getId === 'function') {
+          const groupId = group.getId();
+          const el = document.getElementById(groupId);
+          if (el) {
+            enableDragItem(el, this);
+          } else {
+            draggableGroups.push(groupId);
+          }
         }
       });
 
@@ -339,6 +374,7 @@ const Group = function Group(viewer, options = {}) {
       }
     },
     onRender() {
+      draggableGroups.forEach(grp => enableDragItem(document.getElementById(grp), this));
       groupEl = document.getElementById(collapse.getId());
       if (viewer.getControlByName('legend').getuseGroupIndication() && type === 'group') {
         updateGroupIndication();
@@ -360,7 +396,7 @@ const Group = function Group(viewer, options = {}) {
             const thisParent = this;
             const label = group.labelOpacitySlider ? group.labelOpacitySlider : '';
             const layerProperties = LayerProperties({
-              group, viewer, thisParent, labelOpacitySlider: label
+              group, viewer, thisParent, labelOpacitySlider: label, localization
             });
             slidenav.setSecondary(layerProperties);
             slidenav.slideToSecondary();

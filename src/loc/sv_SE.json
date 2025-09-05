@@ -1,0 +1,227 @@
+{
+    "id": "sv-SE",
+    "title": "Svenska",
+    "menuTitle": "Språk",
+    "controls": {
+        "measure": {
+            "layerTitle": "Mätresultat",
+            "mainButtonTooltip": "Mäta",
+            "startMeasureTooltip": "Klicka för att börja mäta",
+            "lengthTooltip": "Längd",
+            "areaTooltip": "Yta",
+            "clearTooltip": "Rensa",
+            "bufferTooltip": "Buffert",
+            "bufferModalTitle": "Ange buffert i meter (ex 1000):",
+            "bufferModalOkButton": "OK",
+            "snapTooltip": "Snappning",
+            "showSectionsTooltip": "Visa delsträckor",
+            "addNodeTooltip": "Lägg till punkt",
+            "elevationTooltip": "Höjd",
+            "fetchingElevation": "Hämtar höjd...",
+            "undoTooltip": "Ångra"
+        },
+        "sharemap": {
+            "title": "Dela karta",
+            "linkToMap": "Länk till karta",
+            "shareMapInstruction": "Kopiera och klistra in länken för att dela kartan."
+        },
+        "print": {
+            "title": "Skriv ut",
+            "headerPlaceholderText": "Här kan du skriva en titel",
+            "descriptionPlaceholderText": "Här kan du skriva en beskrivning",
+            "resolutionLabelLow": "Låg",
+            "resolutionLabelHigh": "Hög",
+            "resolutionLabelMedium": "Mellan",
+            "pdfButtonTitle": "Skapa pdf",
+            "pngButtonTitle": "Skapa png",
+            "settingsButtonTooltip": "Visa inställningar",
+            "closeButtonAriaLabel": "Stäng",
+            "mapInteractionButtonTooltip": "Ändra kartans läge",
+            "titleTitle": "Titel",
+            "titleAdjustment": "Justera titel",
+            "titleSize": "Storlek titel",
+            "titleSizeAriaLabel": "Storlek på titel",
+            "titleAlignLeft": "Vänster",
+            "titleAlignCenter": "Mitten",
+            "titleAlignRight": "Höger",
+            "descriptionAlignLeft": "Vänster",
+            "descriptionAlignCenter": "Mitten",
+            "descriptionAlignRight": "Höger",
+            "description": "Beskrivning",
+            "descriptionSize": "Storlek på beskrivning",
+            "descriptionAlignment": "Justering på beskrivning",
+            "descriptionSizeAriaLabel": "Storlek på beskrivning",
+            "paperSize": "Storlek",
+            "orientation": "Orientering",
+            "resolution": "Upplösning",
+            "useMargins": "Använd marginaler",
+            "showCreatedDate": "Visa utskriftsdatum",
+            "showScale": "Visa skala",
+            "showLegend": "Visa legend",
+            "showNorthArrow": "Visa nordpil",
+            "selectScale": "Välj skala",
+            "selectPrintScale": "Välj utskriftsskala",
+            "rotateMap": "Rotera karta",
+            "configureSize": "Ändra storlek",
+            "configureSizeAriaLabel": "Ändra storlek",
+            "height": "Höjd",
+            "width": "Bredd",
+            "portrait": "Stående",
+            "portraitAriaLabel": "Stående",
+            "landscape": "Liggande",
+            "landscapeAriaLabel": "Liggande"
+        },
+        "draw": {
+            "title": "Rita",
+            "popupSaveButton": "Spara",
+            "popupCancelButton": "Avbryt",
+            "popupPlaceholderText": "Ange popuptext",
+            "popupTextModalTitle": "Popuptext",
+            "layerDialogLayerNamePlaceholder": "Ange lagernamn",
+            "layerDialogActivateLayerTooltip": "Aktivera ritlager",
+            "layerDialogDeleteLayerConfirm": "Vill du radera det här ritlagret?",
+            "layerDialogDeleteLayerTooltip": "Radera ritlager",
+            "layerDialogDownloadLayerTooltip": "Ladda ner ritlager",
+            "layerDialogAddLayerButton": "Nytt ritlager",
+            "layerDialogImportLayerButton": "Importera ritlager",
+            "layerDialogOkButton": "OK",
+            "layerDialogTitle": "Ritlager",
+            "pointButtonTooltip": "Punkt",
+            "lineButtonTooltip": "Linje",
+            "polygonButtonTooltip": "Polygon",
+            "textButtonTooltip": "Text",
+            "attributeButtonTooltip": "Attribut",
+            "styleButtonTooltip": "Stil",
+            "layerButtonTooltip": "Lager",
+            "saveButtonTooltip": "Spara",
+            "downloadButtonTooltip": "Ladda ner",
+            "deleteButtonTooltip": "Ta bort",
+            "closeButtonTooltip": "Stäng",
+            "drawLayerTitleDefault": "Ritlager",
+            "drawGroupTitleDefault": "Ritlager",
+            "drawPolygon": "Polygon",
+            "drawPoint": "Punkt",
+            "drawLine": "Linje",
+            "drawBox": "Rektangel",
+            "drawSquare": "Fyrkant",
+            "drawCircle": "Cirkel",
+            "drawFreehand": "Frihand"
+        },
+        "bookmarks": {
+            "title": "Bokmärken",
+            "close": "Stäng",
+            "bookmarkLabel": "Bokmärke för"
+        },
+        "externalurl": {
+            "tooltipText": "Visa kartan i en extern karttjänst",
+            "noUrl": "Ingen URL är angiven i konfigurationen",
+            "linkTooltipText": "Öppna länk"
+        },
+        "draganddrop": {
+            "addFromFile": "Lägg till från fil",
+            "yourLayersName": "egna-lager",
+            "yourLayersTitle": "Egna lager"
+        },
+        "legend": {
+            "placeholderText": "Sök lager",
+            "turnOffLayersTitle": "Släck alla lager",
+            "showVisibleTitle": "Visa endast tända lager",
+            "showAllVisibleTitle": "Visa alla lager",
+            "turnOnLayersTitle": "Tänd alla lager",
+            "addLayerTitle": "Lägg till lager",
+            "selectHandlerError": "Search options are missing",
+            "titleMissing": "Titel saknas",
+            "layerSwitcher": "Lagerbytare",
+            "close": "Stäng",
+            "layer": "Lager",
+            "addLayerWarningGroup": "Grupp",
+            "addLayerWarningDNE": "finns inte",
+            "layerTitleMissing": "Titel saknas",
+            "layerIcon": "Lager ikon",
+            "toggleLayer": "Växla lagersynlighet",
+            "showInfoMenuItem": "Visa",
+            "layerInfoMenuItem": "lagerinformation",
+            "groupInfoMenuItem": "gruppinformation",
+            "zoomToExtentMenuItem": "Zooma till",
+            "exportLayerTitle": "export",
+            "exportLayerSave": "Spara lager",
+            "removeLayerQuestion": "Vill du ta bort lagret?",
+            "removeLayer": "Ta bort lager",
+            "moreInfoButtonLabel": "Visa lagerinfo",
+            "renderStyleSelect": "Välj stil"
+        },
+        "zoom": {
+            "zoomInButtonTooltip": "Zooma in i kartan",
+            "zoomOutButtonTooltip": "Zooma ut i kartan"
+        },
+        "fullscreen": {
+            "fullscreenButtonTooltip": "Visa stor karta"
+        },
+        "home": {
+            "zoomHomeButtonTooltip": "Zooma till hela kartan"
+        },
+        "geoposition": {
+            "positionButtonTooltip": "Visa din nuvarande position i kartan"
+        },
+        "about": {
+            "title": "Om kartan"
+        },
+        "mapmenu": {
+            "menuButtonTooltip": "Meny",
+            "closeButtonLabel": "Stäng"
+        },
+        "scale": {
+            "scaleText": "Skala 1:"
+        },
+        "scalepicker": {
+            "selectScaleAriaLabel": "Välj skala"
+        },
+        "position": {
+            "characterError": "Ogiltigt tecken för koordinat, vänligen försök igen.",
+            "extentError": "Angivna koordinater ligger inte inom kartans utsträckning, vänligen försök igen.",
+            "configError": "Ingen titel eller projektion har angetts för positionskontrollen",
+            "centerButtonLabel": "Position ikon",
+            "projButtonLabel": "Projektion"
+        }
+    },
+    "style": {
+        "drawStyles": {
+            "modifyTooltip": "Dra för att ändra"
+        },
+        "styleWindow": {
+            "title": "Definiera stil"
+
+        },
+        "styleTemplate": {
+            "fillColor": "Fyllning",
+            "backgroundFillColor": "Bakgrundsfyllning",
+            "opacity": "Opacitet",
+            "strokeWidth": "Linjebredd",
+            "textSize": "Textstorlek",
+            "pointSize": "Punktstorlek",
+            "showLengthArea": "Visa längd/area",
+            "showSegments": "Visa dellängder",
+            "stroke": "Linje",
+            "strokeTypeSolid": "Heldragen linje",
+            "strokeTypeDotted": "Punktad linje",
+            "strokeTypeDashed" : "Streckad linje",
+            "strokeTypeDashedDotted" : "Streck-punkt-linje",
+            "dimensions": "Mått",
+            "margins": "Marginaler",
+            "rotation": "Rotation",
+            "degreesRotation": "Grader",
+            "marginForText": "Marginal",
+            "frame": "Ram",
+            "margin": "Marginal",
+            "point": "Punkt",
+            "pointTypePoint": "Punkt",
+            "pointTypeCircle": "Cirkel",
+            "pointTypeX": "Kryss",
+            "pointTypePlus": "Kors",
+            "pointTypeStar": "Stjärna",
+            "pointTypeTriangle": "Tringel",
+            "pointTypeSquare": "Fyrkant",
+            "pointTypeMarker": "Markör"
+        }
+    }
+}

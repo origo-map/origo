@@ -1,32 +1,34 @@
+@use '../variables';
+
 // standard margin
 .margin {
-  margin: $margin-standard;
+  margin: variables.$margin-standard;
 }
 
 .margin-top {
-  margin-top: $margin-standard;
+  margin-top: variables.$margin-standard;
 }
 
 .margin-right {
-  margin-right: $margin-standard;
+  margin-right: variables.$margin-standard;
 }
 
 .margin-bottom {
-  margin-bottom: $margin-standard;
+  margin-bottom: variables.$margin-standard;
 }
 
 .margin-left {
-  margin-left: $margin-standard;
+  margin-left: variables.$margin-standard;
 }
 
 .margin-x {
-  margin-left: $margin-standard;
-  margin-right: $margin-standard;
+  margin-left: variables.$margin-standard;
+  margin-right: variables.$margin-standard;
 }
 
 .margin-y {
-  margin-bottom: $margin-standard;
-  margin-top: $margin-standard;
+  margin-bottom: variables.$margin-standard;
+  margin-top: variables.$margin-standard;
 }
 
 .margin-x-auto {
@@ -57,124 +59,124 @@
 
 // large margin
 .margin-large {
-  margin: $margin-large;
+  margin: variables.$margin-large;
 }
 
 .margin-top-large {
-  margin-top: $margin-large;
+  margin-top: variables.$margin-large;
 }
 
 .margin-right-large {
-  margin-right: $margin-large;
+  margin-right: variables.$margin-large;
 }
 
 .margin-bottom-large {
-  margin-bottom: $margin-large;
+  margin-bottom: variables.$margin-large;
 }
 
 .margin-left-large {
-  margin-left: $margin-large;
+  margin-left: variables.$margin-large;
 }
 
 .margin-x-large {
-  margin-left: $margin-large;
-  margin-right: $margin-large;
+  margin-left: variables.$margin-large;
+  margin-right: variables.$margin-large;
 }
 
 .margin-y-large {
-  margin-bottom: $margin-large;
-  margin-top: $margin-large;
+  margin-bottom: variables.$margin-large;
+  margin-top: variables.$margin-large;
 }
 
 // small margin
 .margin-small {
-  margin: $margin-small;
+  margin: variables.$margin-small;
 }
 
 .margin-top-small {
-  margin-top: $margin-small;
+  margin-top: variables.$margin-small;
 }
 
 .margin-right-small {
-  margin-right: $margin-small;
+  margin-right: variables.$margin-small;
 }
 
 .margin-bottom-small {
-  margin-bottom: $margin-small;
+  margin-bottom: variables.$margin-small;
 }
 
 .margin-left-small {
-  margin-left: $margin-small;
+  margin-left: variables.$margin-small;
 }
 
 .margin-x-small {
-  margin-left: $margin-small;
-  margin-right: $margin-small;
+  margin-left: variables.$margin-small;
+  margin-right: variables.$margin-small;
 }
 
 .margin-y-small {
-  margin-bottom: $margin-small;
-  margin-top: $margin-small;
+  margin-bottom: variables.$margin-small;
+  margin-top: variables.$margin-small;
 }
 
 // smaller margin
 .margin-smaller {
-  margin: $margin-smaller;
+  margin: variables.$margin-smaller;
 }
 
 .margin-top-smaller {
-  margin-top: $margin-smaller;
+  margin-top: variables.$margin-smaller;
 }
 
 .margin-right-smaller {
-  margin-right: $margin-smaller;
+  margin-right: variables.$margin-smaller;
 }
 
 .margin-bottom-smaller {
-  margin-bottom: $margin-smaller;
+  margin-bottom: variables.$margin-smaller;
 }
 
 .margin-left-smaller {
-  margin-left: $margin-smaller;
+  margin-left: variables.$margin-smaller;
 }
 
 .margin-x-smaller {
-  margin-left: $margin-smaller;
-  margin-right: $margin-smaller;
+  margin-left: variables.$margin-smaller;
+  margin-right: variables.$margin-smaller;
 }
 
 .margin-y-smaller {
-  margin-bottom: $margin-smaller;
-  margin-top: $margin-smaller;
+  margin-bottom: variables.$margin-smaller;
+  margin-top: variables.$margin-smaller;
 }
 
 // smallest margin
 .margin-smallest {
-  margin: $margin-smallest;
+  margin: variables.$margin-smallest;
 }
 
 .margin-top-smallest {
-  margin-top: $margin-smallest;
+  margin-top: variables.$margin-smallest;
 }
 
 .margin-right-smallest {
-  margin-right: $margin-smallest;
+  margin-right: variables.$margin-smallest;
 }
 
 .margin-bottom-smallest {
-  margin-bottom: $margin-smallest;
+  margin-bottom: variables.$margin-smallest;
 }
 
 .margin-left-smallest {
-  margin-left: $margin-smallest;
+  margin-left: variables.$margin-smallest;
 }
 
 .margin-x-smallest {
-  margin-left: $margin-smallest;
-  margin-right: $margin-smallest;
+  margin-left: variables.$margin-smallest;
+  margin-right: variables.$margin-smallest;
 }
 
 .margin-y-smallest {
-  margin-bottom: $margin-smallest;
-  margin-top: $margin-smallest;
+  margin-bottom: variables.$margin-smallest;
+  margin-top: variables.$margin-smallest;
 }

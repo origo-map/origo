@@ -1,4 +1,6 @@
-$divider-color: $grey-lighter;
+@use './variables';
+
+$divider-color: variables.$grey-lighter;
 
 .divider {
   border-right: 1px solid $divider-color;

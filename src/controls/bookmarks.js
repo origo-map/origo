@@ -3,12 +3,18 @@ import { Component, Button, Element as El, dom } from '../ui';
 import utils from '../utils';
 
 const Bookmarks = function Bookmarks(options = {}) {
+  const localization = options.localization;
+
+  function localize(key) {
+    return localization.getStringByKeys({ targetParentKey: 'bookmarks', targetKey: key });
+  }
+
   const {
     maxZoom = 15,
     duration = 300,
     closeIcon = '#ic_close_24px',
     bookmarksIcon = '#ic_bookmark_24px',
-    title = 'Bokmärken',
+    title = localize('title'),
     autoClose = false
   } = options;
   let {
@@ -55,7 +61,8 @@ const Bookmarks = function Bookmarks(options = {}) {
     const button = Button({
       cls: 'icon-smallest compact no-grow o-bookmark-button',
       click,
-      icon
+      icon,
+      ariaLabel: `${localize('bookmarkLabel')} ${bookmarkTitle}`
     });
 
     return Component({
@@ -106,7 +113,7 @@ const Bookmarks = function Bookmarks(options = {}) {
 
       closeButton = Button({
         cls: 'small round margin-top-smaller margin-bottom-auto margin-right-small icon-smallest grey-lightest',
-        ariaLabel: 'Stäng',
+        ariaLabel: localize('close'),
         icon: closeIcon,
         click() {
           toggle();

@@ -1,96 +1,143 @@
-@import 'no-map';
-@import 'background-grid';
-@import 'variables';
-@import 'ui/ui';
-@import 'bookmark';
+@use "sass:meta";
+@use 'no-map';
+@use 'background-grid';
+@use 'variables';
+@use 'ui/ui';
+@use 'bookmark';
+@use 'ol';
+@use 'viewer';
+@use 'reset';
+@use 'glide/custom' as glideCustom;
+@use 'card';
+@use 'container';
+@use 'toolbar';
+@use 'button';
+@use 'image';
+@use 'modal';
+@use 'popup';
+@use 'popover';
+@use 'dropdown';
+@use 'sidebar';
+@use 'stylepicker';
+@use 'close';
+@use 'icon';
+@use 'tooltip';
+@use 'rotate';
+@use 'mapmenu';
+@use 'draw';
+@use 'editor';
+@use 'editor-toolbar';
+@use 'position';
+@use 'progressbar';
+@use 'measure';
+@use 'print';
+@use 'search';
+@use 'searchList';
+@use 'hidden';
+@use 'featureinfo';
+@use 'infowindow';
+@use 'ui/validate' as uiValidate;
+@use 'o-scale';
+@use 'scalepicker';
+@use 'embedded-overlay';
+@use 'spinner';
+@use 'logger';
+@use 'localization';
+@use 'audio';
+@use 'video';
+@use 'guide';
+
 
 .o-map {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
-  position: relative;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-  @import 'reset';
-  @import 'ol';
-  @import 'externs/glidejs/import.scss';
-  @import 'glide/custom';
-  @import 'card';
-  @import 'container';
-  @import 'toolbar';
-  @import 'button';
-  @import 'image';
-  @import 'modal';
-  @import 'popup';
-  @import 'popover';
-  @import 'dropdown';
-  @import 'sidebar';
-  @import 'stylepicker';
-  @import 'close';
-  @import 'icon';
-  @import 'tooltip';
-  @import 'viewer';
-  @import 'rotate';
-  @import 'mapmenu';
-  @import 'draw';
-  @import 'editor';
-  @import 'editor-toolbar';
-  @import 'position';
-  @import 'progressbar';
-  @import 'measure';
-  @import 'print';
-  @import 'search';
-  @import 'searchList';
-  @import 'hidden';
-  @import 'featureinfo';
-  @import 'infowindow';
-  @import 'ui/validate';
-  @import 'o-scale';
-  @import 'scalepicker';
-  @import 'embedded-overlay';
-  @import 'spinner';
-  @import 'guide';
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    @include reset.default;
+    @include ol.default;
+    // Use precompiled glide CSS
+    @include meta.load-css('externs/glidejs/import.scss');
+    @include glideCustom.default;
+    @include card.default;
+    @include container.default;
+    @include toolbar.default;
+    @include button.default;
+    @include image.default;
+    @include modal.default;
+    @include popup.default;
+    @include popover.default;
+    @include dropdown.default;
+    @include sidebar.default;
+    @include stylepicker.default;
+    @include close.default;
+    @include icon.default;
+    @include tooltip.default;
+    @include viewer.default;
+    @include rotate.default;
+    @include mapmenu.default;
+    @include draw.default;
+    @include editor.default;
+    @include editor-toolbar.default;
+    @include position.default;
+    @include progressbar.default;
+    @include measure.default;
+    @include print.default;
+    @include search.default;
+    @include searchList.default;
+    @include hidden.default;
+    @include featureinfo.default;
+    @include infowindow.default;
+    @include uiValidate.default;
+    @include o-scale.default;
+    @include scalepicker.default;
+    @include embedded-overlay.default;
+    @include spinner.default;
+    @include logger.default;
+    @include localization.default;
+    @include audio.default;
+    @include video.default;
+    @include guide.default;
 }
 
 html,
 body {
-  height: 100%;
-  margin: 0;
-  overscroll-behavior-y: contain;
+    height: 100%;
+    margin: 0;
+    overscroll-behavior-y: contain;
 }
 
 #o-wrapper,
 #app-wrapper {
-  height: 100%;
-  overflow: hidden;
-  position: relative;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
 }
 
 #loading {
-  width: 100vw;
-  height: 100vh;
-  position: fixed;
-  left: 0;
-  top: 0;
-  z-index: 9999999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 9999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.7);
 
-  background-color: rgba(0, 0, 0, 0.7);
-
-  &.hide {
-    display: none;
-  }
-
-  // based on code from https://codepen.io/mandelid/pen/kNBYLJ
-  .loading-spinner {
-    display: inline-block;
-    width: 75px;
-    height: 75px;
-    border: 5px solid rgba(255,255,255,.3);
-    border-radius: 50%;
-    border-top-color: #fff;
-    animation: spin 1s ease-in-out infinite;
-  }
+    &.hide {
+        display: none;
+    }
+    // based on code from https://codepen.io/mandelid/pen/kNBYLJ
+    .loading-spinner {
+        display: inline-block;
+        width: 75px;
+        height: 75px;
+        border: 5px solid rgba(255,255,255,.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+    }
 }

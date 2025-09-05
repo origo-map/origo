@@ -1,36 +1,38 @@
+@use '../variables';
+
 // z-index
 .z-index-bottom {
-  z-index: $z-bottom;
+  z-index: variables.$z-bottom;
 }
 
 .z-index-low {
-  z-index: $z-low;
+  z-index: variables.$z-low;
 }
 
 .z-index-middle {
-  z-index: $z-middle;
+  z-index: variables.$z-middle;
 }
 
 .z-index-high {
-  z-index: $z-high;
+  z-index: variables.$z-high;
 }
 
 .z-index-top {
-  z-index: $z-top;
+  z-index: variables.$z-top;
 }
 
 .z-index-ontop-low {
-  z-index: $z-top + $z-low;
+  z-index: variables.$z-top + variables.$z-low;
 }
 
 .z-index-ontop-middle {
-  z-index: $z-top + $z-middle;
+  z-index: variables.$z-top + variables.$z-middle;
 }
 
 .z-index-ontop-high {
-  z-index: $z-top + $z-high;
+  z-index: variables.$z-top + variables.$z-high;
 }
 
 .z-index-ontop-top {
-  z-index: $z-top + $z-top;
+  z-index: variables.$z-top + variables.$z-top;
 }

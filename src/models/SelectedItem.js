@@ -1,16 +1,39 @@
 import { getUid } from 'ol';
-import getAttributes from '../getattributes';
-
+import getAttributes, { getAttributesAsync } from '../getattributes';
+/**
+ * Class that represents a selected feature �n selection manager. Wraps a feature, its layer and html visualization of attributes
+ */
 export default class SelectedItem {
-  constructor(feature, layer, map, selectionGroup, selectionGroupTitle) {
+  /**
+   * Contructor for SelectedItem. Builds the content according to layer's configuration, but does not include async
+   * content (related tables, attachments) as that is an async operation.
+   * @param {any} feature
+   * @param {any} layer
+   * @param {any} map
+   * @param {any} selectionGroup
+   * @param {any} selectionGroupTitle
+   * @param {any} [localization]
+   */
+  constructor(feature, layer, map, selectionGroup, selectionGroupTitle, localization) {
     this.feature = feature;
     this.layer = layer;
+    this.map = map;
+    this.localization = localization;
     if (layer && map) {
-      this.content = getAttributes(feature, layer, map);
+      // Create the visual representation of this feature
+      // must not fail or be async as this is called from the contructor
+      this.content = getAttributes(feature, layer, map, localization);
     }
 
     this.selectionGroup = selectionGroup || layer.get('name');
     this.selectionGroupTitle = selectionGroupTitle || layer.get('title');
+  }
+
+  /**
+   * Builds the content including async content.
+   */
+  async createContentAsync() {
+    this.content = await getAttributesAsync(this.feature, this.layer, this.map, this.localization);
   }
 
   getId() {

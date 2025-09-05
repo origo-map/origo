@@ -9,10 +9,16 @@ import * as drawStyles from './drawstyles';
 import styleTemplate from './styletemplate';
 import hexToRgba from './hextorgba';
 import { Component, Button, Element, dom } from '../ui';
+import formatLengthString from '../utils/formatlengthstring';
 
 const Stylewindow = function Stylewindow(optOptions = {}) {
+  const { localization } = optOptions;
+  function localize(key) {
+    return localization.getStringByKeys({ targetParentKey: 'styleWindow', targetKey: key });
+  }
+
   const {
-    title = 'Anpassa stil',
+    title = localize('title'),
     cls = 'control overflow-hidden hidden',
     css = '',
     viewer,
@@ -73,19 +79,19 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     return colorArray[3];
   }
 
-  function stringToRgba(colorString, opacity) {
+  function stringToRgba(colorString, opacity = 1) {
     if (typeof colorString === 'string') {
       if (colorString.toLowerCase().startsWith('rgba(')) { return colorString; }
       if (colorString.startsWith('#')) {
-        return hexToRgba(colorString, opacity || 1);
+        return hexToRgba(colorString, opacity);
       } else if (colorString.toLowerCase().startsWith('rgb(')) {
-        return rgbToRgba(colorString, opacity || 1);
+        return rgbToRgba(colorString, opacity);
       }
     }
     return rgbToRgba(swDefaults.fillColor, swDefaults.fillOpacity);
   }
 
-  function paddingToArray(padding) {
+  function paddingToArray(padding = swDefaults.paddingText) {
     return [padding, padding, padding, padding];
   }
 
@@ -139,6 +145,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
           selected
         };
         break;
+      case 'Circle':
       case 'Polygon':
       case 'MultiPolygon':
         styleObject = {
@@ -220,6 +227,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
         document.getElementById('o-draw-style-backgroundStroke').classList.add('hidden');
         document.getElementById('o-draw-style-padding').classList.add('hidden');
         break;
+      case 'Circle':
       case 'Polygon':
       case 'MultiPolygon':
         document.getElementById('o-draw-style-point').classList.add('hidden');
@@ -327,10 +335,10 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
     newStyleObj.strokeWidth *= styleScale;
     newStyleObj.textSize *= styleScale;
     newStyleObj.pointSize *= styleScale;
-    newStyleObj.backgroundStrokeOpacity = featureStyle.backgroundStrokeOpacity;
     newStyleObj.backgroundStrokeColor = stringToRgba(newStyleObj.backgroundStrokeColor, newStyleObj.backgroundStrokeOpacity);
     newStyleObj.backgroundStrokeWidth *= styleScale;
-    newStyleObj.paddingText = paddingToArray(featureStyle.paddingText);
+    newStyleObj.backgroundFill = featureStyle.backgroundFill ? featureStyle.backgroundFill : stringToRgba(newStyleObj.backgroundFillColor, newStyleObj.backgroundFillOpacity);
+    newStyleObj.paddingText = paddingToArray(newStyleObj.paddingText);
     const geom = feature.getGeometry();
     let geometryType = feature.getGeometry().getType();
     if (feature.get(annotationField)) {
@@ -381,11 +389,11 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
           stroke
         });
         if (newStyleObj.showMeasureSegments) {
-          const segmentLabelStyle = drawStyles.getSegmentLabelStyle(geom, projection, styleScale);
+          const segmentLabelStyle = drawStyles.getSegmentLabelStyle({ line: geom, projection, scale: styleScale, localization });
           style = style.concat(segmentLabelStyle);
         }
         if (newStyleObj.showMeasure) {
-          const label = drawStyles.formatLength(geom, projection);
+          const label = drawStyles.formatLength({ line: geom, projection, localization });
           const point = new Point(geom.getLastCoordinate());
           const labelStyle = drawStyles.getLabelStyle(styleScale);
           labelStyle.setGeometry(point);
@@ -401,7 +409,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
           const featureCoords = feature.getGeometry().getCoordinates();
           featureCoords.forEach(part => {
             const line = new LineString(part);
-            const segmentLabelStyle = drawStyles.getSegmentLabelStyle(line, projection, styleScale);
+            const segmentLabelStyle = drawStyles.getSegmentLabelStyle({ line, projection, scale: styleScale, localization });
             style = style.concat(segmentLabelStyle);
           });
         }
@@ -409,13 +417,36 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
           const featureCoords = feature.getGeometry().getCoordinates();
           featureCoords.forEach(part => {
             const line = new LineString(part);
-            const label = drawStyles.formatLength(line, projection);
+            const label = drawStyles.formatLength({ line, projection, localization });
             const point = new Point(line.getLastCoordinate());
             const labelStyle = drawStyles.getLabelStyle(styleScale);
             labelStyle.setGeometry(point);
             labelStyle.getText().setText(label);
             style = style.concat(labelStyle);
           });
+        }
+        break;
+      case 'Circle':
+        style[0] = new Style({
+          fill,
+          stroke
+        });
+        if (newStyleObj.showMeasureSegments) {
+          const radius = geom.getRadius();
+          const circ = radius * 2 * Math.PI;
+          const label = formatLengthString(circ, { decimals: 2, localization });
+          const labelStyle = drawStyles.getBufferLabelStyle(label, styleScale);
+          style = style.concat(labelStyle);
+        }
+        if (newStyleObj.showMeasure) {
+          const radius = geom.getRadius();
+          const area = radius * radius * Math.PI;
+          const label = drawStyles.formatArea({ useHectare: true, projection, featureArea: area, localization });
+          const point = new Point(geom.getCenter());
+          const labelStyle = drawStyles.getLabelStyle(styleScale);
+          labelStyle.setGeometry(point);
+          labelStyle.getText().setText(label);
+          style = style.concat(labelStyle);
         }
         break;
       case 'Polygon':
@@ -425,11 +456,11 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
         });
         if (newStyleObj.showMeasureSegments) {
           const line = new LineString(geom.getCoordinates()[0]);
-          const segmentLabelStyle = drawStyles.getSegmentLabelStyle(line, projection, styleScale);
+          const segmentLabelStyle = drawStyles.getSegmentLabelStyle({ line, projection, scale: styleScale, localization });
           style = style.concat(segmentLabelStyle);
         }
         if (newStyleObj.showMeasure) {
-          const label = drawStyles.formatArea(geom, true, projection);
+          const label = drawStyles.formatArea({ polygon: geom, useHectare: true, projection, localization });
           const point = geom.getInteriorPoint();
           const labelStyle = drawStyles.getLabelStyle(styleScale);
           labelStyle.setGeometry(point);
@@ -447,7 +478,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
           featureCoords.forEach(parts => {
             parts.forEach(part => {
               const line = new LineString(part);
-              const segmentLabelStyle = drawStyles.getSegmentLabelStyle(line, projection, styleScale);
+              const segmentLabelStyle = drawStyles.getSegmentLabelStyle({ line, projection, scale: styleScale });
               style = style.concat(segmentLabelStyle);
             });
           });
@@ -456,7 +487,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
           const featureCoords = feature.getGeometry().getCoordinates();
           featureCoords.forEach(parts => {
             const polygon = new Polygon(parts);
-            const label = drawStyles.formatArea(polygon, true, projection);
+            const label = drawStyles.formatArea({ polygon, useHectare: true, projection, localization });
             const point = polygon.getInteriorPoint();
             const labelStyle = drawStyles.getLabelStyle(styleScale);
             labelStyle.setGeometry(point);
@@ -693,7 +724,7 @@ const Stylewindow = function Stylewindow(optOptions = {}) {
 
       contentEl = Element({
         cls: 'o-draw-stylewindow-content overflow-auto',
-        innerHTML: `${styleTemplate(palette, swStyle)}`
+        innerHTML: `${styleTemplate({ palette, swStyle, localization })}`
       });
 
       this.addComponent(headerEl);

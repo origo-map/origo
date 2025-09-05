@@ -1,11 +1,16 @@
-&[class*=#{$media-l-m-s}] {
-  #o-sidebar {
-    max-width: 230px;
-    width: 100%;
-  }
-}
-&[class*=#{$media-l-m-s-xs}] {
-  #o-sidebar {
-    display: none;
-  }
+@use './variables' as vars;
+@mixin default {
+
+    &[class*=#{vars.$media-l-m-s}] {
+        #o-sidebar {
+            max-width: 230px;
+            width: 100%;
+        }
+    }
+
+    &[class*=#{vars.$media-l-m-s-xs}] {
+        #o-sidebar {
+            display: none;
+        }
+    }
 }

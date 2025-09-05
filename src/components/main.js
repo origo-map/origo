@@ -6,8 +6,8 @@ export default function Main(options = {}) {
   } = options;
 
   const cls = `${clsSettings} o-main transparent relative flex column grow transparent height-full no-margin`.trim();
-  const navigation = El({ cls: 'o-navigation flex column relative transparent spacing-vertical-small' });
-  const mapTools = El({ cls: 'o-maptools flex column relative transparent spacing-vertical-small' });
+  const navigation = El({ cls: 'o-navigation flex column relative transparent spacing-vertical-small align-start' });
+  const mapTools = El({ cls: 'o-maptools flex column relative transparent spacing-vertical-small align-start' });
   const miscTools = El({ cls: 'o-misc flex column relative transparent spacing-vertical-small' });
   const bottomTools = El({ cls: 'o-tools-bottom absolute transparent bottom-left width-full no-margin' });
 

@@ -10,6 +10,7 @@ let exportContainer;
 let groupFooterContainer;
 let sublists;
 let subexports;
+let subexportResponses;
 let urvalElements;
 let footerContainers;
 let expandableContents;
@@ -18,6 +19,9 @@ let activeSelectionGroup;
 let selectionManager;
 let viewer;
 let infowindowOptions;
+let initialMinimizeButtonIcon;
+let hiddenMinimizeButtonIcon;
+let minimizeButton;
 
 function createSvgElement(id, className) {
   const svgContainer = document.createElement('div');
@@ -109,6 +113,46 @@ function createCloseButton() {
   });
 }
 
+function createMinimizeButton() {
+  return Button({
+    cls: 'minimizebutton-svg-container small round small icon-smaller grey-lightest margin-top-small margin-right-small z-index-ontop-low ',
+    icon: initialMinimizeButtonIcon,
+    state: 'initial',
+    validStates: ['initial', 'hidden'],
+    ariaLabel: 'Minimera'
+  });
+}
+
+function resetInfowindow() {
+  urvalListContainer.classList.remove('hidden');
+  listContainer.classList.remove('hidden');
+  exportContainer.classList.remove('hidden');
+  groupFooterContainer.classList.remove('hidden');
+  mainContainer.classList.remove('fit-width');
+  urvalContainer.classList.remove('minimizedurvalelement');
+  minimizeButton.setIcon(initialMinimizeButtonIcon);
+  minimizeButton.setState('initial');
+}
+
+function minimizeInfowindow() {
+  urvalListContainer.classList.add('hidden');
+  listContainer.classList.add('hidden');
+  exportContainer.classList.add('hidden');
+  groupFooterContainer.classList.add('hidden');
+  mainContainer.classList.add('fit-width');
+  urvalContainer.classList.add('minimizedurvalelement');
+  minimizeButton.setIcon(hiddenMinimizeButtonIcon);
+  minimizeButton.setState('hidden');
+}
+
+function toggleInfowindow() {
+  if (urvalListContainer.classList.contains('hidden')) {
+    resetInfowindow();
+  } else {
+    minimizeInfowindow();
+  }
+}
+
 function render(viewerId) {
   mainContainer = document.createElement('div');
   setInfowindowStyle();
@@ -126,6 +170,8 @@ function render(viewerId) {
   urvalTextNodeContainer.appendChild(urvalTextNode);
   urvalContainer.appendChild(urvalTextNodeContainer);
   const closeButton = createCloseButton();
+  minimizeButton = createMinimizeButton();
+  urvalContainer.appendChild(dom.html(minimizeButton.render()));
   urvalContainer.appendChild(dom.html(closeButton.render()));
   urvalContainer.appendChild(urvalListContainer);
   listContainer = document.createElement('div');
@@ -157,6 +203,13 @@ function render(viewerId) {
     viewer.dispatch('toggleClickInteraction', detail);
     selectionManager.clearSelection();
     hideInfowindow();
+    if (urvalListContainer.classList.contains('hidden')) {
+      resetInfowindow();
+    }
+  });
+
+  document.getElementById(minimizeButton.getId()).addEventListener('click', () => {
+    toggleInfowindow();
   });
 
   // Make the DIV element draggagle:
@@ -203,6 +256,8 @@ function showSelectedList(selectionGroup) {
   }
   const subexportToAppend = subexports.get(selectionGroup);
   exportContainer.appendChild(subexportToAppend);
+  const subexportResponseToAppend = subexportResponses.get(selectionGroup);
+  exportContainer.appendChild(subexportResponseToAppend);
   selectionManager.clearHighlightedFeatures();
   selectionManager.refreshAllLayers();
   urvalElements.forEach((value, key) => {
@@ -238,8 +293,18 @@ function createUrvalElement(selectionGroup, selectionGroupTitle) {
   const footerContainer = document.createElement('div');
   footerContainers.set(selectionGroup, footerContainer);
 
-  const subexportComponent = createSubexportComponent({ selectionGroup, viewer, exportOptions });
+  // Updates the response content for the given selectionGroup
+  const responseHandler = function responseHandler(responseSelectionGroup, text) {
+    const responseContainer = subexportResponses.get(responseSelectionGroup);
+    responseContainer.innerHTML = text;
+  };
+
+  const subexportComponent = createSubexportComponent({ selectionGroup, viewer, exportOptions, responseHandler });
   subexports.set(selectionGroup, subexportComponent);
+
+  const subexportResponseComponent = document.createElement('div');
+  subexportResponseComponent.classList.add('export-response-container');
+  subexportResponses.set(selectionGroup, subexportResponseComponent);
 }
 
 function createExpandableContent(listElementContentContainer, content, elementId) {
@@ -427,9 +492,12 @@ function init(options) {
   exportOptions = infowindowOptions.export || {};
   sublists = new Map();
   subexports = new Map();
+  subexportResponses = new Map();
   urvalElements = new Map();
   expandableContents = new Map();
   footerContainers = new Map();
+  initialMinimizeButtonIcon = '#ic_close_fullscreen_24px';
+  hiddenMinimizeButtonIcon = '#ic_open_in_full_24px';
 
   render(options.viewer.getId());
 

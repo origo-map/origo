@@ -1,29 +1,33 @@
-@import 'externs/ol';
+@use 'externs/ol';
 
-.ol-attribution li a {
-  color: #bbb;
-}
+@mixin default {
+    @include ol.default;
 
-.ol-attribution li a:focus {
-  color: #fff;
-  text-decoration: underline;
-}
+    .ol-attribution li a {
+        color: #bbb;
+    }
 
-.ol-attribution li a:focus:not(:focus-visible) {
-  color: #bbb;
-  text-decoration: none;
-}
+    .ol-attribution li a:focus {
+        color: #fff;
+        text-decoration: underline;
+    }
 
-.ol-overlaycontainer-stopevent {
-  z-index: unset !important;
-}
+    .ol-attribution li a:focus:not(:focus-visible) {
+        color: #bbb;
+        text-decoration: none;
+    }
 
-.ol-overlaycontainer,
-.ol-overlaycontainer-stopevent {
-  pointer-events: none;
-}
+    .ol-overlaycontainer-stopevent {
+        z-index: unset !important;
+    }
 
-.ol-overlaycontainer > *,
-.ol-overlaycontainer-stopevent > * {
-  pointer-events: auto;
+    .ol-overlaycontainer,
+    .ol-overlaycontainer-stopevent {
+        pointer-events: none;
+    }
+
+    .ol-overlaycontainer > *,
+    .ol-overlaycontainer-stopevent > * {
+        pointer-events: auto;
+    }
 }

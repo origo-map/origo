@@ -12,9 +12,7 @@ import StyleTypes from './style/styletypes';
 import getFeatureInfo from './getfeatureinfo';
 import replacer from './utils/replacer';
 import SelectedItem from './models/SelectedItem';
-import attachmentclient from './utils/attachmentclient';
-import getAttributes, { getContent, featureinfotemplates } from './getattributes';
-import relatedtables from './utils/relatedtables';
+import { getContent, featureinfotemplates } from './getattributes';
 
 const styleTypes = StyleTypes();
 
@@ -28,7 +26,8 @@ const Featureinfo = function Featureinfo(options = {}) {
     savedPin: savedPinOptions,
     savedSelection,
     selectionStyles: selectionStylesOptions,
-    autoplay = false
+    autoplay = false,
+    localization
   } = options;
 
   let selectionLayer;
@@ -153,6 +152,14 @@ const Featureinfo = function Featureinfo(options = {}) {
     }
   };
 
+  const dispatchItemAdded = function dispatchItemAdded(item) {
+    // Make sure it actually is a SelectedItem. At least Search can call render() without creating proper selectedItems when
+    // search result is remote.
+    if (item instanceof SelectedItem) {
+      component.dispatch('itemadded', item);
+    }
+  };
+
   const dispatchToggleFeatureEvent = function dispatchToggleFeatureEvent(currentItem) {
     const toggleFeatureinfo = new CustomEvent('toggleFeatureinfo', {
       detail: {
@@ -261,6 +268,12 @@ const Featureinfo = function Featureinfo(options = {}) {
     return hitTolerance;
   };
 
+  /**
+   * Registers a custom attribute formatter function
+   * @param {any} attributeType Name of your brand new attribute type. Must match the first key specified in attributes configuration
+   * @param {any} fn A function that thaes argumnets (feature, attribute, attributes, map) and returns a HTML string or HTMLElement
+   * @returns A reference to the getContent function.
+   */
   const addAttributeType = function addAttributeType(attributeType, fn) {
     getContent[attributeType] = fn;
     return getContent;
@@ -302,246 +315,136 @@ const Featureinfo = function Featureinfo(options = {}) {
   };
 
   /**
-   * Creates temporary attributes on a feature in order for featureinfo to display attributes from related tables and
-   * display attachments as links. Recursively adds attributes to related features in order to support multi level relations.
-   * In order to do so, attributes are also added to the related features.
-   * The hoistedAttributes array can be used to remove all attributes that have been added.
-   * @param {any} parentLayer The layer that holds the feature
-   * @param {any} parentFeature The feature to add attributes to
-   * @param {any} hoistedAttributes An existing array that is populated with the added attributes.
-   */
-  async function hoistRelatedAttributes(parentLayer, parentFeature, hoistedAttributes) {
-    // This function is async and called recursively, DO NOT USE forEach!!! (It won't work)
-
-    let dirty = false;
-    // Add attachments first but only if configured for attribute hoisting
-    const attachmentsConf = parentLayer.get('attachments');
-    if (attachmentsConf && attachmentsConf.groups.some(g => g.linkAttribute || g.fileNameAttribute)) {
-      const ac = attachmentclient(parentLayer);
-      const attachments = await ac.getAttachments(parentFeature);
-      for (let i = 0; i < ac.getGroups().length; i += 1) {
-        const currAttrib = ac.getGroups()[i];
-        let val = '';
-        let texts = '';
-        if (attachments.has(currAttrib.name)) {
-          const group = attachments.get(currAttrib.name);
-          val = group.map(g => g.url).join(';');
-          texts = group.map(g => g.filename).join(';');
-        }
-        if (currAttrib.linkAttribute) {
-          parentFeature.set(currAttrib.linkAttribute, val);
-          hoistedAttributes.push({ feature: parentFeature, attrib: currAttrib.linkAttribute });
-          dirty = true;
-        }
-        if (currAttrib.fileNameAttribute) {
-          hoistedAttributes.push({ feature: parentFeature, attrib: currAttrib.fileNameAttribute });
-          parentFeature.set(currAttrib.fileNameAttribute, texts);
-          dirty = true;
-        }
-      }
-    }
-
-    // Add related layers
-    const relatedLayersConfig = relatedtables.getConfig(parentLayer);
-    if (relatedLayersConfig) {
-      for (let i = 0; i < relatedLayersConfig.length; i += 1) {
-        const layerConfig = relatedLayersConfig[i];
-
-        if (layerConfig.promoteAttribs) {
-          // First recurse our children so we can propagate from n-level to top level
-          const childLayer = viewer.getLayer(layerConfig.layerName);
-          // Function is recursice, we have to await
-          // eslint-disable-next-line no-await-in-loop
-          const childFeatures = await relatedtables.getChildFeatures(parentLayer, parentFeature, childLayer);
-          for (let jx = 0; jx < childFeatures.length; jx += 1) {
-            const childFeature = childFeatures[jx];
-            // So here comes the infamous recursive call ...
-            // Function is recursice, we have to await
-            // eslint-disable-next-line no-await-in-loop
-            await hoistRelatedAttributes(childLayer, childFeature, hoistedAttributes);
-          }
-
-          // Then actually hoist some related attributes
-          for (let j = 0; j < layerConfig.promoteAttribs.length; j += 1) {
-            const currAttribConf = layerConfig.promoteAttribs[j];
-            const resarray = [];
-            childFeatures.forEach(child => {
-              // Collect the attributes from all children
-              // Here one could imagine supporting more attribute types, but html is pretty simple and powerful
-              if (currAttribConf.html) {
-                const val = replacer.replace(currAttribConf.html, child.getProperties());
-                resarray.push(val);
-              }
-            });
-            // Then actually aggregate them. Its a two step operation so in the future we could support more aggregate functions, like min(), max() etc
-            // and also to avoid appending manually and handle that pesky separator on last element.
-            const sep = currAttribConf.separator ? currAttribConf.separator : '';
-            const resaggregate = resarray.join(sep);
-            parentFeature.set(currAttribConf.parentName, resaggregate);
-            hoistedAttributes.push({ feature: parentFeature, attrib: currAttribConf.parentName });
-            dirty = true;
-          }
-        }
-      }
-    }
-    // Only returns if top level is dirty. We don't build content for related objects.
-    return dirty;
-  }
-
-  /**
-   * Adds content from related tables and attachments.
-   * @param {any} item
-   * @param {any} hoistedAttributes
-   */
-  async function addRelatedContent(item) {
-    const hoistedAttributes = [];
-    const updated = await hoistRelatedAttributes(item.getLayer(), item.getFeature(), hoistedAttributes);
-    if (updated) {
-      // Update content as the pseudo attributes have changed
-      // Ideally this should have been made before SelectedItem was created, but that changes so much
-      // in the code flow as the getAttachment is async-ish
-      item.setContent(getAttributes(item.getFeature(), item.getLayer(), viewer.getMap()));
-    }
-    // Remove all temporary added attributes. They mess up saving edits as there are no such fields in db.
-    hoistedAttributes.forEach(hoist => {
-      hoist.feature.unset(hoist.attrib, true);
-    });
-  }
-
-  /**
    * Internal helper that performs the actual rendering
    * @param {any} identifyItems
    * @param {any} target
    * @param {any} coordinate
    * @param {bool} ignorePan true if overlay should not be panned into view
    */
-  const doRender = function doRender(identifyItems, target, coordinate, ignorePan) {
-    const map = viewer.getMap();
-
-    items = identifyItems;
+  const doRender = function doRender(identifyItems, target, coordinate, ignorePan, suppressDialog) {
     clear(false);
-    // FIXME: variable is overwritten in next row
-    let content = items.map((i) => i.content).join('');
-    content = '<div id="o-identify"><div id="o-identify-carousel" class="flex"></div></div>';
-    switch (target) {
-      case 'overlay':
-      {
-        popup = Popup(`#${viewer.getId()}`, { closeCb: onInfoClosed });
-        popup.setContent({
-          content,
-          title: getTitle(items[0])
-        });
-        const contentDiv = document.getElementById('o-identify-carousel');
-        const carouselIds = [];
-        items.forEach((item) => {
-          carouselIds.push(item.feature.ol_uid);
-          if (item.content instanceof Element) {
-            contentDiv.appendChild(item.content);
-          } else {
-            contentDiv.innerHTML = item.content;
-          }
-        });
-        popup.setVisibility(true);
-        initCarousel('#o-identify-carousel');
-        const firstFeature = items[0].feature;
-        const geometry = firstFeature.getGeometry();
-        const origostyle = firstFeature.get('origostyle');
-        const clone = firstFeature.clone();
-        clone.setId(firstFeature.getId());
-        // FIXME: should be layer name, not feature name
-        clone.layerName = firstFeature.name;
-        selectionLayer.clearAndAdd(
-          clone,
-          selectionStyles[geometry.getType()]
-        );
-        selectionLayer.setSourceLayer(items[0].layer);
-        const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
-        carouselIds.forEach((carouselId) => {
-          let targetElement;
-          const elements = document.getElementsByClassName(`o-image-carousel${carouselId}`);
-          Array.from(elements).forEach(element => {
-            if (!element.closest('.glide__slide--clone')) {
-              targetElement = element;
+    items = identifyItems;
+    if (target === 'infowindow') {
+      if (items.length === 1) {
+        selectionManager.addOrHighlightItem(items[0], { suppressDialog });
+      } else if (items.length > 1) {
+        selectionManager.addItems(items, { suppressDialog });
+      }
+    } else {
+      // Overlay or sidebar goes here
+      const map = viewer.getMap();
+
+      // Add the first feature to selection layer.
+      // Only one is added, the others are added when the carousel changes.
+      const firstFeature = items[0].feature;
+      const geometry = firstFeature.getGeometry();
+      const clone = firstFeature.clone();
+      clone.setId(firstFeature.getId());
+      selectionLayer.clearAndAdd(
+        clone,
+        selectionStyles[geometry.getType()]
+      );
+      selectionLayer.setSourceLayer(items[0].layer);
+
+      // Create the popup/side bar
+      if (!suppressDialog) {
+        const content = '<div id="o-identify"><div id="o-identify-carousel" class="flex"></div></div>';
+        switch (target) {
+          case 'overlay':
+          {
+            popup = Popup(`#${viewer.getId()}`, { closeCb: onInfoClosed });
+            popup.setContent({
+              content,
+              title: getTitle(items[0])
+            });
+            const contentDiv = document.getElementById('o-identify-carousel');
+            const carouselIds = [];
+            items.forEach((item) => {
+              carouselIds.push(item.feature.ol_uid);
+              if (item.content instanceof Element) {
+                contentDiv.appendChild(item.content);
+              } else {
+                contentDiv.innerHTML = item.content;
+              }
+            });
+            popup.setVisibility(true);
+            initCarousel('#o-identify-carousel');
+            const origostyle = firstFeature.get('origostyle');
+
+            const coord = geometry.getType() === 'Point' ? geometry.getCoordinates() : coordinate;
+            carouselIds.forEach((carouselId) => {
+              let targetElement;
+              const elements = document.getElementsByClassName(`o-image-carousel${carouselId}`);
+              Array.from(elements).forEach(element => {
+                if (!element.closest('.glide__slide--clone')) {
+                  targetElement = element;
+                }
+              });
+              const imageCarouselEl = document.getElementsByClassName(`o-image-carousel${carouselId}`);
+              if (imageCarouselEl.length > 0) {
+                initImageCarousel(`#o-image-carousel${carouselId}`, `.o-image-content${carouselId}`, carouselId, targetElement);
+              }
+            });
+            const popupEl = popup.getEl();
+            const popupHeight = document.querySelector('.o-popup').offsetHeight + 10;
+            popupEl.style.height = `${popupHeight}px`;
+            const overlayOptions = { element: popupEl, positioning: 'bottom-center' };
+            if (!ignorePan) {
+              overlayOptions.autoPan = {
+                margin: 55,
+                animation: {
+                  duration: 500
+                }
+              };
             }
-          });
-          const imageCarouselEl = document.getElementsByClassName(`o-image-carousel${carouselId}`);
-          if (imageCarouselEl.length > 0) {
-            initImageCarousel(`#o-image-carousel${carouselId}`, `.o-image-content${carouselId}`, carouselId, targetElement);
-          }
-        });
-        const popupEl = popup.getEl();
-        const popupHeight = document.querySelector('.o-popup').offsetHeight + 10;
-        popupEl.style.height = `${popupHeight}px`;
-        const overlayOptions = { element: popupEl, positioning: 'bottom-center' };
-        if (!ignorePan) {
-          overlayOptions.autoPan = {
-            margin: 55,
-            animation: {
-              duration: 500
+            if (items[0].layer && items[0].layer.get('styleName')) {
+              const styleName = items[0].layer.get('styleName');
+              const itemStyle = viewer.getStyle(styleName);
+              if (itemStyle && itemStyle[0] && itemStyle[0][0] && itemStyle[0][0].overlayOptions) {
+                Object.assign(overlayOptions, itemStyle[0][0].overlayOptions);
+              }
             }
-          };
-        }
-        if (items[0].layer && items[0].layer.get('styleName')) {
-          const styleName = items[0].layer.get('styleName');
-          const itemStyle = viewer.getStyle(styleName);
-          if (itemStyle && itemStyle[0] && itemStyle[0][0] && itemStyle[0][0].overlayOptions) {
-            Object.assign(overlayOptions, itemStyle[0][0].overlayOptions);
+            if (origostyle && origostyle.overlayOptions) {
+              Object.assign(overlayOptions, origostyle.overlayOptions);
+            }
+            if (overlayOptions.positioning) {
+              popupEl.classList.add(`popup-${overlayOptions.positioning}`);
+            }
+            overlay = new Overlay(overlayOptions);
+            map.addOverlay(overlay);
+            overlay.setPosition(coord);
+            break;
+          }
+          case 'sidebar':
+          {
+            sidebar.setContent({
+              content,
+              title: getTitle(items[0])
+            });
+            const contentDiv = document.getElementById('o-identify-carousel');
+            items.forEach((item) => {
+              if (item.content instanceof Element) {
+                contentDiv.appendChild(item.content);
+              } else {
+                contentDiv.innerHTML = item.content;
+              }
+            });
+            sidebar.setVisibility(true);
+
+            initCarousel('#o-identify-carousel');
+            break;
+          }
+
+          default:
+          {
+            break;
           }
         }
-        if (origostyle && origostyle.overlayOptions) {
-          Object.assign(overlayOptions, origostyle.overlayOptions);
-        }
-        if (overlayOptions.positioning) {
-          popupEl.classList.add(`popup-${overlayOptions.positioning}`);
-        }
-        overlay = new Overlay(overlayOptions);
-        map.addOverlay(overlay);
-        overlay.setPosition(coord);
-        break;
-      }
-      case 'sidebar':
-      {
-        sidebar.setContent({
-          content,
-          title: getTitle(items[0])
-        });
-        const contentDiv = document.getElementById('o-identify-carousel');
-        items.forEach((item) => {
-          if (item.content instanceof Element) {
-            contentDiv.appendChild(item.content);
-          } else {
-            contentDiv.innerHTML = item.content;
-          }
-        });
-        sidebar.setVisibility(true);
-        const firstFeature = items[0].feature;
-        const geometry = firstFeature.getGeometry();
-        const clone = firstFeature.clone();
-        clone.setId(firstFeature.getId());
-        // FIXME: should be layer name
-        clone.layerName = firstFeature.name;
-        selectionLayer.clearAndAdd(
-          clone,
-          selectionStyles[geometry.getType()]
-        );
-        selectionLayer.setSourceLayer(items[0].layer);
-        initCarousel('#o-identify-carousel');
-        break;
-      }
-      case 'infowindow':
-      {
-        if (items.length === 1) {
-          selectionManager.addOrHighlightItem(items[0]);
-        } else if (items.length > 1) {
-          selectionManager.addItems(items);
-        }
-        break;
-      }
-      default:
-      {
-        break;
       }
     }
+
+    // Dispatch itemadded event for every item added
+    items.forEach((item) => dispatchItemAdded(item));
 
     const modalLinks = document.getElementsByClassName('o-identify-link-modal');
     for (let i = 0; i < modalLinks.length; i += 1) {
@@ -554,21 +457,28 @@ const Featureinfo = function Featureinfo(options = {}) {
   };
   /**
    * Renders the feature info window. Consider using showInfo instead if calling using api.
+   * Does not add async content as SelectedItem is displayed as-is, which means user can inject just about anything
+   * in SelectedItem.Content
    * @param {any} identifyItems Array of SelectedItems
    * @param {any} target Name of infoWindow type
    * @param {any} coordinate Coordinate where to show pop up.
    * @param {any} opts Additional options. Supported options are : ignorePan, disable auto pan to popup overlay.
    */
   const render = function render(identifyItems, target, coordinate, opts = {}) {
-    // Append attachments (if any) to the SelectedItems
+    doRender(identifyItems, target, coordinate, opts.ignorePan, opts.suppressDialog);
+  };
+  /**
+   * Renders the selectedItems after adding async content. Not actually defined as async as it is part of a sync call chain,
+   * which no one awaits.
+   * @param {any} identifyItems Array of SelectedItems
+   * @param {any} target Name of infoWindow type
+   * @param {any} coordinate Coordinate where to show pop up.
+   * @param {any} opts Additional options. Supported options are : ignorePan, disable auto pan to popup overlay.
+   */
+  function renderInternal(identifyItems, target, coordinate, opts = {}) {
     const requests = [];
     identifyItems.forEach(currItem => {
-      // At least search can call render without SelectedItem as Items, it just sends an object with the least possible fields render uses
-      // so we need to exclude those from related tables handling, as we know nothing about them
-      if (currItem instanceof SelectedItem && currItem.getLayer()) {
-        // Fire off a bunch of promises that fetches attachments and related tables
-        requests.push(addRelatedContent(currItem));
-      }
+      requests.push(currItem.createContentAsync());
     });
     // Wait for all requests. If there are no attachments it just calls .then() without waiting.
     Promise.all(requests)
@@ -577,10 +487,10 @@ const Featureinfo = function Featureinfo(options = {}) {
         alert('Kunde inte hämta relaterade objekt. En del fält från relaterade objekt kommer att vara tomma.');
       })
       .then(() => {
-        doRender(identifyItems, target, coordinate, opts.ignorePan);
+        doRender(identifyItems, target, coordinate, opts.ignorePan, opts.suppressDialog);
       })
       .catch(err => console.log(err));
-  };
+  }
 
   /**
   * Shows the featureinfo popup/sidebar/infowindow for the provided features. Only vector layers are supported.
@@ -602,7 +512,7 @@ const Featureinfo = function Featureinfo(options = {}) {
         newItems.push(newItem);
       });
     });
-    render(newItems, identifyTarget, opts.coordinate || maputils.getCenter(newItems[0].getFeature().getGeometry()), opts);
+    renderInternal(newItems, identifyTarget, opts.coordinate || maputils.getCenter(newItems[0].getFeature().getGeometry()), opts);
   };
 
   /**
@@ -634,7 +544,7 @@ const Featureinfo = function Featureinfo(options = {}) {
       newItems.push(newItem);
     }
     if (newItems.length > 0) {
-      render(newItems, identifyTarget, thisOpts.coordinate || maputils.getCenter(newItems[0].getFeature().getGeometry()), thisOpts);
+      renderInternal(newItems, identifyTarget, thisOpts.coordinate || maputils.getCenter(newItems[0].getFeature().getGeometry()), thisOpts);
       viewer.getMap().getView().fit(maputils.getExtent(newItems.map(i => i.getFeature())), { maxZoom: thisOpts.maxZoomLevel });
     }
   };
@@ -651,7 +561,7 @@ const Featureinfo = function Featureinfo(options = {}) {
       hitTolerance,
       map,
       pixel
-    }, viewer);
+    }, viewer, localization);
     // Abort if clientResult is false
     if (clientResult !== false) {
       getFeatureInfo.getFeaturesFromRemote({
@@ -664,7 +574,7 @@ const Featureinfo = function Featureinfo(options = {}) {
           const result = serverResult.concat(clientResult);
           if (result.length > 0) {
             selectionLayer.clear(false);
-            render(result, identifyTarget, evt.coordinate);
+            renderInternal(result, identifyTarget, evt.coordinate);
           } else if (selectionLayer.getFeatures().length > 0 || (identifyTarget === 'infowindow' && selectionManager.getNumberOfSelectedItems() > 0)) {
             clear(false);
           } else if (pinning) {

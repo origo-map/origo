@@ -36,9 +36,9 @@ Not convinced? Or maybe you need some inspiration? Check out these examples of w
  * [Demo of latest release](http://origo-map.github.io/origo-map-demo/index.html)
  * [Enakartan](http://karta.enkoping.se)
  * [Eskilstunakartan](https://karta.eskilstuna.se)
- * [Hallstakartan](http://karta.hallstahammar.se)
  * [Haninge kommun webbkarta](https://karta.haninge.se/)
  * [Karlstadskartan](http://gi.karlstad.se)
+ * [Malmö](https://stadsatlas.malmo.se/stadsatlas/)
  * [Mälardalskartan](http://www.malardalskartan.se)
  * [Sigtunakartan](https://karta.sigtuna.se)
  * [Strängnäskartan](https://kartor.strangnas.se)
@@ -53,7 +53,7 @@ Just follow these three steps and you will be up and running in no time.
 The minimum requirements are:
 
   * [Git](https://git-scm.com/)
-  * [Node.js](https://nodejs.org/) (version 10 or higher is recommended to avoid build problems)
+  * [Node.js](https://nodejs.org/) (current lts version or higher is recommended to avoid build problems)
 
  1. To get your own local copy of Origo use git to clone the repository with the command below:
 

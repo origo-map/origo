@@ -7,7 +7,8 @@ const OverlayProperties = function OverlayProperties(options = {}) {
     cls: clsOptions = '',
     group,
     layer,
-    viewer
+    viewer,
+    localization
   } = options;
   let cls = '';
   let title;
@@ -52,6 +53,10 @@ const OverlayProperties = function OverlayProperties(options = {}) {
     label
   });
 
+  function localize(key) {
+    return localization.getStringByKeys({ targetParentKey: 'legend', targetKey: key });
+  }
+
   function hasStylePicker() {
     return stylePicker.length > 0;
   }
@@ -70,7 +75,7 @@ const OverlayProperties = function OverlayProperties(options = {}) {
 
   function renderStyleSelection() {
     if (hasStylePicker()) {
-      const html = `<div class="o-stylepicker-header text-small padding-small">Välj stil</div>${styleSelection.render()}`;
+      const html = `<div class="o-stylepicker-header text-small padding-small">${localize('renderStyleSelect')}</div>${styleSelection.render()}`;
       return html;
     }
     return '';
@@ -173,7 +178,7 @@ const OverlayProperties = function OverlayProperties(options = {}) {
           buttonTextCls: 'text-smaller',
           text: getStyleDisplayName(layer.get('styleName')),
           buttonIconCls: 'black',
-          ariaLabel: 'Välj stil'
+          ariaLabel: localize('renderStyleSelect')
         });
         components.push(styleSelection);
       }

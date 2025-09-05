@@ -50,6 +50,15 @@ const LayerRow = function LayerRow(options) {
   };
 
   /**
+   * Helper that creates a WMS getLegendGraphics request url string
+   * @param {any} url base url
+   * @param {any} layerName name of layer to create legend for
+   * @param {any} format valid mime type
+   * @returns {string} A WMS getLegendGraphics request url string
+   */
+  const createGetlegendGrapicUrl = (url, layerName, format) => `${url}?SERVICE=WMS&layer=${layerName}&format=${format}&version=1.1.1&request=getLegendGraphic&scale=401&legend_options=dpi:300`;
+
+  /**
    * Returns the URL to the WMS legend in the specified format
    *
    * @param {Layer} aLayer
@@ -66,7 +75,7 @@ const LayerRow = function LayerRow(options) {
       }
       return `${style[0][0].icon.src}?format=${format}`;
     }
-    return `${url}?SERVICE=WMS&layer=${layerName}&format=${format}&version=1.1.1&request=getLegendGraphic&scale=401&legend_options=dpi:300`;
+    return createGetlegendGrapicUrl(url, layerName, format);
   };
 
   /**
@@ -170,11 +179,14 @@ const LayerRow = function LayerRow(options) {
       return getTitleWithIcon(title, getStyleIcon(style[0]));
     }
 
+    const hasThematicStyle = (layer.get('thematicStyling') === true);
     const children = style.map((thisStyle, index) => {
-      if (!isHidden(thisStyle)) {
-        const styleIcon = getStyleIcon(thisStyle);
-        const rowTitle = thisStyle[0].label ? thisStyle[0].label : index + 1;
-        return getListItem(rowTitle, styleIcon);
+      if (!(isHidden(thisStyle))) {
+        if ((!(hasThematicStyle)) || (!(thisStyle[0]?.visible === false))) {
+          const styleIcon = getStyleIcon(thisStyle);
+          const rowTitle = thisStyle[0].label ? thisStyle[0].label : index + 1;
+          return getListItem(rowTitle, styleIcon);
+        }
       }
       return '';
     });
@@ -200,16 +212,60 @@ const LayerRow = function LayerRow(options) {
           <img src="${getLegendGraphicUrl}" alt="${title}" />
         </div>`;
     }
-    if (json.Legend[0].rules.length <= 1) {
+    // Handle the simple one first. One layer, one rule
+    if (json.Legend.length === 1 && json.Legend[0].rules.length <= 1) {
       const icon = `<img class="cover" src="${getLegendGraphicUrl}"  alt="${title}"/>`;
       return getTitleWithIcon(title, icon);
     }
 
-    const rules = json.Legend[0].rules.map((rule, index) => {
-      const ruleImageUrl = `${getLegendGraphicUrl}&rule=${rule.name}`;
-      const rowTitle = rule.title ? rule.title : index + 1;
-      return getListItem(rowTitle, ruleImageUrl, true);
+    const thematicStyle = (layer.get('thematicStyling') === true) ? viewer.getStyle(layer.get('styleName')) : undefined;
+    const rules = [];
+    let index = 0;
+    const layerName = layer.get('id');
+    const isLayerGroup = json.Legend.length > 1;
+    // Loop all layers in json response. Usually there is only one, but Layer Groups have several.
+    json.Legend.forEach(currLayer => {
+      let currLayerName = currLayer.layerName;
+      currLayer.rules.forEach(currRule => {
+        if (!(layer.get('thematicStyling')) || thematicStyle[0]?.thematic[index]?.visible) {
+          let layerImageUrl;
+          if (isLayerGroup) {
+            // This is layer group and the contained layer is most likely not known to us,
+            // so we can't treat is as an Origo layer.
+            // Generate a request and hope that the server has a layer by that name.
+            const baseUrl = getOneUrl(layer);
+            const layerWs = layerName.split(':');
+            if (layerWs.length > 1) {
+              currLayerName = `${layerWs[0]}:${currLayer.layerName}`;
+            }
+            // This is a little bit shaky, if Layer Group name constains workspace, contained layers must come from
+            // the same workspace, but if layer group is a top level layer group (no workspace), contained layers can
+            // come from any workspace but the json response NEVER contains info about workspace.
+            // So for Layer Groups with a workspace prefix we can assume that the actual layers should have the same workspace prefix,
+            // but for top level Layer Groups we have absolutely no idea which workspace the layer is in.
+            // But not all is lost as Geoserver tries its best to get the legend for any workspace with that layer name.
+            // Problem is when the same layer name appears in several workspaces. In that case you get from what is configured as default.
+            // One more tricky thing is that layer groups can configure different symbols than the actual layer.
+            // Querying the layer Group for png will return the group layer style, but the getLegendGrapich for each layer
+            // will return the symbol for the actual layer, so legend and print legend will differ.
+            layerImageUrl = createGetlegendGrapicUrl(baseUrl, currLayerName, 'image/png');
+          } else {
+            layerImageUrl = getLegendGraphicUrl;
+          }
+          let ruleImageUrl = `${layerImageUrl}`;
+          // Add specific rule if necessary. If there is only one rule there is no need (in fact it will probably break as most
+          // styles using only one rule will not have a named rule). This is to handle Layer Groups without rules in some of the contained
+          // layer's style
+          if (currLayer.rules.length > 1) {
+            ruleImageUrl += `&rule=${currRule.name}`;
+          }
+          const rowTitle = currRule.title ? currRule.title : index + 1;
+          rules.push(getListItem(rowTitle, ruleImageUrl, true));
+        }
+        index += 1;
+      });
     });
+
     return getTitleWithChildren(title, rules);
   };
 
@@ -276,8 +332,9 @@ const LayerRows = function LayerRows(options) {
       });
       const layerListCmp = Component({
         async render() {
-          const content = await overlayEls.reduce(async (acc, item) => await acc + await item.render(), '');
-          return `<ul id="${this.getId()}" class="list">${content}</ul>`;
+          const rowPromises = overlayEls.map((item) => item.render());
+          const rows = await Promise.all(rowPromises);
+          return `<ul id="${this.getId()}" class="list">${rows.reverse().join('')}</ul>`;
         }
       });
       return `

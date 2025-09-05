@@ -1,8 +1,10 @@
-$box-full: $size-full;
-$box-full-no-margin: $size-100;
+@use './variables';
+
+$box-full: variables.$size-full;
+$box-full-no-margin: variables.$size-100;
 
 .box {
-  background-color: $background-color;
+  background-color: variables.$background-color;
   box-sizing: border-box;
   max-height: $box-full;
   max-width: $box-full;

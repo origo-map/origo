@@ -34,7 +34,7 @@ function relatedTablesForm(viewer, layer, feature, el) {
 
         // Add the deletebutton to the row
         if (!relatedLayerConf.disableDelete) {
-          const deleteButtonEl = createElement('button', '<span class="icon-smaller"><svg class="o-icon-24"><use xlink:href="#ic_delete_24px"></use></svg></span><span data-tooltip="Ta bort"></span>', { cls: 'compact o-tooltip hover', 'aria-label': 'Ta bort' });
+          const deleteButtonEl = createElement('button', '<span class="icon"><svg class="o-icon-24"><use xlink:href="#ic_delete_24px"></use></svg></span><span data-tooltip="Ta bort"></span>', { cls: 'compact o-tooltip hover', 'aria-label': 'Ta bort' });
           deleteButtonEl.addEventListener('click', () => {
             if (window.confirm(`Är du säker att du vill ta bort objektet ${itemTitle}?`)) {
               editdispatcher.emitDeleteChild(childLayer, feature, currChild);

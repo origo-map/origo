@@ -1,18 +1,20 @@
+@use './variables';
+
 .o-scrollbar::-webkit-scrollbar {
-  width: $scrollbar-px-width;
+  width: variables.$scrollbar-px-width;
 }
 
 .o-scrollbar {
-  scrollbar-color: $scrollbar-thumb $scrollbar-bg;
+  scrollbar-color: variables.$scrollbar-thumb variables.$scrollbar-bg;
   scrollbar-width: thin;
 }
 
 .o-scrollbar::-webkit-scrollbar-track {
-  background: $scrollbar-bg;
+  background: variables.$scrollbar-bg;
 }
 
 .o-scrollbar::-webkit-scrollbar-thumb {
-  background-color: $scrollbar-thumb;
-  border: 3px solid $scrollbar-bg;
+  background-color: variables.$scrollbar-thumb;
+  border: 3px solid variables.$scrollbar-bg;
   border-radius: 6px;
 }

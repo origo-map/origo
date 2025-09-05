@@ -1,3 +1,5 @@
+@use "sass:math";
+
 // Margin and padding
 $app-margin: 1rem;
 $spacer: 1rem;
@@ -6,20 +8,20 @@ $spacer: 1rem;
 $black: rgba(0, 0, 0, 1);
 $white: rgba(255, 255, 255, 1);
 $whitesmoke: rgba(245, 245, 245, 1);
-$red: hsl(3, 59, 48);
-$orange: hsl(35, 100, 50);
-$yellow: hsl(48, 100, 50);
-$green: hsl(130, 65, 58);
-$blue: hsl(205, 100, 48);
-$purple: hsl(241, 61, 59);
-$pink: hsl(349, 100, 59);
+$red: hsl(3, 59%, 48%);
+$orange: hsl(35, 100%, 50%);
+$yellow: hsl(48, 100%, 50%);
+$green: hsl(130, 65%, 58%);
+$blue: hsl(205, 100%, 48%);
+$purple: hsl(241, 61%, 59%);
+$pink: hsl(349, 100%, 59%);
 
-$grey-darker: hsl(0, 0, 21);
-$grey-dark: hsl(0, 0, 29);
-$grey: hsl(0, 0, 48);
-$grey-light: hsl(0, 0, 71);
-$grey-lighter: hsl(0, 0, 86);
-$grey-lightest: hsl(0, 0, 92);
+$grey-darker: hsl(0, 0%, 21%);
+$grey-dark: hsl(0, 0%, 29%);
+$grey: hsl(0, 0%, 48%);
+$grey-light: hsl(0, 0%, 71%);
+$grey-lighter: hsl(0, 0%, 86%);
+$grey-lightest: hsl(0, 0%, 92%);
 
 
 // General colors
@@ -31,10 +33,10 @@ $success-color: $green;
 $warning-color: $yellow;
 $danger-color: $red;
 
-$primary-color-dark: hsl(205, 100, 43);
-$primary-color-light: hsl(205, 100, 60);
+$primary-color-dark: hsl(205, 100%, 43%);
+$primary-color-light: hsl(205, 100%, 60%);
 $light-color: $white;
-$danger-color-dark: hsl(3, 59, 43);
+$danger-color-dark: hsl(3, 59%, 43%);
 
 $border-color: $grey-lighter;
 
@@ -79,7 +81,7 @@ $font-weight-semibold: 600;
 $font-weight-bold: 700;
 $font-weight-base: $font-weight-normal;
 
-$headings-margin-bottom: $spacer / 2;
+$headings-margin-bottom: math.div($spacer, 2);
 $h1-font-size: $font-size-base * 2.5;
 $h2-font-size: $font-size-base * 2;
 $h3-font-size: $font-size-base * 1.75;

@@ -1,52 +1,56 @@
-.o-popover-container {
-  display: inline-block;
-  position: relative;
-}
+@use './ui/variables';
 
-.o-popover {
-  background-color: #fff;
-  border: 1px solid #ccc;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  border-radius: 6px;
-  bottom: 100%;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-  box-sizing: border-box;
-  display: none;
-  left: 50%;
-  margin: 0 0 10px -125px;
-  padding: .5rem 0;
-  position: absolute;
-  width: 250px;
-}
+@mixin default {
+    .o-popover-container {
+        display: inline-block;
+        position: relative;
+    }
 
-.o-popover::before,
-.o-popover::after {
-  border: solid transparent;
-  content: ' ';
-  display: block;
-  height: 0;
-  pointer-events: none;
-  position: absolute;
-  width: 0;
-}
+    .o-popover {
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        border-radius: 6px;
+        bottom: 100%;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        box-sizing: border-box;
+        display: none;
+        left: 50%;
+        margin: 0 0 10px -125px;
+        padding: .5rem 0;
+        position: absolute;
+        width: 250px;
+    }
 
-.o-popover::after {
-  border-top-color: $white;
-  border-width: 10px;
-  bottom: -20px;
-  left: 50%;
-  margin-left: -10px;
-}
+    .o-popover::before,
+    .o-popover::after {
+        border: solid transparent;
+        content: ' ';
+        display: block;
+        height: 0;
+        pointer-events: none;
+        position: absolute;
+        width: 0;
+    }
 
-.o-popover::before {
-  border-top-color: #999;
-  border-width: 11px;
-  bottom: -22px;
-  left: 50%;
-  margin-left: -11px;
-}
+    .o-popover::after {
+        border-top-color: variables.$white;
+        border-width: 10px;
+        bottom: -20px;
+        left: 50%;
+        margin-left: -10px;
+    }
 
-.o-popover.o-active {
-  display: inline-block;
+    .o-popover::before {
+        border-top-color: #999;
+        border-width: 11px;
+        bottom: -22px;
+        left: 50%;
+        margin-left: -11px;
+    }
+
+    .o-popover.o-active {
+        display: inline-block;
+    }
 }

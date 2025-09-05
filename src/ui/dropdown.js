@@ -15,9 +15,12 @@ export default function Dropdown(options = {}) {
     buttonContainerCls = '',
     style: styleSettings,
     direction = 'down',
-    text = ' ',
     ariaLabel = '',
     buttonTextCls = 'flex'
+  } = options;
+  let {
+    text = ' ',
+    items = []
   } = options;
 
   let containerElement;
@@ -28,31 +31,56 @@ export default function Dropdown(options = {}) {
 
   const style = createStyle(styleSettings);
 
-  const selectItem = function selectItem(item) {
+  const selectItem = function selectItem(itemEl, doClick = true) {
+    const selectedItem = document.getElementById(itemEl.getId()).getAttribute('data-item');
     const customEvt = new CustomEvent('dropdown:select', {
-      bubbles: true
+      bubbles: true,
+      detail: JSON.parse(selectedItem) // Pass both value and label inside an object as the detail
     });
-    document.getElementById(item.getId()).dispatchEvent(customEvt);
-    dropdownButton.dispatch('click');
+    document.getElementById(itemEl.getId()).dispatchEvent(customEvt);
+    if (doClick) dropdownButton.dispatch('click');
   };
 
   const setButtonText = function setButtonText(buttonText) {
-    document.getElementById(`${dropdownButton.getId()}`).getElementsByTagName('span')[1].innerHTML = buttonText;
+    text = buttonText;
+    document.getElementById(`${dropdownButton.getId()}`).getElementsByTagName('span')[1].innerHTML = text;
+  };
+
+  const getItems = function getItems() {
+    const contentCmps = contentComponent.getComponents();
+    if (contentCmps) return contentCmps;
+    return false;
   };
 
   const setItems = function setItems(listItems) {
-    listItems.forEach((listItem) => {
-      const itemEl = El({
-        tagName: 'li',
-        innerHTML: `<span>${listItem}</span>`
-      });
-
-      document.getElementById(contentComponent.getId()).appendChild(html(itemEl.render()));
-
-      document.getElementById(itemEl.getId()).addEventListener('click', () => {
-        selectItem(itemEl);
-      });
+    items = listItems.map(item => {
+      if (typeof item === 'object' && Object.hasOwn(item, 'label') && Object.hasOwn(item, 'value')) {
+        return item;
+      }
+      return { label: item, value: item };
     });
+
+    const contentEl = document.getElementById(contentComponent.getId());
+    if (contentEl) {
+      contentComponent.clearComponents();
+      contentEl.replaceChildren();
+      items.forEach((listItem) => {
+        const itemEl = El({
+          tagName: 'li',
+          innerHTML: `<span>${listItem.label}</span>`,
+          attributes: {
+            data: {
+              item: JSON.stringify({ value: listItem.value, label: listItem.label })
+            }
+          }
+        });
+        contentComponent.addComponent(itemEl);
+        contentEl.appendChild(html(itemEl.render()));
+        document.getElementById(itemEl.getId()).addEventListener('click', () => {
+          selectItem(itemEl);
+        });
+      });
+    }
   };
 
   const toggle = function toggle() {
@@ -64,7 +92,10 @@ export default function Dropdown(options = {}) {
 
   return Component({
     setButtonText,
+    getItems,
     setItems,
+    selectItem,
+    toggle,
     onInit() {
       let position;
 
@@ -75,7 +106,8 @@ export default function Dropdown(options = {}) {
           toggle();
         },
         style: {
-          padding: '0 .5rem'
+          padding: '0 .5rem',
+          overflow: 'hidden'
         },
         icon: `#ic_arrow_drop_${direction}_24px`,
         iconCls: `${buttonIconCls} icon-smaller flex`,
@@ -120,6 +152,7 @@ export default function Dropdown(options = {}) {
     },
     onRender() {
       setButtonText(text);
+      setItems(items);
       this.dispatch('render');
     },
     render() {

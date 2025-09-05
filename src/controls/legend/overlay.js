@@ -11,8 +11,13 @@ const OverlayLayer = function OverlayLayer(options) {
     layer,
     position = 'top',
     style,
-    viewer
+    viewer,
+    localization
   } = options;
+
+  function localize(key) {
+    return localization.getStringByKeys({ targetParentKey: 'legend', targetKey: key });
+  }
 
   const buttons = [];
   let headerIconClass = headerIconCls;
@@ -20,7 +25,7 @@ const OverlayLayer = function OverlayLayer(options) {
   const hasStylePicker = viewer.getLayerStylePicker(layer).length > 0;
   const layerIconCls = `round compact icon-small relative no-shrink light ${hasStylePicker ? 'style-picker' : ''}`;
   const cls = `${clsSettings} flex row align-center padding-left padding-right-smaller item wrap`.trim();
-  const title = layer.get('title') || 'Titel saknas';
+  const title = layer.get('title') || localize('layerTitleMissing');
   const name = layer.get('name');
   const secure = layer.get('secure');
   let hasExtendedLegend = false;
@@ -96,7 +101,7 @@ const OverlayLayer = function OverlayLayer(options) {
       height: 'calc(1.5rem + 2px)',
       width: 'calc(1.5rem + 2px)'
     },
-    ariaLabel: 'Lager ikon',
+    ariaLabel: localize('layerIcon'),
     icon: headerIcon,
     tabIndex: -1
   });
@@ -115,7 +120,7 @@ const OverlayLayer = function OverlayLayer(options) {
       'padding-left': '.5rem'
     },
     icon: getCheckIcon(layer.getVisible()),
-    ariaLabel: 'Växla lagersynlighet',
+    ariaLabel: localize('toggleLayer'),
     tabIndex: -1
   });
 
@@ -135,7 +140,7 @@ const OverlayLayer = function OverlayLayer(options) {
     }
   });
 
-  const moreInfoButton = createMoreInfoButton({ layer, viewer });
+  const moreInfoButton = createMoreInfoButton({ layer, viewer, localization });
   buttons.push(moreInfoButton);
   const ButtonsHtml = `${layerIcon.render()}${label.render()}${toggleButton.render()}${moreInfoButton.render()}`;
 

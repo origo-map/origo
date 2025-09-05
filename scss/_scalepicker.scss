@@ -1,16 +1,20 @@
-.o-scalepicker {
-  height: 1.25rem;
-  margin-right: 5px;
-  min-width: 110px;
-}
+@use './ui/variables';
 
-.o-scalepicker button {
-  border-radius: 10px;
-  font-family: Arial, 'Helvetica Neue', sans-serif;
-  font-size: .625rem;
-  line-height: 1.25rem;
-}
+@mixin default {
+    .o-scalepicker {
+        height: 1.25rem;
+        margin-right: 5px;
+        min-width: 110px;
+    }
 
-.o-scalepicker .dropdown li:hover {
-  color: $grey-darker;
+    .o-scalepicker button {
+        border-radius: 10px;
+        font-family: Arial, 'Helvetica Neue', sans-serif;
+        font-size: .625rem;
+        line-height: 1.25rem;
+    }
+
+    .o-scalepicker .dropdown li:hover {
+        color: variables.$grey-darker;
+    }
 }

@@ -1,73 +1,77 @@
-.o-button-container {
-  border-radius: 4px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
-  display: inline-block;
-  height: 2rem;
-  position: absolute;
-  width: 2rem;
-}
+@use './variables';
 
-.o-button {
-  background-color: $o-btn-bg;
-  border: 0;
-  border-radius: 4px;
-  color: $o-btn-color;
-  cursor: pointer;
-  display: inline-block;
-  font-size: 1rem;
-  height: 2em;
-  line-height: 1em;
-  padding: 0;
-  position: relative;
-  text-align: center;
-  text-decoration: none;
-  width: 2em;
-}
+@mixin default {
+    .o-button-container {
+        border-radius: 4px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
+        display: inline-block;
+        height: 2rem;
+        position: absolute;
+        width: 2rem;
+    }
 
-.o-no-boxshadow {
-  box-shadow: none;
-}
+    .o-button {
+        background-color: variables.$o-btn-bg;
+        border: 0;
+        border-radius: 4px;
+        color: variables.$o-btn-color;
+        cursor: pointer;
+        display: inline-block;
+        font-size: 1rem;
+        height: 2em;
+        line-height: 1em;
+        padding: 0;
+        position: relative;
+        text-align: center;
+        text-decoration: none;
+        width: 2em;
+    }
 
-.o-button:hover,
-.o-button:focus {
-  background-color: $o-btn-hover-bg;
-  color: $o-btn-hover-color;
-  text-decoration: none;
-}
+    .o-no-boxshadow {
+        box-shadow: none;
+    }
 
-.o-button span.o-button-text {
-  height: 2em;
-  left: 0;
-  line-height: 1em;
-  padding-left: 0.625em;
-  position: absolute;
-  top: .5em;
-}
+    .o-button:hover,
+    .o-button:focus {
+        background-color: variables.$o-btn-hover-bg;
+        color: variables.$o-btn-hover-color;
+        text-decoration: none;
+    }
 
-.o-btn-2 {
-  height: 2rem;
-  width: 2rem;
-}
+    .o-button span.o-button-text {
+        height: 2em;
+        left: 0;
+        line-height: 1em;
+        padding-left: 0.625em;
+        position: absolute;
+        top: .5em;
+    }
 
-.o-btn-3 {
-  height: 3rem;
-  width: 3rem;
-}
+    .o-btn-2 {
+        height: 2rem;
+        width: 2rem;
+    }
 
-.o-button-lg {
-  background-color: $o-btn-bg;
-  border: 0;
-  border-radius: 50%;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
-  color: $o-btn-color;
-  cursor: pointer;
-  display: inline-block;
-  height: 2.5rem;
-  padding: .5rem;
-  position: relative;
-  text-align: center;
-  text-decoration: none;
-  width: 2.5rem;
+    .o-btn-3 {
+        height: 3rem;
+        width: 3rem;
+    }
+
+    .o-button-lg {
+        background-color: variables.$o-btn-bg;
+        border: 0;
+        border-radius: 50%;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.45);
+        color: variables.$o-btn-color;
+        cursor: pointer;
+        display: inline-block;
+        height: 2.5rem;
+        padding: .5rem;
+        position: relative;
+        text-align: center;
+        text-decoration: none;
+        width: 2.5rem;
+    }
 }
