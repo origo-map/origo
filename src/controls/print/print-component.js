@@ -95,7 +95,7 @@ const PrintComponent = function PrintComponent(options = {}) {
 
   if (!Array.isArray(scales) || scales.length === 0) {
     scales = originalResolutions.map(currRes => {
-      const unlocalizedScaleLabel = maputils.resolutionToFormattedScale(currRes, viewer.getProjection()); // it's a pretty thankless job to interpret a localized scale string and it shouldn't need to be done
+      const unlocalizedScaleLabel = maputils.resolutionToFormattedScale(currRes, viewer.getProjection());
       const value = maputils.formattedScaleToScaleDenominator(unlocalizedScaleLabel);
       const label = maputils.resolutionToFormattedScale(currRes, viewer.getProjection(), localization);
       return { label, value };
@@ -238,7 +238,7 @@ const PrintComponent = function PrintComponent(options = {}) {
   };
 
   const created = function created() {
-    return showCreated ? `${createdPrefix}${today.toLocaleDateString(localeId)} ${today.toLocaleTimeString(localeId)}` : '';
+    return showCreated ? `${createdPrefix}${today.toLocaleDateString(localization.getCurrentLocaleId())} ${today.toLocaleTimeString(localization.getCurrentLocaleId())}` : '';
   };
 
   const titleComponent = Component({

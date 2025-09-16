@@ -27,7 +27,7 @@ export default function SetScaleControl(map, options = {}) {
       this.addComponents([selectScale]);
     },
     onChangeScale(evt) {
-      this.dispatch('change:scale', { scale: evt.value / 1000 }); // 10000 blir till scale: 10 ..och nånting här sätter buttonText för selectScale
+      this.dispatch('change:scale', { scale: evt.value / 1000 });
     },
     onRender() {
       this.dispatch('render');
