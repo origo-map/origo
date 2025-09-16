@@ -52,7 +52,7 @@ const PrintSettings = function PrintSettings(options = {}) {
     showPrintLegend,
     rotation,
     rotationStep,
-    localize
+    localization
   } = options;
 
   let headerComponent;
@@ -65,6 +65,10 @@ const PrintSettings = function PrintSettings(options = {}) {
   let printLegendControl;
   let rotationControl;
   let setScaleControl;
+
+  const localize = function localize(key) {
+    return localization.getStringByKeys({ targetParentKey: 'print', targetKey: key });
+  };
 
   // Set tabindex for all settings buttons to include or exclude in taborder depending on if expanded or not
   const setTabIndex = function setTabIndex() {
@@ -188,7 +192,7 @@ const PrintSettings = function PrintSettings(options = {}) {
       setScaleControl = SetScaleControl(map, {
         scales,
         initialScale: scaleInitial,
-        localize
+        localization
       });
 
       contentComponent = Component({
