@@ -185,6 +185,10 @@ const Editor = function Editor(options = {}) {
     createFeature,
     editFeatureAttributes,
     deleteFeature,
+    // TODO: remove, only used for develop.
+    undo: () => EditHandler.undo(),
+    redo: () => EditHandler.redo(),
+
 
     changeActiveLayer: (layerName) => {
       // Only need to actually change layer if editor is active. Otherwise state is just set in toolbar and will

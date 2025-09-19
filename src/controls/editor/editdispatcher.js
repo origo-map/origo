@@ -19,7 +19,8 @@ function emitChangeFeature(change) {
       feature: change.feature,
       layerName: change.layerName,
       action: change.action,
-      status: change.status || 'pending'
+      status: change.status || 'pending',
+      before: change.before
     }
   });
   document.dispatchEvent(changeFeature);

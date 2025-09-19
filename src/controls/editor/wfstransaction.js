@@ -25,6 +25,7 @@ function writeWfsTransaction(transObj, options) {
       Object.keys(props).forEach(prop => (props[prop] === '') && feature.unset(prop));
     });
   }
+  // TODO: set id and use id when id should be recreated
   const node = format.writeTransaction(transObj.insert, transObj.update, transObj.delete, options);
   return node;
 }

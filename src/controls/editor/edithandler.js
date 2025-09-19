@@ -27,6 +27,7 @@ import attachmentsform from './attachmentsform';
 import relatedTablesForm from './relatedtablesform';
 import relatedtables from '../../utils/relatedtables';
 import Style from '../../style';
+import UndoStack from '../../utils/undostack';
 
 const editsStore = store();
 let editLayers = {};
@@ -69,6 +70,7 @@ let useTrace;
 let modifyDrawSnapInteraction;
 let modifyDrawInteraction;
 let component;
+let undoHandler;
 
 function isActive() {
   // FIXME: this only happens at startup as they are set to null on closing. If checking for null/falsley/not truely it could work as isVisible with
@@ -201,7 +203,7 @@ function getSnapSources(layers) {
   return layers.map(layer => viewer.getLayer(layer).getSource());
 }
 /**
- * Saves the features to server.
+ * Saves all features in editStore to server.
  * @returns A promise which is resolved when all features have been saved if the source supports it. Otherwise it is resolved immediately.
  * */
 async function saveFeatures() {
@@ -237,8 +239,38 @@ async function saveFeatures() {
 async function saveFeature(change, ignoreAutoSave) {
   dispatcher.emitChangeFeature(change);
   if (autoSave && !ignoreAutoSave) {
-    await saveFeatures(change);
+    await saveFeatures();
   }
+}
+
+function addEditsToEditStore(edits) {
+  edits.forEach(currEdit => {
+    dispatcher.emitChangeFeature(currEdit);
+  });
+  if (autoSave) {
+    // TODO: await?
+    saveFeatures();
+  }
+}
+
+// TODO: Add method for aborting unsaved edits. Pull before states from editStore and
+// restore states.
+
+
+// Undo last operation
+function undo() {
+  const edits = undoHandler.undo();
+
+  // Send edits to editstore
+  addEditsToEditStore(edits);
+}
+
+// Redo last operation
+
+function redo() {
+  const edits = undoHandler.redo();
+  // Send edits to editstore
+  addEditsToEditStore(edits);
 }
 
 function onModifyEnd(evt) {
@@ -247,19 +279,27 @@ function onModifyEnd(evt) {
   if (validateOnDraw && !topology.isGeometryValid(feature.getGeometry())) {
     feature.setGeometry(modifyGeometry);
   } else {
+    // clone and push to undo using modifyGeometry. Must clone here to use old geometry. Can't push to
+    // undo before modify as validation may fail and that would require an undo rollback (or programatic undo, but undo may not be available
+    // for this layer)
+    const unchanged = feature.clone();
+    unchanged.setGeometry(modifyGeometry);
+    const layer = viewer.getLayer(currentLayer);
+    undoHandler.pushEdit(layer, feature, 'update', unchanged);
     saveFeature({
       feature,
       layerName: currentLayer,
-      action: 'update'
+      action: 'update',
+      before: unchanged
     });
   }
 }
 
 function onModifyStart(evt) {
   // Get a copy of the geometry before modification
-  if (validateOnDraw) {
+  //if (validateOnDraw) {
     modifyGeometry = evt.features.item(0).getGeometry().clone();
-  }
+  //}
 }
 
 /**
@@ -274,6 +314,8 @@ async function addFeatureToLayer(feature, layerName) {
   feature.setProperties(defaultAttributes);
   feature.setId(generateUUID());
   layer.getSource().addFeature(feature);
+  // Add to undostack
+  undoHandler.pushEdit(layer, feature, 'insert');
   return saveFeature({
     feature,
     layerName,
@@ -893,6 +935,8 @@ async function deleteFeature(feature, layer, supressDbDelete) {
     });
   }
   const source = layer.getSource();
+  // TODO: add to undostack. How to handle supressed deletes? Also recursive deletes should be in a transaction
+  undoHandler.pushEdit(layer, feature, 'delete');
   source.removeFeature(feature);
 }
 
@@ -987,19 +1031,36 @@ function onModalClosed() {
  * @param {any} formEl The attributes to set on features
  */
 function attributesSaveHandler(features, formEl) {
+  const undoOperations = [];
+  const layer = viewer.getLayer(currentLayer);
+  
   features.forEach(feature => {
+    // Must create before manually to add all features as an undo batch
+    const before = feature.clone();
+    // Use same id. Can not add to same source after this.
+    before.setId(feature.getId());
+    undoOperations.push({
+      layer,
+      featureRef: feature,
+      op: 'update',
+      before
+
+    });
     // get DOM values and set attribute values to feature
     attributes.forEach((attribute) => {
       if (Object.prototype.hasOwnProperty.call(formEl, attribute.name)) {
         feature.set(attribute.name, formEl[attribute.name]);
       }
     });
+  
     saveFeature({
       feature,
       layerName: currentLayer,
-      action: 'update'
+      action: 'update',
+      before
     }, true);
   });
+  undoHandler.pushEdits(undoOperations);
   // Take control of auto save here to avoid one transaction per feature when batch editing
   if (autoSave) {
     saveFeatures();
@@ -1921,6 +1982,7 @@ function onSplitLineByPointEnd(evt) {
     });
   }
   if (part2Coords.length > 1) {
+    // TODO: Add both edits as a transaction to undostack
     // Click actually hit the line, split where clicked.
     // Start with the easy one, change geom of original line
     selectedFeature.getGeometry().setCoordinates(part1Coords);
@@ -2006,6 +2068,8 @@ export default function editHandler(options, v) {
       component = this;
       viewer = v;
       map = viewer.getMap();
+      undoHandler = new UndoStack();
+
 
       // Set up a layer for displaying trace possibilities. Do it up front as it may become possible to turn it on later
       traceHighligtLayer = new VectorLayer({
@@ -2065,6 +2129,8 @@ export default function editHandler(options, v) {
     deleteFeature: deleteFeatureApi,
     setActiveLayer: setActiveLayerApi,
     setModifyTool: setModifyToolApi,
-    preselectFeature
+    preselectFeature,
+    undo,
+    redo
   });
 }
