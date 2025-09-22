@@ -28,9 +28,6 @@ A plugin to connect Origo-map with EDP Visions "Integrations API GIS-koppling (K
 **[Elevation profile](https://github.com/origo-map/elevation-profile-plugin)**
 A plugin that shows an elevation profile for linestring features with z-dimension.
 
-**[FME Report plugin](https://github.com/SigtunaGIS/fmereport-plugin)**
-A plugin to show results from FME Flow workspaces
-
 **[Geouttag](https://github.com/Eskilstuna-kommun/Geouttag)**
 A plugin for geodata export (requires FME Server).
 
