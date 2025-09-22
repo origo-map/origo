@@ -408,15 +408,17 @@ const Legend = function Legend(options = {}) {
         if (layerGroup.exclusive) { // If group is exclusive only make the first layer visible.
           for (let i = 0; i < layers.length; i += 1) {
             if (i === 0) {
-              layers[i].setVisible(true);
+              if (!layers[i].get('secure')) {
+                layers[i].setVisible(true);
+              }
             } else {
               layers[i].setVisible(false);
             }
           }
         } else {
-          layers.forEach(l => l.setVisible(true));
+          layers.forEach(l => { if (!l.get('secure')) { l.setVisible(true); } });
         }
-      } else {
+      } else if (!layer.get('secure')) {
         layer.setVisible(true);
       }
       document.getElementsByClassName('o-search-layer-field')[0].value = '';
