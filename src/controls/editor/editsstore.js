@@ -12,9 +12,11 @@ import dispatcher from './editdispatcher';
 export default function editsStore() {
   /** Holds all pending edits for this session. An object with layerName as properties with the internal structure for each layer as value */
   const edits = {};
-  /** Map key: fid, value: feature as it looked before first edit. Not stored with edits to not mess with logic that enumerates properties */
+  /** Map key: layerName, value: Map with key: fid and value: feature as it looked before first edit. Not stored with edits to not mess with logic that enumerates properties */
   const befores = new Map();
   //TODO: add map of deleted objects for rollback. Don't forget to clear in on successful save and abort
+  /** Map key: layerName, value: Map with key: fid and value: feature ref. Not stored with edits to not mess with logic that enumerates properties */
+  const deletes = new Map();
 
   /**
    * Creates the internal structure for one layer
@@ -49,6 +51,7 @@ export default function editsStore() {
       if (finished) {
         delete edits[layerName];
         befores.delete(layerName);
+        deletes.delete(layerName);
         return finished;
       }
 
@@ -150,7 +153,7 @@ export default function editsStore() {
       // Insert after delete can only mean undo as id would otherwise differ and thus be a different object
       if (hasFeature('delete', e.detail.feature, e.detail.layerName) === false) {
         addFeature('insert', e.detail.feature, e.detail.layerName);
-        // TODO: clear before-delete-state here?
+        
       } else {
         // Remove the delete as a delete and insert on the same feature makes no sense to the server, and most likely will
         // make the user unhappy
@@ -160,14 +163,16 @@ export default function editsStore() {
           // No need to actually use the stored feature
           addFeature('update', e.detail.feature, e.detail.layerName);
         }
-
+        // Don't need the deleted state anymore
+        deletes.get(e.detail.layerName).delete(e.detail.feature.getId());
         removeFeature('delete', e.detail.feature, e.detail.layerName);
+        
       }
     } else if (e.detail.action === 'update') {
       // Check if update results in "before" state, in which case it's an undo that won't require saving.
       if (hasFeature('insert', e.detail.feature, e.detail.layerName) === false) {
         if (hasFeature('update', e.detail.feature, e.detail.layerName) === false) {
-          // TODO: maybe add to update Map here instead of in addFeature. We "know" here that Map must be empty.
+          // TODO: maybe add to update Map here instead of in addFeature to keep code cleaner
           addFeature('update', e.detail.feature, e.detail.layerName, e.detail.before);
         } else {
           // Compare the feature with its original state
@@ -187,9 +192,17 @@ export default function editsStore() {
       }
     } else if (e.detail.action === 'delete') {
       if (hasFeature('insert', e.detail.feature, e.detail.layerName) === false) {
-        // TODO: store feature before delete to be able to abort session. Not needed for undo as undo keeps its own state
-        // but undo is not aware of any edit sessions so we can't get it from there. Remember to clear structure if delete is undone
+        
         addFeature('delete', e.detail.feature, e.detail.layerName);
+        // Store feature before delete to be able to abort session. Not needed for undo as undo keeps its own state
+        // but undo is not aware of any edit sessions so we can't get it from there. Remember to clear structure if delete is undone
+        let thisLayerDeletes = deletes.get(e.detail.layerName);
+        if (!thisLayerDeletes) {
+          thisLayerDeletes = new Map();
+          deletes.set(e.detail.layerName, thisLayerDeletes);
+        }
+        thisLayerDeletes.set(e.detail.feature.getId(), e.detail.feature);
+
       }
       removeFeature('insert', e.detail.feature, e.detail.layerName);
       // Don't clear before-state for this feature, it may me needed if undoing the delete to convert pending edit to undo.
@@ -220,6 +233,14 @@ export default function editsStore() {
     return edits;
   }
 
+  function getOriginalState(layerName, fid) {
+    return befores.get(layerName)?.get(fid);
+  }
+
+  function getPendingDeletedFeature(layerName, fid) {
+    return deletes.get(layerName)?.get(fid);
+  }
+
   /**
    * Event handler for adding pending edits and also removing pendning edits when transaction handler has saved them to server. 
    * 
@@ -238,8 +259,8 @@ export default function editsStore() {
 
   return {
     getEdits,
-    hasFeature
-    // TODO: Add method for getting pending edits with features state before session started. getEdits does not contain features, only ids.
-    // TODO: Add method to clear all state. Possibly possible to implement using normal event.
+    hasFeature,
+    getOriginalState,
+    getPendingDeletedFeature
   };
 }

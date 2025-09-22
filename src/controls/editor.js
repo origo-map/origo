@@ -7,7 +7,8 @@ const Editor = function Editor(options = {}) {
     autoForm = false,
     autoSave = true,
     isActive = true,
-    featureList = true
+    featureList = true,
+    reuseIds = false
   } = options;
   let editorButton;
   let target;
@@ -88,7 +89,8 @@ const Editor = function Editor(options = {}) {
         currentLayer,
         editableLayers,
         isActive,
-        featureList
+        featureList,
+        reuseIds
       });
       editHandler = EditHandler(handlerOptions, viewer);
       // Relay selected features from handler to toolbar so toolbar can calculate which tools are available for the current situation
@@ -186,8 +188,9 @@ const Editor = function Editor(options = {}) {
     editFeatureAttributes,
     deleteFeature,
     // TODO: remove, only used for develop.
-    undo: () => EditHandler.undo(),
-    redo: () => EditHandler.redo(),
+    undo: () => editHandler.undo(),
+    redo: () => editHandler.redo(),
+    abort: () => editHandler.abortSession(),
 
 
     changeActiveLayer: (layerName) => {

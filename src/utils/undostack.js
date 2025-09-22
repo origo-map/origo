@@ -13,7 +13,7 @@ export default class UndoStack {
   pushEdit(layer, featureRef, op, before = null) {
     return this.pushEdits([{ layer, featureRef, before, op }]);
   }
-  // TODO: must handle atomic operations (split, batchedit)
+  // TODO: Add a supressCreateTransaction for cascading deletes
   // 
   pushEdits(edits) {
     // Clone and add to stack
@@ -62,7 +62,8 @@ export default class UndoStack {
 
     const retval = [];
     // TODO: safeguard index
-    this._stack[this._currentIndex].forEach(currEdit => {
+    // Reverse order to support update and delete on same feature
+    this._stack[this._currentIndex].toReversed().forEach(currEdit => {
       const currRetval = {};
       currRetval.feature = currEdit.featureRef;
       currRetval.layerName = currEdit.layer.get('name');
@@ -95,8 +96,8 @@ export default class UndoStack {
         // Add to source, keep reference in undostack for redo
         // If Id exists, it will not be added
         currEdit.layer.getSource().addFeature(currEdit.featureRef);
-        // TODO: add feature to retval
       }
+      // TODO: not if supressed
       retval.push(currRetval);
     });
     this._currentIndex -= 1;
@@ -140,42 +141,11 @@ export default class UndoStack {
         // Add to source, keep reference in undostack for redo
         // If Id exists, it will not be added
         currEdit.layer.getSource().removeFeature(currEdit.featureRef);
-        // TODO: add feature to retval
       }
+      // TODO: not if supressed
       retval.push(currRetval);
     });
     return retval;
   }
-
-  _applyEdit() {
-    /** All edits that has been applied */
-    const retval = [];
-
-    this._stack[this._currentIndex].forEach(currEdit => {
-      const currRetval = {};
-      currRetval.layerName = currEdit.layer.get('name');
-
-      if (currEdit.op == 'update') {
-        currRetval.action = 'update';
-        // just restore all edits
-        currEdit.featureRef.setGeometry(currEdit.before.getGeometry().clone());
-        currEdit.featureRef.setProperties(currEdit.before.getProperties());
-      } else if (currEdit.op == 'insert') {
-        currRetval.action = 'delete';
-        // Delete from source, keep reference in undostack for redo
-        // TODO: As we are using feature refs, it will work even if insert has been saved and given a new id?
-        currEdit.layer.getSource().removeFeature(currEdit.featureRef);
-      } else if (currEdit.op == 'delete') {
-        // Create a new feature
-        currRetval.action = 'insert';
-        // Add to source, keep reference in undostack for redo
-        // If Id exists, it will not be added
-        currEdit.layer.getSource().addFeature(currEdit.featureRef);
-      }
-      retval.push(currRetval);
-    });
-    return retval;
-  }
-  
 
 }

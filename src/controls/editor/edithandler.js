@@ -71,6 +71,7 @@ let modifyDrawSnapInteraction;
 let modifyDrawInteraction;
 let component;
 let undoHandler;
+let reuseIds;
 
 function isActive() {
   // FIXME: this only happens at startup as they are set to null on closing. If checking for null/falsley/not truely it could work as isVisible with
@@ -199,6 +200,15 @@ function getDefaultValues(attrs) {
     }, {});
 }
 
+function getReuseIdsForLayer(layer) {
+  const layerreuse = layer.get('reuseIds');
+  if (layerreuse !== undefined) {
+    return layerreuse;
+  } else {
+    return reuseIds;
+  }
+}
+
 function getSnapSources(layers) {
   return layers.map(layer => viewer.getLayer(layer).getSource());
 }
@@ -211,6 +221,7 @@ async function saveFeatures() {
   const layerNames = Object.getOwnPropertyNames(edits);
   const promises = [];
   layerNames.forEach((layerName) => {
+    const layer = viewer.getLayer(layerName);
     const transaction = {
       insert: null,
       delete: null,
@@ -218,7 +229,6 @@ async function saveFeatures() {
     };
     const editTypes = Object.getOwnPropertyNames(edits[layerName]);
     editTypes.forEach((editType) => {
-      const layer = viewer.getLayer(layerName);
       const ids = edits[layerName][editType];
       const features = getFeaturesByIds(editType, layer, ids);
       if (features.length) {
@@ -226,7 +236,7 @@ async function saveFeatures() {
       }
     });
     // If the source does not return a promise it is not awaited for in Promise.all, so this is pretty safe.
-    promises.push(transactionHandler(transaction, layerName, viewer));
+    promises.push(transactionHandler(transaction, layerName, viewer, { reuseIds: getReuseIdsForLayer(layer) }));
   });
   return Promise.all(promises);
 }
@@ -253,8 +263,6 @@ function addEditsToEditStore(edits) {
   }
 }
 
-// TODO: Add method for aborting unsaved edits. Pull before states from editStore and
-// restore states.
 
 
 // Undo last operation
@@ -273,6 +281,88 @@ function redo() {
   addEditsToEditStore(edits);
 }
 
+function abortSession() {
+  // There actually is no such thing as a session, but reversing all pending edits
+  // is pretty similar. Can't just have editStore to clear its state as undoStack also hold references
+  // and may or may not contain all edits in the session, which also makes it unsuitable to
+  // use undoStack to get unmodified features
+
+  // These reversing actions can either be added to the undostack as one transaction to be able to undo the abortSession
+  // or the undoStack must be restored as well to avoid missmatch in undo. Maybe would have been a good idea to implement
+  // undo in the editStore instead ...
+
+  const undoOperations = [];
+  // Get all pending edits from store
+  const edits = editsStore.getEdits();
+  const layerNames = Object.getOwnPropertyNames(edits);
+  layerNames.forEach((layerName) => {
+    const layer = viewer.getLayer(layerName);
+
+    // Must take deletes first, as they can also have to be un-updated.
+    // If last edit is reversed
+    const deletedIds = edits[layerName]?.delete;
+    if (deletedIds) {
+      deletedIds.forEach(currFid => {
+        const deletedFeature = editsStore.getPendingDeletedFeature(layerName, currFid);
+        layer.getSource().addFeature(deletedFeature);
+        saveFeature({
+          feature: deletedFeature,
+          layerName: layerName,
+          action: 'insert'
+        });
+        undoOperations.push({ layer, featureRef: deletedFeature, op: 'insert' });
+      });
+    }
+
+    const updatedIds = edits[layerName]?.update;
+    if (updatedIds) {
+      updatedIds.forEach(currFid => {
+        const originalState = editsStore.getOriginalState(layerName, currFid);
+        const updatedFeature = layer.getSource().getFeatureById(currFid);
+        // Before is not actually used as editSore will cancel out the two updates,
+        // but if we are making it possible to undo abortSession it is needed for the undoStack.
+        const clone = updatedFeature.clone();
+        clone.setId(updatedFeature.getId());
+
+        updatedFeature.setProperties(originalState.getProperties());
+        // Geometry is included in properties, but it is a ref to an existing geometry instance
+        // Do an implicit deep copy to get rid of dependencies
+        updatedFeature.setGeometry(originalState.getGeometry().clone());
+        saveFeature({
+          feature: updatedFeature,
+          layerName: layerName,
+          action: 'update',
+          before: clone
+        });
+        undoOperations.push({ layer, featureRef: updatedFeature, op: 'update', before: clone });
+      });
+    }
+
+    const insertedIds = edits[layerName]?.insert;
+    if (insertedIds) {
+      insertedIds.forEach(currFid => {
+        const insertedFeature = layer.getSource().getFeatureById(currFid);
+        layer.getSource().removeFeature(insertedFeature);
+        saveFeature({
+          feature: insertedFeature,
+          layerName: layerName,
+          action: 'delete'
+        });
+        undoOperations.push({ layer, featureRef: insertedFeature, op: 'delete' });
+      });
+    }
+
+  });
+
+  // Add all these reversions to undoStack as one undo-operation, making it possible to undo the abort. (Which is pretty confusing)
+  // TODO: discard from undoStack instead?
+  if (undoOperations.length) {
+    undoHandler.pushEdits(undoOperations);
+  }
+
+
+  
+}
 function onModifyEnd(evt) {
   const feature = evt.features.item(0);
   // Roll back modification if the resulting geometry was invalid
@@ -302,6 +392,20 @@ function onModifyStart(evt) {
   //}
 }
 
+function createId(layer) {
+  // Prefix id so we can determine if this feature is created in the editor or just happens to have a guid-like id
+  // from the server, which is highly unlikely. WFS prefixes id with layer name and AGS uses ObjectId, which is integer,
+  // but in this way we don't have to regex for a GUID where we need to know if it is newly created. We just checks if it starts
+  // with 'origotmp:'
+  // Prefix only if we should try to recreate deleted Ids on undo because if some older app is assuming that id is
+  // strictly a guid. As those older apps won't try recreating id:s they will still work.
+  let id = generateUUID();
+  if (getReuseIdsForLayer(layer)) {
+    id = 'origotmp:' + id;
+  }
+  return id;
+}
+
 /**
  * Adds the feature to the layer and set default attributes and a temporary id. If autosaved is enabled it is saved to db.
  * @param {any} feature
@@ -312,7 +416,7 @@ async function addFeatureToLayer(feature, layerName) {
   const layer = viewer.getLayer(layerName);
   const defaultAttributes = getDefaultValues(layer.get('attributes'));
   feature.setProperties(defaultAttributes);
-  feature.setId(generateUUID());
+  feature.setId(createId(layer));
   layer.getSource().addFeature(feature);
   // Add to undostack
   undoHandler.pushEdit(layer, feature, 'insert');
@@ -936,6 +1040,7 @@ async function deleteFeature(feature, layer, supressDbDelete) {
   }
   const source = layer.getSource();
   // TODO: add to undostack. How to handle supressed deletes? Also recursive deletes should be in a transaction
+  // Add an optional "don't generate transaction" to undo
   undoHandler.pushEdit(layer, feature, 'delete');
   source.removeFeature(feature);
 }
@@ -1994,7 +2099,7 @@ function onSplitLineByPointEnd(evt) {
     // The litte tricker, create a copy with the rest of the line
     const newFeature = selectedFeature.clone();
     newFeature.setGeometry(new LineString(part2Coords));
-    newFeature.setId(generateUUID());
+    newFeature.setId(createId(layer));
     const layer = viewer.getLayer(currentLayer);
     layer.getSource().addFeature(newFeature);
     saveFeature({
@@ -2069,6 +2174,7 @@ export default function editHandler(options, v) {
       viewer = v;
       map = viewer.getMap();
       undoHandler = new UndoStack();
+      reuseIds = options.reuseIds;
 
 
       // Set up a layer for displaying trace possibilities. Do it up front as it may become possible to turn it on later
@@ -2131,6 +2237,7 @@ export default function editHandler(options, v) {
     setModifyTool: setModifyToolApi,
     preselectFeature,
     undo,
-    redo
+    redo,
+    abortSession
   });
 }
