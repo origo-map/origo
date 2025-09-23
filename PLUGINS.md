@@ -28,6 +28,9 @@ A plugin to connect Origo-map with EDP Visions "Integrations API GIS-koppling (K
 **[Elevation profile](https://github.com/origo-map/elevation-profile-plugin)**
 A plugin that shows an elevation profile for linestring features with z-dimension.
 
+**[Elevation profile](https://github.com/jokd/elevation-profile-plugin-v2)**
+Elevation profile plugin for Origo. Shows profiles for linestrings or polygons that has z-dimension or gets z values from service. Improved version of the above.
+
 **[Geouttag](https://github.com/Eskilstuna-kommun/Geouttag)**
 A plugin for geodata export (requires FME Server).
 
