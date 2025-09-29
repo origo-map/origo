@@ -176,6 +176,11 @@
         "scalepicker": {
             "selectScaleAriaLabel": "Pick scale"
         },
+        "splash": {
+            "defaultTitle": "About the map",
+            "dontShowAgain": "Don't show again",
+            "makeSure": "Are you sure you don't want to see the information again?"
+        },
         "position": {
             "characterError": "Invalid character for coordinate, please try again.",
             "extentError": "The coordinates provided are not within the map's extent, please try again.",

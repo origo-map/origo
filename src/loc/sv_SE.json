@@ -176,7 +176,12 @@
         "scalepicker": {
             "selectScaleAriaLabel": "Välj skala"
         },
-        "position": {
+         "splash": {
+            "defaultTitle": "Om kartan",
+            "dontShowAgain": "Visa inte igen",
+            "makeSure": "Är du säker på att du inte vill se informationen igen?"
+        },
+       "position": {
             "characterError": "Ogiltigt tecken för koordinat, vänligen försök igen.",
             "extentError": "Angivna koordinater ligger inte inom kartans utsträckning, vänligen försök igen.",
             "configError": "Ingen titel eller projektion har angetts för positionskontrollen",
