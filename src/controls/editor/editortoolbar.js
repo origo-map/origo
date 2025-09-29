@@ -31,6 +31,9 @@ const EditorToolbar = function EditorToolbar(options = {}) {
   let modifyToolsPopoverEl;
   let component;
   let selection;
+  let abortBtn;
+  let undoBtn;
+  let redoBtn;
 
   /**
    * Renders the toolbar. Injects itself to DOM, so no need for caller to insert it
@@ -44,6 +47,11 @@ const EditorToolbar = function EditorToolbar(options = {}) {
     $editDelete = document.getElementById('o-editor-delete');
     $editLayers = document.getElementById('o-editor-layers');
     $editSave = document.getElementById('o-editor-save');
+    abortBtn = document.getElementById('o-editor-abort-session');
+    undoBtn = document.getElementById('o-editor-undo');
+    undoBtn.classList.add(disableClass);
+    redoBtn = document.getElementById('o-editor-redo');
+    redoBtn.classList.add(disableClass);
     // Hide layers choice button if only 1 layer in editable
     if (editableLayers.length < 2) {
       $editLayers.parentNode.classList.add('o-hidden');
@@ -51,6 +59,11 @@ const EditorToolbar = function EditorToolbar(options = {}) {
     // Hide save button if configured with autoSave
     if (options.autoSave) {
       $editSave.classList.add('o-hidden');
+      abortBtn.classList.add('o-hidden');
+    }
+    if (options.noUndo) {
+      undoBtn.classList.add('o-hidden');
+      redoBtn.classList.add('o-hidden');
     }
     layerSelector = editorLayers(editableLayers, viewer, {
       activeLayer: currentLayer
@@ -126,6 +139,24 @@ const EditorToolbar = function EditorToolbar(options = {}) {
       closeModifyToolsPopover();
       dispatcher.emitToggleEdit('save');
       $editSave.blur();
+      e.preventDefault();
+    });
+    abortBtn.addEventListener('click', (e) => {
+      closeModifyToolsPopover();
+      dispatcher.emitToggleEdit('abortSession');
+      abortBtn.blur();
+      e.preventDefault();
+    });
+    undoBtn.addEventListener('click', (e) => {
+      closeModifyToolsPopover();
+      dispatcher.emitToggleEdit('undo');
+      undoBtn.blur();
+      e.preventDefault();
+    });
+    redoBtn.addEventListener('click', (e) => {
+      closeModifyToolsPopover();
+      dispatcher.emitToggleEdit('redo');
+      redoBtn.blur();
       e.preventDefault();
     });
     modifyToolsBtn.addEventListener('click', (e) => {
@@ -230,14 +261,21 @@ const EditorToolbar = function EditorToolbar(options = {}) {
     }
   }
 
+  /**
+   * Called when number of pending edits in editstore have changed.
+   * Uses to grey out ot enable save/abort session buttons
+   * @param {any} e
+   */
   function toggleSave(e) {
     const { detail: { edits } } = e;
     if (edits) {
       if ($editSave.classList.contains(disableClass)) {
         $editSave.classList.remove(disableClass);
+        abortBtn.classList.remove(disableClass);
       }
     } else {
       $editSave.classList.add(disableClass);
+      abortBtn.classList.add(disableClass);
     }
   }
 
@@ -260,6 +298,19 @@ const EditorToolbar = function EditorToolbar(options = {}) {
     e.stopPropagation();
   }
 
+  function onUndoStackChanged(e) {
+    if (e.detail.undoDepth) {
+      undoBtn.classList.remove(disableClass);
+    } else {
+      undoBtn.classList.add(disableClass);
+    }
+    if (e.detail.redoDepth) {
+      redoBtn.classList.remove(disableClass);
+    } else {
+      redoBtn.classList.add(disableClass);
+    }
+  }
+
   // Here be the return statement that returns the Component created
   return Component({
     onInit() {
@@ -267,6 +318,7 @@ const EditorToolbar = function EditorToolbar(options = {}) {
       document.addEventListener('changeEdit', onChangeEdit);
       document.addEventListener('editsChange', toggleSave);
       document.addEventListener('toggleEdit', onToggleEdit);
+      document.addEventListener(dispatcher.UNDO_STACK_EVENT, onUndoStackChanged);
       component = this;
     },
     onRender() {

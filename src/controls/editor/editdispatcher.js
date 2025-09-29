@@ -2,6 +2,7 @@
 const ADD_CHILD_EVENT = 'addChild';
 const EDIT_CHILD_EVENT = 'editChild';
 const DELETE_CHILD_EVENT = 'deleteChild';
+const UNDO_STACK_EVENT = 'undoStackChanged';
 
 function emitChangeEdit(tool, state) {
   const changeEdit = new CustomEvent('changeEdit', {
@@ -11,6 +12,23 @@ function emitChangeEdit(tool, state) {
     }
   });
   document.dispatchEvent(changeEdit);
+}
+
+/**
+ * Signal that something has happened that has affected the undostack
+ * @param {('edit' | 'undo' | 'redo')} change The change that has happened
+ * @param {number} undoDepth Number of undoable actions in the stack
+ * @param {number} redoDepth Number of redoable actions in the stack
+ */
+function emitUndoStackChange(change, undoDepth, redoDepth) {
+  const ev = new CustomEvent(UNDO_STACK_EVENT, {
+    detail: {
+      change,
+      undoDepth,
+      redoDepth
+    }
+  });
+  document.dispatchEvent(ev);
 }
 
 function emitChangeFeature(change) {
@@ -125,5 +143,7 @@ export default {
   EDIT_CHILD_EVENT,
   emitAddChild,
   emitDeleteChild,
-  DELETE_CHILD_EVENT
+  DELETE_CHILD_EVENT,
+  emitUndoStackChange,
+  UNDO_STACK_EVENT
 };

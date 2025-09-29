@@ -21,6 +21,18 @@ export default `<div id="o-editor-toolbar" class="o-editor-toolbar o-toolbar o-t
       </svg>
       <span data-tooltip="Radera" data-placement="north"></span>
     </button>
+        <button id="o-editor-undo" class="o-button-lg o-tooltip" style aria-label="Ångra" type="button" name="button">
+      <svg class="o-icon-24">
+          <use xlink:href="#ic_undo_24px"></use>
+      </svg>
+      <span data-tooltip="Ångra" data-placement="north"></span>
+    </button>
+        <button id="o-editor-redo" class="o-button-lg o-tooltip" style aria-label="Gör igen" type="button" name="button">
+      <svg class="o-icon-24">
+          <use xlink:href="#ic_redo_24px"></use>
+      </svg>
+      <span data-tooltip="Gör igen" data-placement="north"></span>
+    </button>
     <div class="o-popover-container">
       <button id="o-editor-layers" class="o-button-lg o-tooltip" style aria-label="Lager" type="button" name="button">
         <svg class="o-icon-24">
@@ -37,6 +49,12 @@ export default `<div id="o-editor-toolbar" class="o-editor-toolbar o-toolbar o-t
         <span data-tooltip="Modifiera" data-placement="north"></span>
       </button>
     </div>
+    <button id="o-editor-abort-session" class="o-button-lg o-disabled o-tooltip" style aria-label="Spara" type="button" name="button">
+      <svg class="o-icon-24">
+          <use xlink:href="#ic_cancel_24px"></use>
+      </svg>
+      <span data-tooltip="Ångra osparade redigeringar" data-placement="north"></span>
+    </button>
     <button id="o-editor-save" class="o-button-lg o-disabled o-tooltip" style aria-label="Spara" type="button" name="button">
       <svg class="o-icon-24">
           <use xlink:href="#ic_save_24px"></use>
