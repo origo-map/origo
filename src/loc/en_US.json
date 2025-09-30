@@ -176,7 +176,7 @@
         "scalepicker": {
             "selectScaleAriaLabel": "Pick scale",
             "buttonPrefix": "",
-            "scaleListItemPrefix": ""
+            "listItemPrefix": ""
         },
         "position": {
             "characterError": "Invalid character for coordinate, please try again.",

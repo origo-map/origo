@@ -176,7 +176,7 @@
         "scalepicker": {
             "selectScaleAriaLabel": "Välj skala",
             "buttonPrefix": "",
-            "scaleListItemPrefix": ""
+            "listItemPrefix": ""
         },
         "position": {
             "characterError": "Ogiltigt tecken för koordinat, vänligen försök igen.",
