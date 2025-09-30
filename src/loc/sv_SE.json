@@ -176,10 +176,10 @@
         "scalepicker": {
             "selectScaleAriaLabel": "Välj skala"
         },
-         "splash": {
+        "splash": {
             "defaultTitle": "Om kartan",
-            "dontShowAgain": "Visa inte igen",
-            "makeSure": "Är du säker på att du inte vill se informationen igen?"
+            "hideText": "Visa inte igen",
+            "confirmText": "Är du säker på att du inte vill se informationen igen?"
         },
        "position": {
             "characterError": "Ogiltigt tecken för koordinat, vänligen försök igen.",

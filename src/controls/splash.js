@@ -81,8 +81,8 @@ const Splash = function Splash(options = {}) {
       if (!content) content = defaultContent;
       if (options.hideButton) {
         hideButtonVisible = Object.prototype.hasOwnProperty.call(options.hideButton, 'visible') ? options.hideButton.visible : false;
-        hideText = Object.prototype.hasOwnProperty.call(options.hideButton, 'hideText') ? options.hideButton.hideText : localize('dontShowAgain');
-        confirmText = Object.prototype.hasOwnProperty.call(options.hideButton, 'confirmText') ? options.hideButton.confirmText : localize('makeSure');
+        hideText = Object.prototype.hasOwnProperty.call(options.hideButton, 'hideText') ? options.hideButton.hideText : localize('hideText');
+        confirmText = Object.prototype.hasOwnProperty.call(options.hideButton, 'confirmText') ? options.hideButton.confirmText : localize('confirmText');
       }
       if (hideButtonVisible) {
         hideButton = Button({

@@ -178,8 +178,8 @@
         },
         "splash": {
             "defaultTitle": "About the map",
-            "dontShowAgain": "Don't show again",
-            "makeSure": "Are you sure you don't want to see the information again?"
+            "hideText": "Don't show again",
+            "confirmText": "Are you sure you don't want to see the information again?"
         },
         "position": {
             "characterError": "Invalid character for coordinate, please try again.",
