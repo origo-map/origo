@@ -133,8 +133,7 @@ const Print = function Print(options = {}) {
         mapInteractionsActive,
         supressResolutionsRecalculation,
         suppressNewDPIMethod,
-        localize,
-        localeId: localization.getCurrentLocaleId()
+        localization
       });
       if (placement.indexOf('screen') > -1) {
         mapTools = `${viewer.getMain().getMapTools().getId()}`;

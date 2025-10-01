@@ -1,6 +1,10 @@
 import { Button, Component } from '../../ui';
 
-const PrintToolbar = function PrintToolbar({ localize }) {
+const PrintToolbar = function PrintToolbar({ localization }) {
+  const localize = function localize(key) {
+    return localization.getStringByKeys({ targetParentKey: 'print', targetKey: key });
+  };
+
   const pngButton = Button({
     cls: 'light text-smaller padding-left-large',
     text: localize('pngButtonTitle')

@@ -52,8 +52,7 @@ const PrintComponent = function PrintComponent(options = {}) {
     supressResolutionsRecalculation,
     suppressNewDPIMethod,
     settingsExpanded,
-    localize,
-    localeId
+    localization
   } = options;
 
   let {
@@ -95,7 +94,18 @@ const PrintComponent = function PrintComponent(options = {}) {
   const olPixelRatio = map.pixelRatio_;
 
   if (!Array.isArray(scales) || scales.length === 0) {
-    scales = originalResolutions.map(currRes => maputils.resolutionToFormattedScale(currRes, viewer.getProjection()));
+    scales = originalResolutions.map(currRes => {
+      const unlocalizedScaleLabel = maputils.resolutionToFormattedScale(currRes, viewer.getProjection());
+      const value = maputils.formattedScaleToScaleDenominator(unlocalizedScaleLabel);
+      const label = maputils.resolutionToFormattedScale(currRes, viewer.getProjection(), localization);
+      return { label, value };
+    });
+  } else {
+    scales = scales.map((unlocalizedScaleLabel) => {
+      const value = maputils.formattedScaleToScaleDenominator(unlocalizedScaleLabel);
+      const label = maputils.formatScale(value, localization);
+      return { value, label };
+    });
   }
 
   const calcMaxRes = function calcMaxRes() {
@@ -228,7 +238,7 @@ const PrintComponent = function PrintComponent(options = {}) {
   };
 
   const created = function created() {
-    return showCreated ? `${createdPrefix}${today.toLocaleDateString(localeId)} ${today.toLocaleTimeString(localeId)}` : '';
+    return showCreated ? `${createdPrefix}${today.toLocaleDateString(localization.getCurrentLocaleId())} ${today.toLocaleTimeString(localization.getCurrentLocaleId())}` : '';
   };
 
   const titleComponent = Component({
@@ -337,12 +347,13 @@ const PrintComponent = function PrintComponent(options = {}) {
     rotation,
     rotationStep,
     viewerResolutions: originalResolutions,
-    localize
+    localization
   });
-  const printInteractionToggle = PrintInteractionToggle({ map, target, mapInteractionsActive, pageSettings: viewer.getViewerOptions().pageSettings, localize });
+
+  const printInteractionToggle = PrintInteractionToggle({ map, target, mapInteractionsActive, pageSettings: viewer.getViewerOptions().pageSettings, localization });
 
   const printToolbar = PrintToolbar({
-    localize
+    localization
   });
 
   let mapLoadListenRefs;
@@ -368,7 +379,7 @@ const PrintComponent = function PrintComponent(options = {}) {
         view.getCenter()
       );
       let textContent = scale;
-      textContent = maputils.formatScale(scale * 1000);
+      textContent = maputils.formatScale(scale * 1000, localization);
       printSettings.getScaleControl().setButtonText(textContent);
       setScale(scale);
     }
