@@ -1,7 +1,16 @@
 import { Component, Button, Modal } from '../ui';
 
 const Splash = function Splash(options = {}) {
-  const defaultTitle = 'Om kartan';
+  const {
+    url,
+    localization
+  } = options;
+
+  function localize(key) {
+    return localization.getStringByKeys({ targetParentKey: 'splash', targetKey: key });
+  }
+
+  const defaultTitle = localize('defaultTitle');
   const defaultContent = '';
   const cls = 'o-splash';
   const style = options.style || '';
@@ -19,10 +28,6 @@ const Splash = function Splash(options = {}) {
     hideButtonVisible,
     hideText,
     confirmText
-  } = options;
-
-  const {
-    url
   } = options;
 
   const addButton = function addButton() {
@@ -76,8 +81,8 @@ const Splash = function Splash(options = {}) {
       if (!content) content = defaultContent;
       if (options.hideButton) {
         hideButtonVisible = Object.prototype.hasOwnProperty.call(options.hideButton, 'visible') ? options.hideButton.visible : false;
-        hideText = Object.prototype.hasOwnProperty.call(options.hideButton, 'hideText') ? options.hideButton.hideText : 'Visa inte igen';
-        confirmText = Object.prototype.hasOwnProperty.call(options.hideButton, 'confirmText') ? options.hideButton.confirmText : 'Är du säker på att du inte vill se informationen igen?';
+        hideText = Object.prototype.hasOwnProperty.call(options.hideButton, 'hideText') ? options.hideButton.hideText : localize('hideText');
+        confirmText = Object.prototype.hasOwnProperty.call(options.hideButton, 'confirmText') ? options.hideButton.confirmText : localize('confirmText');
       }
       if (hideButtonVisible) {
         hideButton = Button({
