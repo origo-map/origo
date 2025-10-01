@@ -174,7 +174,9 @@
             "scaleText": "Scale 1:"
         },
         "scalepicker": {
-            "selectScaleAriaLabel": "Pick scale"
+            "selectScaleAriaLabel": "Pick scale",
+            "buttonPrefix": "",
+            "listItemPrefix": ""
         },
         "splash": {
             "defaultTitle": "About the map",
