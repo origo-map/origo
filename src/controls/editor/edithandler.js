@@ -27,6 +27,7 @@ import attachmentsform from './attachmentsform';
 import relatedTablesForm from './relatedtablesform';
 import relatedtables from '../../utils/relatedtables';
 import Style from '../../style';
+import UndoStack from '../../utils/undostack';
 
 const editsStore = store();
 let editLayers = {};
@@ -69,6 +70,8 @@ let useTrace;
 let modifyDrawSnapInteraction;
 let modifyDrawInteraction;
 let component;
+let undoHandler;
+let reuseIds;
 
 function isActive() {
   // FIXME: this only happens at startup as they are set to null on closing. If checking for null/falsley/not truely it could work as isVisible with
@@ -197,11 +200,25 @@ function getDefaultValues(attrs) {
     }, {});
 }
 
+/**
+ * Helper that checks if we should reuse ids when undoing deletes by recreating the feature on server for this layer. Layer configuration
+ * overrides editor setting
+ * @param {any} layer
+ * @returns {boolean} true if ids should be reused
+ */
+function getReuseIdsForLayer(layer) {
+  const layerreuse = layer.get('reuseIds');
+  if (layerreuse !== undefined) {
+    return layerreuse;
+  }
+  return reuseIds;
+}
+
 function getSnapSources(layers) {
   return layers.map(layer => viewer.getLayer(layer).getSource());
 }
 /**
- * Saves the features to server.
+ * Saves all features in editStore to server.
  * @returns A promise which is resolved when all features have been saved if the source supports it. Otherwise it is resolved immediately.
  * */
 async function saveFeatures() {
@@ -209,6 +226,7 @@ async function saveFeatures() {
   const layerNames = Object.getOwnPropertyNames(edits);
   const promises = [];
   layerNames.forEach((layerName) => {
+    const layer = viewer.getLayer(layerName);
     const transaction = {
       insert: null,
       delete: null,
@@ -216,7 +234,6 @@ async function saveFeatures() {
     };
     const editTypes = Object.getOwnPropertyNames(edits[layerName]);
     editTypes.forEach((editType) => {
-      const layer = viewer.getLayer(layerName);
       const ids = edits[layerName][editType];
       const features = getFeaturesByIds(editType, layer, ids);
       if (features.length) {
@@ -224,7 +241,7 @@ async function saveFeatures() {
       }
     });
     // If the source does not return a promise it is not awaited for in Promise.all, so this is pretty safe.
-    promises.push(transactionHandler(transaction, layerName, viewer));
+    promises.push(transactionHandler(transaction, layerName, viewer, { reuseIds: getReuseIdsForLayer(layer) }));
   });
   return Promise.all(promises);
 }
@@ -237,29 +254,162 @@ async function saveFeatures() {
 async function saveFeature(change, ignoreAutoSave) {
   dispatcher.emitChangeFeature(change);
   if (autoSave && !ignoreAutoSave) {
-    await saveFeatures(change);
+    await saveFeatures();
   }
 }
 
+function addEditsToEditStore(edits) {
+  edits.forEach(currEdit => {
+    dispatcher.emitChangeFeature(currEdit);
+  });
+  if (autoSave) {
+    // TODO: await?
+    saveFeatures();
+  }
+}
+
+function emitUndoStackEvent(change) {
+  const stackDepth = undoHandler.getStackDepth();
+  dispatcher.emitUndoStackChange(change, stackDepth.undoDepth, stackDepth.redoDepth);
+}
+
+// Undo last operation
+function undo() {
+  const edits = undoHandler.undo();
+  emitUndoStackEvent('undo');
+  // Send edits to editstore
+  addEditsToEditStore(edits);
+}
+
+// Redo last operation
+
+function redo() {
+  const edits = undoHandler.redo();
+  emitUndoStackEvent('redo');
+  // Send edits to editstore
+  addEditsToEditStore(edits);
+}
+
+function abortSession() {
+  // There actually is no such thing as a session, but reversing all pending edits
+  // is pretty similar. Can't just have editStore to clear its state as undoStack also hold references
+  // and may or may not contain all edits in the session, which also makes it unsuitable to
+  // use undoStack to get unmodified features
+
+  // These reversing actions can either be added to the undostack as one transaction to be able to undo the abortSession
+  // or the undoStack must be restored as well to avoid missmatch in undo. Maybe would have been a good idea to implement
+  // undo in the editStore instead ...
+
+  const undoOperations = [];
+  // Get all pending edits from store
+  const edits = editsStore.getEdits();
+  const layerNames = Object.getOwnPropertyNames(edits);
+  layerNames.forEach((layerName) => {
+    const layer = viewer.getLayer(layerName);
+
+    // Must take deletes first, as they can also have to be un-updated.
+    // If last edit is reversed
+    const deletedIds = edits[layerName]?.delete;
+    if (deletedIds) {
+      deletedIds.forEach(currFid => {
+        const deletedFeature = editsStore.getPendingDeletedFeature(layerName, currFid);
+        layer.getSource().addFeature(deletedFeature);
+        saveFeature({
+          feature: deletedFeature,
+          layerName,
+          action: 'insert'
+        });
+        undoOperations.push({ layer, featureRef: deletedFeature, op: 'insert' });
+      });
+    }
+
+    const updatedIds = edits[layerName]?.update;
+    if (updatedIds) {
+      updatedIds.forEach(currFid => {
+        const originalState = editsStore.getOriginalState(layerName, currFid);
+        const updatedFeature = layer.getSource().getFeatureById(currFid);
+        // Before is not actually used as editStore will cancel out the two updates,
+        // but if we are making it possible to undo abortSession it is needed for the undoStack.
+        const clone = updatedFeature.clone();
+        clone.setId(updatedFeature.getId());
+
+        updatedFeature.setProperties(originalState.getProperties());
+        // Geometry is included in properties, but it is a ref to an existing geometry instance
+        // Do an implicit deep copy to get rid of dependencies
+        updatedFeature.setGeometry(originalState.getGeometry().clone());
+        saveFeature({
+          feature: updatedFeature,
+          layerName,
+          action: 'update',
+          before: clone
+        });
+        undoOperations.push({ layer, featureRef: updatedFeature, op: 'update', before: clone });
+      });
+    }
+
+    const insertedIds = edits[layerName]?.insert;
+    if (insertedIds) {
+      insertedIds.forEach(currFid => {
+        const insertedFeature = layer.getSource().getFeatureById(currFid);
+        layer.getSource().removeFeature(insertedFeature);
+        saveFeature({
+          feature: insertedFeature,
+          layerName,
+          action: 'delete'
+        });
+        undoOperations.push({ layer, featureRef: insertedFeature, op: 'delete' });
+      });
+    }
+  });
+
+  // Add all these reversions to undoStack as one undo-operation, making it possible to undo the abort.
+  if (undoOperations.length) {
+    undoHandler.pushEdits(undoOperations);
+    emitUndoStackEvent('undo');
+  }
+}
 function onModifyEnd(evt) {
   const feature = evt.features.item(0);
   // Roll back modification if the resulting geometry was invalid
   if (validateOnDraw && !topology.isGeometryValid(feature.getGeometry())) {
     feature.setGeometry(modifyGeometry);
   } else {
+    // clone and push to undo using modifyGeometry. Must clone here to use old geometry. Can't push to
+    // undo before modify as validation may fail and that would require an undo rollback (or programatic undo, but undo may not be available
+    // for this layer)
+    const unchanged = feature.clone();
+    unchanged.setGeometry(modifyGeometry);
+    const layer = viewer.getLayer(currentLayer);
+    undoHandler.pushEdit(layer, feature, 'update', unchanged);
     saveFeature({
       feature,
       layerName: currentLayer,
-      action: 'update'
+      action: 'update',
+      before: unchanged
     });
+    emitUndoStackEvent('edit');
   }
 }
 
 function onModifyStart(evt) {
   // Get a copy of the geometry before modification
-  if (validateOnDraw) {
-    modifyGeometry = evt.features.item(0).getGeometry().clone();
+  // if (validateOnDraw) {
+  modifyGeometry = evt.features.item(0).getGeometry().clone();
+  // }
+}
+
+function createId(layer) {
+  // Prefix id so we can determine if this feature is created in the editor or just happens to have a guid-like id
+  // from the server, which is highly unlikely. WFS prefixes id with layer name and AGS uses ObjectId, which is integer,
+  // but in this way we don't have to regex for a GUID where we need to know if it is newly created. We just checks if it starts
+  // with 'origotmp:'
+  // Prefix only if we should try to recreate deleted Ids on undo because if some older app is assuming that id is
+  // strictly a guid. As those older apps won't try recreating id:s they will still work.
+  let id = generateUUID();
+  if (getReuseIdsForLayer(layer)) {
+    id = `origotmp:${id}`;
   }
+  return id;
 }
 
 /**
@@ -272,8 +422,11 @@ async function addFeatureToLayer(feature, layerName) {
   const layer = viewer.getLayer(layerName);
   const defaultAttributes = getDefaultValues(layer.get('attributes'));
   feature.setProperties(defaultAttributes);
-  feature.setId(generateUUID());
+  feature.setId(createId(layer));
   layer.getSource().addFeature(feature);
+  // Add to undostack
+  undoHandler.pushEdit(layer, feature, 'insert');
+  emitUndoStackEvent('edit');
   return saveFeature({
     feature,
     layerName,
@@ -852,9 +1005,10 @@ function setEditProps(options) {
  * @param {any} feature The feature to delete
  * @param {any} layer The layer in which the feature is
  * @param {any} supressDbDelete True if the feature should in fact not be deleted from db. Defaults to false. Mainly used by recursive calls.
+ * @param {any} undoItems Array of undo items that is populated in each recursion when a delete is recursive
  * @returns a promise which is resolved when feature is deleted from db (or immediately id not autosave)
  */
-async function deleteFeature(feature, layer, supressDbDelete) {
+async function deleteFeatureRecurseHelper(feature, layer, supressDbDelete, undoItems) {
   // If editor is in auto save mode we can delete in the correct order by start by recursing before deleting anything
   // If editor is not in auto save, it is up to the transactionhandler in combination with the map server if
   // delete order is preserved. Better not have any db constraints if mode is 'cascade'.
@@ -877,7 +1031,7 @@ async function deleteFeature(feature, layer, supressDbDelete) {
           const currChildFeature = childFeatures[jx];
           // This funtion is recursive, we have to await
           // eslint-disable-next-line no-await-in-loop
-          await deleteFeature(currChildFeature, childLayer, deleteMode === 'db');
+          await deleteFeatureRecurseHelper(currChildFeature, childLayer, deleteMode === 'db', undoItems);
         }
       }
     }
@@ -892,8 +1046,36 @@ async function deleteFeature(feature, layer, supressDbDelete) {
       action: 'delete'
     });
   }
+
+  // Add this delete to the undo transaction. If related item has cascadingDelete = 'db' we assume it
+  // also is deleted in database so we can recreate children as well. If conficured with cascadingDelete = 'db' and
+  // there is no cascading delete in db we will get duplicate items in db, which may or not be a problem.
+  undoItems.push(
+    {
+      layer,
+      featureRef: feature,
+      op: 'delete'
+    }
+  );
+
+  // Actually remove it from layer
   const source = layer.getSource();
   source.removeFeature(feature);
+}
+
+/**
+ * Deletes a feature. If the feature belongs to a layer that has related layers the deletion is recursive
+ * if configured so in the relation configuration.
+ * @param {any} feature The feature to delete
+ * @param {any} layer The layer in which the feature is
+ * @returns a promise which is resolved when feature is deleted from db (or immediately id not autosave)
+ */
+async function deleteFeature(feature, layer) {
+  // Use an array to collect all deletes in one undo transaction for handling cascading deletes when using related tables.
+  const undoItems = [];
+  await deleteFeatureRecurseHelper(feature, layer, false, undoItems);
+  undoHandler.pushEdits(undoItems);
+  emitUndoStackEvent('edit');
 }
 
 function onDeleteSelected() {
@@ -987,19 +1169,37 @@ function onModalClosed() {
  * @param {any} formEl The attributes to set on features
  */
 function attributesSaveHandler(features, formEl) {
+  const undoOperations = [];
+  const layer = viewer.getLayer(currentLayer);
+
   features.forEach(feature => {
+    // Must create before manually to add all features as an undo batch
+    const before = feature.clone();
+    // Use same id. Can not add to same source after this.
+    before.setId(feature.getId());
+    undoOperations.push({
+      layer,
+      featureRef: feature,
+      op: 'update',
+      before
+
+    });
     // get DOM values and set attribute values to feature
     attributes.forEach((attribute) => {
       if (Object.prototype.hasOwnProperty.call(formEl, attribute.name)) {
         feature.set(attribute.name, formEl[attribute.name]);
       }
     });
+
     saveFeature({
       feature,
       layerName: currentLayer,
-      action: 'update'
+      action: 'update',
+      before
     }, true);
   });
+  undoHandler.pushEdits(undoOperations);
+  emitUndoStackEvent('edit');
   // Take control of auto save here to avoid one transaction per feature when batch editing
   if (autoSave) {
     saveFeatures();
@@ -1710,6 +1910,7 @@ function editAttributes(feat) {
 
 /**
  * Handles toggling of editing tools based on the triggered event.
+ * Events can come flying from anywhere, but most likely editor toolbar or MapTools toolbar
  * @param {Event} e - The triggered event containing tool details.
  */
 function onToggleEdit(e) {
@@ -1732,6 +1933,12 @@ function onToggleEdit(e) {
     removeInteractions();
   } else if (tool === 'save') {
     saveFeatures();
+  } else if (tool === 'abortSession') {
+    abortSession();
+  } else if (tool === 'undo') {
+    undo();
+  } else if (tool === 'redo') {
+    redo();
   }
 }
 
@@ -1921,25 +2128,44 @@ function onSplitLineByPointEnd(evt) {
     });
   }
   if (part2Coords.length > 1) {
+    const layer = viewer.getLayer(currentLayer);
     // Click actually hit the line, split where clicked.
     // Start with the easy one, change geom of original line
+
+    // Add both edits as a transaction to undostack
+    const undoItems = [];
+    const before = selectedFeature.clone();
+    before.setId(selectedFeature.getId());
+    undoItems.push({
+      layer,
+      featureRef: selectedFeature,
+      op: 'update',
+      before
+    });
     selectedFeature.getGeometry().setCoordinates(part1Coords);
     saveFeature({
       feature: selectedFeature,
       layerName: currentLayer,
-      action: 'update'
+      action: 'update',
+      before
     });
     // The litte tricker, create a copy with the rest of the line
     const newFeature = selectedFeature.clone();
     newFeature.setGeometry(new LineString(part2Coords));
-    newFeature.setId(generateUUID());
-    const layer = viewer.getLayer(currentLayer);
+    newFeature.setId(createId(layer));
     layer.getSource().addFeature(newFeature);
     saveFeature({
       feature: newFeature,
       layerName: currentLayer,
       action: 'insert'
     });
+    undoItems.push({
+      layer,
+      featureRef: newFeature,
+      op: 'insert'
+    });
+    undoHandler.pushEdits(undoItems);
+    emitUndoStackEvent('edit');
   }
 
   // We're done, either the line is split or user clicked outside geometry.
@@ -2006,6 +2232,8 @@ export default function editHandler(options, v) {
       component = this;
       viewer = v;
       map = viewer.getMap();
+      undoHandler = new UndoStack({ maxLength: options.maxUndoLevels });
+      reuseIds = options.reuseIds;
 
       // Set up a layer for displaying trace possibilities. Do it up front as it may become possible to turn it on later
       traceHighligtLayer = new VectorLayer({
@@ -2065,6 +2293,9 @@ export default function editHandler(options, v) {
     deleteFeature: deleteFeatureApi,
     setActiveLayer: setActiveLayerApi,
     setModifyTool: setModifyToolApi,
-    preselectFeature
+    preselectFeature,
+    undo,
+    redo,
+    abortSession
   });
 }
