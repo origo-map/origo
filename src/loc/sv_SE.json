@@ -148,7 +148,8 @@
             "removeLayerQuestion": "Vill du ta bort lagret?",
             "removeLayer": "Ta bort lager",
             "moreInfoButtonLabel": "Visa lagerinfo",
-            "renderStyleSelect": "Välj stil"
+            "renderStyleSelect": "Välj stil",
+            "legendSearchGroupSuffix": "(Grupp)"
         },
         "zoom": {
             "zoomInButtonTooltip": "Zooma in i kartan",
