@@ -1,4 +1,4 @@
-export default function styleTemplate({ palette, swStyle, localization }) {
+export default function styleTemplate({ palette, swStyle, localization, svgMarkers }) {
   function localize(key) {
     return localization.getStringByKeys({ targetParentKey: 'styleTemplate', targetKey: key });
   }
@@ -109,6 +109,10 @@ export default function styleTemplate({ palette, swStyle, localization }) {
     </select>
   </div></div>`;
 
+  const arrSvgMarkers = [];
+  svgMarkers.forEach(marker => {
+    arrSvgMarkers.push(`<option value="${marker.name}">${marker.title}</option>`);
+  });
   const pointHtml = `<div id="o-draw-style-point" class="padding border-bottom"><div class="text-large text-align-center">${localize('point')}</div><div class="padding-smaller o-tooltip active">
     <input id="o-draw-style-pointSizeSlider" type="range" min="1" max="50" value="${swStyle.pointSize}" step="1">
     <div class="text-align-center">
@@ -126,6 +130,7 @@ export default function styleTemplate({ palette, swStyle, localization }) {
       <option value="triangle"${swStyle.pointType === 'triangle' ? ' selected' : ''}>${localize('pointTypeTriangle')}</option>
       <option value="square"${swStyle.pointType === 'square' ? ' selected' : ''}>${localize('pointTypeSquare')}</option>
       <option value="marker"${swStyle.pointType === 'marker' ? ' selected' : ''}>${localize('pointTypeMarker')}</option>
+      ${arrSvgMarkers.join('')}
     </select>
   </div></div>`;
 
