@@ -22,6 +22,9 @@
       "name": "print"
     },
     {
+      "name": "guide"
+    },
+    {
       "name": "about",
       "options": {
         "buttonText": "Om Origo",

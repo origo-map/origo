@@ -45,6 +45,7 @@
 @use 'localization';
 @use 'audio';
 @use 'video';
+@use 'guide';
 
 
 .o-map {
@@ -97,6 +98,7 @@
     @include localization.default;
     @include audio.default;
     @include video.default;
+    @include guide.default;
 }
 
 html,

@@ -752,7 +752,7 @@ const Legend = function Legend(options = {}) {
         icon: '#ic_layers_24px',
         tooltipText: localize('layer'),
         tooltipPlacement: 'west',
-        cls: `control icon-small medium round absolute light bottom-right${layerButtonCls}`,
+        cls: `o-legend-btn control icon-small medium round absolute light bottom-right${layerButtonCls}`,
         click() {
           if (!isExpanded) {
             overlaysCmp.dispatch('expand');

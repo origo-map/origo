@@ -93,6 +93,68 @@
   padding-top: variables.$padding-larger;
 }
 
+// larger padding
+.padding-larger {
+  padding: variables.$padding-larger;
+}
+
+.padding-top-larger {
+  padding-top: variables.$padding-larger;
+}
+
+.padding-right-larger {
+  padding-right: variables.$padding-larger;
+}
+
+.padding-bottom-larger {
+  padding-bottom: variables.$padding-larger;
+}
+
+.padding-left-larger {
+  padding-left: variables.$padding-larger;
+}
+
+.padding-x-larger {
+  padding-left: variables.$padding-larger;
+  padding-right: variables.$padding-larger;
+}
+
+.padding-y-larger {
+  padding-bottom: variables.$padding-larger;
+  padding-top: variables.$padding-larger;
+}
+
+// largest padding
+.padding-largest {
+  padding: variables.$padding-largest;
+}
+
+.padding-top-largest {
+  padding-top: variables.$padding-largest;
+}
+
+.padding-right-largest {
+  padding-right: variables.$padding-largest;
+}
+
+.padding-bottom-largest {
+  padding-bottom: variables.$padding-largest;
+}
+
+.padding-left-largest {
+  padding-left: variables.$padding-larger;
+}
+
+.padding-x-largest {
+  padding-left: variables.$padding-largest;
+  padding-right: variables.$padding-largest;
+}
+
+.padding-y-largest {
+  padding-bottom: variables.$padding-largest;
+  padding-top: variables.$padding-largest;
+}
+
 // small padding
 .padding-small {
   padding: variables.$padding-small;
