@@ -658,6 +658,7 @@ const PrintComponent = function PrintComponent(options = {}) {
       }
       printMapComponent.dispatch('change:toggleScale', { showScale });
       this.updatePageSize();
+      viewer.getLayersByProperty('type', 'WMS').forEach(layer => layer.getSource().refresh());
     },
     updateMapSize() {
       map.updateSize();
