@@ -63,13 +63,45 @@ function buildUrlContent(feature, attribute, attributes, map) {
   return parseUrl(feature.get(attribute.url), feature, attribute, attributes, map);
 }
 
+/**
+ * Get the values of attributes and format them according to the different various types there is.
+ *
+ * @constant
+ * @name getContent
+ * @kind variable
+ * @type {{ name(feature: any, attribute: any, attributes: any, map: any): HTMLLIElement; url(feature: any, attribute: any, attributes: any, map: any): HTMLLIElement; img(feature: any, attribute: any, attributes: any, map: any): HTMLLIElement; audio(feature: any, attribute: any, attributes: any, map: any): HTMLLIElement; video(feature: any, attribute: any, attributes: any, map: any): HTMLLIElement; carousel(feature: any, attribute: any, attributes: any, map: any): HTMLLIElement; html(feature: any, attribute: any, attributes: any, map: any): HTMLLIElement; }}
+ */
 const getContent = {
   name(feature, attribute, attributes, map) {
     let val = '';
     let title = '';
     let prefix = '';
     let suffix = '';
-    const featureValue = feature.get(attribute.name) === 0 ? feature.get(attribute.name).toString() : feature.get(attribute.name);
+    let featureValue = feature.get(attribute.name);
+
+    // Convert featureValue to string if it's exactly 0
+    if (featureValue === 0) {
+      featureValue = featureValue.toString();
+    }
+
+    // If featureValue is undefined and attribute.name contains a dot
+    if (typeof featureValue === 'undefined' && attribute.name.indexOf('.') > 0) {
+      const splitMatch = attribute.name.split('.');
+      let key = splitMatch.shift(); // Get the first key
+      let objectTemp = feature.get(key); // Get the initial object
+
+      // Drill down to the end of the nested attribute and return the value
+      while (splitMatch.length > 0 && objectTemp !== undefined) {
+        key = splitMatch.shift(); // Get the next key
+        if (objectTemp && key in objectTemp) {
+          objectTemp = objectTemp[key]; // Move deeper into the object
+        } else {
+          objectTemp = undefined; // Key does not exist, set to undefined
+          break; // No need to continue if the key is not found
+        }
+      }
+      featureValue = objectTemp; // Assign the nested value to featureValue
+    }
     if (featureValue) {
       val = featureValue;
       if (attribute.title) {
