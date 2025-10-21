@@ -2015,6 +2015,7 @@ export default function editHandler(options, v) {
       // Set up a layer for displaying trace possibilities. Do it up front as it may become possible to turn it on later
       traceHighligtLayer = new VectorLayer({
         group: 'none',
+        offline: true,
         source: new VectorSource(),
         style: {
           'stroke-color': 'rgba(100, 255, 0, 1)',

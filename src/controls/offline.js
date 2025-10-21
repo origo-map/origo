@@ -127,6 +127,7 @@ export default function Offline(opts = {}) {
       }
       return {
         name: currLayer.get('name'),
+        title: currLayer.get('title'),
         size,
         tiles: numberOfTiles,
         isVector: currLayer.get('layerType') === 'vector',
@@ -183,7 +184,7 @@ export default function Offline(opts = {}) {
 
     const modalCloseButton = createButton({
       cls: 'o-offline-modal-btn-close icon-smaller',
-      text: localize('dlg_save_abort'),
+      text: localize('dlgSaveAbort'),
       icon: '#ic_close_24px',
       click() {
         modal.closeModal();
@@ -197,7 +198,7 @@ export default function Offline(opts = {}) {
     // is done by the user.
     const modalSaveButton = createButton({
       cls: 'o-offline modal btn-save icon-smaller',
-      text: localize('dlg_save_save'),
+      text: localize('dlgSaveAve'),
       icon: '#ic_save_24px',
       click() {
         // Save info about the layers that are about to be downloaded so we can display progress
@@ -227,8 +228,8 @@ export default function Offline(opts = {}) {
         clearOfflineSelections();
         viewer.getLogger().createToast({
           status: 'info',
-          title: localize('toast_starting_title'),
-          message: localize('toast_starting_body')
+          title: localize('toastStartingTitle'),
+          message: localize('toastStartingBody')
         });
 
         // Resolves when all layers are done
@@ -237,8 +238,8 @@ export default function Offline(opts = {}) {
           layersInProgress = [];
           viewer.getLogger().createToast({
             status: 'success',
-            title: localize('toast_finished_title'),
-            message: localize('toast_finished_body')
+            title: localize('toastFinishedTitle'),
+            message: localize('toastFinishedBody')
           });
         });
       }
@@ -249,18 +250,18 @@ export default function Offline(opts = {}) {
       components: [modalCloseButton, modalSaveButton]
     });
 
-    const lagerElements = offlineSize.map(lager => Element({
-      tagName: 'span', innerHTML: `${localize('global_layer')}: ${lager.name}: ${lager.isVector ? `(${localize('global_vector')})` : `${lager.size}(${lager.tiles} ${localize('global_tiles')})`}`
+    const layerElements = offlineSize.map(currLayer => Element({
+      tagName: 'span', innerHTML: `${localize('globalLayer')}: ${currLayer.title}: ${currLayer.isVector ? `(${localize('globalVector')})` : `${currLayer.size}(${currLayer.tiles} ${localize('globalTiles')})`}`
     }));
 
     return Element({
       style: 'display: flex; flex-direction: column; gap: 4px;',
       components: [
-        Element({ tagName: 'span', innerHTML: `${localize('dlg_save_body')}` }),
+        Element({ tagName: 'span', innerHTML: `${localize('dlgSaveBody')}` }),
         Element({
           style: 'display: flex; flex-direction: column; gap: 4px;',
           components: [
-            Element({ style: 'padding-top: 8px; padding-bottom: 8px; display: flex; flex-direction: column; gap: 4px;', components: lagerElements }),
+            Element({ style: 'padding-top: 8px; padding-bottom: 8px; display: flex; flex-direction: column; gap: 4px;', components: layerElements }),
             Element({ tagName: 'hr' }),
             actionButtons
           ]
@@ -292,21 +293,25 @@ export default function Offline(opts = {}) {
     envelope.on(
       'drawend',
       async (evt) => {
-        // Finalize the drawing by removing the draw interaction.
-        map.removeInteraction(envelope);
-
         // Reset the state of the envelopeButton to 'initial'.
         envelopeButton.setState('initial');
 
-        const modalContent = await createSaveModalContent(evt.feature);
+        // Make rectangle visible as it disappears when interaction is finished
+        existingOfflineExtentsLayer.getSource().addFeature(evt.feature);
 
-        modal = createModal({
-          title: localize('dlg_save_title'),
-          content: modalContent,
-          onClose: () => {
-            clearAndRemoveInteraction();
-            clearOfflineSelections();
-          }
+        const modalContent = await createSaveModalContent(evt.feature);
+        // Yield the eventloop as OL will dispatch a fake click that closes the modal when using touch.
+        // Couldn't find any way to supress that event.
+        // By rescheduling our business the event will happen before modal is visible.
+        setTimeout(() => {
+          modal = createModal({
+            title: localize('dlgSaveTitle'),
+            content: modalContent,
+            onClose: () => {
+              clearAndRemoveInteraction();
+              clearOfflineSelections();
+            }
+          });
         });
       }
     );
@@ -333,11 +338,11 @@ export default function Offline(opts = {}) {
       return Element({
         style: 'display: flex; gap: 4px;',
         components: [
-          Element({ tagName: 'span', innerHTML: `${localize('global_layer')}: ${currLayer.name}: ${currLayer.isVector ? `${localize('global_vector')}` : `${currLayer.size}(${currLayer.tiles} ${localize('global_tiles')})`}` }),
+          Element({ tagName: 'span', innerHTML: `${localize('globalLayer')}: ${currLayer.name}: ${currLayer.isVector ? `${localize('globalVector')}` : `${currLayer.size}(${currLayer.tiles} ${localize('globalTiles')})`}` }),
           Element({
             style: 'display: flex; gap: 2px;',
             components: [
-              Element({ cls: `${currLayer.name}-progress`, tagName: 'span', innerHTML: `${localize('dlg_download_progress')}: ` }),
+              Element({ cls: `${currLayer.name}-progress`, tagName: 'span', innerHTML: `${localize('dlgDownloadProgress')}: ` }),
               Element({ cls: `${currLayer.name}-progress-percent`, tagName: 'span', innerHTML: percent })
             ]
           })
@@ -346,13 +351,13 @@ export default function Offline(opts = {}) {
     });
 
     if (layerElements.length === 0) {
-      layerElements = [Element({ tagName: 'p', innerHTML: `${localize('dlg_download_no_active')}` })];
+      layerElements = [Element({ tagName: 'p', innerHTML: `${localize('dlgDownloadNoActive')}` })];
     }
 
     return Element({
       style: 'display: flex; flex-direction: column; gap: 4px;',
       components: [
-        Element({ tagName: 'span', innerHTML: `${localize('dlg_download_layers')}` }),
+        Element({ tagName: 'span', innerHTML: `${localize('dlgDownloadLayers')}` }),
         Element({
           style: 'display: flex; flex-direction: column; gap: 4px;',
           components: [
@@ -419,15 +424,15 @@ export default function Offline(opts = {}) {
     Promise.all(responses).then(() => {
       viewer.getLogger().createToast({
         status: 'success',
-        title: `${localize('toast_sync_title')}`,
-        message: `${localize('toast_sync_body')}`
+        title: `${localize('toastSyncTitle')}`,
+        message: `${localize('toastSyncBody')}`
       });
     }).catch(e => {
       console.error(e);
       viewer.getLogger().createToast({
         status: 'danger',
-        title: `${localize('toast_sync_title')}`,
-        message: `${localize('toast_sync_body_fail')}`
+        title: `${localize('toastSyncTitle')}`,
+        message: `${localize('toastSyncBodyFail')}`
       });
     });
   }
@@ -456,8 +461,8 @@ export default function Offline(opts = {}) {
         const res = await Promise.all(editsPromise);
         if (res.some(r => r)) {
           viewer.getLogger().createModal({
-            title: localize('global_error'),
-            message: localize('btn_envelope_pending_edits'),
+            title: localize('globalError'),
+            message: localize('btnEnvelopePendingEdits'),
             status: 'danger'
           });
         } else {
@@ -467,7 +472,7 @@ export default function Offline(opts = {}) {
         }
       },
       icon: '#ic_crop_square_24px',
-      tooltipText: `${localize('btn_envelope_tooltip')}`,
+      tooltipText: `${localize('btnEnvelopeTooltip')}`,
       tooltipPlacement: 'south',
       tooltipStyle: 'bottom:-5px;'
     });
@@ -478,21 +483,21 @@ export default function Offline(opts = {}) {
         clearAndRemoveInteraction();
         envelopeButton.setState('initial');
         // If Origo had a confirm modal, this would be a great place to use it.
-        if (window.confirm(localize('btn_clear_confirm'))) {
+        if (window.confirm(localize('btnClearConfirm'))) {
           const offlineLayers = getOfflineLayers();
           // Pick all known offline sources
           const responses = offlineLayers.map(layer => layer.getSource().clearStorage());
           Promise.all(responses).then(() => {
             viewer.getLogger().createToast({
               status: 'success',
-              title: `${localize('toast_clear_title')}`,
-              message: `${localize('toast_clear_body')}`
+              title: `${localize('toastClearTitle')}`,
+              message: `${localize('toastClearBody')}`
             });
           });
         }
       },
       icon: '#ic_delete_24px',
-      tooltipText: `${localize('btn_clear_tooltip')}`,
+      tooltipText: `${localize('btnClearTooltip')}`,
       tooltipPlacement: 'south',
       tooltipStyle: 'bottom:-5px;'
     });
@@ -503,14 +508,14 @@ export default function Offline(opts = {}) {
       async click() {
         const modalContent = createDownloadModalContent();
         modal = createModal({
-          title: `${localize('dlg_download_tile')}`,
+          title: `${localize('dlgDownloadTile')}`,
           content: modalContent,
           onClose: () => downloadButton.setState('inactive')
         });
         downloadButton.setState('active');
       },
       icon: '#ic_downloading_24px',
-      tooltipText: `${localize('btn_download_tooltip')}`,
+      tooltipText: `${localize('btnDownloadTooltip')}`,
       tooltipPlacement: 'south',
       tooltipStyle: 'bottom:-5px;'
     });
@@ -521,7 +526,7 @@ export default function Offline(opts = {}) {
         toggleOfflineLayers();
       },
       icon: '#ic_wifi_off_24px',
-      tooltipText: `${localize('btn_offline_tooltip')}`,
+      tooltipText: `${localize('btnOfflineTooltip')}`,
       tooltipPlacement: 'south',
       tooltipStyle: 'bottom:-5px;'
     });
@@ -533,8 +538,8 @@ export default function Offline(opts = {}) {
         // Just block, no fancy grey out of button as that requires events from editStore
         if (viewer.getControlByName('editor').hasEdits()) {
           viewer.getLogger().createModal({
-            title: localize('global_error'),
-            message: localize('btn_sync_pending_edits'),
+            title: localize('globalError'),
+            message: localize('btnSyncPendingEdits'),
             status: 'danger'
           });
         } else {
@@ -542,7 +547,7 @@ export default function Offline(opts = {}) {
         }
       },
       icon: '#ic_sync_24px',
-      tooltipText: `${localize('btn_sync_tooltip')}`,
+      tooltipText: `${localize('btnSyncTooltip')}`,
       tooltipPlacement: 'south',
       tooltipStyle: 'bottom:-5px;'
     });
@@ -569,7 +574,7 @@ export default function Offline(opts = {}) {
     cls: 'o-offline-in padding-small icon-smaller round light box-shadow',
     click: toggleOffline,
     icon: '#ic_wifi_off_24px',
-    tooltipText: localize('btn_tool_title'),
+    tooltipText: localize('btnToolTitle'),
     tooltipPlacement: 'east'
   });
 
@@ -647,6 +652,7 @@ export default function Offline(opts = {}) {
       // Set up a temporary layer for displaying already downloaded extents
       existingOfflineExtentsLayer = new VectorLayer({
         group: 'none',
+        offline: true,
         name: 'offline-selection',
         source: new VectorSource(),
         stroke: new Stroke({
