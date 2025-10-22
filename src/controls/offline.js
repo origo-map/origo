@@ -466,9 +466,14 @@ export default function Offline(opts = {}) {
             status: 'danger'
           });
         } else {
-          clearAndRestartInteraction();
-          drawExistingOfflineSelections();
-          envelopeButton.setState('active');
+          if (envelopeButton.getState() === 'active') {
+            clearAndRemoveInteraction();
+            clearOfflineSelections();
+          } else {
+            clearAndRestartInteraction();
+            drawExistingOfflineSelections();
+          }
+          envelopeButton.setState(envelopeButton.getState() === 'active' ? 'initial' : 'active');
         }
       },
       icon: '#ic_crop_square_24px',
@@ -594,7 +599,7 @@ export default function Offline(opts = {}) {
    *  Function to disable interaction and update button states.
    */
   function disableInteraction() {
-    document.getElementById(envelopeButton.getId()).classList.remove('active');
+    envelopeButton.setState('initial');
     document.getElementById(toolbar.getId()).classList.add('o-hidden');
     setActive(false);
     clearOfflineSelections();
