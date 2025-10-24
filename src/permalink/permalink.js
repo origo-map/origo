@@ -77,6 +77,7 @@ export default (() => ({
     saveOnServerServiceEndPoint = url;
   },
   saveStateToServer: function saveStateToServer(viewer) {
+    console.log(permalinkStore.getState(viewer, true));
     return fetch(saveOnServerServiceEndPoint, {
       method: 'POST',
       body: JSON.stringify(permalinkStore.getState(viewer, true)),

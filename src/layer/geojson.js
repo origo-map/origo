@@ -1,7 +1,7 @@
 import VectorSource from 'ol/source/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
 import Feature from 'ol/Feature';
-import { Circle } from 'ol/geom';
+import { recreateCircleFeatures } from '../utils/circleFeatureNormalizer';
 import vector from './vector';
 import isurl from '../utils/isurl';
 import validate from '../utils/validate';
@@ -78,24 +78,7 @@ function createSource(options) {
       }
     });
 
-    // Recreate circles from properties
-    const featureArrayWithRecreatedCircles = featureArray.map((f) => {
-      const props = f.getProperties();
-      if (
-        props.circleOriginal &&
-        Array.isArray(props.circleCenter) &&
-        props.circleRadius != null
-      ) {
-        const circle = new Circle(
-          props.circleCenter,
-          Number(props.circleRadius)
-        );
-        f.setGeometry(circle);
-      }
-      return f;
-    });
-
-    return new VectorSource({ features: featureArrayWithRecreatedCircles });
+    return new VectorSource({ features: recreateCircleFeatures(featureArray) });
   }
   return new VectorSource({});
 }
