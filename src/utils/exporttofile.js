@@ -5,16 +5,24 @@ import { Polygon } from "ol/geom";
 // TODO: move to maputils?
 
 // Transforms all circles into polygons for GeoJSON or KML export
-function normalizeCircleFeatures(features, segments = 64) {
+function normalizeCircleFeatures(features, format, segments = 64) {
+  // GeoJSON and KML do not support circles, so we convert them to polygons.
+  // GPX does not support polygons at all, so we leave circles as-is.
+  if (format !== "geojson" && format !== "kml") {
+    return features;
+  }
+
   return features.map((f) => {
     const g = f.getGeometry?.();
     if (g && g.getType?.() === "Circle") {
       const poly = Polygon.fromCircle(g, segments);
       const clone = f.clone();
       clone.setGeometry(poly);
+      
       const center = g.getCenter?.();
       const radius = g.getRadius?.();
-      if (center && radius != null) {
+      // Origo can recreate circles when loading if saved as GeoJSON, so we add the info needed
+      if (center && radius != null && format === "geojson") {
         const props = clone.getProperties();
         clone.setProperties({
           ...props,
@@ -77,7 +85,10 @@ const exportToFile = function exportToFile(features, format, opts = {}) {
   });
 
   // Convert features to the specified format using the provided parameters
-  const bytes = formatter.writeFeatures(normalizeCircleFeatures(features), formatterOptions);
+  const bytes = formatter.writeFeatures(
+    normalizeCircleFeatures(features, format),
+    formatterOptions
+  );
 
   // Create the "file"
   // always use octet/stream to force download if download-attrib is not supported on anchor tag
