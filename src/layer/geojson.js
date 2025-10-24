@@ -45,33 +45,22 @@ function createSource(options) {
     let features = options.features;
     let featureArray = [];
 
-    if (typeof features === "string" && validate.json(features)) {
-      // JSON-string
+    if (typeof features === 'string' && validate.json(features)) { // JSON-string
       features = JSON.parse(features);
     }
 
-    if (
-      typeof features === "object" &&
-      (features.type === "FeatureCollection" || features.type === "Feature")
-    ) {
-      // GeoJSON-object
+    if (typeof features === 'object' && (features.type === 'FeatureCollection' || features.type === 'Feature')) { // GeoJSON-object
       featureArray = new GeoJSON().readFeatures(features, formatOptions);
     } else if (Array.isArray(features)) {
       for (let j = features.length - 1; j >= 0; j -= 1) {
         let item = features[j];
-        if (typeof item === "string" && validate.json(item)) {
-          // JSON-string
+        if (typeof item === 'string' && validate.json(item)) { // JSON-string
           item = JSON.parse(item);
         }
-        if (
-          typeof item === "object" &&
-          (item.type === "FeatureCollection" || item.type === "Feature")
-        ) {
-          // GeoJSON-object
+        if (typeof item === 'object' && (item.type === 'FeatureCollection' || item.type === 'Feature')) { // GeoJSON-object
           const readFeatures = new GeoJSON().readFeatures(item, formatOptions);
           featureArray.push(...readFeatures);
-        } else if (item instanceof Feature) {
-          // Real OpenLayers feature
+        } else if (item instanceof Feature) { // Real OpenLayers feature
           featureArray.push(item);
         }
       }
@@ -81,8 +70,8 @@ function createSource(options) {
       if (!element.getId()) {
         if (element.get(options.idField)) {
           element.setId(element.get(options.idField));
-        } else if (element.get("id")) {
-          element.setId(element.get("id"));
+        } else if (element.get('id')) {
+          element.setId(element.get('id'));
         } else {
           element.setId(1000000 + index);
         }

@@ -1,20 +1,20 @@
-import GPXFormat from "ol/format/GPX";
-import GeoJSONFormat from "ol/format/GeoJSON";
-import KMLFormat from "ol/format/KML";
-import { Polygon } from "ol/geom";
+import GPXFormat from 'ol/format/GPX';
+import GeoJSONFormat from 'ol/format/GeoJSON';
+import KMLFormat from 'ol/format/KML';
+import { Polygon } from 'ol/geom';
 // TODO: move to maputils?
 
 // Transforms all circles into polygons for GeoJSON or KML export
 function normalizeCircleFeatures(features, format, segments = 64) {
   // GeoJSON and KML do not support circles, so we convert them to polygons.
   // GPX does not support polygons at all, so we leave circles as-is.
-  if (format !== "geojson" && format !== "kml") {
+  if (format !== 'geojson' && format !== 'kml') {
     return features;
   }
 
   return features.map((f) => {
     const g = f.getGeometry?.();
-    if (g && g.getType?.() === "Circle") {
+    if (g && g.getType?.() === 'Circle') {
       const poly = Polygon.fromCircle(g, segments);
       const clone = f.clone();
       clone.setGeometry(poly);
@@ -22,7 +22,7 @@ function normalizeCircleFeatures(features, format, segments = 64) {
       const center = g.getCenter?.();
       const radius = g.getRadius?.();
       // Origo can recreate circles when loading if saved as GeoJSON, so we add the info needed
-      if (center && radius != null && format === "geojson") {
+      if (center && radius != null && format === 'geojson') {
         const props = clone.getProperties();
         clone.setProperties({
           ...props,
@@ -48,39 +48,41 @@ function normalizeCircleFeatures(features, format, segments = 64) {
  * @returns {boolean} false if export failed
  */
 const exportToFile = function exportToFile(features, format, opts = {}) {
-  const { featureProjection, filename = "origoexport" } = opts;
+  const {
+    featureProjection,
+    filename = 'origoexport'
+  } = opts;
   // None of the currently implemented formats supports custom CRS (well GeoJson can, but is not standard)
   // If a format that supports custom CRS, dataProjection should be promoted to an optional parameter.
-  const dataProjection = "EPSG:4326";
+  const dataProjection = 'EPSG:4326';
   let formatter;
 
   switch (format) {
-    case "geojson":
+    case 'geojson':
       formatter = new GeoJSONFormat();
       break;
-    case "gpx":
+    case 'gpx':
       formatter = new GPXFormat();
       break;
-    case "kml":
+    case 'kml':
       formatter = new KMLFormat();
       break;
     // More formats could be added if desired, but some are not implemented as OL does not implement a writer, amd some because they are obscure.
     // False as there will be no export
-    default:
-      return false;
+    default: return false;
   }
   const formatterOptions = {
     rightHanded: true,
     dataProjection,
-    featureProjection,
+    featureProjection
   };
 
   // Set selected attribute if origostyle is present
   features.forEach((feature) => {
-    if (feature.get("origostyle")) {
-      const style = feature.get("origostyle");
+    if (feature.get('origostyle')) {
+      const style = feature.get('origostyle');
       style.selected = false;
-      feature.set("origostyle", style);
+      feature.set('origostyle', style);
     }
   });
 
@@ -92,16 +94,16 @@ const exportToFile = function exportToFile(features, format, opts = {}) {
 
   // Create the "file"
   // always use octet/stream to force download if download-attrib is not supported on anchor tag
-  const data = new Blob([bytes], { type: "octet/stream" });
+  const data = new Blob([bytes], { type: 'octet/stream' });
   const url = window.URL.createObjectURL(data);
 
   // Let's play dirty. It is not possible to save a file progamaticallay (yet, it is in the making in saveAs),
   // so we create a link that we click programatically
-  const el = document.createElement("a");
+  const el = document.createElement('a');
   el.download = `${filename}.${format}`;
   el.href = url;
 
-  el.addEventListener("click", () => {
+  el.addEventListener('click', () => {
     // Schedule our own clean up to be performed when download has been performed, otherwise file is lost
     // As download is performed in the same thread, we don't have to wait for anything special, just yield the thread.
     setTimeout(() => {
