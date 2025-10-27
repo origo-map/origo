@@ -478,7 +478,7 @@ const DrawHandler = function DrawHandler(options = {}) {
         id: layerId,
         title: layerTitle,
         visible,
-        features: geojson.writeFeatures(normalizeCircleFeatures(features)),
+        features: geojson.writeFeatures(normalizeCircleFeatures(features))
       });
     });
     if (layerArr.length > 0) {
