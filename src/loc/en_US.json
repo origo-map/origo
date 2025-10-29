@@ -148,7 +148,8 @@
             "removeLayerQuestion": "Do you want to remove the layer?",
             "removeLayer": "Remove layer",
             "moreInfoButtonLabel": "Show layer info",
-            "renderStyleSelect": "Select style"
+            "renderStyleSelect": "Select style",
+            "legendSearchGroupSuffix": "(Group)"
         },
         "zoom": {
             "zoomInButtonTooltip": "Zoom into the map",
