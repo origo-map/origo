@@ -355,7 +355,9 @@ const Group = function Group(viewer, options = {}) {
           const overlays = groupList.getOverlays();
           overlays.forEach((overlay) => {
             const layer = overlay.getLayer();
-            layer.setVisible(true);
+            if (!layer.get('secure')) {
+              layer.setVisible(true);
+            }
           });
           const groups = groupList.getGroups();
           groups.forEach((group) => {
