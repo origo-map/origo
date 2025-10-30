@@ -1,3 +1,13 @@
+/**
+ * Get value for attribute key and drill down to the last key part of the attribute if it is a nested JSON object
+ *
+ * @function
+ * @name getNestedValue
+ * @kind variable
+ * @param {any} feature
+ * @param {any} attributeKey
+ * @returns {string}
+ */
 const getNestedValue = function getNestedValue(feature, attributeKey) {
   let attributeKeyValue = '';
   // Handle if foreignKey is nested json object
