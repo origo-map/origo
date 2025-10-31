@@ -16,6 +16,9 @@ Please not that some plugins are third-party plugins that are neither developed 
 **[Castor plugin](https://github.com/SigtunaGIS/castor-plugin)**
 A plugin for Origo made to integrate with Castor.
 
+**[Coordinate finder plugin](https://github.com/kartomat/coordinate-finder-plugin)**
+A plugin that lets the user search for locations through inputting coordinates in your Origo Map instance.
+
 **[Dialogue](https://github.com/origo-map/dialogue-plugin)**
 A simple citizens' dialogue plugin for Origo.
 
@@ -51,6 +54,9 @@ Plugin to select features with different methods such as circle, polygon and buf
 
 **[OIDC plugin](https://github.com/SigtunaGIS/oidc-plugin)**
 A plugin for openid connect authorization with Origo.
+
+**[Print logo switcher plugin](https://github.com/kartomat/print-logo-switcher-plugin)**
+A plugin that allows you to change the print logo in your Origo map instance.
 
 **[Swiper plugin](https://github.com/SigtunaGIS/swiper-plugin)**
 A plugin to compare two different views.
