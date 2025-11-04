@@ -8,6 +8,10 @@ Origo core has a lot of dependencies by default which are available to use from 
 
 Smaller adjustment to the core might be necessary but should be avoided to make the plugin as standalone as possible. 
 
+A number of Origo developer seminars were held in the second half of 2024 and first half of 2025. The presentation on plugins can be found at **[Developing in Origo part 3 - plugins](https://docs.google.com/presentation/d/13e38b81OnGhhud2t4cDxux5vXzGZYFLO/edit?usp=sharing&ouid=116035513551791915749&rtpof=true&sd=true)**.
+
+Plugins with a graphical user interface showing text and numbers can avail of the localization control in the Origo core. This makes the plugin potentially global and makes the user experience consistent when the localization control's language menu is enabled. Details on this can be found in the **[API documentation](https://origo-map.github.io/origo-documentation/latest/#using-origo-api)**.
+
 ## Available plugins
 Below is a list of available plugins. More information about each plugin can be found in the plugin's own repository.
 
