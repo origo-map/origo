@@ -3,12 +3,12 @@ import permalink from '../permalink/permalink';
 
 const ShareMap = function ShareMap(options = {}) {
   let {
-    target,
-    configName // <-- retrieve configName from options if provided
+    target
   } = options;
 
   const {
-    localization
+    localization,
+    configName // <-- retrieve configName from options if provided
   } = options;
 
   function localize(key) {
