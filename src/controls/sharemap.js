@@ -3,7 +3,8 @@ import permalink from '../permalink/permalink';
 
 const ShareMap = function ShareMap(options = {}) {
   let {
-    target
+    target,
+    configName // <-- retrieve configName from options if provided
   } = options;
 
   const {
@@ -25,13 +26,21 @@ const ShareMap = function ShareMap(options = {}) {
   let menuItem;
   let modal;
 
-  const createContent = function createContent() { // Kopiera och klistra in länken för att dela kartan.
+  // --- New function to get configName also for inline config ---
+  function getConfigName() {
+    // Check if we received a configName via options or as a global variable
+    // Otherwise, use 'inline' as fallback
+    return configName || window.config || 'inline';
+  }
+
+  const createContent = function createContent() { // Copy and paste the link to share the map.
     const shareMapInstruction = localize('shareMapInstruction');
     return `<div class="o-share-link"><input type="text"></div><i>${shareMapInstruction}</i>`;
   };
 
   const createLink = function createLink(data) {
-    const url = permalink.getPermalink(viewer, data);
+    // Include configName so the permalink is identified correctly
+    const url = permalink.getPermalink(viewer, data, getConfigName());
     const inputElement = document.getElementsByClassName('o-share-link')[0].firstElementChild;
 
     inputElement.value = url;
@@ -41,7 +50,7 @@ const ShareMap = function ShareMap(options = {}) {
   return Component({
     name: 'sharemap',
     addParamsToGetMapState(key, callback) {
-      permalink.addParamsToGetMapState(key, callback);
+      permalink.addParamsToGetMapState(key, callback, getConfigName());
     },
     onInit() {
       if (storeMethod && serviceEndpoint) {
@@ -62,7 +71,8 @@ const ShareMap = function ShareMap(options = {}) {
           });
           this.addComponent(modal);
           if (storeMethod === 'saveStateToServer') {
-            permalink.saveStateToServer(viewer).then((data) => {
+            // Send configName to the backend save function!
+            permalink.saveStateToServer(viewer, getConfigName()).then((data) => {
               createLink(data);
             });
           } else {
