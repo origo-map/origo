@@ -127,3 +127,4 @@ export default {
 
 export { default as slugify } from './utils/slugify';
 export { default as exportToFile } from './utils/exporttofile';
+export { default as urlparser } from './utils/urlparser';
