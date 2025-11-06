@@ -1,5 +1,38 @@
 import { Polygon, Circle } from 'ol/geom';
 
+// Adds circle info to feature properties for later recreation
+function addCircleInfo(feature, center, radius) {
+  const clone = feature.clone();
+  const props = clone.getProperties();
+  clone.setProperties({
+    ...props,
+    origoCircle: {
+      circleCenter: center,
+      circleRadius: radius,
+      circleOriginal: true,
+    },
+  });
+
+  return clone;
+}
+
+// Adds circle info to all circle features in the array, leaving them unchanged otherwise
+export function addCircleInfoToFeatures(features) {
+  return features.map((feature) => {
+    const clone = feature.clone();
+    const g = feature.getGeometry?.();
+
+    if (g && g.getType?.() === "Circle") {
+      const center = g.getCenter?.();
+      const radius = g.getRadius?.();
+      if (center && radius != null) {
+        return addCircleInfo(clone, center, radius);
+      }
+    }
+    return clone;
+  });
+}
+
 // Transforms all circles into polygons for GeoJSON or KML export
 export function normalizeCircleFeatures(features, format = 'geojson', segments = 64) {
   // GeoJSON and KML do not support circles, so we convert them to polygons.
@@ -19,16 +52,7 @@ export function normalizeCircleFeatures(features, format = 'geojson', segments =
       const radius = g.getRadius?.();
       // Origo can recreate circles when loading if saved as GeoJSON, so we add the info needed
       if (center && radius != null && format === 'geojson') {
-        const props = clone.getProperties();
-        clone.setProperties({
-          ...props,
-          // Add circle info for later use if needed
-          origoCircle: {
-            circleCenter: center,
-            circleRadius: radius,
-            circleOriginal: true
-          }
-        });
+        return addCircleInfo(clone, center, radius);
       }
       return clone;
     }
@@ -36,6 +60,7 @@ export function normalizeCircleFeatures(features, format = 'geojson', segments =
   });
 }
 
+// Recreates circle geometries from features that have circle info saved in properties
 export function recreateCircleFeatures(
   featureArray
 ) {
