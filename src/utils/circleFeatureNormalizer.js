@@ -23,9 +23,11 @@ export function normalizeCircleFeatures(features, format = 'geojson', segments =
         clone.setProperties({
           ...props,
           // Add circle info for later use if needed
-          circleCenter: center,
-          circleRadius: radius,
-          circleOriginal: true
+          origoCircle: {
+            circleCenter: center,
+            circleRadius: radius,
+            circleOriginal: true
+          }
         });
       }
       return clone;
@@ -41,11 +43,15 @@ export function recreateCircleFeatures(
   return featureArray.map((f) => {
     const props = f.getProperties();
     if (
-      props.circleOriginal
-      && Array.isArray(props.circleCenter)
-      && props.circleRadius != null
+      props.origoCircle !== undefined &&
+      props.origoCircle.circleOriginal &&
+      Array.isArray(props.origoCircle.circleCenter) &&
+      props.origoCircle.circleRadius != null
     ) {
-      const circle = new Circle(props.circleCenter, Number(props.circleRadius));
+      const circle = new Circle(
+        props.origoCircle.circleCenter,
+        Number(props.origoCircle.circleRadius)
+      );
       f.setGeometry(circle);
     }
     return f;
