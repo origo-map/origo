@@ -63,7 +63,6 @@ const loadResources = async function loadResources(mapOptions, config) {
       }
       map.options = Object.assign(config, mapOptions);
       map.options.controls = config.defaultControls || [];
-
       if (mapOptions.controls) {
         mapOptions.controls.forEach((control) => {
           const matchingControlIndex = map.options.controls.findIndex(
@@ -87,6 +86,7 @@ const loadResources = async function loadResources(mapOptions, config) {
         }
       }
       const restorePromise = storeMethod === 'saveStateToServer' ? restorePermalink(storeMethod) : Promise.resolve();
+
       return Promise.all(loadSvgSprites(config) || [])
         .then(() => restorePromise)
         .then((params) => {
@@ -101,6 +101,7 @@ const loadResources = async function loadResources(mapOptions, config) {
         url = mapOptions.split('#')[0];
         mapUrl = url;
 
+        // remove file name if included in
         url = trimUrl(url);
 
         json = `${urlParams.map}.json`;
@@ -121,6 +122,7 @@ const loadResources = async function loadResources(mapOptions, config) {
         .then(() => fetch(url, {
           dataType: format
         })
+          // res.json() does not allow comments in json. Read out body as string and parse "manually"
           .then(res => res.text())
           .then((bodyAsJson) => {
             const stripped = stripJSONComments(bodyAsJson);
@@ -187,6 +189,7 @@ const loadResources = async function loadResources(mapOptions, config) {
     return null;
   }
 
+  // Check if authorization is required before map options is loaded
   if (config.authorizationUrl) {
     return fetch(config.authorizationUrl)
       .then(() => loadMapOptions());
