@@ -63,6 +63,7 @@ const loadResources = async function loadResources(mapOptions, config) {
       }
       map.options = Object.assign(config, mapOptions);
       map.options.controls = config.defaultControls || [];
+
       if (mapOptions.controls) {
         mapOptions.controls.forEach((control) => {
           const matchingControlIndex = map.options.controls.findIndex(
@@ -78,16 +79,28 @@ const loadResources = async function loadResources(mapOptions, config) {
       map.options.url = getUrl();
       map.options.map = undefined;
       map.options.params = urlParams;
-
+      for (let i = 0; i < map.options.controls.length; i += 1) {
+        if (map.options.controls[i].name === 'sharemap' &&
+            map.options.controls[i].options?.storeMethod === 'saveStateToServer') {
+          storeMethod = 'saveStateToServer';
+          permalink.setSaveOnServerServiceEndpoint(map.options.controls[i].options.serviceEndpoint);
+        }
+      }
+      const restorePromise = storeMethod === 'saveStateToServer' ? restorePermalink(storeMethod) : Promise.resolve();
       return Promise.all(loadSvgSprites(config) || [])
-        .then(() => map);
+        .then(() => restorePromise)
+        .then((params) => {
+          if (params) {
+            map.options.params = params;
+          }
+          return map;
+        });
     } else if (typeof (mapOptions) === 'string') {
       if (isUrl(mapOptions)) {
         urlParams = permalink.parsePermalink(mapOptions);
         url = mapOptions.split('#')[0];
         mapUrl = url;
 
-        // remove file name if included in
         url = trimUrl(url);
 
         json = `${urlParams.map}.json`;
@@ -108,7 +121,6 @@ const loadResources = async function loadResources(mapOptions, config) {
         .then(() => fetch(url, {
           dataType: format
         })
-          // res.json() does not allow comments in json. Read out body as string and parse "manually"
           .then(res => res.text())
           .then((bodyAsJson) => {
             const stripped = stripJSONComments(bodyAsJson);
@@ -175,7 +187,6 @@ const loadResources = async function loadResources(mapOptions, config) {
     return null;
   }
 
-  // Check if authorization is required before map options is loaded
   if (config.authorizationUrl) {
     return fetch(config.authorizationUrl)
       .then(() => loadMapOptions());
