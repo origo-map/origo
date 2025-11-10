@@ -80,8 +80,8 @@ const loadResources = async function loadResources(mapOptions, config) {
       map.options.map = undefined;
       map.options.params = urlParams;
       for (let i = 0; i < map.options.controls.length; i += 1) {
-        if (map.options.controls[i].name === 'sharemap' &&
-            map.options.controls[i].options?.storeMethod === 'saveStateToServer') {
+        if (map.options.controls[i].name === 'sharemap'
+            && map.options.controls[i].options?.storeMethod === 'saveStateToServer') {
           storeMethod = 'saveStateToServer';
           permalink.setSaveOnServerServiceEndpoint(map.options.controls[i].options.serviceEndpoint);
         }
