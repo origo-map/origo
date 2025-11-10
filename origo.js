@@ -131,128 +131,23 @@ const Origo = function Origo(configPath, options = {}) {
 
   /** Helper that initialises a new viewer  */
   const initViewer = () => {
-    // Merge default config with user-provided options
     const defaultConfig = Object.assign({}, origoConfig, options);
-
-    // Load configuration (supports both external JSON and inline)
     loadResources(configPath, defaultConfig)
-      .then((data) => {
+      .then(async (data) => {
         const viewerOptions = data.options;
-
-        // Initialize controls (zoom, scale, etc.)
-        viewerOptions.controls = initControls(viewerOptions.controls);
-
-        // Initialize extensions (plugins)
+        viewerOptions.controls = await initControls(viewerOptions.controls);
         viewerOptions.extensions = initExtensions(viewerOptions.extensions || []);
-
+        return viewerOptions;
+      })
+      .then((viewerOptions) => {
         const target = viewerOptions.target;
         viewer = Viewer(target, viewerOptions);
-
-        // Wait for the map to be fully loaded (layers, controls, etc.)
         viewer.on('loaded', () => {
-          // Check URL for ?mapStateId= parameter
-          const urlParams = new URLSearchParams(window.location.search);
-          const mapStateId = urlParams.get('mapStateId');
-
-          if (mapStateId) {
-            // Fetch and parse the saved map state from server
-            permalink.readStateFromServer(mapStateId).then(state => {
-              if (state) {
-                try {
-                  const view = viewer.getMap().getView();
-
-                  // Restore center
-                  if (state.center) {
-                    view.setCenter(state.center);
-                  }
-
-                  // Restore zoom level
-                  if (state.zoom !== undefined) {
-                    view.setZoom(state.zoom);
-                  }
-
-                  // Restore layer visibility, legend, opacity, and style
-                  if (state.layers) {
-                    Object.keys(state.layers).forEach(name => {
-                      const layer = viewer.getLayer(name);
-                      if (layer) {
-                        const l = state.layers[name];
-
-                        // Visibility
-                        if (l.visible !== undefined) {
-                          layer.setVisible(l.visible);
-                        }
-
-                        // Legend toggle
-                        if (l.legend !== undefined) {
-                          layer.set('legend', l.legend);
-                        }
-
-                        // Opacity (stored as 0–100, convert to 0–1)
-                        if (l.opacity !== undefined) {
-                          layer.setOpacity(l.opacity);
-                        }
-
-                        // Alternate style index
-                        if (l.altStyleIndex !== undefined) {
-                          layer.set('altStyleIndex', l.altStyleIndex);
-                          // Optional: trigger style change if needed
-                          // viewer.getStyleManager()?.setActiveStyle(layer, l.altStyleIndex);
-                        }
-                      }
-                    });
-                  }
-
-                  // Restore legend control state (expanded/collapsed)
-                  if (state.legend) {
-                    const legend = viewer.getControlByName('legend');
-                    if (legend && legend.setVisible) {
-                      const isExpanded = Array.isArray(state.legend)
-                        ? state.legend.includes('expanded')
-                        : state.legend.includes('expanded');
-                      legend.setVisible(isExpanded);
-                    }
-                  }
-
-                  // Restore pin (feature info marker)
-                  if (state.pin) {
-                    const featureinfo = viewer.getFeatureinfo();
-                    if (featureinfo && featureinfo.setPin) {
-                      featureinfo.setPin(state.pin, true);
-                    }
-                  }
-
-                  // Restore selected feature
-                  if (state.feature) {
-                    const featureinfo = viewer.getFeatureinfo();
-                    if (featureinfo && featureinfo.setFeatureId) {
-                      featureinfo.setFeatureId(state.feature);
-                    }
-                  }
-
-                  // Restore map name (if using map switching)
-                  if (state.map) {
-                    viewer.setMapName(state.map);
-                  }
-
-                  console.log('Map state restored from ?mapStateId=', mapStateId);
-                } catch (err) {
-                  console.error('Failed to apply map state:', err);
-                }
-              }
-            }).catch(err => {
-              console.error('Failed to load map state:', err);
-            });
-          }
-
-          // Notify extensions that the viewer is ready
+          // Inform listeners that there is a new Viewer in town
           origo.dispatch('load', viewer);
         });
       })
-      .catch(error => {
-        console.error('Failed to load configuration:', error);
-        renderError(error);
-      });
+      .catch(error => console.error(error));
   };
   // Add a listener to handle a new sharemap when using hash format.
   window.addEventListener('hashchange', (ev) => {
