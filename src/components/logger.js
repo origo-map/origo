@@ -51,8 +51,10 @@ const createModal = function createModal(options) {
 
   if (duration && duration > 0) {
     setTimeout(() => {
-      modal.closeModal();
-      modal = null;
+      if (document.getElementById(modal.getId())) {
+        modal.closeModal();
+        modal = null;
+      }
     }, duration);
   }
 };
