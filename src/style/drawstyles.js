@@ -15,7 +15,7 @@ function isValidRgbaString(colorString) {
   return regex.test(colorString);
 }
 
-function createRegularShape(type, pointSize, pointFill, pointStroke, pointRotation) {
+function createRegularShape(type, pointSize, pointFill, pointStroke, pointRotation, extraMarkers) {
   let style;
   const size = pointSize || 10;
   const stroke = pointStroke || new Stroke({
@@ -25,6 +25,7 @@ function createRegularShape(type, pointSize, pointFill, pointStroke, pointRotati
     color: 'rgba(0, 153, 255, 0.8)'
   });
   const rotation = pointRotation || 0;
+  const foundMarker = extraMarkers.find(({ name }) => name === type);
   switch (type) {
     case 'square':
       style = new Style({
@@ -128,14 +129,65 @@ function createRegularShape(type, pointSize, pointFill, pointStroke, pointRotati
       });
       break;
     }
+
     default:
-      style = new Style({
-        image: new CircleStyle({
-          fill,
-          stroke,
-          radius: size
-        })
-      });
+      // Check if there is a corresponding extra marker.
+      if (foundMarker) {
+        let fillColor = 'blue';
+        let strokeColor = 'black';
+
+        // Get fill color if available
+        if (fill && fill.getColor) {
+          fillColor = encodeURIComponent(fill.getColor());
+        }
+
+        // Get stroke color if available
+        if (stroke && stroke.getColor) {
+          strokeColor = encodeURIComponent(stroke.getColor());
+        }
+
+        let src = foundMarker.src;
+        switch (foundMarker.type) {
+          case 'svg':
+            src = src.replace('$fillColor$', fillColor)
+              .replace('$strokeColor$', strokeColor)
+              .replace('$height$', 15 + size)
+              .replace('$width$', 15 + size);
+            // Create style with an svg icon
+            style = new Style({
+              image: new Icon({
+                src,
+                scale: 1,
+                rotation: (rotation / 360) * Math.PI,
+                anchor: [0.5, 0.85],
+                color: fill.getColor()
+              })
+            });
+            break;
+          case 'image':
+            // Create style with an png icon
+            style = new Style({
+              image: new Icon({
+                src,
+                scale: foundMarker.scale ? foundMarker.scale : 1,
+                rotation: (rotation / 360) * Math.PI,
+                anchor: [0.5, 0.85]
+              })
+            });
+            break;
+          default:
+            break;
+        }
+      } else {
+        // Fallback to default CircleStyle
+        style = new Style({
+          image: new CircleStyle({
+            fill,
+            stroke,
+            radius: size
+          })
+        });
+      }
   }
   return style;
 }
