@@ -190,6 +190,12 @@
             "configError": "Ingen titel eller projektion har angetts för positionskontrollen",
             "centerButtonLabel": "Position ikon",
             "projButtonLabel": "Projektion"
+        },
+        "search": {
+          "searchlistExportButtonText": "Exportera",
+          "searchlistMakeSelectionButtonText": "Gör ett urval i kartan",
+          "searchlistTitle": "Sökresultat för",
+          "hintText": "Sök..."
         }
     },
     "style": {
