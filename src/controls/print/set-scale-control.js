@@ -11,10 +11,10 @@ export default function SetScaleControl(map, options = {}) {
 
   let selectScale;
   let inputScale;
-  let lockButtonText = false
+  let lockButtonText = false;
 
   if (userDefinedScale) {
-    scales.push({label: localization.getStringByKeys({ targetParentKey: 'print', targetKey: 'userDefinedScale' }), value: "userDefinedScale"});
+    scales.push({ label: localization.getStringByKeys({ targetParentKey: 'print', targetKey: 'userDefinedScale' }), value: 'userDefinedScale' });
   }
 
   const localize = function localize(key) {
@@ -39,15 +39,12 @@ export default function SetScaleControl(map, options = {}) {
           placeholderText: '1:1234',
           type: 'number',
           value: '1:'
-          //label: localize('userDefinedScale'),
-          //labelCls: 'text-black',
-          //ariaLabel: localize('userDefinedScale')
         });
         this.addComponents([inputScale]);
         inputScale.hidden = true;
         inputScale.on('change', (evt) => {
           const value = mapUtils.formattedScaleToScaleDenominator(evt.value);
-          if (isNaN(value) || value <= 0) {
+          if (Number.isNaN(value) || value <= 0) {
             return;
           }
           this.dispatch('change:scale', { scale: value / 1000 });
@@ -55,15 +52,14 @@ export default function SetScaleControl(map, options = {}) {
       }
     },
     onChangeScale(evt) {
-      if (evt.value === "userDefinedScale") {
+      if (evt.value === 'userDefinedScale') {
         document.getElementById(inputScale.getId()).hidden = false;
         selectScale.setButtonText(localization.getStringByKeys({ targetParentKey: 'print', targetKey: 'userDefinedScale' }));
         lockButtonText = true;
-        return;
       } else {
         lockButtonText = false;
         this.dispatch('change:scale', { scale: evt.value / 1000 });
-        document.getElementById(inputScale.getId()).hidden = true
+        document.getElementById(inputScale.getId()).hidden = true;
       }
     },
     onRender() {
