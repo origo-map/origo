@@ -1,14 +1,21 @@
-import { Dropdown, Component } from '../../ui';
+import { Dropdown, Component, Input } from '../../ui';
 import mapUtils from '../../maputils';
 
 export default function SetScaleControl(map, options = {}) {
   const {
     scales = [],
     initialScale,
-    localization
+    localization,
+    userDefinedScale
   } = options;
 
   let selectScale;
+  let inputScale;
+  let lockButtonText = false
+
+  if (userDefinedScale) {
+    scales.push({label: localization.getStringByKeys({ targetParentKey: 'print', targetKey: 'userDefinedScale' }), value: "userDefinedScale"});
+  }
 
   const localize = function localize(key) {
     return localization.getStringByKeys({ targetParentKey: 'print', targetKey: key });
@@ -25,9 +32,39 @@ export default function SetScaleControl(map, options = {}) {
         text: localize('selectScale')
       });
       this.addComponents([selectScale]);
+      if (userDefinedScale) {
+        inputScale = Input({
+          cls: 'o-search-layer-field placeholder-text-smaller smaller',
+          style: { height: '1.5rem', margin: 0, width: '100%' },
+          placeholderText: '1:1234',
+          type: 'number',
+          value: '1:'
+          //label: localize('userDefinedScale'),
+          //labelCls: 'text-black',
+          //ariaLabel: localize('userDefinedScale')
+        });
+        this.addComponents([inputScale]);
+        inputScale.hidden = true;
+        inputScale.on('change', (evt) => {
+          const value = mapUtils.formattedScaleToScaleDenominator(evt.value);
+          if (isNaN(value) || value <= 0) {
+            return;
+          }
+          this.dispatch('change:scale', { scale: value / 1000 });
+        });
+      }
     },
     onChangeScale(evt) {
-      this.dispatch('change:scale', { scale: evt.value / 1000 });
+      if (evt.value === "userDefinedScale") {
+        document.getElementById(inputScale.getId()).hidden = false;
+        selectScale.setButtonText(localization.getStringByKeys({ targetParentKey: 'print', targetKey: 'userDefinedScale' }));
+        lockButtonText = true;
+        return;
+      } else {
+        lockButtonText = false;
+        this.dispatch('change:scale', { scale: evt.value / 1000 });
+        document.getElementById(inputScale.getId()).hidden = true
+      }
     },
     onRender() {
       this.dispatch('render');
@@ -58,10 +95,15 @@ export default function SetScaleControl(map, options = {}) {
       <h6>${localize('selectPrintScale')}</h6>
       <div class="padding-smaller o-tooltip active">
         ${selectScale.render()}
+      </div>
+      <div class="padding-0 o-tooltip active">
+        ${inputScale.render()}
       </div>`;
     },
     setButtonText(buttonText) {
-      selectScale.setButtonText(buttonText);
+      if (!lockButtonText) {
+        selectScale.setButtonText(buttonText);
+      }
     }
   });
 }

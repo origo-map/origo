@@ -52,7 +52,8 @@ const PrintSettings = function PrintSettings(options = {}) {
     showPrintLegend,
     rotation,
     rotationStep,
-    localization
+    localization,
+    userDefinedScale
   } = options;
 
   let headerComponent;
@@ -192,7 +193,8 @@ const PrintSettings = function PrintSettings(options = {}) {
       setScaleControl = SetScaleControl(map, {
         scales,
         initialScale: scaleInitial,
-        localization
+        localization,
+        userDefinedScale
       });
 
       contentComponent = Component({
