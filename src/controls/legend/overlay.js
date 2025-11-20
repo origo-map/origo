@@ -49,6 +49,10 @@ const OverlayLayer = function OverlayLayer(options) {
 
   const getCheckIcon = (visible) => {
     const isVisible = visible ? checkIcon : uncheckIcon;
+    // If layer is secure, use padlock icon instead
+    if (secure) {
+      return '#ic_lock_outline_24px';
+    }
     return isVisible;
   };
 
