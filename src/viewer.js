@@ -570,7 +570,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
       }));
 
       tileGrid = maputils.tileGrid(tileGridSettings);
-      stylewindow = Stylewindow({ palette, viewer: this, localization: controls.find((control) => control.name === 'localization'), extraMarkers: controls.find((control) => control.name === 'draw').options.extraMarkers });
+      stylewindow = Stylewindow({ palette, viewer: this, localization: controls.find((control) => control.name === 'localization'), extraMarkers: controls.find((control) => control.name === 'draw')?.options?.extraMarkers });
 
       setMap(Map(Object.assign(options, { projection, center, zoom, target: this.getId() })));
 
