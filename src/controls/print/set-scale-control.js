@@ -6,7 +6,7 @@ export default function SetScaleControl(map, options = {}) {
     scales = [],
     initialScale,
     localization,
-    userDefinedScale
+    userDefinedScale = false
   } = options;
 
   let selectScale;
@@ -59,7 +59,7 @@ export default function SetScaleControl(map, options = {}) {
       } else {
         lockButtonText = false;
         this.dispatch('change:scale', { scale: evt.value / 1000 });
-        document.getElementById(inputScale.getId()).hidden = true;
+        if (inputScale) document.getElementById(inputScale.getId()).hidden = true;
       }
     },
     onRender() {
@@ -92,9 +92,12 @@ export default function SetScaleControl(map, options = {}) {
       <div class="padding-smaller o-tooltip active">
         ${selectScale.render()}
       </div>
-      <div class="padding-0 o-tooltip active">
-        ${inputScale.render()}
-      </div>`;
+      ${userDefinedScale
+          ? `<div class="padding-0 o-tooltip active">
+              ${inputScale.render()}
+            </div>`
+          : ''
+      }`;
     },
     setButtonText(buttonText) {
       if (!lockButtonText) {
