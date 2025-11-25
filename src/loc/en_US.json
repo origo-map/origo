@@ -69,7 +69,8 @@
             "portrait": "Portrait",
             "portraitAriaLabel": "Portrait",
             "landscape": "Landscape",
-            "landscapeAriaLabel": "Landscape"
+            "landscapeAriaLabel": "Landscape",
+            "userDefinedScale": "Input user-defined scale"
         },
         "draw": {
             "title": "Draw",
