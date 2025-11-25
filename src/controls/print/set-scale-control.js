@@ -93,11 +93,11 @@ export default function SetScaleControl(map, options = {}) {
         ${selectScale.render()}
       </div>
       ${userDefinedScale
-          ? `<div class="padding-0 o-tooltip active">
-              ${inputScale.render()}
-            </div>`
-          : ''
-      }`;
+    ? `<div class="padding-0 o-tooltip active">
+        ${inputScale.render()}
+      </div>`
+    : ''
+}`;
     },
     setButtonText(buttonText) {
       if (!lockButtonText) {
