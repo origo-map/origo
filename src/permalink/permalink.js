@@ -5,10 +5,6 @@ import urlparser from '../utils/urlparser';
 let saveOnServerServiceEndPoint = '';
 let loadMapStateIdMethod;
 
-export function setLoadMapStateIdMethod(method) {
-  loadMapStateIdMethod = method || 'path';
-}
-
 export default (() => ({
   getSaveLayers: function getSaveLayers(layers) {
     return urlparser.formatUrl({ layers: permalinkStore.getSaveLayers(layers) });
@@ -81,6 +77,9 @@ export default (() => ({
   setSaveOnServerServiceEndpoint: function setSaveOnServerServiceEndPoint(url) {
     saveOnServerServiceEndPoint = url;
   },
+  setLoadMapStateIdMethod: function setLoadMapStateIdMethod(method) {
+    loadMapStateIdMethod = method || 'path';
+  },
   saveStateToServer: function saveStateToServer(viewer) {
     return fetch(saveOnServerServiceEndPoint, {
       method: 'POST',
@@ -99,10 +98,11 @@ export default (() => ({
       const throwMessage = 'No saveOnServerServiceEndPoint defined';
       throw throwMessage;
     } else {
-      const url = loadMapStateIdMethod === 'query'
+      const method = loadMapStateIdMethod || 'path';
+      const url = method === 'query'
         ? `${saveOnServerServiceEndPoint}?mapStateId=${mapStateId}`
         : `${saveOnServerServiceEndPoint}/${mapStateId}`;
-      return fetch(url)
+      return fetch(url).then(response => response.json())
         .then((data) => {
           const mapObj = {};
           Object.keys(data).forEach(key => {
