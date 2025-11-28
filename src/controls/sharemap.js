@@ -18,7 +18,7 @@ const ShareMap = function ShareMap(options = {}) {
     icon = '#ic_screen_share_outline_24px',
     title = localize('title'),
     storeMethod,
-	loadMapStateIdMethod,
+    loadMapStateIdMethod,
     serviceEndpoint
   } = options;
   let viewer;
@@ -47,7 +47,7 @@ const ShareMap = function ShareMap(options = {}) {
     onInit() {
       if (storeMethod && serviceEndpoint) {
         permalink.setSaveOnServerServiceEndpoint(serviceEndpoint);
-		if (loadMapStateIdMethod) {
+	    if (loadMapStateIdMethod) {
           permalink.setLoadMapStateIdMethod(loadMapStateIdMethod);
         }
       }
