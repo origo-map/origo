@@ -47,7 +47,7 @@ const ShareMap = function ShareMap(options = {}) {
     onInit() {
       if (storeMethod && serviceEndpoint) {
         permalink.setSaveOnServerServiceEndpoint(serviceEndpoint);
-	    if (loadMapStateIdMethod) {
+        if (loadMapStateIdMethod) {
           permalink.setLoadMapStateIdMethod(loadMapStateIdMethod);
         }
       }
