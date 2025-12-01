@@ -78,7 +78,7 @@ export default (() => ({
     saveOnServerServiceEndPoint = url;
   },
   setLoadMapStateIdMethod: function setLoadMapStateIdMethod(method) {
-    if (method) {loadMapStateIdMethod = method};
+    if (method) { loadMapStateIdMethod = method; }
   },
   saveStateToServer: function saveStateToServer(viewer) {
     return fetch(saveOnServerServiceEndPoint, {
