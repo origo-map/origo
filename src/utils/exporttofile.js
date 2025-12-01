@@ -54,7 +54,7 @@ const exportToFile = function exportToFile(features, format, opts = {}) {
 
   // Convert features to the specified format using the provided parameters
   const bytes = formatter.writeFeatures(
-    normalizeCircleFeatures(features, format),
+    normalizeCircleFeatures(features, formatterOptions, format),
     formatterOptions
   );
 
