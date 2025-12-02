@@ -90,17 +90,15 @@ export function recreateCircleFeatures(featureArray, formatOptions = null) {
       && props.origoCircle.circleRadius != null
     ) {
       let circleCenter = props.origoCircle.circleCenter;
-      let dataProjection = formatOptions?.dataProjection || 'EPSG:4326';
-      
+      const dataProjection = formatOptions?.dataProjection || 'EPSG:4326';
       if (
-        formatOptions &&
-        dataProjection &&
-        formatOptions.featureProjection &&
-        dataProjection !== formatOptions.featureProjection
+        formatOptions
+        && dataProjection
+        && formatOptions.featureProjection
+        && dataProjection !== formatOptions.featureProjection
       ) {
         // Transform center coordinate to map projection
-        const transformFunctions =
-          dataProjection && formatOptions.featureProjection
+        const transformFunctions = dataProjection && formatOptions.featureProjection
             ? [dataProjection, formatOptions.featureProjection]
             : null;
         if (transformFunctions) {
