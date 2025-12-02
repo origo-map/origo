@@ -79,7 +79,7 @@ function createSource(options) {
     });
 
     return new VectorSource({
-      features: recreateCircleFeatures(featureArray, formatOptions),
+      features: recreateCircleFeatures(featureArray, formatOptions)
     });
   }
   return new VectorSource({});

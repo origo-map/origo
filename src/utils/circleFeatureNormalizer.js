@@ -1,5 +1,5 @@
 import { Polygon, Circle } from 'ol/geom';
-import { transform } from "ol/proj";
+import { transform } from 'ol/proj';
 
 // Adds circle info to feature properties for later recreation
 function addCircleInfo(feature, center, radius) {
@@ -11,8 +11,8 @@ function addCircleInfo(feature, center, radius) {
     origoCircle: {
       circleCenter: center,
       circleRadius: radius,
-      circleOriginal: true,
-    },
+      circleOriginal: true
+    }
   });
 
   return clone;
@@ -52,8 +52,8 @@ export function normalizeCircleFeatures(features, formatOptions = null, format =
 
       let center = g.getCenter?.();
 
-      if (formatOptions && formatOptions.dataProjection && formatOptions.featureProjection &&
-          formatOptions.dataProjection !== formatOptions.featureProjection) {
+      if (formatOptions && formatOptions.dataProjection && formatOptions.featureProjection
+        && formatOptions.dataProjection !== formatOptions.featureProjection) {
         // Transform center coordinate to map projection
         const transformFunctions = formatOptions.dataProjection && formatOptions.featureProjection
           ? [formatOptions.featureProjection, formatOptions.dataProjection]
@@ -84,10 +84,10 @@ export function recreateCircleFeatures(featureArray, formatOptions = null) {
   return featureArray.map((f) => {
     const props = f.getProperties();
     if (
-      props.origoCircle !== undefined &&
-      props.origoCircle.circleOriginal &&
-      Array.isArray(props.origoCircle.circleCenter) &&
-      props.origoCircle.circleRadius != null
+      props.origoCircle !== undefined
+      && props.origoCircle.circleOriginal
+      && Array.isArray(props.origoCircle.circleCenter)
+      && props.origoCircle.circleRadius != null
     ) {
       let circleCenter = props.origoCircle.circleCenter;
       let dataProjection = formatOptions?.dataProjection || 'EPSG:4326';
