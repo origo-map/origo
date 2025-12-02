@@ -198,6 +198,13 @@
           "hintText": "Sök..."
         }
     },
+    "serviceWorker": {
+        "newVersionTitle": "Ny version tillgänglig",
+        "newVersionText": "Det finns en ny version att installera",
+        "newVersionButton": "Installera",
+        "installErrorTitle": "Installationen misslyckades",
+        "installErrorText": "Applikationen kommer inte att fungera offline"
+    },
     "style": {
         "drawStyles": {
             "modifyTooltip": "Dra för att ändra"
@@ -218,8 +225,8 @@
             "stroke": "Linje",
             "strokeTypeSolid": "Heldragen linje",
             "strokeTypeDotted": "Punktad linje",
-            "strokeTypeDashed" : "Streckad linje",
-            "strokeTypeDashedDotted" : "Streck-punkt-linje",
+            "strokeTypeDashed": "Streckad linje",
+            "strokeTypeDashedDotted": "Streck-punkt-linje",
             "dimensions": "Mått",
             "margins": "Marginaler",
             "rotation": "Rotation",
