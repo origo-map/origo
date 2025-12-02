@@ -99,8 +99,8 @@ export function recreateCircleFeatures(featureArray, formatOptions = null) {
       ) {
         // Transform center coordinate to map projection
         const transformFunctions = dataProjection && formatOptions.featureProjection
-            ? [dataProjection, formatOptions.featureProjection]
-            : null;
+          ? [dataProjection, formatOptions.featureProjection]
+          : null;
         if (transformFunctions) {
           circleCenter = transform(
             circleCenter,
