@@ -45,7 +45,10 @@ const LayerList = function LayerList(options, isRootGroup = false) {
   const getVisible = function getVisible() {
     const overlays = getOverlays();
     const visibleLayers = overlays.reduce((prev, overlay) => {
-      const visible = overlay.getLayer().getVisible() ? 'all' : 'none';
+      let visible = overlay.getLayer().getVisible() ? 'all' : 'none';
+      if (overlay.getLayer().get('secure')) {
+        visible = 'none';
+      }
       let current = prev;
       if (!prev) current = visible;
       return compareVisible(visible, current);
