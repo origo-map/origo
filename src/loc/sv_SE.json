@@ -70,7 +70,7 @@
             "portraitAriaLabel": "Stående",
             "landscape": "Liggande",
             "landscapeAriaLabel": "Liggande",
-            "userDefinedScale": "Mata in egen skala"
+            "userDefinedScale": "Ange din egen skala:"
         },
         "draw": {
             "title": "Rita",
