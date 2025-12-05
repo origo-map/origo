@@ -3,6 +3,7 @@ import permalinkStore from './permalinkstore';
 import urlparser from '../utils/urlparser';
 
 let saveOnServerServiceEndPoint = '';
+let loadMapStateIdMethod = 'path';
 
 export default (() => ({
   getSaveLayers: function getSaveLayers(layers) {
@@ -76,6 +77,9 @@ export default (() => ({
   setSaveOnServerServiceEndpoint: function setSaveOnServerServiceEndPoint(url) {
     saveOnServerServiceEndPoint = url;
   },
+  setLoadMapStateIdMethod: function setLoadMapStateIdMethod(method) {
+    if (method) { loadMapStateIdMethod = method; }
+  },
   saveStateToServer: function saveStateToServer(viewer) {
     return fetch(saveOnServerServiceEndPoint, {
       method: 'POST',
@@ -94,7 +98,10 @@ export default (() => ({
       const throwMessage = 'No saveOnServerServiceEndPoint defined';
       throw throwMessage;
     } else {
-      return fetch(`${saveOnServerServiceEndPoint}/${mapStateId}`).then(response => response.json())
+      const url = loadMapStateIdMethod === 'query'
+        ? `${saveOnServerServiceEndPoint}?mapStateId=${mapStateId}`
+        : `${saveOnServerServiceEndPoint}/${mapStateId}`;
+      return fetch(url).then(response => response.json())
         .then((data) => {
           const mapObj = {};
           Object.keys(data).forEach(key => {
