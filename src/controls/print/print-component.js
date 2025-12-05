@@ -52,7 +52,8 @@ const PrintComponent = function PrintComponent(options = {}) {
     supressResolutionsRecalculation,
     suppressNewDPIMethod,
     settingsExpanded,
-    localization
+    localization,
+    userDefinedScale
   } = options;
 
   let {
@@ -347,7 +348,8 @@ const PrintComponent = function PrintComponent(options = {}) {
     rotation,
     rotationStep,
     viewerResolutions: originalResolutions,
-    localization
+    localization,
+    userDefinedScale
   });
 
   const printInteractionToggle = PrintInteractionToggle({ map, target, mapInteractionsActive, pageSettings: viewer.getViewerOptions().pageSettings, localization });
