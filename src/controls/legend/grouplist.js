@@ -42,12 +42,14 @@ const LayerList = function LayerList(options, isRootGroup = false) {
   };
 
   // retrieve current visibility by comparing all layers and groups in list
-  const getVisible = function getVisible() {
+  const getVisible = function getVisible(viewer) {
     const overlays = getOverlays();
     const visibleLayers = overlays.reduce((prev, overlay) => {
       let visible = overlay.getLayer().getVisible() ? 'all' : 'none';
       if (overlay.getLayer().get('secure')) {
         visible = 'none';
+        viewer.getLayer(overlay.getLayer().get('name')).setVisible(false);
+        viewer.getLayer(overlay.getLayer().set('queryable', false));
       }
       let current = prev;
       if (!prev) current = visible;
