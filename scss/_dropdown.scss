@@ -1,8 +1,14 @@
 @mixin default {
     .o-dropdown li {
-        height: 1.5rem;
         line-height: 1.5rem;
         padding: .25rem .75rem;
+    }
+
+    .o-dropdown hr {
+        border: 0;
+        border-bottom: 1px dotted #00000033;
+        margin-left: 10px;
+        margin-right: 10px;
     }
 
     .o-dropdown li:hover {

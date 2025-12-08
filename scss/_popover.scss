@@ -13,14 +13,16 @@
         border-radius: 6px;
         bottom: 100%;
         box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
         box-sizing: border-box;
         display: none;
         left: 50%;
-        margin: 0 0 10px -125px;
+        transform: translate(-50%, 0);
+        margin: 0 0 10px 0;
         padding: .5rem 0;
         position: absolute;
-        width: 250px;
+        width: max-content;
+        min-width: min(100vw - 20px, 140px);
+        max-width: min(100vw - 20px, 320px);
     }
 
     .o-popover::before,
