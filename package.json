@@ -1,6 +1,6 @@
 {
   "name": "origo",
-  "version": "2.10.0",
+  "version": "2.11.0-dev",
   "repository": {
     "type": "git",
     "url": "git://github.com/origo-map/origo.git"
