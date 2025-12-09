@@ -47,7 +47,7 @@ const Group = function Group(viewer, options = {}) {
 
   const listCls = type === 'grouplayer' ? 'divider-start padding-left padding-top-small' : '';
   const groupList = GroupList({ viewer, cls: listCls, abstract, showAbstractInLegend });
-  visibleState = groupList.getVisible(viewer);
+  visibleState = groupList.getVisible();
 
   const thisGroup = viewer.getGroup(name);
 
@@ -189,7 +189,7 @@ const Group = function Group(viewer, options = {}) {
   };
 
   const updateGroupIndication = function updateGroupIndication() {
-    if (groupList.getVisible(viewer) === 'none') {
+    if (groupList.getVisible() === 'none') {
       groupEl.firstElementChild.classList.add('no-group-indication');
       groupEl.firstElementChild.classList.remove('group-indication');
     } else {
@@ -304,7 +304,7 @@ const Group = function Group(viewer, options = {}) {
     onInit() {
       this.addComponent(collapse);
       this.on('add:overlay', (overlay) => {
-        visibleState = groupList.getVisible(viewer);
+        visibleState = groupList.getVisible();
         if (tickButton) {
           tickButton.setState(stateCls[visibleState]);
           tickButton.setIcon(getCheckIcon(visibleState));
@@ -315,7 +315,7 @@ const Group = function Group(viewer, options = {}) {
         }
       });
       this.on('add:group', (group) => {
-        visibleState = groupList.getVisible(viewer);
+        visibleState = groupList.getVisible();
         if (tickButton) {
           tickButton.setState(stateCls[visibleState]);
           tickButton.setIcon(getCheckIcon(visibleState));
@@ -437,7 +437,7 @@ const Group = function Group(viewer, options = {}) {
         });
         groupEl.addEventListener('change:visible', (e) => {
           e.preventDefault();
-          const newVisibleState = groupList.getVisible(viewer);
+          const newVisibleState = groupList.getVisible();
           if (visibleState !== newVisibleState) {
             visibleState = newVisibleState;
             if (tickButton) {
