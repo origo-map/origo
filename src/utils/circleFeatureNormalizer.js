@@ -1,12 +1,17 @@
 import { Polygon, Circle } from 'ol/geom';
 import { transform } from 'ol/proj';
 
-// Adds circle info to feature properties for later recreation
+/**
+ * Adds circle info to feature properties for later recreation.
+ *
+ * @param {*} feature The feature to add circle info to.
+ * @param {*} center The center coordinate of the circle.
+ * @param {*} radius The radius of the circle.
+ * @returns The feature with added circle info properties.
+ */
 function addCircleInfo(feature, center, radius) {
-  const clone = feature.clone();
-  const props = clone.getProperties();
-  // ToDo: convert values to different CRS
-  clone.setProperties({
+  const props = feature.getProperties();
+  feature.setProperties({
     ...props,
     origoCircle: {
       circleCenter: center,
@@ -15,27 +20,39 @@ function addCircleInfo(feature, center, radius) {
     }
   });
 
-  return clone;
+  return feature;
 }
 
-// Adds circle info to all circle features in the array, leaving them unchanged otherwise
+/**
+ * Adds circle info to all circle features in an array, leaving them unchanged otherwise.
+ *
+ * @param {*} features Array of features.
+ * @returns Array of features with circle info added to the relevant features.
+ */
 export function addCircleInfoToFeatures(features) {
   return features.map((feature) => {
-    const clone = feature.clone();
     const g = feature.getGeometry?.();
 
     if (g && g.getType?.() === 'Circle') {
       const center = g.getCenter?.();
       const radius = g.getRadius?.();
       if (center && radius != null) {
-        return addCircleInfo(clone, center, radius);
+        return addCircleInfo(feature, center, radius);
       }
     }
-    return clone;
+    return feature;
   });
 }
 
-// Transforms all circles into polygons for GeoJSON or KML export
+/**
+ * Transforms all circles into polygons for GeoJSON or KML export.
+ *
+ * @param {*} features Array of features.
+ * @param {*} formatOptions The object with the feature projection (to convert from) and data projection (to convert to). E.g., 'EPSG:4326'.
+ * @param {*} format The format, either 'geojson' or 'kml' to perform the transformation.
+ * @param {*} segments Number of segments to use for circle approximation.
+ * @returns Array of features with circles transformed to polygons where applicable.
+ */
 export function normalizeCircleFeatures(features, formatOptions = null, format = 'geojson', segments = 64) {
   // GeoJSON and KML do not support circles, so we convert them to polygons.
   // GPX does not support polygons at all, so we leave circles as-is.
@@ -44,10 +61,15 @@ export function normalizeCircleFeatures(features, formatOptions = null, format =
   }
 
   return features.map((f) => {
-    const g = f.getGeometry?.();
+    const clone = f.clone();
+
+    if (f.getId()) {
+      clone.setId(f.getId());
+    }
+
+    const g = clone.getGeometry?.();
     if (g && g.getType?.() === 'Circle') {
       const poly = Polygon.fromCircle(g, segments);
-      const clone = f.clone();
       clone.setGeometry(poly);
 
       let center = g.getCenter?.();
@@ -78,7 +100,13 @@ export function normalizeCircleFeatures(features, formatOptions = null, format =
   });
 }
 
-// Recreates circle geometries from features that have circle info saved in properties
+/**
+ * Recreates circle geometries from features that have circle info saved in properties.
+ *
+ * @param {*} featureArray Array of features.
+ * @param {*} formatOptions The object with the feature projection (to convert to) and data projection (to convert from). E.g., 'EPSG:4326'.
+ * @returns Array of features with circle geometries recreated where applicable.
+ */
 export function recreateCircleFeatures(featureArray, formatOptions = null) {
   // Recreate circles from properties
   return featureArray.map((f) => {
