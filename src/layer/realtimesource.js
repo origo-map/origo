@@ -133,6 +133,7 @@ class RealtimeSource extends VectorSource {
     url.searchParams.set('layer', this._options.featureType);
     // Unfortunately EventSource does not throw errors so we cannot catch connection errors
     // Best we can do is to listen for onerror events.
+    // TODO: Make CORS configurable or let it follow global crossDomain-setting (which seems not to be used at all)
     this._sse = new EventSource(url, { withCredentials: true });
     // Inserts are treated as updates
     this._sse.addEventListener('update', this.onUpdateEvent.bind(this));
