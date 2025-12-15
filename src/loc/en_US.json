@@ -200,6 +200,12 @@
         }
         
     },
+    "layers": {
+        "realtime": {
+            "connectionError": "Failed to initialize real-time layer. Layer will not be updated in real-time. Layer:",
+            "connectionRestored": "Real-time layer connection restored. Layer:"
+        }
+    },
     "style": {
         "drawStyles": {
             "modifyTooltip": "Drag to alter"

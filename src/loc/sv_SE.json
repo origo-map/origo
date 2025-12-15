@@ -199,6 +199,12 @@
           "hintText": "Sök..."
         }
     },
+    "layers": {
+        "realtime": {
+            "connectionError": "Misslyckades med att initiera realtidslager. Lagret kommer inte att uppdateras i realtid. Lager:",
+            "connectionRestored": "Realtidslageranslutning återställd. Lager:"
+        }
+    },
     "style": {
         "drawStyles": {
             "modifyTooltip": "Dra för att ändra"
