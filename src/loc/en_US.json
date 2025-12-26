@@ -172,6 +172,38 @@
             "menuButtonTooltip": "Menu",
             "closeButtonLabel": "Close"
         },
+        "offline": {
+            "btnToolTitle": "Offline toolbar",
+            "dlgDownloadTile": "Ongoing downloads",
+            "dlgDownloadProgress": "Progress",
+            "dlgDownloadLayers": "Ongoing downloads",
+            "dlgDownloadNoActive": "No ongoing downloads",
+            "btnEnvelopePendingEdits": "You have pending edits. Either sync or clear local storage",
+            "dlgSaveAbort": "Abort",
+            "dlgSaveAve": "Start",
+            "toastStartingTitle": "Preloading in progress",
+            "toastStartingBody": "Your layers are being downloaded in the background",
+            "toastFinishedTitle": "Layers saved",
+            "toastFinishedBody": "Your layers are ready to be used offline",
+            "globalLayer": "Layer",
+            "globalTiles": "tiles",
+            "globalVector": "vector",
+            "globalError": "Error!",
+            "dlgSaveBody": "The following data will be downloaded",
+            "dlgSaveTitle": "Download layers",
+            "toastSyncTitle": "Synchronized",
+            "toastSyncBody": "All local edits have been synchronised",
+            "toastSyncBodyFail": "Failed to synchronize edits",
+            "btnEnvelopeTooltip": "Draw a rectangle to download",
+            "btnClearConfirm": "This will remove all downloaded layers including unsynced edits. Proceed?",
+            "btnClearTooltip": "Delete downladed data",
+            "toastClearTitle": "Local layers deleted",
+            "toastClearBody": "All local layer data has been deleted",
+            "btnDownloadTooltip": "Ongoing downloads",
+            "btnOfflineTooltip": "Toggle offline mode",
+            "btnSyncTooltip": "Synchronize local edits",
+            "btnSyncPendingEdits": "There are unsaved edits. Save them first."
+        },
         "scale": {
             "scaleText": "Scale 1:"
         },
@@ -198,7 +230,15 @@
           "searchlistTitle": "Search results for",
           "hintText": "Search..."
         }
-        
+
+    },
+    "layers": {
+        "wfsoffline": {
+            "init_failed": "Failed to initialise offline database. Offline layer will be unavailable"
+        },
+        "wmsoffline": {
+            "init_failed": "Failed to initialise offline database. Offline layer will be unavailable"
+        }
     },
     "style": {
         "drawStyles": {
@@ -220,8 +260,8 @@
             "stroke": "Line",
             "strokeTypeSolid": "Solid line",
             "strokeTypeDotted": "Dotted line",
-            "strokeTypeDashed" : "Dashed line",
-            "strokeTypeDashedDotted" : "Dash-dotted line",
+            "strokeTypeDashed": "Dashed line",
+            "strokeTypeDashedDotted": "Dash-dotted line",
             "dimensions": "Dimensions",
             "margins": "Margins",
             "rotation": "Rotation",

@@ -168,6 +168,38 @@
         "about": {
             "title": "Om kartan"
         },
+        "offline": {
+            "btnToolTitle": "Offline verktygslåda",
+            "dlgDownloadTile": "Pågående nedladdningar",
+            "dlgDownloadProgress": "Förlopp",
+            "dlgDownloadLayers": "Pågående nedladdningar",
+            "dlgDownloadNoActive": "Inga pågående nedladdningar",
+            "btnEnvelopePendingEdits": "Du har osynkroniserade lokala redigeringar. Du måste antingen synkronisera dem eller tömma allt lokalt data.",
+            "dlgSaveAbort": "Avbryt",
+            "dlgSaveAve": "Starta",
+            "toastStartingTitle": "Nedladdning påbörjad",
+            "toastStartingBody": "Lagren laddas ner i bakgrunden.",
+            "toastFinishedTitle": "Nedladdning klar",
+            "toastFinishedBody": "Dina lager är klara att användas offline",
+            "globalLayer": "Lager",
+            "globalTiles": "tiles",
+            "globalVector": "vektor",
+            "globalError": "Fel!",
+            "dlgSaveBody": "Följande data kommer att laddas ner",
+            "dlgSaveTitle": "Ladda ner lager",
+            "toastSyncTitle": "Synkroniserat",
+            "toastSyncBody": "Alla lokala redigeringar har synkroniserats",
+            "toastSyncBodyFail": "Misslyckades med att synkronisera ändringar",
+            "btnEnvelopeTooltip": "Rita en rektangel för att ladda ner",
+            "btnClearConfirm": "Detta kommer att radera alla lokala lager inklusive osynkronsierade lokala redigeringar. Fortsätt?",
+            "btnClearTooltip": "Radera allt lokalt data",
+            "toastClearTitle": "Lokalt data raderat",
+            "toastClearBody": "Allt lokalt data har raderats",
+            "btnDownloadTooltip": "Visa pågående nedladdningar",
+            "btnOfflineTooltip": "Växla onlineläge",
+            "btnSyncTooltip": "Synkronisera lokala redigeringar",
+            "btnSyncPendingEdits": "Det finns osparade redigeringar. Spara dem först."
+        },
         "mapmenu": {
             "menuButtonTooltip": "Meny",
             "closeButtonLabel": "Stäng"
@@ -199,6 +231,14 @@
           "hintText": "Sök..."
         }
     },
+    "layers": {
+        "wfsoffline": {
+            "init_failed": "Misslyckades med att initialisera offlinelager. Offlinelager är inte tillgängliga"
+        },
+        "wmsoffline": {
+            "init_failed": "Misslyckades med att initialisera offlinelager. Offlinelager är inte tillgängliga"
+        }
+    },
     "style": {
         "drawStyles": {
             "modifyTooltip": "Dra för att ändra"
@@ -219,8 +259,8 @@
             "stroke": "Linje",
             "strokeTypeSolid": "Heldragen linje",
             "strokeTypeDotted": "Punktad linje",
-            "strokeTypeDashed" : "Streckad linje",
-            "strokeTypeDashedDotted" : "Streck-punkt-linje",
+            "strokeTypeDashed": "Streckad linje",
+            "strokeTypeDashedDotted": "Streck-punkt-linje",
             "dimensions": "Mått",
             "margins": "Marginaler",
             "rotation": "Rotation",

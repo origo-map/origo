@@ -7,8 +7,10 @@ const serializer = new XMLSerializer();
 function readResponse(data) {
   let result;
   if (window.Document && data instanceof Document && data.documentElement && data.documentElement.localName === 'ExceptionReport') {
+    // TODO: replace with logger
     alert(data.getElementsByTagNameNS('http://www.opengis.net/ows', 'ExceptionText').item(0).textContent);
   } else {
+    // TODO: this may very well throw if response is anything else than OK or WFS ExceptionReport (e.g. 404, 500 or whatever)
     result = format.readTransactionResponse(data);
   }
 
@@ -16,9 +18,9 @@ function readResponse(data) {
 }
 
 function writeWfsTransaction(transObj, options) {
-  // FIXME: This doesn't do anything. It just deletes the key from the feat object, which is a deep copy of feature's values
-  // and if it did something it would delete an attribute, which probably is a bad thing in itself
-  // but also since it would prevent setting the attribute to empty string, which might would be the desired action.
+  // Delete attributes that are empty strings. Don't know why, but probably to be able to utilize db defaults
+  // as editor always set empty string when form is empty or possibly if empty string can not be cast
+  // to the data type. Too bad the editor does not re-read features to get db default values.
   if (transObj.insert) {
     transObj.insert.forEach((feature) => {
       const props = feature.getProperties();
@@ -29,7 +31,7 @@ function writeWfsTransaction(transObj, options) {
   return node;
 }
 
-function wfsTransaction(transObj, layerName, viewer) {
+function wfsTransaction(transObj, layerName, viewer, supressEvents) {
   const srsName = viewer.getProjectionCode();
   const layer = viewer.getLayer(layerName);
   const featureType = layer.get('featureType');
@@ -46,12 +48,12 @@ function wfsTransaction(transObj, layerName, viewer) {
 
   function error(e) {
     const errorMsg = e ? (`${e.status} ${e.statusText}`) : '';
+    // TODO: replace with logger
     alert(`Det inträffade ett fel när ändringarna skulle sparas till servern...
       ${errorMsg}`);
   }
 
-  function success(data) {
-    const result = readResponse(data);
+  function success(result) {
     let feature;
     if (result) {
       if (result.transactionSummary.totalUpdated > 0) {
@@ -62,7 +64,8 @@ function wfsTransaction(transObj, layerName, viewer) {
           action: 'update'
         });
       }
-
+      // FIXME: If the feature(s) already have been deleted on the server this will result in the edit
+      // being stuck forever in the editstore as the server will respond with 0 features deleted.
       if (result.transactionSummary.totalDeleted > 0) {
         dispatcher.emitChangeFeature({
           feature: transObj.delete,
@@ -71,7 +74,8 @@ function wfsTransaction(transObj, layerName, viewer) {
           action: 'delete'
         });
       }
-
+      // FIXME: If the feature(s) already have been deleted on the server this will result in the edit
+      // being stuck forever in the editstore as the server will respond with 0 features updated.
       if (result.transactionSummary.totalInserted > 0) {
         feature = transObj.insert;
 
@@ -100,8 +104,10 @@ function wfsTransaction(transObj, layerName, viewer) {
     .then(res => res.text())
     .then(str => (new window.DOMParser()).parseFromString(str, 'text/xml'))
     .then((data) => {
-      success(data);
       const result = readResponse(data);
+      if (result && !supressEvents) {
+        success(result);
+      }
       let nr = 0;
       if (result) {
         nr += result.transactionSummary.totalUpdated;
@@ -110,9 +116,11 @@ function wfsTransaction(transObj, layerName, viewer) {
       }
       return nr;
     })
+    // This catches (and swallows) errors from parsing response if response is not in fact a wfs response. ErrorReports are handled and
+    // results in a 0 items update.
     .catch(err => error(err));
 }
 
-export default function wfstransaction(transObj, layerName, viewer) {
-  return wfsTransaction(transObj, layerName, viewer);
+export default function wfstransaction(transObj, layerName, viewer, supressEvents) {
+  return wfsTransaction(transObj, layerName, viewer, supressEvents);
 }

@@ -65,6 +65,10 @@ export default function editsStore() {
     return false;
   }
 
+  /**
+   * Checks for unsaved edits. Does not actually returns the edits to avoid leaking internal format.
+   * @returns {boolean} true if there are unsaved edits
+   */
   function hasEdits() {
     if (Object.getOwnPropertyNames(edits).length) {
       return true;
