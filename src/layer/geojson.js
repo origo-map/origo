@@ -1,6 +1,7 @@
 import VectorSource from 'ol/source/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
 import Feature from 'ol/Feature';
+import { recreateCircleFeatures } from '../utils/circleFeatureNormalizer';
 import vector from './vector';
 import isurl from '../utils/isurl';
 import validate from '../utils/validate';
@@ -77,7 +78,9 @@ function createSource(options) {
       }
     });
 
-    return new VectorSource({ features: featureArray });
+    return new VectorSource({
+      features: recreateCircleFeatures(featureArray, formatOptions)
+    });
   }
   return new VectorSource({});
 }

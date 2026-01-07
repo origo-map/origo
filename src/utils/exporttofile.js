@@ -1,6 +1,7 @@
 import GPXFormat from 'ol/format/GPX';
 import GeoJSONFormat from 'ol/format/GeoJSON';
 import KMLFormat from 'ol/format/KML';
+import { normalizeCircleFeatures } from './circleFeatureNormalizer';
 // TODO: move to maputils?
 
 /**
@@ -52,7 +53,10 @@ const exportToFile = function exportToFile(features, format, opts = {}) {
   });
 
   // Convert features to the specified format using the provided parameters
-  const bytes = formatter.writeFeatures(features, formatterOptions);
+  const bytes = formatter.writeFeatures(
+    normalizeCircleFeatures(features, formatterOptions, format),
+    formatterOptions
+  );
 
   // Create the "file"
   // always use octet/stream to force download if download-attrib is not supported on anchor tag
