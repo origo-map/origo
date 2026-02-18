@@ -107,6 +107,13 @@ export default class UndoStack {
         currEdit.after = currEdit.featureRef.clone();
         currEdit.after.setId(currEdit.featureRef.getId());
         // Restore all edits
+        const oldProperties = Object.keys(currEdit.featureRef.getProperties());
+        // Set properties does not remove existing properties and newly created features does not have all properties until they
+        // are set by a default value, changed manually or read from server. So, clear them to be able to restore to new.
+        // Can't remove them as transaction won't send update on non-existing properties. This requires that db allows null, but that
+        // woul be necessary anyway for properties without origo defaults. If it has defaults, the are restored in the setProperties clause below.
+        // Alternative would have been to always create empty properties when defaults are set, but that would probably break something else
+        oldProperties.forEach(key => currEdit.featureRef.set(key, null, true));
         currEdit.featureRef.setProperties(currEdit.before.getProperties());
         // Geometry is included in properties, but it is a ref to an existing geometry instance
         // Do an implicit deep copy to get rid of dependencies
