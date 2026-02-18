@@ -1,22 +1,25 @@
-import { Dropdown, Component } from '../../ui';
+import { Dropdown, Component, Input } from '../../ui';
 import mapUtils from '../../maputils';
 
 export default function SetScaleControl(map, options = {}) {
   const {
     scales = [],
     initialScale,
-    localize
+    localization,
+    userDefinedScale = false
   } = options;
 
   let selectScale;
+  let inputScale;
+  let lockButtonText = false;
 
-  /**
-   * Parses a formatted scale string and returns the denominator as a number
-   * @param {any} scale
-   */
-  function parseScale(scale) {
-    return parseInt(scale.replace(/\s+/g, '').split(':').pop(), 10);
+  if (userDefinedScale) {
+    scales.push({ label: localization.getStringByKeys({ targetParentKey: 'print', targetKey: 'userDefinedScale' }), value: 'userDefinedScale' });
   }
+
+  const localize = function localize(key) {
+    return localization.getStringByKeys({ targetParentKey: 'print', targetKey: key });
+  };
 
   return Component({
     onInit() {
@@ -29,26 +32,57 @@ export default function SetScaleControl(map, options = {}) {
         text: localize('selectScale')
       });
       this.addComponents([selectScale]);
+      if (userDefinedScale) {
+        inputScale = Input({
+          cls: 'o-search-layer-field placeholder-text-smaller smaller',
+          style: { height: '1.5rem', margin: 0, width: '100%' },
+          placeholderText: '1:1234',
+          type: 'number',
+          value: '1:'
+        });
+        this.addComponents([inputScale]);
+        inputScale.hidden = true;
+        inputScale.on('change', (evt) => {
+          const value = mapUtils.formattedScaleToScaleDenominator(evt.value);
+          if (Number.isNaN(value) || value <= 0) {
+            return;
+          }
+          this.dispatch('change:scale', { scale: value / 1000 });
+        });
+      }
     },
     onChangeScale(evt) {
-      const scaleDenominator = parseScale(evt);
-      this.dispatch('change:scale', { scale: scaleDenominator / 1000 });
-      selectScale.setButtonText(evt);
+      if (evt.value === 'userDefinedScale') {
+        document.getElementById(inputScale.getId()).hidden = false;
+        selectScale.setButtonText(localization.getStringByKeys({ targetParentKey: 'print', targetKey: 'userDefinedScale' }));
+        lockButtonText = true;
+      } else {
+        lockButtonText = false;
+        this.dispatch('change:scale', { scale: evt.value / 1000 });
+        if (inputScale) document.getElementById(inputScale.getId()).hidden = true;
+      }
     },
     onRender() {
       this.dispatch('render');
       selectScale.setItems(scales);
       document.getElementById(selectScale.getId()).addEventListener('dropdown:select', (evt) => {
-        this.onChangeScale(evt.target.textContent);
+        this.onChangeScale(evt.detail);
       });
       if (initialScale) {
-        this.onChangeScale(initialScale);
+        const scaleDenominator = mapUtils.formattedScaleToScaleDenominator(initialScale);
+        this.onChangeScale({
+          label: mapUtils.formatScale(scaleDenominator, localization),
+          value: scaleDenominator
+        });
       } else {
         const viewResolution = map.getView().getResolution();
         const projection = map.getView().getProjection();
         const mapScale = mapUtils.resolutionToScale(viewResolution, projection);
-        const closest = scales.reduce((prev, curr) => (Math.abs(parseScale(curr) - mapScale) < Math.abs(parseScale(prev) - mapScale) ? curr : prev));
-        this.onChangeScale(closest);
+        const closest = scales.reduce((prev, curr) => ((Math.abs(curr.value - mapScale)) < (Math.abs(prev.value - mapScale)) ? curr : prev));
+        this.onChangeScale({
+          label: mapUtils.formatScale(closest.value, localization),
+          value: closest.value
+        });
       }
     },
     render() {
@@ -57,10 +91,18 @@ export default function SetScaleControl(map, options = {}) {
       <h6>${localize('selectPrintScale')}</h6>
       <div class="padding-smaller o-tooltip active">
         ${selectScale.render()}
-      </div>`;
+      </div>
+      ${userDefinedScale
+    ? `<div class="padding-0 o-tooltip active">
+        ${inputScale.render()}
+      </div>`
+    : ''
+}`;
     },
     setButtonText(buttonText) {
-      selectScale.setButtonText(buttonText);
+      if (!lockButtonText) {
+        selectScale.setButtonText(buttonText);
+      }
     }
   });
 }

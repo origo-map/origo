@@ -59,7 +59,8 @@ const Print = function Print(options = {}) {
     mapInteractionsActive = false,
     supressResolutionsRecalculation = false,
     suppressNewDPIMethod = false,
-    settingsExpanded = false
+    settingsExpanded = false,
+    userDefinedScale
   } = options;
   let {
     showNorthArrow = true,
@@ -133,8 +134,8 @@ const Print = function Print(options = {}) {
         mapInteractionsActive,
         supressResolutionsRecalculation,
         suppressNewDPIMethod,
-        localize,
-        localeId: localization.getCurrentLocaleId()
+        localization,
+        userDefinedScale
       });
       if (placement.indexOf('screen') > -1) {
         mapTools = `${viewer.getMain().getMapTools().getId()}`;

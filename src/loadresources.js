@@ -49,6 +49,7 @@ const loadResources = async function loadResources(mapOptions, config) {
   const mapEl = config.target;
   const format = 'json';
   let storeMethod = 'default';
+  let loadMapStateIdMethod;
   let urlParams;
   let url;
   let mapUrl;
@@ -78,9 +79,27 @@ const loadResources = async function loadResources(mapOptions, config) {
       map.options.url = getUrl();
       map.options.map = undefined;
       map.options.params = urlParams;
+      for (let i = 0; i < map.options.controls.length; i += 1) {
+        if (map.options.controls[i].name === 'sharemap'
+            && map.options.controls[i].options?.storeMethod === 'saveStateToServer') {
+          storeMethod = 'saveStateToServer';
+          loadMapStateIdMethod = map.options.controls[i].options?.loadMapStateIdMethod;
+          if (loadMapStateIdMethod) {
+            permalink.setLoadMapStateIdMethod(loadMapStateIdMethod);
+          }
+          permalink.setSaveOnServerServiceEndpoint(map.options.controls[i].options.serviceEndpoint);
+        }
+      }
+      const restorePromise = storeMethod === 'saveStateToServer' ? restorePermalink(storeMethod) : Promise.resolve();
 
       return Promise.all(loadSvgSprites(config) || [])
-        .then(() => map);
+        .then(() => restorePromise)
+        .then((params) => {
+          if (params) {
+            map.options.params = params;
+          }
+          return map;
+        });
     } else if (typeof (mapOptions) === 'string') {
       if (isUrl(mapOptions)) {
         urlParams = permalink.parsePermalink(mapOptions);
@@ -159,6 +178,10 @@ const loadResources = async function loadResources(mapOptions, config) {
                   const options = map.options.controls[i].options;
                   if (options.storeMethod && options.storeMethod === 'saveStateToServer') {
                     storeMethod = options.storeMethod;
+                    loadMapStateIdMethod = options.loadMapStateIdMethod;
+                    if (loadMapStateIdMethod) {
+                      permalink.setLoadMapStateIdMethod(loadMapStateIdMethod);
+                    }
                     permalink.setSaveOnServerServiceEndpoint(map.options.controls[i].options.serviceEndpoint);
                   }
                 }

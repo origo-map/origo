@@ -7,6 +7,7 @@ import Feature from 'ol/Feature';
 import shapes from './shapes';
 import generateUUID from '../../utils/generateuuid';
 import { Component } from '../../ui';
+import { addCircleInfoToFeatures } from '../../utils/circleFeatureNormalizer';
 
 const DrawHandler = function DrawHandler(options = {}) {
   const {
@@ -473,7 +474,12 @@ const DrawHandler = function DrawHandler(options = {}) {
       const visible = layer.get('visible') || layer.getVisible();
       const features = source.getFeatures();
       const geojson = new GeoJSONFormat();
-      layerArr.push({ id: layerId, title: layerTitle, visible, features: geojson.writeFeatures(features) });
+      layerArr.push({
+        id: layerId,
+        title: layerTitle,
+        visible,
+        features: geojson.writeFeatures(addCircleInfoToFeatures(features))
+      });
     });
     if (layerArr.length > 0) {
       return {

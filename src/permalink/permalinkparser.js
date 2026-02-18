@@ -1,5 +1,6 @@
 import GeoJSON from 'ol/format/GeoJSON';
 import urlparser from '../utils/urlparser';
+import { recreateCircleFeatures } from '../utils/circleFeatureNormalizer';
 
 const layerModel = {
   v: {
@@ -102,11 +103,11 @@ const controlDraw = function controlDraw(drawState) {
   let features = [];
   drawLayers.forEach((element) => {
     const layer = element;
-    layer.features = new GeoJSON().readFeatures(element.features);
+    layer.features = recreateCircleFeatures(new GeoJSON().readFeatures(element.features));
     layerArr.push(layer);
   });
   if (drawState.features) {
-    features = new GeoJSON().readFeatures(drawState.features);
+    features = recreateCircleFeatures(new GeoJSON().readFeatures(drawState.features));
   }
   return { features, layers: layerArr };
 };

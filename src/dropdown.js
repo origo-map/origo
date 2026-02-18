@@ -29,7 +29,7 @@ export default function dropDown(target, items, options) {
       }
       li[index] = utils.createElement('li', item.name + active, obj);
     });
-    ul = utils.createElement('ul', li.join(''), {
+    ul = utils.createElement('ul', li.join('<hr/>'), {
       cls: 'o-dropdown'
     });
 

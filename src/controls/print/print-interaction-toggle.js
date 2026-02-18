@@ -10,8 +10,12 @@ export default function PrintInteractionToggle(options = {}) {
     toggleIcon = '#ic_map_24px',
     mapInteractionsActive,
     pageSettings,
-    localize
+    localization
   } = options;
+
+  function localize(key) {
+    return localization.getStringByKeys({ targetParentKey: 'print', targetKey: key });
+  }
 
   const interactions = mapInteractions({ target, mapInteractions: pageSettings && pageSettings.mapInteractions ? pageSettings.mapInteractions : {} });
   let mapInteractionToggleButton;

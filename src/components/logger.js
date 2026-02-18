@@ -51,8 +51,10 @@ const createModal = function createModal(options) {
 
   if (duration && duration > 0) {
     setTimeout(() => {
-      modal.closeModal();
-      modal = null;
+      if (document.getElementById(modal.getId())) {
+        modal.closeModal();
+        modal = null;
+      }
     }, duration);
   }
 };
@@ -85,9 +87,14 @@ const createToast = function createToast(options = {}) {
   `;
   toast.innerHTML = content;
 
-  setTimeout(() => {
+  const timeout = setTimeout(() => {
     toast.parentNode.removeChild(toast);
   }, duration > 0 ? duration : 5000);
+
+  toast.addEventListener('click', () => {
+    clearTimeout(timeout);
+    toast.parentNode.removeChild(toast);
+  });
 };
 
 const Logger = function Logger(options = {}) {

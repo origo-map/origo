@@ -24,6 +24,7 @@
 { "type": "Feature", "properties": { "id": 20, "name": "Kristianstad" }, "geometry": { "type": "Point", "coordinates": [ 1575633.0, 7565358.0 ] } },
 { "type": "Feature", "properties": { "id": 21, "name": "Mora" }, "geometry": { "type": "Point", "coordinates": [ 1618908.0, 8627715.0 ] } },
 { "type": "Feature", "properties": { "id": 22, "name": "Orsa" }, "geometry": { "type": "Point", "coordinates": [ 1627705.0, 8653421.0 ] } },
-{ "type": "Feature", "properties": { "id": 23, "name": "Tomelilla" }, "geometry": { "type": "Point", "coordinates": [ 1553290.0, 7467849.0 ] } }
+{ "type": "Feature", "properties": { "id": 23, "name": "Tomelilla" }, "geometry": { "type": "Point", "coordinates": [ 1553290.0, 7467849.0 ] } },
+{ "type": "Feature", "properties": { "id": 24, "name": "Haninge" }, "geometry": { "type": "Point", "coordinates": [ 2018984, 8216175 ] } }
 ]
 }

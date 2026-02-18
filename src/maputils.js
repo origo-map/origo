@@ -140,9 +140,9 @@ const maputils = {
     const resolution = scale / (mpu * 39.37 * dpi);
     return resolution;
   },
-  formatScale: function formatScale(scale) {
+  formatScale: function formatScale(scale, localization) {
     const roundedScale = Math.round(scale / 10) * 10;
-    return `1:${numberFormatter(roundedScale)}`;
+    return `1:${numberFormatter(roundedScale, localization)}`;
   },
   roundScale: function roundScale(scale) {
     let scaleValue = scale;
@@ -151,6 +151,15 @@ const maputils = {
       scaleValue += (10 - differens);
     }
     return scaleValue;
+  },
+
+  /**
+   * Returns the denominator of a scale string, e.g. 1:10000 => 10000
+   * @param {string} scaleString The scale string to parse. Must be of print conf form (not localized).
+   * @returns {number} The denominator of the scale string
+   */
+  formattedScaleToScaleDenominator: function formattedScaleToScaleDenominator(scaleString) {
+    return parseInt(scaleString.replace(/\s+/g, '').split(':').pop(), 10);
   },
   createMarker: function createMarker(coordinates, title, content, viewer, layerProps = {}, showPopup = true) {
     const {

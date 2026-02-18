@@ -69,7 +69,8 @@
             "portrait": "Portrait",
             "portraitAriaLabel": "Portrait",
             "landscape": "Landscape",
-            "landscapeAriaLabel": "Landscape"
+            "landscapeAriaLabel": "Landscape",
+            "userDefinedScale": "Input user-defined scale"
         },
         "draw": {
             "title": "Draw",
@@ -148,7 +149,8 @@
             "removeLayerQuestion": "Do you want to remove the layer?",
             "removeLayer": "Remove layer",
             "moreInfoButtonLabel": "Show layer info",
-            "renderStyleSelect": "Select style"
+            "renderStyleSelect": "Select style",
+            "legendSearchGroupSuffix": "(Group)"
         },
         "zoom": {
             "zoomInButtonTooltip": "Zoom into the map",
@@ -174,7 +176,14 @@
             "scaleText": "Scale 1:"
         },
         "scalepicker": {
-            "selectScaleAriaLabel": "Pick scale"
+            "selectScaleAriaLabel": "Pick scale",
+            "buttonPrefix": "",
+            "listItemPrefix": ""
+        },
+        "splash": {
+            "defaultTitle": "About the map",
+            "hideText": "Don't show again",
+            "confirmText": "Are you sure you don't want to see the information again?"
         },
         "position": {
             "characterError": "Invalid character for coordinate, please try again.",
@@ -182,6 +191,12 @@
             "configError": "No title or projection was set for the position control",
             "centerButtonLabel": "Position icon",
             "projButtonLabel": "Projection"
+        },
+        "search": {
+          "searchlistExportButtonText": "Export",
+          "searchlistMakeSelectionButtonText": "Make a selection in the map",
+          "searchlistTitle": "Search results for",
+          "hintText": "Search..."
         }
         
     },

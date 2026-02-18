@@ -219,39 +219,48 @@ function updateLayer(layer, viewer) {
   }
 }
 
+const thematicPromises = new Map(); // against a possible race condition in a shared map
 async function setIcon(src, cmp, styleRules, layer, viewer, clickable) {
   const styleName = layer.get('styleName');
   const style = viewer.getStyle(styleName);
   const activeThemes = layer.get('activeThemes');
   const hasThemeLegend = layer.get('hasThemeLegend');
-  if (!style[0].thematic) {
-    style[0].thematic = [];
-    const paramsString = src.icon.json;
-    const searchParams = new URLSearchParams(paramsString);
-    const response = await fetch(src.icon.json);
-    const jsonData = await response.json();
-    jsonData.Legend[0].rules.forEach(row => {
-      searchParams.set('FORMAT', 'image/png');
-      searchParams.set('RULE', row.name);
-      const imgUrl = decodeURIComponent(searchParams.toString());
-      if (typeof row.filter !== 'undefined') {
-        style[0].thematic.push({
-          image: { src: imgUrl },
-          filter: row.filter,
-          name: row.name,
-          label: row.title || row.name,
-          visible: row.visible !== false
+  if (!style[0].thematic || style[0].thematic.length === 0) {
+    if (!thematicPromises.has(styleName)) {
+      const promise = (async () => {
+        style[0].thematic = [];
+        const paramsString = src.icon.json;
+        const searchParams = new URLSearchParams(paramsString);
+        const response = await fetch(src.icon.json);
+        const jsonData = await response.json();
+        jsonData.Legend[0].rules.forEach(row => {
+          searchParams.set('FORMAT', 'image/png');
+          searchParams.set('RULE', row.name);
+          const imgUrl = decodeURIComponent(searchParams.toString());
+          if (typeof row.filter !== 'undefined') {
+            style[0].thematic.push({
+              image: { src: imgUrl },
+              filter: row.filter,
+              name: row.name,
+              label: row.title || row.name,
+              visible: row.visible !== false
+            });
+            if (activeThemes && hasThemeLegend) {
+              const lastItem = style[0].thematic[style[0].thematic.length - 1];
+              lastItem.visible = activeThemes.includes(row.name || row.title);
+            }
+          }
         });
-        if (activeThemes && hasThemeLegend) {
-          const lastItem = style[0].thematic[style[0].thematic.length - 1];
-          lastItem.visible = activeThemes.includes(row.name || row.title);
-        }
-      }
-    });
-    viewer.setStyle(styleName, style);
-    updateLayer(layer, viewer);
+        viewer.setStyle(styleName, style);
+        updateLayer(layer, viewer);
+      })();
+      thematicPromises.set(styleName, promise);
+    }
+    await thematicPromises.get(styleName);
   }
+
   const cmps = [];
+
   for (let index = 0; index < style[0].thematic.length; index += 1) {
     const rule = style[0].thematic[index];
     let label = rule.label || '';
