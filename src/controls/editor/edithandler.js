@@ -70,16 +70,6 @@ let modifyDrawSnapInteraction;
 let modifyDrawInteraction;
 let component;
 
-function isActive() {
-  // FIXME: this only happens at startup as they are set to null on closing. If checking for null/falsley/not truely it could work as isVisible with
-  // the exption that it can not determine if it is visble before interactions are set, i.e. it can't be used to determine if interactions should be set.
-  // Right now it does not matter as it is not used anywhere critical.
-  if (modify === undefined || select === undefined) {
-    return false;
-  }
-  return true;
-}
-
 function setActive(editType) {
   map.removeInteraction(modifyDrawSnapInteraction);
   modifyDrawSnapInteraction = null;
@@ -513,24 +503,22 @@ function addSnapInteraction(sources) {
 }
 
 function removeInteractions() {
-  if (isActive()) {
-    map.removeInteraction(modify);
-    map.removeInteraction(select);
-    map.removeInteraction(draw);
-    if (snap) {
-      snap.forEach((snapInteraction) => {
-        map.removeInteraction(snapInteraction);
-      });
-    }
-
-    modify = null;
-    select = null;
-    draw = null;
-    snap = null;
-    // The select interaction is deleted and recreated so we must send the select event manually as
-    // the selection collection events are not fired when interaction is destroyed effectively selecting nothing.
-    component.dispatch('select', []);
+  map.removeInteraction(modify);
+  map.removeInteraction(select);
+  map.removeInteraction(draw);
+  if (snap) {
+    snap.forEach((snapInteraction) => {
+      map.removeInteraction(snapInteraction);
+    });
   }
+
+  modify = null;
+  select = null;
+  draw = null;
+  snap = null;
+  // The select interaction is deleted and recreated so we must send the select event manually as
+  // the selection collection events are not fired when interaction is destroyed effectively selecting nothing.
+  component.dispatch('select', []);
 }
 
 function setAllowedOperations() {
@@ -837,8 +825,8 @@ function setEditProps(options) {
     const layer = viewer.getLayer(layerName);
     const layerProperties = layerProps;
     const snapLayers = options.snapLayers || editableLayers;
-    snap = 'snap' in options ? options.snap : true;
-    layer.set('snap', snap);
+    const snapOn = 'snap' in options ? options.snap : true;
+    layer.set('snap', snapOn);
     layer.set('snapLayers', snapLayers);
     layerProperties[layerName] = layer;
     return layerProps;
@@ -916,7 +904,7 @@ function onDeleteSelected() {
 function startDraw() {
   if (!editLayers[currentLayer].get('geometryType')) {
     alert(`"geometryType" har inte angivits för ${editLayers[currentLayer].get('name')}`);
-  } else if (hasDraw !== true && isActive()) {
+  } else if (!hasDraw) {
     setActive('draw');
     hasDraw = true;
     dispatcher.emitChangeEdit('draw', true);
