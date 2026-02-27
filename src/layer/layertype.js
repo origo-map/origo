@@ -12,7 +12,7 @@ import xyz from './xyz';
 import osm from './osm';
 import vectortile from './vectortile';
 import feature from './featurelayer';
-import realtime from './realtime';
+import featuresApi from './featuresapi';
 
 const layerType = {};
 
@@ -30,6 +30,6 @@ layerType.XYZ = xyz;
 layerType.OSM = osm;
 layerType.VECTORTILE = vectortile;
 layerType.FEATURE = feature;
-layerType.REALTIME = realtime;
+layerType.FEATURESAPI = featuresApi;
 
 export default layerType;
