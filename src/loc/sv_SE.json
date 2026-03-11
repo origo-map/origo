@@ -9,6 +9,7 @@
             "startMeasureTooltip": "Klicka för att börja mäta",
             "lengthTooltip": "Längd",
             "areaTooltip": "Yta",
+            "objectTooltip": "Mät befintliga objekt",
             "clearTooltip": "Rensa",
             "bufferTooltip": "Buffert",
             "bufferModalTitle": "Ange buffert i meter (ex 1000):",
