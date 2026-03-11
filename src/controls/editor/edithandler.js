@@ -9,6 +9,7 @@ import { noModifierKeys } from 'ol/events/condition';
 import VectorSource from 'ol/source/Vector';
 import VectorLayer from 'ol/layer/Vector';
 import { squaredDistance, toFixed } from 'ol/math';
+import { createEditingStyle } from 'ol/style/Style';
 import { Button, Element as El, Modal, Component } from '../../ui';
 import FloatingPanel from '../../ui/floatingpanel';
 import store from './editsstore';
@@ -27,6 +28,7 @@ import attachmentsform from './attachmentsform';
 import relatedTablesForm from './relatedtablesform';
 import relatedtables from '../../utils/relatedtables';
 import Style from '../../style';
+import { selectionStyle } from '../../style/drawstyles';
 import UndoStack from '../../utils/undostack';
 
 const editsStore = store();
@@ -70,6 +72,7 @@ let useTrace;
 let modifyDrawSnapInteraction;
 let modifyDrawInteraction;
 let component;
+let defaultSelectionStyle;
 let undoHandler;
 let reuseIds;
 
@@ -798,6 +801,37 @@ function traceCallback(evt) {
   // Return true to allow the trace start/stop.
   return true;
 }
+
+/**
+ * Creates a style function that returns styles for selecting a feature for modification
+ * Uses the same default symbol that Select interaction uses, but adds points on all vertices.
+ * The function handles all geometry types.
+ * Most of this function is knicked from ol/interaction/Select getDefaultStyleFunction(), but that is not exported
+ * @returns A function that return styles
+ */
+function getDefaultSelectStyleFunction() {
+  // Get same default symbol that select uses.
+  const styles = createEditingStyle();
+  // For some odd reason createEditingStyle does not create outlines on polygons, so we add them here
+  // This is exactly what ol/interaction/Select getDefaultStyleFunction() also does, but they forgot MultiPolygon
+  styles.Polygon = styles.Polygon.concat(styles.LineString);
+  styles.MultiPolygon = styles.MultiPolygon.concat(styles.LineString);
+  styles.GeometryCollection = styles.GeometryCollection.concat(styles.LineString);
+
+  // Return the actual styling function
+  return (feature) => {
+    if (!feature.getGeometry()) {
+      return null;
+    }
+    const geometryType = feature.getGeometry().getType();
+    if (geometryType === 'Point' || geometryType === 'MultiPoint') {
+      return styles[geometryType];
+    }
+    // For non-points, add the vertices styles from drawstyles
+    return [...styles[geometryType], selectionStyle];
+  };
+}
+
 function setInteractions(drawType) {
   const editLayer = editLayers[currentLayer];
   attributes = editLayer.get('attributes');
@@ -823,7 +857,8 @@ function setInteractions(drawType) {
   hasDraw = false;
   select = new Select({
     layers: [editLayer],
-    multi: !!floatingPanelCmp
+    multi: !!floatingPanelCmp,
+    style: defaultSelectionStyle
   });
   // Dispatch Component event when selection changes. 'change' is never emitted from Collection, so it's both 'add' and 'remove'.
   // select interaction's 'select' event is not fired when the feature collection is manipulated manually, so we take events from
@@ -2232,6 +2267,7 @@ export default function editHandler(options, v) {
       component = this;
       viewer = v;
       map = viewer.getMap();
+      defaultSelectionStyle = getDefaultSelectStyleFunction();
       undoHandler = new UndoStack({ maxLength: options.maxUndoLevels });
       reuseIds = options.reuseIds;
 
