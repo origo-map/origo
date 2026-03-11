@@ -76,7 +76,7 @@ const externalurlSeveralButtons = function externalurlSeveralButtons(options = {
       });
 
       externalUrlMainButton = Button({
-        cls: 'o-measure padding-small icon-smaller round light box-shadow',
+        cls: 'o-external-url padding-small margin-bottom-smaller icon-smaller round light box-shadow',
         icon: mainbuttonIcon,
         tooltipText: mainbuttonTooltipText,
         tooltipPlacement: 'east',
