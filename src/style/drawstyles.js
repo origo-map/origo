@@ -469,6 +469,27 @@ function getSegmentLabelStyle({ line, projection, scale = 1, segmentStyles = [],
   return style;
 }
 
+function getVertexStyle({ geometry, scale = 1, highlightColor } = {}) {
+  const geomType = geometry.getType();
+  const coords = geomType === 'Polygon'
+    ? geometry.getCoordinates()[0].slice(0, -1)
+    : geometry.getCoordinates();
+
+  const vertexBaseStyle = new Style({
+    image: new CircleStyle({
+      radius: 5 * scale,
+      fill: new Fill({ color: highlightColor || 'rgba(0, 153, 255, 0.8)' }),
+      stroke: new Stroke({ color: 'rgba(255, 255, 255, 0.95)', width: 2 * scale })
+    })
+  });
+
+  return coords.map((coord) => {
+    const vertexStyle = vertexBaseStyle.clone();
+    vertexStyle.setGeometry(new Point(coord));
+    return vertexStyle;
+  });
+}
+
 function getBufferPointStyle(scale = 1) {
   return new Style({
     fill: new Fill({
@@ -602,6 +623,7 @@ export {
   getBufferPointStyle,
   getLabelStyle,
   getSegmentLabelStyle,
+  getVertexStyle,
   labelStyle,
   measure,
   measureStyle,

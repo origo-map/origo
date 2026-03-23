@@ -105,6 +105,16 @@ const Measure = function Measure({
       labelStyle.getText().setText(label);
       styles.push(labelStyle);
     }
+
+    if (geomType === 'Polygon' || geomType === 'LineString') {
+      const vertexStyles = drawStyles.getVertexStyle({
+        geometry,
+        scale: styleScale,
+        highlightColor
+      });
+      styles = styles.concat(vertexStyles);
+    }
+
     if (
       tip
       && geomType === 'Point'
