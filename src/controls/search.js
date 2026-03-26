@@ -38,7 +38,8 @@ const Search = function Search(options = {}) {
     maxZoomLevel,
     limit,
     hintText,
-    minLength
+    minLength,
+    searchDelay = 400
   } = options;
 
   const {
@@ -69,6 +70,7 @@ const Search = function Search(options = {}) {
   let containerElement;
   let wrapperElement;
   let infowindow;
+  let debounceTimer;
 
   function clear() {
     featureInfo.clear();
@@ -569,21 +571,24 @@ const Search = function Search(options = {}) {
       if (queryType) {
         queryUrl += `&t=${queryType}`;
       }
-      fetch(queryUrl)
-        .then(response => response.json())
-        .then((data) => {
-          let list = [];
-          searchDb = {};
-          if (data.length) {
-            setSearchDb(data);
-            if (name && groupSuggestions && !ignoreGroup) {
-              list = groupToList(groupDb(searchDb));
-            } else {
-              list = dbToList(data);
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        fetch(queryUrl)
+          .then(response => response.json())
+          .then((data) => {
+            let list = [];
+            searchDb = {};
+            if (data.length) {
+              setSearchDb(data);
+              if (name && groupSuggestions && !ignoreGroup) {
+                list = groupToList(groupDb(searchDb));
+              } else {
+                list = dbToList(data);
+              }
             }
-          }
-          reqHandler(list, searchVal, opt);
-        });
+            reqHandler(list, searchVal, opt);
+          });
+      }, complete ? 0 : searchDelay);
     }
 
     input.addEventListener('keyup', (e) => {
