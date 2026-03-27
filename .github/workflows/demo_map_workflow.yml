@@ -1,0 +1,24 @@
+name: Sync default member layer files to demo map
+on:
+  push:
+    paths:
+      - 'data/origo-cities-3857.geojson'
+      - 'data/origo-mask-3857.geojson'
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout app repo
+        uses: actions/checkout@v4
+
+      - name: Clone, copy, commit, and push
+        run: |
+          git clone https://github.com/origo-map/origo-map.github.io.git
+          cd origo-map.github.io/origo-map-demo
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          cp ../../data/origo-cities-3857.geojson data/
+          cp ../../data/origo-mask-3857.geojson data/
+          git add data/
+          git commit -m "update: default layer files automatically from the Origo repo"
+          git push https://${{ secrets.ORIGO_BOT_UPDATE_DEMO_MAP_MEMBERS }}@github.com/origo-map/origo-map.github.io.git
