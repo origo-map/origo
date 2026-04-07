@@ -2,7 +2,7 @@ name: Sync default member layer files to demo map
 on:
   push:
     branches:
-      - main
+      - master
     paths:
       - 'data/origo-cities-3857.geojson'
       - 'data/origo-mask-3857.geojson'
