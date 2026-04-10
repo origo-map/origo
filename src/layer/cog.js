@@ -11,7 +11,10 @@ function createSource(sourceInfo, sourceOptions, geoTIFFOptions = {}) {
 const cog = function cog(layerOptions, viewer) {
   const cogDefault = {
     layerType: 'tile',
-    crossOrigin: 'anonymous'
+    crossOrigin: 'anonymous',
+    interpolate: true,
+    normalize: true,
+    wrapX: false
   };
 
   const cogOptions = Object.assign({}, cogDefault, layerOptions);
@@ -19,12 +22,34 @@ const cog = function cog(layerOptions, viewer) {
   const sourceInfo = {};
   const sourceOptions = {};
 
-  sourceOptions.headers = cogOptions.headers;
+  if (cogOptions.sourceOptions && typeof cogOptions.sourceOptions === 'object') {
+    Object.assign(sourceOptions, cogOptions.sourceOptions);
+  }
+
+  if (cogOptions.crossOrigin) {
+    sourceOptions.crossOrigin = cogOptions.crossOrigin;
+  }
+
+  if (cogOptions.headers) {
+    sourceOptions.headers = cogOptions.headers;
+  }
 
   if (cogOptions.source && viewer.getMapSource()[cogOptions.source]) {
     sourceInfo.url = viewer.getMapSource()[cogOptions.source].url;
     if (viewer.getMapSource()[cogOptions.source].overviews) {
       sourceInfo.overviews = viewer.getMapSource()[cogOptions.source].overviews;
+    }
+    if (viewer.getMapSource()[cogOptions.source].min !== undefined) {
+      sourceInfo.min = viewer.getMapSource()[cogOptions.source].min;
+    }
+    if (viewer.getMapSource()[cogOptions.source].max !== undefined) {
+      sourceInfo.max = viewer.getMapSource()[cogOptions.source].max;
+    }
+    if (viewer.getMapSource()[cogOptions.source].nodata !== undefined) {
+      sourceInfo.nodata = viewer.getMapSource()[cogOptions.source].nodata;
+    }
+    if (viewer.getMapSource()[cogOptions.source].bands !== undefined) {
+      sourceInfo.bands = viewer.getMapSource()[cogOptions.source].bands;
     }
     cogOptions.sourceName = cogOptions.source;
   } else if (cogOptions.source) {
@@ -37,6 +62,18 @@ const cog = function cog(layerOptions, viewer) {
   if (cogOptions.overviews) {
     sourceInfo.overviews = cogOptions.overviews;
   }
+  if (cogOptions.min !== undefined) {
+    sourceInfo.min = cogOptions.min;
+  }
+  if (cogOptions.max !== undefined) {
+    sourceInfo.max = cogOptions.max;
+  }
+  if (cogOptions.nodata !== undefined) {
+    sourceInfo.nodata = cogOptions.nodata;
+  }
+  if (cogOptions.bands !== undefined) {
+    sourceInfo.bands = cogOptions.bands;
+  }
 
   if (mapSource.url && !sourceInfo.url) {
     sourceInfo.url = mapSource.url;
@@ -46,15 +83,12 @@ const cog = function cog(layerOptions, viewer) {
   }
 
   const geoTIFFOptions = {};
-  if (cogOptions.projection) {
-    geoTIFFOptions.projection = cogOptions.projection;
-  }
-  if (cogOptions.convertToRGB !== undefined) {
-    geoTIFFOptions.convertToRGB = cogOptions.convertToRGB;
-  }
-  if (cogOptions.normalize !== undefined) {
-    geoTIFFOptions.normalize = cogOptions.normalize;
-  }
+
+  ['projection', 'convertToRGB', 'normalize', 'wrapX', 'interpolate', 'transition', 'cacheSize', 'minZoom', 'maxZoom', 'tileSize', 'gutter', 'reprojectionErrorThreshold', 'key'].forEach((option) => {
+    if (cogOptions[option] !== undefined) {
+      geoTIFFOptions[option] = cogOptions[option];
+    }
+  });
 
   const cogSource = createSource(sourceInfo, sourceOptions, geoTIFFOptions);
   const options = Object.assign({}, cogOptions, { source: cogSource });
