@@ -21,6 +21,12 @@ class FeaturesApiSource extends VectorSource {
   /** Timer handle to keep track if we already have a reconnect in waiting */
   _reconnectTimer;
 
+  /** Keeps track of if a full reconnect should be performed even when realtimeConnect is 'stream'
+   * Happens when WS closes with code 1008 to indicate that the stream is no longer available
+   * Most likely happens on reconnect to stream and the server uses sessions and the session is lost
+   */
+  _forceFullReconnect = false;
+
   /**
      * Creates a new instance of FeaturesApiSource
      * @param {any} options The options to use.
@@ -31,7 +37,6 @@ class FeaturesApiSource extends VectorSource {
       attributions: options.attribution,
       // Save a common formatter to not have to set coordsys every time
       format: new GeoJSONFormat({
-        geometryName: options.geometryName,
         // Defaults to 4326 for GeoJSON as per spec, set in layer. But server may send in any CRS.
         // Some sources can send actual CRS in GeoJson, but that is ignored.
         dataProjection: options.dataProjection,
@@ -92,12 +97,8 @@ class FeaturesApiSource extends VectorSource {
 
   /**
    * handles error events from the websocket connection.
-   * @param {*} event The raw event from Javascript
    */
-  onWsError(event) {
-    // Too bad that we don't get any useful info from the error event
-    // Close event is better.
-    console.error('WS error', event);
+  onWsError() {
     // Errors can just keep coming due to reconnect, only notify once
     if (!this._alreadyNotifiedError) {
       this._alreadyNotifiedError = true;
@@ -123,6 +124,7 @@ class FeaturesApiSource extends VectorSource {
    */
   clearErrorNotification() {
     this._wsTimeout = RETRY_DELAY;
+    this._forceFullReconnect = false;
     if (this._alreadyNotifiedError) {
       this.showToast('connectionRestored', 'success');
       this._alreadyNotifiedError = false;
@@ -159,15 +161,13 @@ class FeaturesApiSource extends VectorSource {
     this._ws = new WebSocket(addr, 'cloudevents.json');
 
     // The open event handler. Resets state
-    this._ws.addEventListener('open', (event) => {
-      console.log('Socket open', event);
+    this._ws.addEventListener('open', () => {
       this.clearErrorNotification();
     });
 
     // Listen for messages on websocket and call the appropriate action according to the
     // CloudEvent type.
     this._ws.addEventListener('message', (event) => {
-      console.log('Message from server ', event.data);
       const cloudEvent = JSON.parse(event.data);
       const eventType = cloudEvent.type;
       // Handle the events we know about. Ignore everyting else
@@ -184,9 +184,8 @@ class FeaturesApiSource extends VectorSource {
     // Handle errors on websocket. Errors can occur for various reasons, but we get
     // little information, so there is not much we can do. Most common errors are
     // network disconnect or server not responding.
-    this._ws.addEventListener('error', (event) => {
-      this.onWsError(event);
-      console.error('Error ', event);
+    this._ws.addEventListener('error', () => {
+      this.onWsError();
     });
 
     // Handle close event. Close can be both intentional or unintentional (due to errors, which may not be
@@ -195,8 +194,16 @@ class FeaturesApiSource extends VectorSource {
       // Ignore code 1000 which is intentional close, most likely from our side when
       // hiding layer.
       if (event.code !== 1000) {
-        console.error('Closing ', event);
-        this.onWsError(event);
+        // Server can indicate intentional disconnect due to "protocol error". We interpret that as the stream is no longer valid
+        // but the featuresapi may give us a new working stream as it was featuresapi that gave us the stream in the first place and
+        // thus is repsonsible for the "protocol". Most likely it is a stream reconnect to a server that uses sessions and the session
+        // has expired between reconnects so the server does not have enough information for creating a new stream using only the WS call.
+        // Remember that you can not reconnect to a websocket, it always creates a new socket using the provided information (url, query args,
+        // headers, cookies, supported protocols, etc), which constitutes the "protocol".
+        if (event.code === 1008) {
+          this._forceFullReconnect = true;
+        }
+        this.onWsError();
       }
     });
   }
@@ -240,7 +247,7 @@ class FeaturesApiSource extends VectorSource {
       // Only reconnect if this is a result of a reconnect due to dropped connection on stream.
       // Failed connecions on first call throws and leaves the layer as not ready (right or wrong, but
       // that's how other layers work), which means OL just ignores it.
-      if (this._options.realtimeReconnect === 'full' && this._alreadyNotifiedError) {
+      if (this._alreadyNotifiedError) {
         this.onWsError(e);
       } else {
         throw (e);
@@ -253,8 +260,8 @@ class FeaturesApiSource extends VectorSource {
    * Reconnnects according to configured reconnection policy
    */
   reconnect() {
-    if (this._options.realtimeReconnect === 'full') {
-      console.log('Performing full reconnect');
+    if (!this._wsUrl) this._forceFullReconnect = true;
+    if (this._options.realtimeReconnect === 'full' || this._forceFullReconnect) {
       // This can unintentionally turn into a sort of polling mechanism if the features api call succeeds
       // and the server returns features, but the connection to the stream fails later.
       this._loaderHelper().then(features => {
@@ -265,8 +272,8 @@ class FeaturesApiSource extends VectorSource {
           super.addFeatures(features);
         }
       });
-    } else if (this._options.realtimeReconnect === 'stream') {
-      console.log('Performing stream reconnect');
+    } else {
+      // Must be 'stream', as 'none' never triggers reconnect in the first place
       this._connectToWs(this._wsUrl);
     }
   }

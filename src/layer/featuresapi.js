@@ -22,17 +22,12 @@ export default function featuresapi(options, viewer) {
   sourceOptions.featureType = layerOptions.id;
   sourceOptions.title = layerOptions.title;
   layerOptions.featureType = layerOptions.id;
-  sourceOptions.geometryName = layerOptions.geometryName;
   sourceOptions.realtime = layerOptions.realtime;
   sourceOptions.realtimeReconnect = layerOptions.realtimeReconnect;
   sourceOptions.realtimeDisconnectOnHide = layerOptions.realtimeDisconnectOnHide;
   sourceOptions.credentials = layerOptions.credentials;
-  // TODO: clear out options that are not relevant for FeaturesApiSource
-  sourceOptions.filter = layerOptions.filter;
   sourceOptions.attribution = layerOptions.attribution;
-  sourceOptions.customExtent = layerOptions.extent;
   layerOptions.extent = undefined;
-  sourceOptions.resolutions = viewer.getResolutions();
   sourceOptions.projectionCode = viewer.getProjectionCode();
   // Source is GeoJson. It only supports 4326 according to spec, but we let configuration override that
   if (layerOptions.projection) {
@@ -48,7 +43,6 @@ export default function featuresapi(options, viewer) {
   // Set up a handler so source can disconnect when hidden
   function onVisibilityChange(evt) {
     featuresApiSource.setActive(evt.target.getVisible());
-    console.log('Realtime layer visibility changed', evt);
   }
   const vectorLayer = vector(layerOptions, featuresApiSource, viewer);
   // Set up a handler so source can disconnect when hidden
