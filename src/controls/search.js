@@ -38,8 +38,7 @@ const Search = function Search(options = {}) {
     maxZoomLevel,
     limit,
     hintText,
-    minLength,
-    searchDelay = 400
+    minLength
   } = options;
 
   const {
@@ -50,7 +49,8 @@ const Search = function Search(options = {}) {
     searchlistOptions = {},
     queryType,
     suppressDialog,
-    localization
+    localization,
+    searchDelay = 400
   } = options;
 
   function localize(key) {
