@@ -9,6 +9,7 @@
             "startMeasureTooltip": "Click to start measuring",
             "lengthTooltip": "Length",
             "areaTooltip": "Area",
+            "objectTooltip": "Measure existing features",
             "clearTooltip": "Clear",
             "bufferTooltip": "Buffer",
             "bufferModalTitle": "Enter buffer radius in meters (e.g. 1000):",
