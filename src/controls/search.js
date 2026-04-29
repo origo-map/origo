@@ -617,6 +617,7 @@ const Search = function Search(options = {}) {
           }
         }
       } else {
+        clearTimeout(debounceTimer);
         switch (searchlistPlacement) {
           case 'floating':
           case 'left':
