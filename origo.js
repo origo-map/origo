@@ -8,6 +8,7 @@ import * as olSource from 'ol/source';
 import * as olStyle from 'ol/style';
 import * as olFormat from 'ol/format';
 import * as olProj from 'ol/proj';
+import OLCesium from 'olcs/OLCesium';
 import * as ui from './src/ui';
 import Viewer from './src/viewer';
 import loadResources from './src/loadresources';
@@ -32,8 +33,10 @@ import * as Loader from './src/loading';
 import Spinner from './src/utils/spinner';
 import layerType from './src/layer/layertype';
 import mapUtils from './src/maputils';
+import stripJSONComments from './src/utils/stripjsoncomments';
 
 const Origo = function Origo(configPath, options = {}) {
+  window.OLCesium = OLCesium;
   /** Reference to the returned Component */
   let origo;
   let viewer;
@@ -207,5 +210,7 @@ Origo.Loader.withLoading = Loader.withLoading;
 Origo.Loader.getInlineSpinner = Spinner;
 Origo.layerType = layerType;
 Origo.mapUtils = mapUtils;
+Origo.stripJSONComments = stripJSONComments;
+// window.OLCesium = OLCesium;
 
 export default Origo;
