@@ -382,6 +382,9 @@ const Group = function Group(viewer, options = {}) {
       groupEl.addEventListener('mouseenter', () => {
         activateLazyLegendImages(groupEl);
       });
+      groupEl.addEventListener('click', () => {
+        activateLazyLegendImages(groupEl);
+      });
       if (viewer.getControlByName('legend').getuseGroupIndication() && type === 'group') {
         updateGroupIndication();
         this.on('add:overlay', () => {

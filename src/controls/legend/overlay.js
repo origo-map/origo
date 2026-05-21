@@ -199,6 +199,9 @@ const OverlayLayer = function OverlayLayer(options) {
       el.addEventListener('mouseenter', () => {
         activateLazyLegendImages(el);
       });
+      el.addEventListener('click', () => {
+        activateLazyLegendImages(el);
+      });
       el.addEventListener('focusin', () => {
         activateLazyLegendImages(el);
       });
