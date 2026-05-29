@@ -405,12 +405,13 @@ export const activateLazyLegendImages = function activateLazyLegendImages(rootEl
   }
   const lazyImages = rootEl.querySelectorAll('img[data-legend-src]');
   lazyImages.forEach((img) => {
-    if (!img.src) {
-      const legendSrc = img.dataset.legendSrc;
+    const imageEl = img;
+    if (!imageEl.src) {
+      const legendSrc = imageEl.dataset.legendSrc;
       if (legendSrc) {
-        img.src = legendSrc;
+        imageEl.src = legendSrc;
       }
-      delete img.dataset.legendSrc;
+      delete imageEl.dataset.legendSrc;
     }
   });
 };
