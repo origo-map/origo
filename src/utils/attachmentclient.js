@@ -111,8 +111,8 @@ const attachmentclient = function attachmentclient(layer) {
   /**
    * Posts a new attachment to the server
    * @param {any} feature The feature the attachments belongs to
-   * @param {any} file The actual file object
-   * @param {any} group Name of the group that the attachment belongs to. Ingored for arcgis.
+   * @param {File} file The actual file object
+   * @param {string} group Name of the group that the attachment belongs to. Ingored for arcgis.
    * @returns A promise when resolved returns the id of the newly created attachment
    */
   const addAttachment = function addAttachment(feature, file, group) {
@@ -138,6 +138,27 @@ const attachmentclient = function attachmentclient(layer) {
     // No error handling. Let caller deal with that.
     return retval;
   };
+
+  /**
+   * Multiple wrapper for addAttachment
+   * @param {*} feature The feature the attachments belongs to
+   * @param {FileList} files Files to attach
+   * @param {string} group Name of the group that the attachments belong to. Ingored for arcgis.
+   * @returns A promise that rejects if any file failed
+   */
+  async function addAttachments(feature, files, group) {
+    const tasks = [];
+    // FileList is not a true Array, so we have to loop old school
+    // Luckily for us, it is never empty when coming from file input event.
+    for (let i = 0; i < files.length; i += 1) {
+      tasks.push(addAttachment(feature, files[i], group));
+    }
+    // Just return fail or success. Form will re-read current attachments from server so it will list those who succeeded and omit
+    // those that failed
+    const res = await Promise.all(tasks);
+    return res;
+  }
+
   /**
    * Deletes an attachemnt from the server
    * @param {any} feature The feature that the attachment belongs to
@@ -165,6 +186,7 @@ const attachmentclient = function attachmentclient(layer) {
   return {
     getAttachments,
     addAttachment,
+    addAttachments,
     deleteAttachment,
     getGroups
   };

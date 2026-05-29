@@ -8,16 +8,6 @@ const urlSuffix = {
   delete: 'deleteFeatures'
 };
 
-function error(e) {
-  const errorMsg = e ? `Det inträffade ett fel när ändringarna skulle sparas till servern...<br><br> ${e.status} ${e.statusText}` : '';
-  alert(errorMsg);
-}
-
-function throwServerError(e) {
-  const errorMsg = `${e.description} (${e.code})`;
-  alert(errorMsg);
-}
-
 function writeAgsTransaction(features, options) {
   const data = {};
 
@@ -34,12 +24,25 @@ function writeAgsTransaction(features, options) {
   return data;
 }
 
-function agsTransaction(transObj, layerName, viewer) {
+function agsTransaction(transObj, layerName, viewer, opts) {
+  const {
+    localizeFunc
+  } = opts;
   const projection = viewer.getProjection();
   const layer = viewer.getLayer(layerName);
   const id = layer.get('id');
   const source = viewer.getMapSource()[layer.get('sourceName')];
   const types = Object.getOwnPropertyNames(transObj);
+
+  function error(e) {
+    const errorMsg = e instanceof Error ? `<br>${localizeFunc('additionalErrorInformation')}<br><br>${e.message})` : '';
+    viewer.getLogger().createToast({ status: 'danger', message: `${localizeFunc('saveError')}${errorMsg}`, title: localizeFunc('generalErrorTitle') });
+  }
+
+  function throwServerError(e) {
+    const errorMsg = `<br>${localizeFunc('additionalErrorInformation')}<br><br>${e.description} (${e.code})`;
+    viewer.getLogger().createToast({ status: 'danger', message: `${localizeFunc('saveError')}${errorMsg}`, title: localizeFunc('generalErrorTitle') });
+  }
 
   function updateSuccess(data) {
     const feature = transObj.update;
@@ -142,6 +145,6 @@ function agsTransaction(transObj, layerName, viewer) {
   });
 }
 
-export default function agstransaction(transObj, layerName, viewer) {
-  agsTransaction(transObj, layerName, viewer);
+export default function agstransaction(transObj, layerName, viewer, opts = {}) {
+  agsTransaction(transObj, layerName, viewer, opts);
 }

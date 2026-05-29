@@ -6,10 +6,6 @@ import makeEmptyList from './utils/makeEmptyList';
 import moveBtn from './utils/moveBtn';
 import spinner from '../../../../utils/spinner';
 
-/** Default user message. Can be overriden by config. */
-const hintTypeMore = 'Skriv fler tecken';
-/** Default user message. Can be overriden by config. */
-const hintNoHits = 'Inga träffar';
 /** Attribute name in DOM for backing data */
 const databackingValue = 'data-backing-value';
 
@@ -65,7 +61,11 @@ function imageItemFormatter(text, itemInput) {
  * @param {Object} conf.config An object with the documented searchList configuration.
  * @param {Object} conf.list The list of suggestions. Optional for remote list
  */
-function searchList(input, conf) {
+function searchList(input, conf, opts = {}) {
+  const {
+    localizeFunc,
+    viewer
+  } = opts;
   /** The list of items set to awesome */
   let olist = conf.list || [];
   const searchListConfig = conf.config;
@@ -234,9 +234,9 @@ function searchList(input, conf) {
     if (input.value.length === 0) {
       hideMessage();
     } else if (input.value.length < awesome.minChars) {
-      setMessage(searchListConfig.typeMoreText || hintTypeMore);
+      setMessage(searchListConfig.typeMoreText || localizeFunc('typeMore'));
     } else if (!awesome.opened) {
-      setMessage(searchListConfig.noHitsText || hintNoHits);
+      setMessage(searchListConfig.noHitsText || localizeFunc('noHits'));
     }
   }
 
@@ -262,7 +262,7 @@ function searchList(input, conf) {
     })
       .catch(e => {
         console.error(e);
-        alert('Autocompleteservern svarar inte');
+        viewer.getLogger().createToast({ status: 'danger', message: localizeFunc('suggestServerError'), title: localizeFunc('generalErrorTitle') });
         hideMessage();
       });
   }
@@ -308,7 +308,7 @@ function searchList(input, conf) {
     })
       .catch(e => {
         console.error(e);
-        alert('Autocompleteservern svarar inte');
+        viewer.getLogger().createToast({ status: 'danger', message: localizeFunc('suggestServerError'), title: localizeFunc('generalErrorTitle') });
         hideMessage();
       });
   }

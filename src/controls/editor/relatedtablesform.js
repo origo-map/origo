@@ -9,7 +9,10 @@ import relatedtables from '../../utils/relatedtables';
  * @param {any} feature The parent feature that related items should be displayed for
  * @param {any} el The DOM element where the form is to be dispalyed. It must exist and content is overwritten.
  */
-function relatedTablesForm(viewer, layer, feature, el) {
+function relatedTablesForm(viewer, layer, feature, el, opts = {}) {
+  const {
+    localizeFunc
+  } = opts;
   // Shortest way to clear out contents. Must be allowed.
   // eslint-disable-next-line no-param-reassign
   el.innerHTML = '';
@@ -34,9 +37,9 @@ function relatedTablesForm(viewer, layer, feature, el) {
 
         // Add the deletebutton to the row
         if (!relatedLayerConf.disableDelete) {
-          const deleteButtonEl = createElement('button', '<span class="icon"><svg class="o-icon-24"><use xlink:href="#ic_delete_24px"></use></svg></span><span data-tooltip="Ta bort"></span>', { cls: 'compact o-tooltip hover', 'aria-label': 'Ta bort' });
+          const deleteButtonEl = createElement('button', `<span class="icon"><svg class="o-icon-24"><use xlink:href="#ic_delete_24px"></use></svg></span><span data-tooltip="${localizeFunc('removeButton')}"></span>`, { cls: 'compact o-tooltip hover', 'aria-label': localizeFunc('removeButton') });
           deleteButtonEl.addEventListener('click', () => {
-            if (window.confirm(`Är du säker att du vill ta bort objektet ${itemTitle}?`)) {
+            if (window.confirm(`${localizeFunc('deleteConfirm')} ${itemTitle}?`)) {
               editdispatcher.emitDeleteChild(childLayer, feature, currChild);
             }
           });
@@ -45,7 +48,7 @@ function relatedTablesForm(viewer, layer, feature, el) {
 
         // Add the edit button to the row
         if (!relatedLayerConf.disableEdit) {
-          const editButtonEl = createElement('button', '<span class="icon"><svg class="o-icon-24"><use xlink:href="#ic_edit_24px"></use></svg></span><span data-tooltip="Redigera"></span>', { cls: 'compact o-tooltip hover', 'aria-label': 'Redigera' });
+          const editButtonEl = createElement('button', `<span class="icon"><svg class="o-icon-24"><use xlink:href="#ic_edit_24px"></use></svg></span><span data-tooltip="${localizeFunc('editButton')}"></span>`, { cls: 'compact o-tooltip hover', 'aria-label': localizeFunc('editButton') });
           editButtonEl.addEventListener('click', () => {
             editdispatcher.emitEditChild(childLayer, feature, currChild);
           });
@@ -58,7 +61,7 @@ function relatedTablesForm(viewer, layer, feature, el) {
       // Add an add button
       if (!relatedLayerConf.disableAdd && (!relatedLayerConf.maxChildren || childFeatures.length < relatedLayerConf.maxChildren)) {
         const rowEl = createElement('div', '', { cls: 'flex row padding-x padding-y-smaller row-reverse' });
-        const addButtonEl = createElement('button', '<span class="icon"><svg class="o-icon-24"><use xlink:href="#ic_add_24px"></use></svg></span><span data-tooltip="Lägg till ny"></span>', { cls: 'compact o-tooltip hover', 'aria-label': 'Lägg till' });
+        const addButtonEl = createElement('button', `<span class="icon"><svg class="o-icon-24"><use xlink:href="#ic_add_24px"></use></svg></span><span data-tooltip="${localizeFunc('addButton')}"></span>`, { cls: 'compact o-tooltip hover', 'aria-label': localizeFunc('addButton') });
         addButtonEl.addEventListener('click', () => {
           editdispatcher.emitAddChild(layer, feature, childLayer);
         });
