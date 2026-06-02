@@ -20,7 +20,6 @@ input {
   line-height: variables.$line-height-base;
   margin-bottom: .375rem;
   padding: $button-padding-medium;
-  resize: vertical;
 
   &.grey {
     background-color: variables.$grey-lightest;
