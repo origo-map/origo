@@ -9,12 +9,9 @@ When developing, progressive enhancement is an encouraged strategy. That means t
 
 ## JavaScript
 Origo follows the [Airbnb's JavaScript Style Guide](https://github.com/airbnb/javascript) for EcmaScript 6. There are npm scripts that can be used
-to verify that the code complies with the rules: `npm run lint`to check the code, `npm run lint-run` to run the _webpack dev server_ with lint enabled and
-`npm run lint-build` to lint and build. As the lint rules are also enforced when creating a pull request, there must be no errors in the code. If an error can not be avoided
+to verify that the code complies with the rules: `npm run lint` to check the code. As the lint rules are also enforced when creating a pull request, there must be no errors in the code. If an error can not be avoided
 it must be ignored by adding a _eslint_ ignore comment: `// eslint-disable-next-line <name-of-error>`. There should also be a comment that
 clearly states why it is ignored instead of fixed.
-
-We wish to promote modular development, and in order to do this we have chosen [webpack](https://github.com/webpack/webpack) as the bundler.
 
 Server components are handled separately in the [Origo-server repository](https://github.com/origo-map/origo-server) and are not part of the Origo framework.
 

@@ -63,7 +63,7 @@ The minimum requirements are:
 
   		   npm install
 
- 3. To start webpack-dev-server use:
+ 3. To start a version for local development use:
 
    		  npm start
 

@@ -42,7 +42,7 @@
       "error",
       {
         "devDependencies": [
-          "tasks/**"
+          "vite.config.js"
         ],
         "optionalDependencies": false
       }
