@@ -5,14 +5,11 @@ const format = new WFSFormat();
 const serializer = new XMLSerializer();
 
 function readResponse(data) {
-  let result;
   if (window.Document && data instanceof Document && data.documentElement && data.documentElement.localName === 'ExceptionReport') {
-    alert(data.getElementsByTagNameNS('http://www.opengis.net/ows', 'ExceptionText').item(0).textContent);
-  } else {
-    result = format.readTransactionResponse(data);
+    // This message comes from wfs response and can't be localized.
+    throw new Error(data.getElementsByTagNameNS('http://www.opengis.net/ows', 'ExceptionText').item(0).textContent);
   }
-
-  return result;
+  return format.readTransactionResponse(data);
 }
 
 function writeWfsTransaction(transObj, options, reuseIds) {
@@ -53,7 +50,8 @@ function writeWfsTransaction(transObj, options, reuseIds) {
 
 function wfsTransaction(transObj, layerName, viewer, opts) {
   const {
-    reuseIds
+    reuseIds,
+    localizeFunc
   } = opts;
   const srsName = viewer.getProjectionCode();
   const layer = viewer.getLayer(layerName);
@@ -71,48 +69,44 @@ function wfsTransaction(transObj, layerName, viewer, opts) {
   const node = writeWfsTransaction(transObj, options, reuseIds);
 
   function error(e) {
-    const errorMsg = e ? (`${e.status} ${e.statusText}`) : '';
-    alert(`Det inträffade ett fel när ändringarna skulle sparas till servern...
-      ${errorMsg}`);
+    const errorMsg = e instanceof Error ? `<br>${localizeFunc('additionalErrorInformation')}<br><br>${e.message})` : '';
+    viewer.getLogger().createToast({ status: 'danger', message: `${localizeFunc('saveError')}${errorMsg}`, title: localizeFunc('generalErrorTitle') });
   }
 
   function success(data) {
     const result = readResponse(data);
     let feature;
-    if (result) {
-      if (result.transactionSummary.totalUpdated > 0) {
-        dispatcher.emitChangeFeature({
-          feature: transObj.update,
-          layerName,
-          status: 'finished',
-          action: 'update'
-        });
-      }
-
-      if (result.transactionSummary.totalDeleted > 0) {
-        dispatcher.emitChangeFeature({
-          feature: transObj.delete,
-          layerName,
-          status: 'finished',
-          action: 'delete'
-        });
-      }
-
-      if (result.transactionSummary.totalInserted > 0) {
-        feature = transObj.insert;
-
-        dispatcher.emitChangeFeature({
-          feature: transObj.insert,
-          layerName,
-          status: 'finished',
-          action: 'insert'
-        });
-        const insertIds = result.insertIds;
-        insertIds.forEach((insertId, index) => feature[index].setId(insertId));
-      }
-    } else {
-      error();
+    if (result.transactionSummary.totalUpdated > 0) {
+      dispatcher.emitChangeFeature({
+        feature: transObj.update,
+        layerName,
+        status: 'finished',
+        action: 'update'
+      });
     }
+
+    if (result.transactionSummary.totalDeleted > 0) {
+      dispatcher.emitChangeFeature({
+        feature: transObj.delete,
+        layerName,
+        status: 'finished',
+        action: 'delete'
+      });
+    }
+
+    if (result.transactionSummary.totalInserted > 0) {
+      feature = transObj.insert;
+
+      dispatcher.emitChangeFeature({
+        feature: transObj.insert,
+        layerName,
+        status: 'finished',
+        action: 'insert'
+      });
+      const insertIds = result.insertIds;
+      insertIds.forEach((insertId, index) => feature[index].setId(insertId));
+    }
+    return result;
   }
 
   const header = new Headers();
@@ -126,8 +120,7 @@ function wfsTransaction(transObj, layerName, viewer, opts) {
     .then(res => res.text())
     .then(str => (new window.DOMParser()).parseFromString(str, 'text/xml'))
     .then((data) => {
-      success(data);
-      const result = readResponse(data);
+      const result = success(data);
       let nr = 0;
       if (result) {
         nr += result.transactionSummary.totalUpdated;

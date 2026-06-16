@@ -32,6 +32,7 @@ import { selectionStyle } from '../../style/drawstyles';
 import UndoStack from '../../utils/undostack';
 
 const editsStore = store();
+let localizeFunc;
 let editLayers = {};
 let autoSave;
 let autoForm;
@@ -265,7 +266,7 @@ async function saveFeatures() {
       }
     });
     // If the source does not return a promise it is not awaited for in Promise.all, so this is pretty safe.
-    promises.push(transactionHandler(transaction, layerName, viewer, { reuseIds: getReuseIdsForLayer(layer) }));
+    promises.push(transactionHandler(transaction, layerName, viewer, { reuseIds: getReuseIdsForLayer(layer), localizeFunc }));
   });
   if (!autoSave && clearUndoOnSessionEnd) {
     clearUndoStack();
@@ -538,7 +539,7 @@ function onDrawEnd(evt) {
 
   // If live validation did its job, we should not have to validate here, but freehand bypasses all controls and we can't tell if freehand was used.
   if (validateOnDraw && !topology.isGeometryValid(f.getGeometry())) {
-    alert('Kan ej spara, geometrin är ogiltig');
+    viewer.getLogger().createToast({ status: 'danger', message: localizeFunc('invalidGeometryMsg'), title: localizeFunc('generalErrorTitle') });
   } else {
     addFeature(evt.feature);
   }
@@ -665,7 +666,7 @@ function onCustomDrawEnd(e) {
   const feature = e.detail.feature;
   if (feature) {
     if (!ensureCorrectGeometryType(feature)) {
-      alert('Kan inte lägga till en geometri av den typen i det lagret');
+      viewer.getLogger().createToast({ status: 'danger', message: localizeFunc('badGeometryType'), title: localizeFunc('generalErrorTitle') });
     } else {
       // Must move geometry to correct property. Setting geometryName is not enough.
       if (editLayers[currentLayer].get('geometryName') !== feature.getGeometryName()) {
@@ -1147,7 +1148,7 @@ function onDeleteSelected() {
   // const editSource = editLayers[currentLayer].getSource();
   if (features.getLength() === 1) {
     const feature = features.item(0);
-    const r = window.confirm('Är du säker på att du vill ta bort det här objektet?');
+    const r = window.confirm(localizeFunc('deleteConfirm'));
     if (r === true) {
       deleteFeature(feature, editLayers[currentLayer]).then(() => select.getFeatures().clear());
     }
@@ -1159,7 +1160,8 @@ function onDeleteSelected() {
  */
 function startDraw() {
   if (!editLayers[currentLayer].get('geometryType')) {
-    alert(`"geometryType" har inte angivits för ${editLayers[currentLayer].get('name')}`);
+    // This is a configuration error. No need to localize
+    alert(`"geometryType" is not configured for layer ${editLayers[currentLayer].get('name')}`);
   } else if (hasDraw !== true && isActive()) {
     setActive('draw');
     hasDraw = true;
@@ -1198,7 +1200,7 @@ function onChangeShape(e) {
  */
 function refreshRelatedTablesForm(feature) {
   const relatedTablesFormEl = document.getElementById(`o-relatedtables-form-${currentLayer}`);
-  relatedTablesForm(viewer, viewer.getLayer(currentLayer), feature, relatedTablesFormEl);
+  relatedTablesForm(viewer, viewer.getLayer(currentLayer), feature, relatedTablesFormEl, { localizeFunc });
 }
 
 /** Called when the edit form modal is closed. Reverts the editor state to edit the parent object if the modal was a child table */
@@ -1363,7 +1365,7 @@ function onAttributesSave(features, attrs) {
       const errorOn = document.querySelector(`[id="${inputId}"]`);
       const errorCls = `.o-${inputId}`;
       const errorMsg = document.querySelector(errorCls);
-      const errorText = `Vänligen ange korrekt ${inputName}`;
+      const errorText = `${localizeFunc('invalidField')} ${inputName}`;
       const requiredOn = document.querySelector(`[id="${inputId}"]`);
       const requiredCls = `.o-${inputId}-requiredMsg`;
       const requiredMsg = document.querySelector(requiredCls);
@@ -1372,9 +1374,9 @@ function onAttributesSave(features, attrs) {
       if (!valid.required && inputRequired && inputValue === '') {
         if (!requiredMsg) {
           if (requiredOn.getAttribute('class') === 'awesomplete') {
-            requiredOn.parentNode.insertAdjacentHTML('afterend', `<div class="o-${inputId}-requiredMsg errorMsg fade-in padding-bottom-small">Obligatoriskt fält</div>`);
+            requiredOn.parentNode.insertAdjacentHTML('afterend', `<div class="o-${inputId}-requiredMsg errorMsg fade-in padding-bottom-small">${localizeFunc('mandatoryField')}</div>`);
           } else {
-            requiredOn.insertAdjacentHTML('afterend', `<div class="o-${inputId}-requiredMsg errorMsg fade-in padding-bottom-small">Obligatoriskt fält</div>`);
+            requiredOn.insertAdjacentHTML('afterend', `<div class="o-${inputId}-requiredMsg errorMsg fade-in padding-bottom-small">${localizeFunc('mandatoryField')}`);
           }
         }
       } else if (requiredMsg) {
@@ -1597,7 +1599,7 @@ function addImageListener() {
     document.querySelector(`#${obj.elId}`).addEventListener('change', (ev) => {
       if (ev.target.files && ev.target.files[0]) {
         document.querySelector(`${containerClass} img`).classList.remove('o-hidden');
-        document.querySelector(`${containerClass} input[type=button]`).classList.remove('o-hidden');
+        document.querySelector(`${containerClass} .o-delete-image-button`).classList.remove('o-hidden');
         fileReader.onload = () => {
           // When the file has been read, rotate it and resize to configured max size or default max
           // Don't know why it's rotated. Probably something to do with iphones that store images upside down.
@@ -1616,7 +1618,7 @@ function addImageListener() {
       }
     });
     // Find the remove button and attach event handler.
-    document.querySelector(`${containerClass} input[type=button]`).addEventListener('click', (e) => {
+    document.querySelector(`${containerClass} .o-delete-image-button`).addEventListener('click', (e) => {
       // Clear the filename
       document.getElementById(obj.elId).value = '';
       // Also clear the model value
@@ -1645,7 +1647,7 @@ function addAudioListener() {
     const containerElement = document.getElementsByClassName(`.${obj.elId}`);
 
     if (!containerElement) return;
-    const inputElement = document.querySelector(`.${obj.elId} > input[type='file']`);
+    const inputElement = document.querySelector(`.${obj.elId} .o-hidden-fileselector`);
     const inputUrlElement = document.querySelector(`.${obj.elId} > input[type='url']`);
     const audioElement = document.querySelector(`.${obj.elId} > audio:first-of-type`);
     const buttonElement = document.querySelector(`.${obj.elId} > input[type='button']`);
@@ -1703,7 +1705,7 @@ function addVideoListener() {
     const containerElement = document.getElementsByClassName(`.${obj.elId}`);
 
     if (!containerElement) return;
-    const inputElement = document.querySelector(`.${obj.elId} > input[type='file']`);
+    const inputElement = document.querySelector(`.${obj.elId} .o-hidden-fileselector`);
     const inputUrlElement = document.querySelector(`.${obj.elId} > input[type='url']`);
     const videoElement = document.querySelector(`.${obj.elId} > video:first-of-type`);
     const buttonElement = document.querySelector(`.${obj.elId} > input[type='button']`);
@@ -1769,7 +1771,7 @@ function addBatchEditListener() {
  */
 function turnIntoSearchList(obj) {
   const el = document.getElementById(obj.elId);
-  return searchList(el, { list: obj.list, config: obj.config });
+  return searchList(el, { list: obj.list, config: obj.config }, { localizeFunc, viewer });
 }
 
 /**
@@ -1839,7 +1841,8 @@ function editAttributes(feat) {
             obj.elId = `input-${currentLayer}-${obj.name}-${slugify(obj.requiredVal)}`;
             obj.elDependencyId = `input-${currentLayer}-${constraintProps[1]}`;
           } else {
-            alert('Villkor verkar inte vara rätt formulerat. Villkor formuleras enligt principen change:attribute:value');
+            // This is a configuration error. No need to localize
+            alert('Bad constraint. Should be "change:attribute:value"');
           }
         } else if (obj.type === 'checkboxgroup') {
           if (obj.options && obj.options.length > 0 && obj.val) {
@@ -1881,14 +1884,14 @@ function editAttributes(feat) {
           // Hide the attribute that this checkbox is connected to so it won't be changed unless user checks the box first.
           obj.isVisible = false;
           // Inject the checkbox next to the attribute
-          obj.formElement = editForm(batchObj) + editForm(obj);
+          obj.formElement = editForm(batchObj, { localizeFunc }) + editForm(obj, { localizeFunc });
 
           // Defer adding click handler until element exists in DOM
           batchObj.addListener = addBatchEditListener();
 
           batchEditBoxes.push(batchObj);
         } else {
-          obj.formElement = editForm(obj);
+          obj.formElement = editForm(obj, { localizeFunc });
         }
         return obj;
       });
@@ -1907,9 +1910,9 @@ function editAttributes(feat) {
       attachmentsForm = `<div id="o-attach-form-${currentLayer}"></div>`;
     }
 
-    let form = `<div id="o-form">${formElement}${relatedTablesFormHTML}${attachmentsForm}<br><div class="o-form-save"><input id="o-save-button-${currentLayer}" type="button" value="OK" class="o-editor-input" aria-label="OK"></input></div></div>`;
+    let form = `<div id="o-form">${formElement}${relatedTablesFormHTML}${attachmentsForm}<br><div class="o-form-save"><input id="o-save-button-${currentLayer}" type="button" value="${localizeFunc('okButton')}" class="o-editor-input" aria-label="${localizeFunc('okButton')}"></input></div></div>`;
     if (autoCreatedFeature) {
-      form = `<div id="o-form">${formElement}${relatedTablesFormHTML}${attachmentsForm}<br><div class="o-form-save"><input id="o-save-button-${currentLayer}" type="button" value="Spara" aria-label="Spara"></input><input id="o-abort-button-${currentLayer}" type="button" value="Ta bort" aria-label="Ta bort"></input></div></div>`;
+      form = `<div id="o-form">${formElement}${relatedTablesFormHTML}${attachmentsForm}<br><div class="o-form-save"><input id="o-save-button-${currentLayer}" type="button" value="${localizeFunc('saveButton')}" aria-label="${localizeFunc('saveButton')}"></input><input id="o-abort-button-${currentLayer}" type="button" value="${localizeFunc('removeButton')}" aria-label="${localizeFunc('removeButton')}"></input></div></div>`;
       autoCreatedFeature = false;
     }
 
@@ -1927,10 +1930,10 @@ function editAttributes(feat) {
     if (attachmentsForm) {
       const attachmentEl = document.getElementById(`o-attach-form-${currentLayer}`);
       if (editsStore.hasFeature('insert', feature, currentLayer)) {
-        attachmentEl.innerHTML = `<label>${layer.get('attachments').formTitle || 'Bilagor'}</label><p>Du måste spara innan du kan lägga till bilagor.</p>`;
+        attachmentEl.innerHTML = `<label>${layer.get('attachments').formTitle || localizeFunc('attachmentsTitle')}</label><p>${localizeFunc('attchmentsSaveFirst')}</p>`;
       } else {
         // Async fire and forget. Populates the form placeholder.
-        attachmentsform(layer, feature, attachmentEl);
+        attachmentsform(layer, feature, attachmentEl, { localizeFunc });
       }
     }
 
@@ -1941,9 +1944,9 @@ function editAttributes(feat) {
     if (relatedTablesFormHTML) {
       const formEl = document.getElementById(`o-relatedtables-form-${currentLayer}`);
       if (editsStore.hasFeature('insert', feature, currentLayer)) {
-        formEl.innerHTML = '<h3>Relaterade objekt</h3><p>Du måste spara innan du kan lägga till relaterade objekt.</p>';
+        formEl.innerHTML = localizeFunc('relatedTablesSaveFirst');
       } else {
-        relatedTablesForm(viewer, layer, feature, formEl);
+        relatedTablesForm(viewer, layer, feature, formEl, { localizeFunc });
       }
     }
 
@@ -2112,7 +2115,8 @@ async function createFeatureApi(layerName, geometry = null) {
   const newfeature = new Feature();
   if (geometry) {
     if (geometry.getType() !== editLayer.get('geometryType')) {
-      throw new Error('Kan inte lägga till en geometri av den typen i det lagret');
+      // This is a developer error, no need to localize
+      throw new Error('Bad geometry type');
     }
     newfeature.setGeometryName(editLayer.get('geometryName'));
     newfeature.setGeometry(geometry);
@@ -2136,7 +2140,8 @@ function setActiveLayerApi(layerName) {
   if (!layer || layer.get('isTable')) {
     // Can't set tables as active in editor as the editor can't handle them. They are in list though, as they may
     // be edited through api
-    throw new Error(`Layer ${layerName} är inte redigerbart`);
+    // This is a developer error, no need to localize
+    throw new Error(`Layer ${layerName} is not editable`);
   }
   setEditLayer(layerName);
 }
@@ -2306,6 +2311,7 @@ export default function editHandler(options, v) {
       defaultSelectionStyle = getDefaultSelectStyleFunction();
       undoHandler = new UndoStack({ maxLength: options.maxUndoLevels });
       reuseIds = options.reuseIds;
+      localizeFunc = options.localizeFunc;
       ({
         clearUndoOnLayerChange,
         clearUndoOnToolChange,
@@ -2332,7 +2338,7 @@ export default function editHandler(options, v) {
 
       featureInfo = viewer.getControlByName('featureInfo');
       if (options.featureList) {
-        floatingPanelCmp = FloatingPanel({ viewer, type: 'floating', title: 'Välj objekt' });
+        floatingPanelCmp = FloatingPanel({ viewer, type: 'floating', title: localizeFunc('selectFeature') });
         floatingPanelCmp.render();
       }
       currentLayer = options.currentLayer;

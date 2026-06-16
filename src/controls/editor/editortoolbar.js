@@ -15,10 +15,15 @@ const disableClass = 'o-disabled';
  * @returns Component
  */
 const EditorToolbar = function EditorToolbar(options = {}) {
-  let currentLayer = options.currentLayer;
-  const editableLayers = options.editableLayers;
-  const viewer = options.viewer;
-  const modifyTools = options.modifyTools;
+  let {
+    currentLayer
+  } = options;
+  const {
+    editableLayers,
+    localizeFunc,
+    modifyTools,
+    viewer
+  } = options;
 
   let $editAttribute;
   let $editDraw;
@@ -40,7 +45,7 @@ const EditorToolbar = function EditorToolbar(options = {}) {
    * @returns nothing
    */
   function render() {
-    const { body: editortemplateHTML } = new DOMParser().parseFromString(editortemplate, 'text/html');
+    const { body: editortemplateHTML } = new DOMParser().parseFromString(editortemplate(localizeFunc), 'text/html');
     document.getElementById('o-tools-bottom').appendChild(editortemplateHTML);
     $editAttribute = document.getElementById('o-editor-attribute');
     $editDraw = document.getElementById('o-editor-draw');
@@ -68,7 +73,7 @@ const EditorToolbar = function EditorToolbar(options = {}) {
     layerSelector = editorLayers(editableLayers, viewer, {
       activeLayer: currentLayer
     });
-    drawToolsSelector = drawTools(options.drawTools, currentLayer, viewer);
+    drawToolsSelector = drawTools(options.drawTools, currentLayer, viewer, { localizeFunc });
     modifyToolsBtn = document.getElementById('o-editor-modifytools');
     if (!modifyTools) {
       modifyToolsBtn.classList.add('o-hidden');
