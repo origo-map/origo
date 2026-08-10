@@ -127,9 +127,15 @@ const getContent = {
     } else {
       const featGet = attribute.img ? feature.get(attribute.img) : feature.get(attribute.name);
       if (featGet) {
-        const url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.img), attributes, null, map));
-        const attribution = attribute.attribution ? `<div class="o-image-attribution">${attribute.attribution}</div>` : '';
-        val = `<div class="o-image-container"><img src="${url}">${attribution}</div>`;
+        let attribution = attribute.attribution ? `<div class="o-image-attribution">${attribute.attribution}</div>` : '';
+        if (/^data/.test(featGet)) {
+          val = `<b>${attribute.title}</b><div class="o-image-container"><img src="${featGet}">${attribution}</div>`;
+        } else {
+          let url = createUrl(attribute.urlPrefix, attribute.urlSuffix, replacer.replace(feature.get(attribute.img), attributes, null, map));
+          if (url) {
+            val = `<div class="o-image-container"><img src="${url}">${attribution}</div>`;
+          }
+        }
       }
     }
     const newElement = document.createElement('li');
