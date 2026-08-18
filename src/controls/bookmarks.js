@@ -103,7 +103,7 @@ const Bookmarks = function Bookmarks(options = {}) {
 
       bookmarksButton = Button({
         icon: bookmarksIcon,
-        cls: `control icon-smaller medium round light${bookmarksButtonCls}`,
+        cls: `o-bookmarks-btn control icon-smaller medium round light${bookmarksButtonCls}`,
         tooltipText: title,
         tooltipPlacement: 'east',
         click() {
@@ -160,7 +160,7 @@ const Bookmarks = function Bookmarks(options = {}) {
       });
 
       bookmarks = El({
-        cls: `absolute flex column control bg-white text-small overflow-hidden z-index-top no-select grab${bookmarksElCls}`,
+        cls: `o-bookmarks absolute flex column control bg-white text-small overflow-hidden z-index-top no-select grab${bookmarksElCls}`,
         style: 'top: 1rem; left: 4rem;',
         collapseX: true,
         components: [headerComponent, contentComponent]
