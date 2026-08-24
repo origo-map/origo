@@ -283,7 +283,9 @@ function getFeatureInfoRequests({
   if (layers) {
     queryableLayers = layers;
   } else {
-    queryableLayers = viewer.getLayersByProperty('queryable', true);
+    queryableLayers = viewer.getLayersByProperty('queryable', true)
+      // No need to query layers that are not active unless the imageFeatureInfoMode is `always`
+      .filter((layer) => layer.get('visible') || ((layer.get('imageFeatureInfoMode') && layer.get('imageFeatureInfoMode') === 'always')) || (!layer.get('imageFeatureInfoMode') && imageFeatureInfoMode === 'always'));
     const layerGroups = viewer.getGroupLayers();
     layerGroups.forEach(layerGroup => {
       if (layerGroup.get('visible')) {
@@ -302,7 +304,12 @@ function getFeatureInfoRequests({
     });
   }
 
-  const imageLayers = queryableLayers.filter(layer => layer instanceof BaseTileLayer || layer instanceof ImageLayer);
+  const imageLayers = queryableLayers.filter((layer, index, self) => {
+    // Only include each layer/featureinfoLayer once
+    const firstInstance = self.map((infoLayer) => infoLayer.get('featureinfoLayer') || infoLayer.get('name'))
+      .indexOf(layer.get('featureinfoLayer') || layer.get('name')) === index;
+    return firstInstance && (layer instanceof BaseTileLayer || layer instanceof ImageLayer);
+  });
   imageLayers.forEach(layer => {
     let item;
     let imageInfoMode;
