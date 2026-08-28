@@ -2,6 +2,12 @@ import { Component, Button, dom, Collapse } from '../../ui';
 import { HeaderIcon, Legend } from '../../utils/legendmaker';
 import createMoreInfoButton from './moreinfobutton';
 
+/**
+ * Creates a Component that represents one row in the Legend. Includes symbology
+ * and visiblily toggle buttons and context menu etc.
+ * @param {object} options The options to use
+ * @returns {*} A Component
+ */
 const OverlayLayer = function OverlayLayer(options) {
   const {
     headerIconCls = '',
@@ -21,15 +27,17 @@ const OverlayLayer = function OverlayLayer(options) {
 
   const buttons = [];
   let headerIconClass = headerIconCls;
-
-  const hasStylePicker = viewer.getLayerStylePicker(layer).length > 0;
+  // Secure layers don't have StylePickers
+  const secure = layer.get('secure');
+  const hasStylePicker = viewer.getLayerStylePicker(layer).length > 0 && !secure;
   const layerIconCls = `round compact icon-small relative no-shrink light ${hasStylePicker ? 'style-picker' : ''}`;
   const cls = `${clsSettings} flex row align-center padding-left padding-right-smaller item wrap`.trim();
   const title = layer.get('title') || localize('layerTitleMissing');
   const name = layer.get('name');
-  const secure = layer.get('secure');
   let hasExtendedLegend = false;
   let thisComponent;
+  /** Style to use for Legend. Don't mess with incoming style or layer if you want to change in the Legend */
+  let legendStyle = style;
 
   const checkIcon = '#ic_check_circle_24px';
   let uncheckIcon = '#ic_radio_button_unchecked_24px';
@@ -39,11 +47,13 @@ const OverlayLayer = function OverlayLayer(options) {
     // If layer is secure, set it to not visible and not queryable to avoid unnecessary network traffic
     layer.setVisible(false);
     layer.set('queryable', false);
+    // Don't display legend for secure layers as it may involve a query that can be forbidden
+    legendStyle = undefined;
   }
 
   const opacity = layer.getOpacity();
 
-  let headerIcon = HeaderIcon(style, opacity);
+  let headerIcon = HeaderIcon(legendStyle, opacity);
   if (!headerIcon) {
     headerIcon = icon;
     headerIconClass = iconCls;
@@ -76,7 +86,7 @@ const OverlayLayer = function OverlayLayer(options) {
   // Always do this even if there is no extended legend, as user may change symbol later and then its nice to have a placeholder.
   const extendedLegendContent = Component({
     render() {
-      const legendContent = Legend({ styleRules: style, layer, viewer });
+      const legendContent = Legend({ styleRules: legendStyle, layer, viewer });
       if (typeof (legendContent) === 'string') {
         return `<div id="${this.getId()}" class="padding-left">${hasExtendedLegend ? legendContent : ''}</div>`;
       }

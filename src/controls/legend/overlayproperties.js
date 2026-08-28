@@ -2,6 +2,11 @@ import { Component, InputRange, Dropdown } from '../../ui';
 import { Legend } from '../../utils/legendmaker';
 import Style from '../../style';
 
+/**
+ * Creates a Component containing the layer properties displayed at the bottom om Legend when Layerinfo is selected
+ * @param {*} options The options to use
+ * @returns {*} A Component
+ */
 const OverlayProperties = function OverlayProperties(options = {}) {
   const {
     cls: clsOptions = '',
@@ -19,6 +24,7 @@ const OverlayProperties = function OverlayProperties(options = {}) {
   let style;
   let legendComponent;
   let stylePicker = [];
+  let secure = false;
   if (layer) {
     cls = `${clsOptions} item`.trim();
     title = layer.get('title') || '';
@@ -26,7 +32,9 @@ const OverlayProperties = function OverlayProperties(options = {}) {
     description = layer.get('description') || '';
     opacity = layer.getOpacity();
     opacityControl = layer.get('opacityControl') !== false;
-    style = viewer.getStyle(layer.get('styleName'));
+    // Use no style at all for secure layers as it may involve a request that will be forbidden
+    secure = !!layer.get('secure');
+    style = secure ? undefined : viewer.getStyle(layer.get('styleName'));
     legendComponent = Legend({ styleRules: style, opacity, layer, viewer, clickable: false });
     stylePicker = viewer.getLayerStylePicker(layer);
   } else if (group) {
@@ -58,7 +66,8 @@ const OverlayProperties = function OverlayProperties(options = {}) {
   }
 
   function hasStylePicker() {
-    return stylePicker.length > 0;
+    // Secure layers should not have StylePicker as it won't work anyway
+    return stylePicker.length > 0 && !secure;
   }
 
   function extendedLegendZoom(e) {
