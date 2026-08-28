@@ -13,9 +13,9 @@ function readResponse(data) {
 }
 
 function writeWfsTransaction(transObj, options, reuseIds) {
-  // FIXME: This doesn't do anything. It just deletes the key from the feat object, which is a deep copy of feature's values
-  // and if it did something it would delete an attribute, which probably is a bad thing in itself
-  // but also since it would prevent setting the attribute to empty string, which might would be the desired action.
+  // Delete attributes that are empty strings. Don't know why, but probably to be able to utilize db defaults
+  // as editor always set empty string when form is empty or possibly if empty string can not be cast
+  // to the data type. Too bad the editor does not re-read features to get db default values.
   if (transObj.insert) {
     transObj.insert.forEach((feature) => {
       const props = feature.getProperties();
@@ -51,7 +51,8 @@ function writeWfsTransaction(transObj, options, reuseIds) {
 function wfsTransaction(transObj, layerName, viewer, opts) {
   const {
     reuseIds,
-    localizeFunc
+    localizeFunc,
+    supressEvents
   } = opts;
   const srsName = viewer.getProjectionCode();
   const layer = viewer.getLayer(layerName);
@@ -73,36 +74,50 @@ function wfsTransaction(transObj, layerName, viewer, opts) {
     viewer.getLogger().createToast({ status: 'danger', message: `${localizeFunc('saveError')}${errorMsg}`, title: localizeFunc('generalErrorTitle') });
   }
 
+  /**
+   * Handles the response from wfs server
+   * @param {string} data The raw response string from wfs server
+   * @returns The deserialized response from the transaction
+   */
   function success(data) {
     const result = readResponse(data);
     let feature;
-    if (result.transactionSummary.totalUpdated > 0) {
-      dispatcher.emitChangeFeature({
-        feature: transObj.update,
-        layerName,
-        status: 'finished',
-        action: 'update'
-      });
-    }
+    // Send events so editstore can clear edits and reset toolbar.
+    // Events are supressed when wfstransaction is called from code that does not use EditStore or editor toolbar (e.g. offline sync)
+    if (!supressEvents) {
+      // FIXME: If the feature(s) already have been deleted on the server this will result in the edit
+      // being stuck forever in the editstore as the server will respond with 0 features updated.
+      if (result.transactionSummary.totalUpdated > 0) {
+        dispatcher.emitChangeFeature({
+          feature: transObj.update,
+          layerName,
+          status: 'finished',
+          action: 'update'
+        });
+      }
+      // FIXME: If the feature(s) already have been deleted on the server this will result in the edit
+      // being stuck forever in the editstore as the server will respond with 0 features deleted.
+      if (result.transactionSummary.totalDeleted > 0) {
+        dispatcher.emitChangeFeature({
+          feature: transObj.delete,
+          layerName,
+          status: 'finished',
+          action: 'delete'
+        });
+      }
 
-    if (result.transactionSummary.totalDeleted > 0) {
-      dispatcher.emitChangeFeature({
-        feature: transObj.delete,
-        layerName,
-        status: 'finished',
-        action: 'delete'
-      });
+      if (result.transactionSummary.totalInserted > 0) {
+        dispatcher.emitChangeFeature({
+          feature: transObj.insert,
+          layerName,
+          status: 'finished',
+          action: 'insert'
+        });
+      }
     }
-
+    // Update feature ids with the server assigned fid
     if (result.transactionSummary.totalInserted > 0) {
       feature = transObj.insert;
-
-      dispatcher.emitChangeFeature({
-        feature: transObj.insert,
-        layerName,
-        status: 'finished',
-        action: 'insert'
-      });
       const insertIds = result.insertIds;
       insertIds.forEach((insertId, index) => feature[index].setId(insertId));
     }
@@ -129,6 +144,8 @@ function wfsTransaction(transObj, layerName, viewer, opts) {
       }
       return nr;
     })
+    // This catches (and swallows) errors from parsing response if response is not in fact a wfs response. ErrorReports are handled and
+    // results in a 'undefined' items update.
     .catch(err => error(err));
 }
 
