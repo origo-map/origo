@@ -859,7 +859,9 @@ function setInteractions(drawType) {
   select = new Select({
     layers: [editLayer],
     multi: !!floatingPanelCmp,
-    style: defaultSelectionStyle
+    // For now just short circuit the style function and use OL default. If the style should be customizable the check
+    // should be performed in the style function
+    style: allowEditGeometry ? defaultSelectionStyle : undefined
   });
   // Dispatch Component event when selection changes. 'change' is never emitted from Collection, so it's both 'add' and 'remove'.
   // select interaction's 'select' event is not fired when the feature collection is manipulated manually, so we take events from
