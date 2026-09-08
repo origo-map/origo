@@ -8,6 +8,7 @@ on:
       - 'data/origo-mask-3857.geojson'
 jobs:
   sync:
+    if: github.repository == 'origo-map/origo'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout app repo
