@@ -1002,7 +1002,7 @@ function setEditLayer(layerName) {
 function setGeometryProps(layer) {
   const layerName = layer.get('name');
   editLayers[layerName].set('geometryType', layer.getSource().getFeatures()[0].getGeometry().getType());
-  if (layerName === currentLayer) {
+  if (layerName === currentLayer && isActive()) {
     setEditLayer(layerName);
   }
 }
