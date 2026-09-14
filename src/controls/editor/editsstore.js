@@ -126,9 +126,10 @@ export default function editsStore() {
     }
     return false;
   }
+
   /**
-   * Checks if there are any pendning edits.
-   * @returns
+   * Checks for unsaved edits. Does not actually returns the edits to avoid leaking internal format.
+   * @returns {boolean} true if there are unsaved edits
    */
   function hasEdits() {
     // Just checks the object for exitence of layers. isFinished() does the actual clean up when the last edit for

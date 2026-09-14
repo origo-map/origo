@@ -122,6 +122,7 @@ const Measure = function Measure({
 
   const vector = new VectorLayer({
     group: 'none',
+    offline: true,
     name: 'measure',
     title: locTitle,
     source,
