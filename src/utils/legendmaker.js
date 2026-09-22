@@ -92,7 +92,8 @@ export const findHeaderStyle = function findHeaderStyle(styleRules) {
 };
 
 export const renderSvgIcon = function renderSvgIcon(styleRule, {
-  opacity
+  opacity,
+  lazyIcons = false
 } = {}) {
   const styleType = findStyleType(styleRule);
   if (styleType in renderIcon) {
@@ -176,11 +177,11 @@ export const renderSvgIcon = function renderSvgIcon(styleRule, {
       return `${renderSvg(icon, { opacity })}`;
     } else if (styleType === 'Icon') {
       const iconOption = styleRule.find(style => style.icon.src);
-      const icon = renderIcon.Icon(iconOption.icon);
+      const icon = renderIcon.Icon(iconOption.icon, { lazy: lazyIcons });
       return icon;
     } else if (styleType === 'Image') {
       const iconOption = styleRule.find(style => style.image.src);
-      const icon = renderIcon.Icon(iconOption.image);
+      const icon = renderIcon.Image(iconOption.image, { lazy: lazyIcons });
       return icon;
     }
     return '';
@@ -264,7 +265,7 @@ async function setIcon(src, cmp, styleRules, layer, viewer, clickable) {
   for (let index = 0; index < style[0].thematic.length; index += 1) {
     const rule = style[0].thematic[index];
     let label = rule.label || '';
-    const svgIcon = renderSvgIcon([rule], { opacity: 1 });
+    const svgIcon = renderSvgIcon([rule], { opacity: 1, lazyIcons: true });
     const elCmps = [];
     if (layer) {
       const toggleButton = Button({
@@ -300,7 +301,7 @@ async function setIcon(src, cmp, styleRules, layer, viewer, clickable) {
 }
 
 export const renderExtendedLegendItem = function renderExtendedLegendItem(extendedLegendItem) {
-  return El({ innerHTML: `<img class="extendedlegend pointer" src=${extendedLegendItem.icon.src} />` });
+  return El({ innerHTML: `<img class="extendedlegend pointer" data-legend-src="${extendedLegendItem.icon.src}" />` });
 };
 
 export const renderExtendedThematicLegendItem = function renderExtendedThematicLegendItem(extendedLegendItem, styleRules, layer, viewer, clickable) {
@@ -370,7 +371,7 @@ export const Legend = function Legend({
               });
               elCmps.push(toggleButton);
             }
-            const svgIcon = renderSvgIcon(rule, { opacity });
+            const svgIcon = renderSvgIcon(rule, { opacity, lazyIcons: true });
             elCmps.push(renderLegendItem(svgIcon, label, { styleName, index }));
             cmps.push(El({ components: elCmps, tagName: 'li', cls: 'flex row align-center padding-y-smallest' }));
           }
@@ -388,9 +389,29 @@ export const HeaderIcon = function HeaderIcon(styleRules, opacity = 1) {
   if (Array.isArray(styleRules)) {
     const headerStyle = findHeaderStyle(styleRules);
     if (headerStyle) {
-      return renderSvgIcon(headerStyle, { opacity, header: true });
+      return renderSvgIcon(headerStyle, { opacity, header: true, lazyIcons: true });
     }
     return null;
   }
   return null;
+};
+/**
+ * Activate lazy-loaded legend images by setting src from data-legend-src attribute.
+ * @param {HTMLElement} rootEl - The root element to search for lazy images
+ */
+export const activateLazyLegendImages = function activateLazyLegendImages(rootEl) {
+  if (!rootEl) {
+    return;
+  }
+  const lazyImages = rootEl.querySelectorAll('img[data-legend-src]');
+  lazyImages.forEach((img) => {
+    const imageEl = img;
+    if (!imageEl.src) {
+      const legendSrc = imageEl.dataset.legendSrc;
+      if (legendSrc) {
+        imageEl.src = legendSrc;
+      }
+      delete imageEl.dataset.legendSrc;
+    }
+  });
 };
