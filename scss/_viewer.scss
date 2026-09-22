@@ -11,15 +11,25 @@
     // Make the tools reachable when they don't fit the height of the map, e.g. in
     // a short browser window or on a phone in landscape mode.
     #o-tools-left {
+        $fade-height: 5rem;
+
+        // Fade out the tools at the bottom. The mask stays at the bottom edge of 
+        // the container while the content scrolls, and the padding is the runway 
+        // that lets the last button scroll clear of the fade.
+        -webkit-mask-image: linear-gradient(to bottom, black calc(100% - #{$fade-height}), transparent 100%);
+        mask-image: linear-gradient(to bottom, black calc(100% - #{$fade-height}), transparent 100%);
         overflow-x: hidden;
         overflow-y: auto;
         overscroll-behavior: contain;
+        padding-bottom: $fade-height;
         // Hide the scrollbar to keep the map clean. Scrolling is done with the
         // mouse wheel, by touch or by tabbing through the buttons.
         scrollbar-width: none;
         // A scroll container clips its content, so the container is stretched to
-        // leave room for the button tooltips. It does not catch any pointer
-        // events, only its buttons do, see .transparent in ui/helpers.
+        // leave room for the button tooltips and to keep the fade at the bottom of
+        // the map, out of the way when the tools do fit. It does not catch any
+        // pointer events, only its buttons do, see .transparent in ui/helpers.
+        height: variables.$size-full;
         width: 100%;
 
         &::-webkit-scrollbar {
@@ -27,7 +37,7 @@
         }
 
         // Keep the toolbars at their own size in the stretched container.
-        >* {
+        > * {
             align-self: flex-start;
             flex: 0 0 auto;
         }
