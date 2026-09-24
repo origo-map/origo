@@ -4,6 +4,7 @@
  */
 
 import groupBy from './groupby';
+import getNestedValue from './getnestedvalue';
 
 /** Just about anything for creating a dummy group */
 const ARCGIS_DEFAULT_GROUP = 'default';
@@ -51,7 +52,7 @@ const attachmentclient = function attachmentclient(layer) {
    */
   function getId(feature) {
     if (config.foreignKey) {
-      return encodeURIComponent(feature.get(config.foreignKey));
+      return encodeURIComponent(getNestedValue(feature, config.foreignKey));
     }
     let id = feature.getId();
     if (stripLayerNameFromId) {

@@ -4,6 +4,7 @@ import isUrl from './utils/isurl';
 import geom from './geom';
 import attachmentclient from './utils/attachmentclient';
 import relatedtables from './utils/relatedtables';
+import getNestedValue from './utils/getnestedvalue';
 
 function createUrl(prefix, suffix, url) {
   const p = prefix || '';
@@ -63,13 +64,32 @@ function buildUrlContent(feature, attribute, attributes, map) {
   return parseUrl(feature.get(attribute.url), feature, attribute, attributes, map);
 }
 
+/**
+ * Get the values of attributes and format them according to the different various types there is.
+ *
+ * @constant
+ * @name getContent
+ * @kind variable
+ * @type {{ name(feature: any, attribute: any, attributes: any, map: any): HTMLLIElement; url(feature: any, attribute: any, attributes: any, map: any): HTMLLIElement; img(feature: any, attribute: any, attributes: any, map: any): HTMLLIElement; audio(feature: any, attribute: any, attributes: any, map: any): HTMLLIElement; video(feature: any, attribute: any, attributes: any, map: any): HTMLLIElement; carousel(feature: any, attribute: any, attributes: any, map: any): HTMLLIElement; html(feature: any, attribute: any, attributes: any, map: any): HTMLLIElement; }}
+ */
 const getContent = {
   name(feature, attribute, attributes, map) {
     let val = '';
     let title = '';
     let prefix = '';
     let suffix = '';
-    const featureValue = feature.get(attribute.name) === 0 ? feature.get(attribute.name).toString() : feature.get(attribute.name);
+    let featureValue = feature.get(attribute.name);
+
+    // Convert featureValue to string if it's exactly 0
+    if (featureValue === 0) {
+      featureValue = featureValue.toString();
+    }
+
+    // If featureValue is undefined and attribute.name contains a dot
+    if (typeof featureValue === 'undefined' && attribute.name.indexOf('.') > 0) {
+      featureValue = getNestedValue(feature, attribute.name);
+    }
+
     if (featureValue) {
       val = featureValue;
       if (attribute.title) {
