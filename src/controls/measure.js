@@ -10,6 +10,7 @@ import { unByKey } from 'ol/Observable';
 import { Component, Icon, Element as El, Button, dom, Modal } from '../ui';
 import * as drawStyles from '../style/drawstyles';
 import replacer from '../utils/replacer';
+import getFeatureInfo from '../getfeatureinfo';
 
 const Measure = function Measure({
   default: defaultMeasureTool = 'length',
@@ -40,6 +41,7 @@ const Measure = function Measure({
   let areaTool;
   let elevationTool;
   let bufferTool;
+  let objectTool;
   let toggleSnapButton;
   let defaultTool;
   let isActive = false;
@@ -53,6 +55,7 @@ const Measure = function Measure({
   let bufferToolButton;
   let bufferSize;
   let elevationToolButton;
+  let objectToolButton;
   let addNodeButton;
   let showSegmentLabelButton;
   let showSegmentLabelButtonState = showSegmentLabelButtonActive;
@@ -67,6 +70,7 @@ const Measure = function Measure({
   let snapActive = snapIsActive;
   let tipPoint;
   let projection;
+  let measuredFeatures; // Set to track measured feature composite keys (layerId|featureId)
 
   const tipStyle = drawStyles.tipStyle;
   const modifyStyle = drawStyles.modifyStyle(localization);
@@ -419,6 +423,74 @@ const Measure = function Measure({
     }
   }
 
+  async function onMeasureObject(evt) {
+    const pixel = evt.pixel;
+    const coordinate = evt.coordinate;
+
+    // Get client-side features
+    const clientResult = getFeatureInfo.getFeaturesAtPixel({
+      coordinate,
+      clusterFeatureinfoLevel: 1,
+      hitTolerance: 0,
+      map,
+      pixel
+    }, viewer, localization);
+
+    if (clientResult === false) {
+      return; // Cluster zoom action occurred
+    }
+
+    try {
+      // Get server-side features
+      const data = await getFeatureInfo.getFeaturesFromRemote({
+        coordinate,
+        map,
+        pixel,
+        forceFormat: "application/geo+json"
+      }, viewer, null);
+
+      const serverResult = data || [];
+      const allResults = serverResult.concat(clientResult);
+
+      // Filter for LineString and Polygon only, and avoid duplicates
+      allResults.forEach((item) => {
+        const feature = item.feature;
+        const layer = item.layer;
+        const geometry = feature.getGeometry();
+        const geomType = geometry.getType();
+
+        if (geomType.endsWith('LineString') || geomType.endsWith('Polygon')) {
+          // Create composite key to track measured features
+          const layerId = layer.ol_uid || layer.get('name');
+          const featureId = feature.getId() || feature.ol_uid;
+          const compositeKey = `${layerId}|${featureId}`;
+
+          // Skip if already measured
+          if (measuredFeatures.has(compositeKey)) {
+            return;
+          }
+
+          // Add to measured set
+          measuredFeatures.add(compositeKey);
+
+          if (geomType === "MultiPolygon") {
+            geometry.getPolygons().forEach((g) => {
+              source.addFeature(new Feature(g.clone()));
+            });
+          } else if (geomType === "MultiLineString") {
+            geometry.getLineStrings().forEach((g) => {
+              source.addFeature(new Feature(g.clone()));
+            });
+          } else {
+            source.addFeature(new Feature(geometry.clone()));
+          }
+        }
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   function disableInteraction() {
     if (activeButton) {
       document.getElementById(activeButton.getId()).classList.remove('active');
@@ -439,6 +511,9 @@ const Measure = function Measure({
     if (bufferTool) {
       document.getElementById(bufferToolButton.getId()).classList.add('hidden');
     }
+    if (objectTool) {
+      document.getElementById(objectToolButton.getId()).classList.add('hidden');
+    }
     if (snap) {
       document.getElementById(toggleSnapButton.getId()).classList.add('hidden');
     }
@@ -453,6 +528,10 @@ const Measure = function Measure({
       markerIconElement.parentNode.removeChild(markerIconElement);
     }
     setActive(false);
+    // Remove click handler if measure existing mode was active
+    if (activeButton && activeButton.data.tool === 'object') {
+      map.un('click', onMeasureObject);
+    }
     map.removeInteraction(measure);
     map.removeInteraction(modify);
     if (snap) {
@@ -473,6 +552,9 @@ const Measure = function Measure({
     }
     if (bufferTool) {
       document.getElementById(bufferToolButton.getId()).classList.remove('hidden');
+    }
+    if (objectTool) {
+      document.getElementById(objectToolButton.getId()).classList.remove('hidden');
     }
     if (snap) {
       document.getElementById(toggleSnapButton.getId()).classList.remove('hidden');
@@ -510,7 +592,14 @@ const Measure = function Measure({
     activeButton = button;
     map.removeInteraction(measure);
     map.removeInteraction(modify);
-    addInteraction();
+    if (button.data.tool === 'object') {
+      // Click mode: don't add draw interaction, register click handler instead
+      map.on('click', onMeasureObject);
+    } else {
+      map.un('click', onMeasureObject);
+      // Draw mode: add draw interaction
+      addInteraction();
+    }
   }
 
   function addNode() {
@@ -747,16 +836,18 @@ const Measure = function Measure({
       restoreState(viewer.getUrlParams());
     },
     onInit() {
-      lengthTool = measureTools.indexOf('length') >= 0;
-      areaTool = measureTools.indexOf('area') >= 0;
-      elevationTool = measureTools.indexOf('elevation') >= 0;
-      bufferTool = measureTools.indexOf('buffer') >= 0;
+      lengthTool = measureTools.includes('length');
+      areaTool = measureTools.includes('area');
+      elevationTool = measureTools.includes('elevation');
+      bufferTool = measureTools.includes('buffer');
+      objectTool = measureTools.includes('object');
+      measuredFeatures = new Set();
       defaultTool = lengthTool ? defaultMeasureTool : 'area';
       snapCollection = new Collection([], {
         unique: true
       });
       snapEventListenerKeys = new Collection([], { unique: true });
-      if (lengthTool || areaTool || elevationTool || bufferTool) {
+      if (lengthTool || areaTool || elevationTool || bufferTool || objectTool) {
         measureElement = El({
           tagName: 'div',
           cls: 'flex column'
@@ -833,6 +924,21 @@ const Measure = function Measure({
           });
           buttons.push(bufferToolButton);
         }
+
+        if (objectTool) {
+          objectToolButton = Button({
+            cls: 'o-measure-object padding-small margin-bottom-smaller icon-smaller round light box-shadow hidden',
+            click() {
+              toggleType(this);
+            },
+            data: { tool: 'object' },
+            icon: '#ic_left_click_24px',
+            tooltipText: localize('objectTooltip'),
+            tooltipPlacement: 'east'
+          });
+          buttons.push(objectToolButton);
+        }
+
         switch (defaultTool) {
           case 'area':
             defaultButton = areaToolButton;
@@ -842,6 +948,9 @@ const Measure = function Measure({
             break;
           case 'buffer':
             defaultButton = bufferToolButton;
+            break;
+          case 'object':
+            defaultButton = objectToolButton;
             break;
           default:
             defaultButton = lengthToolButton;
@@ -858,12 +967,15 @@ const Measure = function Measure({
             tooltipPlacement: 'east'
           });
           buttons.push(undoButton);
+        }
+        if (lengthTool || areaTool || objectTool) {
           clearButton = Button({
             cls: 'o-measure-clear padding-small margin-bottom-smaller icon-smaller round light box-shadow hidden',
             click() {
               measure.abortDrawing();
               vector.getSource().clear();
               viewer.removeOverlays(overlayArray);
+              measuredFeatures.clear();
             },
             icon: '#ic_delete_24px',
             tooltipText: localize('clearTooltip'),
@@ -909,6 +1021,11 @@ const Measure = function Measure({
       }
       if (areaTool) {
         htmlString = areaToolButton.render();
+        el = dom.html(htmlString);
+        document.getElementById(measureElement.getId()).appendChild(el);
+      }
+      if (objectTool) {
+        htmlString = objectToolButton.render();
         el = dom.html(htmlString);
         document.getElementById(measureElement.getId()).appendChild(el);
       }
