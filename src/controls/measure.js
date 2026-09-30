@@ -10,6 +10,7 @@ import { unByKey } from 'ol/Observable';
 import { Component, Icon, Element as El, Button, dom, Modal } from '../ui';
 import * as drawStyles from '../style/drawstyles';
 import replacer from '../utils/replacer';
+import getFeatureInfo from '../getfeatureinfo';
 
 const Measure = function Measure({
   default: defaultMeasureTool = 'length',
@@ -24,6 +25,7 @@ const Measure = function Measure({
   snapIsActive = true,
   queryable = false,
   snapLayers,
+  snapWmsLayers,
   snapRadius = 15,
   highlightColor,
   localization
@@ -238,6 +240,7 @@ const Measure = function Measure({
     snapCollection.clear();
     snapEventListenerKeys.forEach((k) => unByKey(k));
     snapEventListenerKeys.clear();
+    clearWmsSnap();
   }
 
   function renderMarker() {
@@ -322,6 +325,93 @@ const Measure = function Measure({
     snapEventListenerKeys.push(eventKey);
     return sn;
   }
+  let wmsSnapSource;
+  let wmsSnapPointerMoveKey;
+  let wmsSnapFetchKey = 0;
+
+  function getWmsSnapLayers() {
+    if (Array.isArray(snapWmsLayers)) {
+      return snapWmsLayers
+        .map((sl) => viewer.getLayer(sl))
+        .filter((l) => l && l.get('type') === 'WMS');
+    }
+    if (snapWmsLayers === true) {
+      return viewer.getLayers().filter((l) => {
+        if (!l || l.get('type') !== 'WMS') return false;
+        if (l.get('queryable') === false) return false;
+        const state = l.getLayerState();
+        return state && state.visible;
+      });
+    }
+    return [];
+  }
+
+  function createWmsSnapInteraction() {
+    wmsSnapSource = new VectorSource();
+    const sn = new Snap({
+      source: wmsSnapSource,
+      pixelTolerance: snapRadius
+    });
+    sn.setActive(snapActive);
+    const seenKeys = new Set();
+    let debounceTimer = null;
+    const debounceMs = 150;
+    const fetchNearby = async (coordinate, pixel) => {
+      const fetchId = ++wmsSnapFetchKey;
+      const layers = getWmsSnapLayers();
+      if (layers.length === 0) return;
+      try {
+        const items = await getFeatureInfo.getFeaturesFromRemote({
+          coordinate,
+          map,
+          pixel,
+          layers
+        }, viewer);
+        if (fetchId !== wmsSnapFetchKey) return;
+        const newFeatures = [];
+        items.forEach((item) => {
+          const feature = item.getFeature();
+          const geom = feature && feature.getGeometry && feature.getGeometry();
+          if (!geom) return;
+          const geomType = geom.getType();
+          if (geomType !== 'Polygon'
+            && geomType !== 'MultiPolygon'
+            && geomType !== 'LineString'
+            && geomType !== 'MultiLineString') return;
+          const key = `${geomType}:${JSON.stringify(geom.getCoordinates())}`;
+          if (seenKeys.has(key)) return;
+          seenKeys.add(key);
+          newFeatures.push(new Feature({
+            geometry: geom.clone()
+          }));
+        });
+        if (newFeatures.length > 0) {
+          wmsSnapSource.addFeatures(newFeatures);
+      } catch (err) {
+        // Silently ignore
+      }
+    };
+    wmsSnapPointerMoveKey = map.on('pointermove', (evt) => {
+      if (!snapActive || evt.dragging) return;
+      if (debounceTimer) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        fetchNearby(evt.coordinate, evt.pixel);
+      }, debounceMs);
+    });
+    return sn;
+  }
+
+  function clearWmsSnap() {
+    if (wmsSnapPointerMoveKey) {
+      unByKey(wmsSnapPointerMoveKey);
+      wmsSnapPointerMoveKey = null;
+    }
+    if (wmsSnapSource) {
+      wmsSnapSource.clear();
+      wmsSnapSource = null;
+    }
+    wmsSnapFetchKey++;
+  }
 
   function createSnapInteractionsRecursive(layer) {
     const snaps = [];
@@ -352,6 +442,13 @@ const Measure = function Measure({
       });
       const sn = createSnapInteractionForVectorLayer(vector);
       if (sn) snapCollection.push(sn);
+    }
+    if (snapWmsLayers === true
+      || (Array.isArray(snapWmsLayers) && snapWmsLayers.length > 0)) {
+      if (getWmsSnapLayers().length > 0) {
+        const sn = createWmsSnapInteraction();
+        snapCollection.push(sn);
+      }
     }
     snapCollection.forEach((s) => {
       map.addInteraction(s);
