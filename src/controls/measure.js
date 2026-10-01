@@ -387,6 +387,7 @@ const Measure = function Measure({
         });
         if (newFeatures.length > 0) {
           wmsSnapSource.addFeatures(newFeatures);
+        }
       } catch (err) {
         // Silently ignore
       }
