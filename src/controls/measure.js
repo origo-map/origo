@@ -235,6 +235,22 @@ const Measure = function Measure({
     feature.setGeometry(bufferCircle);
   }
 
+  let wmsSnapSource;
+  let wmsSnapPointerMoveKey;
+  let wmsSnapFetchKey = 0;
+  
+  function clearWmsSnap() {
+    if (wmsSnapPointerMoveKey) {
+      unByKey(wmsSnapPointerMoveKey);
+      wmsSnapPointerMoveKey = null;
+    }
+    if (wmsSnapSource) {
+      wmsSnapSource.clear();
+      wmsSnapSource = null;
+    }
+    wmsSnapFetchKey += 1;
+  }
+  
   function clearSnapInteractions() {
     snapCollection.forEach((s) => map.removeInteraction(s));
     snapCollection.clear();
@@ -325,9 +341,6 @@ const Measure = function Measure({
     snapEventListenerKeys.push(eventKey);
     return sn;
   }
-  let wmsSnapSource;
-  let wmsSnapPointerMoveKey;
-  let wmsSnapFetchKey = 0;
 
   function getWmsSnapLayers() {
     if (Array.isArray(snapWmsLayers)) {
@@ -357,7 +370,8 @@ const Measure = function Measure({
     let debounceTimer = null;
     const debounceMs = 150;
     const fetchNearby = async (coordinate, pixel) => {
-      const fetchId = ++wmsSnapFetchKey;
+      wmsSnapFetchKey += 1;
+      const fetchId = wmsSnapFetchKey;
       const layers = getWmsSnapLayers();
       if (layers.length === 0) return;
       try {
@@ -400,18 +414,6 @@ const Measure = function Measure({
       }, debounceMs);
     });
     return sn;
-  }
-
-  function clearWmsSnap() {
-    if (wmsSnapPointerMoveKey) {
-      unByKey(wmsSnapPointerMoveKey);
-      wmsSnapPointerMoveKey = null;
-    }
-    if (wmsSnapSource) {
-      wmsSnapSource.clear();
-      wmsSnapSource = null;
-    }
-    wmsSnapFetchKey++;
   }
 
   function createSnapInteractionsRecursive(layer) {
