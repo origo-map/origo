@@ -16,7 +16,7 @@ function emitChangeEdit(tool, state) {
 
 /**
  * Signal that something has happened that has affected the undostack
- * @param {('edit' | 'undo' | 'redo')} change The change that has happened
+ * @param {('edit' | 'undo' | 'redo' | 'clear')} change The change that has happened
  * @param {number} undoDepth Number of undoable actions in the stack
  * @param {number} redoDepth Number of redoable actions in the stack
  */

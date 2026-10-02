@@ -10,7 +10,10 @@ const Editor = function Editor(options = {}) {
     featureList = true,
     localization,
     reuseIds = false,
-    maxUndoLevels = 100
+    maxUndoLevels = 100,
+    clearUndoOnLayerChange = false,
+    clearUndoOnSessionEnd = false,
+    clearUndoOnToolChange = false
   } = options;
   let editorButton;
   let target;
@@ -105,7 +108,10 @@ const Editor = function Editor(options = {}) {
         featureList,
         localizeFunc: localize,
         reuseIds,
-        maxUndoLevels
+        maxUndoLevels,
+        clearUndoOnLayerChange,
+        clearUndoOnSessionEnd,
+        clearUndoOnToolChange
       });
       editHandler = EditHandler(handlerOptions, viewer);
       // Relay selected features from handler to toolbar so toolbar can calculate which tools are available for the current situation
@@ -152,6 +158,7 @@ const Editor = function Editor(options = {}) {
           // Someone else got active. Ditch the last selected item as we don't go directly from featureinfo to edit
           lastSelectedItem = null;
           editorButton.dispatch('change', { state: 'initial' });
+          editHandler.onDisable();
         }
       });
       this.addComponent(editorButton);
