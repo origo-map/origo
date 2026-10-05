@@ -238,7 +238,7 @@ const Measure = function Measure({
   let wmsSnapSource;
   let wmsSnapPointerMoveKey;
   let wmsSnapFetchKey = 0;
-  
+
   function clearWmsSnap() {
     if (wmsSnapPointerMoveKey) {
       unByKey(wmsSnapPointerMoveKey);
@@ -250,7 +250,7 @@ const Measure = function Measure({
     }
     wmsSnapFetchKey += 1;
   }
-  
+
   function clearSnapInteractions() {
     snapCollection.forEach((s) => map.removeInteraction(s));
     snapCollection.clear();
