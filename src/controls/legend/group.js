@@ -281,6 +281,11 @@ const Group = function Group(viewer, options = {}) {
     getOverlayList,
     getVisible,
     getHeaderCmp() { return headerComponent; },
+    /**
+     * Expands the group in the legend. Does nothing if already expanded.
+     * @returns {void}
+     */
+    expand() { collapse.expand(); },
     name,
     exclusive,
     parent,
