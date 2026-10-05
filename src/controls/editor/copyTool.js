@@ -3,11 +3,17 @@ import Feature from 'ol/Feature';
 
 import dispatcher from './editdispatcher';
 
-// Point of entry. Create on of these each time the tool is selected
-//  viewer: the viewer
-//  editLayer: the destination layer for edits
-//  options: the current drawTools configuration for this layer
-const copyTool = function copyTool(viewer, options) {
+/**
+ * Point of entry. Create on of these each time the tool is selected
+ * @param {*} viewer the viewer
+ * @param {*} options the current drawTools configuration for this layer
+ * @param {*} opts Options for the tool (not from configuration)
+ * @returns
+ */
+const copyTool = function copyTool(viewer, options, opts) {
+  const {
+    localizeFunc
+  } = opts;
   const map = viewer.getMap();
   let selectLayers = [];
   let hasGoups = false;
@@ -68,7 +74,7 @@ const copyTool = function copyTool(viewer, options) {
 
     // The event is actually fired on deselect as well
     if (e.selected.length > 0) {
-      const accept = window.confirm('Kopiera vald geometri? Avbryt för att välja en annan');
+      const accept = window.confirm(localizeFunc('copyGeometry'));
       if (accept) {
         const f = new Feature(e.selected[0].getGeometry().clone());
 

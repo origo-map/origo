@@ -38,6 +38,9 @@ A plugin that shows an elevation profile for linestring features with z-dimensio
 **[Elevation profile](https://github.com/jokd/elevation-profile-plugin-v2)**
 Elevation profile plugin for Origo. Shows profiles for linestrings or polygons that has z-dimension or gets z values from service. Improved version of the above.
 
+**[Featureinfo template](https://github.com/Sundsvallskommun/origo-featureinfo-template-plugin)**
+Origo plugin for configurable infowindow templates. Allows you to register your own featureinfo templates - including code that is executed only when the template's HTML is in the DOM - without changing anything in Origo's core.
+
 **[Geouttag](https://github.com/Eskilstuna-kommun/Geouttag)**
 A plugin for geodata export (requires FME Server).
 

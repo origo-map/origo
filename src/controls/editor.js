@@ -7,7 +7,13 @@ const Editor = function Editor(options = {}) {
     autoForm = false,
     autoSave = true,
     isActive = true,
-    featureList = true
+    featureList = true,
+    localization,
+    reuseIds = false,
+    maxUndoLevels = 100,
+    clearUndoOnLayerChange = false,
+    clearUndoOnSessionEnd = false,
+    clearUndoOnToolChange = false
   } = options;
   let editorButton;
   let target;
@@ -21,6 +27,15 @@ const Editor = function Editor(options = {}) {
 
   /** The handler were all state is kept */
   let editHandler;
+
+  /**
+   * Helper to localize strings. Is passed to underlaying functions as well
+   * @param {*} key Key to locale dict
+   * @returns string in the correct language
+   */
+  function localize(key) {
+    return localization.getStringByKeys({ targetParentKey: 'editor', targetKey: key });
+  }
 
   const toggleState = function toggleState() {
     const detail = {
@@ -79,8 +94,10 @@ const Editor = function Editor(options = {}) {
         currentLayer,
         editableLayers: editableFeatureLayers,
         isActive,
+        localizeFunc: localize,
         viewer,
-        modifyTools: options.modifyTools
+        modifyTools: options.modifyTools,
+        noUndo: maxUndoLevels === 0
       });
       const handlerOptions = Object.assign({}, options, {
         autoForm,
@@ -88,7 +105,13 @@ const Editor = function Editor(options = {}) {
         currentLayer,
         editableLayers,
         isActive,
-        featureList
+        featureList,
+        localizeFunc: localize,
+        reuseIds,
+        maxUndoLevels,
+        clearUndoOnLayerChange,
+        clearUndoOnSessionEnd,
+        clearUndoOnToolChange
       });
       editHandler = EditHandler(handlerOptions, viewer);
       // Relay selected features from handler to toolbar so toolbar can calculate which tools are available for the current situation
@@ -135,6 +158,7 @@ const Editor = function Editor(options = {}) {
           // Someone else got active. Ditch the last selected item as we don't go directly from featureinfo to edit
           lastSelectedItem = null;
           editorButton.dispatch('change', { state: 'initial' });
+          editHandler.onDisable();
         }
       });
       this.addComponent(editorButton);
@@ -149,7 +173,7 @@ const Editor = function Editor(options = {}) {
           toggleState();
         },
         icon: '#ic_edit_24px',
-        tooltipText: 'Redigera',
+        tooltipText: localize('toolTip'),
         tooltipPlacement: 'east',
         state,
         methods: {
@@ -185,7 +209,6 @@ const Editor = function Editor(options = {}) {
     createFeature,
     editFeatureAttributes,
     deleteFeature,
-
     changeActiveLayer: (layerName) => {
       // Only need to actually change layer if editor is active. Otherwise state is just set in toolbar and will
       // activate set layer when toggled visible

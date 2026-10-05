@@ -341,8 +341,12 @@ const Position = function Position(options = {}) {
     } else {
       precision = 0;
     }
-    const exampleCoord = getStringifyFunction()(view.getCenter());
-    inputEl.setAttribute('size', exampleCoord.length);
+    // The dms-formatter omits trailing zeroes, so if center just happens to be exactly on a second the string will be too short
+    // when map moves. This happens on demo map on start up. So for dms we use a "known" length instead of discovering it from the
+    // current position when crs is toggled. Could of course also have adjusted size on each update, but that would probably cause someone
+    // to have an epileptic seizure.
+    const inputSize = currentConfig.dms ? 30 + 2 * precision : getStringifyFunction()(view.getCenter()).length;
+    inputEl.setAttribute('size', inputSize);
   }
 
   function writeProjection() {

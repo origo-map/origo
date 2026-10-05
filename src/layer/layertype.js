@@ -11,6 +11,7 @@ import agsTile from './agstile';
 import xyz from './xyz';
 import osm from './osm';
 import vectortile from './vectortile';
+import cog from './cog';
 import feature from './featurelayer';
 
 const layerType = {};
@@ -28,6 +29,7 @@ layerType.AGS_TILE = agsTile;
 layerType.XYZ = xyz;
 layerType.OSM = osm;
 layerType.VECTORTILE = vectortile;
+layerType.COG = cog;
 layerType.FEATURE = feature;
 
 export default layerType;

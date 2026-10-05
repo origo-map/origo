@@ -8,16 +8,20 @@ const createElement = utils.createElement;
 let viewer;
 let layer;
 
-const drawToolsSelector = function drawToolsSelector(tools, defaultLayer, v) {
+const drawToolsSelector = function drawToolsSelector(tools, defaultLayer, v, opts = {}) {
+  const {
+    localizeFunc
+  } = opts;
   const toolNames = {
-    Polygon: 'Polygon',
-    MultiPolygon: 'Polygon',
-    Point: 'Punkt',
-    MultiPoint: 'Punkt',
-    Line: 'Linje',
-    MultiLine: 'Linje',
-    box: 'Rektangel',
-    Copy: 'Kopiera'
+    // Use same label for multi variants, as only one is displayed for each layer
+    Polygon: localizeFunc('polygonToolName'),
+    MultiPolygon: localizeFunc('polygonToolName'),
+    Point: localizeFunc('pointToolName'),
+    MultiPoint: localizeFunc('pointToolName'),
+    Line: localizeFunc('lineToolName'),
+    MultiLine: localizeFunc('lineToolName'),
+    box: localizeFunc('boxToolName'),
+    Copy: localizeFunc('copyToolName')
   };
   viewer = v;
   const defaultTools = tools || {};
@@ -76,7 +80,7 @@ const drawToolsSelector = function drawToolsSelector(tools, defaultLayer, v) {
           // Copy tool is handled entirely in copyTool. Only notify edithandler to back off
           // and call copyTool to do its stuff.
           dispatcher.emitChangeEditorShapes('custom');
-          copyTool(viewer, drawTools.find((tool) => tool.toolName === 'Copy'));
+          copyTool(viewer, drawTools.find((tool) => tool.toolName === 'Copy'), { localizeFunc });
           break;
         default:
           // This is an OL shape tool. Let edithandler handle it
