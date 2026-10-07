@@ -3,7 +3,12 @@
 import VectorSource from 'ol/source/Vector';
 import GeoJSONFormat from 'ol/format/GeoJSON';
 import * as LoadingStrategy from 'ol/loadingstrategy';
+import { unByKey } from 'ol/Observable';
+import { easeOut } from 'ol/easing';
+import { Style, Circle as CircleStyle, Stroke, Fill } from 'ol/style';
+import { getVectorContext } from 'ol/render';
 
+const animationDuration = 3000;
 const RETRY_DELAY = 250;
 /** Class that represents a OGC Features API source. Supports real time updates
  * according to the OCG Features pub/sub workflow (partial support)
@@ -53,6 +58,91 @@ class FeaturesApiSource extends VectorSource {
   }
 
   /**
+   * Flashy function that flashes a feature by creating an animation on top of the symbol.
+   * @param {*} feature The feature to flash
+   */
+  flash(feature) {
+    const start = Date.now();
+    const flashGeom = feature.getGeometry().clone();
+    const geomType = flashGeom.getType();
+    const v = this._viewer;
+    // The layer instance is not known in constructor as source is created first,
+    // but when we get here the layer has been added to the viewer
+    const layer = v.getLayer(this._options.layername);
+    const map = v.getMap();
+    const stroke = new Stroke();
+    const fill = new Fill();
+    const circleStyle = new CircleStyle({ radius: 5, stroke, fill });
+    const style = new Style();
+
+    let listenerKey;
+
+    /**
+     * Eventhandler that performs the actual animation. Is called for each frame.
+     * Relies heavily on the closure-variables defined above in order to
+     * keep up the speed on each frame
+     * @param {*} event The postrender event from the layer
+     */
+    function animate(event) {
+      const frameState = event.frameState;
+      const elapsed = frameState.time - start;
+
+      // Clean up when we are done in order to not being called each frame and do nothing
+      if (elapsed >= animationDuration) {
+        unByKey(listenerKey);
+        return;
+      }
+
+      const vectorContext = getVectorContext(event);
+      const elapsedRatio = elapsed / animationDuration;
+
+      const opacity = easeOut(1 - elapsedRatio);
+      const pulseFactor = easeOut(elapsedRatio);
+
+      // Points get a pulsating circle
+      if (geomType === 'Point' || geomType === 'MultiPoint') {
+        const radius = pulseFactor * 25 + 5;
+
+        stroke.setColor(`rgba(255, 0, 0, ${opacity})`);
+        stroke.setWidth(0.5 + opacity * 2);
+        fill.setColor('rgba(0, 0, 0, 0)');
+
+        circleStyle.setRadius(radius);
+        style.setImage(circleStyle);
+        style.setStroke(null);
+        style.setFill(null);
+      } else {
+        // All other geometries get a border that expands and shrinks.
+        // Reason is that creating a pulsating border becomes complex as OL has no buffer function
+        stroke.setColor(`rgba(255, 0, 0, ${opacity})`);
+        const currentWidth = Math.sin(elapsedRatio * Math.PI) * 15;
+        stroke.setWidth(currentWidth);
+
+        if (geomType.includes('Polygon')) {
+          fill.setColor(`rgba(255, 0, 0, ${opacity * 0.15})`);
+          style.setFill(fill);
+        } else {
+          style.setFill(null);
+        }
+
+        style.setImage(null);
+        style.setStroke(stroke);
+      }
+
+      // Finally draw this frame's geometry on the canvas
+      vectorContext.setStyle(style);
+      vectorContext.drawGeometry(flashGeom);
+
+      // Trigger a redraw to advance to the next frame
+      map.render();
+    }
+
+    // Draw the animation on top of this layer's symbols by listening to postrender for this layer
+    // which will give us this layer's canvas in the event
+    listenerKey = layer.on('postrender', animate);
+  }
+
+  /**
      * Handles replace and create events from the ws connection.
      * Inserts a new feature. If fid alreday exits it is overwritten
      * @param {*} geoJsonfeature Feature to insert
@@ -64,9 +154,15 @@ class FeaturesApiSource extends VectorSource {
     if (existingFeature) {
       // Update existing feature. Geometry is included
       existingFeature.setProperties(feature.getProperties());
+      if (this._options.flashOnUpdate) {
+        this.flash(existingFeature);
+      }
     } else {
       // New feature
       super.addFeature(feature);
+      if (this._options.flashOnCreate) {
+        this.flash(feature);
+      }
     }
   }
 

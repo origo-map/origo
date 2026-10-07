@@ -27,6 +27,9 @@ export default function featuresapi(options, viewer) {
   sourceOptions.realtimeDisconnectOnHide = layerOptions.realtimeDisconnectOnHide;
   sourceOptions.credentials = layerOptions.credentials;
   sourceOptions.attribution = layerOptions.attribution;
+  sourceOptions.layerName = layerOptions.name;
+  sourceOptions.flashOnCreate = layerOptions.flashOnCreate;
+  sourceOptions.flashOnUpdate = layerOptions.flashOnUpdate;
   layerOptions.extent = undefined;
   sourceOptions.projectionCode = viewer.getProjectionCode();
   // Source is GeoJson. It only supports 4326 according to spec, but we let configuration override that
