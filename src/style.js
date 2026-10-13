@@ -385,14 +385,14 @@ function checkOptions(options = {}) {
         exprArr.forEach((exp) => {
           if (filtering === 'AND') {
             // eslint-disable-next-line no-eval
-            if (eval(exp) && filterMatch) {
+            if ((0, eval)(exp) && filterMatch) {
               filterMatch = true;
             } else {
               filterMatch = false;
             }
           } else if (filtering === 'OR') {
             // eslint-disable-next-line no-eval
-            if ((eval(exp) || filterMatchOR)) {
+            if (((0, eval)(exp) || filterMatchOR)) {
               filterMatch = true;
             } else {
               filterMatch = false;
@@ -407,7 +407,7 @@ function checkOptions(options = {}) {
             }
           } else if (filtering === '') {
             // eslint-disable-next-line no-eval
-            if (eval(exp)) {
+            if ((0, eval)(exp)) {
               filterMatch = true;
             } else {
               filterMatch = false;

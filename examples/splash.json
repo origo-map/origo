@@ -71,7 +71,7 @@
       "title": "origo-mask",
       "group": "none",
       "queryable": false,
-      "source": "../data/origo-mask-3857.geojson",
+      "source": "data/origo-mask-3857.geojson",
       "style": "mask",
       "type": "GEOJSON",
       "visible": true
