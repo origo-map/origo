@@ -15,8 +15,8 @@
   "license": "BSD-2-Clause",
   "scripts": {
     "start": "vite",
-    "lint": "eslint -c .eslintrc.json src/index.js src/ plugins/",
-    "lint-fix": "eslint -c .eslintrc.json src/index.js src/ plugins/ --fix",
+    "lint": "eslint -c .eslintrc.json src/index.js src/",
+    "lint-fix": "eslint -c .eslintrc.json src/index.js src/ --fix",
     "build": "vite build -c vite.build.config.mjs && node vite.build.plugins.config.mjs"
   },
   "dependencies": {
