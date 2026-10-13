@@ -1,9 +1,9 @@
-import demoplugin from "./demoplugin/demoplugin.js";
+import demoplugin from './demoplugin/demoplugin';
 
 if (import.meta.env.DEV) {
-	new demoplugin({
-		mySetting: "Demo plugin",
-		a: "value",
-		b: "value"
-	});
+  demoplugin({
+    mySetting: 'Demo plugin',
+    a: 'value',
+    b: 'value'
+  });
 }

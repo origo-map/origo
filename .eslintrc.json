@@ -1,12 +1,14 @@
 {
   "extends": "airbnb-base",
+  "globals": {
+    "globalThis": "readonly"
+  },
   "env": {
     "browser": true
   },
   "parserOptions": {
     "ecmaVersion": "latest"
-},
-
+  },
   "rules": {
     "comma-dangle": [
       "error",
