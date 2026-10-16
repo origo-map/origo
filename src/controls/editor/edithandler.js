@@ -79,17 +79,20 @@ let clearUndoOnLayerChange;
 let clearUndoOnSessionEnd;
 let clearUndoOnToolChange;
 let reuseIds;
+let hasInteractions = false;
 
+/**
+ * Determine if the handler is active, i.e. has interactions. Not necessarily the same as the Editor Component is active.
+ * @returns true if handler i active
+ */
 function isActive() {
-  // FIXME: this only happens at startup as they are set to null on closing. If checking for null/falsley/not truely it could work as isVisible with
-  // the exption that it can not determine if it is visble before interactions are set, i.e. it can't be used to determine if interactions should be set.
-  // Right now it does not matter as it is not used anywhere critical.
-  if (modify === undefined || select === undefined) {
-    return false;
-  }
-  return true;
+  return hasInteractions;
 }
 
+/**
+ * Sets which (existing) interaction that should be active.
+ * @param {['modify' |  'draw' | 'custom' | null ]} editType  name of interaction
+ */
 function setActive(editType) {
   map.removeInteraction(modifyDrawSnapInteraction);
   modifyDrawSnapInteraction = null;
@@ -694,24 +697,23 @@ function addSnapInteraction(sources) {
 }
 
 function removeInteractions() {
-  if (isActive()) {
-    map.removeInteraction(modify);
-    map.removeInteraction(select);
-    map.removeInteraction(draw);
-    if (snap) {
-      snap.forEach((snapInteraction) => {
-        map.removeInteraction(snapInteraction);
-      });
-    }
-
-    modify = null;
-    select = null;
-    draw = null;
-    snap = null;
-    // The select interaction is deleted and recreated so we must send the select event manually as
-    // the selection collection events are not fired when interaction is destroyed effectively selecting nothing.
-    component.dispatch('select', []);
+  map.removeInteraction(modify);
+  map.removeInteraction(select);
+  map.removeInteraction(draw);
+  if (snap) {
+    snap.forEach((snapInteraction) => {
+      map.removeInteraction(snapInteraction);
+    });
   }
+
+  modify = null;
+  select = null;
+  draw = null;
+  snap = null;
+  hasInteractions = false;
+  // The select interaction is deleted and recreated so we must send the select event manually as
+  // the selection collection events are not fired when interaction is destroyed effectively selecting nothing.
+  component.dispatch('select', []);
 }
 
 function setAllowedOperations() {
@@ -996,6 +998,7 @@ function setInteractions(drawType) {
     snapSources.push(selectionSource);
     snap = addSnapInteraction(snapSources);
   }
+  hasInteractions = true;
 }
 
 /** Closes all modals and resets breadcrumbs */
@@ -1053,8 +1056,8 @@ function setEditProps(options) {
     const layer = viewer.getLayer(layerName);
     const layerProperties = layerProps;
     const snapLayers = options.snapLayers || editableLayers;
-    snap = 'snap' in options ? options.snap : true;
-    layer.set('snap', snap);
+    const snapOn = 'snap' in options ? options.snap : true;
+    layer.set('snap', snapOn);
     layer.set('snapLayers', snapLayers);
     layerProperties[layerName] = layer;
     return layerProps;
@@ -1162,7 +1165,7 @@ function startDraw() {
   if (!editLayers[currentLayer].get('geometryType')) {
     // This is a configuration error. No need to localize
     alert(`"geometryType" is not configured for layer ${editLayers[currentLayer].get('name')}`);
-  } else if (hasDraw !== true && isActive()) {
+  } else if (!hasDraw) {
     setActive('draw');
     hasDraw = true;
     dispatcher.emitChangeEdit('draw', true);
