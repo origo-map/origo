@@ -1,13 +1,20 @@
 {
   "extends": "airbnb-base",
+  "globals": {
+    "globalThis": "readonly"
+  },
   "env": {
     "browser": true
   },
   "parserOptions": {
     "ecmaVersion": "latest"
-},
-
+  },
   "rules": {
+    "import/extensions": ["error", "ignorePackages", {
+      "js": "never",
+      "mjs": "never",
+      "jsx": "never"
+    }],
     "comma-dangle": [
       "error",
       "never"
