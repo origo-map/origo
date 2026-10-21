@@ -1,6 +1,8 @@
 import { Component, Button, dom } from '../../ui';
 import PopupMenu from '../../ui/popupmenu';
+import ColorPicker from '../../ui/colorpicker';
 import exportToFile from '../../utils/exporttofile';
+import { setLayerColor } from '../../utils/layercolor';
 
 export default function createMoreInfoButton(params) {
   const {
@@ -116,6 +118,37 @@ export default function createMoreInfoButton(params) {
       });
       popupMenuItems.push(exportLayerMenuItem);
     });
+  }
+
+  if (layer && layer.get('layerColor')) {
+    const colorPicker = ColorPicker({
+      cls: 'hidden padding-top-small',
+      value: layer.get('layerColor'),
+      ariaLabel: localize('changeColor'),
+      customColorLabel: localize('customColor'),
+      change(color) {
+        setLayerColor(layer, color, viewer);
+      }
+    });
+    const changeColorMenuItem = Component({
+      onInit() {
+        this.addComponent(colorPicker);
+      },
+      onRender() {
+        const labelEl = document.getElementById(this.getId());
+        labelEl.addEventListener('click', (e) => {
+          document.getElementById(colorPicker.getId()).classList.toggle('hidden');
+          e.preventDefault();
+          e.stopPropagation();
+        });
+        this.dispatch('render');
+      },
+      render() {
+        const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
+        return `<li class="${labelCls}"><div id="${this.getId()}">${localize('changeColor')}</div>${colorPicker.render()}</li>`;
+      }
+    });
+    popupMenuItems.push(changeColorMenuItem);
   }
 
   if (layer && layer.get('removable')) {

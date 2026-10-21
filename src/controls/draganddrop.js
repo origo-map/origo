@@ -5,6 +5,8 @@ import IGCFormat from 'ol/format/IGC';
 import KMLFormat from 'ol/format/KML';
 import TopoJSONFormat from 'ol/format/TopoJSON';
 import { Component, InputFile, Button, Element as El } from '../ui';
+import { getUnusedColor } from '../utils/colorpalette';
+import { addLayerStyle } from '../utils/layercolor';
 
 const DragAndDrop = function DragAndDrop(options = {}) {
   let dragAndDrop;
@@ -125,7 +127,34 @@ const DragAndDrop = function DragAndDrop(options = {}) {
           type: 'GEOJSON',
           features: event.features
         };
-        if (!styleByAttribute) {
+        // Give each layer its own color unless styles are configured or the file has its own styles (kml)
+        if (!featureStyles && !['kml', 'kmz'].includes(fileExtension.toLowerCase())) {
+          if (styleByAttribute) {
+            // Features with a style attribute keep their own style
+            const getStyleFunction = viewer.getStylewindow().getStyleFunction;
+            event.features.forEach((feature) => {
+              const featureStyle = feature.get('origostyle') || feature.get('style');
+              if (feature.getGeometry() && featureStyle && typeof featureStyle === 'object') {
+                feature.setStyle(getStyleFunction(feature));
+              }
+            });
+          }
+          // Only features without their own style get the layer color
+          let layerColor;
+          if (event.features.some(feature => feature.getGeometry() && !feature.getStyle())) {
+            const usedColors = viewer.getLayers().map(l => l.get('layerColor')).filter(color => color);
+            layerColor = getUnusedColor(usedColors);
+            layerOptions.layerColor = layerColor;
+          }
+          layerOptions.styleByAttribute = false;
+          layerOptions.style = addLayerStyle({
+            name: layerName,
+            color: layerColor,
+            features: event.features,
+            labels: { layerColor: localize('layerColorLabel'), ownStyle: localize('ownStyleLabel') },
+            viewer
+          });
+        } else if (!styleByAttribute) {
           const styles = [];
           const types = new Set();
           const getStyleFunction = viewer.getStylewindow().getStyleFunction;

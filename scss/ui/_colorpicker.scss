@@ -1,0 +1,61 @@
+@use './variables';
+
+.o-colorpicker {
+  gap: 0.25rem;
+  justify-content: flex-end;
+  list-style: none;
+  margin: 0;
+  max-width: 8rem;
+  padding: 0;
+}
+
+.o-colorpicker-swatch {
+  border: 2px solid variables.$white;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px variables.$grey-light;
+  cursor: pointer;
+  height: 1.25rem;
+  padding: 0;
+  width: 1.25rem;
+
+  &.selected {
+    box-shadow: 0 0 0 2px variables.$grey-darker;
+  }
+}
+
+.o-colorpicker-custom-item {
+  flex-basis: 100%;
+}
+
+.o-colorpicker-custom {
+  justify-content: flex-end;
+  position: relative;
+
+  // The input is hidden, clicking the label opens the browser color picker
+  input {
+    block-size: 0;
+    border: 0;
+    inline-size: 0;
+    opacity: 0;
+    padding: 0;
+    position: absolute;
+  }
+
+  input:focus-visible + .o-colorpicker-custom-icon {
+    outline: 2px solid variables.$primary-color;
+  }
+}
+
+.o-colorpicker-custom-icon {
+  background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red);
+  border: 2px solid variables.$white;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px variables.$grey-light;
+  block-size: 1.25rem;
+  flex-shrink: 0;
+  inline-size: 1.25rem;
+
+  &.selected {
+    box-shadow: 0 0 0 2px variables.$grey-darker;
+  }
+}
