@@ -31,6 +31,8 @@ permalinkStore.getSaveLayers = function getSaveLayers(layers, viewer) {
       }
       saveLayer.th = activeThemes.join('~');
     }
+    // Only save expanded state when expanded to keep the link short, collapsed is default
+    if (layer.get('hasThemeLegend') && layer.get('expanded')) saveLayer.expLeg = 1;
     // Only get style for layer styles that have changed
     if (layer.get('defaultStyle') && layer.get('defaultStyle') !== layer.get('styleName')) saveLayer.sn = layer.get('altStyleIndex');
     if (saveLayer.s || saveLayer.v) {

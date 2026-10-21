@@ -22,6 +22,10 @@ const layerModel = {
   th: {
     name: 'activeThemes',
     dataType: 'array'
+  },
+  expLeg: {
+    name: 'expanded',
+    dataType: 'boolean'
   }
 };
 
