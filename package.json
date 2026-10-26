@@ -17,7 +17,7 @@
     "start": "vite",
     "lint": "eslint -c .eslintrc.json src/index.js src/",
     "lint-fix": "eslint -c .eslintrc.json src/index.js src/ --fix",
-    "build": "vite build -c vite.build.config.mjs && node vite.build.plugins.config.mjs"
+    "build": "vite build -c vite.build.config.mjs"
   },
   "dependencies": {
     "@glidejs/glide": "^3.7.1",

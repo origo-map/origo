@@ -1,4 +1,4 @@
-import { dirname, resolve, basename } from 'node:path';
+import { resolve, basename } from 'node:path';
 import { defineConfig } from 'vite';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 
@@ -15,6 +15,9 @@ function transformExampleHtml(content, filename) {
 }
 
 export default defineConfig({
+  define: {
+    '__APP_VERSION__': JSON.stringify(process.env.npm_package_version)
+  },
   plugins: [
     viteStaticCopy({
       targets: [
@@ -30,10 +33,6 @@ export default defineConfig({
               '<script type="module" src="main.js"></script>',
               '<script src="./js/origo.min.js"></script>\r\n\t<script>const origo = new Origo("index.json")</script>'
             )
-            .replace(
-              '<script type="module" src="plugins/main.js"></script>',
-              '<!-- plugins -->'
-            )
         },
         {
           src: 'examples/*',
@@ -48,9 +47,35 @@ export default defineConfig({
     lib: {
       entry: resolve(import.meta.dirname, 'src/index.js'),
       name: 'Origo',
-      formats: ['iife'],
       fileName: (format, entryName) => 'js/origo.min.js',
       cssFileName: 'css/style'
+    },
+    rollupOptions: {
+      output: [
+        {
+          format: 'iife',
+          name: 'Origo',
+          entryFileNames: 'js/origo.min.js',
+          plugins: [],
+        },
+        {
+          format: 'iife',
+          name: 'Origo',
+          entryFileNames: 'js/origo.js',
+          minify: false,
+          plugins: [
+            {
+              name: 'disable-minification-for-this-output',
+              renderChunk(code) {
+                return {
+                  code,
+                  map: null
+                }
+              }
+            }
+          ]
+        }
+      ],
     },
     sourcemap: true
   }

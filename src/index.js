@@ -220,4 +220,6 @@ Origo.Loader.getInlineSpinner = Spinner;
 Origo.layerType = layerType;
 Origo.mapUtils = mapUtils;
 
+Origo.version = __APP_VERSION__;
+
 export default Origo;

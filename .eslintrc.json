@@ -1,7 +1,8 @@
 {
   "extends": "airbnb-base",
   "globals": {
-    "globalThis": "readonly"
+    "globalThis": "readonly",
+    "__APP_VERSION__": "readonly"
   },
   "env": {
     "browser": true
