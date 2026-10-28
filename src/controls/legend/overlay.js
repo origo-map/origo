@@ -1,5 +1,5 @@
 import { Component, Button, dom, Collapse } from '../../ui';
-import { HeaderIcon, Legend } from '../../utils/legendmaker';
+import { HeaderIcon, Legend, activateLazyLegendImages } from '../../utils/legendmaker';
 import createMoreInfoButton from './moreinfobutton';
 
 /**
@@ -181,6 +181,7 @@ const OverlayLayer = function OverlayLayer(options) {
     newIcon = !newIcon ? icon : newIcon;
     layerIconCmp.className = `${headerIconClass} ${layerIconCls}`;
     layerIcon.dispatch('change', { icon: newIcon });
+    activateLazyLegendImages(document.getElementById(thisComponent.getId()));
   };
 
   const onLayerTitleChange = function onLayerTitleChange(newTitle) {
@@ -205,6 +206,15 @@ const OverlayLayer = function OverlayLayer(options) {
       } else {
         parentEl.appendChild(el);
       }
+      el.addEventListener('mouseenter', () => {
+        activateLazyLegendImages(el);
+      });
+      el.addEventListener('click', () => {
+        activateLazyLegendImages(el);
+      });
+      el.addEventListener('focusin', () => {
+        activateLazyLegendImages(el);
+      });
       this.addComponents(buttons);
       this.addComponent(label);
       this.addComponent(extendedLegendCmp);
