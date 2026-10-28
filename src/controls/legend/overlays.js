@@ -251,11 +251,62 @@ const Overlays = function Overlays(options) {
     return groupCmps;
   };
 
+  /**
+   * Expands the group with the given name and all of its parent groups,
+   * so that the group's position in the legend structure becomes visible.
+   * The overlays container is expanded as well.
+   * @param {string} groupName Name of the group to expand.
+   * @returns {Object|undefined} The group component, or undefined if no group with that name exists.
+   */
+  const expandGroup = function expandGroup(groupName) {
+    const groupCmp = groupCmps.find((cmp) => cmp.name === groupName);
+    const chain = [];
+    let current = groupCmp;
+    while (current && !chain.includes(current)) {
+      chain.push(current);
+      const parentName = current.parent;
+      current = parentName ? groupCmps.find((cmp) => cmp.name === parentName) : undefined;
+    }
+    // Expand innermost first so that each parent measures the correct height of its expanded children
+    chain.forEach((cmp) => cmp.expand());
+    overlaysCollapse.expand();
+    return groupCmp;
+  };
+
+  /**
+   * Expands the groups containing the layer and scrolls the layer, or the
+   * group if a group name is given, into view in the legend.
+   * @param {Object} options
+   * @param {import('ol/layer/Base').default} [options.layer] Layer to show. Takes precedence over groupName.
+   * @param {string} [options.groupName] Name of the group to show, used when no layer is given.
+   * @returns {void}
+   */
+  const showInLegend = function showInLegend({ layer, groupName }) {
+    const targetGroupName = layer ? layer.get('group') : groupName;
+    const groupCmp = expandGroup(targetGroupName);
+    let targetCmp = groupCmp;
+    if (layer) {
+      const overlayCmp = groupCmp
+        ? groupCmp.getOverlayList().getOverlays().find((overlay) => overlay.getLayer() === layer)
+        : rootGroup.getOverlays().find((overlay) => overlay.getLayer() === layer);
+      if (overlayCmp) targetCmp = overlayCmp;
+    }
+    if (targetCmp) {
+      // Wait for the expand transitions to finish before scrolling
+      setTimeout(() => {
+        const targetEl = document.getElementById(targetCmp.getId());
+        if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 350);
+    }
+  };
+
   return Component({
     onAddGroup,
     onChangeLayer,
     slidenav,
     getGroups,
+    expandGroup,
+    showInLegend,
     getOverlays() {
       return readOverlays();
     },
