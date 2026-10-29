@@ -194,6 +194,17 @@ export const renderLegendItem = function renderLegendItem(svgIcon, label = '') {
     innerHTML: `<div ${style} class="icon-small round">${svgIcon}</div><div class="text-smaller padding-left-small">${label}</div>` });
   return legendCmp;
 };
+// An else rule matches all features not matched by any of the other rules
+function getElseFilter(thematicArr) {
+  const filters = thematicArr
+    .filter(theme => !theme.elseFilter)
+    .map(theme => `(${theme.filter.replace(/^\s*\[(.*)\]\s*$/, '$1')})`);
+  if (filters.length === 0) {
+    return 'INCLUDE';
+  }
+  return `NOT (${filters.join(' OR ')})`;
+}
+
 function updateLayer(layer, viewer) {
   const styleName = layer.get('styleName');
   const style = viewer.getStyle(styleName);
@@ -206,7 +217,7 @@ function updateLayer(layer, viewer) {
       thematicArr.forEach(theme => {
         if (theme.visible) {
           filterStr += filterStr === '' ? '' : ' OR ';
-          filterStr += theme.filter;
+          filterStr += theme.elseFilter ? getElseFilter(thematicArr) : theme.filter;
         }
       });
       if (filterStr === '') {
@@ -237,10 +248,12 @@ async function setIcon(src, cmp, styleRules, layer, viewer, clickable) {
           searchParams.set('FORMAT', 'image/png');
           searchParams.set('RULE', row.name);
           const imgUrl = decodeURIComponent(searchParams.toString());
-          if (typeof row.filter !== 'undefined') {
+          const elseFilter = row.ElseFilter === 'true' || row.ElseFilter === true;
+          if (typeof row.filter !== 'undefined' || elseFilter) {
             style[0].thematic.push({
               image: { src: imgUrl },
               filter: row.filter,
+              elseFilter,
               name: row.name,
               label: row.title || row.name,
               visible: row.visible !== false
