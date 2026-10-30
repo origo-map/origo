@@ -47,6 +47,9 @@ A plugin for geodata export (requires FME Server).
 **[Globe plugin](https://github.com/origo-map/globe-plugin)**
 A plugin for Origo map to enable CesiumJS globe using Ol-Cesium
 
+**[Help plugin](https://github.com/Sundsvallskommun/origo-help-plugin)**
+Adds a help to a Origo-map.
+
 **[Iframe plugin](https://github.com/Eskilstuna-kommun/ek-iframe-plugin)**
 Ger ett API för att styra delar av Origo inuti en <iframe>.
 
@@ -55,6 +58,9 @@ A layer manager plugin.
 
 **[LM search plugin](https://github.com/origo-map/lmsearch-plugin)**
 Search for Lantmäteriet Direct services via Origoserver API.
+
+**[Matomo plugin](https://github.com/Sundsvallskommun/origo-matomo-plugin)**
+Plugin for Origo that sends usage statistics to Matomo as events.
 
 **[Multiselect plugin](https://github.com/origo-map/multiselect-plugin)**
 Plugin to select features with different methods such as circle, polygon and buffer.
