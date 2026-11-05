@@ -65,5 +65,8 @@ A plugin for openid connect authorization with Origo.
 **[Print logo switcher plugin](https://github.com/kartomat/print-logo-switcher-plugin)**
 A plugin that allows you to change the print logo in your Origo map instance.
 
+**[Rita Detaljplan](https://github.com/ritaplan/rita-detaljplan-origomap)**
+Shows a municipality's detailed development plans (detaljplaner) from a PostGIS database as a map layer, with an information panel for plan data, documents and regulations with their motives. Uses GeoServer or QGIS Server. Works with maps in Web Mercator and SWEREF 99 TM. Developed together with the QGIS plugin Rita Detaljplan.
+
 **[Swiper plugin](https://github.com/SigtunaGIS/swiper-plugin)**
 A plugin to compare two different views.
