@@ -1,13 +1,20 @@
 @use './variables';
 
 .o-colorpicker {
+  // The palette fills the first five columns, the custom color has the last column to itself
+  display: grid;
   gap: 0.25rem;
-  justify-content: flex-end;
+  grid-template-columns: repeat(6, 1.25rem);
+  justify-content: end;
   list-style: none;
   margin: 0;
-  max-width: 8rem;
   // Space between the menu item text and the swatches, room for the ring around a selected swatch
   padding: variables.$padding-small 0 0;
+
+  // This file is loaded after the helpers, so the hidden helper needs repeating
+  &.hidden {
+    display: none;
+  }
 }
 
 .o-colorpicker-swatch {
@@ -25,11 +32,13 @@
 }
 
 .o-colorpicker-custom-item {
-  flex-basis: 100%;
+  align-self: center;
+  grid-column: 6;
+  grid-row: 1 / span 2;
 }
 
 .o-colorpicker-custom {
-  justify-content: flex-end;
+  display: block;
   position: relative;
 
   // The input is hidden, clicking the label opens the browser color picker
@@ -53,7 +62,7 @@
   border-radius: 50%;
   box-shadow: 0 0 0 1px variables.$grey-light;
   block-size: 1.25rem;
-  flex-shrink: 0;
+  display: block;
   inline-size: 1.25rem;
 
   &.selected {

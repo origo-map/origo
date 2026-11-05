@@ -71,13 +71,12 @@ export default function ColorPicker(options = {}) {
       const customValue = value ? rgbToHex(value) : '#000000';
       const customIconStyle = isCustomColor() ? ` style="background: ${value};"` : '';
       const custom = `<li class="o-colorpicker-custom-item">
-        <label class="o-colorpicker-custom flex row align-center pointer">
+        <label class="o-colorpicker-custom pointer" title="${customColorLabel}">
           <input type="color" value="${customValue}" aria-label="${customColorLabel}">
           <span class="o-colorpicker-custom-icon${isCustomColor() ? ' selected' : ''}"${customIconStyle}></span>
-          <span class="padding-left-small">${customColorLabel}</span>
         </label>
       </li>`;
-      return `<ul id="${this.getId()}" class="o-colorpicker flex row wrap ${cls}" aria-label="${ariaLabel}">${swatches}${custom}</ul>`;
+      return `<ul id="${this.getId()}" class="o-colorpicker ${cls}" aria-label="${ariaLabel}">${swatches}${custom}</ul>`;
     }
   });
 }
