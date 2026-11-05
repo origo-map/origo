@@ -202,6 +202,11 @@
             "exportLayerSave": "Spara lager",
             "removeLayerQuestion": "Vill du ta bort lagret?",
             "removeLayer": "Ta bort lager",
+            "showCoordinates": "Visa koordinater",
+            "hideCoordinates": "Dölj koordinater",
+            "coordinateNorth": "N",
+            "coordinateEast": "E",
+            "coordinateZ": "Z",
             "moreInfoButtonLabel": "Visa lagerinfo",
             "renderStyleSelect": "Välj stil",
             "legendSearchGroupSuffix": "(Grupp)"

@@ -202,6 +202,11 @@
             "exportLayerSave": "Save layer",
             "removeLayerQuestion": "Do you want to remove the layer?",
             "removeLayer": "Remove layer",
+            "showCoordinates": "Show coordinates",
+            "hideCoordinates": "Hide coordinates",
+            "coordinateNorth": "N",
+            "coordinateEast": "E",
+            "coordinateZ": "Z",
             "moreInfoButtonLabel": "Show layer info",
             "renderStyleSelect": "Select style",
             "legendSearchGroupSuffix": "(Group)"
