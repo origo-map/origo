@@ -175,7 +175,9 @@
         "draganddrop": {
             "addFromFile": "Add from file",
             "yourLayersName": "your-layers",
-            "yourLayersTitle": "Your layers"
+            "yourLayersTitle": "Your layers",
+            "layerColorLabel": "Layer color",
+            "ownStyleLabel": "Own style"
         },
         "legend": {
             "placeholderText": "Search for layer",
@@ -202,6 +204,8 @@
             "exportLayerSave": "Save layer",
             "removeLayerQuestion": "Do you want to remove the layer?",
             "removeLayer": "Remove layer",
+            "changeColor": "Change color",
+            "customColor": "Custom color",
             "moreInfoButtonLabel": "Show layer info",
             "renderStyleSelect": "Select style",
             "legendSearchGroupSuffix": "(Group)"

@@ -28,6 +28,7 @@
   @include meta.load-css('helpers/helpers');
   @include meta.load-css('group-indication');
   @include meta.load-css('popup-menu');
+  @include meta.load-css('colorpicker');
 }
 
 .app {
