@@ -1,7 +1,8 @@
 @use './variables';
 
 .o-colorpicker {
-  // The palette fills the first five columns, the custom color has the last column to itself
+  // The palette fills the first five columns, the custom color has the last column to itself.
+  // colorpicker.js sets how many rows the custom color spans.
   display: grid;
   gap: 0.25rem;
   grid-template-columns: repeat(6, 1.25rem);
@@ -34,7 +35,6 @@
 .o-colorpicker-custom-item {
   align-self: center;
   grid-column: 6;
-  grid-row: 1 / span 2;
 }
 
 .o-colorpicker-custom {
