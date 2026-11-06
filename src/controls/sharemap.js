@@ -61,6 +61,7 @@ const ShareMap = function ShareMap(options = {}) {
             target
           });
           this.addComponent(modal);
+          viewer.dispatch('sharemap:open', { title });
           if (storeMethod === 'saveStateToServer') {
             permalink.saveStateToServer(viewer).then((data) => {
               createLink(data);

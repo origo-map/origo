@@ -566,6 +566,7 @@ const PrintComponent = function PrintComponent(options = {}) {
         filename: `${filename}.png`,
         el: pageElement
       }));
+      viewer.dispatch('print:download', { format: 'png', size, orientation, resolution });
     },
     async downloadPDF() {
       let height;
@@ -590,6 +591,7 @@ const PrintComponent = function PrintComponent(options = {}) {
         size,
         width
       }));
+      viewer.dispatch('print:download', { format: 'pdf', size, orientation, resolution });
     },
     async printToScalePDF() {
       let height;
@@ -616,6 +618,7 @@ const PrintComponent = function PrintComponent(options = {}) {
         widthImage,
         heightImage
       }));
+      viewer.dispatch('print:download', { format: 'pdf', size, orientation, resolution, scale: printScale });
     },
     async onRender() {
       function addMapLoadListeners() {
@@ -734,6 +737,7 @@ const PrintComponent = function PrintComponent(options = {}) {
       `;
 
       targetElement.appendChild(dom.html(htmlString));
+      viewer.dispatch('print:open');
       this.dispatch('render');
     }
   });

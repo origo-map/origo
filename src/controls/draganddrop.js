@@ -147,6 +147,8 @@ const DragAndDrop = function DragAndDrop(options = {}) {
           }
         }
         const layer = viewer.addLayer(layerOptions);
+        // Statistics event: file format and number of features, never the file name or content
+        viewer.dispatch('draganddrop:addfile', { format: fileExtension.toLowerCase(), features: event.features.length });
         if (zoomToExtentOnLoad) {
           const extent = typeof layer.getSource !== 'undefined' && typeof layer.getSource().getExtent !== 'undefined' ? layer.getSource().getExtent() : layer.getExtent();
           if (layer.getVisible()) {

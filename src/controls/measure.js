@@ -394,6 +394,7 @@ const Measure = function Measure({
       }
       tip = idleTip;
       document.getElementById(undoButton.getId()).classList.add('hidden');
+      viewer.dispatch('measure:end', { tool: activeButton.data.tool });
       if (activeButton.data.tool === 'buffer') {
         feature.set('tool', 'buffer');
         createRadiusModal(feature);
