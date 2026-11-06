@@ -382,12 +382,28 @@ const Legend = function Legend(options = {}) {
     }
   };
 
+  // Statistics event legend:searchresult with the number of hits, never the query itself. Dispatched when the
+  // user has stopped typing for a while, or selects a hit, rather than for every key.
+  const searchResultDelay = 1000;
+  let searchResultTimer;
+  let pendingSearchHits;
+
+  function dispatchSearchResult() {
+    clearTimeout(searchResultTimer);
+    if (pendingSearchHits !== undefined) {
+      viewer.dispatch('legend:searchresult', { hits: pendingSearchHits });
+      pendingSearchHits = undefined;
+    }
+  }
+
   /** There are several different ways to handle selected search result.
  */
 
   function selectHandler(evt) {
     const label = evt.text.label;
     if (name) {
+      // The search that led to the selection is counted before the selection
+      dispatchSearchResult();
       // Todo
       const layer = viewer.getLayer(label);
       let layerGroup;
@@ -549,8 +565,9 @@ const Legend = function Legend(options = {}) {
       });
       awesomplete.list = hitArr;
       awesomplete.evaluate();
-      // Statistics event: number of hits, never the query itself
-      viewer.dispatch('legend:searchresult', { hits: hitArr.length });
+      pendingSearchHits = hitArr.length;
+      clearTimeout(searchResultTimer);
+      searchResultTimer = setTimeout(dispatchSearchResult, searchResultDelay);
     }
 
     if (typeof input !== 'undefined') {
