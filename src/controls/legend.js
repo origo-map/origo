@@ -421,6 +421,7 @@ const Legend = function Legend(options = {}) {
       } else if (!layer.get('secure')) {
         layer.setVisible(true);
       }
+      viewer.dispatch('legend:searchselect', { name: label, isGroup: Boolean(isGroup) });
       document.getElementsByClassName('o-search-layer-field')[0].value = '';
     } else {
       console.error(localize('selectHandlerError'));
@@ -548,6 +549,8 @@ const Legend = function Legend(options = {}) {
       });
       awesomplete.list = hitArr;
       awesomplete.evaluate();
+      // Statistics event: number of hits, never the query itself
+      viewer.dispatch('legend:searchresult', { hits: hitArr.length });
     }
 
     if (typeof input !== 'undefined') {

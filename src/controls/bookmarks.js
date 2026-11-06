@@ -137,6 +137,7 @@ const Bookmarks = function Bookmarks(options = {}) {
           bookmarkTitle: item.name,
           click() {
             goToBookmark(item);
+            viewer.dispatch('bookmarks:select', { name: item.name });
             if (autoClose) {
               const size = viewer.getSize();
               if (size === 'm' || size === 's' || size === 'xs') {
