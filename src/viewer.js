@@ -21,6 +21,7 @@ import generateUUID from './utils/generateuuid';
 import Logger from './components/logger';
 import permalink from './permalink/permalink';
 import Stylewindow from './style/stylewindow';
+import CoordinateLabels, { canShowCoordinates } from './utils/coordinatelabels';
 
 const Viewer = function Viewer(targetOption, options = {}) {
   let map;
@@ -28,6 +29,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
   let featureinfo;
   let selectionmanager;
   let stylewindow;
+  let coordinateLabels;
 
   const {
     breakPoints,
@@ -57,7 +59,12 @@ const Viewer = function Viewer(targetOption, options = {}) {
     tileGridOptions = {},
     loggerOptions = {},
     url,
-    palette
+    palette,
+    // "Show coordinates" in the layer menu of every vector layer. A layer, or the draganddrop control for
+    // the layers it adds, can override it with its own coordinatesMenuItem.
+    // coordinateDecimals sets the decimals of the coordinates, default 2 for meters and 6 for degrees.
+    coordinatesMenuItem = true,
+    coordinateDecimals
   } = options;
 
   let {
@@ -435,6 +442,19 @@ const Viewer = function Viewer(targetOption, options = {}) {
     }
   };
 
+  // The legend reads showCoordinates when the layer is added to the map, so it must be set before that.
+  // The most specific coordinatesMenuItem wins: the layer's, then the map's.
+  const setCoordinatesProperty = function setCoordinatesProperty(layer) {
+    const layerSetting = layer.get('coordinatesMenuItem');
+    const enabled = typeof layerSetting === 'boolean' ? layerSetting : coordinatesMenuItem !== false;
+    if (enabled && canShowCoordinates(layer)) {
+      layer.set('showCoordinates', layer.get('showCoordinates') === true);
+      return true;
+    }
+    layer.unset('showCoordinates');
+    return false;
+  };
+
   const addLayer = function addLayer(thisProps, insertBefore) {
     let layerProps = thisProps;
     if (thisProps.layerParam && layerParams[thisProps.layerParam]) {
@@ -447,10 +467,21 @@ const Viewer = function Viewer(targetOption, options = {}) {
     }
     const layer = Layer(layerProps, this);
     addLayerStylePicker(layerProps);
+    const showsCoordinates = setCoordinatesProperty(layer);
     if (insertBefore) {
       map.getLayers().insertAt(map.getLayers().getArray().indexOf(insertBefore), layer);
     } else {
       map.addLayer(layer);
+    }
+    if (showsCoordinates) {
+      coordinateLabels.addLayer(layer);
+      // Statistics event when the coordinates are shown or hidden, with the configured layer name. Not for layers
+      // from a user's file (source 'none'), whose name comes from the file name; draganddrop has its own event.
+      if (layer.get('sourceName') !== 'none') {
+        layer.on('change:showCoordinates', () => {
+          this.dispatch('layer:coordinates', { show: layer.get('showCoordinates'), name: layer.get('name') });
+        });
+      }
     }
     this.dispatch('addlayer', {
       layerName: layerProps.name
@@ -573,6 +604,15 @@ const Viewer = function Viewer(targetOption, options = {}) {
       stylewindow = Stylewindow({ palette, viewer: this, localization: controls.find((control) => control.name === 'localization'), extraMarkers: controls.find((control) => control.name === 'draw')?.options?.extraMarkers });
 
       setMap(Map(Object.assign(options, { projection, center, zoom, target: this.getId() })));
+
+      // Labels for the coordinates of the layers with "Show coordinates" turned on in the layer menu
+      const localization = controls.find((control) => control.name === 'localization');
+      const coordinateLabel = (key, fallback) => localization?.getStringByKeys({ targetParentKey: 'legend', targetKey: key }) || fallback;
+      coordinateLabels = CoordinateLabels({
+        map,
+        decimals: coordinateDecimals,
+        labels: { north: coordinateLabel('coordinateNorth', 'N'), east: coordinateLabel('coordinateEast', 'E'), z: coordinateLabel('coordinateZ', 'Z') }
+      });
 
       mergeSavedLayerProps(layerOptions, urlParams.layers)
         .then(layerProps => {
