@@ -7,6 +7,9 @@ const additionalMapStateParams = {};
 permalinkStore.getSaveLayers = function getSaveLayers(layers, viewer) {
   const saveLayers = [];
   layers.forEach((layer) => {
+    // Secure (padlocked) layers are not accessible for the current user and therefore never visible anyway.
+    // Leave them out to avoid confusion and to prevent errors when trying to access their properties.
+    if (layer.get('secure')) return;
     const saveLayer = {};
     const activeThemes = [];
     function getActiveThemes(style) {
