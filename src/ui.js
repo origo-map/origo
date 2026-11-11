@@ -8,6 +8,7 @@ import * as dom from './ui/dom/dom';
 export { dom };
 export { default as Button } from './ui/button';
 export { default as Collapse } from './ui/collapse';
+export { default as ColorPicker } from './ui/colorpicker';
 export { default as CollapseHeader } from './ui/collapseheader';
 export { default as Dropdown } from './ui/dropdown';
 export { default as FloatingPanel } from './ui/floatingpanel';
