@@ -112,6 +112,7 @@ const OverlayLayer = function OverlayLayer(options) {
     click() {
       if (hasExtendedLegend) {
         extendedLegendContent.toggle();
+        layer.set('expanded', !layer.get('expanded'));
       }
     },
     style: {
