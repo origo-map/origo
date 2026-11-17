@@ -13,6 +13,7 @@ import osm from './osm';
 import vectortile from './vectortile';
 import cog from './cog';
 import feature from './featurelayer';
+import featuresApi from './featuresapi';
 
 const layerType = {};
 
@@ -31,5 +32,6 @@ layerType.OSM = osm;
 layerType.VECTORTILE = vectortile;
 layerType.COG = cog;
 layerType.FEATURE = feature;
+layerType.FEATURESAPI = featuresApi;
 
 export default layerType;
