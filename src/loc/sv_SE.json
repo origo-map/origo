@@ -175,7 +175,9 @@
         "draganddrop": {
             "addFromFile": "Lägg till från fil",
             "yourLayersName": "egna-lager",
-            "yourLayersTitle": "Egna lager"
+            "yourLayersTitle": "Egna lager",
+            "layerColorLabel": "Lagrets färg",
+            "ownStyleLabel": "Egen stil"
         },
         "legend": {
             "placeholderText": "Sök lager",
@@ -202,6 +204,8 @@
             "exportLayerSave": "Spara lager",
             "removeLayerQuestion": "Vill du ta bort lagret?",
             "removeLayer": "Ta bort lager",
+            "changeColor": "Byt färg",
+            "customColor": "Valfri färg",
             "moreInfoButtonLabel": "Visa lagerinfo",
             "renderStyleSelect": "Välj stil",
             "legendSearchGroupSuffix": "(Grupp)"
