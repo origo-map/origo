@@ -2,6 +2,7 @@ import { Component, Button, Collapse, CollapseHeader, dom } from '../../ui';
 import GroupList from './grouplist';
 import createMoreInfoButton from './moreinfobutton';
 import LayerProperties from './overlayproperties';
+import { activateLazyLegendImages } from '../../utils/legendmaker';
 
 /**
  * The Group component can be a group or a subgroup,
@@ -378,6 +379,12 @@ const Group = function Group(viewer, options = {}) {
     onRender() {
       draggableGroups.forEach(grp => enableDragItem(document.getElementById(grp), this));
       groupEl = document.getElementById(collapse.getId());
+      groupEl.addEventListener('mouseenter', () => {
+        activateLazyLegendImages(groupEl);
+      });
+      groupEl.addEventListener('click', () => {
+        activateLazyLegendImages(groupEl);
+      });
       if (viewer.getControlByName('legend').getuseGroupIndication() && type === 'group') {
         updateGroupIndication();
         this.on('add:overlay', () => {
