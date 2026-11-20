@@ -62,9 +62,7 @@ const Viewer = function Viewer(targetOption, options = {}) {
     palette,
     // "Show coordinates" in the layer menu of every vector layer. A layer, or the draganddrop control for
     // the layers it adds, can override it with its own coordinatesMenuItem.
-    // coordinateDecimals sets the decimals of the coordinates, default 2 for meters and 6 for degrees.
-    coordinatesMenuItem = true,
-    coordinateDecimals
+    coordinatesMenuItem = true
   } = options;
 
   let {
@@ -606,12 +604,11 @@ const Viewer = function Viewer(targetOption, options = {}) {
       setMap(Map(Object.assign(options, { projection, center, zoom, target: this.getId() })));
 
       // Labels for the coordinates of the layers with "Show coordinates" turned on in the layer menu
-      const localization = controls.find((control) => control.name === 'localization');
-      const coordinateLabel = (key, fallback) => localization?.getStringByKeys({ targetParentKey: 'legend', targetKey: key }) || fallback;
       coordinateLabels = CoordinateLabels({
         map,
-        decimals: coordinateDecimals,
-        labels: { north: coordinateLabel('coordinateNorth', 'N'), east: coordinateLabel('coordinateEast', 'E'), z: coordinateLabel('coordinateZ', 'Z') }
+        position: controls.find((control) => control.name === 'position'),
+        logger,
+        localization: controls.find((control) => control.name === 'localization')
       });
 
       mergeSavedLayerProps(layerOptions, urlParams.layers)

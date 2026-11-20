@@ -4,6 +4,7 @@ import VectorLayer from 'ol/layer/Vector';
 import VectorImageLayer from 'ol/layer/VectorImage';
 import ClusterSource from 'ol/source/Cluster';
 import VectorSource from 'ol/source/Vector';
+import { createStringXY } from 'ol/coordinate';
 import { containsCoordinate } from 'ol/extent';
 import { Fill, Stroke, Style, Text } from 'ol/style';
 
@@ -55,15 +56,23 @@ export function canShowCoordinates(layer) {
 /**
  * Shows the coordinates of the vertices in the added layers that have the property showCoordinates, as labels
  * in an unmanaged layer which is not part of the legend. The property is turned on and off from the layer menu in the legend.
+ * The coordinates are formatted like the position control, in its selected projection, and follow it when the projection
+ * is changed. Without a position control they are shown as x, y in the map projection.
  * Z is only shown when the geometry has z values, e.g. elevation in gpx.
- * Only vertices within the view get a label, at most maxLabels, so a large layer doesn't freeze the map.
+ * Only vertices within the view get a label. Above maxLabels no labels are shown, so a large layer doesn't freeze
+ * the map, until the user zooms in. A toast tells the user to zoom in if that is the case when the coordinates are turned on.
  */
 export default function CoordinateLabels({
   map,
-  decimals,
-  labels = { north: 'N', east: 'E', z: 'Z' },
+  position,
+  logger,
+  localization,
   maxLabels = 2000
 }) {
+  function localize(key) {
+    return localization.getStringByKeys({ targetParentKey: 'legend', targetKey: key });
+  }
+
   const layers = new Set();
   const source = new VectorSource();
   const labelLayer = new VectorLayer({
@@ -76,48 +85,68 @@ export default function CoordinateLabels({
     }
   });
   labelLayer.setMap(map);
-  // Two decimals for meters, six for degrees unless configured
-  const defaultDecimals = map.getView().getProjection().getUnits() === 'degrees' ? 6 : 2;
-  const precision = typeof decimals === 'number' ? decimals : defaultDecimals;
+  // Used without a position control, or before it is added: two decimals for meters, six for degrees
+  const formatXY = createStringXY(map.getView().getProjection().getUnits() === 'degrees' ? 6 : 2);
 
   function getText(coordinates, hasZ) {
-    // Northing first, as is customary for SWEREF 99
-    const rows = [`${labels.north}: ${coordinates[1].toFixed(precision)}`, `${labels.east}: ${coordinates[0].toFixed(precision)}`];
-    if (hasZ) rows.push(`${labels.z}: ${coordinates[2].toFixed(precision)}`);
+    const rows = [position?.formatCoordinate(coordinates) ?? formatXY(coordinates)];
+    if (hasZ) rows.push(`Z: ${coordinates[2].toFixed(2)}`);
     return rows.join('\n');
   }
 
-  function update() {
+  // Draws the labels. Returns true if there are too many vertices in the view to show their labels.
+  function drawLabels() {
     source.clear();
-    const shown = [...layers].filter(layer => layer.getVisible() && layer.get('showCoordinates'));
-    if (shown.length === 0) return;
-    const viewExtent = map.getView().calculateExtent(map.getSize());
-    const features = [];
-    shown.some((layer) => layer.getSource().getFeatures().some((feature) => getVertices(feature.getGeometry()).some(([coordinates, hasZ]) => {
-      if (!containsCoordinate(viewExtent, coordinates)) return false;
-      features.push(new Feature({ geometry: new Point(coordinates), text: getText(coordinates, hasZ) }));
-      return features.length >= maxLabels;
+    const view = map.getView();
+    // isVisible also checks minZoom/maxZoom, so the labels are hidden when the layer is zoomed out of range
+    const shown = [...layers].filter(layer => layer.get('showCoordinates') && layer.isVisible(view));
+    if (shown.length === 0) return false;
+    const viewExtent = view.calculateExtent(map.getSize());
+    const vertices = [];
+    const tooMany = shown.some((layer) => layer.getSource().getFeatures().some((feature) => getVertices(feature.getGeometry()).some((vertex) => {
+      if (!containsCoordinate(viewExtent, vertex[0])) return false;
+      vertices.push(vertex);
+      return vertices.length > maxLabels;
     })));
-    source.addFeatures(features);
+    if (tooMany) return true;
+    source.addFeatures(vertices.map(([coordinates, hasZ]) => new Feature({ geometry: new Point(coordinates), text: getText(coordinates, hasZ) })));
+    return false;
+  }
+
+  // Used as a listener, so it must not return false since OpenLayers then stops calling the other listeners of the event
+  function update() {
+    drawLabels();
+  }
+
+  function onChangeShowCoordinates(evt) {
+    const tooMany = drawLabels();
+    if (tooMany && evt.target.get('showCoordinates')) {
+      logger.createToast({ status: 'info', title: localize('showCoordinates'), message: localize('coordinatesZoomIn') });
+    }
   }
 
   function removeLayer(layer) {
     if (!layers.delete(layer)) return;
     layer.un('change:visible', update);
-    layer.un('change:showCoordinates', update);
+    layer.un('change:showCoordinates', onChangeShowCoordinates);
     layer.getSource().un('change', update);
     update();
   }
 
   map.getLayers().on('remove', evt => removeLayer(evt.element));
   map.on('moveend', update);
+  if (position) {
+    // Layers are added before the controls, so update when the position control is ready and when its projection is changed
+    position.on('render', update);
+    position.on('change:projection', update);
+  }
 
   return {
     addLayer(layer) {
       if (layers.has(layer)) return;
       layers.add(layer);
       layer.on('change:visible', update);
-      layer.on('change:showCoordinates', update);
+      layer.on('change:showCoordinates', onChangeShowCoordinates);
       layer.getSource().on('change', update);
       update();
     }

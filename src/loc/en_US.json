@@ -204,9 +204,7 @@
             "removeLayer": "Remove layer",
             "showCoordinates": "Show coordinates",
             "hideCoordinates": "Hide coordinates",
-            "coordinateNorth": "N",
-            "coordinateEast": "E",
-            "coordinateZ": "Z",
+            "coordinatesZoomIn": "There are too many coordinates in the map view. Zoom in to see them.",
             "moreInfoButtonLabel": "Show layer info",
             "renderStyleSelect": "Select style",
             "legendSearchGroupSuffix": "(Group)"

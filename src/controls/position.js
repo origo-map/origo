@@ -372,6 +372,17 @@ const Position = function Position(options = {}) {
     name: 'position',
     onTogglePosition,
     isMousePositionActive() { return mousePositionActive; },
+    /**
+     * Formats a coordinate in the map projection the same way as the control shows coordinates: in the
+     * selected projection, with its precision, as x, y or DMS. Dispatches change:projection when the projection is changed.
+     * @param {number[]} coordinate Coordinate in the map projection.
+     * @returns {string|undefined} The formatted coordinate, or undefined if the control has not been added to the map yet.
+     */
+    formatCoordinate(coordinate) {
+      if (!currentConfig) return undefined;
+      const coords = currentConfig.projectionCode !== mapProjection ? transformCoords(coordinate, mapProjection, currentConfig.projectionCode) : coordinate;
+      return getStringifyFunction()(coords);
+    },
     onAdd(evt) {
       viewer = evt.target;
       map = viewer.getMap();
@@ -401,6 +412,7 @@ const Position = function Position(options = {}) {
       this.render();
     },
     onInit() {
+      const position = this;
       centerButton = Button({
         cls: 'o-position-center-button',
         click() {
@@ -415,6 +427,7 @@ const Position = function Position(options = {}) {
         ariaLabel: localize('projButtonLabel'),
         click() {
           onToggleProjection();
+          position.dispatch('change:projection');
         }
       });
       coordsElement = El({

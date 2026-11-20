@@ -204,9 +204,7 @@
             "removeLayer": "Ta bort lager",
             "showCoordinates": "Visa koordinater",
             "hideCoordinates": "Dölj koordinater",
-            "coordinateNorth": "N",
-            "coordinateEast": "E",
-            "coordinateZ": "Z",
+            "coordinatesZoomIn": "Det finns för många koordinater i kartvyn. Zooma in för att se dem.",
             "moreInfoButtonLabel": "Visa lagerinfo",
             "renderStyleSelect": "Välj stil",
             "legendSearchGroupSuffix": "(Grupp)"
