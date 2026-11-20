@@ -146,7 +146,22 @@ const DragAndDrop = function DragAndDrop(options = {}) {
             layerOptions.styleDef = styles;
           }
         }
+        // "Show coordinates" in the layer menu is handled by the viewer, for all vector layers. The control's
+        // coordinatesMenuItem overrides the map's for the layers added here; without geometries there is nothing to show.
+        const hasGeometry = event.features.some(feature => feature.getGeometry());
+        if (!hasGeometry) {
+          layerOptions.coordinatesMenuItem = false;
+        } else if (typeof options.coordinatesMenuItem === 'boolean') {
+          layerOptions.coordinatesMenuItem = options.coordinatesMenuItem;
+        }
+        layerOptions.showCoordinates = options.showCoordinates === true;
         const layer = viewer.addLayer(layerOptions);
+        if (typeof layer.get('showCoordinates') === 'boolean') {
+          // Statistics event when the coordinates are shown or hidden from the layer menu, with the file format only
+          layer.on('change:showCoordinates', () => {
+            viewer.dispatch('draganddrop:coordinates', { show: layer.get('showCoordinates'), format: fileExtension.toLowerCase() });
+          });
+        }
         if (zoomToExtentOnLoad) {
           const extent = typeof layer.getSource !== 'undefined' && typeof layer.getSource().getExtent !== 'undefined' ? layer.getSource().getExtent() : layer.getExtent();
           if (layer.getVisible()) {
