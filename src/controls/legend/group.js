@@ -283,9 +283,12 @@ const Group = function Group(viewer, options = {}) {
     getHeaderCmp() { return headerComponent; },
     /**
      * Expands the group in the legend. Does nothing if already expanded.
+     * @param {Object} [expandOptions]
+     * @param {boolean} [expandOptions.animate=true] Set to false to expand at once without a transition.
      * @returns {void}
      */
-    expand() { collapse.expand(); },
+    expand(expandOptions) { collapse.expand(expandOptions); },
+    isExpanded() { return collapse.isExpanded(); },
     name,
     exclusive,
     parent,

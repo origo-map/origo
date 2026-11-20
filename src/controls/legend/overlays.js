@@ -267,9 +267,15 @@ const Overlays = function Overlays(options) {
       const parentName = current.parent;
       current = parentName ? groupCmps.find((cmp) => cmp.name === parentName) : undefined;
     }
-    // Expand innermost first so that each parent measures the correct height of its expanded children
-    chain.forEach((cmp) => cmp.expand());
-    overlaysCollapse.expand();
+    // Levels from the outermost (the overlays container) to the innermost group
+    const levels = [overlaysCollapse, ...chain.reverse()];
+    const firstCollapsed = levels.findIndex((cmp) => !cmp.isExpanded());
+    if (firstCollapsed !== -1) {
+      // The levels inside the outermost collapsed level are hidden, so expand them at once, innermost first.
+      // Then the outermost collapsed level measures the full height of its content when it is expanded with a transition.
+      levels.slice(firstCollapsed + 1).reverse().forEach((cmp) => cmp.expand({ animate: false }));
+      levels[firstCollapsed].expand();
+    }
     return groupCmp;
   };
 
@@ -295,7 +301,7 @@ const Overlays = function Overlays(options) {
       // Wait for the expand transitions to finish before scrolling
       setTimeout(() => {
         const targetEl = document.getElementById(targetCmp.getId());
-        if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }, 350);
     }
   };
