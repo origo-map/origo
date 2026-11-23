@@ -49,14 +49,26 @@ export default function Collapse(options = {}) {
     }
   };
 
-  const expand = function expand() {
+  /**
+   * Expands the collapse. Does nothing if already expanded.
+   * @param {Object} [expandOptions]
+   * @param {boolean} [expandOptions.animate=true] Set to false to expand at once without a transition.
+   * @returns {void}
+   */
+  const expand = function expand(expandOptions = {}) {
+    const { animate = true } = expandOptions;
     if (!expanded) {
       collapseEl.classList.add('expanded');
-      const newHeight = contentEl.offsetHeight;
-      const newWidth = contentEl.scrollWidth;
-      if (collapseY) containerEl.style.height = `${newHeight}px`;
-      if (collapseX) containerEl.style.width = `${newWidth}px`;
-      containerEl.addEventListener('transitionend', onTransitionEnd);
+      if (animate) {
+        const newHeight = contentEl.offsetHeight;
+        const newWidth = contentEl.scrollWidth;
+        if (collapseY) containerEl.style.height = `${newHeight}px`;
+        if (collapseX) containerEl.style.width = `${newWidth}px`;
+        containerEl.addEventListener('transitionend', onTransitionEnd);
+      } else {
+        if (collapseY) containerEl.style.height = null;
+        if (collapseX) containerEl.style.width = null;
+      }
       setTabIndex(0);
     }
     expanded = true;
@@ -100,6 +112,7 @@ export default function Collapse(options = {}) {
     collapse,
     data,
     expand,
+    isExpanded() { return expanded; },
     containerId,
     onInit() {
       if (contentComponent) {
