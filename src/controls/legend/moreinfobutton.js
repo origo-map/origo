@@ -118,6 +118,31 @@ export default function createMoreInfoButton(params) {
     });
   }
 
+  // Vector layers, shows or hides the coordinates of the vertices. The viewer sets showCoordinates on the layers
+  // that can show them, see coordinatesMenuItem.
+  if (layer && typeof layer.get('showCoordinates') === 'boolean') {
+    const coordinatesMenuItem = Component({
+      onRender() {
+        const labelEl = document.getElementById(this.getId());
+        labelEl.addEventListener('click', (e) => {
+          layer.set('showCoordinates', !layer.get('showCoordinates'));
+          labelEl.innerHTML = this.getText();
+          popupMenu.setVisibility(false);
+          e.preventDefault();
+          e.stopPropagation();
+        });
+      },
+      getText() {
+        return layer.get('showCoordinates') ? localize('hideCoordinates') : localize('showCoordinates');
+      },
+      render() {
+        const labelCls = 'text-smaller padding-x-small grow pointer no-select overflow-hidden';
+        return `<li id="${this.getId()}" class="${labelCls}">${this.getText()}</li>`;
+      }
+    });
+    popupMenuItems.push(coordinatesMenuItem);
+  }
+
   if (layer && layer.get('removable')) {
     const removeLayerMenuItem = Component({
       onRender() {
