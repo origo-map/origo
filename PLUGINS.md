@@ -38,11 +38,17 @@ A plugin that shows an elevation profile for linestring features with z-dimensio
 **[Elevation profile](https://github.com/jokd/elevation-profile-plugin-v2)**
 Elevation profile plugin for Origo. Shows profiles for linestrings or polygons that has z-dimension or gets z values from service. Improved version of the above.
 
+**[Featureinfo template](https://github.com/Sundsvallskommun/origo-featureinfo-template-plugin)**
+Origo plugin for configurable infowindow templates. Allows you to register your own featureinfo templates - including code that is executed only when the template's HTML is in the DOM - without changing anything in Origo's core.
+
 **[Geouttag](https://github.com/Eskilstuna-kommun/Geouttag)**
 A plugin for geodata export (requires FME Server).
 
 **[Globe plugin](https://github.com/origo-map/globe-plugin)**
 A plugin for Origo map to enable CesiumJS globe using Ol-Cesium
+
+**[Help plugin](https://github.com/Sundsvallskommun/origo-help-plugin)**
+Adds a help to a Origo-map.
 
 **[Iframe plugin](https://github.com/Eskilstuna-kommun/ek-iframe-plugin)**
 Ger ett API för att styra delar av Origo inuti en <iframe>.
@@ -53,6 +59,9 @@ A layer manager plugin.
 **[LM search plugin](https://github.com/origo-map/lmsearch-plugin)**
 Search for Lantmäteriet Direct services via Origoserver API.
 
+**[Matomo plugin](https://github.com/Sundsvallskommun/origo-matomo-plugin)**
+Plugin for Origo that sends usage statistics to Matomo as events.
+
 **[Multiselect plugin](https://github.com/origo-map/multiselect-plugin)**
 Plugin to select features with different methods such as circle, polygon and buffer.
 
@@ -61,6 +70,9 @@ A plugin for openid connect authorization with Origo.
 
 **[Print logo switcher plugin](https://github.com/kartomat/print-logo-switcher-plugin)**
 A plugin that allows you to change the print logo in your Origo map instance.
+
+**[Rita Detaljplan](https://github.com/ritaplan/rita-detaljplan-origomap)**
+Shows a municipality's detailed development plans (detaljplaner) from a PostGIS database as a map layer, with an information panel for plan data, documents and regulations with their motives. Uses GeoServer or QGIS Server. Works with maps in Web Mercator and SWEREF 99 TM. Developed together with the QGIS plugin Rita Detaljplan.
 
 **[Swiper plugin](https://github.com/SigtunaGIS/swiper-plugin)**
 A plugin to compare two different views.

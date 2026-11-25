@@ -17,6 +17,14 @@ export default class UndoStack {
   }
 
   /**
+   * Clears the stack
+   */
+  clear() {
+    this._stack = [];
+    this._currentIndex = -1;
+  }
+
+  /**
    * Gets the current stack depth. Good for greying out undo/redo buttons etc
    * @returns object with two properties: undoDepth and redoDepth.
    */

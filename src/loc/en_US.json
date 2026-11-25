@@ -206,6 +206,9 @@
             "removeLayer": "Remove layer",
             "changeColor": "Change color",
             "customColor": "Custom color",
+            "showCoordinates": "Show coordinates",
+            "hideCoordinates": "Hide coordinates",
+            "coordinatesZoomIn": "There are too many coordinates in the map view. Zoom in to see them.",
             "moreInfoButtonLabel": "Show layer info",
             "renderStyleSelect": "Select style",
             "legendSearchGroupSuffix": "(Group)"

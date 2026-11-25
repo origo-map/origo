@@ -75,18 +75,24 @@ let modifyDrawInteraction;
 let component;
 let defaultSelectionStyle;
 let undoHandler;
+let clearUndoOnLayerChange;
+let clearUndoOnSessionEnd;
+let clearUndoOnToolChange;
 let reuseIds;
+let hasInteractions = false;
 
+/**
+ * Determine if the handler is active, i.e. has interactions. Not necessarily the same as the Editor Component is active.
+ * @returns true if handler i active
+ */
 function isActive() {
-  // FIXME: this only happens at startup as they are set to null on closing. If checking for null/falsley/not truely it could work as isVisible with
-  // the exption that it can not determine if it is visble before interactions are set, i.e. it can't be used to determine if interactions should be set.
-  // Right now it does not matter as it is not used anywhere critical.
-  if (modify === undefined || select === undefined) {
-    return false;
-  }
-  return true;
+  return hasInteractions;
 }
 
+/**
+ * Sets which (existing) interaction that should be active.
+ * @param {['modify' |  'draw' | 'custom' | null ]} editType  name of interaction
+ */
 function setActive(editType) {
   map.removeInteraction(modifyDrawSnapInteraction);
   modifyDrawSnapInteraction = null;
@@ -221,6 +227,24 @@ function getReuseIdsForLayer(layer) {
 function getSnapSources(layers) {
   return layers.map(layer => viewer.getLayer(layer).getSource());
 }
+
+/**
+ * Helper to emit an Event so toolbar can update status of buttons
+ * @param {('edit' | 'undo' | 'redo' | 'clear')} change The change that has happened
+ */
+function emitUndoStackEvent(change) {
+  const stackDepth = undoHandler.getStackDepth();
+  dispatcher.emitUndoStackChange(change, stackDepth.undoDepth, stackDepth.redoDepth);
+}
+
+/**
+ * Clears the undostack and notifies toolbar
+ */
+function clearUndoStack() {
+  undoHandler.clear();
+  emitUndoStackEvent('clear');
+}
+
 /**
  * Saves all features in editStore to server.
  * @returns A promise which is resolved when all features have been saved if the source supports it. Otherwise it is resolved immediately.
@@ -247,6 +271,9 @@ async function saveFeatures() {
     // If the source does not return a promise it is not awaited for in Promise.all, so this is pretty safe.
     promises.push(transactionHandler(transaction, layerName, viewer, { reuseIds: getReuseIdsForLayer(layer), localizeFunc }));
   });
+  if (!autoSave && clearUndoOnSessionEnd) {
+    clearUndoStack();
+  }
   return Promise.all(promises);
 }
 
@@ -272,12 +299,9 @@ function addEditsToEditStore(edits) {
   }
 }
 
-function emitUndoStackEvent(change) {
-  const stackDepth = undoHandler.getStackDepth();
-  dispatcher.emitUndoStackChange(change, stackDepth.undoDepth, stackDepth.redoDepth);
-}
-
-// Undo last operation
+/**
+ * Undo last operation
+ */
 function undo() {
   const edits = undoHandler.undo();
   emitUndoStackEvent('undo');
@@ -285,8 +309,9 @@ function undo() {
   addEditsToEditStore(edits);
 }
 
-// Redo last operation
-
+/**
+ * Redo last operation
+ */
 function redo() {
   const edits = undoHandler.redo();
   emitUndoStackEvent('redo');
@@ -365,13 +390,15 @@ function abortSession() {
       });
     }
   });
-
-  // Add all these reversions to undoStack as one undo-operation, making it possible to undo the abort.
-  if (undoOperations.length) {
+  if (clearUndoOnSessionEnd) {
+    clearUndoStack();
+  } else if (undoOperations.length) {
+    // Add all these reversions to undoStack as one undo-operation, making it possible to undo the abort.
     undoHandler.pushEdits(undoOperations);
-    emitUndoStackEvent('undo');
+    emitUndoStackEvent('edit');
   }
 }
+
 function onModifyEnd(evt) {
   const feature = evt.features.item(0);
   // Roll back modification if the resulting geometry was invalid
@@ -670,24 +697,23 @@ function addSnapInteraction(sources) {
 }
 
 function removeInteractions() {
-  if (isActive()) {
-    map.removeInteraction(modify);
-    map.removeInteraction(select);
-    map.removeInteraction(draw);
-    if (snap) {
-      snap.forEach((snapInteraction) => {
-        map.removeInteraction(snapInteraction);
-      });
-    }
-
-    modify = null;
-    select = null;
-    draw = null;
-    snap = null;
-    // The select interaction is deleted and recreated so we must send the select event manually as
-    // the selection collection events are not fired when interaction is destroyed effectively selecting nothing.
-    component.dispatch('select', []);
+  map.removeInteraction(modify);
+  map.removeInteraction(select);
+  map.removeInteraction(draw);
+  if (snap) {
+    snap.forEach((snapInteraction) => {
+      map.removeInteraction(snapInteraction);
+    });
   }
+
+  modify = null;
+  select = null;
+  draw = null;
+  snap = null;
+  hasInteractions = false;
+  // The select interaction is deleted and recreated so we must send the select event manually as
+  // the selection collection events are not fired when interaction is destroyed effectively selecting nothing.
+  component.dispatch('select', []);
 }
 
 function setAllowedOperations() {
@@ -859,7 +885,9 @@ function setInteractions(drawType) {
   select = new Select({
     layers: [editLayer],
     multi: !!floatingPanelCmp,
-    style: defaultSelectionStyle
+    // For now just short circuit the style function and use OL default. If the style should be customizable the check
+    // should be performed in the style function
+    style: allowEditGeometry ? defaultSelectionStyle : undefined
   });
   // Dispatch Component event when selection changes. 'change' is never emitted from Collection, so it's both 'add' and 'remove'.
   // select interaction's 'select' event is not fired when the feature collection is manipulated manually, so we take events from
@@ -972,6 +1000,7 @@ function setInteractions(drawType) {
     snapSources.push(selectionSource);
     snap = addSnapInteraction(snapSources);
   }
+  hasInteractions = true;
 }
 
 /** Closes all modals and resets breadcrumbs */
@@ -997,12 +1026,15 @@ function setEditLayer(layerName) {
   currentLayer = layerName;
   setAllowedOperations();
   setInteractions();
+  if (clearUndoOnLayerChange) {
+    clearUndoStack();
+  }
 }
 
 function setGeometryProps(layer) {
   const layerName = layer.get('name');
   editLayers[layerName].set('geometryType', layer.getSource().getFeatures()[0].getGeometry().getType());
-  if (layerName === currentLayer) {
+  if (layerName === currentLayer && isActive()) {
     setEditLayer(layerName);
   }
 }
@@ -1026,8 +1058,8 @@ function setEditProps(options) {
     const layer = viewer.getLayer(layerName);
     const layerProperties = layerProps;
     const snapLayers = options.snapLayers || editableLayers;
-    snap = 'snap' in options ? options.snap : true;
-    layer.set('snap', snap);
+    const snapOn = 'snap' in options ? options.snap : true;
+    layer.set('snap', snapOn);
     layer.set('snapLayers', snapLayers);
     layerProperties[layerName] = layer;
     return layerProps;
@@ -1135,7 +1167,7 @@ function startDraw() {
   if (!editLayers[currentLayer].get('geometryType')) {
     // This is a configuration error. No need to localize
     alert(`"geometryType" is not configured for layer ${editLayers[currentLayer].get('name')}`);
-  } else if (hasDraw !== true && isActive()) {
+  } else if (!hasDraw) {
     setActive('draw');
     hasDraw = true;
     dispatcher.emitChangeEdit('draw', true);
@@ -2259,6 +2291,15 @@ function preselectFeature(feature) {
 }
 
 /**
+ * Function to call when component becomes inactive.
+ * Great place to clean up stuff.
+ */
+function onDisable() {
+  if (clearUndoOnToolChange) {
+    clearUndoStack();
+  }
+}
+/**
  * Creates the handler Component. In reality only one instance can be created as it relies on global variables and DOM ids and DOM events
  * It isn't a traditional Component as it has no visual elements but it can emit Eventer events.
  * It communicates with the editor toolbar and forms using DOM events.
@@ -2276,6 +2317,11 @@ export default function editHandler(options, v) {
       undoHandler = new UndoStack({ maxLength: options.maxUndoLevels });
       reuseIds = options.reuseIds;
       localizeFunc = options.localizeFunc;
+      ({
+        clearUndoOnLayerChange,
+        clearUndoOnToolChange,
+        clearUndoOnSessionEnd
+      } = options);
 
       // Set up a layer for displaying trace possibilities. Do it up front as it may become possible to turn it on later
       traceHighligtLayer = new VectorLayer({
@@ -2338,6 +2384,7 @@ export default function editHandler(options, v) {
     preselectFeature,
     undo,
     redo,
-    abortSession
+    abortSession,
+    onDisable
   });
 }

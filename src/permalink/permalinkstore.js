@@ -7,6 +7,9 @@ const additionalMapStateParams = {};
 permalinkStore.getSaveLayers = function getSaveLayers(layers, viewer) {
   const saveLayers = [];
   layers.forEach((layer) => {
+    // Secure (padlocked) layers are not accessible for the current user and therefore never visible anyway.
+    // Leave them out to avoid confusion and to prevent errors when trying to access their properties.
+    if (layer.get('secure')) return;
     const saveLayer = {};
     const activeThemes = [];
     function getActiveThemes(style) {
@@ -31,6 +34,8 @@ permalinkStore.getSaveLayers = function getSaveLayers(layers, viewer) {
       }
       saveLayer.th = activeThemes.join('~');
     }
+    // Only save expanded state when it has been set in the config or by the user, to keep the link short
+    if (layer.get('expanded') !== undefined) saveLayer.expLeg = layer.get('expanded') ? 1 : 0;
     // Only get style for layer styles that have changed
     if (layer.get('defaultStyle') && layer.get('defaultStyle') !== layer.get('styleName')) saveLayer.sn = layer.get('altStyleIndex');
     if (saveLayer.s || saveLayer.v) {

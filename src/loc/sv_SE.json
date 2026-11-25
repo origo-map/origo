@@ -35,7 +35,7 @@
             "layerTooltip": "Byt lager",
             "lineToolName": "Linje",
             "mandatoryField": "Obligatoriskt fält",
-            "modifyTooltip": "Modifiera geometry",
+            "modifyTooltip": "Modifiera geometri",
             "newObjTooltip": "Nytt objekt",
             "noHits": "Inga träffar",
             "okButton": "OK",
@@ -206,6 +206,9 @@
             "removeLayer": "Ta bort lager",
             "changeColor": "Byt färg",
             "customColor": "Valfri färg",
+            "showCoordinates": "Visa koordinater",
+            "hideCoordinates": "Dölj koordinater",
+            "coordinatesZoomIn": "Det finns för många koordinater i kartvyn. Zooma in för att se dem.",
             "moreInfoButtonLabel": "Visa lagerinfo",
             "renderStyleSelect": "Välj stil",
             "legendSearchGroupSuffix": "(Grupp)"
