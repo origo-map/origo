@@ -157,7 +157,7 @@ const Legend = function Legend(options = {}) {
   const turnOnAllLayers = function turnOnAllLayers() {
     const layers = viewer.getLayers();
     layers.forEach((el) => {
-      if (!(['none', 'background'].includes(el.get('group')))) {
+      if (!(['none', 'background'].includes(el.get('group'))) && !el.get('secure')) {
         const group = viewer.getGroups().find((item) => item.name === el.get('group'));
         if (typeof group !== 'undefined') {
           if (!group.exclusive) {

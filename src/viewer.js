@@ -337,7 +337,6 @@ const Viewer = function Viewer(targetOption, options = {}) {
   const mergeSecuredLayer = (layerlist, capabilitiesLayers) => {
     if (capabilitiesLayers && Object.keys(capabilitiesLayers).length > 0) {
       return layerlist.map(layer => {
-        let secure;
         let layername = layer.name;
         // remove workspace if syntax is workspace:layername
         layername = layername.split(':').pop();
@@ -346,16 +345,11 @@ const Viewer = function Viewer(targetOption, options = {}) {
           layername = layername.substring(0, layername.lastIndexOf('__'));
         }
         const layerSourceOptions = layer.source ? getSource2(layer.source) : undefined;
-        if (layerSourceOptions && layerSourceOptions.capabilitiesURL) {
-          if (capabilitiesLayers[layer.source].indexOf(layername) >= 0) {
-            secure = false;
-          } else {
-            secure = true;
-          }
-        } else {
-          secure = false;
+        if (layerSourceOptions && layerSourceOptions.capabilitiesURL && capabilitiesLayers[layer.source].indexOf(layername) < 0) {
+          // Hide a secure layer before it is created, so it never makes a request that would be forbidden
+          return { ...layer, secure: true, visible: false, queryable: false };
         }
-        return { ...layer, secure };
+        return { ...layer, secure: false };
       });
     }
     return layerlist;
