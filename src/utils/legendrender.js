@@ -186,7 +186,7 @@ export const renderIcon = {
     }
     return `<line x1="6" y1="6" x2="18" y2="18" style="${stroke}" /><line x1="6" y1="18" x2="18" y2="6" style="${stroke}" />`;
   },
-  Icon(iconStyle) {
+  Icon(iconStyle, { lazy = false } = {}) {
     const fit = iconStyle.fit ? 'contain' : 'cover';
     const iconSize = iconStyle.size || iconStyle.imgSize || [size, size];
 
@@ -201,11 +201,13 @@ export const renderIcon = {
         'margin-top': marginTop
       });
     }
-    return `<img class="${fit}" src="${iconStyle.src}" style="${style}" alt="Lager ikon"/>`;
+    const srcAttribute = lazy ? `data-legend-src="${iconStyle.src}"` : `src="${iconStyle.src}"`;
+    return `<img class="${fit}" ${srcAttribute} style="${style}" alt="Lager ikon"/>`;
   },
-  Image(iconStyle) {
+  Image(iconStyle, { lazy = false } = {}) {
     const fit = iconStyle.fit ? 'contain' : 'cover';
-    return `<img class="${fit}" src="${iconStyle.src}" alt="Lager ikon"/>`;
+    const srcAttribute = lazy ? `data-legend-src="${iconStyle.src}"` : `src="${iconStyle.src}"`;
+    return `<img class="${fit}" ${srcAttribute} alt="Lager ikon"/>`;
   },
   Text(color) {
     const fill = color ? `fill: ${color};` : 'fill: #000;';
