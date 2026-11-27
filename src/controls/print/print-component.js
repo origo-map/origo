@@ -422,7 +422,12 @@ const PrintComponent = function PrintComponent(options = {}) {
       printSettings.on('change:resolution', this.changeResolution.bind(this));
       printSettings.on('change:scale', this.changeScale.bind(this));
       printSettings.on('change:showscale', this.toggleScale.bind(this));
-      closeButton.on('click', this.close.bind(this));
+      closeButton.on('click', function() {
+        this.close();
+        viewer.getLayersByProperty('type', 'WMS').forEach(function(layer) {
+          layer.getSource().refresh();
+        });
+      }.bind(this));
     },
     changeDescription(evt) {
       description = evt.value;
