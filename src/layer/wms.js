@@ -4,6 +4,8 @@ import tile from './tile';
 import maputils from '../maputils';
 import image from './image';
 
+const LEGEND_FORMAT = 'image/png';
+
 function createTileSource(options) {
   const sourceOptions = {
     attributions: options.attribution,
@@ -85,13 +87,17 @@ function createWmsStyle({ wmsOptions, source, viewer, initialStyle = false }) {
   let styleName;
 
   if (newStyle.defaultWMSServerStyle) {
-    getLegendString = source.getLegendUrl(maxResolution, legendParams);
+    getLegendString = source.getLegendUrl(maxResolution, {
+      ...legendParams,
+      FORMAT: LEGEND_FORMAT
+    });
     getLegendJson = source.getLegendUrl(maxResolution, Object.assign({}, legendParams, { FORMAT: 'application/json' }));
     styleName = `${wmsOptions.name}_WMSServerDefault`;
   } else {
     getLegendString = source.getLegendUrl(maxResolution, {
-      STYLE: newStyle.style,
-      ...legendParams
+      ...legendParams,
+      FORMAT: LEGEND_FORMAT,
+      STYLE: newStyle.style
     });
     getLegendJson = source.getLegendUrl(maxResolution, Object.assign({}, legendParams, { FORMAT: 'application/json' }));
     styleName = newStyle.style;
