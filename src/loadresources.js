@@ -30,18 +30,23 @@ function restorePermalink(storeMethod) {
 }
 
 const loadSvgSprites = function loadSvgSprites(config) {
-  const svgSprites = config.svgSprites;
+  const svgSprites = config.svgSprites || [];
   const svgPath = config.svgSpritePath;
-  const svgPromises = [];
-  svgSprites.forEach((sprite) => {
-    const promise = fetch(svgPath + sprite).then(res => res.text()).then((data) => {
+  return svgSprites.map(sprite => fetch(svgPath + sprite)
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error(`${res.status} ${res.statusText}`);
+      }
+      return res.text();
+    })
+    .then((data) => {
       const div = document.createElement('div');
       div.innerHTML = data;
       document.body.insertBefore(div, document.body.childNodes[0]);
-    });
-    svgPromises.push(promise);
-    return svgPromises;
-  });
+    })
+    .catch((error) => {
+      console.warn(`Could not load svg sprite ${svgPath + sprite}`, error);
+    }));
 };
 
 const loadResources = async function loadResources(mapOptions, config) {
