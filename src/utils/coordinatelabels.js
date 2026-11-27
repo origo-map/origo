@@ -84,7 +84,14 @@ export default function CoordinateLabels({
       return textStyle;
     }
   });
-  labelLayer.setMap(map);
+  let attached = false;
+
+  function setAttached(attach) {
+    if (attach === attached) return;
+    attached = attach;
+    labelLayer.setMap(attach ? map : null);
+  }
+
   // Used without a position control, or before it is added: two decimals for meters, six for degrees
   const formatXY = createStringXY(map.getView().getProjection().getUnits() === 'degrees' ? 6 : 2);
 
@@ -96,11 +103,14 @@ export default function CoordinateLabels({
 
   // Draws the labels. Returns true if there are too many vertices in the view to show their labels.
   function drawLabels() {
-    source.clear();
+    if (source.getFeatures().length > 0) source.clear();
     const view = map.getView();
     // isVisible also checks minZoom/maxZoom, so the labels are hidden when the layer is zoomed out of range
     const shown = [...layers].filter(layer => layer.get('showCoordinates') && layer.isVisible(view));
-    if (shown.length === 0) return false;
+    if (shown.length === 0) {
+      setAttached(false);
+      return false;
+    }
     const viewExtent = view.calculateExtent(map.getSize());
     const vertices = [];
     const tooMany = shown.some((layer) => layer.getSource().getFeatures().some((feature) => getVertices(feature.getGeometry()).some((vertex) => {
@@ -108,8 +118,12 @@ export default function CoordinateLabels({
       vertices.push(vertex);
       return vertices.length > maxLabels;
     })));
-    if (tooMany) return true;
+    if (tooMany || vertices.length === 0) {
+      setAttached(false);
+      return tooMany;
+    }
     source.addFeatures(vertices.map(([coordinates, hasZ]) => new Feature({ geometry: new Point(coordinates), text: getText(coordinates, hasZ) })));
+    setAttached(true);
     return false;
   }
 

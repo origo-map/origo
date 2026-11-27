@@ -66,7 +66,9 @@ const Layer = function Layer(optOptions, viewer) {
 
   if (layerOptions.type) {
     const layer = layerType[layerOptions.type](layerOptions, viewer);
-    layer.once('postrender', onChangeVisible);
+    if (layerOptions.css) {
+      layer.once('postrender', onChangeVisible);
+    }
     return layer;
   }
 
