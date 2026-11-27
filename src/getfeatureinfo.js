@@ -54,9 +54,12 @@ function createSelectedItem(feature, layer, map, groupLayers, localization) {
 async function getFeatureInfoUrl({
   coordinate,
   resolution,
-  projection
+  projection,
+  forceFormat
 }, layer, viewer, textHtmlHandler) {
-  if (layer.get('infoFormat') === 'text/html') {
+  const format = forceFormat || layer.get('infoFormat');
+
+  if (format === 'text/html') {
     const mapSource = viewer.getMapSource();
     const sourceName = layer.get('sourceName');
     const WMSServerType = mapSource[sourceName].type.toLowerCase();
@@ -143,9 +146,8 @@ async function getFeatureInfoUrl({
     return features;
   }
 
-  if (layer.get('infoFormat') === 'application/geo+json' || layer.get('infoFormat') === 'application/geojson') {
-    const infoFormat = layer.get('infoFormat');
-    const formatArr = [...new Set([infoFormat, 'application/geo+json', 'application/geojson', 'application/json'])];
+  if (format === 'application/geo+json' || format === 'application/geojson') {
+    const formatArr = [...new Set([format, layer.get("infoFormat"), 'application/geo+json', 'application/geojson', 'application/json'])];
     let text;
     for (let i = 0; i < formatArr.length; i += 1) {
       const format = formatArr[i];
@@ -233,7 +235,7 @@ function getAGSIdentifyUrl({ layer, coordinate }, viewer) {
   }).catch(error => console.error(error));
 }
 
-function getGetFeatureInfoRequest({ layer, coordinate }, viewer, textHtmlHandler) {
+function getGetFeatureInfoRequest({ layer, coordinate, forceFormat }, viewer, textHtmlHandler) {
   const layerType = layer.get('type');
   const obj = {};
   const projection = viewer.getProjection();
@@ -245,23 +247,23 @@ function getGetFeatureInfoRequest({ layer, coordinate }, viewer, textHtmlHandler
       if (layer.get('featureinfoLayer')) {
         const featureinfoLayerName = layer.get('featureinfoLayer');
         const featureinfoLayer = viewer.getLayer(featureinfoLayerName);
-        return getGetFeatureInfoRequest({ layer: featureinfoLayer, coordinate }, viewer);
+        return getGetFeatureInfoRequest({ layer: featureinfoLayer, coordinate, forceFormat }, viewer, textHtmlHandler);
       }
       break;
     case 'WMS':
       if (layer.get('featureinfoLayer')) {
         const featureinfoLayerName = layer.get('featureinfoLayer');
         const featureinfoLayer = viewer.getLayer(featureinfoLayerName);
-        return getGetFeatureInfoRequest({ layer: featureinfoLayer, coordinate }, viewer);
+        return getGetFeatureInfoRequest({ layer: featureinfoLayer, coordinate, forceFormat }, viewer, textHtmlHandler);
       }
       obj.cb = 'GEOJSON';
-      obj.fn = getFeatureInfoUrl({ coordinate, resolution, projection }, layer, viewer, textHtmlHandler);
+      obj.fn = getFeatureInfoUrl({ coordinate, resolution, projection, forceFormat }, layer, viewer, textHtmlHandler);
       return obj;
     case 'AGS_TILE':
       if (layer.get('featureinfoLayer')) {
         const featureinfoLayerName = layer.get('featureinfoLayer');
         const featureinfoLayer = viewer.getLayer(featureinfoLayerName);
-        return getGetFeatureInfoRequest({ layer: featureinfoLayer, coordinate }, viewer);
+        return getGetFeatureInfoRequest({ layer: featureinfoLayer, coordinate, forceFormat }, viewer, textHtmlHandler);
       }
       obj.fn = getAGSIdentifyUrl({ layer, coordinate }, viewer);
       return obj;
@@ -275,7 +277,8 @@ function getGetFeatureInfoRequest({ layer, coordinate }, viewer, textHtmlHandler
 function getFeatureInfoRequests({
   coordinate,
   pixel,
-  layers
+  layers,
+  forceFormat
 }, viewer, textHtmlHandler) {
   const imageFeatureInfoMode = viewer.getViewerOptions().featureinfoOptions.imageFeatureInfoMode || 'pixel';
   const requests = [];
@@ -314,12 +317,12 @@ function getFeatureInfoRequests({
     if (imageInfoMode === 'pixel') {
       const pixelVal = layer.getData(pixel);
       if (pixelVal instanceof Uint8ClampedArray && pixelVal[3] > 0) {
-        item = getGetFeatureInfoRequest({ layer, coordinate }, viewer, textHtmlHandler);
+        item = getGetFeatureInfoRequest({ layer, coordinate, forceFormat }, viewer, textHtmlHandler);
       }
     } else if ((imageInfoMode === 'visible') && (layer.get('visible') === true)) {
-      item = getGetFeatureInfoRequest({ layer, coordinate }, viewer, textHtmlHandler);
+      item = getGetFeatureInfoRequest({ layer, coordinate, forceFormat }, viewer, textHtmlHandler);
     } else if (imageInfoMode === 'always') {
-      item = getGetFeatureInfoRequest({ layer, coordinate }, viewer, textHtmlHandler);
+      item = getGetFeatureInfoRequest({ layer, coordinate, forceFormat }, viewer, textHtmlHandler);
     }
     if (item) {
       requests.push(item);
