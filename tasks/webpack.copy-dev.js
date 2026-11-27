@@ -22,7 +22,8 @@ module.exports = merge(common, {
         'data/*',
         'index.html',
         'index.json',
-        'img/**'
+        'img/**',
+        'guide.json'
       ]
     })
   ]
